@@ -1,0 +1,1 @@
+from railpminer.experiments.permutations import create_all_permutations
