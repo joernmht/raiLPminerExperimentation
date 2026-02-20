@@ -15,9 +15,13 @@ def apply_selection_criteria(df_full, df_filtered, group_column, criteria, resul
         result_column_name: Name of the new column to add.
 
     Returns:
-        DataFrame with new column containing selection reasons or ``"none"``.
+        Tuple of (df_full, df_expanded) where:
+        - df_full: DataFrame with new column (last criterion wins on overlap).
+        - df_expanded: DataFrame containing one row per fulfilled criterion
+          (duplicates the row when a MILP matches multiple criteria).
     """
     df_full[result_column_name] = 'none'
+    expanded_rows = []
 
     for group_value in df_filtered[group_column].unique():
         group_df = df_filtered[df_filtered[group_column] == group_value]
@@ -41,4 +45,10 @@ def apply_selection_criteria(df_full, df_filtered, group_column, criteria, resul
 
             df_full.at[idx, result_column_name] = reason
 
-    return df_full
+            row = df_full.loc[idx].copy()
+            row[result_column_name] = reason
+            expanded_rows.append(row)
+
+    df_expanded = pd.DataFrame(expanded_rows)
+
+    return df_full, df_expanded
