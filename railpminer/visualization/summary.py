@@ -48,7 +48,7 @@ def display_model_summary(df: pd.DataFrame, index: int = 0):
         </div>
         <h4>Complexity Metrics:</h4>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div><strong>Minimal Complexity:</strong> {row['minimal_complexity']:.2f}</div>
+            <div><strong>Minimal Size:</strong> {row['minimal_size']:.2f}</div>
             <div><strong>Graph Diameter:</strong> {row['graph_diameter']:.0f}</div>
             <div><strong>Constraint/Variable Ratio:</strong> {row['constraint_variable_ratio']:.2f}</div>
             <div><strong>Model Coherence:</strong> {'V' if row['model_coherence'] == 1 else 'X'}</div>

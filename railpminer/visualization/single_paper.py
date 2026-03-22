@@ -1,10 +1,12 @@
 """Single-paper selected MILP visualization."""
 
+import textwrap
 from typing import Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+from matplotlib.patches import FancyBboxPatch
 
 from railpminer.visualization.graphviz_utils import (
     create_manual_tree_layout,
@@ -17,7 +19,7 @@ def visualize_single_paper_selected(
     paper_name: str,
     analysis_column: str = 'analysis_parameter',
     save_path: str = None,
-    figsize_per_cell: Tuple[int, int] = (5, 5),
+    figsize_per_cell: Tuple[int, int] = (5, 10),
 ):
     """Visualize selected MILPs for a single paper in a 1-row layout.
 
@@ -38,10 +40,10 @@ def visualize_single_paper_selected(
         return
 
     reason_order = [
+        'High Minimal Size',
+        'Low Minimal Size',
         'High Constraint Variable Ratio',
         'High Graph Diameter',
-        'High Minimal Complexity',
-        'Low Minimal Complexity',
     ]
     df_selected['_sort_key'] = df_selected[analysis_column].apply(
         lambda x: reason_order.index(x) if x in reason_order else 99
@@ -133,38 +135,46 @@ def visualize_single_paper_selected(
                 node_shape='D', node_size=600, alpha=0.8, ax=ax,
             )
         nx.draw_networkx_labels(
-            G, pos, labels=node_labels, font_size=7, font_weight='bold', ax=ax,
+            G, pos, labels=node_labels, font_size=8, font_weight='bold', ax=ax,
         )
 
         ax.axis('off')
 
-        display_reason = (
-            selection_reason.replace(" ", "\n", 1)
-            if len(selection_reason) > 20
-            else selection_reason
+        # Header box (fixed size for uniform appearance)
+        display_reason = textwrap.fill(selection_reason, width=18)
+        box = FancyBboxPatch(
+            (0.04, 1.04), 0.92, 0.22,
+            transform=ax.transAxes,
+            boxstyle="round,pad=0.02",
+            facecolor='#f0f0f0', edgecolor='#cccccc', alpha=0.9,
+            clip_on=False,
         )
-        ax.annotate(
-            display_reason, xy=(0.5, 1.08), xycoords='axes fraction',
-            ha='center', va='bottom', fontsize=11, fontweight='bold',
-            bbox=dict(
-                boxstyle="round,pad=0.4", facecolor='#f0f0f0',
-                edgecolor='#cccccc', alpha=0.9,
-            ),
+        ax.add_patch(box)
+        ax.text(
+            0.5, 1.15, display_reason,
+            transform=ax.transAxes, ha='center', va='center',
+            fontsize=24, fontweight='bold', clip_on=False,
         )
 
+        # Info box (fixed size for uniform appearance)
         model_name = str(row_data.get('model', ''))
         temperature = row_data.get('temperature', '')
         workflow = str(row_data.get('workflow', ''))
         model_display = model_name.replace('_', ' ').title() if model_name else 'N/A'
 
         info_text = f"LLM: {model_display}\nTemperature: {temperature}\nWorkflow: {workflow}"
-        ax.annotate(
-            info_text, xy=(0.5, -0.05), xycoords='axes fraction',
-            ha='center', va='top', fontsize=9,
-            bbox=dict(
-                boxstyle="round,pad=0.4", facecolor='#f7f7f7',
-                edgecolor='#dddddd', alpha=0.8,
-            ),
+        box = FancyBboxPatch(
+            (0.04, -0.28), 0.92, 0.24,
+            transform=ax.transAxes,
+            boxstyle="round,pad=0.02",
+            facecolor='#f7f7f7', edgecolor='#dddddd', alpha=0.8,
+            clip_on=False,
+        )
+        ax.add_patch(box)
+        ax.text(
+            0.5, -0.16, info_text,
+            transform=ax.transAxes, ha='center', va='center',
+            fontsize=24, clip_on=False,
         )
 
     plt.tight_layout(rect=[0, 0.08, 1, 0.92])

@@ -19,7 +19,7 @@ def calculate_complexity_metrics(
         connections: List of ``[equation_number, variable_number]`` pairs.
 
     Returns:
-        Dictionary with ``minimal_complexity``, ``graph_diameter``,
+        Dictionary with ``minimal_size``, ``graph_diameter``,
         ``constraint_variable_ratio``, ``model_coherence``,
         ``model_completeness``, ``constraint_count``, ``variable_count``.
     """
@@ -47,7 +47,7 @@ def calculate_complexity_metrics(
 
     nV_min = n_variables if n_variables > 0 else 1
     nC_min = n_constraints if n_constraints > 0 else 1
-    metrics['minimal_complexity'] = nV_min * nC_min
+    metrics['minimal_size'] = nV_min * nC_min
     metrics['constraint_count'] = n_constraints
     metrics['variable_count'] = n_variables
 
@@ -104,7 +104,7 @@ def add_complexity_metrics(df: pd.DataFrame) -> pd.DataFrame:
     df_copy = df.copy()
 
     metric_names = [
-        'minimal_complexity', 'graph_diameter', 'constraint_variable_ratio',
+        'minimal_size', 'graph_diameter', 'constraint_variable_ratio',
         'model_coherence', 'model_completeness', 'model_naivety',
     ]
     for metric in metric_names:
@@ -182,7 +182,7 @@ def analyze_lp_models(
     if show_summary and len(df_processed) > 0:
         print("\n=== Summary Statistics ===")
         metric_cols = [
-            'minimal_complexity', 'graph_diameter',
+            'minimal_size', 'graph_diameter',
             'constraint_variable_ratio', 'model_coherence',
             'model_completeness', 'model_naivety',
         ]
