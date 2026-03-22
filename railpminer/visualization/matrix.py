@@ -1,11 +1,13 @@
 """Matrix-layout graph visualizations (papers x selection reasons)."""
 
 import ast
+import textwrap
 from typing import Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
+from matplotlib.patches import FancyBboxPatch
 
 from railpminer.visualization.graphviz_utils import (
     create_manual_tree_layout,
@@ -88,7 +90,7 @@ def _draw_standard_nodes(ax, G, pos, variable_nodes, objective_nodes, constraint
             node_shape='D', node_size=node_size, alpha=0.8, ax=ax,
         )
     nx.draw_networkx_labels(
-        G, pos, labels=node_labels, font_size=7, font_weight='bold', ax=ax,
+        G, pos, labels=node_labels, font_size=8, font_weight='bold', ax=ax,
     )
 
 
@@ -278,7 +280,15 @@ def visualize_paper_matrix_selected(
         return
 
     unique_papers = sorted(df_selected['paper'].unique())
-    unique_selection_reasons = sorted(df_selected['selection_reason'].unique())
+    reason_order = [
+        'High Minimal Size',
+        'Low Minimal Size',
+        'High Constraint Variable Ratio',
+        'High Graph Diameter',
+    ]
+    present_reasons = set(df_selected['selection_reason'].unique())
+    unique_selection_reasons = [r for r in reason_order if r in present_reasons] + \
+        sorted(present_reasons - set(reason_order))
 
     n_rows = len(unique_papers)
     n_cols = len(unique_selection_reasons)
@@ -332,22 +342,42 @@ def visualize_paper_matrix_selected(
             _draw_standard_nodes(ax, G, pos, variable_nodes, objective_nodes, constraint_nodes, node_labels)
             ax.axis('off')
 
+    # Column headers — fixed-size boxes
     for col_idx, selection_reason in enumerate(unique_selection_reasons):
-        axes[0][col_idx].annotate(
-            selection_reason, xy=(0.5, 1.15), xycoords='axes fraction',
-            ha='center', va='bottom', fontsize=11, fontweight='bold',
-            bbox=dict(boxstyle="round,pad=0.3", facecolor='#f0f0f0',
-                      edgecolor='#cccccc', alpha=0.9),
+        ax = axes[0][col_idx]
+        wrapped = textwrap.fill(selection_reason, width=16)
+        box = FancyBboxPatch(
+            (0.04, 1.04), 0.92, 0.22,
+            transform=ax.transAxes,
+            boxstyle="round,pad=0.02",
+            facecolor='#f0f0f0', edgecolor='#cccccc', alpha=0.9,
+            clip_on=False,
+        )
+        ax.add_patch(box)
+        ax.text(
+            0.5, 1.15, wrapped,
+            transform=ax.transAxes, ha='center', va='center',
+            fontsize=20, fontweight='bold', clip_on=False,
         )
 
+    # Row labels — fixed-size boxes
     for row_idx, paper in enumerate(unique_papers):
-        axes[row_idx][0].annotate(
-            paper.replace('_', ' '), xy=(-0.15, 0.5),
-            xycoords='axes fraction', ha='right', va='center',
-            fontsize=12, fontweight='bold',
+        ax = axes[row_idx][0]
+        box = FancyBboxPatch(
+            (-0.30, 0.10), 0.20, 0.80,
+            transform=ax.transAxes,
+            boxstyle="round,pad=0.02",
+            facecolor='#f0f0f0', edgecolor='#cccccc', alpha=0.9,
+            clip_on=False,
+        )
+        ax.add_patch(box)
+        ax.text(
+            -0.20, 0.5, paper.replace('_', ' '),
+            transform=ax.transAxes, ha='center', va='center',
+            fontsize=20, fontweight='bold', rotation=90, clip_on=False,
         )
 
-    plt.tight_layout(rect=[0.08, 0, 1, 0.94])
+    plt.tight_layout(rect=[0.10, 0, 1, 0.94])
 
     if save_path:
         fig.savefig(save_path, dpi=300, bbox_inches='tight')

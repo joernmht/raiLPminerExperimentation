@@ -223,9 +223,9 @@ def generate_constraint_tables_per_paper(
     }
 
     attribute_columns = [
-        'Low Minimal Complexity',
+        'Low Minimal Size',
         'High Graph Diameter',
-        'High Minimal Complexity',
+        'High Minimal Size',
         'High Constraint Variable Ratio',
     ]
 

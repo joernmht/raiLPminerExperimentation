@@ -17,11 +17,12 @@ def create_advanced_scatter_analysis(
     annotation_threshold=1,
     save_path=None,
     title_suffix="",
-    bottom_margin=0.15,
+    bottom_margin=0.20,
     title=False,
     legend=False,
     cols=4,
     category_order=None,
+    font_size=20,
 ):
     """Enhanced scatter analysis with coherence/completeness highlighting.
 
@@ -53,30 +54,37 @@ def create_advanced_scatter_analysis(
         categories = df[category_col].unique()
     n_categories = len(categories)
 
+    # Always use the full cols-wide grid so all figures share the same width;
+    # unused cells are left as blank space (axis off), acting as padding.
     if n_categories <= cols:
-        n_cols, n_rows = cols, 1
-        default_figsize = (cols * n_categories, 6)
+        n_cols = cols
+        n_rows = 1
+        default_figsize = (5 * cols, 6)
     elif n_categories <= cols * 2:
         n_cols, n_rows = cols, 2
-        default_figsize = (19, 12)
+        default_figsize = (5 * cols, 10)
     else:
         n_cols = cols
         n_rows = int(np.ceil(n_categories / cols))
-        default_figsize = (10, 5 * n_rows + 2)
+        default_figsize = (5 * cols, 5 * n_rows)
 
     figsize = figsize or default_figsize
+    # No sharey (causes gray dots to disappear) and no width_ratios (causes
+    # first column to be wider). Tick labels are hidden manually below.
     fig, axes = plt.subplots(n_rows, n_cols, figsize=figsize)
 
     if n_categories == 1:
         axes = [axes]
     elif n_rows == 1:
-        axes = axes if n_categories > 1 else [axes]
+        axes = list(axes) if n_categories > 1 else [axes]
     else:
         axes = axes.flatten()
 
+    FONT_SIZE = font_size
     max_frequency = 0
 
     for i, category in enumerate(categories):
+        col_idx = i % n_cols
         category_data = df[df[category_col] == category]
 
         freq_data = category_data.groupby([x_col, y_col]).agg({
@@ -110,13 +118,24 @@ def create_advanced_scatter_analysis(
                 edgecolors='darkblue', linewidth=0.5, zorder=2,
             )
 
-        axes[i].set_xlim(0, 25)
+        axes[i].set_xlim(0, 20)
         axes[i].set_ylim(0, 15)
-        axes[i].set_xlabel(x_col.replace('_', ' ').title(), fontsize=18)
-        axes[i].set_ylabel(y_col.replace('_', ' ').title(), fontsize=18)
+        axes[i].set_yticks([0, 5, 10, 15])
+        axes[i].set_xticks([0, 5, 10, 15])
+        axes[i].tick_params(axis='both', labelsize=FONT_SIZE)
+        axes[i].set_xlabel(x_col.replace('_', ' ').title(), fontsize=FONT_SIZE)
+        # Show y-axis label and tick numbers only on the first column of each row
+        if col_idx == 0:
+            axes[i].set_ylabel(y_col.replace('_', ' ').title(), fontsize=FONT_SIZE)
+        else:
+            axes[i].set_ylabel('')
+            axes[i].tick_params(labelleft=False)
+            # Hide the "0" x-tick label so it does not visually merge with the
+            # right edge of the adjacent plot when wspace=0
+            axes[i].xaxis.get_major_ticks()[0].label1.set_visible(False)
         axes[i].set_title(
             f'{category_col.title()}: {category}',
-            fontsize=18, fontweight='bold',
+            fontsize=FONT_SIZE, fontweight='bold',
         )
         axes[i].grid(True, alpha=0.3, zorder=0)
 
@@ -131,17 +150,22 @@ def create_advanced_scatter_analysis(
         if title_suffix:
             main_title += f' - {title_suffix}'
         plt.suptitle(
-            main_title, fontsize=18, fontweight='bold',
+            main_title, fontsize=FONT_SIZE, fontweight='bold',
             x=figsize[0] * 0.009,
         )
 
-    plt.tight_layout(rect=[0, bottom_margin, 1, 0.96])
+    # Reserve top space only when a suptitle is present
+    top = 0.94 if title else 1.0
+    plt.tight_layout(rect=[0, bottom_margin, 1, top])
+    # Close horizontal gaps between adjacent plots; tight_layout's wspace is
+    # overridden here so plots appear as a seamless row
+    fig.subplots_adjust(wspace=0)
 
     if legend:
-        legend_y = 0.08
+        legend_y = 0.10  # raised from 0.08 for breathing room below the plots
 
         size_legend_ax = fig.add_axes(
-            [0.15, legend_y - 0.02, 0.30, 0.08], frameon=False,
+            [0.15, legend_y - 0.02, 0.30, 0.09], frameon=False,
         )
         size_legend_ax.axis('off')
 
@@ -156,23 +180,23 @@ def create_advanced_scatter_analysis(
             )
             size_legend_ax.text(
                 x_positions[si], 0.01, label,
-                ha='center', va='top', fontsize=18,
+                ha='center', va='top', fontsize=FONT_SIZE,
             )
 
         size_legend_ax.text(
-            0.5, 0.9, 'Frequency', ha='center', va='bottom',
-            fontsize=18, fontweight='bold',
+            0.5, 0.95, 'Frequency', ha='center', va='bottom',
+            fontsize=FONT_SIZE, fontweight='bold',
         )
         size_legend_ax.set_xlim(0, 1)
         size_legend_ax.set_ylim(0, 1)
 
         ring_legend_ax = fig.add_axes(
-            [0.55, legend_y - 0.02, 0.30, 0.08], frameon=False,
+            [0.55, legend_y - 0.02, 0.30, 0.09], frameon=False,
         )
         ring_legend_ax.axis('off')
 
         ring_legend_ax.scatter(0.25, 0.5, s=150, c='#808080', alpha=0.5, edgecolors='none')
-        ring_legend_ax.text(0.1, 0.01, 'All values', ha='center', va='top', fontsize=18)
+        ring_legend_ax.text(0.1, 0.01, 'All values', ha='center', va='top', fontsize=FONT_SIZE)
 
         ring_legend_ax.scatter(0.75, 0.5, s=150, c='#808080', alpha=0.5, edgecolors='none')
         ring_legend_ax.scatter(
@@ -181,12 +205,12 @@ def create_advanced_scatter_analysis(
         )
         ring_legend_ax.text(
             0.9, 0.01, 'Accepted (Coherence=1 & Completeness=1)',
-            ha='center', va='top', fontsize=18,
+            ha='center', va='top', fontsize=FONT_SIZE,
         )
 
         ring_legend_ax.text(
             0.5, 0.95, 'MILP acceptance', ha='center', va='bottom',
-            fontsize=18, fontweight='bold',
+            fontsize=FONT_SIZE, fontweight='bold',
         )
         ring_legend_ax.set_xlim(0, 1)
         ring_legend_ax.set_ylim(0, 1)

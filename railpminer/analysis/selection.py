@@ -29,20 +29,27 @@ def apply_selection_criteria(df_full, df_filtered, group_column, criteria, resul
         if len(group_df) == 0:
             continue
 
+        used_indices = set()
+
         for column_name, operation in criteria:
+            available_df = group_df.drop(index=list(used_indices), errors='ignore')
+            if available_df.empty:
+                continue
+
             if operation == 'max':
-                idx = group_df[column_name].idxmax()
+                idx = available_df[column_name].idxmax()
                 reason = f'High {column_name.replace("_", " ").title()}'
             elif operation == 'min':
-                idx = group_df[column_name].idxmin()
+                idx = available_df[column_name].idxmin()
                 reason = f'Low {column_name.replace("_", " ").title()}'
             elif operation == 'avg':
-                mean_val = group_df[column_name].mean()
-                idx = (group_df[column_name] - mean_val).abs().idxmin()
+                mean_val = available_df[column_name].mean()
+                idx = (available_df[column_name] - mean_val).abs().idxmin()
                 reason = f'Average {column_name.replace("_", " ").title()}'
             else:
                 continue
 
+            used_indices.add(idx)
             df_full.at[idx, result_column_name] = reason
 
             row = df_full.loc[idx].copy()

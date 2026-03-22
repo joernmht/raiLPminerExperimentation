@@ -54,16 +54,18 @@ def create_manual_tree_layout(G):
         levels[node_type].append(node_id)
 
     if levels['objective']:
-        pos[levels['objective'][0]] = (0, 2)
+        pos[levels['objective'][0]] = (0, 4)
 
     variable_count = len(levels['variable'])
-    for i, node in enumerate(levels['variable']):
-        x = (i - variable_count / 2 + 0.5) * 2
-        pos[node] = (x, 1)
-
     constraint_count = len(levels['constraint'])
+
     for i, node in enumerate(levels['constraint']):
-        x = (i - constraint_count / 2 + 0.5) * 3
-        pos[node] = (x, 0)
+        x = -15+(30*i/(constraint_count-1))
+        pos[node] = (x, 0)    
+
+    
+    for i, node in enumerate(levels['variable']):
+        x= -15+(30*i/(variable_count-1))
+        pos[node] = (x, 2)
 
     return pos
