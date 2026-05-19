@@ -1,4 +1,17 @@
-"""Central configuration for raiLPminer. No LLM API calls at import time."""
+"""Central configuration for raiLPminer.
+
+No LLM API calls happen at import time: the model registry stores *factories*,
+not live client objects.  A factory is only invoked when :func:`get_model` is
+called for that key.
+
+Open-source model focus
+-----------------------
+All generation models are open-weight models served through an
+OpenAI-compatible aggregator (OpenRouter by default).  This keeps the
+pydantic-ai ``Agent`` code unchanged while making every result reproducible
+with publicly available weights.  Set ``OPENROUTER_API_KEY`` (or point
+``OPENROUTER_BASE_URL`` at a local vLLM/Ollama OpenAI endpoint) to run them.
+"""
 
 import os
 from pathlib import Path
@@ -8,75 +21,80 @@ PACKAGE_DIR = Path(__file__).parent
 PROJECT_ROOT = PACKAGE_DIR.parent
 TABLES_DIR = PROJECT_ROOT / "tables"
 FIGS_DIR = PROJECT_ROOT / "figs"
+INPUTS_DIR = PROJECT_ROOT / "inputs"
+BENCHMARKS_DIR = PROJECT_ROOT / "benchmarks"
 
 DEFAULT_CSV = "experiment_results_metrics_corrected_selected.csv"
 
+# OpenAI-compatible aggregator endpoint.  Override OPENROUTER_BASE_URL to use a
+# local server (vLLM/Ollama) hosting the same open-weight models.
+OPENROUTER_BASE_URL = os.getenv(
+    "OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"
+)
+
 
 # ---------------------------------------------------------------------------
-# Lazy model registry — factories, not live objects.  Only instantiated when
-# get_model() is called, so importing this module never hits the network.
+# Open-weight model registry
+#
+# Keys are stable identifiers used throughout the experiment grid; values are
+# the OpenRouter slugs of the corresponding open-weight checkpoints.  Four
+# distinct model families are used so that structural-diversity differences
+# cannot be attributed to a single lineage.
 # ---------------------------------------------------------------------------
 
-def _make_deepseek_v3():
-    from pydantic_ai.models.openai import OpenAIChatModel
-    from pydantic_ai.providers.deepseek import DeepSeekProvider
-    return OpenAIChatModel(
-        'deepseek-chat',
-        provider=DeepSeekProvider(api_key=os.getenv("DEEPSEEK_API_KEY")),
-    )
-
-
-def _make_deepseek_r1():
-    from pydantic_ai.models.openai import OpenAIChatModel
-    from pydantic_ai.providers.deepseek import DeepSeekProvider
-    return OpenAIChatModel(
-        'deepseek-reasoner',
-        provider=DeepSeekProvider(api_key=os.getenv("DEEPSEEK_API_KEY")),
-    )
-
-
-def _make_gemini_flash():
-    from pydantic_ai.models.google import GoogleModel
-    return GoogleModel("gemini-2.5-flash-preview-04-17", provider='google-gla')
-
-
-def _make_gemini_pro():
-    from pydantic_ai.models.google import GoogleModel
-    return GoogleModel('gemini-2.5-pro-preview-05-06', provider='google-gla')
-
-
-def _make_openai41mini():
-    from pydantic_ai.models.openai import OpenAIChatModel
-    return OpenAIChatModel('gpt-4.1-mini')
-
-
-def _make_openai_o4_mini():
-    from pydantic_ai.models.openai import OpenAIChatModel
-    return OpenAIChatModel('o4-mini')
-
-
-MODEL_REGISTRY = {
-    "deepseek_v3": _make_deepseek_v3,
-    "deepseek_r1": _make_deepseek_r1,
-    "gemini_flash": _make_gemini_flash,
-    "gemini_pro": _make_gemini_pro,
-    "openai41mini": _make_openai41mini,
-    "openai_o4_mini": _make_openai_o4_mini,
+OPEN_MODEL_SLUGS = {
+    # key                # OpenRouter slug (open-weight checkpoint)
+    "llama_3_3_70b":      "meta-llama/llama-3.3-70b-instruct",
+    "qwen_2_5_72b":       "qwen/qwen-2.5-72b-instruct",
+    "deepseek_v3":        "deepseek/deepseek-chat",
+    "mistral_small_3":    "mistralai/mistral-small-3.1-24b-instruct",
 }
 
-# Cache so we only create each model once per session
+# Models that do not honour a sampling ``temperature`` argument.  Recorded
+# explicitly instead of silently rewriting temperature values afterwards
+# (see utils.data.annotate_temperature_support).
+MODELS_WITHOUT_TEMPERATURE = set()
+
+
+def _make_open_model(slug):
+    """Build an OpenAI-compatible client for an open-weight model.
+
+    The client talks to the aggregator defined by ``OPENROUTER_BASE_URL``
+    using ``OPENROUTER_API_KEY``.
+    """
+    from pydantic_ai.models.openai import OpenAIChatModel
+    from pydantic_ai.providers.openai import OpenAIProvider
+
+    provider = OpenAIProvider(
+        base_url=OPENROUTER_BASE_URL,
+        api_key=os.getenv("OPENROUTER_API_KEY", "not-set"),
+    )
+    return OpenAIChatModel(slug, provider=provider)
+
+
+# Factories, created lazily so importing this module never touches the network.
+MODEL_REGISTRY = {
+    key: (lambda s=slug: _make_open_model(s))
+    for key, slug in OPEN_MODEL_SLUGS.items()
+}
+
+# Cache so each model is built at most once per session.
 _model_cache = {}
 
 
+def register_model(name, factory):
+    """Register an extra model factory (e.g. a local stub for offline runs)."""
+    MODEL_REGISTRY[name] = factory
+    _model_cache.pop(name, None)
+
+
 def get_model(name):
-    """Get a model instance by name. Creates it lazily on first call.
+    """Return a model instance by name, building it lazily on first use.
 
     Args:
-        name: Key in MODEL_REGISTRY (e.g. ``"openai_o4_mini"``).
-              If it's already a model object (not a string), it's returned as-is.
-
-    Returns:
-        The model object.
+        name: Key in :data:`MODEL_REGISTRY`.  If it is already a model
+              object (not a string) it is returned unchanged, which lets
+              callers inject a stub/test model directly.
     """
     if not isinstance(name, str):
         return name
@@ -85,38 +103,49 @@ def get_model(name):
         if factory is None:
             raise KeyError(
                 f"Unknown model '{name}'. "
-                f"Available: {list(MODEL_REGISTRY.keys())}"
+                f"Available: {sorted(MODEL_REGISTRY)}"
             )
         _model_cache[name] = factory()
     return _model_cache[name]
 
 
 # ---------------------------------------------------------------------------
-# Paper registry — populated at runtime via load_papers()
+# Problem-description registry
+#
+# Inputs are now *problem descriptions* (operational setting, objective and
+# constraints to consider), NOT paper abstracts/introductions.  The legacy
+# ``register_paper`` / ``get_paper`` names are kept as thin aliases so older
+# notebooks keep working.
 # ---------------------------------------------------------------------------
 
-PAPER_REGISTRY = {}
+PROBLEM_REGISTRY = {}
 
 
-def register_paper(name, content):
-    """Register paper content so it can be looked up by name."""
-    PAPER_REGISTRY[name] = content
+def register_problem(name, content):
+    """Register a problem-description text so it can be looked up by name."""
+    PROBLEM_REGISTRY[name] = content
 
 
-def get_paper(name):
-    """Get paper content by name.
+def get_problem(name):
+    """Return problem-description content by name.
 
     Args:
-        name: Key in PAPER_REGISTRY (e.g. ``"Paper_1"``).
-              If it's not a string, it's returned as-is.
+        name: Key in :data:`PROBLEM_REGISTRY`.  Non-string values are
+              returned unchanged.
     """
     if not isinstance(name, str):
         return name
-    content = PAPER_REGISTRY.get(name)
+    content = PROBLEM_REGISTRY.get(name)
     if content is None:
         raise KeyError(
-            f"Unknown paper '{name}'. "
-            f"Registered: {list(PAPER_REGISTRY.keys())}. "
-            f"Use register_paper() or load papers via utils.io.process_inputfiles() first."
+            f"Unknown problem '{name}'. "
+            f"Registered: {sorted(PROBLEM_REGISTRY)}. "
+            f"Load descriptions via utils.io.process_inputfiles() first."
         )
     return content
+
+
+# Backwards-compatible aliases (old code referred to "papers").
+register_paper = register_problem
+get_paper = get_problem
+PAPER_REGISTRY = PROBLEM_REGISTRY

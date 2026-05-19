@@ -1,251 +1,205 @@
 # raiLPminer
 
-**LLM-driven optimization model mining for generating creative railway rescheduling approaches**
+**Graphing as a means of designing MILPs for railway rescheduling — with
+embedded domain classification and solver-grounded validation.**
 
-raiLPminer generates diverse Mixed-Integer Linear Programming (MILP) formulations from unstructured textual descriptions using Large Language Models. It converts generated MILPs into graph representations (LP2Graph) to evaluate structural quality — without solving — and selects a high-diversity subset for further development.
+raiLPminer generates Mixed-Integer Linear Programming (MILP) formulations
+for railway rescheduling from **problem descriptions** using **open-weight**
+LLMs, and tests one focused question:
 
-> **Paper:** Maurischat, J., & Bešinović, N. (2025). *raiLPminer: LLM-driven optimization model mining for generating creative railway rescheduling approaches.* Preprint submitted to Elsevier.
-> Experimental notebooks: [doi:10.5281/zenodo.17460374](https://doi.org/10.5281/zenodo.17460374) · Experimental results: [doi:10.5281/zenodo.17460136](https://doi.org/10.5281/zenodo.17460136)
+> **Hypothesis.** A graph-based depiction of a generated MILP allows
+> identifying flaws *early* in the development process — before any solver
+> is implemented.
+
+Creativity / structural diversity is no longer a goal: temperature is **0**
+and the graph is used as a *design and screening instrument*. Every model is
+**actually solved** on benchmark railway instances (PuLP/CBC; Gurobi
+pluggable later) and checked for operational safety, so the cheap,
+solver-free *graph screen* is measured as a *predictor of real validity*.
 
 ---
 
-## Overview
+## What is new in this version
+
+- **Classification is part of generation and parsing — not a-posteriori.**
+  A comprehensive taxonomy (`analysis/taxonomy.py`) spans the **objective**,
+  the **variables**, the **parameters** (now first-class) and the
+  **constraints**. The LLM tags every element; the deterministic parser
+  reads the tags back. There is no keyword matching anywhere (the old
+  keyword classifier was removed), so domain relevance is *declared and
+  parsed*, never synonym-undercounted.
+- **Three workflows, no feedback loops, temperature 0:**
+
+  | Key | Name | Description |
+  |-----|------|-------------|
+  | `SIM` | Simultaneous | One call emits the fully classified MILP |
+  | `TAF` | Text-Analysis-First | Call 1 classifies the problem text into a domain blueprint; call 2 develops the classified MILP from it (two sequential calls) |
+  | `DC` | Direct-Code (baseline) | One call emits runnable PuLP code **plus** an embedded `CLASSIFICATION` dict, so it is solved *and* reverse-graphed for a like-for-like comparison |
+
+- **Diversity subset selection removed.** The project fully commits to the
+  structural-validation metrics and their measured agreement with the
+  solver ground truth.
+- **No second LLM layer.** Parsing is deterministic for all workflows
+  (strict classified text for SIM/TAF; the embedded `CLASSIFICATION` dict
+  for DC).
+
+## How the original rejection points are addressed
+
+| Reviewer point | Concrete change |
+|---|---|
+| #2/#4 — no solver execution / feasibility / safety | `railpminer.validation`: each MILP → PuLP code → solved on **multiple benchmark instances**; feasibility, optimality, runtime and operational-safety checks (running time, dwell, headway, station capacity) recorded as the ground truth. |
+| #2 — completeness/coherence superficial; content-free model "passed" | They are an explicit *early screen*; their true/false-positive rate is **measured** against the solver truth. The empty-model case is a tracked dry-run test, caught by `graph_parse_ok` and the solver. |
+| #2 — questionable significance | The contribution is a millisecond-cost screen that flags flawed MILPs (incl. **missing safety constraints**) before solver implementation; its early-catch rate is quantified per workflow. |
+| #2 — incomplete reference MILPs | No reference MILP is used; ground truth is solver + safety on shared benchmark instances. |
+| #2 — unfair design / temperature fudge | Balanced, fully-crossed, deterministic factorial design (`build_factorial_design` + `assert_balanced`); temperature fixed at 0 (no creativity), so the temperature inconsistency is gone. |
+| #3.1 — keyword-matching limitation | Keyword matching **removed**; classification is embedded in generation and parsed deterministically from the taxonomy. |
+| #3.2 — hard operator threshold | `detect_milp_artifacts(min_coverage=…)` parameterised and documented (kept only as a coarse pre-filter). |
+| #4.4 — second LLM parser layer | Eliminated: deterministic parser for every workflow. |
+| #4.5 — non-linear abs/products | `analysis/linearity.py` flags them structurally; the solver build independently rejects them; both are compared. |
+
+---
+
+## Pipeline
 
 ```
-Textual Input (paper abstract + intro)
+Problem description
         │
         ▼
-  MILP Development          ← 4 workflows × 4 LLMs × 3 temperatures
-  (ZS / CFC / OE / PS)
+  Generation (SIM / TAF / DC), temperature 0, no feedback loop
+        │            answer = classified MILP text  (SIM/TAF)
+        │                   = PuLP code + CLASSIFICATION (DC)
+        ▼
+  Deterministic classified parse → classified bipartite graph   (no LLM)
         │
         ▼
-  LP2Graph (PydanticAI)     ← textual MILP → bipartite graph
+  Graph screen (cheap, solver-free):
+  parse_ok · complete · coherent · linear · safety_classes
         │
         ▼
-  Analysis & Filtering      ← completeness, coherence, complexity metrics
+  Validation per solving:
+  PuLP code → solve on N benchmark instances →
+  feasibility / optimality / railway-safety   (ground truth)
         │
         ▼
-  High-Diversity Subset     ← 4 selected MILPs spanning the solution space
+  Hypothesis analysis: screen vs solver truth
+  (early-catch / false-alarm / precision; per-workflow comparison)
 ```
 
-**Workflows**
-
-| Key | Name | Description |
-|-----|------|-------------|
-| `ZS` | Zero-Shot | Single prompt, no intermediate steps |
-| `CFC` | Code-First-Chain | Generate solver code first, then extract equations |
-| `OE` | Operator-Expert | Orchestrator–worker with iterative self-review |
-| `PS` | Parallelization-Selection | Multiple parallel ZS calls, best one selected |
-
-**Supported LLMs** (via [PydanticAI](https://docs.pydantic.dev/latest/concepts/pydantic_ai/))
-
-| Key | Model |
-|-----|-------|
-| `openai_o4_mini` | OpenAI o4-mini |
-| `gemini_flash` | Gemini 2.5 Flash |
-| `gemini_pro` | Gemini 2.5 Pro |
-| `deepseek_v3` | DeepSeek V3 |
+**Open-weight models** (OpenAI-compatible aggregator, default OpenRouter;
+set `OPENROUTER_BASE_URL` to a local vLLM/Ollama server to run offline):
+`llama_3_3_70b`, `qwen_2_5_72b`, `deepseek_v3`, `mistral_small_3`.
 
 ---
 
 ## Installation
 
-**Python 3.11+** is required.
+Python 3.11+.
 
 ```bash
-git clone <repo-url>
-cd raiLPminerExperimentation
-
-pip install pydantic-ai pandas tqdm statsmodels plotly ipykernel jupyter
+pip install -r requirements.txt
+export PYTHONPATH="$PWD:$PYTHONPATH"
 ```
 
-Install the package in editable mode:
+Default solver is PuLP's bundled CBC (no setup).
+
+## Quick start — offline dry run (no API key, no network)
 
 ```bash
-pip install -e .
+python examples/dry_run.py
 ```
 
-> If there is no `setup.py` / `pyproject.toml`, add the repo root to your `PYTHONPATH`:
-> ```bash
-> export PYTHONPATH="$PWD:$PYTHONPATH"  # Linux/macOS
-> set PYTHONPATH=%CD%;%PYTHONPATH%       # Windows CMD
-> ```
+Runs the full pipeline on mock data for all three workflows. The combined
+graph screen separates the valid models from the non-linear / infeasible /
+empty / **missing-safety** ones (early-catch 1.0, false-alarm 0.0 on the
+mock set); the per-signal table shows `graph_safety_classes` carries most of
+the signal, and the per-workflow table compares SIM/TAF against the DC
+baseline.
 
----
-
-## API Key Setup
-
-Set the required API keys as environment variables before running any experiment. Only the keys for the models you intend to use are required.
-
-```bash
-# OpenAI (o4-mini)
-export OPENAI_API_KEY="sk-..."
-
-# Google (Gemini Flash / Pro)
-export GOOGLE_API_KEY="AIza..."
-
-# DeepSeek (V3 / R1)
-export DEEPSEEK_API_KEY="..."
-```
-
-On Windows (PowerShell):
-```powershell
-$env:OPENAI_API_KEY = "sk-..."
-$env:GOOGLE_API_KEY = "AIza..."
-$env:DEEPSEEK_API_KEY = "..."
-```
-
----
-
-## Reproducing the Experiments
-
-### Step 1 — Prepare paper inputs
-
-The experiments use the **abstract + introduction** of five railway rescheduling papers as input (pre-MILP sections, stripped of all mathematical formulations). Place each paper's text as a plain `.txt` file in an input directory, one file per paper:
-
-```
-inputs/
-├── paper_1.txt   # Zhan et al. (2016) — high-speed train rescheduling
-├── paper_2.txt   # Application study (no explicit MILP)
-├── paper_3.txt   # Koniorczyk et al. (2025) — heterogeneous urban networks
-├── paper_4.txt   # Pellegrini et al. (2014) — complex junctions
-└── paper_5.txt   # Zhang et al. (2023) — large-scale networks
-```
-
-Load papers into the registry at the start of your notebook:
+## Reproducing the full experiment
 
 ```python
 from railpminer.utils.io import process_inputfiles
-from railpminer.config import register_paper
-
-df_papers = process_inputfiles("inputs/", output_name="Paper", file_suffix=".txt")
-for _, row in df_papers.iterrows():
-    register_paper(row["variable_name"], row["text"])
-```
-
-### Step 2 — Define the parameter grid
-
-**Experiment Set 1** (full parameter sweep on Paper 1):
-
-```python
-from railpminer.experiments.permutations import create_all_permutations
-
-params = {
-    "model":       ["openai_o4_mini", "deepseek_v3", "gemini_flash", "gemini_pro"],
-    "workflow":    ["ZS", "CFC", "OE", "PS"],
-    "temperature": [0.2, 0.6, 1.0],
-    "paper":       ["Paper_1"],
-}
-permutation_df = create_all_permutations(params)
-```
-
-**Experiment Set 2** (fixed setup across all papers):
-
-```python
-params = {
-    "model":       ["openai_o4_mini"],
-    "workflow":    ["ZS"],
-    "temperature": [1.0],
-    "paper":       ["Paper_1", "Paper_2", "Paper_3", "Paper_4", "Paper_5"],
-}
-permutation_df = create_all_permutations(params)
-```
-
-### Step 3 — Run MILP generation
-
-```python
-import asyncio
+from railpminer.config import register_problem
+from railpminer.experiments import build_factorial_design, assert_balanced
 from railpminer.experiments.runner import run_agent_experiments
+from railpminer.analysis.graph_parser import create_graph_columns
+from railpminer.analysis.screen import compute_graph_screen
+from railpminer.validation import validate_dataframe
+from railpminer.analysis.hypothesis import (
+    screen_confusion, evaluate_screen_against_solver, workflow_comparison)
 
-results_df = await run_agent_experiments(permutation_df, num_runs=14)
-# Results are streamed to agent_experiment_results_test.csv
+df_p = process_inputfiles("inputs/", output_name="problem", file_suffix=".txt")
+for _, r in df_p.iterrows():
+    register_problem(r["variable_name"], r["text"])
+
+design = build_factorial_design({
+    "model":    ["llama_3_3_70b", "qwen_2_5_72b",
+                 "deepseek_v3", "mistral_small_3"],
+    "workflow": ["SIM", "TAF", "DC"],
+    "problem":  list(df_p["variable_name"]),
+}, replications=14)                       # temperature fixed at 0
+
+gen = await run_agent_experiments(design)                 # OPENROUTER_API_KEY
+gen = compute_graph_screen(create_graph_columns(gen, "answer"))
+val = await validate_dataframe(gen)                       # codegen + solve
+assert_balanced(val, ["model", "workflow", "problem"])
+
+print(screen_confusion(val))
+print(evaluate_screen_against_solver(val))
+print(workflow_comparison(val))           # SIM/TAF vs DC baseline
 ```
 
-> **Note:** `num_runs=14` reproduces the minimum replication count from the paper. Total planned runs for Experiment Set 1: ≥ 720. Each run consumes LLM API tokens.
+`analysis.ipynb` reproduces the same analysis with figures.
 
-### Step 4 — Run LP2Graph (MILP graphing)
+---
 
-Parse generated MILP text into structured graph representations:
+## Project structure
 
-```python
-from railpminer.experiments.runner import run_graphing_agent
-
-graph_df = await run_graphing_agent(results_df, num_runs=1)
 ```
-
-LP2Graph uses `openai_o4_mini` at `temperature=0.2` by default (precision over creativity).
-
-### Step 5 — Compute metrics and analyze
-
-Open `analysis.ipynb` to reproduce all figures and tables from the paper:
-
-```bash
-jupyter notebook analysis.ipynb
-```
-
-The notebook covers:
-- **Acceptance analysis** (completeness × coherence filtering)
-- **Complexity metrics** (minimal size, graph diameter, constraint-variable ratio)
-- **OLS regression** (effect of LLM, workflow, temperature on output)
-- **High-diversity subset selection** (extremal MILPs across metrics)
-- **Domain-oriented constraint analysis** (keyword matching against railway constraint categories)
-- **Inference time analysis**
-
-To skip re-running the experiments and reproduce the analysis directly, load the published results:
-
-```python
-from railpminer.utils.data import load_experiment_data
-df = load_experiment_data("experiment_results_metrics_corrected_selected.csv")
+railpminer/
+  config.py                 # open-weight registry, problem registry
+  instance_contract.py      # shared instance / build_model / CLASSIFICATION text
+  models/
+    schema.py               # Parameter first-class; domain_class on every element
+    agents.py               # SIM / TAF / DC, temperature 0, no feedback loops
+  experiments/
+    permutations.py         # balanced, deterministic factorial design
+    runner.py               # single-pass generation runner
+  analysis/
+    taxonomy.py             # comprehensive 4-kind domain taxonomy
+    graph_parser.py         # deterministic classified parser (text + DC dict)
+    linearity.py            # structural non-linearity detection
+    metrics.py              # structural complexity metrics
+    screen.py               # cheap solver-free verdict (incl. safety classes)
+    hypothesis.py           # screen vs solver truth; per-workflow comparison
+    milp_detection.py       # coarse operator pre-filter (parameterised)
+  validation/
+    instances.py            # benchmark railway rescheduling instances
+    codegen.py              # classified MILP text → PuLP code (single pass)
+    solve.py                # build + solve + status/runtime
+    railway_checks.py       # running-time / dwell / headway / capacity checks
+    pipeline.py             # → strict solver_valid ground-truth label
+inputs/                     # problem descriptions
+examples/                   # offline dry run + mock data
+analysis.ipynb              # validation & hypothesis analysis
 ```
 
 ---
 
-## Project Structure
+## Known limitations (stated up front)
 
-```
-raiLPminerExperimentation/
-├── railpminer/
-│   ├── config.py              # Model & paper registry, directory layout
-│   ├── models/
-│   │   ├── schema.py          # Pydantic models (Variable, Constraint, ObjectiveFunction, Model)
-│   │   └── agents.py          # Workflow builders (ZS, CFC, OE, PS)
-│   ├── experiments/
-│   │   ├── permutations.py    # Cartesian parameter grid generation
-│   │   └── runner.py          # Async experiment execution & LP2Graph runner
-│   ├── analysis/
-│   │   ├── metrics.py         # Complexity metrics (minimal size, diameter, C/V ratio)
-│   │   ├── milp_detection.py  # Operator coverage pre-filter
-│   │   ├── constraints.py     # Domain-oriented constraint classification
-│   │   ├── selection.py       # High-diversity subset selection logic
-│   │   └── regression.py      # OLS regression helpers
-│   ├── utils/
-│   │   ├── io.py              # File loading, Unicode → ASCII preprocessing
-│   │   └── data.py            # CSV loading, temperature label correction
-│   └── visualization/         # Plotly, Graphviz, scatter, runtime, matrix plots
-├── analysis.ipynb             # Main analysis notebook
-├── experiment_results_metrics_corrected_selected.csv  # Published results (35 MB)
-└── legacy/                    # Earlier notebook versions
-```
-
----
-
-## Citation
-
-If you use raiLPminer in your research, please cite:
-
-```bibtex
-@article{maurischat2025railpminer,
-  title   = {{raiLPminer}: {LLM}-driven optimization model mining for generating
-             creative railway rescheduling approaches},
-  author  = {Maurischat, J{\"o}rn and Be{\v{s}}inovi{\'c}, Nikola},
-  journal = {Preprint submitted to Elsevier},
-  year    = {2025},
-  note    = {Experimental notebooks: \url{https://doi.org/10.5281/zenodo.17460374}.
-             Experimental results: \url{https://doi.org/10.5281/zenodo.17460136}}
-}
-```
-
----
+- Classification quality depends on the LLM tagging correctly; mistags fall
+  into the `other_*` buckets (never silently dropped) and their effect is
+  visible in the measured screen accuracy.
+- The operator pre-filter threshold is an empirical hard cut (parameterised;
+  a dynamic threshold is future work). It is now only a coarse gate, not the
+  domain classifier.
+- Generated solver code is executed — run validation only in an isolated
+  sandbox.
+- Benchmark instances are small, synthetic and deterministic (reproducible
+  without external data); sufficient to detect infeasibility, non-linearity
+  and safety violations, not to benchmark industrial-scale solver
+  performance.
 
 ## License
 

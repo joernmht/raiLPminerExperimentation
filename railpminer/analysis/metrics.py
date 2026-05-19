@@ -1,10 +1,22 @@
-"""Complexity metrics calculation and the main analysis pipeline."""
+"""Complexity metrics and the structural analysis pipeline.
+
+Scope and claim
+---------------
+The metrics here (completeness, coherence, minimal size, diameter,
+constraint/variable ratio) are an **early structural screen**, computed in
+milliseconds with no solver.  They are explicitly NOT a proof of
+mathematical correctness, feasibility or operational safety -- the previous
+reviewers were right that a content-free model can satisfy completeness and
+coherence.  That is the whole point of the revised study: the screen is a
+cheap predictor whose true/false positive rate is *measured* against the
+solver ground truth (see :mod:`railpminer.validation`) instead of being
+presented as validity in itself.
+"""
 
 from typing import Dict, List, Tuple
 
 import networkx as nx
 import pandas as pd
-from IPython.display import display
 
 from railpminer.analysis.graph_parser import create_graph_columns
 
@@ -27,9 +39,13 @@ def calculate_complexity_metrics(
     n_constraints = len([n for n in nodes if n['type'] == 'constraint'])
     n_objectives = len([n for n in nodes if n['type'] == 'objective'])
 
+    # Coherence/diameter concern the equation<->variable structure only;
+    # parameter nodes are linked separately and must not be added here or
+    # they would appear as isolated nodes and break connectivity.
     G = nx.Graph()
     for node in nodes:
-        G.add_node(node['id'])
+        if node['type'] in ('variable', 'objective', 'constraint'):
+            G.add_node(node['id'])
 
     for conn in connections:
         eq_num, var_num = conn
@@ -187,7 +203,11 @@ def analyze_lp_models(
             'model_completeness', 'model_naivety',
         ]
         summary_stats = df_processed[metric_cols].describe()
-        display(summary_stats)
+        try:
+            from IPython.display import display
+            display(summary_stats)
+        except ImportError:
+            print(summary_stats)
 
     if visualize_first and len(df_processed) > 0:
         from railpminer.visualization.summary import display_model_summary

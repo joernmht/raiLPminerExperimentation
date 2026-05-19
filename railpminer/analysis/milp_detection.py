@@ -1,50 +1,67 @@
-"""MILP/LP operator detection in text."""
+"""MILP/LP operator detection -- a coarse pre-filter on raw text.
+
+This detects whether a text even *looks* like an optimisation model by
+counting occurrences of five operator groups (<=, >=, sum, for-all,
+subject-to).  It runs before parsing and is intentionally cheap.
+
+Operator-coverage threshold (Reviewer #3.2)
+-------------------------------------------
+The accept rule is parameterised (:func:`detect_milp_artifacts`,
+``min_coverage``).  The default ``min_coverage=0.5`` means at least 3 of the
+5 operator groups must be present.  This is an **empirical hard threshold**
+with a known edge case: a perfectly valid but small MILP may only use, say,
+summation and ``<=`` (coverage 0.4) and would be rejected here even though
+it is structurally fine.  Because the threshold is a parameter, the
+sensitivity of downstream results to it can be reported, and a *dynamic*
+threshold (e.g. scaled by model size, or learned against the solver ground
+truth) is an explicit future-work direction rather than a hidden constant.
+"""
 
 import re
 
 import pandas as pd
 
+OPERATOR_GROUPS = [
+    [r"<=", r"\\leq", r"leq", r"≤"],
+    [r">=", r"\\geq", r"geq", r"≥"],
+    [r"\\sum", r"sum_", r"∑"],
+    [r"\\forall", r"forall", r"for all", r"for each", r"for any", r"∀"],
+    [r"s\.t\.", r"subject to", r"such that"],
+]
 
-def detect_milp_artifacts(df, text_column='answer'):
-    """Detect typical MILP/LP operators in text.
 
-    Adds two columns:
-    - ``count``: total number of operator occurrences.
-    - ``operator_coverage``: fraction of operator groups present (0.0--1.0).
+def detect_milp_artifacts(df, text_column="answer", min_coverage=0.5):
+    """Add ``count``, ``operator_coverage`` and ``sufficient_operators``.
 
     Args:
-        df: DataFrame containing the text data.
-        text_column: Name of the column to check.
+        df: DataFrame containing the text.
+        text_column: Column to scan.
+        min_coverage: Acceptance threshold on operator-group coverage
+            (fraction of the 5 groups present).  Exposed as a parameter so
+            its effect on the results can be reported; see the module
+            docstring for the hard-threshold edge case.
 
     Returns:
-        DataFrame with added ``count`` and ``operator_coverage`` columns.
+        The DataFrame with three added columns.
     """
-    operator_groups = [
-        [r'<=', r'\\leq', r'leq', r'\u2264'],
-        [r'>=', r'\\geq', r'geq', r'\u2265'],
-        [r'\\sum', r'sum_', r'\u2211'],
-        [r'\\forall', r'forall', r'for all', r'for each', r'for any', r'\u2200'],
-        [r's\.t\.', r'subject to', r'such that'],
-    ]
-
-    total_groups = len(operator_groups)
+    total_groups = len(OPERATOR_GROUPS)
 
     def analyze_text(text):
         text = str(text)
-        total_count = 0
-        for group in operator_groups:
-            for pattern in group:
-                total_count += len(re.findall(pattern, text))
-
-        groups_present = 0
-        for group in operator_groups:
-            if any(re.search(pattern, text) for pattern in group):
-                groups_present += 1
-
-        coverage = groups_present / total_groups
-        return total_count, coverage
+        total_count = sum(
+            len(re.findall(p, text))
+            for group in OPERATOR_GROUPS
+            for p in group
+        )
+        groups_present = sum(
+            any(re.search(p, text) for p in group)
+            for group in OPERATOR_GROUPS
+        )
+        return total_count, groups_present / total_groups
 
     results = df[text_column].apply(analyze_text)
-    df['count'] = results.apply(lambda x: x[0])
-    df['operator_coverage'] = results.apply(lambda x: x[1])
+    df = df.copy()
+    df["count"] = results.apply(lambda x: x[0])
+    df["operator_coverage"] = results.apply(lambda x: x[1])
+    df["sufficient_operators"] = df["operator_coverage"] >= min_coverage
     return df
