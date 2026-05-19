@@ -15,20 +15,26 @@ def load_experiment_data(csv_path):
     return pd.read_csv(csv_path)
 
 
-def fix_temperature_labels(df):
-    """Fix openai_o4_mini temperature labels.
+def annotate_temperature_support(df):
+    """Add an explicit ``temperature_supported`` column.
 
-    The o4-mini model does not support temperature != 1, so rows
-    that were recorded with other temperature values are corrected
-    to ``1.001`` (to distinguish them while being close to 1).
+    The previous version silently rewrote the recorded temperature of models
+    that ignore the parameter to ``1.001`` -- a hidden fudge that Reviewer #2
+    flagged as an inconsistent variable.  Instead we keep the requested
+    temperature untouched and add a transparent boolean flag, so analyses can
+    either drop or condition on temperature-insensitive models openly.
 
     Args:
-        df: DataFrame with ``model`` and ``temperature`` columns.
+        df: DataFrame with a ``model`` column.
 
     Returns:
-        DataFrame with corrected temperature values (copy).
+        Copy of ``df`` with a ``temperature_supported`` column.
     """
+    from railpminer.config import MODELS_WITHOUT_TEMPERATURE
+
     df = df.copy()
-    mask = (df["model"] == "openai_o4_mini") & (df["temperature"] != 1)
-    df.loc[mask, "temperature"] = 1.001
+    if "temperature_supported" not in df.columns:
+        df["temperature_supported"] = ~df["model"].isin(
+            MODELS_WITHOUT_TEMPERATURE
+        )
     return df

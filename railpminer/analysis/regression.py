@@ -1,7 +1,5 @@
 """OLS regression helpers."""
 
-from statsmodels.formula.api import ols
-
 
 def run_ols_regression(df, formula):
     """Run an OLS regression and print the summary.
@@ -14,6 +12,8 @@ def run_ols_regression(df, formula):
     Returns:
         Fitted OLS model.
     """
+    from statsmodels.formula.api import ols
+
     model = ols(formula, data=df).fit()
     print(formula)
     print(model.summary())
