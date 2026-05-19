@@ -1,0 +1,103 @@
+case,answer,solver_code,objective_sense,parse_ok,graph_parse_ok,graph_complete,graph_coherent,graph_linear,graph_domain_covered,graph_flag_count,graph_predicts_valid,solver_code_parses,solver_builds_all,solver_is_linear,solver_optimal_all,solver_railway_safe_all,solver_valid,solver_mean_runtime_s
+good,"VARIABLES
+v1: arr -- continuous >= 0 -- arrival time of a train at a station
+v2: dep -- continuous >= 0 -- departure time of a train at a station
+v3: cancel -- binary -- 1 if a train service is cancelled
+OBJECTIVE
+min: w * arr - w * planned + bigM * cancel -- weighted final delay plus cancellation penalty
+CONSTRAINTS
+c1: dep >= planned - bigM * cancel -- a train may not depart before its planned departure time (unless cancelled)
+c2: arr >= dep + min_run -- running time on a segment is at least the minimum running time
+c3: dep >= arr + min_dwell -- dwell time at a stop is at least the minimum dwell time (headway respected via ordering)
+c4: arr <= horizon + bigM * cancel -- a cancelled train imposes no schedule
+c5: dep <= horizon + bigM * cancel -- a cancelled train imposes no schedule
+","
+def build_model(inst):
+    prob = pulp.LpProblem(""resched"", pulp.LpMinimize)
+    trains, stations = inst[""trains""], inst[""stations""]
+    route, pdep = inst[""route""], inst[""planned_departure""]
+    minrun, dwell = inst[""min_run""], inst[""min_dwell""]
+    hw, w = inst[""headway""], inst[""weight""]
+    cap, H = inst[""station_capacity""], inst[""horizon""]
+
+    arr, dep, sched = {}, {}, {}
+    for t in trains:
+        for s in route[t]:
+            arr[t, s] = pulp.LpVariable(f""arr_{t}_{s}"", 0, H)
+            dep[t, s] = pulp.LpVariable(f""dep_{t}_{s}"", 0, H)
+            sched[(t, s)] = {""arr"": arr[t, s], ""dep"": dep[t, s]}
+    cancel = {t: pulp.LpVariable(f""cancel_{t}"", cat=""Binary"") for t in trains}
+
+    for t in trains:
+        r = route[t]
+        prob += dep[t, r[0]] >= pdep[t]
+        prob += arr[t, r[0]] == dep[t, r[0]]
+        for k in range(len(r) - 1):
+            a, b = r[k], r[k + 1]
+            prob += arr[t, b] >= dep[t, a] + minrun[(a, b)]
+        for s in r[1:]:
+            prob += dep[t, s] >= arr[t, s] + dwell[s]
+
+    order = sorted(trains, key=lambda t: pdep[t])
+    for s in stations:
+        passing = [t for t in order if s in route[t]]
+        for i in range(len(passing) - 1):
+            t1, t2 = passing[i], passing[i + 1]
+            prob += dep[t2, s] >= dep[t1, s] + hw
+            prob += arr[t2, s] >= arr[t1, s] + hw
+        c = cap.get(s, len(passing))
+        for i in range(len(passing)):
+            j = i + c
+            if j < len(passing):
+                prob += arr[passing[j], s] >= dep[passing[i], s]
+
+    prob += (
+        pulp.lpSum(w[t] * (arr[t, route[t][-1]] - pdep[t]) for t in trains)
+        + 10000 * pulp.lpSum(cancel.values())
+    )
+    return prob, sched
+",min,True,True,True,True,True,True,0,True,True,True,True,True,True,True,0.006115118662516276
+nonlinear,"VARIABLES
+v1: arr -- continuous >= 0 -- arrival time
+v2: dep -- continuous >= 0 -- departure time
+OBJECTIVE
+min: arr * dep -- (invalid) product of two decision variables
+CONSTRAINTS
+c1: arr >= dep + min_run -- running time
+c2: dep >= planned -- not before planned departure
+","
+def build_model(inst):
+    prob = pulp.LpProblem(""nl"", pulp.LpMinimize)
+    sched = {}
+    a = pulp.LpVariable(""a"", 0, 100)
+    d = pulp.LpVariable(""d"", 0, 100)
+    prob += a * d            # non-linear: PuLP raises here
+    prob += a >= d + 5
+    return prob, sched
+",min,True,True,True,True,False,True,1,False,True,False,False,False,False,False,0.0
+incomplete,"VARIABLES
+v1: dep -- continuous >= 0 -- departure time
+v2: slack -- continuous >= 0 -- never used anywhere
+OBJECTIVE
+min: dep -- minimise departure
+CONSTRAINTS
+c1: dep >= planned -- not before planned departure
+c2: dep <= 0 -- (contradicts c1 when planned > 0)
+","
+def build_model(inst):
+    prob = pulp.LpProblem(""inf"", pulp.LpMinimize)
+    sched = {}
+    d = pulp.LpVariable(""d"", 0, 100)
+    prob += d
+    prob += d >= 10          # planned > 0
+    prob += d <= 0           # contradiction -> infeasible
+    return prob, sched
+",min,True,True,False,False,True,True,2,False,True,True,True,False,False,False,0.003444671630859375
+empty,"VARIABLES
+OBJECTIVE
+CONSTRAINTS
+","
+def build_model(inst):
+    prob = pulp.LpProblem(""empty"", pulp.LpMinimize)
+    return prob, {}
+",,False,False,False,False,False,False,4,False,True,True,True,True,False,False,0.0031119187672932944

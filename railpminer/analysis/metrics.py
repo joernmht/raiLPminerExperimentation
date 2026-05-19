@@ -17,7 +17,6 @@ from typing import Dict, List, Tuple
 
 import networkx as nx
 import pandas as pd
-from IPython.display import display
 
 from railpminer.analysis.graph_parser import create_graph_columns
 
@@ -200,7 +199,11 @@ def analyze_lp_models(
             'model_completeness', 'model_naivety',
         ]
         summary_stats = df_processed[metric_cols].describe()
-        display(summary_stats)
+        try:
+            from IPython.display import display
+            display(summary_stats)
+        except ImportError:
+            print(summary_stats)
 
     if visualize_first and len(df_processed) > 0:
         from railpminer.visualization.summary import display_model_summary
