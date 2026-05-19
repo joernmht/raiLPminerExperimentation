@@ -1,0 +1,44 @@
+Railway rescheduling problem -- double-track high-speed line, partial blockage
+
+Operational setting
+A set of train services runs on a double-track high-speed corridor that
+connects an ordered sequence of stations. Under normal operation each
+direction uses its own track. A disruption makes one track of a single
+segment between two consecutive stations temporarily unavailable, so trains
+of both directions must share the remaining track over that segment for a
+known time window. Each train has a planned timetable: a scheduled departure
+time at its origin, scheduled arrival/departure times at intermediate
+stations, and a minimum running time on every segment plus a minimum dwell
+time at every station where it stops.
+
+Decisions to be made
+- The order in which the affected train services traverse the single-track
+  segment (a sequencing decision between conflicting trains).
+- The adjusted arrival and departure time of every affected train at every
+  station (retiming).
+- Which train services, if any, are cancelled when the conflict cannot be
+  resolved by delaying alone.
+
+Objective
+Recover operation with the least disturbance to passengers: minimise a
+weighted sum of total train delay (deviation of actual times from the
+planned timetable) and a penalty for each cancelled service.
+
+Operational rules that must hold
+- A train cannot depart a station earlier than its planned departure time
+  and cannot run a segment faster than its minimum running time.
+- A train must dwell at least its minimum dwell time at every stop.
+- Two trains using the blocked single-track segment must be separated by a
+  minimum safety headway and may not occupy the segment in opposing
+  directions at the same time.
+- Trains using the same track in the same direction must keep a minimum
+  headway at departure and arrival of every shared segment.
+- A station can hold only a limited number of trains simultaneously
+  (platform/track capacity).
+- A cancelled train imposes no timing or headway requirements.
+
+Quantities the model should expose
+Continuous time variables for arrivals/departures, binary ordering
+(sequencing) variables for pairs of conflicting trains, and binary
+cancellation variables for services. The formulation is expected to be a
+mixed-integer linear program.
