@@ -20,7 +20,11 @@ from typing import Dict, List, Optional
 import pandas as pd
 from tqdm.auto import tqdm
 
-from railpminer.validation.codegen import generate_solver_code
+from railpminer.validation.codegen import (
+    _strip_fences,
+    generate_solver_code,
+    looks_like_code,
+)
 from railpminer.validation.instances import all_instances
 from railpminer.validation.railway_checks import check_schedule
 from railpminer.validation.solve import solve_milp_code
@@ -87,12 +91,13 @@ async def validate_dataframe(
     df = df.copy()
     rows = []
     for idx in tqdm(df.index, total=len(df)):
+        answer = df.at[idx, answer_column]
         if code_column and pd.notna(df.at[idx, code_column]):
-            code = df.at[idx, code_column]
+            code = df.at[idx, code_column]          # offline / precomputed
+        elif looks_like_code(answer):
+            code = _strip_fences(answer)            # DC baseline: already code
         else:
-            code = await generate_solver_code(
-                df.at[idx, answer_column], model=model
-            )
+            code = await generate_solver_code(answer, model=model)  # SIM/TAF
         df.at[idx, "solver_code"] = code
         rows.append(validate_code(code, instances, time_limit=time_limit))
 
