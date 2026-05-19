@@ -1,267 +1,152 @@
-"""Experiment runners for model generation and graphing agents."""
+"""Experiment runners: MILP generation and LP2Graph parsing.
+
+Both runners are single-pass and stream results to a CSV as they go.  No
+feedback / retry-on-content loop is used -- the only retries are for
+transient API errors.
+"""
 
 import asyncio
 import time
 
 import pandas as pd
 from pydantic_ai import Agent
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 
-from railpminer.config import get_model, get_paper
+from railpminer.config import (
+    MODELS_WITHOUT_TEMPERATURE,
+    get_model,
+    get_problem,
+)
 from railpminer.models.agents import agent_builder
 from railpminer.models.schema import Model
 
-
 DEFAULT_GRAPHING_TASK = (
-    "Find all constraints, variables and the objective function in the given "
-    "test. Return these in the predefined form, with the objective function "
-    "having the number 0. Also see, what variables are in the equations by "
-    "number. This is your input:"
+    "Extract every constraint, every variable and the single objective "
+    "function from the MILP text below. Return them in the predefined "
+    "structured form, with the objective function numbered 0. For each "
+    "equation list the numbers of the variables that appear in it. "
+    "Do not invent content that is not in the text. MILP text:\n"
 )
 
 
-async def run_agent_experiments(permutation_df, num_runs=1):
-    """Run agent experiments with different parameter permutations.
+async def run_agent_experiments(
+    design_df, num_runs=None, results_file="generation_results.csv"
+):
+    """Run MILP-generation agents over a factorial design.
 
     Args:
-        permutation_df: DataFrame containing parameter permutations.
-                        Columns: ``model``, ``temperature``, ``workflow``, ``paper``.
-        num_runs: Number of times to run each permutation.
+        design_df: Output of :func:`experiments.permutations.build_factorial_design`
+            (one row per run) or a plain permutation grid (then ``num_runs``
+            replications are applied).
+        num_runs: Replications per row when ``design_df`` is a plain grid.
+            Ignored when the design already has one row per run.
+        results_file: CSV path; rows are appended as they complete.
 
     Returns:
-        DataFrame with experiment results.
+        DataFrame with all results.
     """
-    results_df = pd.DataFrame()
+    per_row_runs = 1 if "replicate" in design_df.columns else (num_runs or 1)
+    results = []
+    header_written = False
 
-    for idx, row in tqdm(permutation_df.iterrows(), total=len(permutation_df)):
+    for idx, row in tqdm(design_df.iterrows(), total=len(design_df)):
         params = row.to_dict()
+        problem_key = params.get("problem", params.get("paper", ""))
+        problem_content = get_problem(problem_key)
+        temperature_supported = params["model"] not in MODELS_WITHOUT_TEMPERATURE
 
-        paper_content = get_paper(params.get('paper', ''))
+        builder_args = {
+            k: params[k]
+            for k in ("workflow", "model", "temperature")
+            if k in params
+        }
+        builder_args["problem"] = problem_key
+        agent = agent_builder(**builder_args)
 
-        agent = agent_builder(**params)
+        for run_id in range(per_row_runs):
+            start = time.time()
+            result = await agent.run(f"\n{problem_content}")
+            runtime = time.time() - start
 
-        for run_id in range(num_runs):
-            start_time = time.time()
-            result = await agent.run(f"\n{paper_content}")
-            runtime_seconds = time.time() - start_time
-
-            result_dict = {
-                'run_id': run_id,
-                'runtime': runtime_seconds,
-                'permutation_id': idx,
-                'conversation': result.all_messages(),
-                'answer': result.output,
-                'usage': result.usage(),
+            record = {
+                "run_id": run_id,
+                "runtime": runtime,
+                "permutation_id": idx,
+                "answer": result.output,
+                "usage": result.usage(),
+                "temperature_supported": temperature_supported,
                 **params,
             }
+            results.append(record)
 
-            results_df = pd.concat(
-                [results_df, pd.DataFrame([result_dict])], ignore_index=True
+            row_df = pd.DataFrame([record])
+            row_df.to_csv(
+                results_file,
+                mode="w" if not header_written else "a",
+                header=not header_written,
+                index=False,
             )
+            header_written = True
 
-            results_df.to_csv(
-                'agent_experiment_results_test.csv',
-                mode='a', index=False, header=False,
-            )
-            print(f'Run {run_id}')
-
-    return results_df
+    return pd.DataFrame(results)
 
 
-async def model_graphing(
-    paper, answer, model=None, temperature=0.2,
-    output_type=None, task=None,
-):
-    """Run a single graphing agent to extract structured model components.
+async def model_graphing(answer, model="deepseek_v3", temperature=0.0, task=None):
+    """Parse one MILP text into the structured :class:`Model` via an LLM.
 
-    Args:
-        paper: Paper content (for context).
-        answer: The LP model text to parse.
-        model: Model name or object.  Defaults to ``"openai_o4_mini"``.
-        temperature: Sampling temperature.
-        output_type: Pydantic model for structured output.
-        task: Task prompt prefix.
-
-    Returns:
-        Agent run result.
+    This is the *LLM parser*.  It is kept for completeness, but the primary
+    parser used in the pipeline is the deterministic
+    :func:`railpminer.analysis.graph_parser.parse_structured_text`, and the
+    two are cross-checked (see ``graph_parser.parser_agreement``) so that the
+    error introduced by this second LLM layer is quantified rather than
+    hidden.
     """
-    if model is None:
-        model = get_model("openai_o4_mini")
-    else:
-        model = get_model(model)
-
-    if output_type is None:
-        output_type = Model
-
-    if task is None:
-        task = DEFAULT_GRAPHING_TASK
-
-    model_graphing_agent = Agent(
-        model,
-        output_type=output_type,
-        retries=10,
-        temperature=temperature,
-    )
-
-    result = await model_graphing_agent.run(f'{task}{answer}')
+    agent = Agent(get_model(model), output_type=Model, retries=5,
+                  temperature=temperature)
+    result = await agent.run(f"{task or DEFAULT_GRAPHING_TASK}{answer}")
     return result
 
 
-async def run_graphing_agent_experiments(permutation_df, num_runs=1):
-    """Run graphing agent experiments with different parameter permutations.
-
-    Args:
-        permutation_df: DataFrame containing parameter permutations.
-        num_runs: Number of times to run each permutation.
-
-    Returns:
-        DataFrame with experiment results.
-    """
-    results_df = pd.DataFrame()
-    timestamp = pd.Timestamp.now().strftime("%H%M")
-    results_file = f'graphagent_results_{timestamp}.csv'
-    header_written = False
-
-    for idx, row in tqdm(permutation_df.iterrows(), total=len(permutation_df)):
-        params = row.to_dict()
-        runkey = params.pop('runkey', None)
-
-        for run_id in range(num_runs):
-            start_time = time.time()
-            result = await model_graphing(**params)
-            runtime_seconds = time.time() - start_time
-
-            result_dict = {
-                'run_id': run_id,
-                'legacy_id': runkey,
-                'runtime': runtime_seconds,
-                'input': params['paper'],
-                'permutation_id': idx,
-                'answer': result.output,
-                'usage': result.usage(),
-                **params,
-            }
-
-            new_row_df = pd.DataFrame([result_dict])
-            results_df = pd.concat(
-                [results_df, new_row_df], ignore_index=True
-            )
-
-            if not header_written:
-                new_row_df.to_csv(results_file, index=False, mode='w')
-                header_written = True
-            else:
-                new_row_df.to_csv(
-                    results_file, index=False, mode='a', header=False
-                )
-
-            print(f'Run {run_id}')
-
-    return results_df
-
-
 async def run_graphing_agent(
-    permutation_df, num_runs=5, max_retries=3, retry_delay=10,
+    df, model="deepseek_v3", max_retries=3, retry_delay=10,
+    results_file="graphing_results.csv",
 ):
-    """Run graphing agent experiments with retry logic.
+    """Run the LLM graphing parser over every ``answer`` in ``df``.
 
-    Args:
-        permutation_df: DataFrame containing parameter permutations.
-        num_runs: Number of times to run each permutation.
-        max_retries: Maximum retry attempts for API calls.
-        retry_delay: Delay in seconds between retry attempts.
-
-    Returns:
-        DataFrame with experiment results.
+    Retries only on transient API errors (no content feedback loop).
     """
-    results_df = pd.DataFrame()
-    timestamp = pd.Timestamp.now().strftime("%H%M")
-    results_file = f'graphagent_results_{timestamp}.csv'
+    out = []
     header_written = False
 
-    for idx, row in tqdm(permutation_df.iterrows(), total=len(permutation_df)):
-        params = row.to_dict()
-        runkey = params.pop('runkey', None)
-
-        for run_id in range(num_runs):
-            result = None
-            retry_count = 0
-            success = False
-            runtime_seconds = -1
-
-            while not success and retry_count <= max_retries:
-                try:
-                    start_time = time.time()
-                    result = await model_graphing(**params)
-                    runtime_seconds = time.time() - start_time
-                    success = True
-                except Exception as e:
-                    retry_count += 1
-                    print(
-                        f"Error during run {run_id}, "
-                        f"attempt {retry_count}: {e!s}"
-                    )
-                    if retry_count <= max_retries:
-                        print(f"Retrying in {retry_delay} seconds...")
-                        await asyncio.sleep(retry_delay)
-                    else:
-                        print(
-                            f"Max retries reached for run {run_id}. "
-                            "Storing error information and continuing."
-                        )
-
-            result_dict = {
-                'run_id': run_id,
-                'legacy_id': runkey,
-                'runtime': runtime_seconds,
-                'paper': params['paper'],
-                'answer': params['answer'],
-                'permutation_id': idx,
-                'error': None if success else "API call failed after max retries",
-                'graph': result.output if result else "ERROR",
-                'usage': result.usage() if result else "ERROR",
-                **params,
-            }
-
-            new_row_df = pd.DataFrame([result_dict])
-            results_df = pd.concat(
-                [results_df, new_row_df], ignore_index=True
-            )
-
+    for idx, row in tqdm(df.iterrows(), total=len(df)):
+        answer = row["answer"]
+        result, attempt, ok = None, 0, False
+        start = time.time()
+        while not ok and attempt <= max_retries:
             try:
-                if not header_written:
-                    new_row_df.to_csv(results_file, index=False, mode='w')
-                    header_written = True
-                else:
-                    new_row_df.to_csv(
-                        results_file, index=False, mode='a', header=False
-                    )
-            except Exception as e:
-                print(
-                    f"Warning: Failed to write to CSV: {e!s}. "
-                    "Will try again on next iteration."
-                )
+                result = await model_graphing(answer, model=model)
+                ok = True
+            except Exception as e:  # transient API failure
+                attempt += 1
+                print(f"row {idx} attempt {attempt} failed: {e}")
+                if attempt <= max_retries:
+                    await asyncio.sleep(retry_delay)
+        runtime = time.time() - start
 
-            print(
-                f"Completed run {run_id} "
-                f"{'successfully' if success else 'with errors'}"
-            )
+        record = {
+            **row.to_dict(),
+            "graph_runtime": runtime,
+            "graph": result.output if ok else "ERROR",
+            "graph_error": None if ok else "API failed after retries",
+        }
+        out.append(record)
+        row_df = pd.DataFrame([record])
+        row_df.to_csv(
+            results_file,
+            mode="w" if not header_written else "a",
+            header=not header_written,
+            index=False,
+        )
+        header_written = True
 
-    return results_df
-
-
-async def process_all_rows(dataframe):
-    """Run model_graphing on every row's answer column.
-
-    Args:
-        dataframe: DataFrame with an ``answer`` column.
-
-    Returns:
-        List of model outputs.
-    """
-    results = []
-    for opt_model in dataframe['answer']:
-        thismodel = await model_graphing(paper=opt_model, answer=opt_model)
-        results.append(thismodel.output)
-        print(thismodel.output)
-    return results
+    return pd.DataFrame(out)
