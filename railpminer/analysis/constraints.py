@@ -11,6 +11,18 @@ import pandas as pd
 def classify_constraint_types(nodes: List[Dict]) -> Dict[str, Any]:
     """Classify each constraint node by type using keyword matching.
 
+    .. warning::
+       **Known limitation (keyword matching).** This classifier is a
+       lexical screen: it only fires when a constraint's name / equation /
+       description contains one of the predefined keywords.  LLMs frequently
+       express a valid constraint with synonymous wording that is not in the
+       keyword list (e.g. "minimum separation" instead of "headway", "buffer
+       time" instead of "dwell"), so the *true* domain relevance of the
+       generated models is systematically **undercounted**.  The figures it
+       produces are therefore a lower bound on domain coverage, never a
+       correctness statement, and they are reported as such.  Embedding- or
+       LLM-based semantic matching is left as future work.
+
     Args:
         nodes: List of node dictionaries (or string representation from CSV).
 

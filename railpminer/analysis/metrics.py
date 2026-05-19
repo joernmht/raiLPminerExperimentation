@@ -1,4 +1,17 @@
-"""Complexity metrics calculation and the main analysis pipeline."""
+"""Complexity metrics and the structural analysis pipeline.
+
+Scope and claim
+---------------
+The metrics here (completeness, coherence, minimal size, diameter,
+constraint/variable ratio) are an **early structural screen**, computed in
+milliseconds with no solver.  They are explicitly NOT a proof of
+mathematical correctness, feasibility or operational safety -- the previous
+reviewers were right that a content-free model can satisfy completeness and
+coherence.  That is the whole point of the revised study: the screen is a
+cheap predictor whose true/false positive rate is *measured* against the
+solver ground truth (see :mod:`railpminer.validation`) instead of being
+presented as validity in itself.
+"""
 
 from typing import Dict, List, Tuple
 

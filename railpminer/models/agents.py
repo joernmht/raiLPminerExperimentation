@@ -1,13 +1,18 @@
-"""Agentic workflow builders for LP model generation.
+"""Agentic workflow builders for MILP generation.
 
-Workflows:
-    ZS  — Zero-Shot
-    CFC — Code-First-Convert
-    OE  — Operator-Evaluator
-    PS  — Parallel-Select
+The agentic design is deliberately kept minimal: the research question is
+about the *graph-based screening* of generated MILPs, not about prompt
+engineering.  There are therefore only two single-pass workflows and **no
+feedback / self-review loops** (the previous Operator-Evaluator and
+Parallel-Select workflows were removed):
+
+    ZS  -- Zero-Shot: one prompt, one answer.
+    CFC -- Code-First-Convert: write solver code first, then transcribe the
+           equations.  Still a single forward pass (no iteration).
+
+Both take a *problem description* (operational setting, decisions, objective
+and rules) as input -- not a paper abstract.
 """
-
-from typing import List
 
 from pydantic_ai import Agent, RunContext
 
@@ -15,139 +20,79 @@ from railpminer.config import get_model
 
 
 GENERAL_SYSTEMPROMPT = (
-    'Inpired by the provided input: '
-    'Generate a complete, linear optimization model with variables, '
-    'objective function and constraints. '
-    'The optimization model should be described completely with equations '
-    'and assumptions'
-    'The input is inspiration, so keep close to it, if you can, and if '
-    'information is missing, make reasonable assumptions and mark them as such.'
-    'Do not ask questions'
+    "You are given a railway rescheduling problem description (operational "
+    "setting, decisions, objective and operational rules). "
+    "Produce a complete Mixed-Integer Linear Programming (MILP) formulation "
+    "and return it in EXACTLY the following layout, nothing before or after:\n"
+    "VARIABLES\n"
+    "v1: <symbol> -- <domain> -- <short description>\n"
+    "v2: <symbol> -- <domain> -- <short description>\n"
+    "OBJECTIVE\n"
+    "min: <linear equation in the variable symbols> -- <short description>\n"
+    "CONSTRAINTS\n"
+    "c1: <linear (in)equality in the variable symbols> -- <description>\n"
+    "c2: ...\n\n"
+    "Rules: use the exact section headers VARIABLES, OBJECTIVE, CONSTRAINTS; "
+    "one item per line; every variable has a unique symbol that is reused "
+    "verbatim inside the equations; the objective line starts with 'min:' or "
+    "'max:'. Keep the formulation strictly linear (no products of variables, "
+    "no absolute values, no min/max operators). Stay close to the problem "
+    "description; if a detail is missing make a reasonable assumption and say "
+    "so in the relevant description. Do not ask questions, do not add prose."
 )
 
+#: Supported workflow keys (kept here so experiment code can iterate them).
+WORKFLOWS = ("ZS", "CFC")
 
-def agent_builder(workflow, model, temperature, paper):
-    """Build a pydantic-ai Agent for the given workflow type.
+
+def agent_builder(workflow, model, temperature, problem=None, paper=None):
+    """Build a pydantic-ai Agent for the given workflow.
 
     Args:
-        workflow: One of ``"ZS"``, ``"CFC"``, ``"OE"``, ``"PS"``.
-        model: Model name (string key in MODEL_REGISTRY) or model object.
+        workflow: ``"ZS"`` or ``"CFC"``.
+        model: Model key in the registry or a model object (e.g. a stub).
         temperature: Sampling temperature.
-        paper: Paper content (unused here, passed to agent.run later).
+        problem: Problem-description content.  Unused here (passed to
+            ``agent.run`` by the runner); accepted for grid compatibility.
+        paper: Legacy alias for ``problem``.
 
     Returns:
         A configured :class:`pydantic_ai.Agent`.
     """
     model = get_model(model)
 
-    match workflow:
-        case "ZS":
-            agent = Agent(
-                model,
-                system_prompt=GENERAL_SYSTEMPROMPT,
-                temperature=temperature,
+    if workflow == "ZS":
+        return Agent(
+            model,
+            system_prompt=GENERAL_SYSTEMPROMPT,
+            temperature=temperature,
+        )
+
+    if workflow == "CFC":
+        agent = Agent(
+            model,
+            system_prompt=GENERAL_SYSTEMPROMPT
+            + (
+                " First call the `or_coder` tool to draft solver code for the "
+                "model, then transcribe it back into plain objective / "
+                "variable / constraint equations. Return only the equations, "
+                "no code."
+            ),
+            temperature=temperature,
+        )
+
+        code_agent = Agent(model, temperature=temperature)
+
+        @agent.tool
+        async def or_coder(ctx: RunContext[None], description: str) -> str:
+            """Draft PuLP/GAMS code for the described model (single pass)."""
+            r = await code_agent.run(
+                "Generate optimization-model code (Python/PuLP or GAMS) for "
+                f"the following description.\n{description}",
+                usage=ctx.usage,
             )
+            return r.output
 
-        case "CFC":
-            systemprompt = GENERAL_SYSTEMPROMPT + (
-                'Use the following approach for your task:'
-                'Use the `or_coder` to generate a code-based model based on '
-                'the provided input.'
-                'Interpret the code and just return the equations for objective '
-                'functions, variables and constraints as text.'
-                'Do not return any code.'
-            )
-            agent = Agent(
-                model,
-                system_prompt=systemprompt,
-                temperature=temperature,
-            )
+        return agent
 
-            code_generation_agent = Agent(model, temperature=temperature)
-
-            @agent.tool
-            async def or_coder(ctx: RunContext[None], description: str) -> str:
-                r = await code_generation_agent.run(
-                    "Generate optimization model code based on the provided "
-                    "description.\nArgs:\n  description: A description of the "
-                    "optimization model to implement\n"
-                    f"Please generate a the python or GAMS code to implement "
-                    f"the provided model\n{description}",
-                    usage=ctx.usage,
-                )
-                return r.output
-
-        case "OE":
-            systemprompt = GENERAL_SYSTEMPROMPT + (
-                'Use the following approach for your task:'
-                'Use the `or_operator` to generate an optimization model '
-                'based on your input.'
-                'Review the optimization model and feedback improvements to '
-                'the `or_operator` and let it try again'
-                'Just return the final model.'
-            )
-            agent = Agent(
-                model,
-                system_prompt=systemprompt,
-                temperature=temperature,
-            )
-
-            singlemodel_generation_agent = Agent(
-                model,
-                system_prompt=(
-                    "Based on your input, generate a complete, linear "
-                    "optimization model with variables, objective function "
-                    "and constraints. Explain the elements of the model."
-                ),
-                temperature=temperature,
-            )
-
-            @agent.tool
-            async def or_operator(ctx: RunContext[None], description: str):
-                r = await singlemodel_generation_agent.run(
-                    f"Please generate an optimization model based on the "
-                    f"provided description\n{description}",
-                    usage=ctx.usage,
-                )
-                return r.output
-
-        case "PS":
-            systemprompt = GENERAL_SYSTEMPROMPT + (
-                'Use the `or_factory` to generate a model based on the '
-                'provided input, then choose the best. '
-                'Just return the best model.'
-            )
-            agent = Agent(
-                model,
-                system_prompt=systemprompt,
-                temperature=temperature,
-            )
-
-            model_generation_agent = Agent(
-                model,
-                system_prompt=(
-                    "Based on your input, generate a complete, linear "
-                    "optimization model with variables, objective function "
-                    "and constraints. Explain the elements of the model."
-                ),
-                output_type=List[str],
-                retries=10,
-                temperature=temperature,
-            )
-
-            @agent.tool
-            async def or_factory(
-                ctx: RunContext[None], count: int, description: str
-            ) -> List[str]:
-                r = await model_generation_agent.run(
-                    f"Please generate \n{count} optimization models based on "
-                    f"the provided description\n{description}",
-                    usage=ctx.usage,
-                )
-                return r.output
-
-        case _:
-            agent = None
-            print("None known agent addressed.")
-
-    return agent
+    raise ValueError(f"Unknown workflow {workflow!r}; expected one of {WORKFLOWS}")
