@@ -1,98 +1,100 @@
-"""Agentic workflow builders for MILP generation.
+"""Workflow builders.
 
-The agentic design is deliberately kept minimal: the research question is
-about the *graph-based screening* of generated MILPs, not about prompt
-engineering.  There are therefore only two single-pass workflows and **no
-feedback / self-review loops** (the previous Operator-Evaluator and
-Parallel-Select workflows were removed):
+The study is no longer about creativity/diversity: temperature is 0 and the
+point is *graphing as a means of designing MILPs*.  Three workflows, no
+feedback loops:
 
-    ZS  -- Zero-Shot: one prompt, one answer.
-    CFC -- Code-First-Convert: write solver code first, then transcribe the
-           equations.  Still a single forward pass (no iteration).
+    SIM  -- Simultaneous: one call emits the fully classified MILP.
+    TAF  -- Text-Analysis-First: call 1 classifies the problem text into a
+            domain blueprint; call 2 develops the classified MILP from it
+            (two sequential calls via a tool, no iteration).
+    DC   -- Direct-Code baseline: one call emits runnable PuLP code *plus*
+            an embedded CLASSIFICATION dict, so it can be solved and
+            reverse-graphed for a like-for-like comparison.
 
-Both take a *problem description* (operational setting, decisions, objective
-and rules) as input -- not a paper abstract.
+Classification is embedded in the output (drawn from the taxonomy) so the
+parser reads it deterministically -- no a-posteriori keyword matching.
 """
 
 from pydantic_ai import Agent, RunContext
 
+from railpminer.analysis.taxonomy import prompt_block
 from railpminer.config import get_model
-
-
-GENERAL_SYSTEMPROMPT = (
-    "You are given a railway rescheduling problem description (operational "
-    "setting, decisions, objective and operational rules). "
-    "Produce a complete Mixed-Integer Linear Programming (MILP) formulation "
-    "and return it in EXACTLY the following layout, nothing before or after:\n"
-    "VARIABLES\n"
-    "v1: <symbol> -- <domain> -- <short description>\n"
-    "v2: <symbol> -- <domain> -- <short description>\n"
-    "OBJECTIVE\n"
-    "min: <linear equation in the variable symbols> -- <short description>\n"
-    "CONSTRAINTS\n"
-    "c1: <linear (in)equality in the variable symbols> -- <description>\n"
-    "c2: ...\n\n"
-    "Rules: use the exact section headers VARIABLES, OBJECTIVE, CONSTRAINTS; "
-    "one item per line; every variable has a unique symbol that is reused "
-    "verbatim inside the equations; the objective line starts with 'min:' or "
-    "'max:'. Keep the formulation strictly linear (no products of variables, "
-    "no absolute values, no min/max operators). Stay close to the problem "
-    "description; if a detail is missing make a reasonable assumption and say "
-    "so in the relevant description. Do not ask questions, do not add prose."
+from railpminer.instance_contract import (
+    BUILD_MODEL_CONTRACT,
+    CLASSIFICATION_CONTRACT,
+    INSTANCE_CONTRACT,
 )
 
-#: Supported workflow keys (kept here so experiment code can iterate them).
-WORKFLOWS = ("ZS", "CFC")
+WORKFLOWS = ("SIM", "TAF", "DC")
+
+_FORMAT = (
+    "Return the formulation in EXACTLY this layout, nothing else, fields "
+    "separated by ' | ', one item per line:\n"
+    "PARAMETERS\n"
+    "p1: <symbol> | <parameter class> | <description>\n"
+    "VARIABLES\n"
+    "v1: <symbol> | <variable class> | <domain> | <description>\n"
+    "OBJECTIVE\n"
+    "o: <min|max> | <objective class> | <linear equation> | <description>\n"
+    "CONSTRAINTS\n"
+    "c1: <constraint class> | <linear (in)equality> | <description>\n\n"
+    "Every variable/parameter symbol is reused verbatim inside the "
+    "equations. Keep everything strictly linear (no var*var, abs, min/max). "
+    "Use ONLY these class vocabularies:\n" + prompt_block()
+)
+
+_SIM_SYS = (
+    "You are given a railway rescheduling problem description. Produce a "
+    "complete, classified MILP (parameters, variables, one objective, "
+    "constraints). " + _FORMAT
+)
+
+_TAF_SYS = (
+    "You design a railway rescheduling MILP in two steps. FIRST call the "
+    "`analyze_problem` tool with the problem text to obtain a domain "
+    "blueprint (which objective/variable/parameter/constraint classes the "
+    "problem requires). THEN, guided by that blueprint, output the complete "
+    "classified MILP. " + _FORMAT
+)
+
+_TAF_ANALYST_SYS = (
+    "Classify the railway rescheduling problem text into a domain "
+    "blueprint. List the required objective class, the variable classes, "
+    "the parameter classes and the constraint classes the model will need, "
+    "with a one-line justification each. Use ONLY these vocabularies:\n"
+    + prompt_block()
+)
+
+_DC_SYS = (
+    "You are given a railway rescheduling problem description. Output "
+    "runnable Python (no markdown fences, no prose). " + BUILD_MODEL_CONTRACT
+    + "\n" + INSTANCE_CONTRACT + "\n" + CLASSIFICATION_CONTRACT
+    + "\nUse ONLY these class vocabularies:\n" + prompt_block()
+)
 
 
-def agent_builder(workflow, model, temperature, problem=None, paper=None):
-    """Build a pydantic-ai Agent for the given workflow.
+def agent_builder(workflow, model, temperature=0.0, problem=None, paper=None):
+    """Build the agent for a workflow (temperature defaults to 0)."""
+    m = get_model(model)
 
-    Args:
-        workflow: ``"ZS"`` or ``"CFC"``.
-        model: Model key in the registry or a model object (e.g. a stub).
-        temperature: Sampling temperature.
-        problem: Problem-description content.  Unused here (passed to
-            ``agent.run`` by the runner); accepted for grid compatibility.
-        paper: Legacy alias for ``problem``.
+    if workflow == "SIM":
+        return Agent(m, system_prompt=_SIM_SYS, temperature=temperature)
 
-    Returns:
-        A configured :class:`pydantic_ai.Agent`.
-    """
-    model = get_model(model)
+    if workflow == "DC":
+        return Agent(m, system_prompt=_DC_SYS, temperature=temperature)
 
-    if workflow == "ZS":
-        return Agent(
-            model,
-            system_prompt=GENERAL_SYSTEMPROMPT,
-            temperature=temperature,
-        )
-
-    if workflow == "CFC":
-        agent = Agent(
-            model,
-            system_prompt=GENERAL_SYSTEMPROMPT
-            + (
-                " First call the `or_coder` tool to draft solver code for the "
-                "model, then transcribe it back into plain objective / "
-                "variable / constraint equations. Return only the equations, "
-                "no code."
-            ),
-            temperature=temperature,
-        )
-
-        code_agent = Agent(model, temperature=temperature)
+    if workflow == "TAF":
+        agent = Agent(m, system_prompt=_TAF_SYS, temperature=temperature)
+        analyst = Agent(m, system_prompt=_TAF_ANALYST_SYS,
+                        temperature=temperature)
 
         @agent.tool
-        async def or_coder(ctx: RunContext[None], description: str) -> str:
-            """Draft PuLP/GAMS code for the described model (single pass)."""
-            r = await code_agent.run(
-                "Generate optimization-model code (Python/PuLP or GAMS) for "
-                f"the following description.\n{description}",
-                usage=ctx.usage,
-            )
+        async def analyze_problem(ctx: RunContext[None], problem_text: str) -> str:
+            """Classify the problem text into a domain blueprint."""
+            r = await analyst.run(problem_text, usage=ctx.usage)
             return r.output
 
         return agent
 
-    raise ValueError(f"Unknown workflow {workflow!r}; expected one of {WORKFLOWS}")
+    raise ValueError(f"Unknown workflow {workflow!r}; expected {WORKFLOWS}")

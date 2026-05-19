@@ -1,303 +1,277 @@
-"""MILP text -> bipartite-graph parsing.
+"""Classified MILP -> bipartite-graph parsing (deterministic, no LLM).
 
-Reviewer concern addressed here
--------------------------------
-The previous pipeline parsed every generated MILP with a *second* LLM, which
-adds an unquantified layer of interpretation (false positives / negatives).
+Classification is embedded by generation and read back here deterministically
+-- there is no a-posteriori keyword matching anywhere.
 
-This module makes the **primary parser deterministic**:
+Two input shapes, one uniform classified graph:
 
-* Generation agents emit the formulation in a strict delimited layout
-  (``VARIABLES`` / ``OBJECTIVE`` / ``CONSTRAINTS`` blocks, one item per line,
-  each variable carrying an explicit symbol).
-* :func:`parse_structured_text` extracts the bipartite graph purely by string
-  processing -- an edge exists between an equation and a variable iff the
-  variable's symbol occurs as a whole token in the equation.  No model is
-  called, so the parse is exactly reproducible.
+1. **Strict classified text** (workflows ``SIM`` / ``TAF``)::
 
-The LLM parser is kept only as a comparison baseline, and
-:func:`parser_agreement` reports how far the two disagree (node-count delta
-and edge Jaccard), so the error introduced by the LLM layer is *measured*
-instead of assumed away.
+       PARAMETERS
+       p1: <symbol> | <parameter_class> | <description>
+       VARIABLES
+       v1: <symbol> | <variable_class> | <domain> | <description>
+       OBJECTIVE
+       o: <min|max> | <objective_class> | <equation> | <description>
+       CONSTRAINTS
+       c1: <constraint_class> | <equation> | <description>
+
+   Edges are inferred by whole-token symbol occurrence in the equations.
+
+2. **Direct-code with an embedded ``CLASSIFICATION`` dict** (workflow
+   ``DC``) -- the baseline emits PuLP code *and* a literal dict; we
+   reverse-graph it from that dict (still deterministic, still parsed, not
+   keyword-guessed).
+
+Output per model: ``nodes`` (parameter/variable/objective/constraint, each
+carrying ``domain_class``), ``connections`` (equation<->variable, kept for
+the existing structural metrics), ``parameter_links`` (equation<->parameter),
+``objective_sense`` and ``parse_ok``.
 """
 
 import ast
 import re
-from dataclasses import dataclass
 from typing import Any, Dict, List
 
 import pandas as pd
 
+from railpminer.analysis.taxonomy import normalize
 
-# --------------------------------------------------------------------------
-# Deterministic parser for the strict delimited generation format
-# --------------------------------------------------------------------------
-
+_HEADERS = ("PARAMETERS", "VARIABLES", "OBJECTIVE", "CONSTRAINTS")
 _SECTION_RE = re.compile(
-    r"^\s*(VARIABLES|OBJECTIVE|CONSTRAINTS)\s*$", re.IGNORECASE | re.MULTILINE
+    r"^\s*(" + "|".join(_HEADERS) + r")\s*$", re.IGNORECASE | re.MULTILINE
 )
-# A variable line:  v1: <symbol> -- <domain> -- <description>
-_VAR_RE = re.compile(r"^\s*v\d+\s*:\s*(?P<sym>[^-]+?)\s*--\s*(?P<rest>.*)$")
-# An objective line: min|max : <equation> -- <description>
-_OBJ_RE = re.compile(
-    r"^\s*(?P<sense>min|max)\w*\s*:\s*(?P<eq>.+?)\s*(?:--\s*(?P<desc>.*))?$",
-    re.IGNORECASE,
-)
-# A constraint line: c1: <equation> -- <description>
-_CON_RE = re.compile(
-    r"^\s*c\d+\s*:\s*(?P<eq>.+?)\s*(?:--\s*(?P<desc>.*))?$"
-)
+_VAR_RE = re.compile(r"^\s*v\d+\s*:\s*(?P<body>.+)$")
+_PAR_RE = re.compile(r"^\s*p\d+\s*:\s*(?P<body>.+)$")
+_OBJ_RE = re.compile(r"^\s*o\s*:\s*(?P<body>.+)$", re.IGNORECASE)
+_CON_RE = re.compile(r"^\s*c\d+\s*:\s*(?P<body>.+)$")
+_CLASSIFICATION_RE = re.compile(r"CLASSIFICATION\s*=\s*(\{.*?\n\})", re.DOTALL)
 
 
-def _split_sections(text):
-    """Return ``{section_name: body}`` for the three known sections."""
-    parts, sections = _SECTION_RE.split(text), {}
-    # parts = [pre, NAME, body, NAME, body, ...]
+def _split_sections(text: str) -> Dict[str, str]:
+    parts = _SECTION_RE.split(text)
+    out = {}
     for i in range(1, len(parts) - 1, 2):
-        sections[parts[i].strip().upper()] = parts[i + 1]
-    return sections
+        out[parts[i].strip().upper()] = parts[i + 1]
+    return out
 
 
-def _symbol_token_re(symbol):
-    """Whole-token matcher for a variable symbol (handles subscripts)."""
-    base = re.escape(symbol.strip())
-    return re.compile(rf"(?<![A-Za-z0-9_]){base}(?![A-Za-z0-9_])")
+def _fields(line: str) -> List[str]:
+    return [f.strip() for f in line.split("|")]
+
+
+def _token_re(symbol: str):
+    return re.compile(
+        rf"(?<![A-Za-z0-9_]){re.escape(symbol.strip())}(?![A-Za-z0-9_])"
+    )
+
+
+def _empty():
+    return {"nodes": [], "connections": [], "parameter_links": [],
+            "objective_sense": None, "parse_ok": False}
 
 
 def parse_structured_text(text: str) -> Dict[str, Any]:
-    """Deterministically parse the strict delimited MILP layout.
+    """Parse the strict classified text layout deterministically."""
+    sections = _split_sections(str(text))
 
-    Returns ``{"nodes": [...], "connections": [...], "objective_sense": ...,
-    "parse_ok": bool}``.  ``parse_ok`` is True iff at least an objective and
-    one variable and one constraint were found.
-    """
-    text = str(text)
-    sections = _split_sections(text)
+    parameters, par_sym = [], {}
+    for line in sections.get("PARAMETERS", "").splitlines():
+        m = _PAR_RE.match(line)
+        if not m:
+            continue
+        f = _fields(m.group("body"))
+        if not f or not f[0]:
+            continue
+        num = len(parameters) + 1
+        parameters.append({
+            "number": num, "symbol": f[0],
+            "domain_class": normalize("parameter", f[1] if len(f) > 1 else None),
+            "description": f[2] if len(f) > 2 else "",
+        })
+        par_sym[num] = f[0]
 
-    variables, var_symbols = [], {}
+    variables, var_sym = [], {}
     for line in sections.get("VARIABLES", "").splitlines():
         m = _VAR_RE.match(line)
         if not m:
             continue
+        f = _fields(m.group("body"))
+        if not f or not f[0]:
+            continue
         num = len(variables) + 1
-        sym = m.group("sym").strip()
-        rest = m.group("rest").split("--")
-        domain = rest[0].strip() if rest else ""
-        desc = rest[1].strip() if len(rest) > 1 else ""
-        variables.append(
-            {"number": num, "abbreviation": sym, "name": sym,
-             "description": f"{domain}; {desc}".strip("; ")}
-        )
-        var_symbols[num] = sym
+        variables.append({
+            "number": num, "symbol": f[0],
+            "domain_class": normalize("variable", f[1] if len(f) > 1 else None),
+            "domain": f[2] if len(f) > 2 else "",
+            "description": f[3] if len(f) > 3 else "",
+        })
+        var_sym[num] = f[0]
 
-    objective, objective_sense = None, None
+    objective, sense = None, None
     for line in sections.get("OBJECTIVE", "").splitlines():
         m = _OBJ_RE.match(line)
-        if m and m.group("eq").strip():
-            objective_sense = "min" if m.group("sense").lower().startswith(
-                "min") else "max"
-            objective = {
-                "number": 0, "name": f"{objective_sense} objective",
-                "equation": m.group("eq").strip(),
-                "description": (m.group("desc") or "").strip(),
-            }
-            break
+        if not m:
+            continue
+        f = _fields(m.group("body"))
+        if len(f) < 3:
+            continue
+        sense = "max" if f[0].lower().startswith("max") else "min"
+        objective = {
+            "number": 0, "name": "objective", "sense": sense,
+            "domain_class": normalize("objective", f[1]),
+            "equation": f[2],
+            "description": f[3] if len(f) > 3 else "",
+        }
+        break
 
     constraints = []
     for line in sections.get("CONSTRAINTS", "").splitlines():
         m = _CON_RE.match(line)
-        if not m or not m.group("eq").strip():
+        if not m:
+            continue
+        f = _fields(m.group("body"))
+        if len(f) < 2:
             continue
         constraints.append({
             "number": len(constraints) + 1,
             "name": f"c{len(constraints) + 1}",
-            "equation": m.group("eq").strip(),
-            "description": (m.group("desc") or "").strip(),
+            "domain_class": normalize("constraint", f[0]),
+            "equation": f[1],
+            "description": f[2] if len(f) > 2 else "",
         })
 
-    nodes, connections = [], []
+    return _assemble(parameters, var_sym, variables, objective, sense,
+                     constraints, edge_mode="text",
+                     var_sym=var_sym, par_sym=par_sym)
+
+
+def parse_classification_dict(code_or_dict) -> Dict[str, Any]:
+    """Parse the embedded ``CLASSIFICATION`` dict from DC code."""
+    data = code_or_dict
+    if isinstance(code_or_dict, str):
+        m = _CLASSIFICATION_RE.search(code_or_dict)
+        if not m:
+            return _empty()
+        try:
+            data = ast.literal_eval(m.group(1))
+        except Exception:
+            return _empty()
+    if not isinstance(data, dict):
+        return _empty()
+
+    parameters, par_sym = [], {}
+    for i, p in enumerate(data.get("parameters", []), start=1):
+        parameters.append({
+            "number": i, "symbol": p.get("symbol", f"p{i}"),
+            "domain_class": normalize("parameter", p.get("class")),
+            "description": p.get("description", p.get("name", "")),
+        })
+        par_sym[i] = p.get("symbol", f"p{i}")
+
+    variables, var_sym, sym_to_num = [], {}, {}
+    for i, v in enumerate(data.get("variables", []), start=1):
+        sym = v.get("symbol", f"v{i}")
+        variables.append({
+            "number": i, "symbol": sym,
+            "domain_class": normalize("variable", v.get("class")),
+            "domain": v.get("domain", ""),
+            "description": v.get("description", v.get("name", "")),
+        })
+        var_sym[i] = sym
+        sym_to_num[sym] = i
+    par_to_num = {s: n for n, s in par_sym.items()}
+
+    obj = data.get("objective", {}) or {}
+    sense = "max" if str(obj.get("sense", "min")).lower().startswith("max") else "min"
+    objective = {
+        "number": 0, "name": "objective", "sense": sense,
+        "domain_class": normalize("objective", obj.get("class")),
+        "equation": obj.get("expr", ""),
+        "description": obj.get("description", ""),
+        "_vars": [sym_to_num[s] for s in obj.get("vars", []) if s in sym_to_num],
+        "_params": [par_to_num[s] for s in obj.get("params", []) if s in par_to_num],
+    } if obj else None
+
+    constraints = []
+    for i, c in enumerate(data.get("constraints", []), start=1):
+        constraints.append({
+            "number": i, "name": c.get("name", f"c{i}"),
+            "domain_class": normalize("constraint", c.get("class")),
+            "equation": c.get("expr", ""),
+            "description": c.get("description", ""),
+            "_vars": [sym_to_num[s] for s in c.get("vars", []) if s in sym_to_num],
+            "_params": [par_to_num[s] for s in c.get("params", []) if s in par_to_num],
+        })
+
+    return _assemble(parameters, var_sym, variables, objective, sense,
+                     constraints, edge_mode="explicit")
+
+
+def _assemble(parameters, _vs, variables, objective, sense, constraints,
+              edge_mode, var_sym=None, par_sym=None):
+    nodes, connections, param_links = [], [], []
+
+    for p in parameters:
+        nodes.append({"id": f"par_{p['number']}", "type": "parameter", **p})
     for v in variables:
         nodes.append({"id": f"var_{v['number']}", "type": "variable", **v})
 
-    compiled = {n: _symbol_token_re(s) for n, s in var_symbols.items()}
+    if edge_mode == "text":
+        v_rx = {n: _token_re(s) for n, s in (var_sym or {}).items()}
+        p_rx = {n: _token_re(s) for n, s in (par_sym or {}).items()}
+
+        def edges(eq):
+            ev = [n for n, rx in v_rx.items() if rx.search(eq)]
+            ep = [n for n, rx in p_rx.items() if rx.search(eq)]
+            return ev, ep
+    else:
+        def edges_from(item):
+            return item.get("_vars", []), item.get("_params", [])
 
     if objective is not None:
-        nodes.append({"id": "obj_0", "type": "objective", **objective})
-        for num, rx in compiled.items():
-            if rx.search(objective["equation"]):
-                connections.append([0, num])
+        clean = {k: v for k, v in objective.items() if not k.startswith("_")}
+        nodes.append({"id": "obj_0", "type": "objective", **clean})
+        ev, ep = (edges(objective["equation"]) if edge_mode == "text"
+                  else edges_from(objective))
+        connections += [[0, n] for n in ev]
+        param_links += [[0, n] for n in ep]
 
     for c in constraints:
-        nodes.append({"id": f"const_{c['number']}", "type": "constraint", **c})
-        for num, rx in compiled.items():
-            if rx.search(c["equation"]):
-                connections.append([c["number"], num])
+        clean = {k: v for k, v in c.items() if not k.startswith("_")}
+        nodes.append({"id": f"const_{c['number']}", "type": "constraint", **clean})
+        ev, ep = (edges(c["equation"]) if edge_mode == "text"
+                  else edges_from(c))
+        connections += [[c["number"], n] for n in ev]
+        param_links += [[c["number"], n] for n in ep]
 
-    parse_ok = objective is not None and bool(variables) and bool(constraints)
-    return {
-        "nodes": nodes,
-        "connections": connections,
-        "objective_sense": objective_sense,
-        "variables": variables,
-        "objective": objective,
-        "constraints": constraints,
-        "parse_ok": parse_ok,
-    }
-
-
-# --------------------------------------------------------------------------
-# Legacy parser: the pydantic ``Model(...)`` repr produced by the LLM parser
-# --------------------------------------------------------------------------
-
-@dataclass
-class _Variable:
-    Number: int
-    Abbreviation: str
-    Name: str
-    Description: str
-
-
-@dataclass
-class _ObjectiveFunction:
-    Name: str
-    Number: int
-    equation: str
-    description: str
-    VariablesIncluded: List[int]
-
-
-@dataclass
-class _Constraint:
-    Name: str
-    Number: int
-    equation: str
-    description: str
-    VariablesIncluded: List[int]
-
-
-def safe_eval_model(model_str: str) -> Dict[str, Any]:
-    """Evaluate a ``Model(...)`` repr with a restricted namespace."""
-    safe_globals = {
-        "Variable": _Variable,
-        "ObjectiveFunction": _ObjectiveFunction,
-        "Constraint": _Constraint,
-        "__builtins__": {},
-    }
-    local_vars: Dict[str, Any] = {}
-    words = [r"constraints=\[Constraint", "objective_function=ObjectiveFunction"]
-    model_str = re.sub(r"(" + "|".join(words) + r")", r"\n\1", model_str)
-    try:
-        exec(model_str.strip(), safe_globals, local_vars)  # noqa: S102
-        return {
-            "variables": local_vars.get("variablesInModel", []),
-            "objective": local_vars.get("objective_function", None),
-            "constraints": local_vars.get("constraints", []),
-        }
-    except Exception as e:
-        print(f"Error parsing legacy model repr: {e}")
-        return {"variables": [], "objective": None, "constraints": []}
-
-
-def parse_lp_model(model_str: str) -> Dict[str, Any]:
-    """Parse a legacy ``Model(...)`` repr into nodes/connections."""
-    parsed = safe_eval_model(str(model_str))
-    variables = parsed["variables"]
-    objective = parsed["objective"]
-    constraints = parsed["constraints"]
-
-    nodes, connections = [], []
-    for var in variables:
-        nodes.append({
-            "id": f"var_{var.Number}", "type": "variable",
-            "number": var.Number, "name": var.Name,
-            "abbreviation": var.Abbreviation, "description": var.Description,
-        })
-    if objective:
-        nodes.append({
-            "id": "obj_0", "type": "objective", "number": 0,
-            "name": objective.Name, "equation": objective.equation,
-            "description": objective.description,
-        })
-        for var_num in getattr(objective, "VariablesIncluded", []) or []:
-            connections.append([0, var_num])
-    for c in constraints:
-        nodes.append({
-            "id": f"const_{c.Number}", "type": "constraint",
-            "number": c.Number, "name": c.Name, "equation": c.equation,
-            "description": c.description,
-        })
-        for var_num in getattr(c, "VariablesIncluded", []) or []:
-            connections.append([c.Number, var_num])
-
+    parse_ok = (objective is not None and bool(variables)
+                and bool(constraints))
     return {"nodes": nodes, "connections": connections,
-            "variables": variables, "objective": objective,
-            "constraints": constraints}
+            "parameter_links": param_links, "objective_sense": sense,
+            "parse_ok": parse_ok}
 
-
-# --------------------------------------------------------------------------
-# Unified entry point + LLM-parser agreement
-# --------------------------------------------------------------------------
 
 def parse_milp(text: str) -> Dict[str, Any]:
-    """Parse a MILP, preferring the deterministic structured parser.
-
-    Falls back to the legacy ``Model(...)`` repr parser when the text is not
-    in the delimited layout (e.g. cached LLM-graph output from old runs).
-    """
+    """Auto-detect the input shape and parse it deterministically."""
     text = str(text)
     if _SECTION_RE.search(text):
         return parse_structured_text(text)
-    return parse_lp_model(text)
-
-
-def _edge_set(connections):
-    return {tuple(c) for c in connections}
-
-
-def parser_agreement(det: Dict[str, Any], llm: Dict[str, Any]) -> Dict[str, float]:
-    """Quantify disagreement between deterministic and LLM parsers.
-
-    Returns variable/constraint count deltas and the Jaccard similarity of
-    the edge sets.  Reported per row so the LLM-parser layer's error is a
-    measured quantity, not an assumption.
-    """
-    def counts(p):
-        return (
-            sum(n["type"] == "variable" for n in p["nodes"]),
-            sum(n["type"] == "constraint" for n in p["nodes"]),
-        )
-
-    dv, dc = counts(det)
-    lv, lc = counts(llm)
-    e_det, e_llm = _edge_set(det["connections"]), _edge_set(llm["connections"])
-    union = e_det | e_llm
-    jacc = len(e_det & e_llm) / len(union) if union else 1.0
-    return {
-        "var_count_delta": lv - dv,
-        "constraint_count_delta": lc - dc,
-        "edge_jaccard": jacc,
-        "deterministic_vars": dv,
-        "deterministic_constraints": dc,
-    }
+    if _CLASSIFICATION_RE.search(text):
+        return parse_classification_dict(text)
+    return _empty()
 
 
 def create_graph_columns(df: pd.DataFrame, column_name: str = "answer") -> pd.DataFrame:
-    """Add deterministic ``nodes`` / ``connections`` / ``objective_sense``
-    / ``parse_ok`` columns by parsing ``column_name`` for every row."""
+    """Add ``nodes`` / ``connections`` / ``parameter_links`` /
+    ``objective_sense`` / ``parse_ok`` columns by parsing ``column_name``."""
     df = df.copy()
-    nodes, conns, senses, oks = [], [], [], []
+    cols = {"nodes": [], "connections": [], "parameter_links": [],
+            "objective_sense": [], "parse_ok": []}
     for _, val in df[column_name].items():
-        if isinstance(val, str) and val.strip().startswith("[") and "{" in val:
-            val = ast.literal_eval(val)  # pre-parsed nodes restored from CSV
-        parsed = parse_milp(val) if isinstance(val, str) else {
-            "nodes": val, "connections": [], "objective_sense": None,
-            "parse_ok": bool(val)}
-        nodes.append(parsed["nodes"])
-        conns.append(parsed["connections"])
-        senses.append(parsed.get("objective_sense"))
-        oks.append(parsed.get("parse_ok", bool(parsed["nodes"])))
-    df["nodes"] = nodes
-    df["connections"] = conns
-    df["objective_sense"] = senses
-    df["parse_ok"] = oks
+        parsed = parse_milp(val) if isinstance(val, str) else _empty()
+        for k in cols:
+            cols[k].append(parsed[k])
+    for k, v in cols.items():
+        df[k] = v
     return df

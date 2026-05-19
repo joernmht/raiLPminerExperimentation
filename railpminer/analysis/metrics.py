@@ -39,9 +39,13 @@ def calculate_complexity_metrics(
     n_constraints = len([n for n in nodes if n['type'] == 'constraint'])
     n_objectives = len([n for n in nodes if n['type'] == 'objective'])
 
+    # Coherence/diameter concern the equation<->variable structure only;
+    # parameter nodes are linked separately and must not be added here or
+    # they would appear as isolated nodes and break connectivity.
     G = nx.Graph()
     for node in nodes:
-        G.add_node(node['id'])
+        if node['type'] in ('variable', 'objective', 'constraint'):
+            G.add_node(node['id'])
 
     for conn in connections:
         eq_num, var_num = conn

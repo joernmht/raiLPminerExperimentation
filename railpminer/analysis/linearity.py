@@ -33,7 +33,7 @@ _NONLINEAR_TOKENS = [
 
 def _variable_symbols(nodes: List[Dict]) -> List[str]:
     return [
-        n.get("abbreviation") or n.get("name", "")
+        n.get("symbol") or n.get("abbreviation") or n.get("name", "")
         for n in nodes
         if n.get("type") == "variable"
     ]
