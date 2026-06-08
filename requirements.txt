@@ -1,14 +1,15 @@
-# Core pipeline
-pandas
-networkx
-pulp                       # bundled CBC solver; Gurobi optional later
-pydantic
-pydantic-ai-slim[openai]   # open-weight models via OpenAI-compatible aggregator
-tqdm
+# raiLPminer drives the deterministic lp2graph mining API. Install lp2graph
+# itself EITHER as a package (`pip install "lp2graph[mining,solver]"`) OR as a
+# sibling checkout run via PYTHONPATH — railpminer auto-detects ../lp2graph/src.
+#
+# The third-party libraries the mining + validation stages need at runtime:
+pydantic>=2.0
+jsonschema>=4.0
+networkx>=3.0      # M6 schema-graph isomorphism
+pulp>=2.8          # grounding + CBC solver (external-fidelity validation)
+highspy>=1.7       # second independent solver (HiGHS) for the cross-solver check
 
-# Analysis & figures (notebooks)
-statsmodels
-matplotlib
-plotly
-ipython
-jupyter
+# Optional — only for your own analysis / figures (not required by the pipeline):
+# pandas
+# matplotlib
+# plotly

@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1.0",
+  "id": "mip_2_8_pesp",
+  "name": "2.8 PESP cyclic timetabling",
+  "family": "milp",
+  "description": "Periodic Event Scheduling Problem. For each event pair (i,j) with target offset l_{i,j} and tolerance window, the difference t_j - t_i mod T lies in [l_{i,j}, l_{i,j}+w_{i,j}]. Modeled with integer wrap variables k.",
+  "tags": ["milp", "pesp", "cyclic", "modulo"],
+  "indices": [
+    { "name": "E", "description": "Events." },
+    { "name": "T", "description": "Time slots within the period.", "ordered": true, "cyclic": true }
+  ],
+  "parameters": [
+    { "name": "l", "shape": ["E", "E"], "kind": "matrix", "description": "Lower offset target." },
+    { "name": "w", "shape": ["E", "E"], "kind": "matrix", "description": "Tolerance window width." },
+    { "name": "T_period", "kind": "scalar", "description": "Period length." }
+  ],
+  "variables": [
+    { "name": "t", "shape": ["E"], "domain": "non_negative", "description": "Event time within the period." },
+    { "name": "k", "shape": ["E", "E"], "domain": "integer", "role": "auxiliary", "description": "Period wrap counter." }
+  ],
+  "constraints": [
+    {
+      "name": "pesp_lower",
+      "kind": "modulo",
+      "description": "Lower bound on cyclic offset.",
+      "quantifiers": [
+        { "index": "i", "over": "E" },
+        { "index": "j", "over": "E", "restriction": "ne_other", "restriction_other": "i" }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "j" }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }], "sign": -1, "role": "lhs" },
+        { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "coefficient": "T_period", "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "l", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" }
+      ]
+    },
+    {
+      "name": "pesp_upper",
+      "kind": "modulo",
+      "description": "Upper bound on cyclic offset (lower + window).",
+      "quantifiers": [
+        { "index": "i", "over": "E" },
+        { "index": "j", "over": "E", "restriction": "ne_other", "restriction_other": "i" }
+      ],
+      "comparator": "le",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "j" }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }], "sign": -1, "role": "lhs" },
+        { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "coefficient": "T_period", "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "l", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" },
+        { "ref": "w", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "tension",
+    "terms": [
+      { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "operator": "sum", "operator_over": ["E", "E"], "role": "objective" }
+    ]
+  }
+}
