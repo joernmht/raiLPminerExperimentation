@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "id": "objective_abs_deviation",
+  "name": "Absolute-deviation objective",
+  "family": "lp",
+  "description": "Minimize the sum of absolute deviations of departure times from a target schedule. Demonstrates the 'abs' operator on objective terms.",
+  "tags": ["lp", "abs", "regularity"],
+  "indices": [{ "name": "I", "description": "Trains." }],
+  "parameters": [
+    { "name": "target", "shape": ["I"], "kind": "vector", "description": "Target departure time." }
+  ],
+  "variables": [
+    { "name": "t", "shape": ["I"], "domain": "non_negative", "description": "Scheduled time." }
+  ],
+  "constraints": [],
+  "objective": {
+    "sense": "min",
+    "name": "l1_deviation",
+    "terms": [
+      { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }], "operator": "abs", "role": "objective" }
+    ]
+  }
+}

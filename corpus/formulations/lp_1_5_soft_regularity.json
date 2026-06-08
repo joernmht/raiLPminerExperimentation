@@ -1,0 +1,47 @@
+{
+  "schema_version": "0.1.0",
+  "id": "lp_1_5_soft_regularity",
+  "name": "1.5 Soft-regularity LP",
+  "family": "lp",
+  "description": "Soft constraint variant: deviations from a target headway are penalized through slack variables in the objective.",
+  "tags": ["lp", "soft", "regularity"],
+  "indices": [
+    { "name": "I", "description": "Trains.", "ordered": true }
+  ],
+  "parameters": [
+    { "name": "h_target", "kind": "scalar", "description": "Target headway." },
+    { "name": "w", "kind": "scalar", "description": "Penalty weight for headway deviation." }
+  ],
+  "variables": [
+    { "name": "t", "shape": ["I"], "domain": "non_negative", "description": "Scheduled departure time." },
+    { "name": "s_pos", "shape": ["I"], "domain": "non_negative", "role": "slack", "description": "Positive deviation from target headway." },
+    { "name": "s_neg", "shape": ["I"], "domain": "non_negative", "role": "slack", "description": "Negative deviation from target headway." }
+  ],
+  "constraints": [
+    {
+      "name": "regularity_soft",
+      "kind": "soft",
+      "description": "Headway equals target plus signed slack.",
+      "quantifiers": [{ "index": "i", "over": "I" }],
+      "comparator": "eq",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i-1", "offset": -1 }], "sign": -1, "role": "lhs" },
+        { "ref": "s_pos", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "sign": -1, "role": "slack" },
+        { "ref": "s_neg", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "sign": 1, "role": "slack" }
+      ],
+      "rhs": [
+        { "ref": "h_target", "ref_kind": "parameter", "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_deviation",
+    "description": "Minimize weighted sum of headway deviations.",
+    "terms": [
+      { "ref": "s_pos", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "coefficient": "w", "operator": "sum", "operator_over": ["I"], "role": "objective" },
+      { "ref": "s_neg", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "coefficient": "w", "operator": "sum", "operator_over": ["I"], "role": "objective" }
+    ]
+  }
+}

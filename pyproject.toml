@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "railpminer"
+version = "1.0.0"
+description = "Reproducible LP-mining experiment harness for 'LP Mining with LP2Graph'."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Jörn Maurischat", email = "joern.maurischat@tu-dresden.de" }]
+keywords = ["LP", "MILP", "mining", "taxonomy", "railway", "rescheduling", "optimization"]
+
+# lp2graph is the core method library. It is listed here so an installed
+# environment is complete; during local development it is commonly a sibling
+# checkout used via PYTHONPATH, which railpminer auto-detects.
+dependencies = [
+    "lp2graph[mining,solver]>=0.3",
+]
+
+[project.optional-dependencies]
+notebooks = ["pandas", "matplotlib", "plotly", "jupyter"]
+dev = ["pytest>=8.0", "ruff", "mypy"]
+
+[project.scripts]
+railpminer = "railpminer.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["railpminer"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+    # pulp 3.x emits deprecation warnings from inside lp2graph's solver; not ours.
+    "ignore::DeprecationWarning:pulp",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
