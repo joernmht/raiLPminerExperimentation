@@ -1,0 +1,56 @@
+{
+  "schema_version": "0.1.0",
+  "id": "assignment",
+  "name": "Linear assignment problem",
+  "family": "milp",
+  "description": "Assign each worker to exactly one job and each job to exactly one worker, minimizing total assignment cost. The canonical textbook assignment/matching model.",
+  "tags": ["milp", "assignment", "matching", "set-partitioning"],
+  "indices": [
+    { "name": "W", "description": "Workers." },
+    { "name": "J", "description": "Jobs." }
+  ],
+  "parameters": [
+    { "name": "c", "shape": ["W", "J"], "kind": "matrix", "domain_class": "cost_weight", "description": "Cost of assigning worker w to job j." }
+  ],
+  "variables": [
+    { "name": "x", "shape": ["W", "J"], "domain": "binary", "domain_role": "selection_assignment", "description": "1 iff worker w is assigned to job j." }
+  ],
+  "constraints": [
+    {
+      "name": "each_worker_one_job",
+      "kind": "set_packing",
+      "domain_class": "assignment_covering",
+      "description": "Each worker is assigned exactly one job.",
+      "quantifiers": [{ "index": "w", "over": "W" }],
+      "comparator": "eq",
+      "lhs": [
+        { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "W", "expr": "w" }, { "index": "J", "expr": "j" }], "operator": "sum", "operator_over": ["J"], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "one", "ref_kind": "literal", "coefficient": 1, "role": "rhs" }
+      ]
+    },
+    {
+      "name": "each_job_one_worker",
+      "kind": "set_packing",
+      "domain_class": "assignment_covering",
+      "description": "Each job is assigned exactly one worker.",
+      "quantifiers": [{ "index": "j", "over": "J" }],
+      "comparator": "eq",
+      "lhs": [
+        { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "W", "expr": "w" }, { "index": "J", "expr": "j" }], "operator": "sum", "operator_over": ["W"], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "one", "ref_kind": "literal", "coefficient": 1, "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_cost",
+    "description": "Minimize total assignment cost.",
+    "terms": [
+      { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "W", "expr": "w" }, { "index": "J", "expr": "j" }], "coefficient": "c", "operator": "sum", "operator_over": ["W", "J"], "role": "objective" }
+    ]
+  }
+}

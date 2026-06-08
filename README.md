@@ -1,206 +1,199 @@
-# raiLPminer
+# raiLPminer — LP Mining experiments
 
-**Graphing as a means of designing MILPs for railway rescheduling — with
-embedded domain classification and solver-grounded validation.**
+Reproducible experiment harness for the paper **“LP Mining with LP2Graph: A Use
+Case for Railway Rescheduling.”**
 
-raiLPminer generates Mixed-Integer Linear Programming (MILP) formulations
-for railway rescheduling from **problem descriptions** using **open-weight**
-LLMs, and tests one focused question:
+It mines a corpus of published LP/MILP formulations from the scientific
+literature and distills them into a **versioned, regenerable dataset** and an
+**induced taxonomy** of variable types, constraint families and model types —
+then validates that the underlying graph representation is faithful by
+round-tripping each model through LaTeX and re-solving it against the optima
+published with it.
 
-> **Hypothesis.** A graph-based depiction of a generated MILP allows
-> identifying flaws *early* in the development process — before any solver
-> is implemented.
-
-Creativity / structural diversity is no longer a goal: temperature is **0**
-and the graph is used as a *design and screening instrument*. Every model is
-**actually solved** on benchmark railway instances (PuLP/CBC; Gurobi
-pluggable later) and checked for operational safety, so the cheap,
-solver-free *graph screen* is measured as a *predictor of real validity*.
-
----
-
-## What is new in this version
-
-- **Classification is part of generation and parsing — not a-posteriori.**
-  A comprehensive taxonomy (`analysis/taxonomy.py`) spans the **objective**,
-  the **variables**, the **parameters** (now first-class) and the
-  **constraints**. The LLM tags every element; the deterministic parser
-  reads the tags back. There is no keyword matching anywhere (the old
-  keyword classifier was removed), so domain relevance is *declared and
-  parsed*, never synonym-undercounted.
-- **Three workflows, no feedback loops, temperature 0:**
-
-  | Key | Name | Description |
-  |-----|------|-------------|
-  | `SIM` | Simultaneous | One call emits the fully classified MILP |
-  | `TAF` | Text-Analysis-First | Call 1 classifies the problem text into a domain blueprint; call 2 develops the classified MILP from it (two sequential calls) |
-  | `DC` | Direct-Code (baseline) | One call emits runnable PuLP code **plus** an embedded `CLASSIFICATION` dict, so it is solved *and* reverse-graphed for a like-for-like comparison |
-
-- **Diversity subset selection removed.** The project fully commits to the
-  structural-validation metrics and their measured agreement with the
-  solver ground truth.
-- **No second LLM layer.** Parsing is deterministic for all workflows
-  (strict classified text for SIM/TAF; the embedded `CLASSIFICATION` dict
-  for DC).
-
-## How the original rejection points are addressed
-
-| Reviewer point | Concrete change |
-|---|---|
-| #2/#4 — no solver execution / feasibility / safety | `railpminer.validation`: each MILP → PuLP code → solved on **multiple benchmark instances**; feasibility, optimality, runtime and operational-safety checks (running time, dwell, headway, station capacity) recorded as the ground truth. |
-| #2 — completeness/coherence superficial; content-free model "passed" | They are an explicit *early screen*; their true/false-positive rate is **measured** against the solver truth. The empty-model case is a tracked dry-run test, caught by `graph_parse_ok` and the solver. |
-| #2 — questionable significance | The contribution is a millisecond-cost screen that flags flawed MILPs (incl. **missing safety constraints**) before solver implementation; its early-catch rate is quantified per workflow. |
-| #2 — incomplete reference MILPs | No reference MILP is used; ground truth is solver + safety on shared benchmark instances. |
-| #2 — unfair design / temperature fudge | Balanced, fully-crossed, deterministic factorial design (`build_factorial_design` + `assert_balanced`); temperature fixed at 0 (no creativity), so the temperature inconsistency is gone. |
-| #3.1 — keyword-matching limitation | Keyword matching **removed**; classification is embedded in generation and parsed deterministically from the taxonomy. |
-| #3.2 — hard operator threshold | `detect_milp_artifacts(min_coverage=…)` parameterised and documented (kept only as a coarse pre-filter). |
-| #4.4 — second LLM parser layer | Eliminated: deterministic parser for every workflow. |
-| #4.5 — non-linear abs/products | `analysis/linearity.py` flags them structurally; the solver build independently rejects them; both are compared. |
+> **What changed.** Earlier, this repository drove LLM *generation* of MILPs
+> (the SIM/TAF/DC workflows and the 4×4×3 experiments). That direction has been
+> **superseded**: the new paper is about *mining* existing formulations, not
+> generating new ones. All generation-era code, data and notebooks were removed
+> (recoverable from git history on the `main` branch). Structure-aware
+> generation now reappears only as a *downstream use* of the mined taxonomy.
 
 ---
 
-## Pipeline
+## How it fits together
+
+The **method** is deterministic and lives in the
+[`lp2graph`](https://github.com/joernmht/lp2graph) library — specifically its
+`mining` package, which implements the six modules the paper's methodology
+needs (M1–M6: ingestion, homologization, clustering, labeling, corpus
+management, isomorphism). This repository is the **experiment**: it manages the
+corpus, orchestrates lp2graph's mining API end-to-end, and writes the paper's
+artifacts. No method logic is re-implemented here — the harness stays thin so it
+tracks the library as it evolves.
 
 ```
-Problem description
-        │
-        ▼
-  Generation (SIM / TAF / DC), temperature 0, no feedback loop
-        │            answer = classified MILP text  (SIM/TAF)
-        │                   = PuLP code + CLASSIFICATION (DC)
-        ▼
-  Deterministic classified parse → classified bipartite graph   (no LLM)
-        │
-        ▼
-  Graph screen (cheap, solver-free):
-  parse_ok · complete · coherent · linear · safety_classes
-        │
-        ▼
-  Validation per solving:
-  PuLP code → solve on N benchmark instances →
-  feasibility / optimality / railway-safety   (ground truth)
-        │
-        ▼
-  Hypothesis analysis: screen vs solver truth
-  (early-catch / false-alarm / precision; per-workflow comparison)
+          corpus  ──►  taxonomy  ──►  labels  ──►  dataset + taxonomy tables
+ (formulations +      (multi-level    (two-stage     (the mined outputs)
+  provenance, M5)      clustering,     closed-loop
+                       M2+M3)          labeling, M4)
+                                                          │
+                       a-posteriori validation  ◄─────────┘
+        (codec round-trip + cross-solver re-solve + intra-cluster isomorphism, M6)
 ```
 
-**Open-weight models** (OpenAI-compatible aggregator, default OpenRouter;
-set `OPENROUTER_BASE_URL` to a local vLLM/Ollama server to run offline):
-`llama_3_3_70b`, `qwen_2_5_72b`, `deepseek_v3`, `mistral_small_3`.
+Each stage is one module in `railpminer/` (see *Architecture* below).
 
 ---
 
-## Installation
+## Quick start
 
-Python 3.11+.
+You need Python 3.11+, the `lp2graph` library, and two solvers for the
+validation stage.
 
 ```bash
+# 1. Third-party runtime deps (mining + validation):
 pip install -r requirements.txt
-export PYTHONPATH="$PWD:$PYTHONPATH"
+
+# 2. lp2graph itself — EITHER install it…
+pip install "lp2graph[mining,solver]"
+#    …OR keep it as a sibling checkout (../lp2graph). railpminer auto-detects
+#    ../lp2graph/src and adds it to the path, so nothing else is needed.
+
+# 3. Run the whole pipeline (writes artifacts under outputs/):
+python -m railpminer run
 ```
 
-Default solver is PuLP's bundled CBC (no setup).
+That prints a run summary and writes the artifacts listed below. Everything is
+deterministic: re-running reproduces byte-identical outputs.
 
-## Quick start — offline dry run (no API key, no network)
-
-```bash
-python examples/dry_run.py
-```
-
-Runs the full pipeline on mock data for all three workflows. The combined
-graph screen separates the valid models from the non-linear / infeasible /
-empty / **missing-safety** ones (early-catch 1.0, false-alarm 0.0 on the
-mock set); the per-signal table shows `graph_safety_classes` carries most of
-the signal, and the per-workflow table compares SIM/TAF against the DC
-baseline.
-
-## Reproducing the full experiment
+From Python:
 
 ```python
-from railpminer.utils.io import process_inputfiles
-from railpminer.config import register_problem
-from railpminer.experiments import build_factorial_design, assert_balanced
-from railpminer.experiments.runner import run_agent_experiments
-from railpminer.analysis.graph_parser import create_graph_columns
-from railpminer.analysis.screen import compute_graph_screen
-from railpminer.validation import validate_dataframe
-from railpminer.analysis.hypothesis import (
-    screen_confusion, evaluate_screen_against_solver, workflow_comparison)
+from railpminer import run, PipelineConfig
 
-df_p = process_inputfiles("inputs/", output_name="problem", file_suffix=".txt")
-for _, r in df_p.iterrows():
-    register_problem(r["variable_name"], r["text"])
-
-design = build_factorial_design({
-    "model":    ["llama_3_3_70b", "qwen_2_5_72b",
-                 "deepseek_v3", "mistral_small_3"],
-    "workflow": ["SIM", "TAF", "DC"],
-    "problem":  list(df_p["variable_name"]),
-}, replications=14)                       # temperature fixed at 0
-
-gen = await run_agent_experiments(design)                 # OPENROUTER_API_KEY
-gen = compute_graph_screen(create_graph_columns(gen, "answer"))
-val = await validate_dataframe(gen)                       # codegen + solve
-assert_balanced(val, ["model", "workflow", "problem"])
-
-print(screen_confusion(val))
-print(evaluate_screen_against_solver(val))
-print(workflow_comparison(val))           # SIM/TAF vs DC baseline
-```
-
-`analysis.ipynb` reproduces the same analysis with figures.
-
----
-
-## Project structure
-
-```
-railpminer/
-  config.py                 # open-weight registry, problem registry
-  instance_contract.py      # shared instance / build_model / CLASSIFICATION text
-  models/
-    schema.py               # Parameter first-class; domain_class on every element
-    agents.py               # SIM / TAF / DC, temperature 0, no feedback loops
-  experiments/
-    permutations.py         # balanced, deterministic factorial design
-    runner.py               # single-pass generation runner
-  analysis/
-    taxonomy.py             # comprehensive 4-kind domain taxonomy
-    graph_parser.py         # deterministic classified parser (text + DC dict)
-    linearity.py            # structural non-linearity detection
-    metrics.py              # structural complexity metrics
-    screen.py               # cheap solver-free verdict (incl. safety classes)
-    hypothesis.py           # screen vs solver truth; per-workflow comparison
-    milp_detection.py       # coarse operator pre-filter (parameterised)
-  validation/
-    instances.py            # benchmark railway rescheduling instances
-    codegen.py              # classified MILP text → PuLP code (single pass)
-    solve.py                # build + solve + status/runtime
-    railway_checks.py       # running-time / dwell / headway / capacity checks
-    pipeline.py             # → strict solver_valid ground-truth label
-inputs/                     # problem descriptions
-examples/                   # offline dry run + mock data
-analysis.ipynb              # validation & hypothesis analysis
+result = run(PipelineConfig())     # writes outputs/, returns a MiningResult
+print(result.summary())
 ```
 
 ---
 
-## Known limitations (stated up front)
+## Command-line interface
 
-- Classification quality depends on the LLM tagging correctly; mistags fall
-  into the `other_*` buckets (never silently dropped) and their effect is
-  visible in the measured screen accuracy.
-- The operator pre-filter threshold is an empirical hard cut (parameterised;
-  a dynamic threshold is future work). It is now only a coarse gate, not the
-  domain classifier.
-- Generated solver code is executed — run validation only in an isolated
-  sandbox.
-- Benchmark instances are small, synthetic and deterministic (reproducible
-  without external data); sufficient to detect infeasibility, non-linearity
-  and safety violations, not to benchmark industrial-scale solver
-  performance.
+```bash
+python -m railpminer run          # full pipeline → outputs/
+python -m railpminer corpus       # load + summarize the corpus
+python -m railpminer cluster      # induce + print the multi-level taxonomy
+python -m railpminer label        # run the closed-loop labeling, print labels
+python -m railpminer validate     # structural + external fidelity + isomorphism
+python -m railpminer taxonomy --latex   # the taxonomy axes table as LaTeX
+
+# Point at a different corpus / output dir:
+python -m railpminer run --corpus path/to/corpus --output path/to/outputs
+```
+
+---
+
+## The corpus
+
+```
+corpus/
+  manifest.json            queries + frozen search date (makes the corpus regenerable)
+  formulations/<id>.json   one VALIDATED canonical LP2Graph model per formulation
+  provenance/<id>.json     one ProvenanceRecord per formulation, matched by id
+  instances/*.json         validation instances (cardinalities + data + published optimum)
+```
+
+The shipped corpus is a **seed**: ten canonical *structural templates*
+(assignment, PESP, big-M ordering, time-indexed, …) paired with illustrative
+bibliographic provenance, so the full pipeline runs end-to-end out of the box.
+The provenance metadata is clearly marked as illustrative in `manifest.json`.
+
+### Building the full corpus
+
+To produce a paper-grade run, replace the seed entries with real extractions
+following the paper's protocol (`chapters/03_methodology/sec_scope_corpus.tex`):
+
+1. **Collect sources** by priority cell P1–P5 (railway rescheduling first,
+   production rescheduling as an analogical outer shell). Source material lives
+   in `../milp_sources/` and is categorized in `../lp2graph/corpus/`.
+2. **Extract** each formulation into a validated canonical LP2Graph model —
+   either by transcribing to the canonical LaTeX grammar
+   (`lp2graph parse model.tex`) or via the M1 ingestion front-end
+   (`lp2graph.mining.ingest`). Ingestion failures are *reported*, never dropped.
+3. **Drop in** the validated `formulations/<id>.json`, a matching
+   `provenance/<id>.json` (real venue, tier, year, citation count at the freeze
+   date, domain shell, activity, priority cell), and — where instance data and a
+   published optimum exist — an `instances/<…>.json`.
+4. Re-run `python -m railpminer run`.
+
+Adding entries needs no code changes: the loader discovers everything by file.
+
+---
+
+## Outputs
+
+`python -m railpminer run` writes to `outputs/` (git-ignored, regenerable):
+
+| File | Contents |
+|------|----------|
+| `dataset.json` | Per-formulation mined dataset: canonical-model summary, structural metrics, presence flags, multi-level labels, provenance, validation status. |
+| `taxonomy.json` | The induced taxonomy: cluster counts and the five axes with their categories. |
+| `taxonomy.csv` | The taxonomy axes as a flat table. |
+| `taxonomy_axes.tex` | The taxonomy axes as a LaTeX table (paper's `tab:taxonomy_axes`). |
+| `clustering_report.json` | Cluster counts, per-level silhouette, and stability (ARI under perturbed configs). |
+| `validation_report.json` | Structural / external fidelity per model, cross-solver agreement, intra-cluster isomorphism, citation-anchored representatives. |
+| `run_summary.json` | Compact digest + the versions of every frozen resource in force. |
+
+---
+
+## Architecture
+
+A thin module per stage; `pipeline.run()` is the deterministic glue.
+
+| Module | Stage | lp2graph modules used |
+|--------|-------|-----------------------|
+| `railpminer/corpus.py` | 1 — corpus construction + provenance | `mining.corpusmgr` (M5) |
+| `railpminer/clustering.py` | 3–4 — features + multi-level clustering | `mining.homologize` (M2), `mining.cluster` (M3) |
+| `railpminer/labeling.py` | 5 — two-stage closed-loop labeling | `mining.label` (M4) |
+| `railpminer/dataset.py` | 6 — the mined dataset | `metrics`, `views` |
+| `railpminer/taxonomy_export.py` | 6 — the taxonomy table | `mining.cluster` |
+| `railpminer/validation.py` | 7 — fidelity validation | `codec`, `solve`, `mining.isomorphism` (M6) |
+| `railpminer/pipeline.py` | — orchestration | all of the above |
+| `railpminer/config.py` | — versioned configuration | — |
+| `railpminer/_lp2graph.py` | — locate/import lp2graph | — |
+
+**Determinism.** Same corpus + same versioned config ⇒ identical artifacts.
+Seeds and thresholds are explicit in `PipelineConfig`; every frozen lp2graph
+resource (lexicon, thesaurus, vocabulary, clustering, label lexicon, rewrite
+rules) is versioned and stamped into `run_summary.json`. The labeling loop runs
+without a human by using a deterministic structural labeler (read off each
+model's type signature) in place of human adjudication, and records the source
+of every label so the provenance stays transparent.
+
+**Honesty about coverage.** Models the canonical grammar cannot express, or that
+have no published instance data, are *reported* and excluded from the claims
+they cannot support — never silently coerced.
+
+---
+
+## Tests
+
+```bash
+python -m pytest
+```
+
+Covers corpus loading, end-to-end determinism (the dataset is byte-identical
+across runs), external fidelity against published optima, and labeling
+completeness/determinism.
+
+---
+
+## Relationship to the other repositories
+
+- **`lp2graph`** — the deterministic method library (core model, codec, solver,
+  and the `mining` M1–M6 modules) this harness orchestrates.
+- **`milp_sources`** — the raw corpus of published formulations to extract from.
+- **`67531d7506c81a8c34f5794e`** — the LaTeX paper this experiment supports.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see `LICENSE`.

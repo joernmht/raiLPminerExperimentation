@@ -1,0 +1,69 @@
+{
+  "schema_version": "0.1.0",
+  "id": "pesp_solvable",
+  "name": "PESP cyclic timetabling (solvable instance form)",
+  "family": "milp",
+  "description": "Periodic Event Scheduling Problem in the timtab/MIPLIB family. For each ordered event pair (i,j) the cyclic difference (t_j - t_i) wrapped by period T into the window [l_{i,j}, l_{i,j}+w_{i,j}] via a non-negative integer wrap counter k_{i,j}. Minimizing the total number of wraps is a proxy for timetable tension. Same structure as the IBM/CPLEX timtab1 cyclic-timetabling MILP, with non-negative wrap counters so the objective is bounded.",
+  "tags": ["milp", "pesp", "cyclic", "modulo", "timetabling"],
+  "indices": [
+    { "name": "E", "description": "Periodic events." }
+  ],
+  "parameters": [
+    { "name": "l", "shape": ["E", "E"], "kind": "matrix", "domain_class": "time_duration", "description": "Lower offset target for the pair (i,j)." },
+    { "name": "w", "shape": ["E", "E"], "kind": "matrix", "domain_class": "time_duration", "description": "Tolerance window width for the pair (i,j)." },
+    { "name": "T_period", "kind": "scalar", "domain_class": "time_duration", "description": "Period length." }
+  ],
+  "variables": [
+    { "name": "t", "shape": ["E"], "domain": "non_negative", "domain_role": "timing", "description": "Event time within the period." },
+    { "name": "k", "shape": ["E", "E"], "domain": "integer", "lower": 0, "role": "auxiliary", "domain_role": "auxiliary_linearization", "description": "Non-negative period wrap counter." }
+  ],
+  "constraints": [
+    {
+      "name": "pesp_lower",
+      "kind": "modulo",
+      "domain_class": "periodic_modulo_pesp",
+      "description": "Lower bound on the cyclic offset.",
+      "quantifiers": [
+        { "index": "i", "over": "E" },
+        { "index": "j", "over": "E", "restriction": "ne_other", "restriction_other": "i" }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "j" }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }], "sign": -1, "role": "lhs" },
+        { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "coefficient": "T_period", "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "l", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" }
+      ]
+    },
+    {
+      "name": "pesp_upper",
+      "kind": "modulo",
+      "domain_class": "periodic_modulo_pesp",
+      "description": "Upper bound on the cyclic offset (lower target plus window).",
+      "quantifiers": [
+        { "index": "i", "over": "E" },
+        { "index": "j", "over": "E", "restriction": "ne_other", "restriction_other": "i" }
+      ],
+      "comparator": "le",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "j" }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }], "sign": -1, "role": "lhs" },
+        { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "coefficient": "T_period", "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "l", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" },
+        { "ref": "w", "ref_kind": "parameter", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_wraps",
+    "description": "Minimize the total number of period wraps (timetable tension proxy).",
+    "terms": [
+      { "ref": "k", "ref_kind": "variable", "bindings": [{ "index": "E", "expr": "i" }, { "index": "E", "expr": "j" }], "operator": "sum", "operator_over": ["E", "E"], "role": "objective" }
+    ]
+  }
+}
