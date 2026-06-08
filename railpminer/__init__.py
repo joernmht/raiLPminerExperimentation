@@ -1,23 +1,49 @@
-"""raiLPminer -- open-LLM MILP generation with solver-validated graph screening.
+"""raiLPminer — a reproducible LP-mining experiment harness.
 
-The framework generates MILP formulations for railway rescheduling from
-*problem descriptions* using open-weight LLMs, screens them with a cheap
-solver-free graph depiction, and validates them by actually solving them on
-benchmark instances -- so the graph screen's predictive value can be
-measured rather than assumed.
+This package applies the *LP Mining with LP2Graph* method to a corpus of
+published LP/MILP formulations and emits the paper's artifacts: a versioned,
+regenerable dataset and an induced taxonomy of variable types, constraint
+families and model types, together with the representation-fidelity validation.
 
-Quick usage::
+It is deliberately thin: the *method* lives in the deterministic ``lp2graph``
+library (its ``mining`` package, modules M1–M6). This harness is the
+*experiment* — corpus management, end-to-end orchestration, and artifact
+generation — analogous to how the repository's earlier version drove the
+(now superseded) LLM-generation experiments.
 
-    from railpminer.config import get_model, get_problem, register_problem
-    from railpminer.experiments import build_factorial_design
-    from railpminer.analysis import compute_graph_screen
-    from railpminer.validation import validate_dataframe
+Quick start::
+
+    from railpminer import run, PipelineConfig
+    result = run(PipelineConfig())          # writes artifacts under outputs/
+    print(result.summary())
+
+The six forward stages plus validation map onto these modules:
+
+    corpus      Stage 1   corpus construction + provenance (M5)
+    clustering  Stage 3-4 feature construction + multi-level clustering (M2, M3)
+    labeling    Stage 5   two-stage closed-loop labeling (M4)
+    dataset     Stage 6   the mined per-formulation dataset
+    taxonomy_export Stage 6   the induced taxonomy table (JSON/CSV/LaTeX)
+    validation  Stage 7   structural/external fidelity + isomorphism (codec, solve, M6)
+    pipeline              the deterministic glue (`run`)
 """
 
-from railpminer.config import (
-    get_model,
-    get_paper,
-    get_problem,
-    register_paper,
-    register_problem,
-)
+from __future__ import annotations
+
+from . import _lp2graph  # noqa: F401  (import side effect: make lp2graph importable)
+from .config import ClusterConfig, LoopConfig, PipelineConfig
+from .corpus import LoadedCorpus, load_corpus
+from .pipeline import MiningResult, run
+
+__version__ = "1.0.0"
+
+__all__ = [
+    "ClusterConfig",
+    "LoadedCorpus",
+    "LoopConfig",
+    "MiningResult",
+    "PipelineConfig",
+    "__version__",
+    "load_corpus",
+    "run",
+]

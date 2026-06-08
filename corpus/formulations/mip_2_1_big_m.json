@@ -1,0 +1,64 @@
+{
+  "schema_version": "0.1.0",
+  "id": "mip_2_1_big_m",
+  "name": "2.1 Big-M ordering MIP",
+  "family": "milp",
+  "description": "Pairwise ordering disjunction encoded with big-M. y_{i,j} = 1 if train i precedes train j.",
+  "tags": ["milp", "big-m", "ordering"],
+  "indices": [
+    { "name": "I", "description": "Trains.", "ordered": false }
+  ],
+  "parameters": [
+    { "name": "M", "kind": "big_m", "description": "Linearization constant; an upper bound on max(t_i)." },
+    { "name": "h", "kind": "scalar", "description": "Minimum headway." }
+  ],
+  "variables": [
+    { "name": "t", "shape": ["I"], "domain": "non_negative", "description": "Departure time." },
+    { "name": "y", "shape": ["I", "I"], "domain": "binary", "role": "indicator", "description": "y_{i,j} = 1 iff train i precedes train j." }
+  ],
+  "constraints": [
+    {
+      "name": "order_a",
+      "kind": "big_m",
+      "description": "If y_{i,j}=1 then train j departs at least h after train i.",
+      "quantifiers": [
+        { "index": "i", "over": "I" },
+        { "index": "j", "over": "I", "restriction": "ne_other", "restriction_other": "i" }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "j", "offset": 0 }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "sign": -1, "role": "lhs" },
+        { "ref": "M", "ref_kind": "parameter", "sign": 1, "role": "lhs" },
+        { "ref": "y", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }, { "index": "I", "expr": "j" }], "coefficient": "M", "sign": -1, "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "h", "ref_kind": "parameter", "role": "rhs" }
+      ]
+    },
+    {
+      "name": "order_pair",
+      "kind": "linear",
+      "description": "Exactly one of y_{i,j}, y_{j,i} is 1 for i < j.",
+      "quantifiers": [
+        { "index": "i", "over": "I" },
+        { "index": "j", "over": "I", "restriction": "ordered_pair", "restriction_other": "i" }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        { "ref": "y", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }, { "index": "I", "expr": "j" }], "role": "lhs" },
+        { "ref": "y", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "j" }, { "index": "I", "expr": "i" }], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "one", "ref_kind": "literal", "coefficient": 1, "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_time",
+    "terms": [
+      { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "operator": "sum", "operator_over": ["I"], "role": "objective" }
+    ]
+  }
+}

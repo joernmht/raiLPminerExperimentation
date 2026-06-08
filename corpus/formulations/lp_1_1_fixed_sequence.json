@@ -1,0 +1,63 @@
+{
+  "schema_version": "0.1.0",
+  "id": "lp_1_1_fixed_sequence",
+  "name": "1.1 Fixed-sequence LP",
+  "family": "lp",
+  "description": "Continuous LP for retiming trains along a fixed sequence. Variables are scheduled departure times; constraints enforce minimum separation and per-train running times.",
+  "tags": ["lp", "fixed-sequence", "timetabling"],
+  "indices": [
+    { "name": "I", "description": "Trains, given in fixed order.", "ordered": true }
+  ],
+  "parameters": [
+    { "name": "h", "kind": "scalar", "description": "Minimum headway between two consecutive trains." },
+    { "name": "r", "shape": ["I"], "kind": "vector", "description": "Per-train minimum running time." },
+    { "name": "earliest", "shape": ["I"], "kind": "vector", "description": "Earliest allowed departure." }
+  ],
+  "variables": [
+    {
+      "name": "t",
+      "shape": ["I"],
+      "domain": "non_negative",
+      "description": "Scheduled departure time of train i."
+    }
+  ],
+  "constraints": [
+    {
+      "name": "headway",
+      "kind": "headway",
+      "description": "Minimum headway between consecutive trains.",
+      "quantifiers": [
+        { "index": "i", "over": "I" }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "role": "lhs" },
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i-1", "offset": -1 }], "sign": -1, "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "h", "ref_kind": "parameter", "role": "rhs" }
+      ]
+    },
+    {
+      "name": "earliest_departure",
+      "kind": "linear",
+      "description": "Each departure must respect its earliest allowed time.",
+      "quantifiers": [{ "index": "i", "over": "I" }],
+      "comparator": "ge",
+      "lhs": [
+        { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "earliest", "ref_kind": "parameter", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_makespan",
+    "description": "Minimize the departure time of the last train.",
+    "terms": [
+      { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i", "offset": 0 }], "operator": "sum", "operator_over": ["I"], "role": "objective" }
+    ]
+  }
+}

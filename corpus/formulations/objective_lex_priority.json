@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "id": "objective_lex_priority",
+  "name": "Lexicographic objective priority",
+  "family": "lp",
+  "description": "Two-tier lexicographic objective: first minimize total cancellations, then minimize total lateness. Demonstrates the 'lexicographic' combination mode.",
+  "tags": ["lp", "lexicographic", "multi-objective"],
+  "indices": [{ "name": "I", "description": "Trains." }],
+  "variables": [
+    { "name": "t", "shape": ["I"], "domain": "non_negative", "description": "Lateness in minutes." },
+    { "name": "c", "shape": ["I"], "domain": "non_negative", "description": "Cancellation indicator (0..1)." }
+  ],
+  "constraints": [],
+  "objective": {
+    "sense": "min",
+    "name": "lex",
+    "combination": "lexicographic",
+    "terms": [
+      { "ref": "c", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }], "operator": "sum", "operator_over": ["I"], "role": "objective" },
+      { "ref": "t", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }], "operator": "sum", "operator_over": ["I"], "role": "objective" }
+    ]
+  }
+}

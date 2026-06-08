@@ -1,0 +1,54 @@
+{
+  "schema_version": "0.1.0",
+  "id": "mip_2_4_time_indexed",
+  "name": "2.4 Time-indexed assignment MIP",
+  "family": "milp",
+  "description": "Binary x_{i,t} = 1 iff train i departs in slot t. Each train picks exactly one slot; per-slot capacity is enforced by a windowed sum.",
+  "tags": ["milp", "time-indexed", "set-packing"],
+  "indices": [
+    { "name": "I", "description": "Trains." },
+    { "name": "T", "description": "Time slots.", "ordered": true }
+  ],
+  "parameters": [
+    { "name": "cap", "kind": "scalar", "description": "Slot capacity." }
+  ],
+  "variables": [
+    { "name": "x", "shape": ["I", "T"], "domain": "binary", "description": "Assignment indicator." }
+  ],
+  "constraints": [
+    {
+      "name": "exactly_one_slot",
+      "kind": "set_packing",
+      "description": "Each train departs in exactly one slot.",
+      "quantifiers": [{ "index": "i", "over": "I" }],
+      "comparator": "eq",
+      "lhs": [
+        { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }, { "index": "T", "expr": "t" }], "operator": "sum", "operator_over": ["T"], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "one", "ref_kind": "literal", "coefficient": 1, "role": "rhs" }
+      ]
+    },
+    {
+      "name": "slot_capacity",
+      "kind": "capacity",
+      "description": "At most `cap` trains share any slot.",
+      "quantifiers": [{ "index": "t", "over": "T" }],
+      "comparator": "le",
+      "lhs": [
+        { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }, { "index": "T", "expr": "t" }], "operator": "sum", "operator_over": ["I"], "role": "lhs" }
+      ],
+      "rhs": [
+        { "ref": "cap", "ref_kind": "parameter", "role": "rhs" }
+      ]
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "lateness",
+    "description": "Penalize choosing a later slot.",
+    "terms": [
+      { "ref": "x", "ref_kind": "variable", "bindings": [{ "index": "I", "expr": "i" }, { "index": "T", "expr": "t" }], "operator": "sum", "operator_over": ["I", "T"], "role": "objective" }
+    ]
+  }
+}
