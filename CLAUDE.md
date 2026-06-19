@@ -73,3 +73,14 @@ The loader discovers entries by file and reports any without provenance.
 
 `../lp2graph` (method + `lp2graph-dev` skill), `../milp_sources` (raw corpus),
 `../67531d7506c81a8c34f5794e` (the LaTeX paper).
+
+## Literature reference
+
+The trilogy's curated literature lives at `~/LiteratureAssistant` (private repo). Use the
+**`literature` skill** for related work: `lit.py search <terms> --topic <code>`,
+`lit.py grep "<phrase>"` (full-text over all PDFs), `lit.py cite <bibkey>`, `lit.py pdf
+<query>` → Read tool. Especially relevant **here**, the active lab for corpus
+construction: survey the literature before curating, and query the optimization-model
+catalog (`lit.py catalog <terms>`) for published constraint/objective/variable families.
+Add papers via **`literature-intake`**. (A *literature* reference — NOT the Paper 1
+scientific corpus to be built here, which is unstarted.)
