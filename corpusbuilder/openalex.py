@@ -16,12 +16,10 @@ import re
 
 import requests
 
+from corpusbuilder import config
 from corpusbuilder.dossier import CitationRef, Dossier, SourceInfo
 
 _BASE = "https://api.openalex.org"
-# OpenAlex "polite pool": identify yourself for stabler rate limits.
-_MAILTO = "joern.maurischat@tu-dresden.de"
-_UA = "raiLPminer-corpusbuilder/1 (mailto:%s)" % _MAILTO
 _ARXIV_RE = re.compile(r"arxiv\.org/(?:abs|pdf)/([0-9]{4}\.[0-9]{4,5}|[a-z\-]+/[0-9]{7})", re.I)
 
 
@@ -32,11 +30,13 @@ class OpenAlexError(RuntimeError):
 class OpenAlexClient:
     """Thin OpenAlex REST client (read-only)."""
 
-    def __init__(self, mailto: str = _MAILTO, timeout: float = 30.0) -> None:
+    def __init__(self, mailto: str | None = None, timeout: float = 30.0) -> None:
         self.timeout = timeout
-        self.mailto = mailto
+        # OpenAlex "polite pool": identify yourself for stabler rate limits.
+        self.mailto = mailto or config.openalex_mailto()
         self._s = requests.Session()
-        self._s.headers.update({"User-Agent": _UA, "Accept": "application/json"})
+        ua = f"raiLPminer-corpusbuilder/1 (mailto:{self.mailto})"
+        self._s.headers.update({"User-Agent": ua, "Accept": "application/json"})
 
     def _get(self, path: str, params: dict | None = None) -> dict:
         params = dict(params or {})
