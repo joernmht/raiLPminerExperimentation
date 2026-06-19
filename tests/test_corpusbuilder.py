@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
+import shutil
+
+import pytest
+
 from corpusbuilder.arxiv import extract_equations_from_text
+from corpusbuilder.elsevier import ElsevierClient, is_elsevier_doi
+from corpusbuilder.mathml import _BRIDGE, _normalize, mathml_to_latex
 from corpusbuilder.dossier import (
     CitationRef,
     Dossier,
@@ -102,3 +108,58 @@ def test_openalex_mapping_from_fixture() -> None:
 
     ref = OpenAlexClient._ref(work)
     assert ref.openalex_id == "W123" and ref.doi == "10.1/abc"
+
+
+# --- Elsevier Tier-2 -------------------------------------------------------
+
+_NODE_READY = shutil.which("node") is not None and (_BRIDGE / "node_modules").exists()
+needs_node = pytest.mark.skipif(not _NODE_READY, reason="node + mathml-to-latex not installed")
+
+_FIXTURE_XML = """<?xml version="1.0"?>
+<full-text-retrieval-response xmlns:ce="http://www.elsevier.com/xml/common/dtd"
+                              xmlns:mml="http://www.w3.org/1998/Math/MathML">
+  <ce:sections>
+    <ce:formula id="fd1"><mml:math><mml:mrow>
+      <mml:mi>x</mml:mi><mml:mo>+</mml:mo><mml:mi>y</mml:mi>
+    </mml:mrow></mml:math></ce:formula>
+    <ce:para>some body text</ce:para>
+  </ce:sections>
+</full-text-retrieval-response>"""
+
+_META_ONLY = """<?xml version="1.0"?>
+<full-text-retrieval-response xmlns:ce="http://www.elsevier.com/xml/common/dtd">
+  <ce:title>Just metadata</ce:title>
+</full-text-retrieval-response>"""
+
+
+def test_is_elsevier_doi() -> None:
+    assert is_elsevier_doi("10.1016/j.trb.2016.08.011")
+    assert not is_elsevier_doi("10.1287/opre.2014.1327")
+    assert not is_elsevier_doi(None)
+
+
+def test_has_full_text_detection() -> None:
+    assert ElsevierClient.has_full_text(_FIXTURE_XML)
+    assert not ElsevierClient.has_full_text(_META_ONLY)
+
+
+def test_normalize_mathml_strips_prefix_and_adds_ns() -> None:
+    out = _normalize('<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math>')
+    assert "mml:" not in out and 'xmlns="http://www.w3.org/1998/Math/MathML"' in out
+
+
+@needs_node
+def test_mathml_to_latex_simple() -> None:
+    res = mathml_to_latex(["<mml:math><mml:mi>x</mml:mi></mml:math>"])
+    assert len(res) == 1 and res[0].ok and res[0].latex.strip() == "x"
+
+
+@needs_node
+def test_extract_formulas_from_fixture() -> None:
+    client = ElsevierClient(api_key="test-key")  # no network; key not validated here
+    recs = client.extract_formulas(_FIXTURE_XML)
+    assert len(recs) == 1
+    assert recs[0].label == "fd1"
+    assert recs[0].method.value == "mathml"
+    assert recs[0].mathml is not None and "mml:math" in recs[0].mathml
+    assert recs[0].latex.replace(" ", "") == "x+y"

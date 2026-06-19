@@ -75,6 +75,22 @@ def openalex_mailto() -> str:
     return _get("OPENALEX_MAILTO") or "joern.maurischat@tu-dresden.de"
 
 
+def corpus_proxy() -> str | None:
+    """Proxy URL for entitled Elsevier full-text (e.g. an SSH SOCKS tunnel).
+
+    Set ``ELSEVIER_PROXY=socks5h://127.0.0.1:8080`` after
+    ``ssh -D 8080 -N -f <zih-login>@login1.zih.tu-dresden.de`` to route requests
+    out through a TU Dresden campus IP.
+    """
+    return _get("ELSEVIER_PROXY") or _get("CORPUS_PROXY")
+
+
+def proxies() -> dict[str, str] | None:
+    """requests-style proxies dict, or None if no proxy is configured."""
+    p = corpus_proxy()
+    return {"http": p, "https": p} if p else None
+
+
 def require(name: str) -> str:
     """Return a credential or raise a helpful error pointing at ``.env``."""
     value = _get(name)
