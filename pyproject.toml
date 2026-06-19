@@ -22,8 +22,10 @@ dependencies = [
 [project.optional-dependencies]
 notebooks = ["pandas", "matplotlib", "plotly", "jupyter"]
 dev = ["pytest>=8.0", "ruff", "mypy"]
-# corpusbuilder: corpus acquisition (OpenAlex/arXiv ingest, citation dossiers).
-corpus = ["requests>=2.31", "python-dotenv>=1.0"]
+# corpusbuilder: corpus acquisition (OpenAlex/arXiv/Elsevier ingest, dossiers).
+# Elsevier full-text MathML->LaTeX also needs Node + `npm install` in
+# corpusbuilder/_mathml2latex. PySocks enables routing through an SSH SOCKS tunnel.
+corpus = ["requests>=2.31", "python-dotenv>=1.0", "lxml>=5.0", "PySocks>=1.7"]
 
 [project.scripts]
 railpminer = "railpminer.cli:main"

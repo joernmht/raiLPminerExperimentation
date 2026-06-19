@@ -83,7 +83,8 @@ class SourceInfo(BaseModel):
     year: int | None = None
     venue: str | None = None
     publisher: str | None = None
-    cited_by_count: int | None = None
+    cited_by_count: int | None = None  # OpenAlex count
+    scopus_cited_by_count: int | None = None  # Scopus count (authoritative cross-check)
     # Provenance of the artifact we actually pulled (None until materialized):
     api: str | None = None  # openalex | arxiv | sciencedirect
     retrieved: str | None = None  # ISO date string, passed in explicitly (no Date.now in forward path)
@@ -156,7 +157,8 @@ class Dossier(BaseModel):
             ("DOI", s.doi),
             ("arXiv", s.arxiv_id),
             ("OpenAlex", s.openalex_id),
-            ("Cited by (total)", s.cited_by_count),
+            ("Cited by (OpenAlex)", s.cited_by_count),
+            ("Cited by (Scopus)", s.scopus_cited_by_count),
             ("Acquired via", s.api),
             ("Retrieved", s.retrieved),
             ("Entitlement", s.entitlement),
