@@ -22,12 +22,15 @@ dependencies = [
 [project.optional-dependencies]
 notebooks = ["pandas", "matplotlib", "plotly", "jupyter"]
 dev = ["pytest>=8.0", "ruff", "mypy"]
+# corpusbuilder: corpus acquisition (OpenAlex/arXiv ingest, citation dossiers).
+corpus = ["requests>=2.31"]
 
 [project.scripts]
 railpminer = "railpminer.cli:main"
+corpusbuilder = "corpusbuilder.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["railpminer"]
+packages = ["railpminer", "corpusbuilder"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
