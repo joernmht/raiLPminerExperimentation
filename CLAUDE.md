@@ -63,6 +63,18 @@ unavailable*, not skipped silently.
   result types, typed signatures, module docstrings that name the paper stage
   and the M-module each wraps.
 
+## PRISMA tally (running corpus artifact)
+
+Corpus construction is framed as a **PRISMA flow** (identification → screening →
+eligibility → included). Keep a **running PRISMA tally as a versioned corpus
+artifact** — `corpus/prisma.json` (+ a human-readable `corpus/prisma.md`) — and
+**update it at every stage that adds, screens, or drops records** (discovery,
+dedup, snowball, HITL accept/correct/reject, tunnel-fetch misses, eligibility).
+Each transition records counts in/out **with reasons for exclusion**, so the
+paper's methods section + PRISMA flow diagram regenerate straight from this file
+rather than being hand-tallied. Determinism applies: same inputs ⇒ same tally.
+Treat it as the single source of truth for every "n =" number in the paper.
+
 ## Adding corpus entries
 
 No code changes needed: drop a validated `formulations/<id>.json`, a matching
