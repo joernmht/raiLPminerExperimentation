@@ -171,11 +171,16 @@ class OpenAlexClient:
         Filters to journal/conference articles with at least ``min_citations``
         citations matching ``query`` in title+abstract.
         """
+        # ``title_and_abstract.search`` (a filter) restricts matching to the
+        # title+abstract, unlike the broad ``search`` param which also matches
+        # full text and lets off-topic mega-cited papers dominate the ranking.
         data = self._get(
             "works",
             {
-                "search": query,
-                "filter": f"cited_by_count:>{max(min_citations - 1, 0)},type:article",
+                "filter": (
+                    f"title_and_abstract.search:{query},"
+                    f"cited_by_count:>{max(min_citations - 1, 0)},type:article"
+                ),
                 "sort": "cited_by_count:desc",
                 "per-page": min(limit, 50),
             },
