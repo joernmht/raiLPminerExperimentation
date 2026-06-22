@@ -469,8 +469,206 @@ def render_figure(t: PrismaTally, out_path: Path) -> Path:
     return out_path
 
 
+def render_html(t: PrismaTally) -> str:
+    """Render the PRISMA flow + yield as a self-contained, mobile-first HTML page.
+
+    No external resources (works offline), responsive down to a phone screen, and
+    deterministic — the markup is a pure function of the tally, so the same frozen
+    corpus produces byte-identical HTML.
+    """
+    import math
+
+    total_id = t.n_db_records + t.n_snowball_total
+
+    def bar_pct(n: int) -> float:
+        # Log-scaled so 2,942 → 10 all stay visible; min width keeps labels legible.
+        return round(8 + 92 * (math.log10(n + 1) / math.log10(total_id + 1)), 2)
+
+    cascade = [
+        ("Identified", total_id, "var(--c1)", ""),
+        ("Screened (database)", t.n_screened, "var(--c2)", ""),
+        ("Topical", t.n_topical, "var(--c3)", f"{t.screen_precision:.0%} topical"),
+        ("Full text retrieved", t.n_fulltext_retrieved, "var(--c4)", f"{t.retrieval_rate:.0%} retrieved"),
+        ("Included formulations", t.n_included, "var(--c5)", f"distilled to {t.n_included}"),
+    ]
+    cascade_rows = "\n".join(
+        f"""      <div class="bar-row">
+        <div class="bar-label">{label}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:{bar_pct(n)}%;background:{color}">
+          <span class="bar-count">{n:,}</span></div></div>
+        <div class="bar-note">{note}</div>
+      </div>"""
+        for label, n, color, note in cascade
+    )
+
+    n_not_retrieved = (t.n_topical - t.n_fulltext_retrieved) + t.n_extraction_empty
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Corpus extraction pipeline — PRISMA flow &amp; yield</title>
+<style>
+  :root {{
+    --bg:#f5f7fa; --card:#ffffff; --ink:#1a2433; --muted:#5b6b7f; --line:#e2e8f0;
+    --stage:#1f4e79; --stage-bg:#e9f1fa; --excl:#9c2b2b; --excl-bg:#fbeded;
+    --inc:#2e6b2e; --inc-bg:#eaf4e6;
+    --c1:#1f4e79; --c2:#2c6ca0; --c3:#3d8ec9; --c4:#4f9d5b; --c5:#2e6b2e;
+  }}
+  * {{ box-sizing:border-box; }}
+  html {{ -webkit-text-size-adjust:100%; }}
+  body {{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.45; padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }}
+  .wrap {{ max-width:760px; margin:0 auto; padding:20px 16px 40px; }}
+  header h1 {{ font-size:clamp(1.25rem,4.5vw,1.7rem); margin:.2em 0 .15em; letter-spacing:-.01em; }}
+  header p {{ color:var(--muted); margin:0 0 1.4em; font-size:clamp(.85rem,3vw,.95rem); }}
+  h2 {{ font-size:clamp(1rem,3.5vw,1.15rem); margin:1.8em 0 .8em; display:flex; align-items:center; gap:.5em; }}
+  h2 .tag {{ font-size:.7rem; font-weight:700; color:var(--muted); border:1px solid var(--line);
+            border-radius:999px; padding:.15em .7em; letter-spacing:.04em; text-transform:uppercase; }}
+
+  /* PRISMA flow — stacked cards with connectors */
+  .flow {{ display:flex; flex-direction:column; align-items:stretch; gap:0; }}
+  .stage {{ background:var(--card); border:1px solid var(--line); border-left:5px solid var(--stage);
+           border-radius:14px; padding:14px 16px; box-shadow:0 1px 3px rgba(20,40,70,.06); }}
+  .stage .kicker {{ font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+                   color:var(--stage); margin-bottom:.35em; }}
+  .stage.inc {{ border-left-color:var(--inc); }}
+  .stage.inc .kicker {{ color:var(--inc); }}
+  .stage ul {{ margin:.2em 0 0; padding-left:0; list-style:none; }}
+  .stage li {{ display:flex; justify-content:space-between; gap:1em; padding:.18em 0;
+              font-size:clamp(.85rem,3vw,.95rem); border-top:1px dashed var(--line); }}
+  .stage li:first-child {{ border-top:0; }}
+  .stage li b {{ font-variant-numeric:tabular-nums; white-space:nowrap; }}
+  .stage li.total {{ font-weight:700; }}
+  .connector {{ display:flex; align-items:stretch; gap:10px; padding:2px 0 2px 18px; }}
+  .connector .down {{ width:2px; background:var(--line); margin-left:1px; flex:0 0 auto; min-height:26px; }}
+  .excl {{ flex:1; background:var(--excl-bg); border:1px solid #f0d4d4; border-radius:10px;
+          padding:8px 12px; margin:6px 0; font-size:clamp(.78rem,2.7vw,.86rem); color:#6f2222; }}
+  .excl b {{ color:var(--excl); font-variant-numeric:tabular-nums; }}
+
+  /* Yield cascade */
+  .yield {{ background:var(--card); border:1px solid var(--line); border-radius:14px;
+           padding:16px; box-shadow:0 1px 3px rgba(20,40,70,.06); }}
+  .bar-row {{ display:grid; grid-template-columns:1fr; gap:2px; margin:0 0 12px; }}
+  .bar-label {{ font-size:clamp(.8rem,2.8vw,.9rem); font-weight:600; }}
+  .bar-track {{ background:#eef1f5; border-radius:8px; overflow:hidden; }}
+  .bar-fill {{ height:26px; border-radius:8px; display:flex; align-items:center; justify-content:flex-end;
+              min-width:42px; transition:width .2s; }}
+  .bar-count {{ color:#fff; font-weight:700; font-size:.85rem; padding:0 10px; font-variant-numeric:tabular-nums; }}
+  .bar-note {{ font-size:.74rem; color:var(--muted); font-style:italic; }}
+
+  /* Headline callout */
+  .callout {{ background:var(--inc-bg); border:1.5px solid #bcdcb2; border-radius:16px;
+             padding:20px 18px; text-align:center; margin-top:16px; }}
+  .callout .big {{ font-size:clamp(1.5rem,7vw,2.3rem); font-weight:800; color:var(--inc);
+                  line-height:1.1; font-variant-numeric:tabular-nums; }}
+  .callout .sub {{ margin-top:.5em; font-size:clamp(.85rem,3vw,1rem); }}
+  .callout .fine {{ margin-top:.4em; font-size:clamp(.74rem,2.6vw,.84rem); color:var(--muted); }}
+
+  .metrics {{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }}
+  .metric {{ flex:1 1 100px; background:var(--card); border:1px solid var(--line); border-radius:12px;
+            padding:12px; text-align:center; }}
+  .metric .v {{ font-size:clamp(1.1rem,5vw,1.5rem); font-weight:800; color:var(--stage);
+               font-variant-numeric:tabular-nums; }}
+  .metric .k {{ font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:.2em; }}
+
+  footer {{ margin-top:26px; font-size:.74rem; color:var(--muted); text-align:center; }}
+  footer code {{ background:#eef1f5; padding:.1em .45em; border-radius:5px; font-size:.95em; }}
+  @media (prefers-color-scheme: dark) {{
+    :root {{ --bg:#0f151d; --card:#172230; --ink:#e6edf5; --muted:#9fb0c3; --line:#26344a;
+            --stage-bg:#15263a; --excl-bg:#2b1a1d; --inc-bg:#16271a; }}
+    .bar-track {{ background:#22303f; }}
+    footer code {{ background:#22303f; }}
+  }}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Corpus extraction pipeline</h1>
+    <p>PRISMA flow &amp; mining yield — how a broad literature sweep is distilled into a small set of
+    validated, machine-checked LP2Graph formulations.</p>
+  </header>
+
+  <h2><span class="tag">a</span> PRISMA flow</h2>
+  <div class="flow">
+    <div class="stage">
+      <div class="kicker">Identification</div>
+      <ul>
+        <li><span>Database search (OpenAlex)</span><b>{t.n_db_records}</b></li>
+        <li><span>Citation searching (snowball)</span><b>{t.n_snowball_total:,}</b></li>
+        <li class="total"><span>Total identified</span><b>{total_id:,}</b></li>
+      </ul>
+    </div>
+    <div class="connector"><div class="down"></div>
+      <div class="excl">Snowball not screened: <b>{t.n_snowball_excluded:,}</b><br>
+      &lt; 2 seed links / off-topic</div></div>
+    <div class="stage">
+      <div class="kicker">Screening · topical</div>
+      <ul>
+        <li><span>Database records screened</span><b>{t.n_screened}</b></li>
+        <li class="total"><span>Topical (carried forward)</span><b>{t.n_topical}</b></li>
+      </ul>
+    </div>
+    <div class="connector"><div class="down"></div>
+      <div class="excl">Excluded at screening: <b>{t.n_offdomain_excluded}</b><br>
+      off-domain venue (clinical / medical)</div></div>
+    <div class="stage">
+      <div class="kicker">Eligibility · full-text retrieval</div>
+      <ul>
+        <li><span>Sought for retrieval</span><b>{t.n_topical}</b></li>
+        <li><span>Full text retrieved</span><b>{t.n_fulltext_retrieved}</b></li>
+        <li class="total"><span>Assessed for extraction</span><b>{t.n_fulltext_retrieved}</b></li>
+      </ul>
+    </div>
+    <div class="connector"><div class="down"></div>
+      <div class="excl">Not retrieved / no LP: <b>{n_not_retrieved}</b><br>
+      {t.n_fulltext_metadata_only} metadata-only · {t.n_fulltext_unavailable} no full text ·
+      {t.n_extraction_empty} no extractable LP</div></div>
+    <div class="stage inc">
+      <div class="kicker">Included</div>
+      <ul>
+        <li><span>Validated canonical formulations</span><b>{t.n_included}</b></li>
+        <li><span>With provenance</span><b>{t.n_with_provenance}</b></li>
+        <li><span>Solvable instances</span><b>{t.n_instances}</b></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2><span class="tag">b</span> Mining yield</h2>
+  <div class="yield">
+{cascade_rows}
+  </div>
+
+  <div class="callout">
+    <div class="big">{t.n_formulas_mined} formula records</div>
+    <div class="sub">machine-checked, mined from <b>{t.n_fulltext_retrieved}</b> full texts
+    — ≈ <b>{t.formulas_per_fulltext:.0f} per paper</b></div>
+    <div class="fine">deterministic-first ladder: arXiv LaTeX → Elsevier MathML · no OCR, no hand transcription</div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="v">{t.screen_precision:.0%}</div><div class="k">Topical screen</div></div>
+    <div class="metric"><div class="v">{t.retrieval_rate:.0%}</div><div class="k">Full-text retrieval</div></div>
+    <div class="metric"><div class="v">{t.extraction_success:.0%}</div><div class="k">Extraction success</div></div>
+  </div>
+
+  <footer>
+    Regenerated from frozen corpus artifacts via
+    <code>python -m corpusbuilder prisma</code> — deterministic.
+  </footer>
+</div>
+</body>
+</html>
+"""
+
+
 def write_artifacts(corpus_dir: Path, *, figure: bool = True) -> dict[str, Path]:
-    """Recompute and write ``prisma.json`` + ``prisma.md`` (+ figure) under ``corpus/``."""
+    """Recompute and write ``prisma.json`` + ``prisma.md`` + ``prisma.html`` (+ figure)."""
     t = build_tally(corpus_dir)
     written: dict[str, Path] = {}
 
@@ -483,6 +681,10 @@ def write_artifacts(corpus_dir: Path, *, figure: bool = True) -> dict[str, Path]
     md_path = corpus_dir / "prisma.md"
     md_path.write_text(tally_to_markdown(t), encoding="utf-8")
     written["md"] = md_path
+
+    html_path = corpus_dir / "prisma.html"
+    html_path.write_text(render_html(t), encoding="utf-8")
+    written["html"] = html_path
 
     if figure:
         written["figure"] = render_figure(t, corpus_dir / "prisma_flow.png")

@@ -206,3 +206,9 @@ def test_prisma_tally_is_deterministic() -> None:
     assert prisma.tally_to_markdown(prisma.build_tally(_CORPUS)) == prisma.tally_to_markdown(
         prisma.build_tally(_CORPUS)
     )
+    # The mobile HTML page is self-contained (no external fetches) and stable too.
+    html = prisma.render_html(prisma.build_tally(_CORPUS))
+    assert html == prisma.render_html(prisma.build_tally(_CORPUS))
+    assert "<!doctype html>" in html and "viewport" in html
+    assert "http://" not in html and "https://" not in html  # no external resources
+    assert f"{prisma.build_tally(_CORPUS).n_formulas_mined} formula records" in html
