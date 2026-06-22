@@ -88,6 +88,9 @@ python -m railpminer taxonomy --latex   # the taxonomy axes table as LaTeX
 
 # Point at a different corpus / output dir:
 python -m railpminer run --corpus path/to/corpus --output path/to/outputs
+
+# Corpus construction (acquisition; not in the deterministic forward path):
+python -m corpusbuilder prisma    # recompute the PRISMA tally + yield figure
 ```
 
 ---
@@ -97,10 +100,27 @@ python -m railpminer run --corpus path/to/corpus --output path/to/outputs
 ```
 corpus/
   manifest.json            queries + frozen search date (makes the corpus regenerable)
-  formulations/<id>.json   one VALIDATED canonical LP2Graph model per formulation
+  candidates.json/.md      database-search hits (identification)
+  snowball_candidates.*    citation-searching neighbours (identification)
+  dossiers/<key>.json/.md  per-paper acquisition record: entitlement + mined formulas (eligibility)
+  formulations/<id>.json   one VALIDATED canonical LP2Graph model per formulation (included)
   provenance/<id>.json     one ProvenanceRecord per formulation, matched by id
   instances/*.json         validation instances (cardinalities + data + published optimum)
+  prisma.json/.md          running PRISMA tally — source of truth for every "n =" in the paper
+  prisma_flow.png          PRISMA flow + mining-yield figure (regenerable)
 ```
+
+### PRISMA flow + yield
+
+Corpus construction is a **PRISMA flow** (identification → screening → eligibility
+→ included). `python -m corpusbuilder prisma` recomputes the tally from the frozen
+corpus artifacts and writes `corpus/prisma.{json,md}` plus the `prisma_flow.png`
+figure. It is **deterministic** (same frozen corpus ⇒ byte-identical tally) and is
+the single source of truth for the paper's methods section. The figure makes the
+pipeline's *yield* obvious: a broad identification sweep is distilled to a small
+set of validated formulations, while the deterministic-first extraction ladder
+(arXiv LaTeX → Elsevier MathML, no OCR) mines hundreds of machine-checked formula
+records from the retrieved full texts.
 
 The shipped corpus is a **seed**: ten canonical *structural templates*
 (assignment, PESP, big-M ordering, time-indexed, …) paired with illustrative
