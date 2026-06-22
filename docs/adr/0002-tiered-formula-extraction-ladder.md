@@ -45,4 +45,3 @@ can report extraction provenance per formula.
 - **Bad:** the "stop at first non-empty tier" rule means a paper on both arXiv
   and Elsevier never cross-checks the two; acceptable because Tier-1 is the
   author's own source.
-</content>

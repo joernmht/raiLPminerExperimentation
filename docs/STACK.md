@@ -113,5 +113,4 @@ PyPI per the workflow. *(Added 2026-06-22; previously no CI.)*
 - **Corpus status:** the shipped `corpus/` is an illustrative SEED (10 structural
   templates), *not* the paper-grade dataset. See `README.md` and the home
   `CLAUDE.md` corpus ground-truth note.
-</content>
 </invoke>
