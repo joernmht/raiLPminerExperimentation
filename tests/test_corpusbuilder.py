@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import shutil
+from pathlib import Path
 
 import pytest
+
+from corpusbuilder import prisma
+
+_CORPUS = Path(__file__).resolve().parents[1] / "corpus"
 
 from corpusbuilder.arxiv import extract_equations_from_text
 from corpusbuilder.elsevier import ElsevierClient, is_elsevier_doi
@@ -163,3 +168,41 @@ def test_extract_formulas_from_fixture() -> None:
     assert recs[0].method.value == "mathml"
     assert recs[0].mathml is not None and "mml:math" in recs[0].mathml
     assert recs[0].latex.replace(" ", "") == "x+y"
+
+
+# --- PRISMA tally ----------------------------------------------------------
+
+
+def test_prisma_tally_arithmetic_closes() -> None:
+    t = prisma.build_tally(_CORPUS)
+    # Screened-in records split exactly across the three retrieval outcomes.
+    assert t.n_topical == (
+        t.n_fulltext_retrieved + t.n_fulltext_metadata_only + t.n_fulltext_unavailable
+    )
+    # Topical = screened minus off-domain exclusions.
+    assert t.n_topical == t.n_screened - t.n_offdomain_excluded
+    # Retrieved full texts split into extracted vs. empty.
+    assert t.n_fulltext_retrieved == t.n_extracted + t.n_extraction_empty
+    # Snowball arm accounts for every identified neighbour.
+    assert t.n_snowball_total == t.n_snowball_recommended + t.n_snowball_excluded
+
+
+def test_prisma_offdomain_screen_flags_only_clinical_venues() -> None:
+    t = prisma.build_tally(_CORPUS)
+    # The clinical/medical false positives are excluded, nothing more.
+    assert t.n_offdomain_excluded == len(t.offdomain_excluded)
+    assert t.n_offdomain_excluded >= 1
+    assert all(doi.startswith("10.") for doi in t.offdomain_excluded)
+
+
+def test_prisma_tally_is_deterministic() -> None:
+    a = prisma.tally_to_dict(prisma.build_tally(_CORPUS))
+    b = prisma.tally_to_dict(prisma.build_tally(_CORPUS))
+    assert a == b
+    # The serialised forms are byte-stable too (the paper's source of truth).
+    import json
+
+    assert json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True)
+    assert prisma.tally_to_markdown(prisma.build_tally(_CORPUS)) == prisma.tally_to_markdown(
+        prisma.build_tally(_CORPUS)
+    )

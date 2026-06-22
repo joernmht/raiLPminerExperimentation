@@ -117,6 +117,22 @@ def cmd_dossier(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_prisma(args: argparse.Namespace) -> int:
+    from corpusbuilder import prisma
+
+    corpus_dir = Path(args.corpus)
+    written = prisma.write_artifacts(corpus_dir, figure=not args.no_figure)
+    t = prisma.build_tally(corpus_dir)
+    for path in written.values():
+        print(f"wrote {path}")
+    print(
+        f"  identified {t.n_db_records + t.n_snowball_total:,} → topical {t.n_topical} → "
+        f"retrieved {t.n_fulltext_retrieved} → {t.n_formulas_mined} formulas mined "
+        f"(≈ {t.formulas_per_fulltext:.0f}/paper) → {t.n_included} included"
+    )
+    return 0
+
+
 def cmd_fetch_arxiv(args: argparse.Namespace) -> int:
     src_dir, sha = fetch_source(args.arxiv_id, Path(args.out) / "_src")
     formulas = extract_equations(src_dir)
@@ -158,6 +174,11 @@ def main(argv: list[str] | None = None) -> int:
                         "(defaults to ELSEVIER_PROXY from the env/secrets)")
     d.add_argument("--out", default=str(_DEFAULT_OUT))
     d.set_defaults(func=cmd_dossier)
+
+    pr = sub.add_parser("prisma", help="recompute the PRISMA tally + yield figure from the corpus")
+    pr.add_argument("--corpus", default="corpus", help="corpus directory (default: corpus)")
+    pr.add_argument("--no-figure", action="store_true", help="write prisma.json/md but skip the figure")
+    pr.set_defaults(func=cmd_prisma)
 
     f = sub.add_parser("fetch-arxiv", help="extract equations from an arXiv source")
     f.add_argument("arxiv_id")
