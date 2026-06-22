@@ -72,4 +72,7 @@ def mathml_to_latex(mathml_list: list[str], timeout: float = 120.0) -> list[Conv
         raw = json.loads(proc.stdout)
     except json.JSONDecodeError as e:  # pragma: no cover - defensive
         raise MathMLConversionError(f"node bridge returned non-JSON: {e}") from e
-    return [Converted(ok=bool(r.get("ok")), latex=r.get("latex") or "", error=r.get("error")) for r in raw]
+    return [
+        Converted(ok=bool(r.get("ok")), latex=r.get("latex") or "", error=r.get("error"))
+        for r in raw
+    ]

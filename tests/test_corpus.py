@@ -15,7 +15,7 @@ def test_formulations_and_records_aligned(corpus) -> None:
     recs = corpus.records
     assert len(forms) == len(recs)
     # ProvenanceRecord.source_id matches the formulation id it annotates.
-    for f, r in zip(forms, recs):
+    for f, r in zip(forms, recs, strict=True):
         assert r.source_id == f.id
 
 

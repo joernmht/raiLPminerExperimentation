@@ -16,9 +16,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from . import _lp2graph  # noqa: F401  (ensures lp2graph is importable)
 from lp2graph.mining.cluster import ClusterConfig
 from lp2graph.mining.label import LoopConfig
+
+from . import _lp2graph  # noqa: F401  (ensures lp2graph is importable)
 
 #: Repository root (the directory containing this package).
 REPO_ROOT: Path = Path(__file__).resolve().parent.parent
@@ -61,4 +62,4 @@ class PipelineConfig:
         return self.corpus_dir / "manifest.json"
 
 
-__all__ = ["PipelineConfig", "ClusterConfig", "LoopConfig", "REPO_ROOT"]
+__all__ = ["REPO_ROOT", "ClusterConfig", "LoopConfig", "PipelineConfig"]

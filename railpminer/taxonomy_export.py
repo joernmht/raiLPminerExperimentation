@@ -13,9 +13,9 @@ import csv
 import io
 from typing import Any
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.mining.cluster import LevelResult, Taxonomy
 
+from . import _lp2graph  # noqa: F401
 from .labeling import LabelingResult
 
 
@@ -85,7 +85,9 @@ def to_csv(axes: list[dict[str, Any]]) -> str:
     writer = csv.writer(buf)
     writer.writerow(["level", "dimension", "derived_from", "categories"])
     for ax in axes:
-        writer.writerow([ax["level"], ax["dimension"], ax["derived_from"], "; ".join(ax["categories"])])
+        writer.writerow(
+            [ax["level"], ax["dimension"], ax["derived_from"], "; ".join(ax["categories"])]
+        )
     return buf.getvalue()
 
 

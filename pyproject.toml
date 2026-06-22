@@ -21,7 +21,7 @@ dependencies = [
 
 [project.optional-dependencies]
 notebooks = ["pandas", "matplotlib", "plotly", "jupyter"]
-dev = ["pytest>=8.0", "ruff", "mypy"]
+dev = ["pytest>=8.0", "ruff>=0.15.12,<0.16", "mypy"]
 # corpusbuilder: corpus acquisition (OpenAlex/arXiv/Elsevier ingest, dossiers).
 # Elsevier full-text MathML->LaTeX also needs Node + `npm install` in
 # corpusbuilder/_mathml2latex. PySocks enables routing through an SSH SOCKS tunnel.
@@ -45,3 +45,15 @@ filterwarnings = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+src = ["."]
+
+[tool.ruff.lint]
+# Shared convention (see ~/.claude/quality/STYLE.md §1). RUF001-003 are ignored
+# because railway problem statements and OR notation carry intentional Unicode
+# (en-dash "S1–S2", minus "max(0, arrival − due)") in docstrings/fixtures that
+# must not be ASCII-mangled (STYLE.md §6).
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["E501", "B008", "RUF001", "RUF002", "RUF003"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["railpminer", "corpusbuilder"]

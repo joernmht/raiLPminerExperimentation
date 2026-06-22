@@ -34,9 +34,9 @@ MIN_CITES = 20
 
 def _key(doi: str | None, oa: str | None) -> str | None:
     if doi:
-        return ("doi:" + doi.lower())
+        return "doi:" + doi.lower()
     if oa:
-        return ("oa:" + oa.lower())
+        return "oa:" + oa.lower()
     return None
 
 
@@ -59,10 +59,15 @@ def main() -> None:
                 rec = agg.get(k)
                 if rec is None:
                     rec = {
-                        "key": k, "doi": r.doi, "openalex_id": r.openalex_id,
-                        "title": r.title, "year": r.year,
+                        "key": k,
+                        "doi": r.doi,
+                        "openalex_id": r.openalex_id,
+                        "title": r.title,
+                        "year": r.year,
                         "cited_by_count": r.cited_by_count or 0,
-                        "seeds": set(), "backward": 0, "forward": 0,
+                        "seeds": set(),
+                        "backward": 0,
+                        "forward": 0,
                         "relevant": bool(r.title and _RELEVANT.search(r.title)),
                     }
                     agg[k] = rec
@@ -80,9 +85,8 @@ def main() -> None:
     # Recommended-to-screen subset: connected to >=2 seeds, or topically relevant
     # and reasonably cited. Everything else stays in the list, just unflagged.
     for r in cands:
-        r["recommended"] = (
-            r["seed_connections"] >= 2
-            or (r["relevant"] and r["cited_by_count"] >= MIN_CITES)
+        r["recommended"] = r["seed_connections"] >= 2 or (
+            r["relevant"] and r["cited_by_count"] >= MIN_CITES
         )
 
     payload = {
@@ -98,8 +102,7 @@ def main() -> None:
     lines = [
         "# Snowball candidates (citation searching over the corpus)",
         "",
-        f"- {len(doss)} seed papers → {len(cands)} unique new neighbours "
-        f"(not already in corpus)",
+        f"- {len(doss)} seed papers → {len(cands)} unique new neighbours (not already in corpus)",
         f"- **{payload['n_recommended']} recommended to screen** "
         f"(≥2 seed links, or topical & ≥{MIN_CITES} cites)",
         "- direction: ← backward (we cite them) · → forward (they cite us)",
@@ -117,8 +120,10 @@ def main() -> None:
         )
     OUT_MD.write_text("\n".join(lines) + "\n")
 
-    print(f"{len(cands)} neighbours, {payload['n_recommended']} recommended -> "
-          f"{OUT_MD.name} (top 60 shown), {OUT_JSON.name} (full)")
+    print(
+        f"{len(cands)} neighbours, {payload['n_recommended']} recommended -> "
+        f"{OUT_MD.name} (top 60 shown), {OUT_JSON.name} (full)"
+    )
 
 
 if __name__ == "__main__":

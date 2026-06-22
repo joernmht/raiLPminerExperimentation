@@ -28,10 +28,9 @@ the paper text, which the canonical templates of the seed corpus do not carry.
 from __future__ import annotations
 
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.core.model import Formulation
 from lp2graph.mining.homologize import Entity, corpus_entities
 from lp2graph.mining.label import (
@@ -40,6 +39,7 @@ from lp2graph.mining.label import (
     seed_vocabulary,
 )
 
+from . import _lp2graph  # noqa: F401
 from .config import PipelineConfig
 
 StructuralLabeler = Callable[[Entity], str]
@@ -229,9 +229,7 @@ def run_labeling(
         "constraint_family": label_dimension(
             formulations, "C", "constraint_family", constraint_family, config
         ),
-        "variable_type": label_dimension(
-            formulations, "V", "variable_type", variable_type, config
-        ),
+        "variable_type": label_dimension(formulations, "V", "variable_type", variable_type, config),
     }
     return LabelingResult(dimensions=dims)
 

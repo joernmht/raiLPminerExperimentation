@@ -82,8 +82,15 @@ def _paper_page(d: Dossier) -> str:
         "title": s.title,
         "doi": s.doi,
         "formulas": [
-            {"id": f.id, "label": f.label, "latex": f.latex, "method": f.method.value,
-             "status": f.status.value, "page_start": f.page_start, "page_end": f.page_end}
+            {
+                "id": f.id,
+                "label": f.label,
+                "latex": f.latex,
+                "method": f.method.value,
+                "status": f.status.value,
+                "page_start": f.page_start,
+                "page_end": f.page_end,
+            }
             for f in d.formulas
         ],
     }
@@ -96,17 +103,25 @@ def _paper_page(d: Dossier) -> str:
             ("Publisher", html.escape(s.publisher or "—")),
             ("DOI", _doi_link(s)),
             ("Entitlement", html.escape(s.entitlement or "—")),
-            ("Cited by (OpenAlex / Scopus)", f"{s.cited_by_count or '—'} / {s.scopus_cited_by_count or '—'}"),
+            (
+                "Cited by (OpenAlex / Scopus)",
+                f"{s.cited_by_count or '—'} / {s.scopus_cited_by_count or '—'}",
+            ),
             ("Formulas", len(d.formulas)),
         ]
     )
     eqs = []
     for f in d.formulas:
-        pg = f" · p.{f.page_start}" + (f"–{f.page_end}" if f.page_end and f.page_end != f.page_start else "") if f.page_start else ""
+        pg = (
+            f" · p.{f.page_start}"
+            + (f"–{f.page_end}" if f.page_end and f.page_end != f.page_start else "")
+            if f.page_start
+            else ""
+        )
         eqs.append(f"""
 <div class="card eq" id="eq-card-{html.escape(f.id)}" data-id="{html.escape(f.id)}">
   <div class="eqhead">
-    <div><b>{html.escape(f.id)}</b> {('<span class="badge">'+html.escape(f.label)+'</span>') if f.label else ''}
+    <div><b>{html.escape(f.id)}</b> {('<span class="badge">' + html.escape(f.label) + "</span>") if f.label else ""}
       <span class="badge">{f.method.value}</span><span class="meta">{pg}</span></div>
     <div>
       <button onclick="setStatus('{html.escape(f.id)}','accepted')">✓ accept</button>
@@ -178,7 +193,7 @@ def _index_page(doss: list[Dossier]) -> str:
             f'<div class="meta">{html.escape(s.venue or "")} {s.year or ""}</div></td>'
             f'<td class="count">{s.cited_by_count or "—"}</td>'
             f'<td class="count">{nf}</td>'
-            f'<td>{_doi_link(s)}</td></tr>'
+            f"<td>{_doi_link(s)}</td></tr>"
         )
     total_f = sum(len(d.formulas) for d in doss)
     return f"""<!doctype html><html><head><meta charset="utf-8">
@@ -187,19 +202,21 @@ def _index_page(doss: list[Dossier]) -> str:
 <div class="wrap">
 <p class="meta">{len(doss)} papers · {total_f} formulas extracted. Click a paper to review its formulas.</p>
 <table><thead><tr><th>Paper</th><th>Cites</th><th>Formulas</th><th>DOI</th></tr></thead>
-<tbody>{''.join(rows)}</tbody></table>
+<tbody>{"".join(rows)}</tbody></table>
 </div></body></html>"""
 
 
 def main() -> None:
     doss = [Dossier.load(p) for p in sorted(DOSS.glob("*.json"))]
-    doss.sort(key=lambda d: (d.source.cited_by_count or 0), reverse=True)
+    doss.sort(key=lambda d: d.source.cited_by_count or 0, reverse=True)
     (OUT / "papers").mkdir(parents=True, exist_ok=True)
     for d in doss:
         (OUT / "papers" / f"{d.key}.html").write_text(_paper_page(d), encoding="utf-8")
     (OUT / "index.html").write_text(_index_page(doss), encoding="utf-8")
-    print(f"wrote {OUT/'index.html'} + {len(doss)} paper pages "
-          f"({sum(len(d.formulas) for d in doss)} formulas)")
+    print(
+        f"wrote {OUT / 'index.html'} + {len(doss)} paper pages "
+        f"({sum(len(d.formulas) for d in doss)} formulas)"
+    )
 
 
 if __name__ == "__main__":

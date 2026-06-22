@@ -14,7 +14,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.core.model import Formulation
 from lp2graph.mining.cluster import (
     ClusterConfig,
@@ -24,6 +23,7 @@ from lp2graph.mining.cluster import (
     induce,
 )
 
+from . import _lp2graph  # noqa: F401
 from .config import PipelineConfig
 
 #: The five taxonomy axes, in induction order.
@@ -100,8 +100,7 @@ def stability(
             ari_by_level[name][vname] = adjusted_rand_index(ref_labels, alt_labels)
 
     ari_min = {
-        name: (min(scores.values()) if scores else 1.0)
-        for name, scores in ari_by_level.items()
+        name: (min(scores.values()) if scores else 1.0) for name, scores in ari_by_level.items()
     }
     return StabilitySummary(
         reference_version=config.cluster.version,

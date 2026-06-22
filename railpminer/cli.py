@@ -20,8 +20,13 @@ import json
 import sys
 from pathlib import Path
 
-from . import _lp2graph  # noqa: F401
-from . import clustering, labeling, taxonomy_export, validation
+from . import (
+    _lp2graph,  # noqa: F401
+    clustering,
+    labeling,
+    taxonomy_export,
+    validation,
+)
 from .config import PipelineConfig
 from .corpus import load_corpus
 from .pipeline import run
@@ -85,7 +90,10 @@ def cmd_label(args: argparse.Namespace) -> int:
             dim: {
                 "vocabulary": list(d.vocabulary),
                 "source_counts": d.source_counts,
-                "labels": [{"entity": o.entity_id, "value": o.value, "source": o.source} for o in d.outcomes],
+                "labels": [
+                    {"entity": o.entity_id, "value": o.value, "source": o.source}
+                    for o in d.outcomes
+                ],
             }
             for dim, d in result.dimensions.items()
         }
@@ -110,12 +118,19 @@ def cmd_validate(args: argparse.Namespace) -> int:
                     "expected_optimum": e.expected_optimum,
                     "cross_solver_agree": e.cross_solver_agree,
                     "matches_expected": e.matches_expected,
-                    "solvers": [{"solver": s.solver, "status": s.status, "objective": s.objective} for s in e.solvers],
+                    "solvers": [
+                        {"solver": s.solver, "status": s.status, "objective": s.objective}
+                        for s in e.solvers
+                    ],
                 }
                 for e in report.external
             ],
             "isomorphism": [
-                {"cluster": i.cluster_name, "size": i.size, "whole_cluster_rate": i.whole_cluster_rate}
+                {
+                    "cluster": i.cluster_name,
+                    "size": i.size,
+                    "whole_cluster_rate": i.whole_cluster_rate,
+                }
                 for i in report.isomorphism
             ],
             "notes": list(report.notes),
@@ -158,16 +173,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    sub.add_parser("corpus", parents=[common], help="load and summarize the corpus").set_defaults(func=cmd_corpus)
-    sub.add_parser("cluster", parents=[common], help="induce and print the multi-level taxonomy").set_defaults(func=cmd_cluster)
-    sub.add_parser("label", parents=[common], help="run the closed-loop labeling and print labels").set_defaults(func=cmd_label)
-    sub.add_parser("validate", parents=[common], help="run representation-fidelity validation").set_defaults(func=cmd_validate)
+    sub.add_parser("corpus", parents=[common], help="load and summarize the corpus").set_defaults(
+        func=cmd_corpus
+    )
+    sub.add_parser(
+        "cluster", parents=[common], help="induce and print the multi-level taxonomy"
+    ).set_defaults(func=cmd_cluster)
+    sub.add_parser(
+        "label", parents=[common], help="run the closed-loop labeling and print labels"
+    ).set_defaults(func=cmd_label)
+    sub.add_parser(
+        "validate", parents=[common], help="run representation-fidelity validation"
+    ).set_defaults(func=cmd_validate)
 
     p_tax = sub.add_parser("taxonomy", parents=[common], help="print the taxonomy axes table")
     p_tax.add_argument("--latex", action="store_true", help="emit a LaTeX table instead of JSON")
     p_tax.set_defaults(func=cmd_taxonomy)
 
-    p_run = sub.add_parser("run", parents=[common], help="run the full pipeline and write all artifacts")
+    p_run = sub.add_parser(
+        "run", parents=[common], help="run the full pipeline and write all artifacts"
+    )
     p_run.add_argument("--no-write", action="store_true", help="compute but do not write artifacts")
     p_run.set_defaults(func=cmd_run)
 

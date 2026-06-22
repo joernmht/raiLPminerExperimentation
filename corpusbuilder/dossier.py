@@ -20,13 +20,13 @@ from __future__ import annotations
 
 import json
 import re
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field
 
 
-class ExtractionMethod(str, Enum):
+class ExtractionMethod(StrEnum):
     """How a formula's LaTeX was obtained — recorded per formula for provenance."""
 
     arxiv_tex = "arxiv-tex"  # pulled byte-exact from arXiv .tex source (Tier 1)
@@ -36,7 +36,7 @@ class ExtractionMethod(str, Enum):
     human = "human"  # typed or corrected by a human reviewer
 
 
-class VerificationStatus(str, Enum):
+class VerificationStatus(StrEnum):
     """Where a formula sits in the human-in-the-loop review."""
 
     unreviewed = "unreviewed"
@@ -87,7 +87,9 @@ class SourceInfo(BaseModel):
     scopus_cited_by_count: int | None = None  # Scopus count (authoritative cross-check)
     # Provenance of the artifact we actually pulled (None until materialized):
     api: str | None = None  # openalex | arxiv | sciencedirect
-    retrieved: str | None = None  # ISO date string, passed in explicitly (no Date.now in forward path)
+    retrieved: str | None = (
+        None  # ISO date string, passed in explicitly (no Date.now in forward path)
+    )
     file_path: str | None = None  # local PDF/XML/tex artifact
     file_sha256: str | None = None
     entitlement: str | None = None  # open-access | tud-subscription | none | unknown
@@ -189,8 +191,14 @@ class Dossier(BaseModel):
             out.append("|---|---|---|---|---|---|")
             for f in self.formulas:
                 pages = (
-                    f"{f.page_start}" if f.page_start == f.page_end else f"{f.page_start}–{f.page_end}"
-                ) if f.page_start is not None else "?"
+                    (
+                        f"{f.page_start}"
+                        if f.page_start == f.page_end
+                        else f"{f.page_start}–{f.page_end}"
+                    )
+                    if f.page_start is not None
+                    else "?"
+                )
                 latex = f.latex.replace("\n", " ").replace("|", r"\|")
                 latex = (latex[:80] + "…") if len(latex) > 80 else latex
                 out.append(
@@ -200,11 +208,15 @@ class Dossier(BaseModel):
             out.append("_No formulas extracted yet._")
         out.append("")
 
-        out.append(f"## References — works this paper cites ({self.references_count or len(self.references)})\n")
+        out.append(
+            f"## References — works this paper cites ({self.references_count or len(self.references)})\n"
+        )
         out.extend(self._cite_lines(self.references))
         out.append("")
 
-        out.append(f"## Cited by — works citing this paper ({self.cited_by_count or len(self.cited_by)})\n")
+        out.append(
+            f"## Cited by — works citing this paper ({self.cited_by_count or len(self.cited_by)})\n"
+        )
         out.extend(self._cite_lines(self.cited_by))
         out.append("")
         return "\n".join(out)

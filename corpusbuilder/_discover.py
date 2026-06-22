@@ -80,11 +80,15 @@ def main() -> None:
         path = "arXiv" if r["tier1_arxiv"] else ("Elsevier" if r["tier2_elsevier"] else "other")
         doi = r["doi"] or (f"arXiv:{r['arxiv_id']}" if r["arxiv_id"] else "—")
         title = r["title"][:80]
-        lines.append(f"| {i} | {r['cited_by_count']} | {r['year'] or '—'} | {path} | {doi} | {title} |")
+        lines.append(
+            f"| {i} | {r['cited_by_count']} | {r['year'] or '—'} | {path} | {doi} | {title} |"
+        )
     OUT_MD.write_text("\n".join(lines) + "\n")
 
     print(f"{len(ranked)} unique candidates -> {OUT_JSON.name}, {OUT_MD.name}")
-    print(f"Tier-1 arXiv: {n_arxiv} | Tier-2 Elsevier: {n_els} | other: {len(ranked) - n_arxiv - n_els}")
+    print(
+        f"Tier-1 arXiv: {n_arxiv} | Tier-2 Elsevier: {n_els} | other: {len(ranked) - n_arxiv - n_els}"
+    )
 
 
 if __name__ == "__main__":
