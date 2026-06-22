@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#00103a" media="(prefers-color-scheme: dark)">
+<title>PRISMA Yield Analysis — Paper 1 Corpus</title>
+<style>
+  /* ---------- Light theme — turquoise accent on a light field ---------- */
+  :root{
+    --page1:#f3f7f8; --page2:#e7f1f1;
+    --ink:#0c1f3a; --muted:#566782;
+    --card:#ffffff; --card2:#f1f8f8; --line:#d6e6e7; --track:#e6f0f0;
+    --accent:#0A777F;            /* Türkis 1 — main brand colour */
+    --accent2:#2F57B2;           /* mid blue — "gain" */
+    --good:#0A777F;              /* yield = türkis */
+    --warn:#C85000;              /* Orange 1 */
+    --bad:#D20F41;               /* Rot 1 */
+    --tier3:#7369BE;             /* violet */
+    --kpi1:#e6f4f4; --kpi2:#eef0fb;
+    --shadow:0 1px 3px rgba(12,40,50,.08),0 6px 18px rgba(12,40,50,.05);
+  }
+  /* ---------- Dark theme — TUD dark blue field, lighter türkis accent ---------- */
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page1:#00103a; --page2:#001a55;   /* Dunkelblau gradient */
+      --ink:#eaf1ff; --muted:#a0b4d8;
+      --card:#0c2766; --card2:#10307c; --line:#2a4a92; --track:#001a55;
+      --accent:#36b8bf;          /* lighter türkis for contrast */
+      --accent2:#7aa2ff;
+      --good:#36b8bf;
+      --warn:#f0922e;
+      --bad:#ff667e;
+      --tier3:#a98bf0;
+      --kpi1:#0c2a6e; --kpi2:#11306f;
+      --shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+    /* logo: brand blue+red on light, all white on the dark blue field */
+    .brandlogo svg text, .brandlogo svg path{fill:#ffffff !important}
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(180deg,var(--page1),var(--page2));
+    background-attachment:fixed; color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:max(16px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    max-width:640px;margin:0 auto;-webkit-font-smoothing:antialiased;
+  }
+  header{margin:6px 0 22px}
+  .brandlogo{margin:2px 0 14px}
+  .brandlogo svg{height:30px;width:auto;display:block}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{font-size:24px;line-height:1.2;margin:6px 0 4px;font-weight:800;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px}
+  .freeze{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:var(--card);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--muted);box-shadow:var(--shadow)}
+  .freeze b{color:var(--ink);font-weight:700}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 24%,transparent)}
+
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+     margin:32px 0 14px;font-weight:700}
+
+  /* KPI grid */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 13px;box-shadow:var(--shadow)}
+  .kpi .v{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .kpi .tag{font-size:11px;color:var(--accent);font-weight:700;margin-top:3px}
+  .kpi.span{grid-column:1 / -1;background:linear-gradient(120deg,var(--kpi1),var(--kpi2))}
+  .kpi.span .v{font-size:34px}
+
+  /* ---------- Process / yield flow chart ---------- */
+  .flow{display:flex;flex-direction:column}
+  .node{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    box-shadow:var(--shadow);position:relative;z-index:2;border-left:4px solid var(--accent)}
+  .node.start{border-left-color:var(--accent2)}
+  .node.end{border-left-color:var(--warn)}
+  .node .nl{min-width:0}
+  .node .nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .node .ntag{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    padding:2px 7px;border-radius:999px;color:var(--warn);
+    background:color-mix(in srgb,var(--warn) 14%,transparent);border:1px solid color-mix(in srgb,var(--warn) 35%,transparent)}
+  .node .ns{font-size:12px;color:var(--muted);margin-top:3px}
+  .node .nc{font-size:25px;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+  .node .nc.amp{color:var(--accent)}
+  .node .nc.zero{color:var(--warn)}
+
+  .conn{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;padding:11px 0}
+  .conn::before{content:"";position:absolute;top:-2px;bottom:-2px;left:50%;transform:translateX(-50%);
+    width:2px;background:var(--line);z-index:0}
+  .chip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--muted);box-shadow:var(--shadow)}
+  .chip .op{color:var(--ink)}
+  .chip.yield  {color:var(--good);  background:color-mix(in srgb,var(--good) 13%,transparent);  border-color:color-mix(in srgb,var(--good) 38%,transparent)}
+  .chip.gain   {color:var(--accent2);background:color-mix(in srgb,var(--accent2) 13%,transparent);border-color:color-mix(in srgb,var(--accent2) 38%,transparent)}
+  .chip.pending{color:var(--warn);  background:color-mix(in srgb,var(--warn) 14%,transparent);  border-color:color-mix(in srgb,var(--warn) 38%,transparent)}
+  .conn .det{position:relative;z-index:1;font-size:11.5px;color:var(--muted);
+    background:linear-gradient(var(--page1),var(--page2));padding:0 8px;text-align:center;max-width:92%}
+
+  /* loss branch */
+  .loss{position:relative;z-index:1;align-self:stretch;margin-left:auto;width:90%;
+    background:var(--lossbg,color-mix(in srgb,var(--bad) 7%,transparent));
+    border:1px solid color-mix(in srgb,var(--bad) 32%,transparent);border-radius:12px;padding:10px 12px}
+  .loss::before{content:"";position:absolute;left:-12px;top:-9px;width:12px;height:22px;
+    border-left:2px solid color-mix(in srgb,var(--bad) 32%,transparent);
+    border-bottom:2px solid color-mix(in srgb,var(--bad) 32%,transparent);border-bottom-left-radius:8px}
+  .loss .lh{display:flex;justify-content:space-between;align-items:baseline}
+  .loss .lt,.loss .lp{font-weight:800;color:var(--bad);font-size:13px}
+  .seg{display:flex;height:9px;border-radius:6px;overflow:hidden;margin-top:9px;background:var(--track)}
+  .seg > span{height:100%;width:0;transition:width .9s cubic-bezier(.22,1,.36,1)}
+  .legend{display:flex;flex-direction:column;gap:5px;margin-top:9px}
+  .legend div{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted)}
+  .legend i{width:9px;height:9px;border-radius:3px;flex:none}
+  .legend b{color:var(--ink);font-weight:700;margin-left:auto}
+  .lossnote{font-size:11px;color:var(--muted);margin-top:8px}
+
+  /* two arms */
+  .arms{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .arm{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;box-shadow:var(--shadow)}
+  .arm .h{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+  .arm .big{font-size:23px;font-weight:800;margin:7px 0 2px}
+  .arm .s{font-size:12px;color:var(--muted)}
+
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  footer code{background:var(--card);padding:2px 6px;border-radius:6px;color:var(--accent);font-size:11.5px;border:1px solid var(--line)}
+  .modenote{font-size:11px;color:var(--muted);margin-top:6px;opacity:.85}
+</style>
+</head>
+<body>
+<header>
+  <div class="brandlogo" aria-label="TUD — Chair of Railway Operations">
+    <svg viewBox="0 0 1014 321" xmlns="http://www.w3.org/2000/svg" role="img"><g transform="translate(-1485 -585)"><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="700" font-size="83" transform="matrix(1 0 0 1 1728.92 690)">TUD | Chair</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1728.92 763)">o</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1774.75 763)">f</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1820.59 763)">Railway </text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1728.92 837)">Operations</text><path d="M1600.51 630 1693 630 1693 722.49 1670.62 744.874 1670.62 674.888 1670.62 674.888 1670.62 651.685 1670.62 651.685 1647.41 651.685 1612.6 651.685 1589.4 674.876 1589.4 674.888 1647.41 674.888 1647.41 768.077 1577.49 838 1577.49 745.511 1485 745.511 1508.77 721.74 1601.01 721.74 1601.01 779.747 1601.02 779.747 1624.21 756.556 1624.21 721.74 1624.21 698.536 1624.21 698.536 1601.01 698.536 1601.01 698.536 1531.97 698.536Z" fill="#00008C" fill-rule="evenodd"/><path d="M1485 628 1554 628 1530.99 651.345 1508.01 651.345 1508.01 674.655 1485 698Z" fill="#C00000" fill-rule="evenodd"/><path d="M1485 768 1508.01 768 1508.01 813.988 1554 813.988 1554 837 1485 837Z" fill="#C00000" fill-rule="evenodd"/><path d="M1694 768 1694 837 1624 837 1647.32 814.012 1670.65 814.012 1670.65 791.012Z" fill="#C00000" fill-rule="evenodd"/></g></svg>
+  </div>
+  <div class="eyebrow">PRISMA · Yield Analysis</div>
+  <h1>Paper&nbsp;1 corpus pipeline</h1>
+  <div class="sub">LP Mining with LP2Graph — yield from search to mined formulations.</div>
+  <div class="freeze"><span class="dot"></span>Freeze date <b id="freeze">—</b> · pre-review snapshot</div>
+</header>
+
+<section><div class="kpis" id="kpis"></div></section>
+
+<h2>Process &amp; yield</h2>
+<div class="flow" id="flow"></div>
+
+<h2>Identification — two arms</h2>
+<div class="arms" id="arms"></div>
+
+<footer>
+  Derived from <code>corpus/prisma.json</code> (single source of truth, generated by
+  <code>corpusbuilder.prisma</code>). Counts are the current pre-review snapshot; the
+  <b>Screening</b> and <b>Eligibility</b> stages are still in progress (citation-arm retrieval,
+  HITL review and the per-cell P1–P5 classification are pending), so figures will move.
+  <div class="modenote">Türkis accent on light · TUD dark-blue field in dark mode · logo and theme follow your device appearance.</div>
+</footer>
+
+<!-- live PRISMA data: replace this block to refresh the page -->
+<script type="application/json" id="prisma-data">
+{
+  "freeze_date": "2026-06-21",
+  "identification": {
+    "database_search_records": 45,
+    "database_queries": 6,
+    "duplicates_removed": 2,
+    "database_unique_records": 43,
+    "citation_search_records_identified": 10056,
+    "citation_search_recommended": 4235
+  },
+  "screening": { "records_screened": 43, "flagged_off_topic_in_corpus": 28 },
+  "retrieval_eligibility": {
+    "reports_retrieved": 286,
+    "from_database_arm": 43,
+    "from_citation_arm": 243,
+    "reports_excluded": {
+      "not_entitled": 10,
+      "no_machine_readable_formulas": 15,
+      "awaiting_tier3_pdf": 23
+    },
+    "reports_excluded_total": 48
+  },
+  "included": {
+    "source_papers": 238,
+    "candidate_formulations": 8957,
+    "hitl_review": { "accepted": 0, "corrected": 0, "rejected": 0, "unreviewed": 8957 }
+  }
+}
+</script>
+
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('prisma-data').textContent);
+  const id = D.identification, sc = D.screening, re = D.retrieval_eligibility, inc = D.included;
+  const fmt = n => n.toLocaleString('en-US');
+  const pct = (a,b) => b ? (100*a/b) : 0;
+  const p1  = x => x.toFixed(1);
+  const totalIdentified = id.database_unique_records + id.citation_search_records_identified;
+  const screened = id.database_unique_records + id.citation_search_recommended; // db screened + citations recommended
+
+  document.getElementById('freeze').textContent = D.freeze_date;
+
+  /* ---- KPI cards ---- */
+  const kpis = [
+    {v: fmt(totalIdentified), l:'records identified', tag:'database + citation'},
+    {v: fmt(re.reports_retrieved), l:'reports retrieved', tag:fmt(re.from_database_arm)+' db · '+fmt(re.from_citation_arm)+' cite'},
+    {v: fmt(inc.source_papers), l:'source papers included', tag:p1(pct(inc.source_papers,re.reports_retrieved))+'% eligibility yield'},
+    {v: fmt(inc.hitl_review.unreviewed), l:'awaiting HITL review', tag:'0% reviewed so far'},
+    {v: fmt(inc.candidate_formulations), l:'candidate formulations mined', tag:'≈ '+p1(inc.candidate_formulations/inc.source_papers)+' per paper', cls:'span'}
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(k=>
+    `<div class="kpi ${k.cls||''}"><div class="v">${k.v}</div><div class="l">${k.l}</div><div class="tag">${k.tag}</div></div>`
+  ).join('');
+
+  /* ---- Process / yield flow chart (full PRISMA chain + mining extension) ---- */
+  const ex = re.reports_excluded, exTot = re.reports_excluded_total;
+  const exItems = [
+    {k:'Full text not entitled', v:ex.not_entitled, c:'var(--bad)'},
+    {k:'No machine-readable formulas', v:ex.no_machine_readable_formulas, c:'var(--warn)'},
+    {k:'Awaiting Tier-3 PDF extraction', v:ex.awaiting_tier3_pdf, c:'var(--tier3)'}
+  ];
+
+  const nodes = [
+    {nm:'Identification', ns:`${fmt(id.database_unique_records)} unique db + ${fmt(id.citation_search_records_identified)} citation`,
+     c:fmt(totalIdentified), cls:'start'},
+
+    {nm:'Screening', tag:'in progress', ns:`${fmt(id.database_unique_records)} database + ${fmt(id.citation_search_recommended)} recommended citations`,
+     c:fmt(screened),
+     t:{op:'De-dup & relevance screen',
+        det:`${id.duplicates_removed} duplicates removed · ${fmt(id.citation_search_recommended)} of ${fmt(id.citation_search_records_identified)} citations recommended · ${sc.flagged_off_topic_in_corpus} flagged off-topic`}},
+
+    {nm:'Eligibility', tag:'in progress', ns:'reports retrieved &amp; assessed',
+     c:fmt(re.reports_retrieved),
+     t:{op:'Retrieve & build dossiers',
+        chip:{cls:'pending', txt:fmt(re.from_citation_arm)+' of '+fmt(id.citation_search_recommended)+' retrieved'},
+        det:`${fmt(re.reports_retrieved)} dossiers built (${fmt(re.from_database_arm)} db + ${fmt(re.from_citation_arm)} citation) — retrieval ongoing`}},
+
+    {nm:'Included papers', ns:'≥1 recoverable formulation', c:fmt(inc.source_papers),
+     t:{op:'Assess eligibility',
+        chip:{cls:'yield', txt:p1(pct(inc.source_papers,re.reports_retrieved))+'% yield'},
+        loss:{total:exTot, pct:pct(exTot,re.reports_retrieved), items:exItems,
+              note:`${ex.awaiting_tier3_pdf} are only deferred (Tier-3 OCR pending), not permanently dropped.`}}},
+
+    {nm:'Candidate formulations', ns:'pre-review extraction output', c:fmt(inc.candidate_formulations), ccls:'amp',
+     t:{op:'Extract · LP2Graph',
+        chip:{cls:'gain', txt:'×'+p1(inc.candidate_formulations/inc.source_papers)+' amplification'},
+        det:`${fmt(inc.candidate_formulations)} formulations from ${fmt(inc.source_papers)} papers`}},
+
+    {nm:'Review-accepted', tag:'pending', ns:'HITL adjudication', c:fmt(inc.hitl_review.accepted), ccls:'zero', cls:'end',
+     t:{op:'HITL review',
+        chip:{cls:'pending', txt:'0% · pending'},
+        det:`0 of ${fmt(inc.hitl_review.unreviewed)} formulations reviewed — next critical-path step`}}
+  ];
+
+  function transitionHTML(t){
+    if(!t) return '';
+    let h = `<div class="conn"><span class="chip"><span class="op">${t.op}</span></span>`;
+    if(t.chip) h += `<span class="chip ${t.chip.cls}">${t.chip.txt}</span>`;
+    if(t.det)  h += `<span class="det">${t.det}</span>`;
+    if(t.loss){
+      const L=t.loss;
+      const seg = L.items.map(e=>`<span data-w="${pct(e.v,L.total)}" style="background:${e.c}"></span>`).join('');
+      const leg = L.items.map(e=>`<div><i style="background:${e.c}"></i>${e.k}<b>${e.v}</b></div>`).join('');
+      h += `<div class="loss">
+        <div class="lh"><span class="lt">✕ ${fmt(L.total)} excluded</span><span class="lp">−${p1(L.pct)}%</span></div>
+        <div class="seg">${seg}</div><div class="legend">${leg}</div>
+        <div class="lossnote">${L.note}</div></div>`;
+    }
+    return h + `</div>`;
+  }
+
+  document.getElementById('flow').innerHTML = nodes.map(n=>
+    transitionHTML(n.t) +
+    `<div class="node ${n.cls||''}">
+       <div class="nl"><div class="nm">${n.nm}${n.tag?`<span class="ntag">${n.tag}</span>`:''}</div><div class="ns">${n.ns}</div></div>
+       <div class="nc ${n.ccls||''}">${n.c}</div>
+     </div>`
+  ).join('');
+
+  /* ---- Two arms ---- */
+  document.getElementById('arms').innerHTML =
+    `<div class="arm"><div class="h">Database search</div>
+       <div class="big">${fmt(id.database_unique_records)}</div>
+       <div class="s">unique records from ${id.database_queries} frozen queries (${fmt(id.database_search_records)} hits, ${id.duplicates_removed} dup)</div></div>
+     <div class="arm"><div class="h">Citation searching</div>
+       <div class="big">${fmt(id.citation_search_records_identified)}</div>
+       <div class="s">neighbours by snowballing · ${fmt(id.citation_search_recommended)} recommended to screen</div></div>`;
+
+  /* ---- animate segmented loss bars ---- */
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll('.seg > span').forEach(el=>{ el.style.width=el.dataset.w+'%'; });
+  }));
+})();
+</script>
+</body>
+</html>
