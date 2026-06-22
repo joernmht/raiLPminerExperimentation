@@ -107,20 +107,22 @@ corpus/
   provenance/<id>.json     one ProvenanceRecord per formulation, matched by id
   instances/*.json         validation instances (cardinalities + data + published optimum)
   prisma.json/.md          running PRISMA tally — source of truth for every "n =" in the paper
-  prisma_flow.png          PRISMA flow + mining-yield figure (regenerable)
+  prisma_flow.png          PRISMA flow + mining-yield figure (regenerable, for the paper)
+  prisma.html              mobile-first, self-contained PRISMA flow + yield page (open in a browser)
 ```
 
 ### PRISMA flow + yield
 
 Corpus construction is a **PRISMA flow** (identification → screening → eligibility
 → included). `python -m corpusbuilder prisma` recomputes the tally from the frozen
-corpus artifacts and writes `corpus/prisma.{json,md}` plus the `prisma_flow.png`
-figure. It is **deterministic** (same frozen corpus ⇒ byte-identical tally) and is
-the single source of truth for the paper's methods section. The figure makes the
-pipeline's *yield* obvious: a broad identification sweep is distilled to a small
-set of validated formulations, while the deterministic-first extraction ladder
-(arXiv LaTeX → Elsevier MathML, no OCR) mines hundreds of machine-checked formula
-records from the retrieved full texts.
+corpus artifacts and writes `corpus/prisma.{json,md}`, a `prisma_flow.png` figure
+(for the paper), and a self-contained, mobile-first `prisma.html` page (open in any
+browser, works offline, supports dark mode). All are **deterministic** (same frozen
+corpus ⇒ byte-identical output) and the JSON/MD are the single source of truth for
+the paper's methods section. The visuals make the pipeline's *yield* obvious: a
+broad identification sweep is distilled to a small set of validated formulations,
+while the deterministic-first extraction ladder (arXiv LaTeX → Elsevier MathML, no
+OCR) mines hundreds of machine-checked formula records from the retrieved full texts.
 
 The shipped corpus is a **seed**: ten canonical *structural templates*
 (assignment, PESP, big-M ordering, time-indexed, …) paired with illustrative
