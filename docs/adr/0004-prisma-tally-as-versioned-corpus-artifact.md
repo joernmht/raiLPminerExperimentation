@@ -36,4 +36,3 @@ being typed by hand.
   (`python -m corpusbuilder` driver) not yet enforced by a hook or CI. A stale
   `prisma.json` would misstate the paper's counts. Mitigation: regenerate as
   part of any corpus-changing commit; consider a CI freshness check later.
-</content>

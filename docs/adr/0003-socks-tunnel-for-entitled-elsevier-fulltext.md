@@ -40,4 +40,3 @@ prints an explicit `METADATA ONLY (not entitled)` warning and records
   metadata-only (mitigated by the printed warning).
 - **Bad:** credentials/proxy live in `.env` / the central secret store, which
   must stay out of git (`.gitignore` covers `.env*` except the example).
-</content>

@@ -42,4 +42,3 @@ runs.
   the type system; a stray `datetime.now()` inside `railpminer/` would silently
   break it. Mitigation: keep all date/RNG inputs in `PipelineConfig` and the
   acquisition layer only.
-</content>
