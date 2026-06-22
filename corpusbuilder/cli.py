@@ -75,7 +75,7 @@ def cmd_dossier(args: argparse.Namespace) -> int:
             dossier.source.entitlement = "open-access"
             dossier.source.api = "openalex+arxiv"
             print(f"extracted {len(dossier.formulas)} formula(s) from arXiv:{arxiv_id} (Tier-1)")
-        except Exception as e:  # noqa: BLE001 — report, never silently drop (honesty rule)
+        except Exception as e:  # report, never silently drop (honesty rule)
             print(f"WARNING: arXiv source extraction failed ({e}); trying other tiers")
 
     # Tier 2 — Elsevier ScienceDirect full-text MathML (needs entitlement).
@@ -87,14 +87,20 @@ def cmd_dossier(args: argparse.Namespace) -> int:
                 dossier.formulas = els.extract_formulas(xml)
                 dossier.source.file_sha256 = hashlib.sha256(xml.encode("utf-8")).hexdigest()
                 dossier.source.api = "openalex+elsevier"
-                dossier.source.entitlement = "tud-subscription" if (els.insttoken or els.proxies) else "open-access"
+                dossier.source.entitlement = (
+                    "tud-subscription" if (els.insttoken or els.proxies) else "open-access"
+                )
                 ok = sum(1 for f in dossier.formulas if not f.note)
-                print(f"extracted {len(dossier.formulas)} formula(s) from Elsevier full text "
-                      f"(Tier-2, {ok} clean); proxy={'yes' if els.proxies else 'no'}")
+                print(
+                    f"extracted {len(dossier.formulas)} formula(s) from Elsevier full text "
+                    f"(Tier-2, {ok} clean); proxy={'yes' if els.proxies else 'no'}"
+                )
             else:
                 dossier.source.entitlement = "metadata-only"
-                print("Elsevier returned METADATA ONLY (not entitled): set ELSEVIER_INSTTOKEN or "
-                      "ELSEVIER_PROXY (campus tunnel) for full text. Dossier has citations only.")
+                print(
+                    "Elsevier returned METADATA ONLY (not entitled): set ELSEVIER_INSTTOKEN or "
+                    "ELSEVIER_PROXY (campus tunnel) for full text. Dossier has citations only."
+                )
         except (ElsevierError, RuntimeError) as e:
             print(f"WARNING: Elsevier extraction failed ({e}); dossier has citations only")
 
@@ -127,9 +133,15 @@ def cmd_fetch_arxiv(args: argparse.Namespace) -> int:
     if len(formulas) > 10:
         print(f"  … and {len(formulas) - 10} more")
     if args.save:
-        src = SourceInfo(title=f"arXiv:{args.arxiv_id}", arxiv_id=args.arxiv_id, api="arxiv",
-                         retrieved=_today(), file_path=str(src_dir), file_sha256=sha,
-                         entitlement="open-access")
+        src = SourceInfo(
+            title=f"arXiv:{args.arxiv_id}",
+            arxiv_id=args.arxiv_id,
+            api="arxiv",
+            retrieved=_today(),
+            file_path=str(src_dir),
+            file_sha256=sha,
+            entitlement="open-access",
+        )
         Dossier(source=src, formulas=formulas).save(args.out)
         print(f"wrote dossier to {args.out}")
     return 0
@@ -148,14 +160,21 @@ def main(argv: list[str] | None = None) -> int:
 
     d = sub.add_parser("dossier", help="build a per-paper dossier (citations + arXiv formulas)")
     d.add_argument("identifier", help="DOI, arXiv id, or OpenAlex id")
-    d.add_argument("--arxiv", default=None, help="arXiv id for formula extraction (if not auto-found)")
+    d.add_argument(
+        "--arxiv", default=None, help="arXiv id for formula extraction (if not auto-found)"
+    )
     d.add_argument("--ref-limit", type=int, default=200)
     d.add_argument("--cite-limit", type=int, default=100)
-    d.add_argument("--no-formulas", action="store_true", help="citations only, skip formula extraction")
+    d.add_argument(
+        "--no-formulas", action="store_true", help="citations only, skip formula extraction"
+    )
     d.add_argument("--no-scopus", action="store_true", help="skip the Scopus cited-by cross-check")
-    d.add_argument("--proxy", default=None,
-                   help="proxy for entitled Elsevier full text, e.g. socks5h://127.0.0.1:8080 "
-                        "(defaults to ELSEVIER_PROXY from the env/secrets)")
+    d.add_argument(
+        "--proxy",
+        default=None,
+        help="proxy for entitled Elsevier full text, e.g. socks5h://127.0.0.1:8080 "
+        "(defaults to ELSEVIER_PROXY from the env/secrets)",
+    )
     d.add_argument("--out", default=str(_DEFAULT_OUT))
     d.set_defaults(func=cmd_dossier)
 

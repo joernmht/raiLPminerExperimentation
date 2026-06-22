@@ -1,0 +1,55 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: py${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+    steps:
+      - name: Checkout raiLPminerExperimentation
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      # The method library is a sibling checkout (not pinned on PyPI); install it
+      # editable with its mining+solver extras so railpminer can import lp2graph.
+      - name: Checkout lp2graph
+        uses: actions/checkout@v4
+        with:
+          repository: joernmht/lp2graph
+          path: lp2graph
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e "./lp2graph[mining,solver]"
+          pip install -e "./main[dev,corpus]"
+
+      - name: Lint
+        working-directory: main
+        run: ruff check .
+
+      - name: Format check
+        working-directory: main
+        run: ruff format --check .
+
+      # mypy is intentionally NOT gated yet (corpusbuilder type debt; see
+      # docs/STACK.md "Known drift"). Re-enable once stubs/annotations land.
+
+      - name: Test
+        working-directory: main
+        run: pytest
+</content>

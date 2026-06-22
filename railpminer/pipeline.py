@@ -16,11 +16,17 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.mining import versions as _versions
 from lp2graph.mining.cluster import Taxonomy
 
-from . import clustering, dataset, labeling, taxonomy_export, validation
+from . import (
+    _lp2graph,  # noqa: F401
+    clustering,
+    dataset,
+    labeling,
+    taxonomy_export,
+    validation,
+)
 from .clustering import StabilitySummary
 from .config import PipelineConfig
 from .corpus import LoadedCorpus, load_corpus

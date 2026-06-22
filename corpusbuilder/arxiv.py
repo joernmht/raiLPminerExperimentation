@@ -29,7 +29,7 @@ _UA = "raiLPminer-corpusbuilder/1 (mailto:joern.maurischat@tu-dresden.de)"
 # Display-math environments we lift verbatim. Order matters only for naming.
 _ENVS = ("equation", "align", "gather", "multline", "eqnarray", "displaymath", "flalign")
 _ENV_RE = re.compile(
-    r"\\begin\{(?P<env>(?:%s)\*?)\}(?P<body>.*?)\\end\{(?P=env)\}" % "|".join(_ENVS),
+    r"\\begin\{(?P<env>(?:" + "|".join(_ENVS) + r")\*?)\}(?P<body>.*?)\\end\{(?P=env)\}",
     re.DOTALL,
 )
 _BRACKET_RE = re.compile(r"(?<!\\)\\\[(?P<body>.*?)(?<!\\)\\\]", re.DOTALL)

@@ -13,13 +13,13 @@ from collections import defaultdict
 from dataclasses import asdict
 from typing import Any
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.core.model import Formulation
 from lp2graph.metrics.flags import presence_flags
 from lp2graph.metrics.structural import structural_summary
 from lp2graph.mining.cluster import LevelResult, Taxonomy
 from lp2graph.views import schema
 
+from . import _lp2graph  # noqa: F401
 from .corpus import LoadedCorpus
 from .labeling import LabelingResult
 from .validation import ValidationReport
@@ -34,7 +34,7 @@ def _model_level_labels(level: LevelResult) -> dict[str, str]:
     """formulation_id -> cluster name for a model-level (one-entity-per-model) pass."""
     cl = level.clustering
     out: dict[str, str] = {}
-    for entity, label in zip(level.entities, cl.labels):
+    for entity, label in zip(level.entities, cl.labels, strict=True):
         out[entity.formulation_id] = cl.names.get(label, "unassigned")
     return out
 

@@ -70,7 +70,10 @@ class OpenAlexClient:
             # Fallback: search, but only accept a hit that actually has an arXiv location.
             hits = self._get("works", {"search": arxiv_id, "per-page": 5})
             for w in hits.get("results", []):
-                if any(_ARXIV_RE.search(loc.get("landing_page_url") or "") for loc in w.get("locations", [])):
+                if any(
+                    _ARXIV_RE.search(loc.get("landing_page_url") or "")
+                    for loc in w.get("locations", [])
+                ):
                     return w
             raise OpenAlexError(f"no OpenAlex work for arXiv id {arxiv_id!r}")
         if ident.startswith("W") and ident[1:].isdigit():

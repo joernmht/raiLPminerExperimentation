@@ -7,8 +7,6 @@ import shutil
 import pytest
 
 from corpusbuilder.arxiv import extract_equations_from_text
-from corpusbuilder.elsevier import ElsevierClient, is_elsevier_doi
-from corpusbuilder.mathml import _BRIDGE, _normalize, mathml_to_latex
 from corpusbuilder.dossier import (
     CitationRef,
     Dossier,
@@ -18,6 +16,8 @@ from corpusbuilder.dossier import (
     VerificationStatus,
     paper_key,
 )
+from corpusbuilder.elsevier import ElsevierClient, is_elsevier_doi
+from corpusbuilder.mathml import _BRIDGE, _normalize, mathml_to_latex
 from corpusbuilder.openalex import OpenAlexClient
 
 _TEX = r"""
@@ -64,8 +64,14 @@ def test_dossier_roundtrip_and_markdown(tmp_path) -> None:
         references_count=1,
         cited_by_count=1,
         formulas=[
-            FormulaRecord(id="eq-0001", latex="x+y=1", method=ExtractionMethod.arxiv_tex,
-                          page_start=3, page_end=3, status=VerificationStatus.accepted),
+            FormulaRecord(
+                id="eq-0001",
+                latex="x+y=1",
+                method=ExtractionMethod.arxiv_tex,
+                page_start=3,
+                page_end=3,
+                status=VerificationStatus.accepted,
+            ),
         ],
     )
     json_path, md_path = dossier.save(tmp_path)
@@ -95,7 +101,9 @@ def test_openalex_mapping_from_fixture() -> None:
         "publication_year": 2018,
         "cited_by_count": 77,
         "authorships": [{"author": {"display_name": "A. Author"}}],
-        "primary_location": {"source": {"display_name": "TR-C", "host_organization_name": "Elsevier"}},
+        "primary_location": {
+            "source": {"display_name": "TR-C", "host_organization_name": "Elsevier"}
+        },
         "locations": [{"landing_page_url": "https://arxiv.org/abs/1801.01234"}],
         "referenced_works": ["https://openalex.org/W1", "https://openalex.org/W2"],
     }
@@ -144,7 +152,9 @@ def test_has_full_text_detection() -> None:
 
 
 def test_normalize_mathml_strips_prefix_and_adds_ns() -> None:
-    out = _normalize('<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math>')
+    out = _normalize(
+        '<mml:math xmlns:mml="http://www.w3.org/1998/Math/MathML"><mml:mi>x</mml:mi></mml:math>'
+    )
     assert "mml:" not in out and 'xmlns="http://www.w3.org/1998/Math/MathML"' in out
 
 

@@ -1,0 +1,21 @@
+# Shared convention: ruff lint+format, pinned so local == pre-commit == CI
+# (see ~/.claude/quality/STYLE.md §1). Install: `pre-commit install`.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12 # keep in lock-step with the `ruff>=0.15.12,<0.16` dev pin
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+</content>

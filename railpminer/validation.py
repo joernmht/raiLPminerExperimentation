@@ -25,15 +25,14 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass, field
 
-from . import _lp2graph  # noqa: F401
 from lp2graph.codec import canonical_normal_form, from_canonical_latex, to_canonical_latex
 from lp2graph.core.model import Formulation
 from lp2graph.mining.cluster import Taxonomy
 from lp2graph.mining.isomorphism import clusters_from_labels, isomorphism_report
 
+from . import _lp2graph  # noqa: F401
 from .config import PipelineConfig
 from .corpus import LoadedCorpus
-
 
 # --------------------------------------------------------------------------- #
 # Structural fidelity
@@ -55,7 +54,7 @@ def structural_fidelity(formulations: list[Formulation]) -> list[StructuralFidel
             restored = from_canonical_latex(to_canonical_latex(f))
             ok = canonical_normal_form(restored) == canonical_normal_form(f)
             out.append(StructuralFidelity(f.id, ok, "" if ok else "normal-form mismatch"))
-        except Exception as exc:  # noqa: BLE001 — report, never drop
+        except Exception as exc:  # report, never drop
             out.append(StructuralFidelity(f.id, False, f"{type(exc).__name__}: {exc}"))
     return out
 
@@ -127,16 +126,24 @@ def external_fidelity(
 
         outcomes: list[SolverOutcome] = []
         if solve is None or not solvers:
-            outcomes.append(SolverOutcome("(none)", "solver_unavailable", None,
-                                          "install the lp2graph 'solver' extra (pulp)"))
+            outcomes.append(
+                SolverOutcome(
+                    "(none)",
+                    "solver_unavailable",
+                    None,
+                    "install the lp2graph 'solver' extra (pulp)",
+                )
+            )
         else:
             inst = Instance(cardinalities=d["cardinalities"], parameters=d.get("parameters", {}))
             for name, backend in solvers:
                 try:
                     r = solve(f, inst, solver=backend)  # type: ignore[misc]
                     outcomes.append(SolverOutcome(name, r.status, r.objective))
-                except Exception as exc:  # noqa: BLE001
-                    outcomes.append(SolverOutcome(name, "error", None, f"{type(exc).__name__}: {exc}"))
+                except Exception as exc:  # report, never drop
+                    outcomes.append(
+                        SolverOutcome(name, "error", None, f"{type(exc).__name__}: {exc}")
+                    )
 
         objs = [o.objective for o in outcomes if o.objective is not None]
         cross_agree = len(objs) >= 2 and all(abs(o - objs[0]) <= eps for o in objs)
@@ -248,7 +255,9 @@ def run_validation(
     solvers_used = tuple(name for name, _ in _available_solvers())
     notes: list[str] = []
     if "Gurobi" not in solvers_used:
-        notes.append("Gurobi not available here; cross-solver check ran on " + ", ".join(solvers_used) + ".")
+        notes.append(
+            "Gurobi not available here; cross-solver check ran on " + ", ".join(solvers_used) + "."
+        )
     return ValidationReport(
         solvers_used=solvers_used,
         structural=tuple(structural),

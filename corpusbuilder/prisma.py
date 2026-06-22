@@ -54,7 +54,10 @@ def main() -> None:
     cite_recommended = snow.get("n_recommended", 0)
 
     # --- Reports sought / retrieved: the dossiers actually built ---
-    doss = [json.loads(Path(p).read_text()) for p in sorted(glob.glob(str(CORPUS / "dossiers" / "*.json")))]
+    doss = [
+        json.loads(Path(p).read_text())
+        for p in sorted(glob.glob(str(CORPUS / "dossiers" / "*.json")))
+    ]
     n_retrieved = len(doss)
     from_db = from_cite = 0
     incl_papers = 0
@@ -63,7 +66,7 @@ def main() -> None:
     off_topic = 0
     for d in doss:
         s = d.get("source") or {}
-        doi = (s.get("doi") or "")
+        doi = s.get("doi") or ""
         nf = len(d.get("formulas", []))
         formulas_total += nf
         if doi.lower() in db_seed_dois:
@@ -89,10 +92,13 @@ def main() -> None:
         reviewed = {"accepted": 0, "corrected": 0, "rejected": 0, "unreviewed": 0}
         for f in dec_files:
             for dd in json.loads(Path(f).read_text()).get("decisions", []):
-                reviewed[dd.get("status", "unreviewed")] = reviewed.get(dd.get("status", "unreviewed"), 0) + 1
+                reviewed[dd.get("status", "unreviewed")] = (
+                    reviewed.get(dd.get("status", "unreviewed"), 0) + 1
+                )
 
     flow = {
-        "freeze_date": cand.get("retrieved") or _load(CORPUS / "manifest.json", {}).get("frozen_search_date"),
+        "freeze_date": cand.get("retrieved")
+        or _load(CORPUS / "manifest.json", {}).get("frozen_search_date"),
         "identification": {
             "database_search_records": db_predup,
             "database_queries": len(cand.get("queries", [])),
@@ -113,7 +119,7 @@ def main() -> None:
             "reports_excluded_total": sum(excl.values()),
         },
         "included": {
-            "source_papers": incl_papers,          # M
+            "source_papers": incl_papers,  # M
             "candidate_formulations": formulas_total,  # N (pre-HITL)
             "hitl_review": reviewed,
             "per_cell_P1_P5": None,  # TODO: requires domain/activity classification step
@@ -122,59 +128,73 @@ def main() -> None:
     payload = {"schema_version": "prisma-1", "derived_from": "corpus/*", "flow": flow}
     (CORPUS / "prisma.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False))
 
-    i, s_, r, inc = flow["identification"], flow["screening"], flow["retrieval_eligibility"], flow["included"]
+    i, s_, r, inc = (
+        flow["identification"],
+        flow["screening"],
+        flow["retrieval_eligibility"],
+        flow["included"],
+    )
     md = f"""# PRISMA flow — Paper 1 corpus (derived; do not hand-edit)
 
-Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {flow['freeze_date']}.
+Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {flow["freeze_date"]}.
 
 ## Identification
-- Records identified — **database searching** ({i['database_queries']} frozen queries): **{i['database_search_records']}**
-- Duplicate records removed: **{i['duplicates_removed']}** → unique: **{i['database_unique_records']}**
-- Records identified — **other methods (citation searching / snowballing)**: **{i['citation_search_records_identified']}** ({i['citation_search_recommended']} recommended to screen)
+- Records identified — **database searching** ({i["database_queries"]} frozen queries): **{i["database_search_records"]}**
+- Duplicate records removed: **{i["duplicates_removed"]}** → unique: **{i["database_unique_records"]}**
+- Records identified — **other methods (citation searching / snowballing)**: **{i["citation_search_records_identified"]}** ({i["citation_search_recommended"]} recommended to screen)
 
 ## Screening
-- Records screened: **{s_['records_screened']}** (database arm)
-- Flagged off-topic among retrieved dossiers (topical screen): **{s_['flagged_off_topic_in_corpus']}**
+- Records screened: **{s_["records_screened"]}** (database arm)
+- Flagged off-topic among retrieved dossiers (topical screen): **{s_["flagged_off_topic_in_corpus"]}**
 
 ## Retrieval & eligibility
-- Reports retrieved (dossiers built): **{r['reports_retrieved']}** — {r['from_database_arm']} via database arm, {r['from_citation_arm']} via citation searching
-- Reports excluded at eligibility: **{r['reports_excluded_total']}**
-  - full text not entitled (metadata-only): {r['reports_excluded']['not_entitled']}
-  - full text retrieved, no machine-readable formulas: {r['reports_excluded']['no_machine_readable_formulas']}
-  - awaiting Tier-3 PDF extraction (non-Elsevier, citation-only so far): {r['reports_excluded']['awaiting_tier3_pdf']}
+- Reports retrieved (dossiers built): **{r["reports_retrieved"]}** — {r["from_database_arm"]} via database arm, {r["from_citation_arm"]} via citation searching
+- Reports excluded at eligibility: **{r["reports_excluded_total"]}**
+  - full text not entitled (metadata-only): {r["reports_excluded"]["not_entitled"]}
+  - full text retrieved, no machine-readable formulas: {r["reports_excluded"]["no_machine_readable_formulas"]}
+  - awaiting Tier-3 PDF extraction (non-Elsevier, citation-only so far): {r["reports_excluded"]["awaiting_tier3_pdf"]}
 
 ## Included
-- Source papers with ≥1 recoverable formulation (**M**): **{inc['source_papers']}**
-- Candidate formulations extracted (**N**, pre-review): **{inc['candidate_formulations']}**
-- HITL review: accepted {inc['hitl_review']['accepted']} · corrected {inc['hitl_review']['corrected']} · rejected {inc['hitl_review']['rejected']} · unreviewed {inc['hitl_review']['unreviewed']}
+- Source papers with ≥1 recoverable formulation (**M**): **{inc["source_papers"]}**
+- Candidate formulations extracted (**N**, pre-review): **{inc["candidate_formulations"]}**
+- HITL review: accepted {inc["hitl_review"]["accepted"]} · corrected {inc["hitl_review"]["corrected"]} · rejected {inc["hitl_review"]["rejected"]} · unreviewed {inc["hitl_review"]["unreviewed"]}
 - Per-cell P1–P5 distribution: _pending domain/activity classification step_
 """
     (CORPUS / "prisma.md").write_text(md)
 
     def cmd(name, val):
         return f"\\newcommand{{\\{name}}}{{{val}}}"
-    tex = "% PRISMA counts — auto-generated by corpusbuilder.prisma; do not edit.\n" + "\n".join([
-        cmd("prismaDBqueries", i["database_queries"]),
-        cmd("prismaDBrecords", i["database_search_records"]),
-        cmd("prismaDBdups", i["duplicates_removed"]),
-        cmd("prismaDBunique", i["database_unique_records"]),
-        cmd("prismaCiteIdentified", i["citation_search_records_identified"]),
-        cmd("prismaCiteRecommended", i["citation_search_recommended"]),
-        cmd("prismaReportsRetrieved", r["reports_retrieved"]),
-        cmd("prismaReportsExcluded", r["reports_excluded_total"]),
-        cmd("prismaExclNotEntitled", r["reports_excluded"]["not_entitled"]),
-        cmd("prismaExclNoFormulas", r["reports_excluded"]["no_machine_readable_formulas"]),
-        cmd("prismaExclTierThree", r["reports_excluded"]["awaiting_tier3_pdf"]),
-        cmd("prismaInclPapers", inc["source_papers"]),
-        cmd("prismaInclFormulations", inc["candidate_formulations"]),
-    ]) + "\n"
+
+    tex = (
+        "% PRISMA counts — auto-generated by corpusbuilder.prisma; do not edit.\n"
+        + "\n".join(
+            [
+                cmd("prismaDBqueries", i["database_queries"]),
+                cmd("prismaDBrecords", i["database_search_records"]),
+                cmd("prismaDBdups", i["duplicates_removed"]),
+                cmd("prismaDBunique", i["database_unique_records"]),
+                cmd("prismaCiteIdentified", i["citation_search_records_identified"]),
+                cmd("prismaCiteRecommended", i["citation_search_recommended"]),
+                cmd("prismaReportsRetrieved", r["reports_retrieved"]),
+                cmd("prismaReportsExcluded", r["reports_excluded_total"]),
+                cmd("prismaExclNotEntitled", r["reports_excluded"]["not_entitled"]),
+                cmd("prismaExclNoFormulas", r["reports_excluded"]["no_machine_readable_formulas"]),
+                cmd("prismaExclTierThree", r["reports_excluded"]["awaiting_tier3_pdf"]),
+                cmd("prismaInclPapers", inc["source_papers"]),
+                cmd("prismaInclFormulations", inc["candidate_formulations"]),
+            ]
+        )
+        + "\n"
+    )
     (CORPUS / "prisma_macros.tex").write_text(tex)
 
-    print(f"PRISMA: db {i['database_search_records']}→{i['database_unique_records']} unique; "
-          f"+{i['citation_search_records_identified']} citation-identified; "
-          f"{r['reports_retrieved']} retrieved → {inc['source_papers']} papers / "
-          f"{inc['candidate_formulations']} formulations included (pre-HITL). "
-          f"wrote prisma.json, prisma.md, prisma_macros.tex")
+    print(
+        f"PRISMA: db {i['database_search_records']}→{i['database_unique_records']} unique; "
+        f"+{i['citation_search_records_identified']} citation-identified; "
+        f"{r['reports_retrieved']} retrieved → {inc['source_papers']} papers / "
+        f"{inc['candidate_formulations']} formulations included (pre-HITL). "
+        f"wrote prisma.json, prisma.md, prisma_macros.tex"
+    )
 
 
 if __name__ == "__main__":

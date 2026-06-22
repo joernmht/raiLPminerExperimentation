@@ -25,7 +25,6 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from . import _lp2graph  # noqa: F401
 from lp2graph import load
 from lp2graph.core.model import Formulation
 from lp2graph.mining.corpusmgr import (
@@ -34,6 +33,7 @@ from lp2graph.mining.corpusmgr import (
     ProvenanceRecord,
 )
 
+from . import _lp2graph  # noqa: F401
 from .config import PipelineConfig
 
 #: The fields lp2graph's ProvenanceRecord accepts; anything else in the JSON
@@ -114,18 +114,16 @@ def load_corpus(config: PipelineConfig | None = None) -> LoadedCorpus:
     for fpath in sorted(config.formulations_dir.glob("*.json")):
         try:
             formulation = load(fpath)
-        except Exception as exc:  # noqa: BLE001 — report, never drop
+        except Exception as exc:  # report, never drop
             failures.append(LoadFailure(str(fpath), f"validation: {exc}"))
             continue
         ppath = config.provenance_dir / f"{formulation.id}.json"
         if not ppath.exists():
-            failures.append(
-                LoadFailure(str(fpath), f"missing provenance/{formulation.id}.json")
-            )
+            failures.append(LoadFailure(str(fpath), f"missing provenance/{formulation.id}.json"))
             continue
         try:
             record = _load_provenance(ppath)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:  # report, never drop
             failures.append(LoadFailure(str(ppath), f"provenance: {exc}"))
             continue
         entries.append((formulation, record))
@@ -135,4 +133,4 @@ def load_corpus(config: PipelineConfig | None = None) -> LoadedCorpus:
     return LoadedCorpus(manager=manager, load_failures=tuple(failures))
 
 
-__all__ = ["LoadedCorpus", "LoadFailure", "load_corpus"]
+__all__ = ["LoadFailure", "LoadedCorpus", "load_corpus"]
