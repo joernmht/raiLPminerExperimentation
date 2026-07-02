@@ -378,15 +378,19 @@ class _P:
             a = self.group_expr()
             return (a + v) if isinstance(a, str) else a
         if k == "prefix":
-            binder = ""
+            sub = sup = ""
             while self.peek()[0] == "script":
                 sv = self.next()[1]          # always consume (else: spin)
-                if not binder and sv.startswith("_"):
-                    binder = _flat(sv[1:], 10)
+                if sv.startswith("_") and not sub:
+                    sub = _flat(sv[1:], 12)
+                elif sv.startswith("^") and not sup:
+                    sup = _flat(sv[1:], 8)
             # min/max govern the whole objective expression; ∑/∏ bind the term
             body = self.add() if v in ("min", "max") else self.mul()
-            label = v + ("_" + binder if binder else "")
-            return [label, body] if body is not None else label
+            binder = sub + ("…" + sup if sup else "")
+            kids = ([["@", binder]] if binder else []) \
+                + ([body] if body is not None else [])
+            return [v] + kids if kids else v
         if k in ("lpar", "lbrace"):
             inner = self.expr()
             if self.peek()[0] == ("rpar" if k == "lpar" else "rbrace"):
@@ -587,6 +591,7 @@ _HTML = r"""<!doctype html>
   --warn:#C85000;--warn-soft:#fbeada;
   --bad:#D20F41;--bad-soft:#fae3e9;
   --g1:#5fb6bc;--g2:#2f979e;--g3:#0a777f;--g4:#06555b;
+  --tier3:#7369BE;
   --shadow:0 1px 3px rgba(12,40,50,.08),0 6px 18px rgba(12,40,50,.05);
 }
 @media (prefers-color-scheme:dark){:root{
@@ -598,6 +603,7 @@ _HTML = r"""<!doctype html>
   --warn:#f0922e;--warn-soft:#3a2a17;
   --bad:#ff667e;--bad-soft:#43102a;
   --g1:#1f6b74;--g2:#2b9199;--g3:#36b8bf;--g4:#7fd7db;
+  --tier3:#a98bf0;
   --shadow:0 1px 3px rgba(0,0,0,.4);
 }
 .brandlogo svg text,.brandlogo svg path{fill:#fff !important}}
@@ -663,6 +669,8 @@ button:active{transform:scale(.97)}
 .gnode-f.hl{stroke:var(--accent2);stroke-width:3}
 .gnode-s{fill:var(--accent);opacity:.92}
 .gnode-s.dim{opacity:.25}
+.gnode-b{fill:var(--tier3)}
+.gbind{stroke:var(--tier3);stroke-dasharray:3 3;opacity:.8}
 .gedge{stroke:var(--line);stroke-width:1}
 .gedge.hl{stroke:var(--accent2);stroke-width:1.8}
 .glabel{font-size:10px;fill:var(--ink);font-weight:600}
@@ -1197,6 +1205,10 @@ function drawPaperGraph(host, p){
 function treeLayout(t){
   let slot=0, occSeq=0; const internals=[], occs=[], edges=[];
   function walk(nd, depth, parent){
+    if (Array.isArray(nd) && nd[0]==="@"){          // binder/range of a big op
+      const rec={label:String(nd[1]), depth, internal:true, binder:true, x:slot++};
+      internals.push(rec); return rec;
+    }
     if (typeof nd === "string" || nd.length<2){
       const label = (typeof nd === "string") ? nd : String(nd[0]);
       const rec={label, depth, x:slot++, parent};
@@ -1249,6 +1261,16 @@ function drawMiniGraph(host, f){
   const px=x=>14+(x+0.5)*((W-28)/Math.max(1,L.slots));
   const py=d=>20+d*rowH;
   const lx=i=>14+(i+0.5)*((W-28)/Math.max(1,L.leaves.length));
+  // binder nodes: show "∈ Set" and link to the bound index in the band
+  const leafIdx={}; L.leaves.forEach((lf,i)=>{ leafIdx[lf.label]=i; });
+  for (const n of L.internals){
+    if (!n.binder) continue;
+    const p=n.label.indexOf("∈");
+    if (p>0 && leafIdx[n.label.slice(0,p)]!==undefined){
+      n.show="∈"+n.label.slice(p+1);
+      n.link=leafIdx[n.label.slice(0,p)];
+    } else n.show=n.label;
+  }
   for (const [a,b] of L.edges)
     svg.appendChild(el("line",{class:"gedge",x1:px(a.x),y1:py(a.depth),x2:px(b.x),y2:py(b.depth)}));
   L.leaves.forEach((lf,i)=>{
@@ -1256,11 +1278,25 @@ function drawMiniGraph(host, f){
       svg.appendChild(el("line",{class:"gedge",x1:px(o.parent.x),y1:py(o.parent.depth),x2:lx(i),y2:bandY}));
   });
   for (const n of L.internals){
+    if (n.binder && n.link!==undefined)
+      svg.appendChild(el("line",{class:"gedge gbind",x1:px(n.x),y1:py(n.depth),x2:lx(n.link),y2:bandY}));
+  }
+  for (const n of L.internals){
     const x=px(n.x), y=py(n.depth);
-    const w=Math.max(20, n.label.length*7+8);
-    svg.appendChild(el("rect",{x:x-w/2,y:y-9,width:w,height:18,rx:6,class:"gnode-s"}));
+    const lbl=n.binder?(n.show||n.label):n.label;
+    const base=lbl.split(/[_^]/)[0];
+    const w=Math.max(20, base.length*7+(lbl.length-base.length)*5.5+8);
+    svg.appendChild(el("rect",{x:x-w/2,y:y-9,width:w,height:18,rx:6,
+      class:"gnode-s"+(n.binder?" gnode-b":"")}));
     const t=el("text",{x:x,y:y+3.5,"text-anchor":"middle","font-size":"10","font-weight":"800"});
-    t.textContent=n.label; t.setAttribute("fill","#fff"); svg.appendChild(t);
+    const cut=lbl.search(/[_^]/);
+    if (cut>0){
+      t.textContent=lbl.slice(0,cut);
+      const sub=el("tspan",{dy:(lbl[cut]==="_"?3:-4),"font-size":"7.5"});
+      sub.textContent=lbl.slice(cut+1).replace(/[_^]/g,"");
+      t.appendChild(sub);
+    } else t.textContent=lbl;
+    t.setAttribute("fill","#fff"); svg.appendChild(t);
   }
   L.leaves.forEach((lf,i)=>{
     const x=lx(i);
