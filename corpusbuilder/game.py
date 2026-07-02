@@ -264,13 +264,21 @@ class _P:
     # ---- grammar ----
     def expr(self):
         segs = [self.rel_chain()]
+        cur_forall = None            # a ∀ governs the comma list that follows it
         while self.peek()[0] in ("forall", "comma"):
             kind = self.next()[0]
             if self.peek()[0] == "end":
                 break
             seg = self.rel_chain()
-            if seg is not None:
-                segs.append(["∀", seg] if kind == "forall" else seg)
+            if seg is None:
+                continue
+            if kind == "forall":
+                cur_forall = ["∀", seg]
+                segs.append(cur_forall)
+            elif cur_forall is not None:
+                cur_forall.append(seg)   # "∀ u, j" → both params under one ∀
+            else:
+                segs.append(seg)
         segs = [s for s in segs if s is not None]
         if not segs:
             return None
@@ -524,6 +532,81 @@ def parse_tree(latex: str):
 
 
 # --------------------------------------------------------------------------
+# Pre-review structural check (heuristic analogues of lp2graph's Level-M
+# well-formedness indicators `model_completeness` / `model_coherence`,
+# computed on raw extractions BEFORE review — the canonical check runs on
+# `Formulation`s after ingest)
+# --------------------------------------------------------------------------
+
+
+def _has_obj_root(t) -> bool:
+    """Objective heuristic on the expression tree: min/max at the root,
+    in a top-level segment, or directly under the root relation
+    (covers ``min Z = ...`` / ``Z = min ...``)."""
+    if not isinstance(t, list) or not t:
+        return False
+    op = t[0]
+    if op in ("min", "max"):
+        return True
+    if op == ";":
+        return any(_has_obj_root(c) for c in t[1:])
+    if isinstance(op, str) and op[:1] in "=≤≥<>≠∈⊆":
+        return any(isinstance(c, list) and c and c[0] in ("min", "max") for c in t[1:])
+    return False
+
+
+def _is_objective(tree, ops, rel) -> bool:
+    if tree:
+        return _has_obj_root(tree)
+    return (not rel) and any(o[0] in ("min", "max") for o in ops)
+
+
+def _paper_check(fs: list[list]) -> dict:
+    """Per-paper completeness + coherence from the formula records.
+
+    completeness: ≥1 objective, ≥1 relational constraint, ≥1 symbol.
+    coherence: share of formulas in the largest symbol-sharing component.
+    Deterministic (union-find with index-ordered roots).
+    """
+    n = len(fs)
+    sym2f: dict[str, list[int]] = {}
+    for i, f in enumerate(fs):
+        for name, _ in f[5]:
+            sym2f.setdefault(name, []).append(i)
+    parent = list(range(n))
+
+    def find(a: int) -> int:
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    for idxs in sym2f.values():
+        if len(idxs) >= 2:
+            r0 = find(idxs[0])
+            for j in idxs[1:]:
+                rj = find(j)
+                if r0 != rj:
+                    lo, hi = min(r0, rj), max(r0, rj)
+                    parent[hi] = lo
+                    r0 = lo
+    comp: dict[int, int] = {}
+    for i in range(n):
+        r = find(i)
+        comp[r] = comp.get(r, 0) + 1
+    giant = max(comp.values()) if comp else 0
+    obj = sum(f[9] for f in fs)
+    con = sum(1 for f in fs if f[7] and not f[9])
+    return {
+        "obj": obj,
+        "con": con,
+        "sym": len(sym2f),
+        "coh": round(giant / n, 3) if n else 0.0,
+        "comp": 1 if (obj >= 1 and con >= 1 and sym2f) else 0,
+    }
+
+
+# --------------------------------------------------------------------------
 # Payload
 # --------------------------------------------------------------------------
 
@@ -551,14 +634,16 @@ def _payload() -> dict:
         fs = []
         for f in d.formulas:
             syms, ops, rel = extract_symbols(f.latex)
+            tree = parse_tree(f.latex)
             fs.append([f.id, f.label or "", f.latex,
                        _METHOD.get(f.method.value, "?"), f.page_start or 0,
-                       syms, ops, rel, parse_tree(f.latex) or 0])
+                       syms, ops, rel, tree or 0,
+                       1 if _is_objective(tree, ops, rel) else 0])
         papers.append({
             "k": d.key, "t": s.title or d.key, "v": s.venue or "",
             "y": s.year or 0, "d": s.doi or "", "c": s.cited_by_count or 0,
             "ot": 0 if (s.title and _RELEVANT.search(s.title)) else 1,
-            "f": fs,
+            "f": fs, "chk": _paper_check(fs),
         })
     return {"papers": papers, "n_formulas": sum(len(p["f"]) for p in papers)}
 
@@ -1102,10 +1187,19 @@ function buildPaperGraph(p){
 const SVGNS="http://www.w3.org/2000/svg";
 function el(tag, attrs){ const e=document.createElementNS(SVGNS,tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
-function isObjective(f){
-  if (f[7]) return false;                                 // has a relation → constraint
-  if ((f[6]||[]).some(o=>o[0]==="min"||o[0]==="max")) return true;
-  const t=f[8]; return !!t && typeof t!=="string" && (t[0]==="min"||t[0]==="max");
+function isObjective(f){ return f[9]===1; }   // precomputed at build (tree-based)
+function chkChips(p){
+  const ck=p.chk||{}; if (!p.f.length) return "";
+  const coh=Math.round((ck.coh||0)*100);
+  const cohCls=ck.coh>=0.7?"var(--good)":ck.coh>=0.4?"var(--warn)":"var(--bad)";
+  return `<div class="chips">
+    <span class="chip" style="color:${ck.obj?"var(--good)":"var(--bad)"}">🎯 ${ck.obj?("objective ✓"+(ck.obj>1?" ×"+ck.obj:"")):"no objective"}</span>
+    <span class="chip" style="color:${cohCls}">🔗 coherence ${coh}%</span>
+    <span class="chip">▦ <b>${ck.con}</b> constraints</span>
+    <span class="chip">◇ <b>${ck.sym}</b> symbols</span>
+    <span class="chip" style="color:${ck.comp?"var(--good)":"var(--warn)"}">${ck.comp?"✓ complete":"⚠ incomplete"}</span>
+  </div>
+  <div class="mut" style="margin-top:4px">pre-review structural check — heuristic Level-M analogue (completeness &amp; coherence); the canonical check runs after ingest</div>`;
 }
 /* layered layout: objective on top, formulas (document order) beneath,
    shared symbols at the bottom (barycenter-ordered to reduce crossings) */
@@ -1398,6 +1492,7 @@ function paintRun(){
   const rows = p.f.map(f=>`
     <div class="frow" id="fr-${f[0]}" data-fid="${f[0]}">
       <div class="fhead"><span class="chip">${f[0]}</span>
+        ${f[9]?'<span class="chip" style="color:var(--good);font-weight:750">🎯 objective</span>':""}
         ${f[1]?'<span class="chip">'+escapeHtml(f[1])+"</span>":""}
         <span class="chip">${f[3]}</span>${f[4]?'<span class="mut">p.'+f[4]+"</span>":""}
         <span class="st"></span></div>
@@ -1419,6 +1514,7 @@ function paintRun(){
         ${p.d?` · <a href="https://doi.org/${encodeURIComponent(p.d)}" target="_blank" rel="noopener">DOI</a>`:""}</div>
       ${p.ot?'<span class="hint-ot">⚠ topical screen: looks off-topic</span>':""}
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
+      ${chkChips(p)}
       <div class="gwrap" id="pgraph"></div>
       <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap a symbol to trace it, tap a formula dot to jump to its row</div>
     </div>
@@ -1654,6 +1750,7 @@ function paintSort(){
     <div class="pmeta">${escapeHtml(p.v)}${p.y?" · "+p.y:""} · ${p.c} citations · ${p.f.length} formulas
       ${p.d?` · <a href="https://doi.org/${encodeURIComponent(p.d)}" target="_blank" rel="noopener">DOI</a>`:""}</div>
     ${p.ot?'<span class="hint-ot">⚠ topical screen: looks off-topic</span>':""}
+    ${chkChips(p)}
     <div class="cells">${cells}
       <button class="x" data-cell="X"><div class="p">🗑️ Out of scope</div><div class="d">off-topic / production operations</div></button>
     </div>
@@ -1738,7 +1835,7 @@ function paintPapers(){
     for (const f of p.f){ const s=(d[f[0]]||{}).s; if(s==="a")a++; else if(s==="c")c++; else if(s==="r")r++; }
     const done=a+c+r;
     return `<li data-pi="${i}"><div class="t">${escapeHtml(p.t.slice(0,90))}${p.y?" ("+p.y+")":""}</div>
-      <div class="m">${escapeHtml(p.v)} · ${p.c} cites · ${done}/${p.f.length} reviewed ${S.cells[p.k]?"· 🧭 "+S.cells[p.k]:""}</div>
+      <div class="m">${escapeHtml(p.v)} · ${p.c} cites · ${done}/${p.f.length} reviewed · 🔗${Math.round(((p.chk||{}).coh||0)*100)}%${(p.chk||{}).obj?" 🎯":""} ${S.cells[p.k]?"· 🧭 "+S.cells[p.k]:""}</div>
       <div class="pbar"><i style="background:var(--good);width:${100*a/p.f.length}%"></i><i style="background:var(--warn);width:${100*c/p.f.length}%"></i><i style="background:var(--bad);width:${100*r/p.f.length}%"></i></div></li>`;
   }).join("");
   document.getElementById("plist").onclick=(e)=>{
