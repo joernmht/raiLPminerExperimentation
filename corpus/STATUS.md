@@ -30,13 +30,16 @@ Tier-1 (none yet). 28 retrieved dossiers are flagged off-topic by the topical sc
 - `review_view` — static HITL review site `corpus/review/index.html` (MathJax + raw LaTeX,
   accept/correct/reject → localStorage → `decisions_<paper>.json` export). Regenerate after corpus changes.
 - `game` — **Formula Express**, the mobile gamified HITL front-end `corpus/review/game.html`
-  (single self-contained file; send to the phone via Telegram). Minigames: Formula Rush
-  (accept ✓ / fix ✎ / reject ✗ per formula — same decision semantics as `review_view`),
-  Blitz (60 s sprint) and Shell Sorter (file each paper into P1–P5 / out-of-scope → fills
-  PRISMA `per_cell_P1_P5` and prunes the off-topic dossiers). XP/ranks, daily streaks +
-  heatmap, badges; progress in localStorage; Export/Import → `game_decisions_<date>.json`
-  (`formula_decisions` = the `review_view` per-paper format, plus `paper_cells`).
-  Regenerate after corpus changes: `PYTHONPATH=. python3 -m corpusbuilder.game`.
+  (single self-contained file in the **CRO CD** via the `tud-mobile` skill; send to the phone
+  via Telegram). Primary mode **Paper Run**: one paper at a time with a deterministic
+  **symbol graph** (formulas ↔ shared symbols; `extract_symbols` in this module — a review
+  aid, NOT canonical lp2graph), per-row ✓/✎/✗ + bulk accept-rest/reject-all, formula
+  mini-graphs (relation+operators+symbols), and a P1–P5 cell prompt on finish (fills PRISMA
+  `per_cell_P1_P5`, prunes off-topic). Plus Blitz (60 s sprint) and Shell Sorter. XP/ranks,
+  daily streaks + heatmap, badges; progress in localStorage (key `fx:state:v1`, stable across
+  regenerations); Export/Import → `game_decisions_<date>.json` (`formula_decisions` = the
+  `review_view` per-paper format, plus `paper_cells`). Regenerate after corpus changes:
+  `PYTHONPATH=. python3 -m corpusbuilder.game`.
 - `prisma` — deterministic PRISMA flow → `prisma.{json,md}` + `prisma_macros.tex` (wired into the paper, Overleaf `0ef1ccd`).
 
 ### Key dependency / gotcha
