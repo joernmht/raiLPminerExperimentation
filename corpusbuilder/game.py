@@ -175,7 +175,10 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
                 j += 1
             word = s[i:j]
             i = j
-            if len(word) == 1:
+            if word.lower() in {"min", "max", "minimize", "maximize"}:
+                key = "min" if "min" in word.lower() else "max"
+                ops[key] = ops.get(key, 0) + 1
+            elif len(word) == 1:
                 add_sym(word)
             elif word.lower() not in _STOPWORDS:
                 add_sym(word)
@@ -188,6 +191,307 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
     top_syms = sorted(syms.items(), key=lambda kv: (-kv[1], kv[0]))[:12]
     top_ops = sorted(ops.items(), key=lambda kv: (-kv[1], kv[0]))[:6]
     return ([[k, v] for k, v in top_syms], [[k, v] for k, v in top_ops], rel)
+
+
+# --------------------------------------------------------------------------
+# Deterministic LaTeX expression-tree parser (for the formula mini-graph)
+# --------------------------------------------------------------------------
+#
+# A pragmatic precedence parser: relation chain > +/- > product (explicit
+# \cdot / implicit juxtaposition) > / and \frac > postfix (indices, function
+# application) > atoms. Indices stay on the leaves ("t_d"), so context is
+# preserved. Anything it cannot make sense of degrades gracefully; a hard
+# failure returns None and the UI falls back to the flat symbol star.
+# Tree encoding: leaf = str, node = [op, child, ...].
+
+_PREFIX_OPS = {"sum": "∑", "prod": "∏", "int": "∫", "min": "min",
+               "max": "max", "bigcup": "∪", "bigcap": "∩"}
+_REL_TOK = {"leq": "≤", "le": "≤", "geq": "≥", "ge": "≥", "neq": "≠",
+            "ne": "≠", "in": "∈", "subseteq": "⊆", "approx": "≈",
+            "equiv": "≡", "sim": "~"}
+_MUL_TOK = {"cdot": "·", "times": "·", "ast": "·"}
+_TREE_MAX_NODES = 44
+
+
+def _flat(s: str, limit: int = 8) -> str:
+    """Flatten an index/exponent group to a short display string."""
+    s = s.replace("\\in", "∈").replace("\\leq", "≤").replace("\\le", "≤")
+    s = re.sub(r"\\[a-zA-Z]+", lambda m: _GREEK.get(m.group(0)[1:], ""), s)
+    s = re.sub(r"[{}\s\\]", "", s)
+    return s[:limit]
+
+
+class _P:
+    """Token-stream parser over (kind, value) tuples."""
+
+    def __init__(self, toks: list[tuple[str, str]]):
+        self.t = toks
+        self.i = 0
+
+    def peek(self):
+        return self.t[self.i] if self.i < len(self.t) else ("end", "")
+
+    def next(self):
+        tok = self.peek()
+        self.i += 1
+        return tok
+
+    # ---- grammar ----
+    def expr(self):
+        segs = [self.rel_chain()]
+        while self.peek()[0] in ("forall", "comma"):
+            kind = self.next()[0]
+            if self.peek()[0] == "end":
+                break
+            seg = self.rel_chain()
+            if seg is not None:
+                segs.append(["∀", seg] if kind == "forall" else seg)
+        segs = [s for s in segs if s is not None]
+        if not segs:
+            return None
+        return segs[0] if len(segs) == 1 else [";"] + segs
+
+    def rel_chain(self):
+        left = self.add()
+        rels = []
+        while self.peek()[0] == "rel":
+            glyph = self.next()[1]
+            right = self.add()
+            if right is None:
+                break
+            rels.append((glyph, right))
+        if left is None or not rels:
+            return left
+        return [rels[0][0], left] + [r[1] for r in rels]
+
+    def add(self):
+        first = self.mul()
+        terms = [] if first is None else [first]
+        while self.peek()[0] == "pm":
+            sign = self.next()[1]
+            nxt = self.mul()
+            if nxt is None:
+                break
+            terms.append(["−", nxt] if sign == "-" else nxt)
+        if not terms:
+            return None
+        return terms[0] if len(terms) == 1 else ["+"] + terms
+
+    def mul(self):
+        factors = []
+        while True:
+            k = self.peek()[0]
+            if k == "slash":
+                self.next()
+                nxt = self.post()
+                if nxt is None:
+                    break
+                prev = factors.pop() if factors else "?"
+                factors.append(["/", prev, nxt])
+                continue
+            if k == "mul":
+                self.next()
+                continue
+            if k not in ("leaf", "num", "frac", "sqrt", "prefix", "lpar",
+                         "lbrace", "decor", "pm"):
+                break
+            if k == "pm":  # unary minus at term start
+                if factors:
+                    break
+                sign = self.next()[1]
+                nxt = self.post()
+                if nxt is None:
+                    break
+                factors.append(["−", nxt] if sign == "-" else nxt)
+                continue
+            nxt = self.post()
+            if nxt is None:
+                break
+            factors.append(nxt)
+        if not factors:
+            return None
+        return factors[0] if len(factors) == 1 else ["·"] + factors
+
+    def post(self):
+        node = self.atom()
+        if node is None:
+            return None
+        while True:
+            k, v = self.peek()
+            if k == "script":
+                self.next()
+                if isinstance(node, str):
+                    node = node + ("_" if v.startswith("_") else "^") + v[1:] \
+                        if v[1:] else node
+                # scripts on non-leaves are dropped (e.g. )^2)
+            elif k == "lpar" and isinstance(node, str):
+                self.next()
+                args, cur = [], self.expr()
+                if cur is not None:
+                    args.append(cur)
+                if self.peek()[0] == "rpar":
+                    self.next()
+                if not args:
+                    return node
+                node = [node + "()"] + args
+            else:
+                break
+        return node
+
+    def atom(self):
+        k, v = self.next()
+        if k == "leaf" or k == "num":
+            return v
+        if k == "frac":
+            a = self.group_expr()
+            b = self.group_expr()
+            return ["/", a if a is not None else "?", b if b is not None else "?"]
+        if k == "sqrt":
+            a = self.group_expr()
+            return ["√", a if a is not None else "?"]
+        if k == "decor":
+            a = self.group_expr()
+            return (a + v) if isinstance(a, str) else a
+        if k == "prefix":
+            binder = ""
+            while self.peek()[0] == "script":
+                sv = self.next()[1]          # always consume (else: spin)
+                if not binder and sv.startswith("_"):
+                    binder = _flat(sv[1:], 10)
+            # min/max govern the whole objective expression; ∑/∏ bind the term
+            body = self.add() if v in ("min", "max") else self.mul()
+            label = v + ("_" + binder if binder else "")
+            return [label, body] if body is not None else label
+        if k in ("lpar", "lbrace"):
+            inner = self.expr()
+            if self.peek()[0] == ("rpar" if k == "lpar" else "rbrace"):
+                self.next()
+            return inner
+        return None
+
+    def group_expr(self):
+        if self.peek()[0] == "lbrace":
+            return self.atom()
+        return self.post()
+
+
+def _tree_tokens(s: str) -> list[tuple[str, str]]:
+    toks: list[tuple[str, str]] = []
+    i, n = 0, len(s)
+    while i < n:
+        c = s[i]
+        if c == "\\":
+            m = re.match(r"\\([a-zA-Z]+|.)", s[i:])
+            cmd = m.group(1)
+            i += len(m.group(0))
+            if cmd in _GREEK:
+                toks.append(("leaf", _GREEK[cmd]))
+            elif cmd == "frac" or cmd == "dfrac" or cmd == "tfrac":
+                toks.append(("frac", "/"))
+            elif cmd == "sqrt":
+                toks.append(("sqrt", "√"))
+            elif cmd in _PREFIX_OPS:
+                toks.append(("prefix", _PREFIX_OPS[cmd]))
+            elif cmd in _REL_TOK:
+                toks.append(("rel", _REL_TOK[cmd]))
+            elif cmd in _MUL_TOK:
+                toks.append(("mul", "·"))
+            elif cmd in _DECOR:
+                toks.append(("decor", _DECOR[cmd]))
+            elif cmd == "forall":
+                toks.append(("forall", "∀"))
+            elif cmd in ("pm", "mp"):
+                toks.append(("pm", "-"))
+            elif cmd in _WRAP_CMDS or cmd in _NOISE_CMDS:
+                pass
+            # unknown commands are dropped
+        elif c == "{":
+            toks.append(("lbrace", c)); i += 1
+        elif c == "}":
+            toks.append(("rbrace", c)); i += 1
+        elif c in "([":
+            toks.append(("lpar", c)); i += 1
+        elif c in ")]":
+            toks.append(("rpar", c)); i += 1
+        elif c in "_^":
+            j = i + 1
+            while j < n and s[j] == " ":
+                j += 1
+            if j < n and s[j] == "{":
+                e = _group_end(s, j)
+                toks.append(("script", c + _flat(s[j:e])))
+                i = e
+            elif j < n and s[j] == "\\":
+                m = re.match(r"\\[a-zA-Z]+|\\.", s[j:])
+                cmd = m.group(0)[1:]
+                toks.append(("script", c + _GREEK.get(cmd, "")))
+                i = j + len(m.group(0))
+            else:
+                toks.append(("script", c + (s[j] if j < n else "")))
+                i = j + 1
+        elif c in "+-":
+            toks.append(("pm", c)); i += 1
+        elif c in "*·×":
+            toks.append(("mul", "·")); i += 1
+        elif c == "/":
+            toks.append(("slash", "/")); i += 1
+        elif c in "=<>≤≥≠∈":
+            toks.append(("rel", {"=": "=", "<": "<", ">": ">"}.get(c, c))); i += 1
+        elif c == ",":
+            toks.append(("comma", c)); i += 1
+        elif c.isdigit():
+            j = i
+            while j < n and (s[j].isdigit() or s[j] == "."):
+                j += 1
+            toks.append(("num", s[i:j])); i = j
+        elif c.isalpha():
+            j = i
+            while j < n and s[j].isalpha():
+                j += 1
+            word = s[i:j]
+            i = j
+            if word.lower() in ("min", "max", "minimize", "maximize"):
+                toks.append(("prefix", "min" if "min" in word.lower() else "max"))
+            elif word.lower() in _STOPWORDS and len(word) > 1:
+                pass
+            else:
+                toks.append(("leaf", word))
+        else:
+            i += 1
+    return toks
+
+
+def _tree_size(t) -> int:
+    if isinstance(t, str):
+        return 1
+    return 1 + sum(_tree_size(c) for c in t[1:])
+
+
+def _prune(t, depth: int = 0):
+    if isinstance(t, str):
+        return t
+    if depth >= 5:
+        return "…"
+    return [t[0]] + [_prune(c, depth + 1) for c in t[1:]]
+
+
+def parse_tree(latex: str):
+    """LaTeX → expression tree (leaf=str, node=[op,...]) or None."""
+    try:
+        toks = _tree_tokens(_collapse_words(latex))
+        if not toks or len(toks) > 400:
+            return None
+        tree = _P(toks).expr()
+        if tree is None or isinstance(tree, str):
+            return None
+        while _tree_size(tree) > _TREE_MAX_NODES:
+            pruned = _prune(tree)
+            if pruned == tree:
+                break
+            tree = pruned
+        return tree
+    except Exception:
+        return None
 
 
 # --------------------------------------------------------------------------
@@ -211,14 +515,16 @@ def _payload() -> dict:
     doss = [Dossier.load(p) for p in sorted(DOSS.glob("*.json"))]
     doss.sort(key=lambda d: (-(d.source.cited_by_count or 0), d.key))
     papers = []
-    for d in doss:
+    for di, d in enumerate(doss):
+        if di % 50 == 0:
+            print(f"  …{di}/{len(doss)} dossiers", flush=True)
         s = d.source
         fs = []
         for f in d.formulas:
             syms, ops, rel = extract_symbols(f.latex)
             fs.append([f.id, f.label or "", f.latex,
                        _METHOD.get(f.method.value, "?"), f.page_start or 0,
-                       syms, ops, rel])
+                       syms, ops, rel, parse_tree(f.latex) or 0])
         papers.append({
             "k": d.key, "t": s.title or d.key, "v": s.venue or "",
             "y": s.year or 0, "d": s.doi or "", "c": s.cited_by_count or 0,
@@ -335,6 +641,9 @@ button:active{transform:scale(.97)}
 .gedge{stroke:var(--line);stroke-width:1}
 .gedge.hl{stroke:var(--accent2);stroke-width:1.8}
 .glabel{font-size:10px;fill:var(--ink);font-weight:600}
+.gband{font-size:8.5px;fill:var(--muted);letter-spacing:.1em;font-weight:800}
+.gnum{fill:var(--muted);font-size:8.5px}
+.minig-slot{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .bulk{position:sticky;top:0;z-index:10;background:var(--card);border:1px solid var(--line);
   border-radius:14px;box-shadow:var(--shadow);padding:8px;display:flex;gap:8px;margin:10px 0}
 .bulk button{flex:1;font-size:13.5px;font-weight:700;min-height:44px;padding:6px 8px}
@@ -757,46 +1066,56 @@ function buildPaperGraph(p){
   });
   return {nodes, edges};
 }
-function layoutGraph(g, W, H){
-  const n=g.nodes.length;
-  const pos=g.nodes.map((nd,i)=>{                      // deterministic init: two rings
-    const ang = 2*Math.PI*i/n + (nd.t==="s"?0.5:0);
-    const r = nd.t==="s" ? 0.28 : 0.42;
-    return [W/2 + W*r*Math.cos(ang), H/2 + H*r*Math.sin(ang)];
-  });
-  const adj=g.edges;
-  const K = Math.sqrt(W*H/Math.max(1,n)) * 0.9;
-  for (let it=0; it<120; it++){
-    const disp = pos.map(()=>[0,0]);
-    for (let i=0;i<n;i++) for (let j=i+1;j<n;j++){       // repulsion
-      let dx=pos[i][0]-pos[j][0], dy=pos[i][1]-pos[j][1];
-      let d2=dx*dx+dy*dy; if (d2<0.01) { dx=(i-j)*0.1; dy=0.1; d2=dx*dx+dy*dy; }
-      const f=K*K/d2;
-      disp[i][0]+=dx*f; disp[i][1]+=dy*f; disp[j][0]-=dx*f; disp[j][1]-=dy*f;
-    }
-    for (const [a,b] of adj){                            // attraction
-      const dx=pos[a][0]-pos[b][0], dy=pos[a][1]-pos[b][1];
-      const d=Math.sqrt(dx*dx+dy*dy)||0.1, f=d/K*0.06;
-      disp[a][0]-=dx*f; disp[a][1]-=dy*f; disp[b][0]+=dx*f; disp[b][1]+=dy*f;
-    }
-    const T = 8*(1-it/120)+1;
-    for (let i=0;i<n;i++){
-      const d=Math.sqrt(disp[i][0]**2+disp[i][1]**2)||1;
-      pos[i][0]+=disp[i][0]/d*Math.min(d,T); pos[i][1]+=disp[i][1]/d*Math.min(d,T);
-      pos[i][0]=Math.max(16,Math.min(W-16,pos[i][0]));
-      pos[i][1]=Math.max(14,Math.min(H-14,pos[i][1]));
-    }
-  }
-  return pos;
-}
 const SVGNS="http://www.w3.org/2000/svg";
 function el(tag, attrs){ const e=document.createElementNS(SVGNS,tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
+function isObjective(f){
+  if (f[7]) return false;                                 // has a relation → constraint
+  if ((f[6]||[]).some(o=>o[0]==="min"||o[0]==="max")) return true;
+  const t=f[8]; return !!t && typeof t!=="string" && (t[0]==="min"||t[0]==="max");
+}
+/* layered layout: objective on top, formulas (document order) beneath,
+   shared symbols at the bottom (barycenter-ordered to reduce crossings) */
 function drawPaperGraph(host, p){
   const g=buildPaperGraph(p);
-  const W=440, H=Math.max(220, Math.min(430, 90+g.nodes.length*3.2));
-  const pos=layoutGraph(g, W, H);
+  const W=440;
+  const objs=[], forms=[], syms=[];
+  g.nodes.forEach((nd,i)=>{
+    if (nd.t==="s") syms.push(i);
+    else (isObjective(p.f[nd.fi])?objs:forms).push(i);
+  });
+  const perF=10, rowsF=Math.ceil(forms.length/perF);
+  const perS=6,  rowsS=Math.ceil(syms.length/perS);
+  const showNums = forms.length<=30;
+  const rowF = showNums?40:28;
+  const yObj=36, hObj=objs.length?44:0;
+  const yF0=yObj+hObj;
+  const yS0=yF0+rowsF*rowF+40;
+  const H=yS0+rowsS*38+10;
+  const pos=new Array(g.nodes.length);
+  objs.forEach((ni,k)=>{ pos[ni]=[W/2+(k-(objs.length-1)/2)*52, yObj]; });
+  forms.forEach((ni,k)=>{
+    const r=Math.floor(k/perF), c=k%perF,
+          inRow=Math.min(perF, forms.length-r*perF);
+    pos[ni]=[22+(W-44)*(c+0.5)/inRow, yF0+r*rowF+8];
+  });
+  const bary={};
+  syms.forEach(ni=>{ let sx=0,n=0;
+    g.edges.forEach(([a,b])=>{ if(a===ni && pos[b]){ sx+=pos[b][0]; n++; } });
+    bary[ni]=n?sx/n:W/2; });
+  syms.sort((a,b)=>bary[a]-bary[b] || a-b);
+  syms.forEach((ni,k)=>{
+    const r=Math.floor(k/perS), c=k%perS,
+          inRow=Math.min(perS, syms.length-r*perS);
+    pos[ni]=[26+(W-78)*(c+0.5)/inRow, yS0+r*38+10];
+  });
   const svg=el("svg",{viewBox:"0 0 "+W+" "+H,role:"img","aria-label":"paper symbol graph"});
+  const bands=[["FORMULAS",yF0-6]];
+  if (objs.length) bands.unshift(["OBJECTIVE",yObj-16]);
+  if (syms.length) bands.push(["VARIABLES & PARAMETERS",yS0-8]);
+  for (const [txt,y] of bands){
+    const t=el("text",{class:"gband",x:8,y:y}); t.textContent=txt; svg.appendChild(t);
+  }
   for (let ei=0; ei<g.edges.length; ei++){
     const [a,b]=g.edges[ei];
     svg.appendChild(el("line",{class:"gedge","data-s":a,"data-f":b,
@@ -804,14 +1123,24 @@ function drawPaperGraph(host, p){
   }
   g.nodes.forEach((nd,i)=>{
     if (nd.t==="f"){
+      const f=p.f[nd.fi];
       const d=(S.dec[p.k]||{})[nd.id];
-      const c=el("circle",{class:"gnode-f"+(d?" s"+d.s:""),cx:pos[i][0],cy:pos[i][1],r:5.5,
-        "data-node":i,"data-fid":nd.id});
+      const obj=isObjective(f);
+      const c=el("circle",{class:"gnode-f"+(d?" s"+d.s:""),cx:pos[i][0],cy:pos[i][1],
+        r:obj?7:5.5,"data-node":i,"data-fid":nd.id});
       svg.appendChild(c);
+      if (obj){
+        const t=el("text",{class:"glabel",x:pos[i][0],y:pos[i][1]-11,"text-anchor":"middle","font-weight":"800"});
+        t.textContent=((f[6]||[]).some(o=>o[0]==="max")&&!(f[6]||[]).some(o=>o[0]==="min"))?"max":"min";
+        svg.appendChild(t);
+      } else if (showNums && f[1]){
+        const t=el("text",{class:"glabel gnum",x:pos[i][0],y:pos[i][1]+17,"text-anchor":"middle"});
+        t.textContent=f[1]; svg.appendChild(t);
+      }
     } else {
       const r=4+Math.min(6,nd.deg*0.8);
       svg.appendChild(el("circle",{class:"gnode-s",cx:pos[i][0],cy:pos[i][1],r:r,"data-node":i,"data-sym":nd.name}));
-      const t=el("text",{class:"glabel",x:pos[i][0]+r+2,y:pos[i][1]+3});
+      const t=el("text",{class:"glabel",x:pos[i][0],y:pos[i][1]+r+11,"text-anchor":"middle"});
       t.textContent=nd.name; svg.appendChild(t);
     }
   });
@@ -836,8 +1165,63 @@ function drawPaperGraph(host, p){
   });
   return svg;
 }
+/* formula mini-graph: expression tree (parse_tree), star fallback */
+function treeLayout(t){
+  let leafX=0; const nodes=[], edges=[];
+  function walk(nd, depth){
+    const isLeaf = (typeof nd === "string");
+    const rec={label:isLeaf?nd:String(nd[0]), leaf:isLeaf, depth};
+    nodes.push(rec);
+    if (isLeaf || nd.length<2){ rec.x=leafX++; return rec; }
+    const kids=nd.slice(1).map(k=>walk(k,depth+1));
+    kids.forEach(k=>edges.push([rec,k]));
+    rec.x=(kids[0].x+kids[kids.length-1].x)/2;
+    return rec;
+  }
+  walk(t,0);
+  return {nodes, edges, leaves:leafX, depth:Math.max.apply(null,nodes.map(n=>n.depth))};
+}
+function leafText(svg, x, y, label, anchor){
+  const t=el("text",{class:"glabel",x:x,y:y,"text-anchor":anchor||"middle"});
+  const us=label.indexOf("_");
+  const hs=label.indexOf("^");
+  const cut=(us<0)?hs:(hs<0?us:Math.min(us,hs));
+  if (cut>0){
+    t.textContent=label.slice(0,cut);
+    const sub=el("tspan",{dy:(label[cut]==="_"?3:-4),"font-size":"7.5"});
+    sub.textContent=label.slice(cut+1).replace(/[_^]/g,"");
+    t.appendChild(sub);
+  } else t.textContent=label;
+  svg.appendChild(t);
+}
 function drawMiniGraph(host, f){
-  // star: relation core, operators inner ring, symbols outer ring
+  const tree=f[8];
+  if (!tree){ drawMiniStar(host, f); return; }
+  const L=treeLayout(tree);
+  const colW=46, rowH=42;
+  const W=Math.max(280, L.leaves*colW+28), H=(L.depth+1)*rowH+26;
+  const svg=el("svg",{viewBox:"0 0 "+W+" "+H,class:"minig",role:"img","aria-label":"formula expression tree"});
+  const px=n=>14+(n.x+0.5)*((W-28)/Math.max(1,L.leaves));
+  const py=n=>20+n.depth*rowH;
+  for (const [a,b] of L.edges)
+    svg.appendChild(el("line",{class:"gedge",x1:px(a),y1:py(a),x2:px(b),y2:py(b)}));
+  for (const n of L.nodes){
+    const x=px(n), y=py(n);
+    if (n.leaf){
+      svg.appendChild(el("circle",{class:"gnode-f",cx:x,cy:y,r:4.5}));
+      leafText(svg, x, y+14, n.label);
+    } else {
+      const w=Math.max(20, n.label.length*7+8);
+      svg.appendChild(el("rect",{x:x-w/2,y:y-9,width:w,height:18,rx:6,class:"gnode-s"}));
+      const t=el("text",{x:x,y:y+3.5,"text-anchor":"middle","font-size":"10","font-weight":"800"});
+      t.textContent=n.label; t.setAttribute("fill","#fff"); svg.appendChild(t);
+    }
+  }
+  host.innerHTML=""; host.appendChild(svg);
+  if (W>360){ svg.style.width=W+"px"; svg.style.maxWidth="none"; }
+}
+function drawMiniStar(host, f){
+  // star fallback: relation core, operators inner ring, symbols outer ring
   const syms=f[5], ops=f[6], rel=f[7]||"·";
   const W=300, H=150, cx=W/2, cy=H/2;
   const svg=el("svg",{viewBox:"0 0 "+W+" "+H,class:"minig",role:"img","aria-label":"formula structure"});
@@ -949,7 +1333,7 @@ function paintRun(){
       ${p.ot?'<span class="hint-ot">⚠ topical screen: looks off-topic</span>':""}
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">● formula (coloured by your ✓✎✗) · <span style="color:var(--accent)">●</span> shared symbol — tap a symbol to trace it, tap a formula dot to jump</div>
+      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap a symbol to trace it, tap a formula dot to jump to its row</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
