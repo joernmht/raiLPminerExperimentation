@@ -96,6 +96,31 @@ def _collapse_words(s: str) -> str:
     return _SPACED_WORD.sub(lambda m: m.group(1).replace(" ", ""), s)
 
 
+# publisher MathML→LaTeX writes big operators as \underset{binder}{\sum} etc.;
+# normalize to \sum_{binder} so they parse as prefix operators, not symbols
+_GRP = r"\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}"
+_UNDERSET_OP = re.compile(
+    r"\\underset\s*" + _GRP +
+    r"\s*\{\s*(\\sum|\\prod|\\min|\\max|\\int|\\bigcup|\\bigcap|min|max)\s*\}")
+_MATHOP = re.compile(r"\\mathop\s*\{\s*(\\[a-zA-Z]+|[a-zA-Z]+)\s*\}")
+_UNDERBRACE = re.compile(r"\\underbrace\s*" + _GRP)
+_OVERSET = re.compile(r"\\overset\s*" + _GRP + r"\s*" + _GRP)
+
+
+def _rewrite_ops(s: str) -> str:
+    for _ in range(3):  # patterns may nest
+        s2 = _UNDERSET_OP.sub(
+            lambda m: (m.group(2) if m.group(2).startswith("\\")
+                       else "\\" + m.group(2)) + "_{" + m.group(1) + "}", s)
+        s2 = _MATHOP.sub(r"\1", s2)
+        s2 = _UNDERBRACE.sub(r"{\1}", s2)
+        s2 = _OVERSET.sub(r"{\2}", s2)
+        if s2 == s:
+            return s
+        s = s2
+    return s
+
+
 def _group_end(s: str, i: int) -> int:
     """i points at '{'; return index just past the matching '}'."""
     depth = 0
@@ -119,7 +144,7 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
     Sub-/superscript contents are treated as indices and skipped, so
     ``x_{ij}`` and ``x_{ik}`` are the same symbol ``x``.
     """
-    s = _collapse_words(latex)
+    s = _rewrite_ops(_collapse_words(latex))
     syms: dict[str, int] = {}
     ops: dict[str, int] = {}
     rel = ""
@@ -478,7 +503,7 @@ def _prune(t, depth: int = 0):
 def parse_tree(latex: str):
     """LaTeX → expression tree (leaf=str, node=[op,...]) or None."""
     try:
-        toks = _tree_tokens(_collapse_words(latex))
+        toks = _tree_tokens(_rewrite_ops(_collapse_words(latex)))
         if not toks or len(toks) > 400:
             return None
         tree = _P(toks).expr()
@@ -1166,20 +1191,38 @@ function drawPaperGraph(host, p){
   return svg;
 }
 /* formula mini-graph: expression tree (parse_tree), star fallback */
+/* DAG layout: internal ops keep the tidy-tree shape; identical leaves
+   (same symbol + same index, e.g. every e_j) merge into ONE node in a
+   variables band at the bottom, with an edge from each use site. */
 function treeLayout(t){
-  let leafX=0; const nodes=[], edges=[];
-  function walk(nd, depth){
-    const isLeaf = (typeof nd === "string");
-    const rec={label:isLeaf?nd:String(nd[0]), leaf:isLeaf, depth};
-    nodes.push(rec);
-    if (isLeaf || nd.length<2){ rec.x=leafX++; return rec; }
-    const kids=nd.slice(1).map(k=>walk(k,depth+1));
-    kids.forEach(k=>edges.push([rec,k]));
+  let slot=0, occSeq=0; const internals=[], occs=[], edges=[];
+  function walk(nd, depth, parent){
+    if (typeof nd === "string" || nd.length<2){
+      const label = (typeof nd === "string") ? nd : String(nd[0]);
+      const rec={label, depth, x:slot++, parent};
+      occs.push(rec); return rec;
+    }
+    const rec={label:String(nd[0]), depth, internal:true};
+    internals.push(rec);
+    const kids=nd.slice(1).map(k=>walk(k, depth+1, rec));
+    kids.filter(k=>k.internal).forEach(k=>edges.push([rec,k]));
     rec.x=(kids[0].x+kids[kids.length-1].x)/2;
     return rec;
   }
-  walk(t,0);
-  return {nodes, edges, leaves:leafX, depth:Math.max.apply(null,nodes.map(n=>n.depth))};
+  walk(t,0,null);
+  // merge occurrences by exact label ("…" and "?" placeholders stay separate)
+  const byLabel={}, leaves=[];
+  for (const o of occs){
+    const key = (o.label==="…"||o.label==="?") ? "§"+(occSeq++) : o.label;
+    let lf=byLabel[key];
+    if (!lf){ lf={label:o.label, uses:[]}; byLabel[key]=lf; leaves.push(lf); }
+    lf.uses.push(o);
+  }
+  for (const lf of leaves)
+    lf.bx = lf.uses.reduce((s,o)=>s+o.x,0)/lf.uses.length;
+  leaves.sort((a,b)=>a.bx-b.bx || (a.label<b.label?-1:1));
+  return {internals, edges, leaves, slots:slot,
+    depth:Math.max.apply(null,internals.map(n=>n.depth))};
 }
 function leafText(svg, x, y, label, anchor){
   const t=el("text",{class:"glabel",x:x,y:y,"text-anchor":anchor||"middle"});
@@ -1199,24 +1242,32 @@ function drawMiniGraph(host, f){
   if (!tree){ drawMiniStar(host, f); return; }
   const L=treeLayout(tree);
   const colW=46, rowH=42;
-  const W=Math.max(280, L.leaves*colW+28), H=(L.depth+1)*rowH+26;
-  const svg=el("svg",{viewBox:"0 0 "+W+" "+H,class:"minig",role:"img","aria-label":"formula expression tree"});
-  const px=n=>14+(n.x+0.5)*((W-28)/Math.max(1,L.leaves));
-  const py=n=>20+n.depth*rowH;
+  const W=Math.max(280, Math.max(L.slots, L.leaves.length)*colW+28);
+  const bandY=20+(L.depth+1)*rowH+6;
+  const H=bandY+32;
+  const svg=el("svg",{viewBox:"0 0 "+W+" "+H,class:"minig",role:"img","aria-label":"formula expression graph"});
+  const px=x=>14+(x+0.5)*((W-28)/Math.max(1,L.slots));
+  const py=d=>20+d*rowH;
+  const lx=i=>14+(i+0.5)*((W-28)/Math.max(1,L.leaves.length));
   for (const [a,b] of L.edges)
-    svg.appendChild(el("line",{class:"gedge",x1:px(a),y1:py(a),x2:px(b),y2:py(b)}));
-  for (const n of L.nodes){
-    const x=px(n), y=py(n);
-    if (n.leaf){
-      svg.appendChild(el("circle",{class:"gnode-f",cx:x,cy:y,r:4.5}));
-      leafText(svg, x, y+14, n.label);
-    } else {
-      const w=Math.max(20, n.label.length*7+8);
-      svg.appendChild(el("rect",{x:x-w/2,y:y-9,width:w,height:18,rx:6,class:"gnode-s"}));
-      const t=el("text",{x:x,y:y+3.5,"text-anchor":"middle","font-size":"10","font-weight":"800"});
-      t.textContent=n.label; t.setAttribute("fill","#fff"); svg.appendChild(t);
-    }
+    svg.appendChild(el("line",{class:"gedge",x1:px(a.x),y1:py(a.depth),x2:px(b.x),y2:py(b.depth)}));
+  L.leaves.forEach((lf,i)=>{
+    for (const o of lf.uses)
+      svg.appendChild(el("line",{class:"gedge",x1:px(o.parent.x),y1:py(o.parent.depth),x2:lx(i),y2:bandY}));
+  });
+  for (const n of L.internals){
+    const x=px(n.x), y=py(n.depth);
+    const w=Math.max(20, n.label.length*7+8);
+    svg.appendChild(el("rect",{x:x-w/2,y:y-9,width:w,height:18,rx:6,class:"gnode-s"}));
+    const t=el("text",{x:x,y:y+3.5,"text-anchor":"middle","font-size":"10","font-weight":"800"});
+    t.textContent=n.label; t.setAttribute("fill","#fff"); svg.appendChild(t);
   }
+  L.leaves.forEach((lf,i)=>{
+    const x=lx(i);
+    svg.appendChild(el("circle",{class:"gnode-f",cx:x,cy:bandY,
+      r:4.5+Math.min(2.5,(lf.uses.length-1)*0.8)}));
+    leafText(svg, x, bandY+15, lf.label);
+  });
   host.innerHTML=""; host.appendChild(svg);
   if (W>360){ svg.style.width=W+"px"; svg.style.maxWidth="none"; }
 }
