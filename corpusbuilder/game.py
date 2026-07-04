@@ -44,7 +44,15 @@ from corpusbuilder.prisma import _RELEVANT
 ROOT = Path(__file__).resolve().parent.parent
 DOSS = ROOT / "corpus" / "dossiers"
 OUT = ROOT / "corpus" / "review" / "game.html"
-LOGO = Path.home() / ".claude" / "skills" / "tud-mobile" / "assets" / "logos" / "Chairlogo_new_engl.svg"
+LOGO = (
+    Path.home()
+    / ".claude"
+    / "skills"
+    / "tud-mobile"
+    / "assets"
+    / "logos"
+    / "Chairlogo_new_engl.svg"
+)
 
 _METHOD = {"arxiv-tex": "T1", "mathml": "T2", "ocr": "T3", "llm": "LLM", "human": "H"}
 
@@ -53,40 +61,159 @@ _METHOD = {"arxiv-tex": "T1", "mathml": "T2", "ocr": "T3", "llm": "LLM", "human"
 # --------------------------------------------------------------------------
 
 _GREEK = {
-    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ", "epsilon": "ε",
-    "varepsilon": "ε", "zeta": "ζ", "eta": "η", "theta": "θ", "vartheta": "θ",
-    "iota": "ι", "kappa": "κ", "lambda": "λ", "mu": "μ", "nu": "ν", "xi": "ξ",
-    "pi": "π", "rho": "ρ", "varrho": "ρ", "sigma": "σ", "tau": "τ",
-    "upsilon": "υ", "phi": "φ", "varphi": "φ", "chi": "χ", "psi": "ψ",
-    "omega": "ω", "Gamma": "Γ", "Delta": "Δ", "Theta": "Θ", "Lambda": "Λ",
-    "Xi": "Ξ", "Pi": "Π", "Sigma": "Σ", "Upsilon": "Υ", "Phi": "Φ",
-    "Psi": "Ψ", "Omega": "Ω",
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "varepsilon": "ε",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θ",
+    "vartheta": "θ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "rho": "ρ",
+    "varrho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φ",
+    "varphi": "φ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Upsilon": "Υ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω",
 }
 _OPS = {
-    "sum": "∑", "prod": "∏", "int": "∫", "min": "min", "max": "max",
-    "frac": "÷", "sqrt": "√", "cup": "∪", "cap": "∩", "partial": "∂",
-    "nabla": "∇", "log": "log", "exp": "exp", "cdot": "·", "times": "×",
+    "sum": "∑",
+    "prod": "∏",
+    "int": "∫",
+    "min": "min",
+    "max": "max",
+    "frac": "÷",
+    "sqrt": "√",
+    "cup": "∪",
+    "cap": "∩",
+    "partial": "∂",
+    "nabla": "∇",
+    "log": "log",
+    "exp": "exp",
+    "cdot": "·",
+    "times": "×",
 }
 _RELS = [
-    ("leq", "≤"), ("le", "≤"), ("geq", "≥"), ("ge", "≥"), ("neq", "≠"),
-    ("ne", "≠"), ("subseteq", "⊆"), ("in", "∈"), ("forall", "∀"),
+    ("leq", "≤"),
+    ("le", "≤"),
+    ("geq", "≥"),
+    ("ge", "≥"),
+    ("neq", "≠"),
+    ("ne", "≠"),
+    ("subseteq", "⊆"),
+    ("in", "∈"),
+    ("forall", "∀"),
 ]
-_DECOR = {"hat": "̂", "bar": "̄", "tilde": "̃", "dot": "̇",
-          "vec": "⃗", "overline": "̄", "widehat": "̂"}
+_DECOR = {"hat": "̂", "bar": "̄", "tilde": "̃", "dot": "̇", "vec": "⃗", "overline": "̄", "widehat": "̂"}
 _NOISE_CMDS = {
-    "left", "right", "big", "bigl", "bigr", "Big", "Bigl", "Bigr", "bigg",
-    "Bigg", "quad", "qquad", "limits", "nolimits", "displaystyle",
-    "textstyle", "nonumber", "label", "tag", "mathstrut", "hspace", "vspace",
-    ",", ";", "!", ":", " ", "\\", "allowbreak", "prime", "ldots", "cdots",
-    "dots", "dotsb", "colon", "%",
+    "left",
+    "right",
+    "big",
+    "bigl",
+    "bigr",
+    "Big",
+    "Bigl",
+    "Bigr",
+    "bigg",
+    "Bigg",
+    "quad",
+    "qquad",
+    "limits",
+    "nolimits",
+    "displaystyle",
+    "textstyle",
+    "nonumber",
+    "label",
+    "tag",
+    "mathstrut",
+    "hspace",
+    "vspace",
+    ",",
+    ";",
+    "!",
+    ":",
+    " ",
+    "\\",
+    "allowbreak",
+    "prime",
+    "ldots",
+    "cdots",
+    "dots",
+    "dotsb",
+    "colon",
+    "%",
 }
-_WRAP_CMDS = {"mathrm", "mathit", "mathbf", "mathsf", "mathcal", "mathbb",
-              "boldsymbol", "bm", "text", "textrm", "textit", "operatorname",
-              "mbox", "mathord", "mathop", "textnormal"}
+_WRAP_CMDS = {
+    "mathrm",
+    "mathit",
+    "mathbf",
+    "mathsf",
+    "mathcal",
+    "mathbb",
+    "boldsymbol",
+    "bm",
+    "text",
+    "textrm",
+    "textit",
+    "operatorname",
+    "mbox",
+    "mathord",
+    "mathop",
+    "textnormal",
+}
 _STOPWORDS = {
-    "if", "for", "all", "and", "or", "st", "otherwise", "where", "then",
-    "else", "is", "to", "the", "of", "a", "an", "with", "subject", "such",
-    "that", "minimize", "maximize", "min", "max", "s", "t", "et", "al",
+    "if",
+    "for",
+    "all",
+    "and",
+    "or",
+    "st",
+    "otherwise",
+    "where",
+    "then",
+    "else",
+    "is",
+    "to",
+    "the",
+    "of",
+    "a",
+    "an",
+    "with",
+    "subject",
+    "such",
+    "that",
+    "minimize",
+    "maximize",
+    "min",
+    "max",
+    "s",
+    "t",
+    "et",
+    "al",
 }
 # runs of >=3 single letters separated by single spaces (MathML word noise)
 _SPACED_WORD = re.compile(r"(?<![A-Za-z\\])([A-Za-z](?: [A-Za-z]){2,})(?![A-Za-z])")
@@ -100,8 +227,10 @@ def _collapse_words(s: str) -> str:
 # normalize to \sum_{binder} so they parse as prefix operators, not symbols
 _GRP = r"\{([^{}]*(?:\{[^{}]*\}[^{}]*)*)\}"
 _UNDERSET_OP = re.compile(
-    r"\\underset\s*" + _GRP +
-    r"\s*\{\s*(\\sum|\\prod|\\min|\\max|\\int|\\bigcup|\\bigcap|min|max)\s*\}")
+    r"\\underset\s*"
+    + _GRP
+    + r"\s*\{\s*(\\sum|\\prod|\\min|\\max|\\int|\\bigcup|\\bigcap|min|max)\s*\}"
+)
 _MATHOP = re.compile(r"\\mathop\s*\{\s*(\\[a-zA-Z]+|[a-zA-Z]+)\s*\}")
 _UNDERBRACE = re.compile(r"\\underbrace\s*" + _GRP)
 _OVERSET = re.compile(r"\\overset\s*" + _GRP + r"\s*" + _GRP)
@@ -110,8 +239,14 @@ _OVERSET = re.compile(r"\\overset\s*" + _GRP + r"\s*" + _GRP)
 def _rewrite_ops(s: str) -> str:
     for _ in range(3):  # patterns may nest
         s2 = _UNDERSET_OP.sub(
-            lambda m: (m.group(2) if m.group(2).startswith("\\")
-                       else "\\" + m.group(2)) + "_{" + m.group(1) + "}", s)
+            lambda m: (
+                (m.group(2) if m.group(2).startswith("\\") else "\\" + m.group(2))
+                + "_{"
+                + m.group(1)
+                + "}"
+            ),
+            s,
+        )
         s2 = _MATHOP.sub(r"\1", s2)
         s2 = _UNDERBRACE.sub(r"{\1}", s2)
         s2 = _OVERSET.sub(r"{\2}", s2)
@@ -203,9 +338,7 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
             if word.lower() in {"min", "max", "minimize", "maximize"}:
                 key = "min" if "min" in word.lower() else "max"
                 ops[key] = ops.get(key, 0) + 1
-            elif len(word) == 1:
-                add_sym(word)
-            elif word.lower() not in _STOPWORDS:
+            elif len(word) == 1 or word.lower() not in _STOPWORDS:
                 add_sym(word)
         elif not rel and c in "=<>":
             rel = {"=": "=", "<": "<", ">": ">"}[c]
@@ -229,11 +362,28 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
 # failure returns None and the UI falls back to the flat symbol star.
 # Tree encoding: leaf = str, node = [op, child, ...].
 
-_PREFIX_OPS = {"sum": "∑", "prod": "∏", "int": "∫", "min": "min",
-               "max": "max", "bigcup": "∪", "bigcap": "∩"}
-_REL_TOK = {"leq": "≤", "le": "≤", "geq": "≥", "ge": "≥", "neq": "≠",
-            "ne": "≠", "in": "∈", "subseteq": "⊆", "approx": "≈",
-            "equiv": "≡", "sim": "~"}
+_PREFIX_OPS = {
+    "sum": "∑",
+    "prod": "∏",
+    "int": "∫",
+    "min": "min",
+    "max": "max",
+    "bigcup": "∪",
+    "bigcap": "∩",
+}
+_REL_TOK = {
+    "leq": "≤",
+    "le": "≤",
+    "geq": "≥",
+    "ge": "≥",
+    "neq": "≠",
+    "ne": "≠",
+    "in": "∈",
+    "subseteq": "⊆",
+    "approx": "≈",
+    "equiv": "≡",
+    "sim": "~",
+}
 _MUL_TOK = {"cdot": "·", "times": "·", "ast": "·"}
 _TREE_MAX_NODES = 44
 
@@ -264,7 +414,7 @@ class _P:
     # ---- grammar ----
     def expr(self):
         segs = [self.rel_chain()]
-        cur_forall = None            # a ∀ governs the comma list that follows it
+        cur_forall = None  # a ∀ governs the comma list that follows it
         while self.peek()[0] in ("forall", "comma"):
             kind = self.next()[0]
             if self.peek()[0] == "end":
@@ -276,13 +426,13 @@ class _P:
                 cur_forall = ["∀", seg]
                 segs.append(cur_forall)
             elif cur_forall is not None:
-                cur_forall.append(seg)   # "∀ u, j" → both params under one ∀
+                cur_forall.append(seg)  # "∀ u, j" → both params under one ∀
             else:
                 segs.append(seg)
         segs = [s for s in segs if s is not None]
         if not segs:
             return None
-        return segs[0] if len(segs) == 1 else [";"] + segs
+        return segs[0] if len(segs) == 1 else [";", *segs]
 
     def rel_chain(self):
         left = self.add()
@@ -308,7 +458,7 @@ class _P:
             terms.append(["−", nxt] if sign == "-" else nxt)
         if not terms:
             return None
-        return terms[0] if len(terms) == 1 else ["+"] + terms
+        return terms[0] if len(terms) == 1 else ["+", *terms]
 
     def mul(self):
         factors = []
@@ -325,8 +475,7 @@ class _P:
             if k == "mul":
                 self.next()
                 continue
-            if k not in ("leaf", "num", "frac", "sqrt", "prefix", "lpar",
-                         "lbrace", "decor", "pm"):
+            if k not in ("leaf", "num", "frac", "sqrt", "prefix", "lpar", "lbrace", "decor", "pm"):
                 break
             if k == "pm":  # unary minus at term start
                 if factors:
@@ -343,7 +492,7 @@ class _P:
             factors.append(nxt)
         if not factors:
             return None
-        return factors[0] if len(factors) == 1 else ["·"] + factors
+        return factors[0] if len(factors) == 1 else ["·", *factors]
 
     def post(self):
         node = self.atom()
@@ -354,8 +503,7 @@ class _P:
             if k == "script":
                 self.next()
                 if isinstance(node, str):
-                    node = node + ("_" if v.startswith("_") else "^") + v[1:] \
-                        if v[1:] else node
+                    node = node + ("_" if v.startswith("_") else "^") + v[1:] if v[1:] else node
                 # scripts on non-leaves are dropped (e.g. )^2)
             elif k == "lpar" and isinstance(node, str):
                 self.next()
@@ -366,7 +514,7 @@ class _P:
                     self.next()
                 if not args:
                     return node
-                node = [node + "()"] + args
+                node = [node + "()", *args]
             else:
                 break
         return node
@@ -388,7 +536,7 @@ class _P:
         if k == "prefix":
             sub = sup = ""
             while self.peek()[0] == "script":
-                sv = self.next()[1]          # always consume (else: spin)
+                sv = self.next()[1]  # always consume (else: spin)
                 if sv.startswith("_") and not sub:
                     sub = _flat(sv[1:], 12)
                 elif sv.startswith("^") and not sup:
@@ -396,9 +544,8 @@ class _P:
             # min/max govern the whole objective expression; ∑/∏ bind the term
             body = self.add() if v in ("min", "max") else self.mul()
             binder = sub + ("…" + sup if sup else "")
-            kids = ([["@", binder]] if binder else []) \
-                + ([body] if body is not None else [])
-            return [v] + kids if kids else v
+            kids = ([["@", binder]] if binder else []) + ([body] if body is not None else [])
+            return [v, *kids] if kids else v
         if k in ("lpar", "lbrace"):
             inner = self.expr()
             if self.peek()[0] == ("rpar" if k == "lpar" else "rbrace"):
@@ -443,13 +590,17 @@ def _tree_tokens(s: str) -> list[tuple[str, str]]:
                 pass
             # unknown commands are dropped
         elif c == "{":
-            toks.append(("lbrace", c)); i += 1
+            toks.append(("lbrace", c))
+            i += 1
         elif c == "}":
-            toks.append(("rbrace", c)); i += 1
+            toks.append(("rbrace", c))
+            i += 1
         elif c in "([":
-            toks.append(("lpar", c)); i += 1
+            toks.append(("lpar", c))
+            i += 1
         elif c in ")]":
-            toks.append(("rpar", c)); i += 1
+            toks.append(("rpar", c))
+            i += 1
         elif c in "_^":
             j = i + 1
             while j < n and s[j] == " ":
@@ -467,20 +618,26 @@ def _tree_tokens(s: str) -> list[tuple[str, str]]:
                 toks.append(("script", c + (s[j] if j < n else "")))
                 i = j + 1
         elif c in "+-":
-            toks.append(("pm", c)); i += 1
+            toks.append(("pm", c))
+            i += 1
         elif c in "*·×":
-            toks.append(("mul", "·")); i += 1
+            toks.append(("mul", "·"))
+            i += 1
         elif c == "/":
-            toks.append(("slash", "/")); i += 1
+            toks.append(("slash", "/"))
+            i += 1
         elif c in "=<>≤≥≠∈":
-            toks.append(("rel", {"=": "=", "<": "<", ">": ">"}.get(c, c))); i += 1
+            toks.append(("rel", {"=": "=", "<": "<", ">": ">"}.get(c, c)))
+            i += 1
         elif c == ",":
-            toks.append(("comma", c)); i += 1
+            toks.append(("comma", c))
+            i += 1
         elif c.isdigit():
             j = i
             while j < n and (s[j].isdigit() or s[j] == "."):
                 j += 1
-            toks.append(("num", s[i:j])); i = j
+            toks.append(("num", s[i:j]))
+            i = j
         elif c.isalpha():
             j = i
             while j < n and s[j].isalpha():
@@ -635,16 +792,33 @@ def _payload() -> dict:
         for f in d.formulas:
             syms, ops, rel = extract_symbols(f.latex)
             tree = parse_tree(f.latex)
-            fs.append([f.id, f.label or "", f.latex,
-                       _METHOD.get(f.method.value, "?"), f.page_start or 0,
-                       syms, ops, rel, tree or 0,
-                       1 if _is_objective(tree, ops, rel) else 0])
-        papers.append({
-            "k": d.key, "t": s.title or d.key, "v": s.venue or "",
-            "y": s.year or 0, "d": s.doi or "", "c": s.cited_by_count or 0,
-            "ot": 0 if (s.title and _RELEVANT.search(s.title)) else 1,
-            "f": fs, "chk": _paper_check(fs),
-        })
+            fs.append(
+                [
+                    f.id,
+                    f.label or "",
+                    f.latex,
+                    _METHOD.get(f.method.value, "?"),
+                    f.page_start or 0,
+                    syms,
+                    ops,
+                    rel,
+                    tree or 0,
+                    1 if _is_objective(tree, ops, rel) else 0,
+                ]
+            )
+        papers.append(
+            {
+                "k": d.key,
+                "t": s.title or d.key,
+                "v": s.venue or "",
+                "y": s.year or 0,
+                "d": s.doi or "",
+                "c": s.cited_by_count or 0,
+                "ot": 0 if (s.title and _RELEVANT.search(s.title)) else 1,
+                "f": fs,
+                "chk": _paper_check(fs),
+            }
+        )
     return {"papers": papers, "n_formulas": sum(len(p["f"]) for p in papers)}
 
 
@@ -1945,8 +2119,10 @@ def main() -> None:
     )
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(html, encoding="utf-8")
-    print(f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB, "
-          f"{len(data['papers'])} papers, {data['n_formulas']} formulas)")
+    print(
+        f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB, "
+        f"{len(data['papers'])} papers, {data['n_formulas']} formulas)"
+    )
 
 
 if __name__ == "__main__":
