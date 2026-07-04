@@ -6,7 +6,7 @@ mining pipeline) and **`corpusbuilder/`** (corpus acquisition: OpenAlex / arXiv 
 Elsevier ingest → per-paper dossiers → PRISMA tally). The *method* lives in
 `lp2graph`; this repo is corpus management + orchestration + artifact generation.
 
-_Last verified: 2026-06-22 (nightly quality pass)._
+_Last verified: 2026-07-04 (nightly quality pass — Security)._
 
 ## Languages & runtime
 
@@ -85,7 +85,7 @@ real retrieval date, network) from the forward pipeline (frozen files, no
 
 | Task | Command |
 |---|---|
-| Tests | `PYTHONPATH=../lp2graph/src python3 -m pytest` (24 tests; offline) |
+| Tests | `PYTHONPATH=../lp2graph/src python3 -m pytest` (27 tests; offline) |
 | Lint | `ruff check .` |
 | Format | `ruff format --check .` (apply: `ruff format .`) |
 | Types | `mypy railpminer corpusbuilder` (**not** `--strict` yet — relaxing |
@@ -113,4 +113,27 @@ PyPI per the workflow. *(Added 2026-06-22; previously no CI.)*
 - **Corpus status:** the shipped `corpus/` is an illustrative SEED (10 structural
   templates), *not* the paper-grade dataset. See `README.md` and the home
   `CLAUDE.md` corpus ground-truth note.
+
+## Security posture (acquisition boundary)
+
+`corpusbuilder/` is the only network- and untrusted-input surface; the
+`railpminer/` forward pipeline reads only frozen local corpus files. Controls
+(hardened in the 2026-07-04 security pass, ADR-0005):
+
+- **Untrusted tarballs** (`arxiv.fetch_source`): `_safe_extract` extracts regular
+  files only (skips symlinks/hardlinks/devices), enforces containment with
+  `Path.is_relative_to` (not a string `startswith`), and passes `filter="data"`.
+- **Untrusted publisher XML** (`elsevier.extract_formulas`): parsed via a
+  hardened `_XML_PARSER` (`resolve_entities=False, no_network=True,
+  load_dtd=False, huge_tree=False`) — no XXE, no entity-expansion DoS.
+- **Node MathML bridge** (`mathml.py`): `subprocess.run` with an argv **list**
+  (no `shell=True`), content via stdin/JSON — no command-injection surface.
+- **Secrets** (`config.py`): API keys read only via accessors from
+  `~/.config/raiLP/secrets.env` (chmod 600) or repo `.env` (git-ignored); never
+  echoed in error messages (only paths/response bodies are).
+- **Open items / watch:** the ScienceDirect DOI is interpolated into the request
+  path (`article/doi/{doi}`) without validation — low risk (DOI comes from
+  OpenAlex, target is a fixed host) but a malformed DOI could reshape the path;
+  consider a DOI-shape guard. HTTP clients rely on `requests`' default TLS
+  verification (good) but set no explicit `verify=`/retry policy.
 </invoke>

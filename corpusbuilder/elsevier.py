@@ -31,6 +31,22 @@ _NS = {
 # DOI registrant prefixes that route to ScienceDirect full text.
 _ELSEVIER_PREFIXES = ("10.1016/", "10.1006/", "10.1053/", "10.1078/", "10.3182/")
 
+# Hardened parser for third-party publisher XML (XXE + entity-expansion /
+# "billion-laughs" DoS defense). The response is nominally from
+# api.elsevier.com over TLS, but it is routed through a SOCKS tunnel and is
+# untrusted third-party content, so we never hand it to lxml's implicit default
+# parser. ``resolve_entities=False`` is the load-bearing control: it stops *both*
+# local-file XXE (``no_network=True`` blocks the network but NOT ``file://``
+# SYSTEM entities, so it is not sufficient alone) and entity-expansion DoS.
+# ``load_dtd=False`` skips external DTD subsets; ``huge_tree=False`` keeps
+# libxml2's tree-size caps on. Elsevier ``<ce:formula>`` bodies use numeric
+# character references / Unicode, not custom named entities, so extraction is
+# unaffected; any residual entity ref is preserved verbatim and flagged for the
+# human review step rather than resolved. See ADR-0005.
+_XML_PARSER = etree.XMLParser(
+    resolve_entities=False, no_network=True, load_dtd=False, huge_tree=False
+)
+
 
 def is_elsevier_doi(doi: str | None) -> bool:
     return bool(doi) and doi.startswith(_ELSEVIER_PREFIXES)
@@ -88,7 +104,7 @@ class ElsevierClient:
         Inline single-symbol math elsewhere in the body is intentionally skipped
         — only the labeled formula objects are corpus-relevant.
         """
-        root = etree.fromstring(xml.encode("utf-8"))
+        root = etree.fromstring(xml.encode("utf-8"), parser=_XML_PARSER)
         formulas = root.findall(".//ce:formula", _NS)
         mml_strings: list[str] = []
         labels: list[str | None] = []

@@ -173,3 +173,85 @@ def test_extract_formulas_from_fixture() -> None:
     assert recs[0].method.value == "mathml"
     assert recs[0].mathml is not None and "mml:math" in recs[0].mathml
     assert recs[0].latex.replace(" ", "") == "x+y"
+
+
+# -- Security: untrusted-input hardening ------------------------------------
+
+
+def _tar_add_bytes(tar, name: str, data: bytes) -> None:
+    import io
+    import tarfile
+
+    info = tarfile.TarInfo(name=name)
+    info.size = len(data)
+    tar.addfile(info, io.BytesIO(data))
+
+
+def test_safe_extract_blocks_path_traversal(tmp_path) -> None:
+    """arXiv e-prints are untrusted: members escaping the dest dir are dropped.
+
+    Guards the sibling-prefix escape a naive ``startswith`` check would accept
+    (``.../2103.04618`` vs ``.../2103.04618_evil/x``) plus plain ``..`` traversal.
+    """
+    import io
+    import tarfile
+
+    from corpusbuilder.arxiv import _safe_extract
+
+    dest = tmp_path / "2103.04618"
+    dest.mkdir()
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w") as tar:
+        _tar_add_bytes(tar, "main.tex", b"legit")
+        _tar_add_bytes(tar, "../2103.04618_evil/pwn.tex", b"sibling-escape")
+        _tar_add_bytes(tar, "../../etc_pwn.tex", b"parent-escape")
+    buf.seek(0)
+    with tarfile.open(fileobj=buf, mode="r") as tar:
+        _safe_extract(tar, dest)
+
+    assert (dest / "main.tex").read_bytes() == b"legit"
+    assert not (tmp_path / "2103.04618_evil").exists()
+    assert not (tmp_path / "etc_pwn.tex").exists()
+    # nothing landed anywhere outside the intended dest dir
+    assert [p.relative_to(tmp_path).as_posix() for p in sorted(tmp_path.rglob("*.tex"))] == [
+        "2103.04618/main.tex"
+    ]
+
+
+def test_safe_extract_skips_symlink_members(tmp_path) -> None:
+    """Symlink members must never be materialised (link-based escape)."""
+    import io
+    import tarfile
+
+    from corpusbuilder.arxiv import _safe_extract
+
+    dest = tmp_path / "id"
+    dest.mkdir()
+    buf = io.BytesIO()
+    with tarfile.open(fileobj=buf, mode="w") as tar:
+        info = tarfile.TarInfo(name="link.tex")
+        info.type = tarfile.SYMTYPE
+        info.linkname = "/etc/passwd"
+        tar.addfile(info)
+    buf.seek(0)
+    with tarfile.open(fileobj=buf, mode="r") as tar:
+        _safe_extract(tar, dest)
+
+    assert not (dest / "link.tex").exists()
+    assert not (dest / "link.tex").is_symlink()
+
+
+def test_elsevier_parser_does_not_disclose_local_files(tmp_path) -> None:
+    """The hardened parser must not resolve external SYSTEM entities (XXE)."""
+    from lxml import etree
+
+    from corpusbuilder.elsevier import _XML_PARSER
+
+    secret = tmp_path / "secret.txt"
+    secret.write_text("TOPSECRET")
+    xml = f'<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "file://{secret}">]><r>&x;</r>'
+    try:
+        root = etree.fromstring(xml.encode(), parser=_XML_PARSER)
+    except etree.XMLSyntaxError:
+        return  # refusing to resolve the entity at all is a valid safe outcome
+    assert "TOPSECRET" not in (root.text or "")

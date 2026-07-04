@@ -73,14 +73,26 @@ def fetch_source(arxiv_id: str, dest_dir: str | Path, timeout: float = 60.0) -> 
 
 
 def _safe_extract(tar: tarfile.TarFile, dest: Path) -> None:
-    """Extract a tarball, refusing path-traversal members."""
+    """Extract a tarball, refusing path-traversal members.
+
+    arXiv e-prints are author-controlled and therefore untrusted. We extract
+    **regular files only** (symlink/hardlink/device members are ignored, closing
+    link-based escapes) and require each resolved target to sit inside ``dest``.
+    Containment is checked with :meth:`Path.is_relative_to`, *not* a string
+    ``startswith`` — the latter falsely accepts sibling dirs that merely share
+    the destination's name prefix (e.g. ``.../2103.04618`` vs
+    ``.../2103.04618_evil/x``), which is an escape.
+    """
     dest = dest.resolve()
     for m in tar.getmembers():
+        if not m.isfile():
+            continue  # skip symlinks/hardlinks/dirs/devices
         target = (dest / m.name).resolve()
-        if not str(target).startswith(str(dest)):
+        if not target.is_relative_to(dest):
             continue  # skip members escaping dest
-        if m.isfile():
-            tar.extract(m, dest)
+        # filter="data" is a second, stdlib-native guard (rejects abs paths,
+        # ``..``, links, special files) and the Python-3.14-ready default.
+        tar.extract(m, dest, filter="data")
 
 
 def _strip_comments(tex: str) -> str:
