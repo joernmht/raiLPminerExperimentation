@@ -780,8 +780,20 @@ def _logo_svg() -> str:
     return svg
 
 
-def _payload() -> dict:
+def _payload(include: set[str] | None = None) -> dict:
+    """Build the embedded game payload from all dossiers.
+
+    ``include`` optionally restricts to papers whose DOI (lower-cased, no
+    ``https://doi.org/`` prefix) is in the set — used for the public
+    GitHub-Pages demo, which may only ship open-access (CC-BY) papers.
+    """
     doss = [Dossier.load(p) for p in sorted(DOSS.glob("*.json"))]
+    if include is not None:
+        doss = [
+            d
+            for d in doss
+            if (d.source.doi or "").lower().removeprefix("https://doi.org/") in include
+        ]
     doss.sort(key=lambda d: (-(d.source.cited_by_count or 0), d.key))
     papers = []
     for di, d in enumerate(doss):
@@ -2108,8 +2120,40 @@ paintHome();
 """
 
 
-def main() -> None:
-    data = _payload()
+def main(argv: list[str] | None = None) -> None:
+    import argparse
+
+    ap = argparse.ArgumentParser(
+        prog="corpusbuilder.game",
+        description="Generate the Formula Express HITL review game (one self-contained HTML).",
+    )
+    ap.add_argument(
+        "--include",
+        type=Path,
+        default=None,
+        metavar="FILE",
+        help="restrict to papers whose DOI is listed in FILE (one per line, '#' comments) "
+        "— e.g. the CC-BY-only subset for the public GitHub-Pages demo",
+    )
+    ap.add_argument(
+        "--out",
+        type=Path,
+        default=OUT,
+        metavar="PATH",
+        help=f"output HTML path (default: {OUT})",
+    )
+    args = ap.parse_args(argv)
+
+    include: set[str] | None = None
+    if args.include is not None:
+        include = {
+            line.strip().lower().removeprefix("https://doi.org/")
+            for line in args.include.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.lstrip().startswith("#")
+        }
+
+    out: Path = args.out
+    data = _payload(include)
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
     html = (
         _HTML.replace("__DATA__", blob)
@@ -2117,10 +2161,10 @@ def main() -> None:
         .replace("__NFORM__", str(data["n_formulas"]))
         .replace("__LOGO__", _logo_svg())
     )
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(html, encoding="utf-8")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(html, encoding="utf-8")
     print(
-        f"wrote {OUT} ({OUT.stat().st_size / 1e6:.1f} MB, "
+        f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB, "
         f"{len(data['papers'])} papers, {data['n_formulas']} formulas)"
     )
 
