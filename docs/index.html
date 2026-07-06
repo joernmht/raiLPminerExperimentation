@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3f7f8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#00103a" media="(prefers-color-scheme: dark)">
+<title>LP Mining with LP2Graph — Conference Demo</title>
+<meta name="description" content="Corpus construction and human-in-the-loop review for railway rescheduling optimization models — TU Dresden, Chair of Railway Operations.">
+<style>
+  /* TUD Chair of Railway Operations — mobile design system (tud-mobile skill). */
+  :root{
+    --page1:#f3f7f8; --page2:#e7f1f1;
+    --ink:#0c1f3a; --muted:#566782;
+    --card:#ffffff; --card2:#f1f8f8; --line:#d6e6e7; --track:#e6f0f0;
+    --accent:#0A777F;
+    --accent2:#2F57B2;
+    --good:#0A777F;
+    --warn:#C85000;
+    --bad:#D20F41;
+    --tier3:#7369BE;
+    --kpi1:#e6f4f4; --kpi2:#eef0fb;
+    --shadow:0 1px 3px rgba(12,40,50,.08),0 6px 18px rgba(12,40,50,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --page1:#00103a; --page2:#001a55;
+      --ink:#eaf1ff; --muted:#a0b4d8;
+      --card:#0c2766; --card2:#10307c; --line:#2a4a92; --track:#001a55;
+      --accent:#36b8bf; --accent2:#7aa2ff; --good:#36b8bf;
+      --warn:#f0922e; --bad:#ff667e; --tier3:#a98bf0;
+      --kpi1:#0c2a6e; --kpi2:#11306f;
+      --shadow:0 1px 3px rgba(0,0,0,.4);
+    }
+    .brandlogo svg text, .brandlogo svg path{fill:#ffffff !important}
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:linear-gradient(180deg,var(--page1),var(--page2));
+    background-attachment:fixed; color:var(--ink);
+    font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:max(16px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    max-width:640px;margin:0 auto;-webkit-font-smoothing:antialiased;
+  }
+  header{margin:6px 0 22px}
+  .brandlogo{margin:2px 0 14px}
+  .brandlogo svg{height:30px;width:auto;display:block}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
+  h1{font-size:24px;line-height:1.2;margin:6px 0 4px;font-weight:800;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px}
+  .pill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:var(--card);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12.5px;color:var(--muted);box-shadow:var(--shadow)}
+  .pill b{color:var(--ink);font-weight:700}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 24%,transparent)}
+
+  h2{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:32px 0 14px;font-weight:700}
+
+  /* app link cards */
+  .apps{display:flex;flex-direction:column;gap:14px}
+  a.app{display:block;text-decoration:none;color:inherit;background:var(--card);
+    border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:16px;
+    padding:16px;box-shadow:var(--shadow);transition:transform .08s ease}
+  a.app:active{transform:scale(.985)}
+  a.app .ah{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  a.app .at{font-size:17px;font-weight:800;letter-spacing:-.01em}
+  a.app .go{flex:none;font-size:13px;font-weight:800;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);
+    border-radius:999px;padding:5px 12px;white-space:nowrap}
+  a.app .as{font-size:13px;color:var(--muted);margin-top:6px}
+  a.app .meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  a.app .meta span{font-size:11px;font-weight:700;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 10%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
+    border-radius:999px;padding:2px 8px}
+  a.app.alt{border-left-color:var(--tier3)}
+  a.app.alt .go{color:var(--tier3);background:color-mix(in srgb,var(--tier3) 12%,transparent);
+    border-color:color-mix(in srgb,var(--tier3) 35%,transparent)}
+  a.app.alt .meta span{color:var(--tier3);background:color-mix(in srgb,var(--tier3) 10%,transparent);
+    border-color:color-mix(in srgb,var(--tier3) 28%,transparent)}
+
+  /* KPI grid */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 13px;box-shadow:var(--shadow)}
+  .kpi .v{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1}
+  .kpi .l{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .kpi .tag{font-size:11px;color:var(--accent);font-weight:700;margin-top:3px}
+  .kpi.span{grid-column:1 / -1;background:linear-gradient(120deg,var(--kpi1),var(--kpi2))}
+  .kpi.span .v{font-size:34px}
+
+  .note{background:color-mix(in srgb,var(--warn) 7%,transparent);
+    border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
+    border-radius:14px;padding:12px 14px;font-size:12.5px;color:var(--muted);margin-top:14px}
+  .note b{color:var(--warn)}
+
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+  footer a{color:var(--accent);font-weight:700;text-decoration:none}
+  footer code{background:var(--card);padding:2px 6px;border-radius:6px;color:var(--accent);font-size:11.5px;border:1px solid var(--line)}
+  .modenote{font-size:11px;color:var(--muted);margin-top:6px;opacity:.85}
+</style>
+</head>
+<body>
+<header>
+  <div class="brandlogo" aria-label="TUD — Chair of Railway Operations">
+    <svg viewBox="0 0 1014 321" xmlns="http://www.w3.org/2000/svg" role="img"><g transform="translate(-1485 -585)"><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="700" font-size="83" transform="matrix(1 0 0 1 1728.92 690)">TUD | Chair</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1728.92 763)">o</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1774.75 763)">f</text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1820.59 763)">Railway </text><text fill="#00008C" font-family="Arial,Arial_MSFontService,sans-serif" font-weight="400" font-size="83" transform="matrix(1 0 0 1 1728.92 837)">Operations</text><path d="M1600.51 630 1693 630 1693 722.49 1670.62 744.874 1670.62 674.888 1670.62 674.888 1670.62 651.685 1670.62 651.685 1647.41 651.685 1612.6 651.685 1589.4 674.876 1589.4 674.888 1647.41 674.888 1647.41 768.077 1577.49 838 1577.49 745.511 1485 745.511 1508.77 721.74 1601.01 721.74 1601.01 779.747 1601.02 779.747 1624.21 756.556 1624.21 721.74 1624.21 698.536 1624.21 698.536 1601.01 698.536 1601.01 698.536 1531.97 698.536Z" fill="#00008C" fill-rule="evenodd"/><path d="M1485 628 1554 628 1530.99 651.345 1508.01 651.345 1508.01 674.655 1485 698Z" fill="#C00000" fill-rule="evenodd"/><path d="M1485 768 1508.01 768 1508.01 813.988 1554 813.988 1554 837 1485 837Z" fill="#C00000" fill-rule="evenodd"/><path d="M1694 768 1694 837 1624 837 1647.32 814.012 1670.65 814.012 1670.65 791.012Z" fill="#C00000" fill-rule="evenodd"/></g></svg>
+  </div>
+  <div class="eyebrow">Conference Demo · LP Mining</div>
+  <h1>LP Mining with LP2Graph</h1>
+  <div class="sub">Mining published LP/MILP formulations for railway rescheduling into a reproducible, typed-graph dataset — corpus construction &amp; human-in-the-loop review.</div>
+  <div class="pill"><span class="dot"></span><span>corpus snapshot <b>2026-06-21</b> · <b>238</b> papers · <b>8,957</b> formulas</span></div>
+</header>
+
+<h2>Open the apps</h2>
+<div class="apps">
+  <a class="app" href="prisma.html">
+    <div class="ah"><div class="at">📊 PRISMA corpus yield</div><div class="go">Open ›</div></div>
+    <div class="as">The corpus-acquisition pipeline as a PRISMA-2020 flow: identification (database + citation snowballing) → screening → retrieval &amp; eligibility → included, with per-stage yield, losses and amplification.</div>
+    <div class="meta"><span>10,099 records in</span><span>238 included</span><span>×37.6 formula yield</span></div>
+  </a>
+  <a class="app alt" href="game.html">
+    <div class="ah"><div class="at">🚆 Formula Express — corpus review</div><div class="go">Play ›</div></div>
+    <div class="as">The gamified human-in-the-loop review app on an exemplary subset of the corpus: per-paper symbol graphs, formula expression trees, accept ✓ / fix ✎ / reject ✗, P1–P5 classification, XP &amp; streaks. Works offline once loaded; progress stays on your device.</div>
+    <div class="meta"><span>15 papers</span><span>639 formulas</span><span>all CC-BY open access</span></div>
+  </a>
+</div>
+
+<h2>Corpus at a glance</h2>
+<div class="kpis">
+  <div class="kpi"><div class="v">10,099</div><div class="l">records identified</div><div class="tag">6 database queries + citation snowballing</div></div>
+  <div class="kpi"><div class="v">286</div><div class="l">reports retrieved</div><div class="tag">43 database · 243 snowball</div></div>
+  <div class="kpi"><div class="v">238</div><div class="l">source papers included</div><div class="tag">83.2% eligibility yield</div></div>
+  <div class="kpi"><div class="v">8,957</div><div class="l">candidate formulations</div><div class="tag">MathML → LaTeX, Tier-2</div></div>
+  <div class="kpi span"><div class="v">→ LP2Graph</div><div class="l">accepted formulas become canonical typed-graph <i>Formulations</i> with provenance — the dataset behind the paper's taxonomy</div></div>
+</div>
+
+<div class="note"><b>Why only 15 papers in the demo?</b> The public demo ships only papers published under a CC-BY licence (verified via OpenAlex). The full 238-paper corpus was mined under Elsevier text-and-data-mining terms and is reproduced from the pipeline, not redistributed.</div>
+
+<footer>
+  <span>Part of the LP2Graph paper series — <i>LP Mining with LP2Graph: A Use Case for Railway Rescheduling</i> (TU Dresden, Chair of Railway Operations).
+  Pipeline &amp; code: <a href="https://github.com/joernmht/raiLPminerExperimentation">joernmht/raiLPminerExperimentation</a> · library: <a href="https://github.com/joernmht/lp2graph">lp2graph</a>.</span>
+  <div class="modenote">Türkis accent on light · TUD dark-blue field in dark mode · theme follows device appearance.</div>
+</footer>
+</body>
+</html>
