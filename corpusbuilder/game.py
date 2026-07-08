@@ -1088,7 +1088,7 @@ a{color:var(--accent)}
     <button class="wide" onclick="openExport()">⤴ Export decisions</button>
   </div>
   <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
-  <p class="mut" style="text-align:center"><a href="https://joernmht.github.io/lp2graph/"
+  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
     style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
 </section>
 
