@@ -237,9 +237,13 @@ _OVERSET = re.compile(r"\\overset\s*" + _GRP + r"\s*" + _GRP)
 # "m i n Z_{1}" collapses to "minZ_{1}": split the glued min/max prefix off a
 # following capitalised symbol so it tokenizes as an operator, not one leaf
 _MINMAX_GLUED = re.compile(r"\b(min|max|minimize|maximize)(?=[A-Z])")
+# environment wrappers (\begin{aligned} min & ... \\ s.t. & ...) — the env-name
+# group would otherwise become a stray leaf that displaces min from the root
+_ENV_CMD = re.compile(r"\\(?:begin|end)\s*\{[a-zA-Z*]+\}")
 
 
 def _rewrite_ops(s: str) -> str:
+    s = _ENV_CMD.sub(" ", s)
     s = _MINMAX_GLUED.sub(r"\1 ", s)
     for _ in range(3):  # patterns may nest
         s2 = _UNDERSET_OP.sub(
@@ -786,42 +790,95 @@ def _pointwise(t) -> bool:
     """min/max over an explicit comma-separated argument list — a pointwise
     definition like ``T = min{a, b}``, not an optimization objective.
     A binder (``max_i {...}``) means the op ranges over an index set, so a
-    comma list under it is still an optimization construct, not pointwise."""
+    comma list under it is still an optimization construct, not pointwise.
+    The argument list may sit below glue nodes (``max(0, x) + R`` parses as
+    ``[max [+ [; 0 x] R]]``), so drill down the leading operands."""
     kids = t[1:]
     if any(isinstance(c, list) and c and c[0] == "@" for c in kids):
         return False
-    return any(isinstance(c, list) and c and c[0] == ";" for c in kids)
+    for c in kids:
+        node = c
+        while isinstance(node, list) and node and node[0] in ("·", "+", "−"):
+            node = node[1] if len(node) > 1 else None
+        if isinstance(node, list) and node and node[0] == ";":
+            return True
+    return False
 
 
-def _opt_minmax(c) -> bool:
-    return isinstance(c, list) and c and c[0] in ("min", "max") and not _pointwise(c)
+def _vector_minmax(t) -> bool:
+    """Bare ``min(z_1, z_2, z_3)`` over plain symbols — a vector
+    (multi-criteria) objective, not a pointwise expression."""
+    if not (isinstance(t, list) and t and t[0] in ("min", "max")):
+        return False
+    for c in t[1:]:
+        if isinstance(c, list) and c and c[0] == ";":
+            return bool(c[1:]) and all(
+                isinstance(x, str) and not x[:1].isdigit() for x in c[1:]
+            )
+    return False
+
+
+def _obj_minmax(c) -> bool:
+    return (
+        isinstance(c, list)
+        and bool(c)
+        and c[0] in ("min", "max")
+        and (not _pointwise(c) or _vector_minmax(c))
+    )
+
+
+# letter-bearing sub/superscripts (x_i, Y_v^k) mark a per-index quantity;
+# numeric ones (Z_1) just number the objective
+_IDX_LETTERS = re.compile(r"[_^][^_^]*[a-zA-Z]")
+
+
+def _indexed(x) -> bool:
+    s = x if isinstance(x, str) else (
+        x[0] if (isinstance(x, list) and x and isinstance(x[0], str)) else ""
+    )
+    return bool(_IDX_LETTERS.search(s))
 
 
 def _has_obj_root(t) -> bool:
     """Objective heuristic on the expression tree: min/max at the root,
-    in a top-level segment, or directly under the root relation
-    (covers ``min Z = ...`` / ``Z = min ...``). NOT an objective when the
-    formula is ∀-quantified (a per-index definition/constraint) or the
-    min/max is pointwise over an argument list (``min{a, b}``)."""
+    in a top-level segment, or under the root ``=`` (``min Z = ...`` /
+    ``Z = min ...``). NOT an objective when the formula is ∀-quantified
+    (a per-index definition/constraint), the min/max is pointwise over an
+    argument list (``min{a, b}``), or an RHS min/max defines a letter-indexed
+    LHS quantity (``M_kr = max_p(...)``)."""
     if not isinstance(t, list) or not t:
         return False
     op = t[0]
     if op in ("min", "max"):
-        return not _pointwise(t)
+        return _obj_minmax(t)
     if op == ";":
         segs = [c for c in t[1:] if not (isinstance(c, list) and c and c[0] == "∀")]
         if len(segs) < len(t) - 1:
-            # ∀-quantified: a definition/constraint — unless a segment is a
-            # bare min/max statement (e.g. the min-max objective
-            # ``min(max_i ...) ∀i``); ``X = min{...} ∀i`` stays a definition
-            return any(_opt_minmax(c) for c in segs)
+            # ∀-quantified — unless a segment is a bare min/max statement
+            # (e.g. the min-max objective ``min(max_i ...) ∀i``)
+            return any(_obj_minmax(c) for c in segs)
         return any(_has_obj_root(c) for c in segs)
     if isinstance(op, str) and op[:1] in "=≤≥<>≠∈⊆":
-        return any(_opt_minmax(c) for c in t[1:])
+        lhs = t[1] if len(t) > 1 else None
+        if _obj_minmax(lhs):
+            return True
+        if op[:1] == "=" and not _indexed(lhs):
+            return any(_obj_minmax(c) for c in t[2:])
+        return False
     return False
 
 
-def _is_objective(tree, ops, rel) -> bool:
+# a formula that STARTS with min/max and carries an "s.t." / "subject to"
+# marker is an inline full-model block — its head is the objective
+_LEAD_MINMAX = re.compile(r"^\s*\\?(?:min|max|minimize|maximize)\b")
+_ST_MARKER = re.compile(r"\bs\s*\.\s*t\s*\.|subject\W{0,20}to\b", re.IGNORECASE)
+
+
+def _is_objective(tree, ops, rel, latex: str = "") -> bool:
+    if latex:
+        s = _rewrite_ops(_collapse_words(latex))
+        if _LEAD_MINMAX.search(s) and _ST_MARKER.search(s):
+            return True
     if tree:
         return _has_obj_root(tree)
     return (not rel) and any(o[0] in ("min", "max") for o in ops)
@@ -925,7 +982,7 @@ def _payload(include: set[str] | None = None) -> dict:
                     ops,
                     rel,
                     tree or 0,
-                    1 if _is_objective(tree, ops, rel) else 0,
+                    1 if _is_objective(tree, ops, rel, f.latex) else 0,
                     disp if disp != f.latex else 0,
                 ]
             )
@@ -1860,6 +1917,7 @@ function paintRun(){
     </div>
     <div id="frows">${rows}</div>
     <div class="under"><button id="run-undo">↶ undo</button>
+      <span class="mut" style="align-self:center">swipe ⇄ to switch paper</span>
       <button id="run-skip">skip paper ›</button></div>`;
   drawPaperGraph(document.getElementById("pgraph"), p);
   for (const f of p.f){
@@ -1899,7 +1957,37 @@ function paintRun(){
   };
   document.getElementById("bk-fin").onclick=()=>finishPaper(p);
   document.getElementById("run-undo").onclick=()=>{ undo(); refreshRun(p); };
-  document.getElementById("run-skip").onclick=()=>{ runIdx=(runIdx+1)%RUSHP.length; paintRun(); };
+  document.getElementById("run-skip").onclick=()=>skipRun(1);
+  attachRunSwipe(slot);
+}
+/* swipe left/right anywhere on the run screen to skip to the next /
+   previous unreviewed paper — no need to scroll down to the skip button */
+function skipRun(dir){
+  for (let i=1;i<=RUSHP.length;i++){
+    const j=(runIdx+dir*i+RUSHP.length*i)%RUSHP.length;
+    const p=RUSHP[j];
+    if (paperProgress(p) < p.f.length){
+      runIdx=j; paintRun(); vibrate(12);
+      toast(dir>0?"paper skipped ›":"‹ previous paper");
+      return;
+    }
+  }
+  toast("no other open papers");
+}
+function attachRunSwipe(slot){
+  if (slot.dataset.swipe) return;          // attach once; survives repaints
+  slot.dataset.swipe="1";
+  let sx=0, sy=0, on=false;
+  slot.addEventListener("touchstart", e=>{
+    // don't hijack horizontally scrollable content or the graph
+    if (e.target.closest(".render,.tex,.minig-slot,.gwrap,a,button,textarea")) { on=false; return; }
+    sx=e.touches[0].clientX; sy=e.touches[0].clientY; on=true;
+  }, {passive:true});
+  slot.addEventListener("touchend", e=>{
+    if (!on) return; on=false;
+    const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+    if (Math.abs(dx)>70 && Math.abs(dx)>2*Math.abs(dy)) skipRun(dx<0?1:-1);
+  }, {passive:true});
 }
 function refreshRun(p){
   const d=S.dec[p.k]||{};
