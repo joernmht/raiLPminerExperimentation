@@ -266,9 +266,9 @@ def _rewrite_ops(s: str) -> str:
 # fix-textarea always show the untouched extraction.
 # --------------------------------------------------------------------------
 
-# binder group holding nothing but combining marks (e.g. U+0332 = the
-# publisher's way of writing an underlined symbol via <munder>)
-_UNDERSET_NOISE = re.compile(r"\\underset\s*\{([\s̀-ͯ]*)\}\s*(?=\{)")
+# binder group holding nothing but combining marks or a bare "_" (e.g.
+# U+0332 = the publisher's way of writing an underlined symbol via <munder>)
+_UNDERSET_NOISE = re.compile(r"\\underset\s*\{([\s_̀-ͯ]*)\}\s*(?=\{)")
 # \left / \right and whatever token follows them (if any)
 _LR_TOK = re.compile(r"\\(left|right)(?![a-zA-Z])\s*(\\[a-zA-Z]+|\\.|[^\s\\])?")
 # tokens MathJax accepts as \left/\right delimiters
@@ -301,17 +301,39 @@ def _repair_lr(m: re.Match) -> str:
     return "\\" + cmd + ". " + nxt
 
 
-# a bare accent command as the \overset decoration (e.g. \overset{\overline}{D}
-# = the publisher's D̄) — apply the accent to the base directly
-_OVERSET_ACCENT = re.compile(r"\\overset\s*\{\s*(\\(?:overline|bar|hat|tilde|dot|ddot|vec))\s*\}")
+# a bare accent command as the \overset/\underset decoration (e.g.
+# \overset{\overline}{D} = the publisher's D̄) — apply the accent directly
+_SET_ACCENT = re.compile(
+    r"\\(?:over|under)set\s*\{\s*(\\(?:overline|underline|bar|hat|tilde|dot|ddot|vec))\s*\}"
+)
+# a bare \underline with no argument group is the converter's rendering of a
+# literal underscore separator (e.g. "Arr_sta" → \mathtt{Arr} \underline \mathtt{sta})
+_BARE_UNDERLINE = re.compile(r"\\underline(?![a-zA-Z])(?!\s*\{)")
+# combining arrows (U+20D7/U+20D6) as \overset decoration crash MathJax
+_OVERSET_RARROW = re.compile(r"\\overset\s*\{\s*⃗\s*\}")
+_OVERSET_LARROW = re.compile(r"\\overset\s*\{\s*⃖\s*\}")
+# nested-msub conversion gives a second script of the same type on one base
+# ("u_{1}_{i,j,k}", "Θ^{'}_{p,f}^{'}") — detach it with an empty group
+_SCRIPT_ARG = r"(?:\{[^{}]*\}|\\[a-zA-Z]+|[^\s{}_^\\])"
+_DUP_SUB = re.compile(r"(_" + _SCRIPT_ARG + r"(?:\s*\^" + _SCRIPT_ARG + r")?)\s*_")
+_DUP_SUP = re.compile(r"(\^" + _SCRIPT_ARG + r"(?:\s*_" + _SCRIPT_ARG + r")?)\s*\^")
 
 
 def render_latex(s: str) -> str:
     """Minimal deterministic repairs so MathJax can display the formula."""
     s = _UNDERSET_NOISE.sub(
-        lambda m: r"\underline" if "̲" in m.group(1) else "", s
+        lambda m: r"\underline" if ("̲" in m.group(1) or "_" in m.group(1)) else "",
+        s,
     )
-    s = _OVERSET_ACCENT.sub(lambda m: m.group(1), s)
+    s = _SET_ACCENT.sub(lambda m: m.group(1), s)
+    s = _BARE_UNDERLINE.sub(r"\\_", s)
+    s = _OVERSET_RARROW.sub(r"\\vec", s)
+    s = _OVERSET_LARROW.sub(r"\\overleftarrow", s)
+    for _ in range(4):
+        s2 = _DUP_SUP.sub(r"\1{}^", _DUP_SUB.sub(r"\1{}_", s))
+        if s2 == s:
+            break
+        s = s2
     s = _LR_TOK.sub(_repair_lr, s)
     return s
 
