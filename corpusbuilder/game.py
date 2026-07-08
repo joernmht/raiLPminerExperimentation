@@ -301,11 +301,17 @@ def _repair_lr(m: re.Match) -> str:
     return "\\" + cmd + ". " + nxt
 
 
+# a bare accent command as the \overset decoration (e.g. \overset{\overline}{D}
+# = the publisher's D̄) — apply the accent to the base directly
+_OVERSET_ACCENT = re.compile(r"\\overset\s*\{\s*(\\(?:overline|bar|hat|tilde|dot|ddot|vec))\s*\}")
+
+
 def render_latex(s: str) -> str:
     """Minimal deterministic repairs so MathJax can display the formula."""
     s = _UNDERSET_NOISE.sub(
         lambda m: r"\underline" if "̲" in m.group(1) else "", s
     )
+    s = _OVERSET_ACCENT.sub(lambda m: m.group(1), s)
     s = _LR_TOK.sub(_repair_lr, s)
     return s
 
