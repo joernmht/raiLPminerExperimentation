@@ -234,9 +234,13 @@ _UNDERSET_OP = re.compile(
 _MATHOP = re.compile(r"\\mathop\s*\{\s*(\\[a-zA-Z]+|[a-zA-Z]+)\s*\}")
 _UNDERBRACE = re.compile(r"\\underbrace\s*" + _GRP)
 _OVERSET = re.compile(r"\\overset\s*" + _GRP + r"\s*" + _GRP)
+# "m i n Z_{1}" collapses to "minZ_{1}": split the glued min/max prefix off a
+# following capitalised symbol so it tokenizes as an operator, not one leaf
+_MINMAX_GLUED = re.compile(r"\b(min|max|minimize|maximize)(?=[A-Z])")
 
 
 def _rewrite_ops(s: str) -> str:
+    s = _MINMAX_GLUED.sub(r"\1 ", s)
     for _ in range(3):  # patterns may nest
         s2 = _UNDERSET_OP.sub(
             lambda m: (
@@ -253,6 +257,56 @@ def _rewrite_ops(s: str) -> str:
         if s2 == s:
             return s
         s = s2
+    return s
+
+
+# --------------------------------------------------------------------------
+# Display repair — publisher MathML→LaTeX artifacts that break MathJax.
+# Applied ONLY to the rendered copy; the stored/exported raw LaTeX and the
+# fix-textarea always show the untouched extraction.
+# --------------------------------------------------------------------------
+
+# binder group holding nothing but combining marks (e.g. U+0332 = the
+# publisher's way of writing an underlined symbol via <munder>)
+_UNDERSET_NOISE = re.compile(r"\\underset\s*\{([\s̀-ͯ]*)\}\s*(?=\{)")
+# \left / \right and whatever token follows them (if any)
+_LR_TOK = re.compile(r"\\(left|right)(?![a-zA-Z])\s*(\\[a-zA-Z]+|\\.|[^\s\\])?")
+# tokens MathJax accepts as \left/\right delimiters
+_DELIM_OK = re.compile(
+    r"[(){}\[\]|./<>]|\\[{}|.\\]|\\(?:"
+    r"[lr][Vv]ert|[Vv]ert|vert|l?angle|rangle|lceil|rceil|lfloor|rfloor|"
+    r"[lr]brace|[lr]brack|backslash|[lr]group|[lr]moustache|"
+    r"[Uu]parrow|[Dd]ownarrow|[Uu]pdownarrow|[Aa]rrowvert|bracevert)"
+)
+# Unicode delimiters the converter emits that MathJax rejects after \left/\right
+_UNI_DELIM = {
+    "⌈": "\\lceil ",
+    "⌉": "\\rceil ",
+    "⌊": "\\lfloor ",
+    "⌋": "\\rfloor ",
+    "‖": "\\Vert ",
+    "⟨": "\\langle ",
+    "⟩": "\\rangle ",
+}
+
+
+def _repair_lr(m: re.Match) -> str:
+    cmd, nxt = m.group(1), m.group(2) or ""
+    if nxt in _UNI_DELIM:
+        return "\\" + cmd + _UNI_DELIM[nxt]
+    if nxt and _DELIM_OK.fullmatch(nxt):
+        return m.group(0)
+    # delimiter lost in conversion (usually a truncated "\right.") — use the
+    # null delimiter and keep the token that followed
+    return "\\" + cmd + ". " + nxt
+
+
+def render_latex(s: str) -> str:
+    """Minimal deterministic repairs so MathJax can display the formula."""
+    s = _UNDERSET_NOISE.sub(
+        lambda m: r"\underline" if "̲" in m.group(1) else "", s
+    )
+    s = _LR_TOK.sub(_repair_lr, s)
     return s
 
 
@@ -584,6 +638,10 @@ def _tree_tokens(s: str) -> list[tuple[str, str]]:
                 toks.append(("decor", _DECOR[cmd]))
             elif cmd == "forall":
                 toks.append(("forall", "∀"))
+            elif cmd == "{":
+                toks.append(("lpar", "{"))
+            elif cmd == "}":
+                toks.append(("rpar", "}"))
             elif cmd in ("pm", "mp"):
                 toks.append(("pm", "-"))
             elif cmd in _WRAP_CMDS or cmd in _NOISE_CMDS:
@@ -696,19 +754,42 @@ def parse_tree(latex: str):
 # --------------------------------------------------------------------------
 
 
+def _pointwise(t) -> bool:
+    """min/max over an explicit comma-separated argument list — a pointwise
+    definition like ``T = min{a, b}``, not an optimization objective.
+    A binder (``max_i {...}``) means the op ranges over an index set, so a
+    comma list under it is still an optimization construct, not pointwise."""
+    kids = t[1:]
+    if any(isinstance(c, list) and c and c[0] == "@" for c in kids):
+        return False
+    return any(isinstance(c, list) and c and c[0] == ";" for c in kids)
+
+
+def _opt_minmax(c) -> bool:
+    return isinstance(c, list) and c and c[0] in ("min", "max") and not _pointwise(c)
+
+
 def _has_obj_root(t) -> bool:
     """Objective heuristic on the expression tree: min/max at the root,
     in a top-level segment, or directly under the root relation
-    (covers ``min Z = ...`` / ``Z = min ...``)."""
+    (covers ``min Z = ...`` / ``Z = min ...``). NOT an objective when the
+    formula is ∀-quantified (a per-index definition/constraint) or the
+    min/max is pointwise over an argument list (``min{a, b}``)."""
     if not isinstance(t, list) or not t:
         return False
     op = t[0]
     if op in ("min", "max"):
-        return True
+        return not _pointwise(t)
     if op == ";":
-        return any(_has_obj_root(c) for c in t[1:])
+        segs = [c for c in t[1:] if not (isinstance(c, list) and c and c[0] == "∀")]
+        if len(segs) < len(t) - 1:
+            # ∀-quantified: a definition/constraint — unless a segment is a
+            # bare min/max statement (e.g. the min-max objective
+            # ``min(max_i ...) ∀i``); ``X = min{...} ∀i`` stays a definition
+            return any(_opt_minmax(c) for c in segs)
+        return any(_has_obj_root(c) for c in segs)
     if isinstance(op, str) and op[:1] in "=≤≥<>≠∈⊆":
-        return any(isinstance(c, list) and c and c[0] in ("min", "max") for c in t[1:])
+        return any(_opt_minmax(c) for c in t[1:])
     return False
 
 
@@ -804,6 +885,7 @@ def _payload(include: set[str] | None = None) -> dict:
         for f in d.formulas:
             syms, ops, rel = extract_symbols(f.latex)
             tree = parse_tree(f.latex)
+            disp = render_latex(f.latex)
             fs.append(
                 [
                     f.id,
@@ -816,6 +898,7 @@ def _payload(include: set[str] | None = None) -> dict:
                     rel,
                     tree or 0,
                     1 if _is_objective(tree, ops, rel) else 0,
+                    disp if disp != f.latex else 0,
                 ]
             )
         papers.append(
@@ -939,7 +1022,12 @@ button:active{transform:scale(.97)}
 .gnode-f.sr{fill:var(--bad);stroke:var(--bad)}
 .gnode-f.hl{stroke:var(--accent2);stroke-width:3}
 .gnode-s{fill:var(--accent);opacity:.92}
-.gnode-s.dim{opacity:.25}
+.gnode-s.dim,.gnode-f.dim{opacity:.25}
+.gnode-s.hl{stroke:var(--accent2);stroke-width:3}
+.gnode-s.sel,.gnode-f.sel{stroke:var(--accent2);stroke-width:3.5}
+.gsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12.5px;color:var(--muted)}
+.gsel .chip{cursor:pointer}
+.gsel .chip.sel{border-color:var(--accent2);color:var(--accent2);font-weight:800}
 .gnode-b{fill:var(--tier3)}
 .gbind{stroke:var(--tier3);stroke-dasharray:3 3;opacity:.8}
 .gedge{stroke:var(--line);stroke-width:1}
@@ -1460,23 +1548,54 @@ function drawPaperGraph(host, p){
     }
   });
   host.innerHTML=""; host.appendChild(svg);
-  let hlSym=null;
+  /* unified tap-to-trace: works for objectives, formulas and symbols alike.
+     Selected node + its connections highlight; a chip strip lists the
+     abbreviated names — selected entity first, then its neighbours. */
+  const strip=document.createElement("div");
+  strip.className="gsel"; host.appendChild(strip);
+  const nbrsOf=i=>{ const s=new Set();
+    g.edges.forEach(([a,b])=>{ if(a===i) s.add(b); if(b===i) s.add(a); });
+    return s; };
+  const nodeName=i=>{ const nd=g.nodes[i];
+    return nd.t==="s" ? nd.name : (p.f[nd.fi][1]||p.f[nd.fi][0]); };
+  let sel=null;
+  function paintSel(){
+    const nbrs = sel===null ? new Set() : nbrsOf(sel);
+    svg.querySelectorAll(".gedge").forEach(l=>{
+      const a=+l.getAttribute("data-s"), b=+l.getAttribute("data-f");
+      l.classList.toggle("hl", sel!==null && (a===sel||b===sel));
+    });
+    svg.querySelectorAll("[data-node]").forEach(c=>{
+      const i=+c.getAttribute("data-node");
+      c.classList.toggle("sel", i===sel);
+      c.classList.toggle("hl", nbrs.has(i));
+      c.classList.toggle("dim", sel!==null && i!==sel && !nbrs.has(i));
+    });
+    if (sel===null){ strip.innerHTML=""; return; }
+    const ids=[sel, ...[...nbrs].sort((a,b)=>a-b)];
+    strip.innerHTML = ids.map((i,k)=>{
+      const nd=g.nodes[i];
+      const obj = nd.t==="f" && isObjective(p.f[nd.fi]);
+      return `<span class="chip${k===0?" sel":""}" data-node="${i}"`+
+        (nd.t==="f" ? ` data-fid="${nd.id}"` : "")+
+        `>${obj?"🎯 ":""}${escapeHtml(String(nodeName(i)))}</span>`;
+    }).join("");
+  }
+  function select(i){ sel = (sel===i) ? null : i; paintSel(); }
   svg.addEventListener("click", e=>{
-    const fEl=e.target.closest(".gnode-f");
-    if (fEl){ const row=document.getElementById("fr-"+fEl.dataset.fid);
+    const nEl=e.target.closest("[data-node]");
+    if (nEl) select(+nEl.getAttribute("data-node"));
+  });
+  strip.addEventListener("click", e=>{
+    const c=e.target.closest(".chip"); if (!c) return;
+    const i=+c.getAttribute("data-node");
+    const fid=c.getAttribute("data-fid");
+    if (fid){                       // formula chip → open its review row
+      const row=document.getElementById("fr-"+fid);
       if (row){ row.scrollIntoView({behavior:"smooth",block:"center"});
         row.classList.add("flash"); setTimeout(()=>row.classList.remove("flash"),1200); }
-      return; }
-    const sEl=e.target.closest(".gnode-s");
-    if (!sEl) return;
-    const si=sEl.getAttribute("data-node");
-    hlSym = (hlSym===si) ? null : si;
-    svg.querySelectorAll(".gedge").forEach(l=>l.classList.toggle("hl", hlSym!==null && l.getAttribute("data-s")===hlSym));
-    const linked=new Set();
-    if (hlSym!==null) g.edges.forEach(([a,b])=>{ if(String(a)===hlSym) linked.add(b); });
-    svg.querySelectorAll(".gnode-f").forEach(c=>c.classList.toggle("hl", linked.has(+c.getAttribute("data-node"))));
-    svg.querySelectorAll(".gnode-s").forEach(c=>c.classList.toggle("dim", hlSym!==null && c.getAttribute("data-node")!==hlSym));
-    toast(hlSym!==null ? "symbol "+sEl.getAttribute("data-sym")+" — in "+linked.size+" formulas" : "highlight off");
+      if (i!==sel) select(i);
+    } else if (i!==sel) select(i);  // symbol chip → trace that symbol
   });
   return svg;
 }
@@ -1704,7 +1823,7 @@ function paintRun(){
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
       ${chkChips(p)}
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap a symbol to trace it, tap a formula dot to jump to its row</div>
+      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace its connections; the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
@@ -1716,7 +1835,7 @@ function paintRun(){
       <button id="run-skip">skip paper ›</button></div>`;
   drawPaperGraph(document.getElementById("pgraph"), p);
   for (const f of p.f){
-    lazyMath(slot.querySelector("#fr-"+f[0]+" .render"), f[2]);
+    lazyMath(slot.querySelector("#fr-"+f[0]+" .render"), f[10]||f[2]);
   }
   refreshRun(p);
   document.getElementById("frows").addEventListener("click", e=>{
@@ -1852,7 +1971,7 @@ function mountCard(slot, p, f, onAct){
   slot.innerHTML = cardHTML(p,f);
   const card = slot.querySelector(".fcard");
   card.querySelector(".tex").textContent = f[2];
-  renderMath(card.querySelector(".fr"), f[2]);
+  renderMath(card.querySelector(".fr"), f[10]||f[2]);
   card.addEventListener("click", e=>{
     const b = e.target.closest("[data-act]"); if (b) onAct(b.dataset.act, e);
   });
