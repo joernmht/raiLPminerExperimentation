@@ -812,9 +812,7 @@ def _vector_minmax(t) -> bool:
         return False
     for c in t[1:]:
         if isinstance(c, list) and c and c[0] == ";":
-            return bool(c[1:]) and all(
-                isinstance(x, str) and not x[:1].isdigit() for x in c[1:]
-            )
+            return bool(c[1:]) and all(isinstance(x, str) and not x[:1].isdigit() for x in c[1:])
     return False
 
 
@@ -833,8 +831,10 @@ _IDX_LETTERS = re.compile(r"[_^][^_^]*[a-zA-Z]")
 
 
 def _indexed(x) -> bool:
-    s = x if isinstance(x, str) else (
-        x[0] if (isinstance(x, list) and x and isinstance(x[0], str)) else ""
+    s = (
+        x
+        if isinstance(x, str)
+        else (x[0] if (isinstance(x, list) and x and isinstance(x[0], str)) else "")
     )
     return bool(_IDX_LETTERS.search(s))
 
