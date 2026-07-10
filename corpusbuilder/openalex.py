@@ -17,21 +17,41 @@ import re
 import requests
 
 from corpusbuilder import config
+from corpusbuilder._http import (
+    DEFAULT_POLICY,
+    AcquisitionError,
+    RetryPolicy,
+    is_transient_status,
+    request_with_retry,
+)
 from corpusbuilder.dossier import CitationRef, Dossier, SourceInfo
 
 _BASE = "https://api.openalex.org"
 _ARXIV_RE = re.compile(r"arxiv\.org/(?:abs|pdf)/([0-9]{4}\.[0-9]{4,5}|[a-z\-]+/[0-9]{7})", re.I)
 
 
-class OpenAlexError(RuntimeError):
+class OpenAlexError(AcquisitionError):
     pass
+
+
+class OpenAlexNotFound(OpenAlexError):
+    """The work is genuinely not indexed (HTTP 404) — never a transient fault."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(message, status=404, transient=False)
 
 
 class OpenAlexClient:
     """Thin OpenAlex REST client (read-only)."""
 
-    def __init__(self, mailto: str | None = None, timeout: float = 30.0) -> None:
+    def __init__(
+        self,
+        mailto: str | None = None,
+        timeout: float = 30.0,
+        retry: RetryPolicy = DEFAULT_POLICY,
+    ) -> None:
         self.timeout = timeout
+        self.retry = retry
         # OpenAlex "polite pool": identify yourself for stabler rate limits.
         self.mailto = mailto or config.openalex_mailto()
         self._s = requests.Session()
@@ -41,10 +61,31 @@ class OpenAlexClient:
     def _get(self, path: str, params: dict | None = None) -> dict:
         params = dict(params or {})
         params.setdefault("mailto", self.mailto)
-        r = self._s.get(f"{_BASE}/{path.lstrip('/')}", params=params, timeout=self.timeout)
+        url = f"{_BASE}/{path.lstrip('/')}"
+        try:
+            r = request_with_retry(
+                lambda: self._s.get(url, params=params, timeout=self.timeout),
+                policy=self.retry,
+                describe=f"OpenAlex GET {path}",
+            )
+        except requests.RequestException as e:  # transport blip that outlived the retries
+            raise OpenAlexError(f"OpenAlex request failed for {url}: {e}", transient=True) from e
+        if r.status_code == 404:
+            raise OpenAlexNotFound(f"OpenAlex 404 for {r.url}")
         if r.status_code != 200:
-            raise OpenAlexError(f"OpenAlex {r.status_code} for {r.url}: {r.text[:200]}")
-        return r.json()
+            raise OpenAlexError(
+                f"OpenAlex {r.status_code} for {r.url}: {r.text[:200]}",
+                status=r.status_code,
+                transient=is_transient_status(r.status_code),
+            )
+        try:
+            return r.json()
+        except ValueError as e:  # truncated body / HTML error page from a proxy
+            raise OpenAlexError(
+                f"OpenAlex returned non-JSON for {r.url}: {e}",
+                status=r.status_code,
+                transient=True,
+            ) from e
 
     # -- raw work lookup ----------------------------------------------------
 
@@ -65,8 +106,11 @@ class OpenAlexClient:
             # arXiv mints a DataCite DOI (10.48550/arXiv.<id>); that is the reliable key.
             try:
                 return self._get(f"works/doi:10.48550/arXiv.{arxiv_id}")
-            except OpenAlexError:
-                pass
+            except OpenAlexNotFound:
+                pass  # not indexed under the DataCite DOI -> fall back to search
+            # NB: only a 404 may fall through. A 429/5xx must propagate: treating an
+            # overload as "not found" would run the fuzzy search below and can bind a
+            # *different* paper to this arXiv id, silently corrupting the corpus.
             # Fallback: search, but only accept a hit that actually has an arXiv location.
             hits = self._get("works", {"search": arxiv_id, "per-page": 5})
             for w in hits.get("results", []):

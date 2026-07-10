@@ -20,6 +20,13 @@ import requests
 from lxml import etree
 
 from corpusbuilder import config
+from corpusbuilder._http import (
+    DEFAULT_POLICY,
+    AcquisitionError,
+    RetryPolicy,
+    is_transient_status,
+    request_with_retry,
+)
 from corpusbuilder.dossier import ExtractionMethod, FormulaRecord, VerificationStatus
 from corpusbuilder.mathml import mathml_to_latex
 
@@ -52,7 +59,7 @@ def is_elsevier_doi(doi: str | None) -> bool:
     return bool(doi) and doi.startswith(_ELSEVIER_PREFIXES)
 
 
-class ElsevierError(RuntimeError):
+class ElsevierError(AcquisitionError):
     pass
 
 
@@ -65,11 +72,13 @@ class ElsevierClient:
         insttoken: str | None = None,
         proxy: str | None = None,
         timeout: float = 90.0,
+        retry: RetryPolicy = DEFAULT_POLICY,
     ) -> None:
         self.api_key = api_key or config.require("ELSEVIER_API_KEY")
         self.insttoken = insttoken if insttoken is not None else config.elsevier_insttoken()
         self.proxies = {"http": proxy, "https": proxy} if proxy else config.proxies()
         self.timeout = timeout
+        self.retry = retry
         self._s = requests.Session()
         headers = {"X-ELS-APIKey": self.api_key, "User-Agent": "raiLPminer-corpusbuilder/1"}
         if self.insttoken:
@@ -77,20 +86,37 @@ class ElsevierClient:
         self._s.headers.update(headers)
 
     def _get(self, path: str, accept: str, params: dict | None = None) -> requests.Response:
-        return self._s.get(
-            f"{_BASE}/{path}",
-            params=params,
-            headers={"Accept": accept},
-            proxies=self.proxies,
-            timeout=self.timeout,
-        )
+        """GET with retries. Transport failures surface as a transient ``ElsevierError``.
+
+        Wrapping ``requests`` exceptions matters here: a dropped SOCKS tunnel
+        (ADR-0003) raises ``requests.ProxyError``, which derives from ``OSError``
+        — *not* ``RuntimeError`` — and so slipped past callers' handlers.
+        """
+        try:
+            return request_with_retry(
+                lambda: self._s.get(
+                    f"{_BASE}/{path}",
+                    params=params,
+                    headers={"Accept": accept},
+                    proxies=self.proxies,
+                    timeout=self.timeout,
+                ),
+                policy=self.retry,
+                describe=f"Elsevier GET {path}",
+            )
+        except requests.RequestException as e:
+            raise ElsevierError(f"Elsevier request failed for {path}: {e}", transient=True) from e
 
     # -- full text ----------------------------------------------------------
 
     def full_text_xml(self, doi: str) -> str:
         r = self._get(f"article/doi/{doi}", "text/xml")
         if r.status_code != 200:
-            raise ElsevierError(f"Elsevier HTTP {r.status_code} for {doi}: {r.text[:200]}")
+            raise ElsevierError(
+                f"Elsevier HTTP {r.status_code} for {doi}: {r.text[:200]}",
+                status=r.status_code,
+                transient=is_transient_status(r.status_code),
+            )
         return r.text
 
     @staticmethod
@@ -133,14 +159,30 @@ class ElsevierClient:
     # -- Scopus -------------------------------------------------------------
 
     def scopus_cited_by_count(self, doi: str) -> int | None:
-        """Authoritative Scopus citation count for a DOI (None if not indexed)."""
+        """Authoritative Scopus citation count for a DOI.
+
+        Returns ``None`` **only** when Scopus answers and the DOI is genuinely not
+        indexed. Any other non-200 raises: silently returning ``None`` on a 429 or
+        an auth failure would record "not in Scopus" as a fact in the dossier,
+        which is exactly the coverage dishonesty CLAUDE.md forbids.
+        """
         r = self._get(
             "search/scopus",
             "application/json",
             params={"query": f"DOI({doi})", "field": "citedby-count"},
         )
+        if r.status_code == 404:
+            return None  # Scopus answered: the DOI is not indexed
         if r.status_code != 200:
-            return None
-        entries = r.json().get("search-results", {}).get("entry", [{}])
+            raise ElsevierError(
+                f"Scopus HTTP {r.status_code} for {doi}: {r.text[:200]}",
+                status=r.status_code,
+                transient=is_transient_status(r.status_code),
+            )
+        try:
+            payload = r.json()
+        except ValueError as e:
+            raise ElsevierError(f"Scopus returned non-JSON for {doi}: {e}", transient=True) from e
+        entries = payload.get("search-results", {}).get("entry", [{}])
         count = entries[0].get("citedby-count") if entries else None
         return int(count) if count is not None and str(count).isdigit() else None

@@ -17,13 +17,43 @@ import hashlib
 import sys
 from pathlib import Path
 
+from lxml.etree import LxmlError
+
 from corpusbuilder import config
+from corpusbuilder._http import is_transient_exception
 from corpusbuilder.arxiv import extract_equations, fetch_source
 from corpusbuilder.dossier import Dossier, SourceInfo
 from corpusbuilder.elsevier import ElsevierClient, ElsevierError, is_elsevier_doi
 from corpusbuilder.openalex import OpenAlexClient
 
 _DEFAULT_OUT = Path("corpus/dossiers")
+
+#: ``cmd_dossier`` exit code for "the network broke, nothing was written, re-run".
+#: Distinct from 1 so a driver script can retry on 2 but escalate on 1.
+EXIT_TRANSIENT = 2
+
+#: Everything a tier can throw. ``requests`` errors derive from ``OSError``, not
+#: ``RuntimeError``, so a bare ``except RuntimeError`` silently misses a dropped
+#: SOCKS tunnel (``requests.ProxyError``); ``LxmlError`` covers truncated XML.
+_TIER_ERRORS = (RuntimeError, OSError, LxmlError)
+
+
+def _abort_transient(stage: str, exc: BaseException) -> int:
+    """Refuse to persist a dossier whose formula extraction failed transiently.
+
+    A transient fault is *not* coverage information. ``prisma.py`` turns an empty
+    ``formulas`` list into a permanent exclusion reason (``not_entitled`` /
+    ``no_machine_readable_formulas`` / ``awaiting_tier3_pdf``), so writing this
+    dossier would launder a network blip into the paper's PRISMA flow diagram.
+    Write nothing; tell the operator to re-run. See ADR-0006.
+    """
+    print(f"ERROR: {stage} failed transiently after retries ({exc}).", file=sys.stderr)
+    print(
+        "Refusing to record a tier downgrade caused by a network fault — no dossier "
+        "written. Re-run once the upstream/tunnel recovers.",
+        file=sys.stderr,
+    )
+    return EXIT_TRANSIENT
 
 
 def _today() -> str:
@@ -55,12 +85,18 @@ def cmd_seeds(args: argparse.Namespace) -> int:
 
 def cmd_dossier(args: argparse.Namespace) -> int:
     client = OpenAlexClient()
-    dossier = client.build_dossier(
-        args.identifier,
-        retrieved=_today(),
-        ref_limit=args.ref_limit,
-        cite_limit=args.cite_limit,
-    )
+    try:
+        dossier = client.build_dossier(
+            args.identifier,
+            retrieved=_today(),
+            ref_limit=args.ref_limit,
+            cite_limit=args.cite_limit,
+        )
+    except _TIER_ERRORS as e:
+        if is_transient_exception(e):
+            return _abort_transient(f"OpenAlex lookup for {args.identifier}", e)
+        print(f"ERROR: OpenAlex lookup for {args.identifier} failed ({e})", file=sys.stderr)
+        return 1
     arxiv_id = args.arxiv or dossier.source.arxiv_id
     doi = dossier.source.doi
 
@@ -75,8 +111,11 @@ def cmd_dossier(args: argparse.Namespace) -> int:
             dossier.source.entitlement = "open-access"
             dossier.source.api = "openalex+arxiv"
             print(f"extracted {len(dossier.formulas)} formula(s) from arXiv:{arxiv_id} (Tier-1)")
-        except Exception as e:  # report, never silently drop (honesty rule)
-            print(f"WARNING: arXiv source extraction failed ({e}); trying other tiers")
+        except _TIER_ERRORS as e:  # report, never silently drop (honesty rule)
+            if is_transient_exception(e):
+                return _abort_transient(f"arXiv Tier-1 extraction for {arxiv_id}", e)
+            # Permanent (e.g. PDF-only e-print): a real fact about the paper.
+            print(f"WARNING: arXiv source unavailable ({e}); trying other tiers")
 
     # Tier 2 — Elsevier ScienceDirect full-text MathML (needs entitlement).
     if not dossier.formulas and not args.no_formulas and is_elsevier_doi(doi):
@@ -101,18 +140,26 @@ def cmd_dossier(args: argparse.Namespace) -> int:
                     "Elsevier returned METADATA ONLY (not entitled): set ELSEVIER_INSTTOKEN or "
                     "ELSEVIER_PROXY (campus tunnel) for full text. Dossier has citations only."
                 )
-        except (ElsevierError, RuntimeError) as e:
+        except _TIER_ERRORS as e:
+            if is_transient_exception(e):
+                return _abort_transient(f"Elsevier Tier-2 extraction for {doi}", e)
+            # Malformed publisher XML survives the HTTP retries, so it is a content
+            # problem, not a blip: record it as a permanent Tier-2 miss (ADR-0006).
             print(f"WARNING: Elsevier extraction failed ({e}); dossier has citations only")
 
     # Scopus cited-by cross-check (works without full-text entitlement).
+    # Not coverage information — a failure here never blocks the dossier, it just
+    # leaves scopus_cited_by_count unset rather than asserting "not indexed".
     if not args.no_scopus and is_elsevier_doi(doi) and config.elsevier_api_key():
         try:
             count = ElsevierClient(proxy=args.proxy).scopus_cited_by_count(doi)
             dossier.source.scopus_cited_by_count = count
             if count is not None:
                 print(f"Scopus cited-by: {count} (OpenAlex: {dossier.source.cited_by_count})")
-        except (ElsevierError, RuntimeError) as e:
-            print(f"WARNING: Scopus cross-check failed ({e})")
+            else:
+                print("Scopus: DOI not indexed (authoritative answer)")
+        except (ElsevierError, *_TIER_ERRORS) as e:
+            print(f"WARNING: Scopus cross-check unavailable ({e}); count left unset")
 
     json_path, md_path = dossier.save(args.out)
     print(f"wrote {json_path}\nwrote {md_path}")
