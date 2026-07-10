@@ -6,7 +6,7 @@ mining pipeline) and **`corpusbuilder/`** (corpus acquisition: OpenAlex / arXiv 
 Elsevier ingest → per-paper dossiers → PRISMA tally). The *method* lives in
 `lp2graph`; this repo is corpus management + orchestration + artifact generation.
 
-_Last verified: 2026-07-04 (nightly quality pass — Security)._
+_Last verified: 2026-07-10 (nightly quality pass — Reliability)._
 
 ## Languages & runtime
 
@@ -34,7 +34,7 @@ _Last verified: 2026-07-04 (nightly quality pass — Security)._
   `os.environ` if absent; see `corpusbuilder/config.py`).
 - `lxml>=5.0` — Elsevier full-text XML parsing (`corpusbuilder/elsevier.py`).
 - `PySocks>=1.7` — SOCKS routing through an SSH tunnel for entitled Elsevier
-  full text from a campus IP (ADR-0002).
+  full text from a campus IP (ADR-0003).
 
 ### `notebooks` extra
 - `pandas`, `matplotlib`, `plotly`, `jupyter` — analysis notebooks only.
@@ -59,16 +59,17 @@ the only deferred work is network I/O (clients) and the Node subprocess (mathml)
   never dropped.
 - `cli.py` — `python -m railpminer {run|corpus|cluster|label|validate|taxonomy}`.
 
-### `corpusbuilder/` — corpus acquisition (1.7k LOC, the active 2026-06 work)
+### `corpusbuilder/` — corpus acquisition (1.9k LOC, the active 2026-06/07 work)
 Clean DAG, no import cycles. `dossier.py` (Pydantic models) is the leaf data
-contract; `config.py` is dependency-light credential loading. Acquisition
-clients (`arxiv`, `openalex`, `elsevier` + `mathml`) sit above; `cli.py`
-orchestrates. One-off drivers (`_discover`, `prisma`, `snowball`, `review_view`)
-read `corpus/*.json` and emit artifacts. Extraction is a **tiered ladder**
-(ADR-0003): Tier-1 arXiv `.tex` → Tier-2 Elsevier MathML → Tier-3 OCR (future).
-A clear **determinism boundary** (ADR-0001) separates acquisition (records a
-real retrieval date, network) from the forward pipeline (frozen files, no
-`Date.now`).
+contract; `config.py` is dependency-light credential loading; `_http.py` is the
+shared transient-fault layer (retry/backoff + `AcquisitionError`) that every
+client GET goes through. Acquisition clients (`arxiv`, `openalex`, `elsevier` +
+`mathml`) sit above; `cli.py` orchestrates. One-off drivers (`_discover`,
+`prisma`, `snowball`, `review_view`) read `corpus/*.json` and emit artifacts.
+Extraction is a **tiered ladder** (ADR-0002): Tier-1 arXiv `.tex` → Tier-2
+Elsevier MathML → Tier-3 OCR (future). A clear **determinism boundary**
+(ADR-0001) separates acquisition (records a real retrieval date, network) from
+the forward pipeline (frozen files, no `Date.now`).
 
 ## Entry points
 
@@ -79,13 +80,18 @@ real retrieval date, network) from the forward pipeline (frozen files, no
 | `python -m corpusbuilder seeds --query …` | list well-cited candidate papers |
 | `python -m corpusbuilder dossier <id> [--arxiv …]` | build a per-paper dossier |
 | `python -m corpusbuilder fetch-arxiv <id>` | extract equations from arXiv source |
+| `python -m corpusbuilder._discover <date> [--resume]` | seed sweep → `corpus/candidates.json` |
 | console scripts | `railpminer`, `corpusbuilder` (via `[project.scripts]`) |
+
+**Exit codes** (`corpusbuilder dossier`, `_discover`): `0` success · `1` permanent
+error · **`2` transient — nothing written, safe to re-run** (ADR-0006). Batch
+drivers should retry on 2 and escalate on 1.
 
 ## Build / test / lint commands
 
 | Task | Command |
 |---|---|
-| Tests | `PYTHONPATH=../lp2graph/src python3 -m pytest` (27 tests; offline) |
+| Tests | `PYTHONPATH=../lp2graph/src python3 -m pytest` (68 tests; offline, no sleeps) |
 | Lint | `ruff check .` |
 | Format | `ruff format --check .` (apply: `ruff format .`) |
 | Types | `mypy railpminer corpusbuilder` (**not** `--strict` yet — relaxing |
@@ -135,5 +141,34 @@ PyPI per the workflow. *(Added 2026-06-22; previously no CI.)*
   path (`article/doi/{doi}`) without validation — low risk (DOI comes from
   OpenAlex, target is a fixed host) but a malformed DOI could reshape the path;
   consider a DOI-shape guard. HTTP clients rely on `requests`' default TLS
-  verification (good) but set no explicit `verify=`/retry policy.
+  verification (good) and set no explicit `verify=`.
+
+## Reliability posture (acquisition boundary)
+
+Hardened in the 2026-07-10 reliability pass (**ADR-0006**). One rule: *a transient
+fault is not coverage information* — retry it, and if it survives the retries,
+refuse to write the corpus record it would have produced.
+
+- **Shared retry layer** (`_http.py`): every client GET goes through
+  `request_with_retry` — jittered exponential backoff, capped, honouring an
+  upstream `Retry-After` (delta-seconds *and* HTTP-date). Retries
+  `{408, 425, 429, 500, 502, 503, 504}` plus transport blips
+  (`ConnectionError`/`ProxyError`, `Timeout`, `ChunkedEncodingError`). 4xx client
+  errors are never retried — a 404 is an answer.
+- **Fault classification**: `AcquisitionError` (base of `OpenAlexError`,
+  `ElsevierError`, `ArxivError`) carries `status` + a `transient` flag.
+  `is_transient_exception()` is the single decision point for the tier ladder.
+- **Refusal to record**: `cmd_dossier` exits **2** and writes nothing on a
+  transient tier failure (a rate-limited arXiv must not demote a Tier-1 paper).
+  `_discover` checkpoints per query and only writes `candidates.json` when *all*
+  queries succeeded, because `prisma.py` derives `database_queries` /
+  `database_search_records` from it. Permanent failures (PDF-only e-print, 403
+  not-entitled) still degrade and record — those are facts about the paper.
+- **Determinism unaffected**: `_http` sits wholly on the acquisition side of
+  ADR-0001's boundary; `railpminer/` gains no clock and no RNG. `sleep`/`rng`/
+  `now` are injectable, so all 41 reliability tests run offline and instantly.
+- **Watch:** no client-side pacing for OpenAlex's ~10 req/s polite pool (retries
+  absorb 429s reactively). `SourceInfo` cannot distinguish "Scopus: not indexed"
+  from "Scopus lookup failed" — both serialize as `null`; fixing needs a
+  `dossier-2` schema bump.
 </invoke>

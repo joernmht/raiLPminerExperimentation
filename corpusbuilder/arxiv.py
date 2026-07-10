@@ -21,6 +21,13 @@ from pathlib import Path
 
 import requests
 
+from corpusbuilder._http import (
+    DEFAULT_POLICY,
+    AcquisitionError,
+    RetryPolicy,
+    is_transient_status,
+    request_with_retry,
+)
 from corpusbuilder.dossier import ExtractionMethod, FormulaRecord
 
 _EPRINT = "https://arxiv.org/e-print/{id}"
@@ -37,6 +44,16 @@ _LABEL_RE = re.compile(r"\\label\{([^}]*)\}")
 _COMMENT_RE = re.compile(r"(?<!\\)%.*?$", re.MULTILINE)
 
 
+class ArxivError(AcquisitionError):
+    """An arXiv e-print could not be fetched or unpacked.
+
+    ``transient=True`` means "retry later" (arXiv sheds load with 503 +
+    ``Retry-After``, and a truncated tarball is a download artefact).
+    ``transient=False`` is a fact about the paper — e.g. it is PDF-only, which
+    permanently rules out Tier-1 and legitimately drops it down the ladder.
+    """
+
+
 def normalize_arxiv_id(s: str) -> str:
     """Strip a URL/prefix down to a bare arXiv id (e.g. ``2103.04618``)."""
     s = s.strip()
@@ -45,29 +62,54 @@ def normalize_arxiv_id(s: str) -> str:
     return m.group(1) if m else s
 
 
-def fetch_source(arxiv_id: str, dest_dir: str | Path, timeout: float = 60.0) -> tuple[Path, str]:
+def fetch_source(
+    arxiv_id: str,
+    dest_dir: str | Path,
+    timeout: float = 60.0,
+    retry: RetryPolicy = DEFAULT_POLICY,
+) -> tuple[Path, str]:
     """Download and unpack an arXiv e-print into ``dest_dir/<id>/``.
 
-    Returns ``(extracted_dir, sha256_of_tarball)``. Raises if the e-print is
-    PDF-only (no LaTeX source — fall back to a later extraction tier).
+    Returns ``(extracted_dir, sha256_of_tarball)``. Raises :class:`ArxivError`;
+    check ``.transient`` to tell "arXiv is rate-limiting us" (retry later) from
+    "this e-print is PDF-only" (a permanent fact — fall to a later tier).
     """
     arxiv_id = normalize_arxiv_id(arxiv_id)
-    r = requests.get(_EPRINT.format(id=arxiv_id), headers={"User-Agent": _UA}, timeout=timeout)
+    url = _EPRINT.format(id=arxiv_id)
+    try:
+        r = request_with_retry(
+            lambda: requests.get(url, headers={"User-Agent": _UA}, timeout=timeout),
+            policy=retry,
+            describe=f"arXiv e-print {arxiv_id}",
+        )
+    except requests.RequestException as e:
+        raise ArxivError(f"arXiv e-print {arxiv_id}: {e}", transient=True) from e
     if r.status_code != 200:
-        raise RuntimeError(f"arXiv e-print {arxiv_id}: HTTP {r.status_code}")
+        # arXiv sheds load with 503 + Retry-After; that is transient, a 404 is not.
+        raise ArxivError(
+            f"arXiv e-print {arxiv_id}: HTTP {r.status_code}",
+            status=r.status_code,
+            transient=is_transient_status(r.status_code),
+        )
     raw = r.content
     sha = hashlib.sha256(raw).hexdigest()
     out = Path(dest_dir) / arxiv_id.replace("/", "_")
     out.mkdir(parents=True, exist_ok=True)
 
     if raw[:4] == b"%PDF":
-        raise RuntimeError(f"arXiv {arxiv_id} is PDF-only (no LaTeX source)")
+        raise ArxivError(f"arXiv {arxiv_id} is PDF-only (no LaTeX source)", transient=False)
     try:
         with tarfile.open(fileobj=io.BytesIO(raw), mode="r:*") as tar:
             _safe_extract(tar, out)
     except tarfile.ReadError:
         # A single gzipped .tex file rather than a tarball.
-        text = gzip.decompress(raw)
+        try:
+            text = gzip.decompress(raw)
+        except (gzip.BadGzipFile, EOFError, OSError) as e:
+            # Neither a tarball nor valid gzip: almost always a truncated body.
+            raise ArxivError(
+                f"arXiv {arxiv_id}: corrupt or truncated e-print archive ({e})", transient=True
+            ) from e
         (out / "main.tex").write_bytes(text)
     return out, sha
 
