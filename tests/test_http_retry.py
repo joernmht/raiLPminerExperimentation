@@ -318,9 +318,18 @@ def _dossier(*, arxiv_id: str | None = None) -> Dossier:
 
 @pytest.fixture
 def _no_openalex(monkeypatch):
-    """Stub OpenAlex so the ladder tests exercise only Tier-1/Tier-2."""
+    """Stub OpenAlex so the ladder tests exercise only Tier-1/Tier-2.
+
+    Also pins a dummy ``ELSEVIER_API_KEY``. The machine's real credentials are part
+    of the outside world these tests isolate themselves from: without this, whether
+    Tier-2 even reaches the mocked ``full_text_xml`` depends on a gitignored ``.env``,
+    so the suite passed on Joern's box and failed in CI (no secret) — which is how
+    the ADR-0007 config-fault hole surfaced. Tests that *want* the key absent must
+    ``monkeypatch.delenv`` it themselves.
+    """
 
     def _install(dossier: Dossier):
+        monkeypatch.setenv("ELSEVIER_API_KEY", "test-key-not-a-real-credential")
         monkeypatch.setattr(cli.OpenAlexClient, "__init__", lambda self: None)
         monkeypatch.setattr(cli.OpenAlexClient, "build_dossier", lambda self, *a, **k: dossier)
 
@@ -407,6 +416,29 @@ def test_tier1_success_keeps_arxiv_provenance(tmp_path, _no_openalex) -> None:
     assert written.source.api == "openalex+arxiv"
     assert written.source.entitlement == "open-access"
     assert written.source.file_sha256 == "abc123"
+
+
+def test_missing_credential_aborts_instead_of_recording_a_tier_miss(
+    tmp_path, _no_openalex, monkeypatch
+) -> None:
+    """ADR-0007: an unset key is a fact about this machine, not about the paper.
+
+    The pre-fix behaviour (which CI demonstrated live on PR #6): ``config.require``
+    raised a bare ``RuntimeError`` at ``ElsevierClient`` *construction*, which
+    ``is_transient_exception`` called permanent, so the ladder took the degrade
+    branch and wrote a 0-formula dossier — and ``prisma.py`` turns that into
+    ``no_machine_readable_formulas``. A config fault became a published claim about
+    the literature.
+    """
+    _no_openalex(_dossier())
+    monkeypatch.delenv("ELSEVIER_API_KEY", raising=False)
+
+    rc = cli.cmd_dossier(_args(tmp_path))
+
+    assert rc == cli.EXIT_CONFIG  # escalate, do not retry-spin
+    assert rc != cli.EXIT_TRANSIENT
+    assert list(tmp_path.glob("*.json")) == []  # nothing persisted…
+    assert list(tmp_path.glob("*.md")) == []  # …so PRISMA cannot learn anything from it
 
 
 def test_openalex_transient_failure_aborts_before_any_tier(tmp_path, _no_openalex, monkeypatch):
