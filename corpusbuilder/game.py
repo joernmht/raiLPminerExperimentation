@@ -1093,6 +1093,10 @@ button:active{transform:scale(.97)}
 /* paper run */
 .ptitle{font-size:16px;font-weight:750;line-height:1.3}
 .pmeta{color:var(--muted);font-size:12.5px;margin-top:3px}
+.proto{background:var(--warn-soft);color:var(--warn);border:1.5px solid var(--warn);
+  border-radius:10px;padding:5px 10px;font-size:12px;font-weight:650;margin:0 0 10px;
+  text-align:center;line-height:1.45}
+.proto a{color:var(--warn);font-weight:800;text-decoration:underline}
 .hint-ot{display:inline-block;background:var(--bad-soft);color:var(--bad);border-radius:10px;
   padding:2px 9px;font-size:12.5px;font-weight:650;margin-top:6px}
 .cellchip{display:inline-block;background:var(--good-soft);color:var(--good);border-radius:10px;
@@ -1225,6 +1229,9 @@ a{color:var(--accent)}
 </head>
 <body>
 <div class="app">
+
+<div class="proto">⚠️ working prototype — extracted formulas &amp; labels are not fully verified yet
+ · <a href="https://github.com/joernmht/lp2graph" target="_blank" rel="noopener">lp2graph repo ↗</a></div>
 
 <!-- ============ HOME ============ -->
 <section id="home" class="on">
