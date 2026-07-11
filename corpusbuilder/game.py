@@ -1086,6 +1086,12 @@ button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(-
 button:active{transform:scale(.97)}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.top.sticky{position:sticky;top:0;z-index:40;margin:0 -4px 10px;padding:8px 4px;
+  background:color-mix(in srgb,var(--page1) 88%,transparent);backdrop-filter:blur(8px)}
+.parrow{width:38px;height:38px;min-height:38px;border-radius:50%;border:1.5px solid var(--accent);
+  color:var(--accent);background:var(--card);font-size:20px;font-weight:800;line-height:1;
+  flex:none;padding:0}
+.parrow:active{background:var(--accent);color:#fff}
 .top .back{border:none;background:none;font-size:15px;color:var(--accent);
   font-weight:700;padding:8px 8px 8px 0}
 .top .info{margin-left:auto;color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
@@ -1241,7 +1247,17 @@ a{color:var(--accent)}
     <h1>🚂 Formula Express</h1>
     <p class="sub">corpus review · __NPAPERS__ papers · __NFORM__ formulas</p>
   </header>
-  <div class="tiles">
+  <div class="games">
+    <div class="game" data-go="run"><span class="ico">📄</span>
+      <div><div class="ttl">Paper Run</div><div class="dsc">a whole paper + its symbol graph · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
+    <div class="game" data-go="blitz"><span class="ico">⏱️</span>
+      <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
+    <div class="game" data-go="sort"><span class="ico">🧭</span>
+      <div><div class="ttl">Shell Sorter</div><div class="dsc">file papers into P1–P5 · <span id="sort-left"></span> left</div></div><span class="go">›</span></div>
+    <div class="game" data-go="papers"><span class="ico">📚</span>
+      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper</div></div><span class="go">›</span></div>
+  </div>
+  <div class="tiles" style="margin-top:12px">
     <div class="tile"><div class="big" id="t-streak">–</div><div class="lbl">🔥 day streak</div><div class="note" id="t-streak-note"></div></div>
     <div class="tile"><div class="big" id="t-xp">0</div><div class="lbl" id="t-rank">XP</div><div class="note" id="t-next"></div></div>
     <div class="tile"><div class="big" id="t-today">0</div><div class="lbl">decisions today</div><div class="note" id="t-today-xp"></div></div>
@@ -1252,17 +1268,9 @@ a{color:var(--accent)}
     <div class="bar" id="mainbar" role="img" aria-label="review progress"></div>
     <div class="chips" id="statchips"></div>
   </div>
-  <div class="games">
-    <div class="game" data-go="run"><span class="ico">📄</span>
-      <div><div class="ttl">Paper Run</div><div class="dsc">a whole paper + its symbol graph · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
-    <div class="game" data-go="blitz"><span class="ico">⏱️</span>
-      <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
-    <div class="game" data-go="sort"><span class="ico">🧭</span>
-      <div><div class="ttl">Shell Sorter</div><div class="dsc">file papers into P1–P5 · <span id="sort-left"></span> left</div></div><span class="go">›</span></div>
+  <div class="games" style="margin-top:10px">
     <div class="game" data-go="journal"><span class="ico">📔</span>
       <div><div class="ttl">Journal</div><div class="dsc">streak calendar, badges, day log</div></div><span class="go">›</span></div>
-    <div class="game" data-go="papers"><span class="ico">📚</span>
-      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper</div></div><span class="go">›</span></div>
   </div>
   <div class="exp-btns">
     <button class="wide" onclick="openExport()">⤴ Export decisions</button>
@@ -1274,9 +1282,11 @@ a{color:var(--accent)}
 
 <!-- ============ PAPER RUN ============ -->
 <section id="run">
-  <div class="top"><button class="back" data-go="home">‹ Home</button>
+  <div class="top sticky"><button class="back" data-go="home">‹ Home</button>
     <span class="combo" id="combo"></span>
-    <span class="info" id="run-info"></span></div>
+    <span class="info" id="run-info"></span>
+    <button class="parrow" id="run-prev" aria-label="previous paper">‹</button>
+    <button class="parrow" id="run-next" aria-label="next paper">›</button></div>
   <div id="run-slot"></div>
 </section>
 
@@ -2357,7 +2367,12 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
 });
 
 /* ---------- boot ---------- */
+document.getElementById("run-prev").onclick=()=>skipRun(-1);
+document.getElementById("run-next").onclick=()=>skipRun(1);
 paintHome();
+/* deep link: game.html#run opens Paper Run directly (also #blitz/#sort/#journal/#papers) */
+const boot=location.hash.replace("#","");
+if (["run","blitz","sort","journal","papers"].includes(boot)) go(boot);
 </script>
 </body>
 </html>
