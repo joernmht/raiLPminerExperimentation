@@ -1,0 +1,132 @@
+// game v7 smoke: objective ruleset + display repair + unified tap-to-trace
+const fs = require('fs');
+const { JSDOM } = require('jsdom');
+const html = fs.readFileSync(process.argv[2] || '/home/joern/raiLPminerExperimentation/docs/game.html', 'utf8');
+
+let pass = 0, fail = 0;
+const ok = (cond, msg) => { if (cond) { pass++; } else { fail++; console.log('FAIL:', msg); } };
+
+// ---- payload checks (no DOM needed) ----
+const m = html.match(/<script id="corpus-data" type="application\/json">([\s\S]*?)<\/script>/);
+ok(m, 'corpus-data payload present');
+const data = JSON.parse(m[1]);
+const trb = data.papers.find(p => p.d === '10.1016/j.trb.2022.02.002');
+ok(trb, 'trb.2022.02.002 in demo payload');
+const byLabel = {};
+trb.f.forEach(f => { byLabel[f[1]] = f; });
+ok(byLabel['d1e6372'][9] === 1, 'minZ_1 (glued "m i n Z") flagged objective');
+ok(byLabel['d1e14053'][9] === 0, 'T=min{a,b} ∀f (pointwise definition) NOT objective');
+ok(byLabel['d1e14054'][9] === 0, 'duplicate pointwise definition NOT objective');
+ok(typeof byLabel['d1e6961'][10] === 'string' && byLabel['d1e6961'][10].includes('\\underline{D}'),
+   'combining-mark \\underset repaired to \\underline in display copy');
+ok(typeof byLabel['d1e13551'][10] === 'string' && byLabel['d1e13551'][10].includes('\\right.'),
+   'dangling \\right repaired with null delimiter in display copy');
+ok(byLabel['d1e6372'][10] === 0, 'clean formula carries no redundant display copy');
+// every display copy must differ from the raw latex; raw stays untouched
+let disp = 0;
+for (const p of data.papers) for (const f of p.f) {
+  if (f[10]) { disp++; ok(f[10] !== f[2], 'display copy differs from raw for ' + f[0]); }
+}
+console.log('  display-repaired formulas in demo:', disp);
+ok(html.includes('f[10]||f[2]'), 'renderMath call sites use repaired display copy');
+
+// ---- DOM interaction: unified tap-to-trace ----
+const dom = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
+  url: 'https://railpmining.joernmaurischat.de/game.html' });
+const w = dom.window, d = w.document;
+w.HTMLElement.prototype.scrollIntoView = function(){};
+ok(typeof w.drawPaperGraph === 'function', 'drawPaperGraph is a page global');
+
+const p = w.eval('RAW').papers.find(pp => pp.d === '10.1016/j.trb.2022.02.002');
+const host = d.createElement('div'); d.body.appendChild(host);
+w.drawPaperGraph(host, p);
+const svg = host.querySelector('svg');
+ok(svg, 'paper graph renders');
+const strip = host.querySelector('.gsel');
+ok(strip && strip.innerHTML === '', 'chip strip exists and starts empty');
+
+// find the objective node (formula node whose f[9]===1)
+const objFi = p.f.findIndex(f => f[9] === 1);
+ok(objFi >= 0, 'demo paper has an objective');
+const objCircle = [...svg.querySelectorAll('.gnode-f')]
+  .find(c => c.getAttribute('data-fid') === p.f[objFi][0]);
+ok(objCircle, 'objective circle present in graph');
+objCircle.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+
+const chips = [...strip.querySelectorAll('.chip')];
+ok(chips.length > 1, 'tapping objective lists connected entities (' + chips.length + ' chips)');
+ok(chips[0].classList.contains('sel'), 'selected entity is FIRST in the list');
+ok(chips[0].getAttribute('data-fid') === p.f[objFi][0], 'first chip is the tapped objective');
+ok(chips[0].textContent.includes('🎯'), 'objective chip carries the objective marker');
+ok(chips.slice(1).every(c => !c.getAttribute('data-fid')), 'objective neighbours are symbols');
+ok(objCircle.classList.contains('sel'), 'tapped node highlighted as selected');
+const hlSyms = [...svg.querySelectorAll('.gnode-s.hl')];
+ok(hlSyms.length === chips.length - 1, 'connected symbol nodes highlighted (' + hlSyms.length + ')');
+ok(svg.querySelectorAll('.gedge.hl').length === chips.length - 1, 'incident edges highlighted');
+ok(svg.querySelectorAll('.gnode-s.dim, .gnode-f.dim').length > 0, 'unconnected nodes dimmed');
+
+// symbol names shown = abbreviated names from the payload
+const symNames = new Set(p.f[objFi][5].map(s => s[0]));
+ok(chips.slice(1).every(c => symNames.has(c.textContent)), 'chips show abbreviated symbol names');
+
+// tap a symbol chip → selection moves to that symbol, symbol first in list
+chips[1].dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+const chips2 = [...strip.querySelectorAll('.chip')];
+ok(chips2[0].classList.contains('sel') && chips2[0].textContent === chips[1].textContent,
+   'tapping a symbol chip re-selects: symbol becomes first + highlighted');
+ok(chips2.slice(1).some(c => c.getAttribute('data-fid')), 'symbol selection lists connected formulas');
+
+// tap same node again → deselect, strip empties
+const symNode = [...svg.querySelectorAll('.gnode-s')]
+  .find(c => c.getAttribute('data-node') === chips2[0].getAttribute('data-node'));
+ok(symNode, 'selected symbol circle found');
+symNode.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+ok(strip.innerHTML === '', 'tapping the selected node again clears the trace');
+ok(svg.querySelectorAll('.hl,.dim,.sel').length === 0, 'all highlight classes cleared');
+
+// ---- v8: refined objective rules in the payload ----
+const byDoi = {};
+data.papers.forEach(pp => { byDoi[pp.d] = pp; });
+const objIds = (doi) => byDoi[doi].f.filter(f => f[9] === 1).map(f => f[0]);
+ok(JSON.stringify(objIds('10.1016/j.ejor.2021.06.025')) ===
+   JSON.stringify(['eq-0005','eq-0009','eq-0018','eq-0027']),
+   'aligned min…s.t. model blocks are the objectives; M_kr/t_kr defs are not');
+ok(JSON.stringify(objIds('10.1016/j.trc.2021.103368')) === JSON.stringify(['eq-0001']),
+   'vector objective min(z_D,z_O,z_P) detected');
+ok(objIds('10.1016/j.trc.2021.103080').length === 1 &&
+   objIds('10.1016/j.trc.2021.103080')[0] === 'eq-0006',
+   'pointwise max{…} constraints no longer flagged; real minimize kept');
+ok(JSON.stringify(objIds('10.1016/j.omega.2022.102796')) === JSON.stringify(['eq-0013','eq-0017']),
+   'η_u = max(0,…) definitions no longer flagged');
+if (data.papers.length <= 3) {
+  ok(data.papers.every(pp => pp.f.some(f => f[9] === 1)),
+     'every demo paper has at least one objective');
+}
+
+// ---- v8: swipe ⇄ to switch paper on the run screen ----
+ok(typeof w.attachRunSwipe === 'function' && typeof w.skipRun === 'function',
+   'swipe handlers are page globals');
+w.eval('paintRun()');
+const runSlot = d.getElementById('run-slot');
+ok(runSlot && runSlot.dataset.swipe === '1', 'swipe listener attached to run slot');
+const swipe = (x1, x2, y2) => {
+  const ts = new w.Event('touchstart', { bubbles: true });
+  ts.touches = [{ clientX: x1, clientY: 100 }];
+  runSlot.dispatchEvent(ts);
+  const te = new w.Event('touchend', { bubbles: true });
+  te.changedTouches = [{ clientX: x2, clientY: y2 }];
+  runSlot.dispatchEvent(te);
+};
+const idx0 = w.eval('runIdx');
+swipe(300, 150, 110);                       // left swipe → next paper
+ok(w.eval('runIdx') !== idx0, 'left swipe skips to the next paper');
+swipe(150, 300, 110);                       // right swipe → previous paper
+ok(w.eval('runIdx') === idx0, 'right swipe returns to the previous paper');
+const idx1 = w.eval('runIdx');
+swipe(300, 260, 105);                       // too short → ignored
+ok(w.eval('runIdx') === idx1, 'short swipe is ignored');
+swipe(300, 180, 250);                       // diagonal (scroll) → ignored
+ok(w.eval('runIdx') === idx1, 'vertical-ish swipe is ignored (scrolling)');
+
+console.log(`\n${pass} passed, ${fail} failed`);
+process.exit(fail ? 1 : 0);
