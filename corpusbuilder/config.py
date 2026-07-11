@@ -91,11 +91,22 @@ def proxies() -> dict[str, str] | None:
     return {"http": p, "https": p} if p else None
 
 
+class ConfigError(RuntimeError):
+    """A credential or endpoint is missing/unusable on *this machine*.
+
+    Deliberately distinct from :class:`~corpusbuilder._http.AcquisitionError`: it
+    says nothing about the paper being acquired. The tier ladder must never let
+    one degrade into a coverage fact — an unset key is not evidence that a paper
+    lacks machine-readable formulas. Subclasses ``RuntimeError`` so existing
+    handlers still catch it; they are expected to re-raise or abort. See ADR-0007.
+    """
+
+
 def require(name: str) -> str:
     """Return a credential or raise a helpful error pointing at ``.env``."""
     value = _get(name)
     if not value:
-        raise RuntimeError(
+        raise ConfigError(
             f"{name} is not set. Add it to {PROJECT_ROOT / '.env'} "
             f"(copy .env.example to .env, chmod 600, fill in the key)."
         )

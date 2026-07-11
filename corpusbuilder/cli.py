@@ -32,6 +32,11 @@ _DEFAULT_OUT = Path("corpus/dossiers")
 #: Distinct from 1 so a driver script can retry on 2 but escalate on 1.
 EXIT_TRANSIENT = 2
 
+#: ``cmd_dossier`` exit code for "this machine is misconfigured, nothing was written".
+#: Distinct from 2 because re-running changes nothing until a human sets the key —
+#: a retry driver must escalate, not spin. See ``_abort_config`` and ADR-0007.
+EXIT_CONFIG = 3
+
 #: Everything a tier can throw. ``requests`` errors derive from ``OSError``, not
 #: ``RuntimeError``, so a bare ``except RuntimeError`` silently misses a dropped
 #: SOCKS tunnel (``requests.ProxyError``); ``LxmlError`` covers truncated XML.
@@ -54,6 +59,24 @@ def _abort_transient(stage: str, exc: BaseException) -> int:
         file=sys.stderr,
     )
     return EXIT_TRANSIENT
+
+
+def _abort_config(stage: str, exc: BaseException) -> int:
+    """Refuse to persist a dossier whose extraction failed for want of a credential.
+
+    The sibling of :func:`_abort_transient`, one layer up: a missing/expired key is
+    a fact about *this machine*, not about the paper. Degrading here would let
+    ``prisma.py`` publish ``no_machine_readable_formulas`` about a paper nobody ever
+    fetched — the ADR-0006 failure mode with a config fault as the trigger. Unlike a
+    blip, re-running will not fix it, so this exits 3, not 2. See ADR-0007.
+    """
+    print(f"ERROR: {stage} could not run — misconfigured ({exc}).", file=sys.stderr)
+    print(
+        "Refusing to record a tier miss caused by a missing credential — no dossier "
+        "written. Set the key, then re-run.",
+        file=sys.stderr,
+    )
+    return EXIT_CONFIG
 
 
 def _today() -> str:
@@ -92,6 +115,8 @@ def cmd_dossier(args: argparse.Namespace) -> int:
             ref_limit=args.ref_limit,
             cite_limit=args.cite_limit,
         )
+    except config.ConfigError as e:
+        return _abort_config(f"OpenAlex lookup for {args.identifier}", e)
     except _TIER_ERRORS as e:
         if is_transient_exception(e):
             return _abort_transient(f"OpenAlex lookup for {args.identifier}", e)
@@ -111,6 +136,8 @@ def cmd_dossier(args: argparse.Namespace) -> int:
             dossier.source.entitlement = "open-access"
             dossier.source.api = "openalex+arxiv"
             print(f"extracted {len(dossier.formulas)} formula(s) from arXiv:{arxiv_id} (Tier-1)")
+        except config.ConfigError as e:
+            return _abort_config(f"arXiv Tier-1 extraction for {arxiv_id}", e)
         except _TIER_ERRORS as e:  # report, never silently drop (honesty rule)
             if is_transient_exception(e):
                 return _abort_transient(f"arXiv Tier-1 extraction for {arxiv_id}", e)
@@ -140,6 +167,8 @@ def cmd_dossier(args: argparse.Namespace) -> int:
                     "Elsevier returned METADATA ONLY (not entitled): set ELSEVIER_INSTTOKEN or "
                     "ELSEVIER_PROXY (campus tunnel) for full text. Dossier has citations only."
                 )
+        except config.ConfigError as e:
+            return _abort_config(f"Elsevier Tier-2 extraction for {doi}", e)
         except _TIER_ERRORS as e:
             if is_transient_exception(e):
                 return _abort_transient(f"Elsevier Tier-2 extraction for {doi}", e)
