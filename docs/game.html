@@ -115,6 +115,7 @@ button:active{transform:scale(.97)}
 .gnode-s{fill:var(--accent);opacity:.92}
 .gnode-s.dim,.gnode-f.dim{opacity:.25}
 .gnode-s.hl{stroke:var(--accent2);stroke-width:3}
+.gnode-s.hl2,.gnode-f.hl2{stroke:var(--accent2);stroke-width:1.6}
 .gnode-s.sel,.gnode-f.sel{stroke:var(--accent2);stroke-width:3.5}
 .gsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .gsel .chip{cursor:pointer}
@@ -123,6 +124,8 @@ button:active{transform:scale(.97)}
 .gbind{stroke:var(--tier3);stroke-dasharray:3 3;opacity:.8}
 .gedge{stroke:var(--line);stroke-width:1}
 .gedge.hl{stroke:var(--accent2);stroke-width:1.8}
+.gedge.hl2{stroke:var(--accent2);stroke-width:1.1;opacity:.55}
+.gedge.dim{opacity:.18}
 .glabel{font-size:10px;fill:var(--ink);font-weight:600}
 .gband{font-size:8.5px;fill:var(--muted);letter-spacing:.1em;font-weight:800}
 .gnum{fill:var(--muted);font-size:8.5px}
@@ -154,6 +157,16 @@ button:active{transform:scale(.97)}
 .minig{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;margin:6px 0}
 .facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
 .facts button{min-height:46px;font-weight:750;font-size:14px}
+/* desktop: paper graph (sticky, left) and formula list (right) side by side */
+@media(min-width:1000px){
+  body.wide .app{max-width:1150px}
+  body.wide #run-slot{display:grid;grid-template-columns:minmax(400px,470px) minmax(0,1fr);
+    column-gap:18px;align-items:start}
+  body.wide #run-slot>.card{grid-column:1;grid-row:1/span 3;position:sticky;top:58px;
+    max-height:calc(100vh - 72px);overflow-y:auto}
+  body.wide #run-slot>.bulk{grid-column:2;margin-top:0;top:58px}
+  body.wide #run-slot>#frows,body.wide #run-slot>.under{grid-column:2}
+}
 /* sorter */
 .cells{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .cells button{min-height:58px;text-align:left;padding:9px 12px;border-radius:16px}
@@ -456,6 +469,7 @@ function nextLevelXp(){ const l=level(); return l>=RANKS.length ? null : 150*l*l
 /* ---------- navigation ---------- */
 function go(id){
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("on", s.id===id));
+  document.body.classList.toggle("wide", id==="run");
   window.scrollTo(0,0);
   if (id==="home") paintHome();
   if (id==="run") paintRun();
@@ -651,23 +665,32 @@ function drawPaperGraph(host, p){
      abbreviated names — selected entity first, then its neighbours. */
   const strip=document.createElement("div");
   strip.className="gsel"; host.appendChild(strip);
-  const nbrsOf=i=>{ const s=new Set();
-    g.edges.forEach(([a,b])=>{ if(a===i) s.add(b); if(b===i) s.add(a); });
+  const adj=g.nodes.map(()=>[]);
+  g.edges.forEach(([a,b])=>{ adj[a].push(b); adj[b].push(a); });
+  const nbrsOf=i=>new Set(adj[i]);
+  const compOf=i=>{ const s=new Set([i]), q=[i];
+    while(q.length){ const n=q.pop();
+      for (const m of adj[n]) if(!s.has(m)){ s.add(m); q.push(m); } }
     return s; };
   const nodeName=i=>{ const nd=g.nodes[i];
     return nd.t==="s" ? nd.name : (p.f[nd.fi][1]||p.f[nd.fi][0]); };
   let sel=null;
   function paintSel(){
     const nbrs = sel===null ? new Set() : nbrsOf(sel);
+    const comp = sel===null ? new Set() : compOf(sel);
     svg.querySelectorAll(".gedge").forEach(l=>{
       const a=+l.getAttribute("data-s"), b=+l.getAttribute("data-f");
-      l.classList.toggle("hl", sel!==null && (a===sel||b===sel));
+      const inc = sel!==null && (a===sel||b===sel);
+      l.classList.toggle("hl", inc);
+      l.classList.toggle("hl2", sel!==null && !inc && comp.has(a) && comp.has(b));
+      l.classList.toggle("dim", sel!==null && !comp.has(a) && !comp.has(b));
     });
     svg.querySelectorAll("[data-node]").forEach(c=>{
       const i=+c.getAttribute("data-node");
       c.classList.toggle("sel", i===sel);
       c.classList.toggle("hl", nbrs.has(i));
-      c.classList.toggle("dim", sel!==null && i!==sel && !nbrs.has(i));
+      c.classList.toggle("hl2", sel!==null && i!==sel && !nbrs.has(i) && comp.has(i));
+      c.classList.toggle("dim", sel!==null && !comp.has(i));
     });
     if (sel===null){ strip.innerHTML=""; return; }
     const ids=[sel, ...[...nbrs].sort((a,b)=>a-b)];
@@ -679,7 +702,26 @@ function drawPaperGraph(host, p){
         `>${obj?"🎯 ":""}${escapeHtml(String(nodeName(i)))}</span>`;
     }).join("");
   }
-  function select(i){ sel = (sel===i) ? null : i; paintSel(); }
+  /* clicking a node lifts its defining formula row(s) to the top of the
+     review list: the formula itself, or (for a symbol) every formula that
+     uses it, in paper order — so the first row is the definition site. */
+  const frows=document.getElementById("frows");
+  let rowOrder0=null;
+  function reorderRows(){
+    if (!frows) return;
+    if (!rowOrder0) rowOrder0=[...frows.children];
+    const top=new Set();
+    if (sel!==null){
+      const nd=g.nodes[sel];
+      if (nd.t==="f") top.add("fr-"+nd.id);
+      else adj[sel].forEach(j=>{ const n2=g.nodes[j];
+        if (n2.t==="f") top.add("fr-"+n2.id); });
+    }
+    rowOrder0.filter(r=>top.has(r.id))
+      .concat(rowOrder0.filter(r=>!top.has(r.id)))
+      .forEach(r=>frows.appendChild(r));
+  }
+  function select(i){ sel = (sel===i) ? null : i; paintSel(); reorderRows(); }
   svg.addEventListener("click", e=>{
     const nEl=e.target.closest("[data-node]");
     if (nEl) select(+nEl.getAttribute("data-node"));
@@ -921,7 +963,7 @@ function paintRun(){
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
       ${chkChips(p)}
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace its connections; the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row</div>
+      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: direct neighbours highlight strongly, everything transitively connected lightly, the rest dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
