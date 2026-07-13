@@ -67,13 +67,13 @@ ok(objCircle.classList.contains('sel'), 'tapped node highlighted as selected');
 const hlSyms = [...svg.querySelectorAll('.gnode-s.hl')];
 ok(hlSyms.length === chips.length - 1, 'connected symbol nodes highlighted (' + hlSyms.length + ')');
 ok(svg.querySelectorAll('.gedge.hl').length === chips.length - 1, 'incident edges highlighted');
-// component highlight: every non-selected node is a strong neighbour (.hl),
-// lightly lit because transitively connected (.hl2), or dimmed (.dim)
+// every non-selected node is either a lit direct neighbour (.hl) or dimmed (.dim)
 const nonSel = [...svg.querySelectorAll('.gnode-s,.gnode-f')].filter(c => !c.classList.contains('sel'));
-ok(nonSel.every(c => c.classList.contains('hl') || c.classList.contains('hl2') || c.classList.contains('dim')),
-   'every non-selected node is neighbour-lit, component-lit or dimmed');
-ok(svg.querySelectorAll('.gnode-s.hl2,.gnode-f.hl2,.gnode-s.dim,.gnode-f.dim').length > 0,
-   'non-neighbour nodes distinguished from direct neighbours');
+ok(nonSel.every(c => c.classList.contains('hl') || c.classList.contains('dim')),
+   'every non-selected node is neighbour-lit or dimmed');
+ok(svg.querySelectorAll('.gnode-s.dim,.gnode-f.dim').length > 0, 'non-neighbour nodes dimmed');
+ok([...svg.querySelectorAll('.gedge')].every(l => l.classList.contains('hl') || l.classList.contains('dim')),
+   'non-incident edges dimmed');
 
 // symbol names shown = abbreviated names from the payload
 const symNames = new Set(p.f[objFi][5].map(s => s[0]));
@@ -92,7 +92,7 @@ const symNode = [...svg.querySelectorAll('.gnode-s')]
 ok(symNode, 'selected symbol circle found');
 symNode.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(strip.innerHTML === '', 'tapping the selected node again clears the trace');
-ok(svg.querySelectorAll('.hl,.hl2,.dim,.sel').length === 0, 'all highlight classes cleared');
+ok(svg.querySelectorAll('.hl,.dim,.sel').length === 0, 'all highlight classes cleared');
 
 // ---- v8: refined objective rules in the payload ----
 const byDoi = {};
