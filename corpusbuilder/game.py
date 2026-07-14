@@ -28,10 +28,15 @@ feeds. Gamification: XP + railway ranks, daily streaks with a heatmap
 ``localStorage`` (same key as v1 — existing progress survives); **Export**
 produces ``game_decisions_<date>.json`` (``formula_decisions`` = the
 ``review_view`` per-paper format, plus ``paper_cells``); Import merges.
-A ✎ fix may split one extracted blob into SEVERAL formulas (duplicate /
+A ✎ fix may split one extracted blob into SEVERAL formulas (copy-box /
 split-at-cursor in the fix sheet): the decision then carries ``parts``
 (full list of corrected LaTeX strings; ``note`` stays part 1 for
-backward compatibility with single-formula ingest).
+backward compatibility with single-formula ingest). A fourth review
+action ⧉ marks a formula as ``duplicate`` (export field
+``duplicate_of``); near-identical formulas are pre-grouped at build
+time by ``_dup_groups`` (bidirectional multiset-token containment,
+deterministic) and shown adjacent with an ``≈ ×n`` chip — tapping the
+chip keeps that copy and marks the group's other open members duplicate.
 
 Run:  PYTHONPATH=. python3 -m corpusbuilder.game
 """
@@ -934,6 +939,68 @@ def _paper_check(fs: list[list]) -> dict:
 
 
 # --------------------------------------------------------------------------
+# Near-duplicate similarity groups (per paper, deterministic)
+# --------------------------------------------------------------------------
+
+_SIMTOK = re.compile(r"\\[A-Za-z]+|[A-Za-z0-9]|[^\sA-Za-z0-9]")
+_SIM_THRESH = 0.9  # bidirectional containment: both directions must reach this
+_SIM_MIN_TOKENS = 8  # below this, only exact (whitespace-normalized) matches group
+
+
+def _dup_groups(fs: list[list]) -> list[list[str]]:
+    """Group very similar formulas of one paper (build-time review aid).
+
+    Similarity is *bidirectional* multiset-token containment:
+    ``min(|A∩B|/|A|, |A∩B|/|B|) >= 0.9`` — both formulas must be almost
+    entirely contained in each other, so a fragment inside a longer
+    formula does NOT group. Whitespace-normalized identical strings
+    always group; formulas shorter than 8 tokens group only on exact
+    match. Union-find over qualifying pairs; groups of >= 2 emitted as
+    formula-id lists in paper order. Deterministic (no RNG, stable order).
+    """
+    from collections import Counter
+
+    n = len(fs)
+    toks = [Counter(_SIMTOK.findall(f[2])) for f in fs]
+    sizes = [sum(t.values()) for t in toks]
+    norm = ["".join(_SIMTOK.findall(f[2])) for f in fs]
+    parent = list(range(n))
+
+    def find(a: int) -> int:
+        while parent[a] != a:
+            parent[a] = parent[parent[a]]
+            a = parent[a]
+        return a
+
+    def union(a: int, b: int) -> None:
+        ra, rb = find(a), find(b)
+        if ra != rb:
+            parent[max(ra, rb)] = min(ra, rb)
+
+    for i in range(n):
+        if not sizes[i]:
+            continue
+        for j in range(i + 1, n):
+            if not sizes[j]:
+                continue
+            if norm[i] == norm[j]:
+                union(i, j)
+                continue
+            if min(sizes[i], sizes[j]) < _SIM_MIN_TOKENS:
+                continue
+            if abs(sizes[i] - sizes[j]) > (1 - _SIM_THRESH) * max(sizes[i], sizes[j]):
+                continue  # sizes too different to reach the threshold both ways
+            inter = sum((toks[i] & toks[j]).values())
+            if inter / sizes[i] >= _SIM_THRESH and inter / sizes[j] >= _SIM_THRESH:
+                union(i, j)
+
+    groups: dict[int, list[int]] = {}
+    for i in range(n):
+        groups.setdefault(find(i), []).append(i)
+    return [[fs[i][0] for i in g] for _, g in sorted(groups.items()) if len(g) > 1]
+
+
+# --------------------------------------------------------------------------
 # Payload
 # --------------------------------------------------------------------------
 
@@ -1000,6 +1067,7 @@ def _payload(include: set[str] | None = None) -> dict:
                 "c": s.cited_by_count or 0,
                 "ot": 0 if (s.title and _RELEVANT.search(s.title)) else 1,
                 "f": fs,
+                "g": _dup_groups(fs),
                 "chk": _paper_check(fs),
             }
         )
@@ -1073,6 +1141,7 @@ section{display:none}section.on{display:block}
 .bar{height:10px;background:var(--track);border-radius:6px;overflow:hidden;display:flex;margin-top:8px}
 .bar i{display:block;height:100%}
 .bar .sa{background:var(--good)}.bar .sc{background:var(--warn)}.bar .sr{background:var(--bad)}
+.bar .sd{background:var(--tier3)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .chip{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:2px 9px}
 .chip b{font-variant-numeric:tabular-nums}
@@ -1148,10 +1217,13 @@ button:active{transform:scale(.97)}
 .frow.sa{border-left-color:var(--good)}
 .frow.sc{border-left-color:var(--warn)}
 .frow.sr{border-left-color:var(--bad);opacity:.75}
+.frow.sd{border-left-color:var(--tier3);opacity:.8}
 .frow.flash{outline:2px solid var(--accent2)}
 .frow .fhead{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
 .frow .st{margin-left:auto;font-weight:800;font-size:13px}
 .frow .st.sa{color:var(--good)}.frow .st.sc{color:var(--warn)}.frow .st.sr{color:var(--bad)}
+.frow .st.sd{color:var(--tier3)}
+.gchip{cursor:pointer;color:var(--tier3);border-color:var(--tier3);font-weight:700}
 .render{background:#fff;color:#0c1f3a;border-radius:10px;border:1px solid var(--line);
   padding:10px;overflow-x:auto;min-height:44px;font-size:14px;margin-top:8px}
 .render .err{color:#566782;font:12px ui-monospace,Menlo,monospace;white-space:pre-wrap}
@@ -1161,8 +1233,9 @@ button:active{transform:scale(.97)}
   padding:8px 10px;font:12px/1.5 ui-monospace,Menlo,monospace;color:var(--muted);
   overflow-x:auto;margin:6px 0}
 .minig{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;margin:6px 0}
-.facts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
-.facts button{min-height:46px;font-weight:750;font-size:14px}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.facts button{min-height:46px;font-weight:750;font-size:13px;padding:6px 4px}
+.b-dup{background:color-mix(in srgb,var(--tier3) 14%,transparent);border-color:var(--tier3);color:var(--tier3)}
 /* desktop: paper graph (sticky, left) and formula list (right) side by side */
 @media(min-width:1000px){
   body.wide .app{max-width:1150px}
@@ -1364,11 +1437,11 @@ a{color:var(--accent)}
 <div class="scrim" id="scrim" onclick="closeSheets()"></div>
 <div class="sheet" id="fixsheet">
   <h2 style="margin-top:0">✎ Fix LaTeX</h2>
-  <p class="mut" style="margin:0 0 12px;font-size:12.5px">One box per formula. If the extraction glued several formulas into one blob: <b>✂ split</b> cuts the box in two at the cursor, <b>⧉ duplicate</b> copies it (then trim each copy). All boxes are saved as separate corrected formulas.</p>
+  <p class="mut" style="margin:0 0 12px;font-size:12.5px">One box per formula. If the extraction glued several formulas into one blob: <b>✂ split</b> cuts the box in two at the cursor, <b>⊕ copy box</b> duplicates it (then trim each copy). All boxes are saved as separate corrected formulas.</p>
   <div id="fix-parts"></div>
   <div class="row fixops" style="margin-top:2px">
     <button onclick="splitFixPart()">✂ split at cursor</button>
-    <button onclick="dupFixPart()">⧉ duplicate</button>
+    <button onclick="dupFixPart()">⊕ copy box</button>
   </div>
   <div class="render" id="fix-prev" style="margin-top:10px"></div>
   <div class="row" style="margin-top:12px">
@@ -1468,10 +1541,11 @@ function today(){ return dayKey(0); }
 
 /* ---------- derived ---------- */
 function decCount(){ let n=0; for (const pk in S.dec) n += Object.keys(S.dec[pk]).length; return n; }
-function statusCounts(){ let a=0,c=0,r=0;
+function statusCounts(){ let a=0,c=0,r=0,d=0;
   for (const pk in S.dec) for (const id in S.dec[pk]){
-    const st=S.dec[pk][id].s; if(st==="a")a++; else if(st==="c")c++; else if(st==="r")r++; }
-  return {a,c,r}; }
+    const st=S.dec[pk][id].s; if(st==="a")a++; else if(st==="c")c++; else if(st==="r")r++;
+    else if(st==="d")d++; }
+  return {a,c,r,d}; }
 function paperProgress(p){ const d=S.dec[p.k]||{}; let n=0;
   for (const f of p.f) if (d[f[0]]) n++; return n; }
 function donePapers(){ return RUSHP.filter(p => paperProgress(p) === p.f.length); }
@@ -1760,7 +1834,17 @@ function drawPaperGraph(host, p){
   function select(i){ sel = (sel===i) ? null : i; paintSel(); reorderRows(); }
   svg.addEventListener("click", e=>{
     const nEl=e.target.closest("[data-node]");
-    if (nEl) select(+nEl.getAttribute("data-node"));
+    if (nEl){ select(+nEl.getAttribute("data-node")); return; }
+    /* forgiving taps: a miss selects the nearest node within ~a fingertip
+       (viewBox units scale with the rendered size, so this stays fair) */
+    const rect=svg.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x=(e.clientX-rect.left)*W/rect.width, y=(e.clientY-rect.top)*H/rect.height;
+    let best=-1, bd=Infinity;
+    pos.forEach((pt,i)=>{ if(!pt) return;
+      const dd=(pt[0]-x)*(pt[0]-x)+(pt[1]-y)*(pt[1]-y);
+      if (dd<bd){ bd=dd; best=i; } });
+    if (best>=0 && bd<=22*22) select(best);
   });
   strip.addEventListener("click", e=>{
     const c=e.target.closest(".chip"); if (!c) return;
@@ -1917,17 +2001,18 @@ function drawMiniStar(host, f){
 }
 
 /* ---------- decisions core ---------- */
-const XP_BASE = {a:10, r:10, c:25, cell:15, blitz:8, finish:50};
+const XP_BASE = {a:10, r:10, c:25, d:10, cell:15, blitz:8, finish:50};
 let undoStack=[];
-function setDec(p, fid, st, note, more){
+function setDec(p, fid, st, note, extra){
   const prev = (S.dec[p.k]||{})[fid] || null;
   const d = {s:st, n:note||null};
-  if (more && more.length) d.m = more;      // extra formulas from a split fix
+  if (extra && extra.m && extra.m.length) d.m = extra.m; // extra formulas from a split fix
+  if (extra && extra.of) d.of = extra.of;                // duplicate of this formula id
   (S.dec[p.k] = S.dec[p.k] || {})[fid] = d;
   return prev;
 }
-function decide(p, f, st, note, ev, mode, more){
-  const prev = setDec(p, f[0], st, note, more);
+function decide(p, f, st, note, ev, mode, extra){
+  const prev = setDec(p, f[0], st, note, extra);
   const xp = award(mode==="blitz" ? XP_BASE.blitz : XP_BASE[st], ev);
   undoStack.push({kind:"dec", pk:p.k, items:[[f[0],prev]], xp, n:1});
   if (undoStack.length>25) undoStack.shift();
@@ -1942,6 +2027,18 @@ function bulkDecide(p, fids, st, ev){
   if (undoStack.length>25) undoStack.shift();
   vibrate(18); save();
   toast((st==="a"?"✓ accepted ":"✗ rejected ")+fids.length+" formulas");
+}
+/* keep one formula of a similarity group, mark all other UNREVIEWED members
+   as its duplicates (undo-able like any bulk decision) */
+function markDupGroup(p, keepFid, gi, ev){
+  const fids=(p.g[gi]||[]).filter(id=>id!==keepFid && !((S.dec[p.k]||{})[id]));
+  if (!fids.length){ toast("no open formulas in this group"); return; }
+  const items=fids.map(fid=>[fid, setDec(p, fid, "d", null, {of:keepFid})]);
+  const xp=award(XP_BASE.d*fids.length, ev, fids.length);
+  undoStack.push({kind:"dec", pk:p.k, items, xp, n:fids.length});
+  if (undoStack.length>25) undoStack.shift();
+  vibrate(18); save();
+  toast("⧉ kept "+keepFid+", marked "+fids.length+" duplicate"+(fids.length>1?"s":""));
 }
 function undo(){
   const u=undoStack.pop(); if(!u){ toast("nothing to undo"); return; }
@@ -1967,19 +2064,32 @@ function nextRunPaper(){
   return null;
 }
 function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-function statSym(st){ return st==="a"?"✓":st==="c"?"✎":st==="r"?"✗":""; }
+function statSym(st){ return st==="a"?"✓":st==="c"?"✎":st==="r"?"✗":st==="d"?"⧉":""; }
 function paintRun(){
   const slot=document.getElementById("run-slot");
   const p=nextRunPaper();
   document.getElementById("run-info").textContent =
     donePapers().length+"/"+RUSHP.length+" papers";
   if (!p){ slot.innerHTML='<div class="card" style="text-align:center"><div style="font-size:44px">🏆</div><p>Every paper reviewed. Legendary.</p></div>'; confetti(40); return; }
-  const rows = p.f.map(f=>`
+  /* similarity groups (p.g, computed at build): members are pulled next to
+     their group's first formula so near-identical extractions sit together */
+  const gOf={}; (p.g||[]).forEach((ids,gi)=>ids.forEach(id=>{ gOf[id]=gi; }));
+  const byId={}; p.f.forEach(f=>{ byId[f[0]]=f; });
+  const ordered=[], seen=new Set();
+  for (const f of p.f){
+    if (seen.has(f[0])) continue;
+    ordered.push(f); seen.add(f[0]);
+    if (gOf[f[0]]!==undefined)
+      for (const id of p.g[gOf[f[0]]])
+        if (!seen.has(id) && byId[id]){ ordered.push(byId[id]); seen.add(id); }
+  }
+  const rows = ordered.map(f=>`
     <div class="frow" id="fr-${f[0]}" data-fid="${f[0]}">
       <div class="fhead"><span class="chip">${f[0]}</span>
         ${f[9]?'<span class="chip" style="color:var(--good);font-weight:750">🎯 objective</span>':""}
         ${f[1]?'<span class="chip">'+escapeHtml(f[1])+"</span>":""}
         <span class="chip">${f[3]}</span>${f[4]?'<span class="mut">p.'+f[4]+"</span>":""}
+        ${gOf[f[0]]!==undefined?'<span class="chip gchip" data-g="'+gOf[f[0]]+'" title="near-identical group — tap to keep THIS one and mark the others as duplicates">≈ ×'+p.g[gOf[f[0]]].length+"</span>":""}
         <span class="st"></span></div>
       <div class="render"></div>
       <div class="fx">
@@ -1987,6 +2097,7 @@ function paintRun(){
         <div class="tex">${escapeHtml(f[2])}</div>
         <div class="facts">
           <button class="b-rej" data-a="r">✗ reject</button>
+          <button class="b-dup" data-a="d">⧉ dup</button>
           <button class="b-fix" data-a="c">✎ fix</button>
           <button class="b-acc" data-a="a">✓ accept</button>
         </div>
@@ -2001,7 +2112,7 @@ function paintRun(){
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
       ${chkChips(p)}
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row</div>
+      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row. In the list, <span style="color:var(--tier3);font-weight:700">≈ ×n</span> marks near-identical formulas (bidirectional token similarity, computed at build; grouped together below): tap ≈ on the copy you want to KEEP to mark the rest ⧉ duplicate, or ⧉ dup a single formula</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
@@ -2020,6 +2131,8 @@ function paintRun(){
   document.getElementById("frows").addEventListener("click", e=>{
     const row=e.target.closest(".frow"); if(!row) return;
     const f=p.f.find(x=>x[0]===row.dataset.fid);
+    const gc=e.target.closest(".gchip");
+    if (gc){ markDupGroup(p, f[0], +gc.dataset.g, e); refreshRun(p); return; }
     const btn=e.target.closest("[data-a]");
     if (btn){
       const a=btn.dataset.a;
@@ -2029,6 +2142,12 @@ function paintRun(){
         paintFixParts(d.m&&d.m.length ? [d.n||f[2], ...d.m] : [d.n||f[2]]);
         fixPreview();
         openSheet("fixsheet");
+      } else if (a==="d"){
+        // duplicate of: the group's first other non-duplicate member, if any
+        const gi=gOf[f[0]];
+        const of=gi===undefined?null:
+          p.g[gi].find(id=>id!==f[0] && ((S.dec[p.k]||{})[id]||{}).s!=="d")||null;
+        decide(p,f,"d",null,e,"run",of?{of}:null); refreshRun(p);
       } else {
         decide(p,f,a,null,e,"run"); refreshRun(p);
       }
@@ -2179,7 +2298,7 @@ function dupFixPart(){
   const i=Math.min(fixActive, vs.length-1);
   vs.splice(i+1, 0, vs[i]);
   paintFixParts(vs); fixPreview(); vibrate(12);
-  toast("duplicated — now trim each copy");
+  toast("box copied — now trim each");
 }
 function splitFixPart(){
   const tas=fixTAs(); const i=Math.min(fixActive, tas.length-1);
@@ -2193,7 +2312,7 @@ function saveFix(){
   if (!fixCtx) return;
   const parts=fixVals();
   if (!parts.length){ toast("empty fix — use ✗ reject instead"); return; }
-  decide(fixCtx.p, fixCtx.f, "c", parts[0], null, "run", parts.slice(1));
+  decide(fixCtx.p, fixCtx.f, "c", parts[0], null, "run", {m:parts.slice(1)});
   closeSheets();
   refreshRun(fixCtx.p);
   const row=document.getElementById("fr-"+fixCtx.f[0]);
@@ -2337,7 +2456,7 @@ function paintSort(){
 
 /* ---------- HOME ---------- */
 function paintHome(){
-  const sc=statusCounts(), done=sc.a+sc.c+sc.r;
+  const sc=statusCounts(), done=sc.a+sc.c+sc.r+sc.d;
   const st=streak();
   document.getElementById("t-streak").textContent=st;
   document.getElementById("t-streak-note").textContent =
@@ -2354,11 +2473,13 @@ function paintHome(){
   const bar=document.getElementById("mainbar");
   bar.innerHTML='<i class="sa" style="width:'+(100*sc.a/NFORM)+'%"></i>'+
     '<i class="sc" style="width:'+(100*sc.c/NFORM)+'%"></i>'+
+    '<i class="sd" style="width:'+(100*sc.d/NFORM)+'%"></i>'+
     '<i class="sr" style="width:'+(100*sc.r/NFORM)+'%"></i>';
   const sorted=Object.keys(S.cells).length;
   document.getElementById("statchips").innerHTML=
     '<span class="chip" style="color:var(--good)">✓ accepted <b>'+sc.a+"</b></span>"+
     '<span class="chip" style="color:var(--warn)">✎ fixed <b>'+sc.c+"</b></span>"+
+    '<span class="chip" style="color:var(--tier3)">⧉ duplicates <b>'+sc.d+"</b></span>"+
     '<span class="chip" style="color:var(--bad)">✗ rejected <b>'+sc.r+"</b></span>"+
     '<span class="chip">🧭 sorted <b>'+sorted+"/"+PAPERS.length+"</b></span>";
   document.getElementById("blitz-best").textContent=S.best;
@@ -2423,9 +2544,11 @@ function buildExport(){
     const d=S.dec[p.k]; if (!d || !Object.keys(d).length) continue;
     fd.push({paper_key:p.k, doi:p.d||null, decisions:p.f.map(f=>{
       const e=d[f[0]]||{};
-      const st = e.s==="a"?"accepted" : e.s==="c"?"corrected" : e.s==="r"?"rejected" : "unreviewed";
+      const st = e.s==="a"?"accepted" : e.s==="c"?"corrected" : e.s==="r"?"rejected" :
+                 e.s==="d"?"duplicate" : "unreviewed";
       const out = {id:f[0], status:st, note:e.n||null};
       if (e.m && e.m.length) out.parts=[e.n, ...e.m];   // split fix: all corrected formulas
+      if (e.of) out.duplicate_of=e.of;                  // which formula it duplicates
       return out;
     })});
   }
@@ -2435,8 +2558,8 @@ function buildExport(){
   });
   const sc=statusCounts();
   return {schema_version:"game-decisions-1", exported:new Date().toISOString(),
-    totals:{reviewed:sc.a+sc.c+sc.r, accepted:sc.a, corrected:sc.c, rejected:sc.r,
-      papers_sorted:cells.length, xp:S.xp},
+    totals:{reviewed:sc.a+sc.c+sc.r+sc.d, accepted:sc.a, corrected:sc.c, rejected:sc.r,
+      duplicates:sc.d, papers_sorted:cells.length, xp:S.xp},
     formula_decisions:fd, paper_cells:cells,
     stats:{xp:S.xp, days:S.days, best_blitz:S.best, badges:S.badges}};
 }
@@ -2444,7 +2567,7 @@ function expName(){ return "game_decisions_"+today()+".json"; }
 function openExport(){
   const sc=statusCounts();
   document.getElementById("exp-sum").textContent =
-    (sc.a+sc.c+sc.r)+" formula decisions ("+sc.a+" ✓ / "+sc.c+" ✎ / "+sc.r+" ✗) · "+
+    (sc.a+sc.c+sc.r+sc.d)+" formula decisions ("+sc.a+" ✓ / "+sc.c+" ✎ / "+sc.d+" ⧉ / "+sc.r+" ✗) · "+
     Object.keys(S.cells).length+" papers sorted";
   openSheet("expsheet");
 }
@@ -2479,6 +2602,7 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
           if (!cur){
             const nd={s:d.status[0], n:d.note||null};
             if (d.parts && d.parts.length>1) nd.m=d.parts.slice(1);
+            if (d.duplicate_of) nd.of=d.duplicate_of;
             (S.dec[pd.paper_key]=S.dec[pd.paper_key]||{})[d.id]=nd; merged++; }
         }
       }
