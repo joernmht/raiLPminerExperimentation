@@ -1023,6 +1023,11 @@ def _payload(include: set[str] | None = None) -> dict:
     ``include`` optionally restricts to papers whose DOI (lower-cased, no
     ``https://doi.org/`` prefix) is in the set — used for the public
     GitHub-Pages demo, which may only ship open-access (CC-BY) papers.
+    In that demo mode, byte-identical re-extractions (same LaTeX after
+    whitespace normalization — publisher-XML artifacts like a twice-
+    listed objective) are collapsed to their first occurrence; the full
+    HITL build keeps every extraction so each gets its own decision
+    (near-duplicates are surfaced there via the ``g`` similarity groups).
     """
     doss = [Dossier.load(p) for p in sorted(DOSS.glob("*.json"))]
     if include is not None:
@@ -1057,6 +1062,16 @@ def _payload(include: set[str] | None = None) -> dict:
                     disp if disp != f.latex else 0,
                 ]
             )
+        if include is not None:  # public demo: drop exact re-extractions
+            seen_norm: set[str] = set()
+            uniq = []
+            for f in fs:
+                key = "".join(_SIMTOK.findall(f[2]))
+                if key and key in seen_norm:
+                    continue
+                seen_norm.add(key)
+                uniq.append(f)
+            fs = uniq
         papers.append(
             {
                 "k": d.key,
