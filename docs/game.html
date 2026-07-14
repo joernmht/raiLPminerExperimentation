@@ -269,12 +269,28 @@ a{color:var(--accent)}
   <div class="games">
     <div class="game" data-go="run"><span class="ico">📄</span>
       <div><div class="ttl">Paper Run</div><div class="dsc">a whole paper + its symbol graph · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
+    <div class="game" data-go="papers"><span class="ico">📚</span>
+      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper</div></div><span class="go">›</span></div>
+    <div class="game" data-go="more"><span class="ico">🎮</span>
+      <div><div class="ttl">Games &amp; stats</div><div class="dsc">Blitz, Shell Sorter · streak, XP, progress, Journal</div></div><span class="go">›</span></div>
+  </div>
+  <div class="exp-btns">
+    <button class="wide" onclick="openExport()">⤴ Export decisions</button>
+  </div>
+  <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
+  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
+    style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
+</section>
+
+<!-- ============ GAMES & STATS ============ -->
+<section id="more">
+  <div class="top"><button class="back" data-go="home">‹ Home</button></div>
+  <h2 style="margin-top:0">🎮 Games &amp; stats</h2>
+  <div class="games">
     <div class="game" data-go="blitz"><span class="ico">⏱️</span>
       <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
     <div class="game" data-go="sort"><span class="ico">🧭</span>
       <div><div class="ttl">Shell Sorter</div><div class="dsc">file papers into P1–P5 · <span id="sort-left"></span> left</div></div><span class="go">›</span></div>
-    <div class="game" data-go="papers"><span class="ico">📚</span>
-      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper</div></div><span class="go">›</span></div>
   </div>
   <div class="tiles" style="margin-top:12px">
     <div class="tile"><div class="big" id="t-streak">–</div><div class="lbl">🔥 day streak</div><div class="note" id="t-streak-note"></div></div>
@@ -291,12 +307,6 @@ a{color:var(--accent)}
     <div class="game" data-go="journal"><span class="ico">📔</span>
       <div><div class="ttl">Journal</div><div class="dsc">streak calendar, badges, day log</div></div><span class="go">›</span></div>
   </div>
-  <div class="exp-btns">
-    <button class="wide" onclick="openExport()">⤴ Export decisions</button>
-  </div>
-  <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
-  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
-    style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
 </section>
 
 <!-- ============ PAPER RUN ============ -->
@@ -311,7 +321,7 @@ a{color:var(--accent)}
 
 <!-- ============ BLITZ ============ -->
 <section id="blitz">
-  <div class="top"><button class="back" data-go="home">‹ Home</button>
+  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button>
     <span class="info" id="blitz-score"></span></div>
   <div class="timer" id="blitz-timer">60</div>
   <div id="blitz-slot"></div>
@@ -326,14 +336,14 @@ a{color:var(--accent)}
 
 <!-- ============ SORTER ============ -->
 <section id="sort">
-  <div class="top"><button class="back" data-go="home">‹ Home</button>
+  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button>
     <span class="info" id="sort-info"></span></div>
   <div id="sort-slot"></div>
 </section>
 
 <!-- ============ JOURNAL ============ -->
 <section id="journal">
-  <div class="top"><button class="back" data-go="home">‹ Home</button></div>
+  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button></div>
   <h2 style="margin-top:0">📔 Journal</h2>
   <div class="card">
     <div style="font-weight:700;font-size:14px">Activity — last 12 weeks</div>
@@ -487,7 +497,7 @@ function go(id){
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("on", s.id===id));
   document.body.classList.toggle("wide", id==="run");
   window.scrollTo(0,0);
-  if (id==="home") paintHome();
+  if (id==="home" || id==="more") paintHome();
   if (id==="run") paintRun();
   if (id==="sort") paintSort();
   if (id==="journal") paintJournal();
@@ -1550,7 +1560,7 @@ document.getElementById("run-next").onclick=()=>skipRun(1);
 paintHome();
 /* deep link: game.html#run opens Paper Run directly (also #blitz/#sort/#journal/#papers) */
 const boot=location.hash.replace("#","");
-if (["run","blitz","sort","journal","papers"].includes(boot)) go(boot);
+if (["run","blitz","sort","journal","papers","more"].includes(boot)) go(boot);
 </script>
 </body>
 </html>
