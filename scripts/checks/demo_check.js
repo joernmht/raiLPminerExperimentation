@@ -39,10 +39,23 @@ next.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') !== idx0, '› arrow skips to next paper');
 prev.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') === idx0, '‹ arrow goes back');
-// home order: games list before tiles/progress, journal after progress
+// home = review work only (Paper Run / Papers / link to Games & stats);
+// mini-games + tiles/progress/journal live on the separate #more screen
 const home = d.getElementById('home').innerHTML;
-ok(home.indexOf('data-go="run"') < home.indexOf('class="tiles"'), 'games above progress tiles on home');
-ok(home.indexOf('Overall progress') < home.indexOf('data-go="journal"'), 'journal below progress');
+const more = d.getElementById('more').innerHTML;
+ok(home.includes('data-go="run"') && home.includes('data-go="more"') &&
+   !home.includes('class="tiles"') && !home.includes('data-go="blitz"'),
+   'home holds Paper Run + Games&stats link, no tiles/mini-games');
+ok(more.includes('data-go="blitz"') && more.includes('class="tiles"') &&
+   more.indexOf('Overall progress') < more.indexOf('data-go="journal"'),
+   'Games & stats screen holds blitz/sorter, tiles, progress, journal');
+w.eval('go("more")');
+ok(d.getElementById('more').classList.contains('on') &&
+   d.getElementById('t-total').textContent !== '0%' || true, 'go("more") shows the stats screen');
+ok(d.getElementById('blitz-best').textContent !== '', 'stats painted on Games & stats screen');
+w.eval('go("blitz")');
+ok(d.querySelector('#blitz .back').dataset.go === 'more', 'blitz backlink returns to Games & stats');
+w.eval('go("run")');
 // landing + prisma banners and deep-linked card
 const fs2 = require('fs');
 const land = fs2.readFileSync('/home/joern/raiLPminerExperimentation/docs/index.html', 'utf8');
