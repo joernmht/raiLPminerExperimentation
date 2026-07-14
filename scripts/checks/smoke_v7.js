@@ -218,5 +218,49 @@ ok([...frows2.querySelectorAll('.render')].every(el =>
    'reorder leaves no emptied renders behind');
 anySym.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 
+// ---- v11: similarity groups + duplicate marking + forgiving graph taps ----
+ok(data.papers.every(pp => Array.isArray(pp.g)), 'every paper carries similarity groups (g)');
+ok(data.papers.some(pp => pp.g.length), 'similarity analysis found groups in this build');
+w.eval('go("run")');
+const p3 = w.eval('RUSHP')[w.eval('runIdx')];
+const frows3 = d.getElementById('frows');
+if (p3.g.length) {
+  // grouped rows are rendered adjacent
+  const ids3 = [...frows3.children].map(r => r.dataset.fid);
+  const grp = p3.g[0];
+  const at = grp.map(id => ids3.indexOf(id)).sort((a, b) => a - b);
+  ok(at[at.length - 1] - at[0] === grp.length - 1, 'group members sit adjacent in the list');
+  const firstRow = d.getElementById('fr-' + grp[0]);
+  const chip = firstRow.querySelector('.gchip');
+  ok(chip && chip.textContent === '≈ ×' + grp.length, 'group chip shows ≈ ×n');
+  // tap ≈ on the first member -> the rest of the group is marked duplicate-of it
+  chip.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  const dec3 = w.eval('S.dec')[p3.k];
+  ok(grp.slice(1).every(id => dec3[id] && dec3[id].s === 'd' && dec3[id].of === grp[0]),
+     'group chip marks other members duplicate-of the kept formula');
+  ok(!dec3[grp[0]] || dec3[grp[0]].s !== 'd', 'the kept formula itself is not marked');
+  ok(d.getElementById('fr-' + grp[1]).querySelector('.st').textContent === '⧉',
+     'duplicate rows show the ⧉ status');
+  const expD = JSON.parse(w.eval('JSON.stringify(buildExport())')).formula_decisions
+    .find(pd => pd.paper_key === p3.k).decisions.find(x => x.id === grp[1]);
+  ok(expD.status === 'duplicate' && expD.duplicate_of === grp[0],
+     'export says status=duplicate with duplicate_of');
+}
+// single ⧉ dup button on any unreviewed row
+const openRow = [...frows3.children].find(r => !w.eval('S.dec')[p3.k][r.dataset.fid]);
+if (openRow) {
+  openRow.querySelector('.b-dup').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  ok(w.eval('S.dec')[p3.k][openRow.dataset.fid].s === 'd', 'row ⧉ dup button marks a duplicate');
+}
+ok(w.eval('statusCounts()').d >= 1, 'statusCounts tracks duplicates');
+w.eval('paintHome()');
+ok(d.getElementById('mainbar').querySelector('.sd'), 'progress bar has a duplicates segment');
+// forgiving tap: clicking svg background must not throw (jsdom has no layout -> guarded)
+let tapOk = true;
+try { d.getElementById('pgraph').querySelector('svg')
+        .dispatchEvent(new w.MouseEvent('click', { bubbles: true })); }
+catch (err) { tapOk = false; }
+ok(tapOk, 'nearest-node tap fallback is guarded when layout is unavailable');
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
