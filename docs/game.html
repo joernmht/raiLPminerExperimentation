@@ -223,6 +223,13 @@ details.raw summary{color:var(--muted);font-size:12.5px;cursor:pointer}
 textarea{width:100%;min-height:110px;background:var(--card2);color:var(--ink);
   border:1px solid var(--line);border-radius:12px;font:13px/1.5 ui-monospace,Menlo,monospace;
   padding:10px}
+.fpart{position:relative;margin-bottom:8px}
+.fpart textarea{min-height:84px;display:block}
+.fpart .fnum{position:absolute;top:-7px;left:10px;background:var(--card);border:1px solid var(--line);
+  border-radius:8px;padding:0 7px;font-size:11px;color:var(--muted);font-weight:700}
+.fpart .fdel{position:absolute;top:6px;right:6px;width:30px;height:30px;min-height:30px;
+  padding:0;border-radius:50%;color:var(--bad);border-color:var(--bad);font-size:14px;line-height:1}
+.fixops button{flex:1;font-size:13.5px;font-weight:700;min-height:42px}
 #toast{position:fixed;left:50%;bottom:calc(86px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
   background:var(--ink);color:var(--card);border-radius:20px;padding:8px 18px;font-size:14.5px;
   font-weight:650;opacity:0;transition:.25s;z-index:50;pointer-events:none;white-space:nowrap}
@@ -349,11 +356,16 @@ a{color:var(--accent)}
 <div class="scrim" id="scrim" onclick="closeSheets()"></div>
 <div class="sheet" id="fixsheet">
   <h2 style="margin-top:0">✎ Fix LaTeX</h2>
-  <textarea id="fix-ta" spellcheck="false" autocapitalize="off"></textarea>
+  <p class="mut" style="margin:0 0 12px;font-size:12.5px">One box per formula. If the extraction glued several formulas into one blob: <b>✂ split</b> cuts the box in two at the cursor, <b>⧉ duplicate</b> copies it (then trim each copy). All boxes are saved as separate corrected formulas.</p>
+  <div id="fix-parts"></div>
+  <div class="row fixops" style="margin-top:2px">
+    <button onclick="splitFixPart()">✂ split at cursor</button>
+    <button onclick="dupFixPart()">⧉ duplicate</button>
+  </div>
   <div class="render" id="fix-prev" style="margin-top:10px"></div>
   <div class="row" style="margin-top:12px">
     <button onclick="closeSheets()">Cancel</button>
-    <button class="b-fix" style="flex:1;font-weight:750;min-height:48px" onclick="saveFix()">Save fix ✎ (+25 XP)</button>
+    <button class="b-fix" style="flex:1;font-weight:750;min-height:48px" onclick="saveFix()" id="fix-save">Save fix ✎ (+25 XP)</button>
   </div>
 </div>
 
@@ -530,21 +542,41 @@ function checkBadges(){
   }
 }
 
-/* ---------- MathJax (lazy) ---------- */
+/* ---------- MathJax (lazy) ----------
+   All typesets go through ONE promise chain: concurrent typesetPromise
+   calls make MathJax v3 reject with retry errors, which used to leave
+   raw code behind (visible e.g. when a node-tap reordered unrendered
+   rows into the viewport). The queue also waits for the async CDN
+   script instead of failing while it is still loading. */
+let mjQ=Promise.resolve();
+function mjErr(el, parts){
+  el.innerHTML="";
+  for (const t of parts){ const d=document.createElement("div");
+    d.className="err"; d.textContent=t; el.appendChild(d); }
+}
 function renderMath(el, latex){
-  el.textContent=""; const d=document.createElement("div");
-  d.textContent="\\[ "+latex+" \\]"; el.appendChild(d);
-  if (window.MathJax && MathJax.typesetPromise && !window.__mjfail){
-    MathJax.typesetPromise([el]).catch(()=>{ el.innerHTML='<div class="err"></div>';
-      el.firstChild.textContent=latex; });
-  } else {
-    el.innerHTML='<div class="err"></div>'; el.firstChild.textContent=latex;
-  }
+  const parts = Array.isArray(latex) ? latex : [latex];
+  el.textContent="";
+  for (const t of parts){ const d=document.createElement("div");
+    d.textContent="\\[ "+t+" \\]"; el.appendChild(d); }
+  if (window.__mjfail){ mjErr(el, parts); return; }
+  mjQ = mjQ.then(async ()=>{
+    for (let i=0; i<20 && !(window.MathJax && MathJax.typesetPromise); i++)
+      await new Promise(r=>setTimeout(r,250));   // CDN script still loading
+    if (window.__mjfail || !(window.MathJax && MathJax.typesetPromise)) throw 0;
+    await MathJax.typesetPromise([el]);
+  }).catch(()=>mjErr(el, parts));
+}
+/* dataset.tex holds one latex string, or a JSON array for multi-part fixes */
+function texOf(el){
+  const t=el.dataset.tex||"";
+  if (t[0]==="["){ try{ const a=JSON.parse(t); if (Array.isArray(a)) return a; }catch(e){} }
+  return t;
 }
 const lazyIO = ("IntersectionObserver" in window) ? new IntersectionObserver(es=>{
   for (const e of es){ if (e.isIntersecting){
     lazyIO.unobserve(e.target);
-    renderMath(e.target, e.target.dataset.tex);
+    renderMath(e.target, texOf(e.target));
   }}
 },{rootMargin:"200px"}) : null;
 function lazyMath(el, latex){
@@ -711,6 +743,11 @@ function drawPaperGraph(host, p){
     rowOrder0.filter(r=>top.has(r.id))
       .concat(rowOrder0.filter(r=>!top.has(r.id)))
       .forEach(r=>frows.appendChild(r));
+    // heal renders that ended up as raw code (failed/interrupted typeset)
+    frows.querySelectorAll(".render").forEach(el=>{
+      if (el.dataset.tex && el.childElementCount && !el.querySelector("mjx-container"))
+        renderMath(el, texOf(el));
+    });
   }
   function select(i){ sel = (sel===i) ? null : i; paintSel(); reorderRows(); }
   svg.addEventListener("click", e=>{
@@ -874,13 +911,15 @@ function drawMiniStar(host, f){
 /* ---------- decisions core ---------- */
 const XP_BASE = {a:10, r:10, c:25, cell:15, blitz:8, finish:50};
 let undoStack=[];
-function setDec(p, fid, st, note){
+function setDec(p, fid, st, note, more){
   const prev = (S.dec[p.k]||{})[fid] || null;
-  (S.dec[p.k] = S.dec[p.k] || {})[fid] = {s:st, n:note||null};
+  const d = {s:st, n:note||null};
+  if (more && more.length) d.m = more;      // extra formulas from a split fix
+  (S.dec[p.k] = S.dec[p.k] || {})[fid] = d;
   return prev;
 }
-function decide(p, f, st, note, ev, mode){
-  const prev = setDec(p, f[0], st, note);
+function decide(p, f, st, note, ev, mode, more){
+  const prev = setDec(p, f[0], st, note, more);
   const xp = award(mode==="blitz" ? XP_BASE.blitz : XP_BASE[st], ev);
   undoStack.push({kind:"dec", pk:p.k, items:[[f[0],prev]], xp, n:1});
   if (undoStack.length>25) undoStack.shift();
@@ -978,8 +1017,9 @@ function paintRun(){
       const a=btn.dataset.a;
       if (a==="c"){
         fixCtx={p,f};
-        document.getElementById("fix-ta").value=((S.dec[p.k]||{})[f[0]]||{}).n||f[2];
-        renderMath(document.getElementById("fix-prev"), document.getElementById("fix-ta").value);
+        const d=(S.dec[p.k]||{})[f[0]]||{};
+        paintFixParts(d.m&&d.m.length ? [d.n||f[2], ...d.m] : [d.n||f[2]]);
+        fixPreview();
         openSheet("fixsheet");
       } else {
         decide(p,f,a,null,e,"run"); refreshRun(p);
@@ -1043,7 +1083,9 @@ function refreshRun(p){
     const st=(d[f[0]]||{}).s||"";
     row.classList.remove("sa","sc","sr"); if (st) row.classList.add("s"+st);
     const stEl=row.querySelector(".st");
-    stEl.textContent=statSym(st); stEl.className="st"+(st?" s"+st:"");
+    const m=(d[f[0]]||{}).m;
+    stEl.textContent=statSym(st)+(st==="c"&&m&&m.length?"×"+(m.length+1):"");
+    stEl.className="st"+(st?" s"+st:"");
     if (st) done++;
   }
   const host=document.getElementById("pgraph");
@@ -1090,21 +1132,68 @@ function openCellSheet(p){
 }
 function skipCell(){ closeSheets(); if (cellCtx){ completePaper(cellCtx); cellCtx=null; } }
 
-/* ---------- fix sheet ---------- */
-let fixDeb;
-document.getElementById("fix-ta").addEventListener("input", ()=>{
-  clearTimeout(fixDeb);
-  fixDeb=setTimeout(()=>renderMath(document.getElementById("fix-prev"),
-    document.getElementById("fix-ta").value), 350);
-});
+/* ---------- fix sheet (one box per formula; duplicate / split-at-cursor) ---------- */
+let fixDeb, fixActive=0;
+function fixTAs(){ return [...document.querySelectorAll("#fix-parts textarea")]; }
+function fixVals(){ return fixTAs().map(t=>t.value.trim()).filter(Boolean); }
+function fixPreviewDeb(){ clearTimeout(fixDeb); fixDeb=setTimeout(fixPreview,350); }
+function fixPreview(){
+  const vs=fixVals();
+  renderMath(document.getElementById("fix-prev"), vs.length?vs:[""]);
+  document.getElementById("fix-save").textContent =
+    vs.length>1 ? "Save "+vs.length+" formulas ✎ (+25 XP)" : "Save fix ✎ (+25 XP)";
+}
+function paintFixParts(vals){
+  fixActive=Math.min(fixActive, vals.length-1);
+  const host=document.getElementById("fix-parts");
+  host.innerHTML="";
+  vals.forEach((v,i)=>{
+    const w=document.createElement("div"); w.className="fpart";
+    const ta=document.createElement("textarea");
+    ta.value=v; ta.spellcheck=false; ta.setAttribute("autocapitalize","off");
+    ta.addEventListener("input", fixPreviewDeb);
+    ta.addEventListener("focus", ()=>{ fixActive=i; });
+    w.appendChild(ta);
+    if (vals.length>1){
+      const n=document.createElement("span"); n.className="fnum";
+      n.textContent="formula "+(i+1)+"/"+vals.length; w.appendChild(n);
+      const x=document.createElement("button"); x.className="fdel"; x.textContent="✕";
+      x.title="remove this formula";
+      x.onclick=()=>{ const vs=fixTAs().map(t=>t.value); vs.splice(i,1);
+        paintFixParts(vs); fixPreview(); };
+      w.appendChild(x);
+    }
+    host.appendChild(w);
+  });
+}
+function dupFixPart(){
+  const vs=fixTAs().map(t=>t.value);
+  const i=Math.min(fixActive, vs.length-1);
+  vs.splice(i+1, 0, vs[i]);
+  paintFixParts(vs); fixPreview(); vibrate(12);
+  toast("duplicated — now trim each copy");
+}
+function splitFixPart(){
+  const tas=fixTAs(); const i=Math.min(fixActive, tas.length-1);
+  const ta=tas[i], pos=ta.selectionStart||0;
+  const a=ta.value.slice(0,pos).trim(), b=ta.value.slice(pos).trim();
+  if (!a || !b){ toast("put the cursor where the split should be"); return; }
+  const vs=tas.map(t=>t.value); vs.splice(i, 1, a, b);
+  paintFixParts(vs); fixPreview(); vibrate(12);
+}
 function saveFix(){
   if (!fixCtx) return;
-  const v=document.getElementById("fix-ta").value.trim();
-  decide(fixCtx.p, fixCtx.f, "c", v, null, "run");
+  const parts=fixVals();
+  if (!parts.length){ toast("empty fix — use ✗ reject instead"); return; }
+  decide(fixCtx.p, fixCtx.f, "c", parts[0], null, "run", parts.slice(1));
   closeSheets();
   refreshRun(fixCtx.p);
   const row=document.getElementById("fr-"+fixCtx.f[0]);
-  if (row) renderMath(row.querySelector(".render"), v);
+  if (row){
+    const el=row.querySelector(".render");
+    el.dataset.tex = parts.length>1 ? JSON.stringify(parts) : parts[0];
+    renderMath(el, parts);
+  }
   fixCtx=null;
 }
 
@@ -1327,7 +1416,9 @@ function buildExport(){
     fd.push({paper_key:p.k, doi:p.d||null, decisions:p.f.map(f=>{
       const e=d[f[0]]||{};
       const st = e.s==="a"?"accepted" : e.s==="c"?"corrected" : e.s==="r"?"rejected" : "unreviewed";
-      return {id:f[0], status:st, note:e.n||null};
+      const out = {id:f[0], status:st, note:e.n||null};
+      if (e.m && e.m.length) out.parts=[e.n, ...e.m];   // split fix: all corrected formulas
+      return out;
     })});
   }
   const cells=Object.keys(S.cells).sort().map(k=>{
@@ -1377,8 +1468,10 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
       for (const d of (pd.decisions||[])){
         if (d.status && d.status!=="unreviewed"){
           const cur=(S.dec[pd.paper_key]||{})[d.id];
-          if (!cur){ (S.dec[pd.paper_key]=S.dec[pd.paper_key]||{})[d.id]=
-            {s:d.status[0], n:d.note||null}; merged++; }
+          if (!cur){
+            const nd={s:d.status[0], n:d.note||null};
+            if (d.parts && d.parts.length>1) nd.m=d.parts.slice(1);
+            (S.dec[pd.paper_key]=S.dec[pd.paper_key]||{})[d.id]=nd; merged++; }
         }
       }
     }

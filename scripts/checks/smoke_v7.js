@@ -172,5 +172,51 @@ ok(JSON.stringify([...frows.children].map(r => r.id)) === JSON.stringify(order0)
 w.eval('go("home")');
 ok(!d.body.classList.contains('wide'), 'leaving the run screen clears body.wide');
 
+// ---- v10: multi-part fix (duplicate / split-at-cursor) ----
+w.eval('go("run")');
+const frows2 = d.getElementById('frows');
+const row0 = frows2.querySelector('.frow');
+const fid0 = row0.dataset.fid;
+row0.querySelector('.b-fix').dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+ok(d.getElementById('fixsheet').classList.contains('on'), 'fix button opens the fix sheet');
+let tas = [...d.querySelectorAll('#fix-parts textarea')];
+ok(tas.length === 1, 'fix sheet starts with one box');
+tas[0].value = 'A = B C = D';
+tas[0].focus(); tas[0].selectionStart = tas[0].selectionEnd = 5;
+w.eval('splitFixPart()');
+tas = [...d.querySelectorAll('#fix-parts textarea')];
+ok(tas.length === 2 && tas[0].value === 'A = B' && tas[1].value === 'C = D',
+   'split at cursor yields two trimmed formulas');
+ok([...d.querySelectorAll('#fix-parts .fnum')].length === 2, 'part labels shown when >1 box');
+tas[1].focus();
+w.eval('dupFixPart()');
+tas = [...d.querySelectorAll('#fix-parts textarea')];
+ok(tas.length === 3 && tas[2].value === 'C = D', 'duplicate copies the focused box');
+ok(d.getElementById('fix-save').textContent.includes('3 formulas'), 'save button counts the parts');
+d.querySelectorAll('#fix-parts .fdel')[2].dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+tas = [...d.querySelectorAll('#fix-parts textarea')];
+ok(tas.length === 2, 'a part can be removed again');
+w.eval('saveFix()');
+const dec = w.eval('S.dec')[w.eval('RUSHP')[w.eval('runIdx')].k][fid0];
+ok(dec && dec.s === 'c' && dec.n === 'A = B' && JSON.stringify(dec.m) === '["C = D"]',
+   'saved decision = corrected, note=part 1, m=extra parts');
+ok(row0.querySelector('.st').textContent === '✎×2', 'row status shows the part count');
+const rEl = row0.querySelector('.render');
+ok(rEl.dataset.tex[0] === '[' && rEl.childElementCount === 2,
+   'row render holds both formulas (dataset.tex = JSON array)');
+const exp = w.eval('JSON.stringify(buildExport())');
+const expDec = JSON.parse(exp).formula_decisions
+  .flatMap(pd => pd.decisions).find(x => x.id === fid0);
+ok(expDec.status === 'corrected' && JSON.stringify(expDec.parts) === '["A = B","C = D"]',
+   'export carries parts=[all corrected formulas], note=part 1');
+// heal path: a raw (untypeset) render survives a reorder as a re-render request
+const svg3 = d.getElementById('pgraph').querySelector('svg');
+const anySym = svg3.querySelector('.gnode-s[data-node]');
+anySym.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+ok([...frows2.querySelectorAll('.render')].every(el =>
+   !el.dataset.tex || !el.childElementCount || el.childElementCount > 0),
+   'reorder leaves no emptied renders behind');
+anySym.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
