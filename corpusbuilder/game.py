@@ -1349,59 +1349,49 @@ a{color:var(--accent)}
 <div class="proto">⚠️ working prototype — extracted formulas &amp; labels are not fully verified yet
  · <a href="https://github.com/joernmht/lp2graph" target="_blank" rel="noopener">lp2graph repo ↗</a></div>
 
-<!-- ============ MENU / GAMES & STATS (no separate start page — Paper Run is main) ============ -->
-<section id="more">
-  <div class="top"><button class="back" data-go="run">‹ Paper Run</button></div>
-  <header style="margin-top:0">
-    <div class="brandlogo">__LOGO__</div>
-    <div class="eyebrow">Chair of Railway Operations · Paper 1</div>
-    <h1>🚂 Formula Express</h1>
-    <p class="sub">corpus review · __NPAPERS__ papers · __NFORM__ formulas</p>
-  </header>
-  <div class="games">
-    <div class="game" data-go="papers"><span class="ico">📚</span>
-      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
-    <div class="game" data-go="blitz"><span class="ico">⏱️</span>
-      <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
-    <div class="game" data-go="sort"><span class="ico">🧭</span>
-      <div><div class="ttl">Shell Sorter</div><div class="dsc">file papers into P1–P5 · <span id="sort-left"></span> left</div></div><span class="go">›</span></div>
-  </div>
-  <div class="tiles" style="margin-top:12px">
-    <div class="tile"><div class="big" id="t-streak">–</div><div class="lbl">🔥 day streak</div><div class="note" id="t-streak-note"></div></div>
-    <div class="tile"><div class="big" id="t-xp">0</div><div class="lbl" id="t-rank">XP</div><div class="note" id="t-next"></div></div>
-    <div class="tile"><div class="big" id="t-today">0</div><div class="lbl">decisions today</div><div class="note" id="t-today-xp"></div></div>
-    <div class="tile"><div class="big" id="t-total">0%</div><div class="lbl">formulas reviewed</div><div class="note" id="t-total-n"></div></div>
-  </div>
-  <div class="card" style="margin-top:10px">
-    <div style="font-weight:700;font-size:14px">Overall progress</div>
-    <div class="bar" id="mainbar" role="img" aria-label="review progress"></div>
-    <div class="chips" id="statchips"></div>
-  </div>
-  <div class="games" style="margin-top:10px">
-    <div class="game" data-go="journal"><span class="ico">📔</span>
-      <div><div class="ttl">Journal</div><div class="dsc">streak calendar, badges, day log</div></div><span class="go">›</span></div>
-  </div>
-  <div class="exp-btns">
-    <button class="wide" onclick="openExport()">⤴ Export decisions</button>
-  </div>
-  <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
-  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
-    style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
-</section>
-
-<!-- ============ PAPER RUN (main screen) ============ -->
+<!-- ============ PAPER RUN (main screen — games & stats integrated below, no menu screen) ============ -->
 <section id="run" class="on">
-  <div class="top sticky"><button class="back" data-go="more">🎮 Menu</button>
+  <div class="top sticky"><button class="back" data-go="papers">📚 Papers</button>
     <span class="combo" id="combo"></span>
     <span class="info" id="run-info"></span>
     <button class="parrow" id="run-prev" aria-label="previous paper">‹</button>
     <button class="parrow" id="run-next" aria-label="next paper">›</button></div>
   <div id="run-slot"></div>
+  <div id="gamesblock" style="max-width:640px;margin:22px auto 0">
+    <h2 style="margin-top:0">🎮 Games &amp; stats</h2>
+    <div class="games">
+      <div class="game" data-go="blitz"><span class="ico">⏱️</span>
+        <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
+      <div class="game" data-go="sort"><span class="ico">🧭</span>
+        <div><div class="ttl">Shell Sorter</div><div class="dsc">file papers into P1–P5 · <span id="sort-left"></span> left</div></div><span class="go">›</span></div>
+      <div class="game" data-go="journal"><span class="ico">📔</span>
+        <div><div class="ttl">Journal</div><div class="dsc">streak calendar, badges, day log</div></div><span class="go">›</span></div>
+    </div>
+    <div class="tiles" style="margin-top:12px">
+      <div class="tile"><div class="big" id="t-streak">–</div><div class="lbl">🔥 day streak</div><div class="note" id="t-streak-note"></div></div>
+      <div class="tile"><div class="big" id="t-xp">0</div><div class="lbl" id="t-rank">XP</div><div class="note" id="t-next"></div></div>
+      <div class="tile"><div class="big" id="t-today">0</div><div class="lbl">decisions today</div><div class="note" id="t-today-xp"></div></div>
+      <div class="tile"><div class="big" id="t-total">0%</div><div class="lbl">formulas reviewed</div><div class="note" id="t-total-n"></div></div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div style="font-weight:700;font-size:14px">Overall progress · <span id="run-left"></span> papers left</div>
+      <div class="bar" id="mainbar" role="img" aria-label="review progress"></div>
+      <div class="chips" id="statchips"></div>
+    </div>
+    <div class="exp-btns">
+      <button class="wide" onclick="openExport()">⤴ Export decisions</button>
+    </div>
+    <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
+    <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
+      style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
+    <div class="brandlogo" style="margin:16px 0 0;display:flex;justify-content:center">__LOGO__</div>
+    <p class="mut" style="text-align:center;margin-top:6px">🚂 Formula Express · Chair of Railway Operations · __NPAPERS__ papers · __NFORM__ formulas</p>
+  </div>
 </section>
 
 <!-- ============ BLITZ ============ -->
 <section id="blitz">
-  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button>
+  <div class="top"><button class="back" data-go="run">‹ Paper Run</button>
     <span class="info" id="blitz-score"></span></div>
   <div class="timer" id="blitz-timer">60</div>
   <div id="blitz-slot"></div>
@@ -1416,14 +1406,14 @@ a{color:var(--accent)}
 
 <!-- ============ SORTER ============ -->
 <section id="sort">
-  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button>
+  <div class="top"><button class="back" data-go="run">‹ Paper Run</button>
     <span class="info" id="sort-info"></span></div>
   <div id="sort-slot"></div>
 </section>
 
 <!-- ============ JOURNAL ============ -->
 <section id="journal">
-  <div class="top"><button class="back" data-go="more">‹ Games &amp; stats</button></div>
+  <div class="top"><button class="back" data-go="run">‹ Paper Run</button></div>
   <h2 style="margin-top:0">📔 Journal</h2>
   <div class="card">
     <div style="font-weight:700;font-size:14px">Activity — last 12 weeks</div>
@@ -1440,7 +1430,7 @@ a{color:var(--accent)}
 
 <!-- ============ PAPER LIST ============ -->
 <section id="papers">
-  <div class="top"><button class="back" data-go="more">‹ Menu</button></div>
+  <div class="top"><button class="back" data-go="run">‹ Paper Run</button></div>
   <h2 style="margin-top:0">📚 Papers <span class="mut" id="plist-sub"></span></h2>
   <ul class="plist" id="plist"></ul>
 </section>
@@ -1548,7 +1538,8 @@ function load(){
   }catch(e){}
   return s;
 }
-function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } }
+function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); }
+  paintHome(); /* stats live inside #run now — keep them fresh on every decision */ }
 function dayKey(off){ const d = new Date(); d.setDate(d.getDate()-off);
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function today(){ return dayKey(0); }
@@ -1577,8 +1568,7 @@ function go(id){
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("on", s.id===id));
   document.body.classList.toggle("wide", id==="run");
   window.scrollTo(0,0);
-  if (id==="more") paintHome();
-  if (id==="run") paintRun();
+  if (id==="run"){ paintRun(); paintHome(); }
   if (id==="sort") paintSort();
   if (id==="journal") paintJournal();
   if (id==="papers") paintPapers();
@@ -2637,10 +2627,10 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
 /* ---------- boot ---------- */
 document.getElementById("run-prev").onclick=()=>skipRun(-1);
 document.getElementById("run-next").onclick=()=>skipRun(1);
-paintHome();
-/* Paper Run IS the start screen; deep links #blitz/#sort/#journal/#papers/#more still work */
+/* Paper Run IS the start screen (games & stats inline); deep links #blitz/#sort/#journal/#papers
+   still work, legacy #more falls back to run */
 const boot=location.hash.replace("#","");
-go(["run","blitz","sort","journal","papers","more"].includes(boot) ? boot : "run");
+go(["run","blitz","sort","journal","papers"].includes(boot) ? boot : "run");
 </script>
 </body>
 </html>
