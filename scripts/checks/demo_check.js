@@ -78,6 +78,14 @@ ok(/<a class="app sister" href="https:\/\/railpmining\.joernmaurischat\.de\/"/.t
    'lp2graph landing has the matching railpmining sister card');
 ok(land.includes('a.app.sister') && l2land.includes('a.app.sister'),
    'sister cards share the same style rule on both landings');
+// desktop: side-by-side columns (PRISMA left, game right); mobile: reduced detail
+ok(land.includes('class="cols"') && /min-width:980px/.test(land) &&
+   /grid-template-columns:1fr 1fr/.test(land) &&
+   land.indexOf('PRISMA — corpus pipeline') < land.indexOf('Formula Express — review game'),
+   'landing: desktop two-column layout, PRISMA left / game right');
+ok(/max-width:640px/.test(land) && land.includes('kpi desk') &&
+   land.includes('-webkit-line-clamp'),
+   'landing: mobile view reduces detail (chips, deep KPIs, note, clamped descriptions)');
 // game stats live on the main landing (reads fx:state:v1 from localStorage)
 ok(land.includes('Your review progress') && land.includes('fx:state:v1') &&
    land.includes('id="g-bar"') && land.includes('id="g-streak"'),

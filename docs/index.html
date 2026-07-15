@@ -106,6 +106,24 @@
     border:1px solid var(--line)}
   .gbar i{display:block;height:100%}
 
+  /* desktop: side-by-side — PRISMA left, game right */
+  .cols>div>h2:first-child{margin-top:24px}
+  .sisterwrap{margin-top:24px}
+  @media (min-width:980px){
+    body{max-width:1120px}
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;align-items:start}
+    .sisterwrap{max-width:640px;margin:28px auto 0}
+    header,footer{max-width:640px}
+  }
+  /* phone: reduce detail — chips, KPI sublines, deep KPIs and the licence note step back */
+  @media (max-width:640px){
+    a.app .meta{display:none}
+    .kpis.corpus .tag{display:none}
+    .kpi.desk{display:none}
+    .note{display:none}
+    a.app .as{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  }
+
   .note{background:color-mix(in srgb,var(--warn) 7%,transparent);
     border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
     border-radius:14px;padding:12px 14px;font-size:12.5px;color:var(--muted);margin-top:14px}
@@ -129,50 +147,56 @@
   <div class="pill"><span class="dot"></span><span>corpus snapshot <b>2026-06-21</b> · <b>238</b> papers · <b>8,957</b> formulas</span></div>
 </header>
 
-<h2>Open the apps</h2>
-<div class="apps">
-  <a class="app" href="prisma.html">
-    <div class="ah"><div class="at">📊 PRISMA corpus yield</div><div class="go">Open ›</div></div>
-    <div class="as">The corpus-acquisition pipeline as a PRISMA-2020 flow: identification (database + citation snowballing) → screening → retrieval &amp; eligibility → included, with per-stage yield, losses and amplification.</div>
-    <div class="meta"><span>10,099 records in</span><span>238 included</span><span>×37.6 formula yield</span></div>
-  </a>
-  <a class="app game" href="game.html#run">
-    <div class="ah"><div class="at">🚆 Formula Express — corpus review</div><div class="go">Play ›</div></div>
-    <div class="as">The gamified human-in-the-loop review app on an exemplary subset of the corpus: per-paper symbol graphs, formula expression trees, accept ✓ / fix ✎ / reject ✗, P1–P5 classification, XP &amp; streaks. Works offline once loaded; progress stays on your device.</div>
-    <div class="meta"><span>3 papers</span><span>92 formulas</span><span>single-objective MILPs</span><span>all CC-BY open access</span></div>
-  </a>
+<div class="cols">
+<div>
+  <h2>PRISMA — corpus pipeline</h2>
+  <div class="apps">
+    <a class="app" href="prisma.html">
+      <div class="ah"><div class="at">📊 PRISMA corpus yield</div><div class="go">Open ›</div></div>
+      <div class="as">The corpus-acquisition pipeline as a PRISMA-2020 flow: identification (database + citation snowballing) → screening → retrieval &amp; eligibility → included, with per-stage yield, losses and amplification.</div>
+      <div class="meta"><span>10,099 records in</span><span>238 included</span><span>×37.6 formula yield</span></div>
+    </a>
+  </div>
+  <h2>Corpus at a glance</h2>
+  <div class="kpis corpus">
+    <div class="kpi desk"><div class="v">10,099</div><div class="l">records identified</div><div class="tag">6 database queries + citation snowballing</div></div>
+    <div class="kpi desk"><div class="v">286</div><div class="l">reports retrieved</div><div class="tag">43 database · 243 snowball</div></div>
+    <div class="kpi"><div class="v">238</div><div class="l">source papers included</div><div class="tag">83.2% eligibility yield</div></div>
+    <div class="kpi"><div class="v">8,957</div><div class="l">candidate formulations</div><div class="tag">MathML → LaTeX, Tier-2</div></div>
+  </div>
+  <div class="note"><b>Why only 3 papers in the demo?</b> The public demo ships only papers published under a CC-BY licence (verified via OpenAlex), and is deliberately focused on a small sample of simple, single-objective MILP formulations. The full 238-paper corpus was mined under Elsevier text-and-data-mining terms and is reproduced from the pipeline, not redistributed.</div>
 </div>
-
-<h2>Your review progress</h2>
-<div class="kpis">
-  <div class="kpi"><div class="v" id="g-streak">0</div><div class="l">🔥 day streak</div></div>
-  <div class="kpi"><div class="v" id="g-xp">0</div><div class="l">XP earned</div></div>
-  <div class="kpi"><div class="v" id="g-today">0</div><div class="l">decisions today</div></div>
-  <div class="kpi"><div class="v" id="g-total">0%</div><div class="l">formulas reviewed</div><div class="tag" id="g-total-n"></div></div>
-  <div class="kpi span" style="padding-top:12px">
-    <div style="font-weight:700;font-size:14px">Overall progress</div>
-    <div class="gbar" id="g-bar" role="img" aria-label="review progress"></div>
-    <div class="l" id="g-leg" style="margin-top:8px"></div>
+<div>
+  <h2>Formula Express — review game</h2>
+  <div class="apps">
+    <a class="app game" href="game.html#run">
+      <div class="ah"><div class="at">🚆 Formula Express — corpus review</div><div class="go">Play ›</div></div>
+      <div class="as">The gamified human-in-the-loop review app on an exemplary subset of the corpus: per-paper symbol graphs, formula expression trees, accept ✓ / fix ✎ / reject ✗, P1–P5 classification, XP &amp; streaks. Works offline once loaded; progress stays on your device.</div>
+      <div class="meta"><span>3 papers</span><span>92 formulas</span><span>single-objective MILPs</span><span>all CC-BY open access</span></div>
+    </a>
+  </div>
+  <h2>Your review progress</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="v" id="g-streak">0</div><div class="l">🔥 day streak</div></div>
+    <div class="kpi"><div class="v" id="g-xp">0</div><div class="l">XP earned</div></div>
+    <div class="kpi"><div class="v" id="g-today">0</div><div class="l">decisions today</div></div>
+    <div class="kpi"><div class="v" id="g-total">0%</div><div class="l">formulas reviewed</div><div class="tag" id="g-total-n"></div></div>
+    <div class="kpi span" style="padding-top:12px">
+      <div style="font-weight:700;font-size:14px">Overall progress</div>
+      <div class="gbar" id="g-bar" role="img" aria-label="review progress"></div>
+      <div class="l" id="g-leg" style="margin-top:8px"></div>
+    </div>
   </div>
 </div>
-
-<h2>Corpus at a glance</h2>
-<div class="kpis">
-  <div class="kpi"><div class="v">10,099</div><div class="l">records identified</div><div class="tag">6 database queries + citation snowballing</div></div>
-  <div class="kpi"><div class="v">286</div><div class="l">reports retrieved</div><div class="tag">43 database · 243 snowball</div></div>
-  <div class="kpi"><div class="v">238</div><div class="l">source papers included</div><div class="tag">83.2% eligibility yield</div></div>
-  <div class="kpi"><div class="v">8,957</div><div class="l">candidate formulations</div><div class="tag">MathML → LaTeX, Tier-2</div></div>
 </div>
 
-<div class="apps" style="margin-top:14px">
+<div class="apps sisterwrap">
   <a class="app sister" href="https://lp2graph.joernmaurischat.de/">
     <div class="tag">sister site</div>
     <div class="ah"><div class="at">🕸 LP2Graph — typed graphs &amp; configurator</div><div class="go">Open ›</div></div>
     <div class="as">Accepted formulas become canonical typed-graph <i>Formulations</i> with provenance — the dataset behind the paper's taxonomy. Explore the representation and the model configurator.</div>
   </a>
 </div>
-
-<div class="note"><b>Why only 3 papers in the demo?</b> The public demo ships only papers published under a CC-BY licence (verified via OpenAlex), and is deliberately focused on a small sample of simple, single-objective MILP formulations. The full 238-paper corpus was mined under Elsevier text-and-data-mining terms and is reproduced from the pipeline, not redistributed.</div>
 
 <footer>
   <span>Part of the LP2Graph paper series — <i>LP Mining with LP2Graph: A Use Case for Railway Rescheduling</i> (TU Dresden, Chair of Railway Operations).
