@@ -39,29 +39,30 @@ next.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') !== idx0, '› arrow skips to next paper');
 prev.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') === idx0, '‹ arrow goes back');
-// no separate start page: Paper Run IS the main screen;
-// papers/mini-games/tiles/progress/journal/export live on the #more menu screen
+// no separate start page and no separate menu screen: Paper Run IS the app;
+// games/tiles/progress/journal/export are integrated at the bottom of #run
 ok(!d.getElementById('home'), 'old start page (#home) is gone');
-const more = d.getElementById('more').innerHTML;
-ok(more.includes('data-go="papers"') && more.includes('data-go="blitz"') &&
-   more.includes('class="tiles"') && more.includes('openExport()') &&
-   more.indexOf('Overall progress') < more.indexOf('data-go="journal"'),
-   'menu screen holds papers/blitz/sorter, tiles, progress, journal, export');
-ok(d.querySelector('#run .back').dataset.go === 'more', 'run top button opens the menu');
-ok(d.querySelector('#more .back').dataset.go === 'run', 'menu back returns to Paper Run');
-ok(d.querySelector('#papers .back').dataset.go === 'more', 'papers back returns to menu');
-w.eval('go("more")');
-ok(d.getElementById('more').classList.contains('on'), 'go("more") shows the menu screen');
-ok(d.getElementById('blitz-best').textContent !== '', 'stats painted on menu screen');
+ok(!d.getElementById('more'), 'separate menu screen (#more) is gone');
+const gb = d.getElementById('gamesblock');
+ok(gb && gb.closest('section').id === 'run', 'games & stats block lives inside Paper Run');
+ok(gb.innerHTML.includes('data-go="blitz"') && gb.innerHTML.includes('data-go="sort"') &&
+   gb.innerHTML.includes('data-go="journal"') && gb.innerHTML.includes('class="tiles"') &&
+   gb.innerHTML.includes('openExport()') && gb.innerHTML.includes('Overall progress'),
+   'run bottom holds blitz/sorter/journal, tiles, progress, export');
+ok(d.querySelector('#run .back').dataset.go === 'papers', 'run top button opens the papers list');
+ok(d.querySelector('#papers .back').dataset.go === 'run', 'papers back returns to Paper Run');
+ok(d.getElementById('blitz-best').textContent !== '', 'stats painted inline on Paper Run');
 w.eval('go("blitz")');
-ok(d.querySelector('#blitz .back').dataset.go === 'more', 'blitz backlink returns to menu');
+ok(d.querySelector('#blitz .back').dataset.go === 'run', 'blitz backlink returns to Paper Run');
 w.eval('go("run")');
-// no-hash boot lands on Paper Run (main)
-const dom2 = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
-  url: 'https://railpmining.joernmaurischat.de/game.html' });
-dom2.window.HTMLElement.prototype.scrollIntoView = function(){};
-ok(dom2.window.document.getElementById('run').classList.contains('on'),
-   'no-hash boot lands on Paper Run (main screen)');
+// no-hash boot lands on Paper Run; legacy #more deep link falls back to run
+for (const u of ['game.html', 'game.html#more']) {
+  const dom2 = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
+    url: 'https://railpmining.joernmaurischat.de/' + u });
+  dom2.window.HTMLElement.prototype.scrollIntoView = function(){};
+  ok(dom2.window.document.getElementById('run').classList.contains('on'),
+     u + ' boots into Paper Run (main screen)');
+}
 // landing + prisma banners and deep-linked card
 const fs2 = require('fs');
 const land = fs2.readFileSync('/home/joern/raiLPminerExperimentation/docs/index.html', 'utf8');
@@ -86,6 +87,10 @@ ok(land.includes('class="cols"') && /min-width:980px/.test(land) &&
 ok(/max-width:640px/.test(land) && land.includes('kpi desk') &&
    land.includes('-webkit-line-clamp'),
    'landing: mobile view reduces detail (chips, deep KPIs, note, clamped descriptions)');
+// game column carries quick deep-links into the game (menu lives on the landing/run, not a screen)
+ok(land.includes('href="game.html#blitz"') && land.includes('href="game.html#sort"') &&
+   land.includes('href="game.html#journal"') && land.includes('href="game.html#papers"'),
+   'landing game column deep-links blitz/sorter/journal/papers');
 // game stats live on the main landing (reads fx:state:v1 from localStorage)
 ok(land.includes('Your review progress') && land.includes('fx:state:v1') &&
    land.includes('id="g-bar"') && land.includes('id="g-streak"'),

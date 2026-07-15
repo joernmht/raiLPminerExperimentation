@@ -169,7 +169,7 @@ ok(JSON.stringify(rows1.slice(nbrFids.size)) ===
 symEl2.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));   // deselect
 ok(JSON.stringify([...frows.children].map(r => r.id)) === JSON.stringify(order0),
    'deselecting restores the original paper order');
-w.eval('go("more")');
+w.eval('go("papers")');
 ok(!d.body.classList.contains('wide'), 'leaving the run screen clears body.wide');
 
 // ---- v10: multi-part fix (duplicate / split-at-cursor) ----
