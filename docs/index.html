@@ -75,6 +75,14 @@
     background:color-mix(in srgb,var(--accent) 10%,transparent);
     border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);
     border-radius:999px;padding:2px 8px}
+  a.app .tag{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;
+    padding:2px 8px;border-radius:999px;margin-bottom:6px;color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 12%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 32%,transparent)}
+  /* sister-site card (same look as on the lp2graph landing) */
+  a.app.sister{border-left-color:var(--accent2)}
+  a.app.sister .go,a.app.sister .tag{color:var(--accent2);background:color-mix(in srgb,var(--accent2) 12%,transparent);
+    border-color:color-mix(in srgb,var(--accent2) 35%,transparent)}
   /* the game stands out: darker (Dunkelblau) in light, orange in dark */
   a.app.game{--gc:#001450;border-left:6px solid var(--gc);
     background:linear-gradient(120deg,color-mix(in srgb,var(--gc) 7%,var(--card)),var(--card))}
@@ -94,6 +102,9 @@
   .kpi .tag{font-size:11px;color:var(--accent);font-weight:700;margin-top:3px}
   .kpi.span{grid-column:1 / -1;background:linear-gradient(120deg,var(--kpi1),var(--kpi2))}
   .kpi.span .v{font-size:34px}
+  .gbar{height:14px;border-radius:999px;background:var(--track);overflow:hidden;display:flex;margin-top:10px;
+    border:1px solid var(--line)}
+  .gbar i{display:block;height:100%}
 
   .note{background:color-mix(in srgb,var(--warn) 7%,transparent);
     border:1px solid color-mix(in srgb,var(--warn) 30%,transparent);
@@ -132,13 +143,33 @@
   </a>
 </div>
 
+<h2>Your review progress</h2>
+<div class="kpis">
+  <div class="kpi"><div class="v" id="g-streak">0</div><div class="l">🔥 day streak</div></div>
+  <div class="kpi"><div class="v" id="g-xp">0</div><div class="l">XP earned</div></div>
+  <div class="kpi"><div class="v" id="g-today">0</div><div class="l">decisions today</div></div>
+  <div class="kpi"><div class="v" id="g-total">0%</div><div class="l">formulas reviewed</div><div class="tag" id="g-total-n"></div></div>
+  <div class="kpi span" style="padding-top:12px">
+    <div style="font-weight:700;font-size:14px">Overall progress</div>
+    <div class="gbar" id="g-bar" role="img" aria-label="review progress"></div>
+    <div class="l" id="g-leg" style="margin-top:8px"></div>
+  </div>
+</div>
+
 <h2>Corpus at a glance</h2>
 <div class="kpis">
   <div class="kpi"><div class="v">10,099</div><div class="l">records identified</div><div class="tag">6 database queries + citation snowballing</div></div>
   <div class="kpi"><div class="v">286</div><div class="l">reports retrieved</div><div class="tag">43 database · 243 snowball</div></div>
   <div class="kpi"><div class="v">238</div><div class="l">source papers included</div><div class="tag">83.2% eligibility yield</div></div>
   <div class="kpi"><div class="v">8,957</div><div class="l">candidate formulations</div><div class="tag">MathML → LaTeX, Tier-2</div></div>
-  <div class="kpi span"><div class="v">→ LP2Graph</div><div class="l">accepted formulas become canonical typed-graph <i>Formulations</i> with provenance — the dataset behind the paper's taxonomy</div></div>
+</div>
+
+<div class="apps" style="margin-top:14px">
+  <a class="app sister" href="https://lp2graph.joernmaurischat.de/">
+    <div class="tag">sister site</div>
+    <div class="ah"><div class="at">🕸 LP2Graph — typed graphs &amp; configurator</div><div class="go">Open ›</div></div>
+    <div class="as">Accepted formulas become canonical typed-graph <i>Formulations</i> with provenance — the dataset behind the paper's taxonomy. Explore the representation and the model configurator.</div>
+  </a>
 </div>
 
 <div class="note"><b>Why only 3 papers in the demo?</b> The public demo ships only papers published under a CC-BY licence (verified via OpenAlex), and is deliberately focused on a small sample of simple, single-objective MILP formulations. The full 238-paper corpus was mined under Elsevier text-and-data-mining terms and is reproduced from the pipeline, not redistributed.</div>
@@ -148,5 +179,36 @@
   Pipeline &amp; code: <a href="https://github.com/joernmht/raiLPminerExperimentation">joernmht/raiLPminerExperimentation</a> · library: <a href="https://github.com/joernmht/lp2graph">lp2graph</a> · sister demo: <a href="https://lp2graph.joernmaurischat.de/">lp2graph — typed graphs &amp; configurator</a>.</span>
   <div class="modenote">Türkis accent on light · TUD dark-blue field in dark mode · theme follows device appearance.</div>
 </footer>
+
+<script>
+/* "Your review progress" — reads Formula Express state (same-origin localStorage, key fx:state:v1). */
+(function(){
+  const NFORM=92, NPAPERS=3;
+  let S=null; try{ S=JSON.parse(localStorage.getItem("fx:state:v1")||"null"); }catch(e){}
+  S=S||{}; const dec=S.dec||{}, days=S.days||{}, cells=S.cells||{};
+  let a=0,c=0,r=0,d=0;
+  for(const pk in dec) for(const id in dec[pk]){ const s=dec[pk][id].s;
+    if(s==="a")a++; else if(s==="c")c++; else if(s==="r")r++; else if(s==="d")d++; }
+  const done=a+c+r+d;
+  const key=off=>{ const t=new Date(); t.setDate(t.getDate()-off);
+    return t.getFullYear()+"-"+String(t.getMonth()+1).padStart(2,"0")+"-"+String(t.getDate()).padStart(2,"0"); };
+  let st=0, off=days[key(0)]?0:1; while(days[key(off)]){ st++; off++; }
+  const td=days[key(0)]||{n:0};
+  const $=id=>document.getElementById(id);
+  $("g-streak").textContent=st;
+  $("g-xp").textContent=(S.xp||0).toLocaleString("en");
+  $("g-today").textContent=td.n||0;
+  $("g-total").textContent=(100*done/NFORM).toFixed(done?1:0)+"%";
+  $("g-total-n").textContent=done.toLocaleString("en")+" / "+NFORM.toLocaleString("en")+" demo formulas";
+  $("g-bar").innerHTML='<i style="background:var(--good);width:'+(100*a/NFORM)+'%"></i>'
+    +'<i style="background:var(--warn);width:'+(100*c/NFORM)+'%"></i>'
+    +'<i style="background:var(--tier3);width:'+(100*d/NFORM)+'%"></i>'
+    +'<i style="background:var(--bad);width:'+(100*r/NFORM)+'%"></i>';
+  $("g-leg").textContent = done
+    ? "✓ "+a+" accepted · ✎ "+c+" fixed · ⧉ "+d+" duplicates · ✗ "+r+" rejected · 🧭 "
+      +Object.keys(cells).length+"/"+NPAPERS+" papers sorted"
+    : "nothing reviewed yet — open Formula Express above and play a Paper Run";
+})();
+</script>
 </body>
 </html>

@@ -1349,35 +1349,18 @@ a{color:var(--accent)}
 <div class="proto">⚠️ working prototype — extracted formulas &amp; labels are not fully verified yet
  · <a href="https://github.com/joernmht/lp2graph" target="_blank" rel="noopener">lp2graph repo ↗</a></div>
 
-<!-- ============ HOME ============ -->
-<section id="home" class="on">
-  <header>
+<!-- ============ MENU / GAMES & STATS (no separate start page — Paper Run is main) ============ -->
+<section id="more">
+  <div class="top"><button class="back" data-go="run">‹ Paper Run</button></div>
+  <header style="margin-top:0">
     <div class="brandlogo">__LOGO__</div>
     <div class="eyebrow">Chair of Railway Operations · Paper 1</div>
     <h1>🚂 Formula Express</h1>
     <p class="sub">corpus review · __NPAPERS__ papers · __NFORM__ formulas</p>
   </header>
   <div class="games">
-    <div class="game" data-go="run"><span class="ico">📄</span>
-      <div><div class="ttl">Paper Run</div><div class="dsc">a whole paper + its symbol graph · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
     <div class="game" data-go="papers"><span class="ico">📚</span>
-      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper</div></div><span class="go">›</span></div>
-    <div class="game" data-go="more"><span class="ico">🎮</span>
-      <div><div class="ttl">Games &amp; stats</div><div class="dsc">Blitz, Shell Sorter · streak, XP, progress, Journal</div></div><span class="go">›</span></div>
-  </div>
-  <div class="exp-btns">
-    <button class="wide" onclick="openExport()">⤴ Export decisions</button>
-  </div>
-  <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
-  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
-    style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
-</section>
-
-<!-- ============ GAMES & STATS ============ -->
-<section id="more">
-  <div class="top"><button class="back" data-go="home">‹ Home</button></div>
-  <h2 style="margin-top:0">🎮 Games &amp; stats</h2>
-  <div class="games">
+      <div><div class="ttl">Papers</div><div class="dsc">jump to a specific paper · <span id="run-left"></span> papers left</div></div><span class="go">›</span></div>
     <div class="game" data-go="blitz"><span class="ico">⏱️</span>
       <div><div class="ttl">Blitz</div><div class="dsc">60-second sprint — best: <b id="blitz-best">0</b></div></div><span class="go">›</span></div>
     <div class="game" data-go="sort"><span class="ico">🧭</span>
@@ -1398,11 +1381,17 @@ a{color:var(--accent)}
     <div class="game" data-go="journal"><span class="ico">📔</span>
       <div><div class="ttl">Journal</div><div class="dsc">streak calendar, badges, day log</div></div><span class="go">›</span></div>
   </div>
+  <div class="exp-btns">
+    <button class="wide" onclick="openExport()">⤴ Export decisions</button>
+  </div>
+  <p class="mut" style="text-align:center">progress autosaves in this browser · export often</p>
+  <p class="mut" style="text-align:center"><a href="https://lp2graph.joernmaurischat.de/"
+    style="color:var(--accent);font-weight:700;text-decoration:none">🕸 lp2graph — the library behind this corpus ›</a></p>
 </section>
 
-<!-- ============ PAPER RUN ============ -->
-<section id="run">
-  <div class="top sticky"><button class="back" data-go="home">‹ Home</button>
+<!-- ============ PAPER RUN (main screen) ============ -->
+<section id="run" class="on">
+  <div class="top sticky"><button class="back" data-go="more">🎮 Menu</button>
     <span class="combo" id="combo"></span>
     <span class="info" id="run-info"></span>
     <button class="parrow" id="run-prev" aria-label="previous paper">‹</button>
@@ -1451,7 +1440,7 @@ a{color:var(--accent)}
 
 <!-- ============ PAPER LIST ============ -->
 <section id="papers">
-  <div class="top"><button class="back" data-go="home">‹ Home</button></div>
+  <div class="top"><button class="back" data-go="more">‹ Menu</button></div>
   <h2 style="margin-top:0">📚 Papers <span class="mut" id="plist-sub"></span></h2>
   <ul class="plist" id="plist"></ul>
 </section>
@@ -1588,7 +1577,7 @@ function go(id){
   document.querySelectorAll("section").forEach(s=>s.classList.toggle("on", s.id===id));
   document.body.classList.toggle("wide", id==="run");
   window.scrollTo(0,0);
-  if (id==="home" || id==="more") paintHome();
+  if (id==="more") paintHome();
   if (id==="run") paintRun();
   if (id==="sort") paintSort();
   if (id==="journal") paintJournal();
@@ -2649,9 +2638,9 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
 document.getElementById("run-prev").onclick=()=>skipRun(-1);
 document.getElementById("run-next").onclick=()=>skipRun(1);
 paintHome();
-/* deep link: game.html#run opens Paper Run directly (also #blitz/#sort/#journal/#papers) */
+/* Paper Run IS the start screen; deep links #blitz/#sort/#journal/#papers/#more still work */
 const boot=location.hash.replace("#","");
-if (["run","blitz","sort","journal","papers","more"].includes(boot)) go(boot);
+go(["run","blitz","sort","journal","papers","more"].includes(boot) ? boot : "run");
 </script>
 </body>
 </html>

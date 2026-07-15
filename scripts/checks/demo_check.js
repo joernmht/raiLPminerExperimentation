@@ -39,23 +39,29 @@ next.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') !== idx0, '› arrow skips to next paper');
 prev.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
 ok(w.eval('runIdx') === idx0, '‹ arrow goes back');
-// home = review work only (Paper Run / Papers / link to Games & stats);
-// mini-games + tiles/progress/journal live on the separate #more screen
-const home = d.getElementById('home').innerHTML;
+// no separate start page: Paper Run IS the main screen;
+// papers/mini-games/tiles/progress/journal/export live on the #more menu screen
+ok(!d.getElementById('home'), 'old start page (#home) is gone');
 const more = d.getElementById('more').innerHTML;
-ok(home.includes('data-go="run"') && home.includes('data-go="more"') &&
-   !home.includes('class="tiles"') && !home.includes('data-go="blitz"'),
-   'home holds Paper Run + Games&stats link, no tiles/mini-games');
-ok(more.includes('data-go="blitz"') && more.includes('class="tiles"') &&
+ok(more.includes('data-go="papers"') && more.includes('data-go="blitz"') &&
+   more.includes('class="tiles"') && more.includes('openExport()') &&
    more.indexOf('Overall progress') < more.indexOf('data-go="journal"'),
-   'Games & stats screen holds blitz/sorter, tiles, progress, journal');
+   'menu screen holds papers/blitz/sorter, tiles, progress, journal, export');
+ok(d.querySelector('#run .back').dataset.go === 'more', 'run top button opens the menu');
+ok(d.querySelector('#more .back').dataset.go === 'run', 'menu back returns to Paper Run');
+ok(d.querySelector('#papers .back').dataset.go === 'more', 'papers back returns to menu');
 w.eval('go("more")');
-ok(d.getElementById('more').classList.contains('on') &&
-   d.getElementById('t-total').textContent !== '0%' || true, 'go("more") shows the stats screen');
-ok(d.getElementById('blitz-best').textContent !== '', 'stats painted on Games & stats screen');
+ok(d.getElementById('more').classList.contains('on'), 'go("more") shows the menu screen');
+ok(d.getElementById('blitz-best').textContent !== '', 'stats painted on menu screen');
 w.eval('go("blitz")');
-ok(d.querySelector('#blitz .back').dataset.go === 'more', 'blitz backlink returns to Games & stats');
+ok(d.querySelector('#blitz .back').dataset.go === 'more', 'blitz backlink returns to menu');
 w.eval('go("run")');
+// no-hash boot lands on Paper Run (main)
+const dom2 = new JSDOM(html, { runScripts: 'dangerously', pretendToBeVisual: true,
+  url: 'https://railpmining.joernmaurischat.de/game.html' });
+dom2.window.HTMLElement.prototype.scrollIntoView = function(){};
+ok(dom2.window.document.getElementById('run').classList.contains('on'),
+   'no-hash boot lands on Paper Run (main screen)');
 // landing + prisma banners and deep-linked card
 const fs2 = require('fs');
 const land = fs2.readFileSync('/home/joern/raiLPminerExperimentation/docs/index.html', 'utf8');
@@ -64,6 +70,18 @@ ok(land.includes('working prototype'), 'railpmining landing has disclaimer');
 ok(land.indexOf('working prototype') < land.indexOf('<header'), 'landing banner at top');
 ok(land.includes('href="game.html#run"'), 'Formula Express card links straight to Paper Run');
 ok(pris.includes('working prototype'), 'prisma page has disclaimer');
+// sister-site linkboxes are real clickable cards, same look on both landings
+ok(/<a class="app sister" href="https:\/\/lp2graph\.joernmaurischat\.de\/"/.test(land),
+   'landing lp2graph linkbox is a clickable sister card');
+const l2land = fs2.readFileSync('/home/joern/lp2graph/docs/demo/index.html', 'utf8');
+ok(/<a class="app sister" href="https:\/\/railpmining\.joernmaurischat\.de\/"/.test(l2land),
+   'lp2graph landing has the matching railpmining sister card');
+ok(land.includes('a.app.sister') && l2land.includes('a.app.sister'),
+   'sister cards share the same style rule on both landings');
+// game stats live on the main landing (reads fx:state:v1 from localStorage)
+ok(land.includes('Your review progress') && land.includes('fx:state:v1') &&
+   land.includes('id="g-bar"') && land.includes('id="g-streak"'),
+   'landing shows game stats block hydrated from localStorage');
 console.log(`\n[round3] ${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
 })();
