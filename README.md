@@ -194,6 +194,12 @@ completeness/determinism.
 - **`milp_sources`** — the raw corpus of published formulations to extract from.
 - **`67531d7506c81a8c34f5794e`** — the LaTeX paper this experiment supports.
 
+## AI disclaimer
+
+This repository was developed with substantial assistance from AI coding tools
+(primarily Anthropic's Claude). Code, documentation and results have been
+reviewed by the author, who takes full responsibility for the content.
+
 ## License
 
 MIT — see `LICENSE`.
