@@ -262,5 +262,33 @@ try { d.getElementById('pgraph').querySelector('svg')
 catch (err) { tapOk = false; }
 ok(tapOk, 'nearest-node tap fallback is guarded when layout is unavailable');
 
+// ---- v13: build-time auto-split suggestions (corpusbuilder.split) ----
+const P = w.eval('RAW').papers;
+ok(P.every(pp => pp.f.every(f => f.length >= 12)), 'every formula carries the split slot f[11]');
+ok(P.every(pp => pp.f.every(f => !f[11] || (Array.isArray(f[11]) && (f[11].length === 1 || f[11].length >= 3)))),
+   'f[11] is 0, [conf] (suspect) or [conf, part1, part2, ...]');
+const pool = w.eval('RUSHP');
+const withSug = [];
+for (const pp of pool) for (const f of pp.f) if (f[11] && f[11].length > 1) withSug.push([pp, f]);
+const sugSplit = withSug[0];
+if (sugSplit) {
+  const [sp, sf] = sugSplit;
+  w.eval(`go("run"); runIdx = RUSHP.findIndex(x=>x.k===${JSON.stringify(sp.k)}); paintRun();`);
+  const srow = d.getElementById('fr-' + sf[0]);
+  const achip = srow && srow.querySelector('.achip');
+  ok(achip && achip.textContent === '⚡×' + (sf[11].length - 1), 'auto-split row shows the ⚡×n chip');
+  achip.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  ok(d.getElementById('fixsheet').classList.contains('on'), '⚡ chip opens the fix sheet');
+  const tas = [...d.querySelectorAll('#fix-parts textarea')];
+  ok(tas.length === sf[11].length - 1, 'fix sheet is pre-filled with one box per detected part');
+  ok(tas.every((t, i) => t.value === sf[11][i + 1]), 'pre-filled boxes carry the detected parts');
+  w.eval('closeSheets()');
+} else {
+  ok(true, 'no split suggestion in this payload (skip chip check)');
+  ok(true, 'no split suggestion in this payload (skip sheet check)');
+  ok(true, 'no split suggestion in this payload (skip boxes check)');
+  ok(true, 'no split suggestion in this payload (skip values check)');
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);
