@@ -49,6 +49,7 @@ from pathlib import Path
 
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.prisma import _RELEVANT
+from corpusbuilder.split import split_latex
 
 ROOT = Path(__file__).resolve().parent.parent
 DOSS = ROOT / "corpus" / "dossiers"
@@ -1047,6 +1048,16 @@ def _payload(include: set[str] | None = None) -> dict:
             syms, ops, rel = extract_symbols(f.latex)
             tree = parse_tree(f.latex)
             disp = render_latex(f.latex)
+            # deterministic multi-formula detection (corpusbuilder.split):
+            # slot 11 = 0 (single) | [conf, part1, part2, ...] (suggested
+            # split) | [0] (multiple statements suspected, no clean cut)
+            sp = split_latex(f.latex)
+            if sp.is_split:
+                auto = [1 if sp.confident else 0, *sp.parts]
+            elif not sp.confident:
+                auto = [0]
+            else:
+                auto = 0
             fs.append(
                 [
                     f.id,
@@ -1060,6 +1071,7 @@ def _payload(include: set[str] | None = None) -> dict:
                     tree or 0,
                     1 if _is_objective(tree, ops, rel, f.latex) else 0,
                     disp if disp != f.latex else 0,
+                    auto,
                 ]
             )
         if include is not None:  # public demo: drop exact re-extractions
@@ -2094,6 +2106,7 @@ function paintRun(){
         ${f[1]?'<span class="chip">'+escapeHtml(f[1])+"</span>":""}
         <span class="chip">${f[3]}</span>${f[4]?'<span class="mut">p.'+f[4]+"</span>":""}
         ${gOf[f[0]]!==undefined?'<span class="chip gchip" data-g="'+gOf[f[0]]+'" title="near-identical group — tap to keep THIS one and mark the others as duplicates">≈ ×'+p.g[gOf[f[0]]].length+"</span>":""}
+        ${f[11]?'<span class="chip achip" style="color:var(--warn);font-weight:750" title="'+(f[11].length>1?"looks like "+(f[11].length-1)+" glued formulas — tap to open the fix sheet pre-split":"several statements suspected — tap to cut by hand")+'">⚡'+(f[11].length>1?"×"+(f[11].length-1):" multi?")+"</span>":""}
         <span class="st"></span></div>
       <div class="render"></div>
       <div class="fx">
@@ -2116,7 +2129,7 @@ function paintRun(){
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
       ${chkChips(p)}
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row. In the list, <span style="color:var(--tier3);font-weight:700">≈ ×n</span> marks near-identical formulas (bidirectional token similarity, computed at build; grouped together below): tap ≈ on the copy you want to KEEP to mark the rest ⧉ duplicate, or ⧉ dup a single formula</div>
+      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row. In the list, <span style="color:var(--tier3);font-weight:700">≈ ×n</span> marks near-identical formulas (bidirectional token similarity, computed at build; grouped together below): tap ≈ on the copy you want to KEEP to mark the rest ⧉ duplicate, or ⧉ dup a single formula. <span style="color:var(--warn);font-weight:700">⚡×n</span> marks an extraction that glued n formulas into one record (deterministic split, computed at build): tap it to open the fix sheet pre-filled with the parts — check, adjust, save; <span style="color:var(--warn);font-weight:700">⚡ multi?</span> = several statements suspected but no clean cut, split by hand with ✂</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
@@ -2137,6 +2150,18 @@ function paintRun(){
     const f=p.f.find(x=>x[0]===row.dataset.fid);
     const gc=e.target.closest(".gchip");
     if (gc){ markDupGroup(p, f[0], +gc.dataset.g, e); refreshRun(p); return; }
+    const ac=e.target.closest(".achip");
+    if (ac){
+      // auto-split suggestion: open the fix sheet pre-filled with the
+      // detected parts (a saved fix takes precedence; suspect = raw blob)
+      fixCtx={p,f};
+      const d=(S.dec[p.k]||{})[f[0]]||{};
+      const sug=(f[11]&&f[11].length>1)?f[11].slice(1):[f[2]];
+      paintFixParts(d.m&&d.m.length ? [d.n||f[2], ...d.m] : (d.n?[d.n]:sug));
+      fixPreview();
+      openSheet("fixsheet");
+      return;
+    }
     const btn=e.target.closest("[data-a]");
     if (btn){
       const a=btn.dataset.a;
