@@ -1,0 +1,17 @@
+{
+  "formulation_id": "multi_obj_lateness_energy",
+  "cardinalities": {
+    "I": 3
+  },
+  "parameters": {
+    "w_late": 3,
+    "w_energy": 5,
+    "e": [
+      4,
+      7,
+      2
+    ]
+  },
+  "expected_optimum": 13,
+  "optimum_source": "planted, then verified: every variable in the weighted sum carries a positive weight and is bounded below but not above, so each is driven to its floor. t has no constraint and only its non-negativity, giving t*=0; v is bounded below only by v_i >= z_i with z binary and unconstrained, so z*=0 forces v*=0. The remaining objective is the constant term sum_i e_i = 4+7+2 = 13, which is therefore the optimum for any positive w_late and w_energy."
+}

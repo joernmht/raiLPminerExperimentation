@@ -1,0 +1,38 @@
+{
+  "formulation_id": "mip_2_8_pesp",
+  "cardinalities": {
+    "E": 2,
+    "T": 10
+  },
+  "parameters": {
+    "l": [
+      [
+        0,
+        4
+      ],
+      [
+        4,
+        0
+      ]
+    ],
+    "w": [
+      [
+        0,
+        2
+      ],
+      [
+        2,
+        0
+      ]
+    ],
+    "T_period": 10
+  },
+  "expected_optimum": null,
+  "expected_status": [
+    "unbounded",
+    "infeasible"
+  ],
+  "optimum_source": "none exists: this formulation has no optimum to publish. The wrap counter k is declared integer with no lower bound, and the objective minimizes sum k, so driving every k to minus infinity is always improving. The two PESP window constraints bound the cyclic offset t_j - t_i + T_period * k, and t compensates freely for any k, so nothing arrests the descent. What this instance validates is that the grounder reports no finite optimum, and that every solver agrees on that verdict, rather than returning a spurious finite value.",
+  "status_note": "Two accepted statuses, verified on this machine: CBC reports `unbounded`, HiGHS and Gurobi both report `infeasible`. That is expected, not a defect. MILP presolve frequently cannot separate an unbounded model from an infeasible one and returns a combined verdict (Gurobi's INF_OR_UNBD), which PuLP surfaces as `infeasible`. Any harness that treats the two spellings as distinguishable across solvers will misreport this model.",
+  "note": "Uses the same data as pesp_2events.json, whose formulation pesp_solvable is this model plus the missing lower bound k >= 0. The pair is the contrast: identical data, one bound apart, optimum 1 versus unbounded."
+}

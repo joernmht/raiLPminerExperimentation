@@ -75,3 +75,43 @@ Permanent fix = institutional `ELSEVIER_INSTTOKEN` from the TUD library.
 
 6. **Then the method proper**: extraction/homologization into LP2Graph → feature vectors →
    multi-level clustering & naming → two-stage labeling → fidelity validation (round-trip + cross-solver).
+
+## Instance coverage & seed-formulation defects (2026-08-12)
+
+Every one of the 10 seed formulations now has at least one instance in `corpus/instances/`
+(was 5), and all 10 validate across **CBC, HiGHS and Gurobi** with `matches_expected` /
+`matches_status` true and cross-solver agreement. Two lp2graph grounder gaps that blocked
+this were closed upstream (`abs` terms are epigraph-lifted where that is exact;
+`solve.solve_lexicographic` stages a lexicographic objective level by level).
+
+Instances are **planted**, per the S2 decision: pick the optimal solution first, then choose
+parameters that make it optimal, so `expected_optimum` is derived by argument and recorded in
+`optimum_source` rather than copied from whatever a solver happened to return.
+
+Writing them exposed four defects in the seed templates. **None is a data problem; all four are
+structural, and all four are corpus-content calls** (changing a formulation shifts the taxonomy
+and clustering artifacts, so they are deliberately left for a human decision).
+
+| # | Formulation | Defect | Consequence | Proposed minimal fix |
+|---|---|---|---|---|
+| 1 | `lp_1_5_soft_regularity` | No anchor: `t` is non-negative with no upper bound and nothing pins any element | Optimum is **0 for every instance**. A perfectly regular schedule always exists, so no parameter choice discriminates | Anchor the first departure (`t_0 = earliest`) or bound `t` above; either makes the penalty weight `w` bite |
+| 2 | `mip_2_8_pesp` | Wrap counter `k` is `integer` with **no lower bound**, and the objective minimizes `sum k` | **Unbounded.** No optimum exists to publish | Add `lower: 0` to `k`. That is exactly what the sibling `pesp_solvable` already does, so the two would then be duplicates: prefer deleting one, or keep `mip_2_8_pesp` as an intentional negative fixture |
+| 3 | `objective_abs_deviation` | Declares parameter `target`, never references it; also has **no constraints** | Model is `min sum_i abs(t_i)`, not the `min sum_i abs(t_i - target_i)` its own description promises; optimum is 0 for any data. lp2graph's own validator flags the unused symbol | Needs an `abs` over a two-term difference, which the **flat `Term` schema cannot express** (a term is one `ref` plus a coefficient). Either extend the schema with nested terms, or restate the model with explicit deviation variables the way `lp_1_5_soft_regularity` does |
+| 4 | `objective_lex_priority` | No constraints and no parameters | The two priority levels never compete, so lexicographic ordering is untested for any instance | Add one coupling constraint (e.g. `c_i + t_i >= 1`) so buying a lower level 1 costs level 2 |
+
+Also found: the lab's `corpus/formulations/mip_2_8_pesp.json` is **stale** relative to
+`~/lp2graph/formulations/constraints/mip_2_8_pesp.json`, which dropped the unused index `T` on
+2026-07-13 (it produced a loose node; the schema view went 11n/18e to 10n/20e). The two copies
+should be reconciled, again a content call because it moves the graph metrics.
+
+A fifth finding is about solvers, not the corpus, and is now encoded in the harness: on an
+unbounded MILP the three solvers **disagree on the word**. CBC reports `unbounded`; HiGHS and
+Gurobi both report `infeasible`, because MILP presolve routinely cannot separate the two and
+returns a combined verdict. `expected_status` in an instance file is therefore a *set* of
+acceptable statuses, and for non-optimal instances cross-solver agreement means agreeing on the
+verdict class, not on the spelling. Any downstream harness that treats these as distinguishable
+will misreport unbounded models.
+
+These matter beyond the seed corpus: defects 1, 3 and 4 all make an instance's optimum
+**independent of its data**, which is precisely what the planned S1/S2 instance generators must
+detect and refuse to emit, and what the real HITL-ingested formulations must be screened for.

@@ -1,0 +1,13 @@
+{
+  "formulation_id": "lp_1_5_soft_regularity",
+  "cardinalities": {
+    "I": 5
+  },
+  "parameters": {
+    "h_target": 6,
+    "w": 2.5
+  },
+  "expected_optimum": 0,
+  "optimum_source": "planted, then verified: the perfectly regular schedule t_i = i * h_target satisfies t_i - t_{i-1} = h_target exactly for every constrained i, so both slacks are 0 and the weighted deviation sum is 0. Since w > 0 and the slacks are non-negative, 0 is also a lower bound, hence optimal.",
+  "degeneracy": "STRUCTURAL, not an artefact of this data: the optimum is 0 for EVERY instance of this formulation. t is non-negative with no upper bound and no anchoring constraint, so a perfectly regular schedule always exists (for negative h_target, start high enough and count down). The instance therefore validates grounding and cross-solver agreement, but carries no discriminating power over the parameter values. See corpus/STATUS.md for the proposed fix (anchor t_0 or bound t from above)."
+}
