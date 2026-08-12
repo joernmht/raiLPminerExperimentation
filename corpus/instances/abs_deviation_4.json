@@ -1,0 +1,17 @@
+{
+  "formulation_id": "objective_abs_deviation",
+  "cardinalities": {
+    "I": 4
+  },
+  "parameters": {
+    "target": [
+      3,
+      1,
+      4,
+      1
+    ]
+  },
+  "expected_optimum": 0,
+  "optimum_source": "planted, then verified: the objective is sum_i |t_i| (see the degeneracy note on why `target` does not enter it) and t is non-negative with no constraints, so t*=0 attains 0, which is also the lower bound of a sum of magnitudes.",
+  "degeneracy": "STRUCTURAL, on two counts. (1) The declared parameter `target` is never referenced by any term, so the model is min sum_i |t_i| rather than the min sum_i |t_i - target_i| its description promises; expressing the latter needs an abs over a two-term difference, which the flat Term schema cannot represent. (2) The formulation has no constraints, so the magnitudes are free to collapse to 0 for any data. The instance exercises the grounder's epigraph lifting of `abs` end to end, but its optimum is data-independent. See corpus/STATUS.md."
+}

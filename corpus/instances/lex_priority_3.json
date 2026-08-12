@@ -1,0 +1,13 @@
+{
+  "formulation_id": "objective_lex_priority",
+  "cardinalities": {
+    "I": 3
+  },
+  "parameters": {},
+  "expected_optimum": [
+    0,
+    0
+  ],
+  "optimum_source": "planted, then verified: one value per priority level, highest first. Level 1 minimizes sum_i c_i and level 2 minimizes sum_i t_i subject to level 1 holding. Both families are non-negative and appear in no constraint, so each level attains its lower bound of 0, and level 1 being pinned at 0 does not restrict level 2.",
+  "degeneracy": "STRUCTURAL: the formulation declares no constraints and no parameters, so the two priority levels never compete. A lexicographic objective only means something when optimizing the higher level costs the lower one, which cannot happen here for any instance. This instance validates the staged solve path (lp2graph.solve.solve_lexicographic) and the level-by-level comparison, not the priority semantics. See corpus/STATUS.md."
+}
