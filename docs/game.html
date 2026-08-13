@@ -120,6 +120,15 @@ button:active{transform:scale(.97)}
 .gsel{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .gsel .chip{cursor:pointer}
 .gsel .chip.sel{border-color:var(--accent2);color:var(--accent2);font-weight:800}
+/* symbol classifier: parameter / variable / index, applied paper-wide */
+.symcls{display:flex;flex-wrap:wrap;align-items:center;gap:6px;width:100%;margin-bottom:2px}
+.kbtn{font:inherit;font-size:12.5px;padding:4px 9px;border-radius:999px;cursor:pointer;
+  border:1.5px solid var(--line);background:transparent;color:var(--muted)}
+.kbtn.on{border-color:var(--accent);color:var(--accent);font-weight:800;background:var(--good-soft)}
+.kn{font-size:11.5px;opacity:.75}
+.gnode-s.kp{fill:var(--accent)}
+.gnode-s.kv{fill:var(--accent2)}
+.gnode-s.ki{fill:var(--tier3)}
 .gnode-b{fill:var(--tier3)}
 .gbind{stroke:var(--tier3);stroke-dasharray:3 3;opacity:.8}
 .gedge{stroke:var(--line);stroke-width:1}
@@ -434,7 +443,12 @@ const LSK = "fx:state:v1";
 let S = load();
 function load(){
   try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s) return s; }catch(e){}
-  const s = {dec:{}, cells:{}, xp:0, days:{}, best:0, badges:{}};
+  /* sym: per-paper symbol table, {paper_key:{symbol:"p"|"v"|"i"}}. A published
+     equation carries no symbol table and promote.py cannot invent one, so this
+     is where the reviewer supplies it. Paper-scoped, not formula-scoped: a
+     symbol means the same thing throughout one model, which is what makes one
+     tap propagate to every formula that uses it. */
+  const s = {dec:{}, cells:{}, sym:{}, xp:0, days:{}, best:0, badges:{}};
   try{
     for (let i=0;i<localStorage.length;i++){
       const k = localStorage.key(i);
@@ -452,6 +466,33 @@ function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ t
 function dayKey(off){ const d = new Date(); d.setDate(d.getDate()-off);
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
 function today(){ return dayKey(0); }
+
+/* ---------- symbol table (parameter / variable / index) ---------- */
+const KINDS = [["p","◆ parameter"],["v","◇ variable"],["i","▫ index"]];
+const KIND_NAME = {p:"parameter", v:"variable", i:"index"};
+function symKind(pk, name){ return ((S.sym||{})[pk]||{})[name] || null; }
+/* every formula of this paper whose symbol list contains `name` — this is the
+   "where else does it occur" the classifier propagates over */
+function symUses(p, name){
+  return p.f.filter(f=>(f[5]||[]).some(s=>s[0]===name));
+}
+function setSymKind(p, name, code){
+  S.sym = S.sym || {};
+  const tab = S.sym[p.k] = S.sym[p.k] || {};
+  const uses = symUses(p, name).length;
+  if (tab[name]===code){ delete tab[name]; save();
+    toast("cleared "+name); return; }
+  tab[name]=code; save();
+  toast(name+" → "+KIND_NAME[code]+", in "+uses+" formula"+(uses===1?"":"s"));
+}
+/* how much of a paper's symbol table is still open — shown on the run header
+   so "what is left" is answerable without opening every formula */
+function symOpen(p){
+  const seen=new Set();
+  for (const f of p.f) for (const s of (f[5]||[])) seen.add(s[0]);
+  let open=0; for (const nm of seen) if (!symKind(p.k, nm)) open++;
+  return [open, seen.size];
+}
 
 /* ---------- derived ---------- */
 function decCount(){ let n=0; for (const pk in S.dec) n += Object.keys(S.dec[pk]).length; return n; }
@@ -601,6 +642,16 @@ const SVGNS="http://www.w3.org/2000/svg";
 function el(tag, attrs){ const e=document.createElementNS(SVGNS,tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]); return e; }
 function isObjective(f){ return f[9]===1; }   // precomputed at build (tree-based)
+/* progress on the reviewer-supplied symbol table: how many of the paper's
+   symbols still have no parameter/variable/index verdict. This is the piece
+   promotion blocks on, so it belongs next to the structural checks. */
+function symChip(p){
+  const [open,total]=symOpen(p);
+  if (!total) return "";
+  const done=total-open;
+  const col = open===0 ? "var(--good)" : done ? "var(--warn)" : "var(--muted)";
+  return `<span class="chip" style="color:${col}">◆ symbols typed <b>${done}/${total}</b></span>`;
+}
 function chkChips(p){
   const ck=p.chk||{}; if (!p.f.length) return "";
   const coh=Math.round((ck.coh||0)*100);
@@ -611,6 +662,7 @@ function chkChips(p){
     <span class="chip">▦ <b>${ck.con}</b> constraints</span>
     <span class="chip">◇ <b>${ck.sym}</b> symbols</span>
     <span class="chip" style="color:${ck.comp?"var(--good)":"var(--warn)"}">${ck.comp?"✓ complete":"⚠ incomplete"}</span>
+    ${symChip(p)}
   </div>
   <div class="mut" style="margin-top:4px">pre-review structural check — heuristic Level-M analogue (completeness &amp; coherence); the canonical check runs after ingest</div>`;
 }
@@ -712,7 +764,22 @@ function drawPaperGraph(host, p){
     });
     if (sel===null){ strip.innerHTML=""; return; }
     const ids=[sel, ...[...nbrs].sort((a,b)=>a-b)];
-    strip.innerHTML = ids.map((i,k)=>{
+    const selNd=g.nodes[sel];
+    /* a selected SYMBOL gets the classifier: parameter / variable / index.
+       One tap writes the whole paper, because the chip strip already shows
+       every formula the symbol appears in — the propagation is visible
+       before it is applied, not a surprise afterwards. */
+    let head="";
+    if (selNd.t==="s"){
+      const cur=symKind(p.k, selNd.name);
+      const n=symUses(p, selNd.name).length;
+      head = `<span class="symcls">`+
+        KINDS.map(([code,label])=>
+          `<button class="kbtn${cur===code?" on":""}" data-kind="${code}" `+
+          `data-sym="${escapeHtml(selNd.name)}">${label}</button>`).join("")+
+        `<span class="kn">${n} formula${n===1?"":"s"}</span></span>`;
+    }
+    strip.innerHTML = head + ids.map((i,k)=>{
       const nd=g.nodes[i];
       const obj = nd.t==="f" && isObjective(p.f[nd.fi]);
       return `<span class="chip${k===0?" sel":""}" data-node="${i}"`+
@@ -720,6 +787,23 @@ function drawPaperGraph(host, p){
         `>${obj?"🎯 ":""}${escapeHtml(String(nodeName(i)))}</span>`;
     }).join("");
   }
+  strip.addEventListener("click", ev=>{
+    const b=ev.target.closest(".kbtn"); if(!b) return;
+    ev.stopPropagation();
+    setSymKind(p, b.getAttribute("data-sym"), b.getAttribute("data-kind"));
+    paintSel(); paintSymNodes();
+  });
+  /* colour every symbol node by its classification, so the reviewer sees at a
+     glance which symbols the paper still owes a decision */
+  function paintSymNodes(){
+    svg.querySelectorAll("[data-sym]").forEach(c=>{
+      const k=symKind(p.k, c.getAttribute("data-sym"));
+      c.classList.toggle("kp", k==="p");
+      c.classList.toggle("kv", k==="v");
+      c.classList.toggle("ki", k==="i");
+    });
+  }
+  paintSymNodes();
   /* clicking a node lifts its defining formula row(s) to the top of the
      review list: the formula itself, or (for a symbol) every formula that
      uses it, in paper order — so the first row is the definition site. */
@@ -1482,11 +1566,25 @@ function buildExport(){
     const p=PAPERS.find(x=>x.k===k);
     return {paper_key:k, doi:(p&&p.d)||null, cell:S.cells[k]==="X"?"out_of_scope":S.cells[k]};
   });
+  /* the reviewer-supplied symbol table, the half of a canonical model that a
+     published equation never carries. corpusbuilder.promote consumes this to
+     emit one %@ param / %@ var / %@ index line per symbol instead of the
+     both-and-a-question-mark stub it has to write without it. */
+  const symtab=[];
+  for (const p of PAPERS){
+    const t=(S.sym||{})[p.k]; if (!t || !Object.keys(t).length) continue;
+    const syms={};
+    for (const nm of Object.keys(t).sort()) syms[nm]=KIND_NAME[t[nm]] || t[nm];
+    const [open,total]=symOpen(p);
+    symtab.push({paper_key:p.k, doi:p.d||null, symbols:syms,
+      classified:total-open, total_symbols:total});
+  }
   const sc=statusCounts();
-  return {schema_version:"game-decisions-1", exported:new Date().toISOString(),
+  return {schema_version:"game-decisions-2", exported:new Date().toISOString(),
     totals:{reviewed:sc.a+sc.c+sc.r+sc.d, accepted:sc.a, corrected:sc.c, rejected:sc.r,
-      duplicates:sc.d, papers_sorted:cells.length, xp:S.xp},
-    formula_decisions:fd, paper_cells:cells,
+      duplicates:sc.d, papers_sorted:cells.length, xp:S.xp,
+      papers_with_symbols:symtab.length},
+    formula_decisions:fd, paper_cells:cells, symbol_tables:symtab,
     stats:{xp:S.xp, days:S.days, best_blitz:S.best, badges:S.badges}};
 }
 function expName(){ return "game_decisions_"+today()+".json"; }
@@ -1535,6 +1633,15 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
     }
     for (const c of (j.paper_cells||[])){
       if (!S.cells[c.paper_key]) { S.cells[c.paper_key]= c.cell==="out_of_scope"?"X":c.cell; merged++; }
+    }
+    const CODE={parameter:"p", variable:"v", index:"i", p:"p", v:"v", i:"i"};
+    for (const t of (j.symbol_tables||[])){
+      S.sym = S.sym || {};
+      const tab = S.sym[t.paper_key] = S.sym[t.paper_key] || {};
+      for (const nm in (t.symbols||{})){
+        const code=CODE[t.symbols[nm]];
+        if (code && !tab[nm]){ tab[nm]=code; merged++; }
+      }
     }
     const st=(j.stats||{});
     if (st.xp>S.xp) S.xp=st.xp;
