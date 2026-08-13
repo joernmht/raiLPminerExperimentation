@@ -952,6 +952,19 @@ def _is_objective(tree, ops, rel, latex: str = "") -> bool:
     return (not rel) and any(o[0] in ("min", "max") for o in ops)
 
 
+def is_objective_latex(latex: str) -> bool:
+    """Public wrapper: does this LaTeX statement *state an objective*?
+
+    The same detector the game uses to flag objective rows (:func:`_is_objective`
+    over :func:`parse_tree` / :func:`extract_symbols`), exposed so downstream
+    consumers — notably ``corpusbuilder.promote``, which must emit the objective
+    row as ``\\min\\quad &`` and every other row as a constraint — reuse *this*
+    ruleset rather than growing a second, divergent heuristic.
+    """
+    _syms, ops, rel = extract_symbols(latex)
+    return _is_objective(parse_tree(latex), ops, rel, latex)
+
+
 def _paper_check(fs: list[list]) -> dict:
     """Per-paper completeness + coherence from the formula records.
 

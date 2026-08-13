@@ -52,10 +52,21 @@ Permanent fix = institutional `ELSEVIER_INSTTOKEN` from the TUD library.
 1. **MANUAL REVIEW (human-in-the-loop) — the immediate critical-path step.**
    The 8,957 formulas are raw extractions, *not yet validated*. Open `corpus/review/index.html`,
    accept/correct/reject per formula, export the decisions JSONs into `corpus/decisions/`.
-   Then build the ingest step: decisions → promote accepted/corrected formulas to canonical
-   lp2graph `Formulation`s in `corpus/formulations/` + `ProvenanceRecord`s in `corpus/provenance/`
-   (this finally replaces the 10 placeholder seed templates). Re-run `prisma` so the HITL counts populate.
-   _Prune the 28 off-topic dossiers here._
+   The ingest step now **exists**: `corpusbuilder.promote` (2026-08-13) reads
+   `corpus/decisions/*.json` in both export schemas and writes canonical `Formulation`s to
+   `corpus/formulations/` + `ProvenanceRecord`s to `corpus/provenance/`, with every failure
+   categorized by cause in `corpus/promotion.{json,md}`. Run it after every review session:
+   `PYTHONPATH=. python3 -m corpusbuilder.promote` (add `--dry-run` to look first).
+   Re-run `prisma` afterwards so the HITL counts populate. _Prune the 28 off-topic dossiers here._
+
+   **Declarations are the real remaining work, and they are per paper, not per formula.**
+   Canonical LaTeX needs a `%@` symbol table (index families, parameter shape/kind, variable
+   domain/role) that a displayed equation simply does not carry — measured: 0 of 10,156
+   extracted units parse without one. So each promoted paper needs a sidecar
+   `corpus/declarations/<paper_key>.tex`; promote writes a fill-in-the-blank
+   `<paper_key>.stub.tex` (symbols and constraint-row names pre-filled) for every paper that
+   lacks one, and the `missing_declarations` count in the report *is* the outstanding worklist.
+   See `docs/adr/0010-promotion-needs-a-declaration-sidecar.md`.
 
 2. **Expert-cluster baseline from surveys (the "compare our clusters vs the reviews" idea).**
    The corpus already contains review/survey papers whose author-proposed taxonomies are the

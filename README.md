@@ -125,6 +125,24 @@ following the paper's protocol (`chapters/03_methodology/sec_scope_corpus.tex`):
    published optimum exist — an `instances/<…>.json`.
 4. Re-run `python -m railpminer run`.
 
+For the harvested-paper corpus, steps 2 and 3 are automated by
+`corpusbuilder.promote`, which turns reviewed formulas into exactly those two
+files:
+
+```
+PYTHONPATH=. python3 -m corpusbuilder.promote --dry-run   # what would happen
+PYTHONPATH=. python3 -m corpusbuilder.promote             # promote + write the report
+```
+
+It reads the HITL verdicts from `corpus/decisions/*.json` (both the review-game
+and the `review_view` export schemas), assembles one candidate model per paper,
+and ingests it through M1. A published equation carries no symbol table, so each
+paper also needs a declaration sidecar at `corpus/declarations/<paper_key>.tex`
+holding its `%@ index` / `param` / `var` / `obj` / `con` lines; papers without one
+fail with cause `missing_declarations` and get a fill-in-the-blank `.stub.tex`
+next to it. Every outcome, promoted or not, is categorized by cause in
+`corpus/promotion.{json,md}` (see `docs/adr/0010-promotion-needs-a-declaration-sidecar.md`).
+
 Adding entries needs no code changes: the loader discovers everything by file.
 
 ---
