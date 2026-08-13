@@ -262,6 +262,40 @@ def _iter_records(payload: dict):
                 yield str(key), (g.get("doi") or None), entry
 
 
+#: The kinds the review game's classifier can emit. Anything else in an export
+#: is ignored rather than guessed at: a sidecar built on a misread verdict would
+#: be worse than one the reviewer still has to fill in.
+_SYMBOL_KINDS = frozenset({"index", "parameter", "variable"})
+
+
+def load_symbol_tables(paths) -> dict[str, dict[str, str]]:
+    """Read the reviewer-supplied symbol tables out of decision exports.
+
+    Same dedup rule as :func:`load_decisions` (sorted-name order, last verdict
+    on a ``(paper_key, symbol)`` wins), so re-exporting a day's work supersedes
+    it. Exports written before the classifier existed simply carry no
+    ``symbol_tables`` key and contribute nothing.
+    """
+    tables: dict[str, dict[str, str]] = {}
+    for path in sorted(paths, key=lambda p: p.name):
+        try:
+            payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        for group in payload.get("symbol_tables") or []:
+            if not isinstance(group, dict):
+                continue
+            key = group.get("paper_key")
+            symbols = group.get("symbols")
+            if not key or not isinstance(symbols, dict):
+                continue
+            table = tables.setdefault(str(key), {})
+            for name, kind in symbols.items():
+                if isinstance(kind, str) and kind in _SYMBOL_KINDS:
+                    table[str(name)] = kind
+    return tables
+
+
 def load_decisions(paths) -> tuple[dict[str, PaperDecisions], dict[str, int]]:
     """Read decision exports into per-paper records, and report odd statuses.
 
@@ -498,7 +532,17 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
     return "\n".join(lines) + "\n"
 
 
-def declaration_stub(dossier: Dossier, rows: list[Row]) -> str:
+#: What the review game's symbol classifier can already answer for a stub.
+_KIND_LINE = {
+    "index": "%@ index {i} ordered=0 cyclic=0 :: ?",
+    "parameter": "%@ param {i} shape=- kind=scalar domain=- :: ?",
+    "variable": "%@ var {i} shape=- domain=? role=primary drole=- lo=- hi=- :: ?",
+}
+
+
+def declaration_stub(
+    dossier: Dossier, rows: list[Row], symbols: dict[str, str] | None = None
+) -> str:
     """A fill-in-the-blank declaration sidecar for a paper awaiting one.
 
     Every line the reviewer must supply is present with the symbol or row name
@@ -506,12 +550,19 @@ def declaration_stub(dossier: Dossier, rows: list[Row]) -> str:
     versus parameters versus variables, their shapes and domains) are left as
     ``?`` placeholders. A stub used unedited fails loudly rather than promoting a
     guessed model.
+
+    ``symbols`` is the reviewer's own answer to the first of those questions,
+    carried over from the review game's symbol classifier (export key
+    ``symbol_tables``). A symbol it classifies gets *only* its declared line;
+    the rest still get all three for the reviewer to choose between. Shapes and
+    domains stay ``?`` either way: the game asks what a symbol *is*, not how it
+    is indexed.
     """
-    symbols: list[str] = []
+    symbol_names: list[str] = []
     for row in rows:
         for name, _ in extract_symbols(row.latex)[0]:
-            if name not in symbols:
-                symbols.append(name)
+            if name not in symbol_names:
+                symbol_names.append(name)
 
     out = [
         f"% Declaration sidecar for {dossier.key}",
@@ -536,14 +587,19 @@ def declaration_stub(dossier: Dossier, rows: list[Row]) -> str:
         "%@ obj sense=? name=objective combination=sum :: ?",
         "",
     ]
-    for symbol in symbols:
+    kinds = symbols or {}
+    for symbol in symbol_names:
         ident = _NON_IDENT.sub("_", symbol).strip("_")
         if not ident or not re.match(r"^[A-Za-z_]", ident):
             out.append(f"% unusable as an identifier, rename or drop: {symbol}")
             continue
-        out.append(f"%@ index {ident} ordered=0 cyclic=0 :: ?")
-        out.append(f"%@ param {ident} shape=- kind=scalar domain=- :: ?")
-        out.append(f"%@ var {ident} shape=- domain=? role=primary drole=- lo=- hi=- :: ?")
+        kind = kinds.get(symbol)
+        if kind in _KIND_LINE:
+            out.append(f"% {symbol}: classified as {kind} during review")
+            out.append(_KIND_LINE[kind].format(i=ident))
+        else:
+            for line in _KIND_LINE.values():
+                out.append(line.format(i=ident))
         out.append("")
     out.append("% Constraint rows (optional — they default to kind=linear):")
     for row in rows:
@@ -651,6 +707,7 @@ def promote_paper(
     declarations_dir: Path = DECLARATIONS,
     write: bool = True,
     out_dirs: dict[str, Path] | None = None,
+    symbols: dict[str, str] | None = None,
 ) -> Outcome:
     """Promote one paper, or explain in one cause why it could not be promoted.
 
@@ -708,7 +765,7 @@ def promote_paper(
         if write:
             stub = dirs["declarations"] / f"{dossier.key}.stub.tex"
             stub.parent.mkdir(parents=True, exist_ok=True)
-            stub.write_text(declaration_stub(dossier, rows), encoding="utf-8")
+            stub.write_text(declaration_stub(dossier, rows, symbols), encoding="utf-8")
             written = (_rel(stub),)
         return fail("missing_declarations", _rel(decl_path), written)
 
@@ -937,6 +994,7 @@ def promote_all(
     """Promote every paper that has decisions, and return the report."""
     paths = sorted(decisions_dir.glob("*.json")) if decisions_dir.exists() else []
     papers, unrecognised = load_decisions(paths)
+    symbol_tables = load_symbol_tables(paths)
 
     outcomes: list[Outcome] = []
     for key, decisions in papers.items():
@@ -961,6 +1019,7 @@ def promote_all(
                 declarations_dir=declarations_dir,
                 out_dirs=out_dirs,
                 write=write,
+                symbols=symbol_tables.get(key),
             )
         )
     return build_report(outcomes, unrecognised)
