@@ -15,11 +15,12 @@ repair, and the statement has a relation or an optimization head). Together
 these say what is left for a human: a formula clean on the structural axes and
 at coefficient 1 needs no structural review, while the rest are routed.
 
-Kinds come from the review game's symbol classifier via the decision exports
-(``corpus/decisions/*.json``, key ``symbol_tables``); before any review has
-happened the only typed symbols are the ones the binder of a big operator
-identifies deterministically as index families, which is the free prefill the
-manual stage starts from.
+Kinds come from two places. :mod:`corpusbuilder.symbols` reads what the algebra
+states outright, index families off big-operator binders and decision variables
+off domain rows, and the review game's symbol classifier supplies the rest via
+the decision exports (``corpus/decisions/*.json``, key ``symbol_tables``). The
+first is the free prefill the manual stage starts from; the second is what the
+manual stage costs. A reviewer verdict overrides an inference.
 
 Outputs (all under ``corpus/``):
   * ``resolution.json``        — per-paper and corpus-level counts (source of truth)
@@ -32,15 +33,11 @@ Run:  PYTHONPATH=. python3 -m corpusbuilder.resolution
 from __future__ import annotations
 
 import json
-import re
 import statistics
 from pathlib import Path
 
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import (
-    _collapse_words,
-    _group_end,
-    _rewrite_ops,
     extract_symbols,
     is_objective_latex,
     parse_tree,
@@ -48,19 +45,11 @@ from corpusbuilder.game import (
 )
 from corpusbuilder.promote import DECISIONS, load_symbol_tables
 from corpusbuilder.split import split_latex
+from corpusbuilder.symbols import INDEX, VARIABLE, paper_evidence
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
 DOSSIERS = CORPUS / "dossiers"
-
-#: Operators whose subscript binds an index over a family, plus the universal
-#: quantifier. A symbol named there is an index or an index family, which is the
-#: one kind assignment the algebra states outright instead of leaving to the prose.
-_BINDER_HEAD = re.compile(r"\\(?:sum|prod|bigcup|bigcap|max|min|forall)(?![a-zA-Z])")
-
-#: Where a ``\forall`` clause ends: it runs to the end of the formula or to the
-#: next relation/separator, unlike a subscript group whose braces delimit it.
-_FORALL_END = re.compile(r"[,;]|\\\\|\\quad|\\qquad|\\text")
 
 #: The share of a paper's formulas the greedy symbol ordering must reach before
 #: we call the paper "mostly resolved" — used only to report how many symbols
@@ -72,46 +61,6 @@ _LEVERAGE_TARGET = 0.8
 def formula_symbols(latex: str) -> set[str]:
     """Every distinct symbol in a formula (never the truncated display list)."""
     return {name for name, _ in extract_symbols(latex, limit=None)[0]}
-
-
-def binder_symbols(latex: str) -> set[str]:
-    """Symbols named in a big operator's binder or a ``\\forall`` clause.
-
-    Read off the normalized source rather than the expression tree: the tree
-    flattens a binder to a display string, and that flattening leaks artifacts
-    (``\\left`` contributes a spurious ``ft``) which would then auto-type a
-    body symbol of the same name. Reuses :func:`extract_symbols` on the binder
-    text so one scanner defines what counts as a symbol everywhere.
-    """
-    s = _rewrite_ops(_collapse_words(latex))
-    found: set[str] = set()
-    for m in _BINDER_HEAD.finditer(s):
-        i = m.end()
-        if m.group(0) == "\\forall":
-            end = _FORALL_END.search(s, i)
-            chunk = s[i : end.start() if end else len(s)]
-        else:
-            # Both scripts bind: "\\sum_{t = 1}^{T}" names the index below and
-            # the family bound above, in either written order.
-            chunks = []
-            while True:
-                while i < len(s) and s[i] == " ":
-                    i += 1
-                if i >= len(s) or s[i] not in "_^":
-                    break
-                i += 1
-                while i < len(s) and s[i] == " ":
-                    i += 1
-                if i < len(s) and s[i] == "{":
-                    end = _group_end(s, i)
-                    chunks.append(s[i + 1 : end - 1])
-                    i = end
-                else:
-                    chunks.append(s[i : i + 1])
-                    i += 1
-            chunk = " ".join(chunks)
-        found.update(name for name, _ in extract_symbols(chunk, limit=None)[0])
-    return found
 
 
 def structural_flags(latex: str) -> dict[str, bool]:
@@ -157,17 +106,23 @@ def _leverage(formulas: list[set[str]], typed: set[str]) -> int:
 
 
 def paper_record(dossier: Dossier, table: dict[str, str]) -> dict:
-    """Resolution state of one paper, deterministic in dossier formula order."""
+    """Resolution state of one paper, deterministic in dossier formula order.
+
+    ``table`` is the reviewer's own symbol table and wins wherever it disagrees
+    with the algebraic evidence: a human verdict supersedes an inference.
+    """
+    evidence = paper_evidence([f.latex for f in dossier.formulas])
+    typed_kind = {**evidence.kinds, **table}
+
     formulas, symbol_sets = [], []
-    binders: set[str] = set()
     for f in dossier.formulas:
         names = formula_symbols(f.latex)
         symbol_sets.append(names)
-        binders |= binder_symbols(f.latex) & names
         formulas.append({"id": f.id, "n_symbols": len(names), **structural_flags(f.latex)})
 
     symbols = sorted(set().union(*symbol_sets)) if symbol_sets else []
-    typed = {s for s in symbols if s in table} | binders
+    typed = {s for s in symbols if s in typed_kind}
+    prefilled = {s for s in typed if s not in table}
     for entry, names in zip(formulas, symbol_sets, strict=True):
         entry["beta"] = round(len(names & typed) / len(names), 3) if names else 1.0
         entry["resolved"] = bool(names) and names <= typed
@@ -177,7 +132,10 @@ def paper_record(dossier: Dossier, table: dict[str, str]) -> dict:
         "n_formulas": len(formulas),
         "n_symbols": len(symbols),
         "n_typed": len(typed),
-        "n_binder_typed": len(binders),
+        "n_prefilled": len(prefilled),
+        "n_index_prefill": sum(1 for s in prefilled if typed_kind[s] == INDEX),
+        "n_variable_prefill": sum(1 for s in prefilled if typed_kind[s] == VARIABLE),
+        "n_reviewed": len(typed) - len(prefilled),
         "n_resolved": sum(1 for e in formulas if e["resolved"]),
         "n_clean": sum(1 for e in formulas if e["clean"]),
         "n_ready": sum(1 for e in formulas if e["clean"] and e["resolved"]),
@@ -213,10 +171,13 @@ def compute() -> dict:
         "symbols_per_formula_median": int(statistics.median(e["n_symbols"] for e in entries)),
         "symbols_per_formula_max": max((e["n_symbols"] for e in entries), default=0),
         "typed_pairs": sum(p["n_typed"] for p in papers),
-        "binder_typed_pairs": sum(p["n_binder_typed"] for p in papers),
-        "binder_typed_pct": round(100 * sum(p["n_binder_typed"] for p in papers) / pairs, 1)
+        "prefilled_pairs": sum(p["n_prefilled"] for p in papers),
+        "prefilled_pct": round(100 * sum(p["n_prefilled"] for p in papers) / pairs, 1)
         if pairs
         else 0.0,
+        "index_prefill_pairs": sum(p["n_index_prefill"] for p in papers),
+        "variable_prefill_pairs": sum(p["n_variable_prefill"] for p in papers),
+        "reviewed_pairs": sum(p["n_reviewed"] for p in papers),
         "resolved": sum(p["n_resolved"] for p in papers),
         "resolved_pct": share(sum(p["n_resolved"] for p in papers)),
         "structural_axes": axes,
@@ -259,7 +220,10 @@ def render_md(r: dict) -> str:
         "## Typed symbols",
         "",
         f"- typed: **{r['typed_pairs']}** of {r['symbol_pairs']} pairs, of which "
-        f"{r['binder_typed_pairs']} ({r['binder_typed_pct']}%) come free from big-operator binders",
+        f"{r['prefilled_pairs']} ({r['prefilled_pct']}%) come free from the algebra "
+        f"({r['index_prefill_pairs']} indices and index families from binders, "
+        f"{r['variable_prefill_pairs']} variables from domain rows) and "
+        f"{r['reviewed_pairs']} from reviewer verdicts",
         f"- formulas at breakdown coefficient 1: **{r['resolved']}** ({r['resolved_pct']}%)",
         f"- symbols still to type for {r['leverage_target_pct']}% of a paper's formulas: "
         f"median {r['symbols_to_leverage_median']}",
@@ -281,13 +245,13 @@ def render_md(r: dict) -> str:
         "",
         "## Per paper",
         "",
-        "| paper | formulas | symbols | typed | resolved | clean | ready |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| paper | formulas | symbols | typed | prefill | resolved | clean | ready |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
     for p in r["per_paper"]:
         lines.append(
             f"| {p['key']} | {p['n_formulas']} | {p['n_symbols']} | {p['n_typed']} | "
-            f"{p['n_resolved']} | {p['n_clean']} | {p['n_ready']} |"
+            f"{p['n_prefilled']} | {p['n_resolved']} | {p['n_clean']} | {p['n_ready']} |"
         )
     return "\n".join(lines) + "\n"
 
@@ -308,8 +272,11 @@ def render_macros(r: dict) -> str:
                 cmd("resSymbolsPerPaperMax", r["symbols_per_paper_max"]),
                 cmd("resSymbolsPerFormula", r["symbols_per_formula_median"]),
                 cmd("resSymbolsPerFormulaMax", r["symbols_per_formula_max"]),
-                cmd("resBinderTyped", r["binder_typed_pairs"]),
-                cmd("resBinderTypedPct", r["binder_typed_pct"]),
+                cmd("resPrefilled", r["prefilled_pairs"]),
+                cmd("resPrefilledPct", r["prefilled_pct"]),
+                cmd("resIndexPrefill", r["index_prefill_pairs"]),
+                cmd("resVariablePrefill", r["variable_prefill_pairs"]),
+                cmd("resReviewed", r["reviewed_pairs"]),
                 cmd("resLeverageSymbols", r["symbols_to_leverage_median"]),
                 cmd("resLeverageTarget", r["leverage_target_pct"]),
                 cmd("resParseClean", r["structural_axes"]["parses"]),
@@ -343,7 +310,8 @@ def main(out_dir: Path | None = None) -> int:
     print(
         f"Resolution: {r['formulas']} formulas over {r['papers']} papers; "
         f"{r['typed_pairs']}/{r['symbol_pairs']} symbol pairs typed "
-        f"({r['binder_typed_pairs']} from binders); "
+        f"({r['index_prefill_pairs']} index + {r['variable_prefill_pairs']} variable "
+        f"from the algebra); "
         f"{r['resolved']} formulas fully broken down; "
         f"{r['structurally_clean']} ({r['structurally_clean_pct']}%) structurally clean; "
         f"{r['ready']} ready. "

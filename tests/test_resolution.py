@@ -8,15 +8,14 @@ untyped) and crediting a kind the reviewer never gave.
 
 from __future__ import annotations
 
+from corpusbuilder.dossier import Dossier, ExtractionMethod, FormulaRecord, SourceInfo
+from corpusbuilder.game import extract_symbols
 from corpusbuilder.resolution import (
-    binder_symbols,
     formula_symbols,
     paper_record,
     render_macros,
     structural_flags,
 )
-from corpusbuilder.dossier import Dossier, ExtractionMethod, FormulaRecord, SourceInfo
-from corpusbuilder.game import extract_symbols
 
 
 def _dossier(*latex: str) -> Dossier:
@@ -39,17 +38,6 @@ def test_symbols_are_not_truncated_to_the_display_list():
 def test_indices_are_not_symbols():
     """Sub-/superscripts are index positions, so x_{ij} and x_{ik} are one symbol."""
     assert formula_symbols(r"x_{ij} + x_{ik} \le b_i") == {"x", "b"}
-
-
-def test_binder_symbols_are_read_off_the_big_operator():
-    assert binder_symbols(r"\sum_{i \in I} c_i x_i") == {"i", "I"}
-    assert binder_symbols(r"\forall i \in I") == {"i", "I"}
-    assert binder_symbols(r"a + b") == set()
-
-
-def test_binder_reading_survives_left_right_delimiters():
-    """The flattened tree leaks 'ft' out of \\left, which would auto-type a body 'ft'."""
-    assert "ft" not in binder_symbols(r"\sum_{r \in R} x \left(u\right) \le b")
 
 
 def test_structural_flags_separate_the_defect_kinds():
@@ -75,12 +63,23 @@ def test_beta_counts_only_symbols_the_reviewer_typed():
     assert full["n_resolved"] == 1
 
 
-def test_binder_typing_is_free_prefill():
-    """A family the binder names, and the body then uses, needs no reviewer tap."""
+def test_algebraic_prefill_costs_the_reviewer_nothing():
+    """A family the binder names and a variable a domain row declares are free."""
+    d = _dossier(r"\sum_{t = 1}^{T} x_t \le T", r"x_t \in \{0,1\}")
+    rec = paper_record(d, {})
+    assert rec["n_prefilled"] == 2  # T as a family, x as a binary variable
+    assert rec["n_index_prefill"] == 1
+    assert rec["n_variable_prefill"] == 1
+    assert rec["n_reviewed"] == 0
+    assert rec["n_resolved"] == 2
+
+
+def test_a_reviewer_verdict_overrides_the_inference():
+    """"\\sum_{t=1}^{T}" is circumstantial: T may be a horizon parameter."""
     d = _dossier(r"\sum_{t = 1}^{T} x_t \le T")
-    rec = paper_record(d, {"x": "variable"})
-    assert rec["n_binder_typed"] == 1  # T, credited without a reviewer verdict
-    assert rec["n_resolved"] == 1
+    rec = paper_record(d, {"T": "parameter", "x": "variable"})
+    assert rec["n_reviewed"] == 2
+    assert rec["n_prefilled"] == 0
 
 
 def test_ready_needs_both_clean_and_resolved():
@@ -101,8 +100,11 @@ def test_macros_are_deterministic_and_complete():
         "symbols_per_paper_max": 5,
         "symbols_per_formula_median": 3,
         "symbols_per_formula_max": 4,
-        "binder_typed_pairs": 1,
-        "binder_typed_pct": 11.1,
+        "prefilled_pairs": 2,
+        "prefilled_pct": 22.2,
+        "index_prefill_pairs": 1,
+        "variable_prefill_pairs": 1,
+        "reviewed_pairs": 0,
         "symbols_to_leverage_median": 3,
         "leverage_target_pct": 80,
         "structural_axes": {"parses": 5, "single": 4, "renders": 5, "statement": 5},
