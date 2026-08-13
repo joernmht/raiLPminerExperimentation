@@ -251,10 +251,68 @@ _MINMAX_GLUED = re.compile(r"\b(min|max|minimize|maximize)(?=[A-Z])")
 # group would otherwise become a stray leaf that displaces min from the root
 _ENV_CMD = re.compile(r"\\(?:begin|end)\s*\{[a-zA-Z*]+\}")
 
+# Papers very often write the objective as a WORD rather than an operator:
+#   "\text{Minimise} : \sum ...",  "(F 1) minimize \frac{1}{2} \sum ...",
+#   "\text{Min} \sum ...",  "\underset{U_{k}}{\text{min}} \sum ...".
+# Those tokenize as ordinary leaves, so min/max never reaches the tree root and
+# the objective is missed. Normalize them to \min / \max so the existing tree
+# rules (pointwise / ∀-quantified / indexed-LHS guards) decide as usual.
+#
+# Only in OPERATOR POSITION, i.e. at the head of the formula after an optional
+# equation label. `\text{min}` is also a legitimate part of a *parameter name*
+# in subscript position (`T_{\text{min}}^{h}` is a headway bound, not an
+# objective), so a global rewrite would manufacture objectives out of bounds.
+_LEAD_NOISE = re.compile(r"^(?:\s|&|~|\\quad|\\qquad|\\,|\\;|\\!|\\displaystyle)+")
+# an equation/model label: (3), (F 1), (LF 1), (P), (M1)
+_EQ_LABEL = re.compile(r"^(?:\\left)?\(\s*[A-Za-z]{0,3}\s*[\d.\s-]{0,5}\s*(?:\\right)?\)")
+_TEXTISH = r"\\(?:operatorname\*?|text(?:rm|bf|it|sf)?|mathrm|mathbf|mbox)\s*\{\s*"
+_MINMAX_WORD = re.compile(
+    r"^(?:" + _TEXTISH + r")?(min|max)(?:imi[sz]e|imise|imize|imum)?\s*(?:\})?\s*:?",
+    re.IGNORECASE,
+)
+# the same word wrapped in an \underset binder: \underset{U_k}{\text{min}}
+_UNDERSET_WORD = re.compile(
+    r"^\\underset\s*" + _GRP + r"\s*\{\s*(?:" + _TEXTISH + r")?"
+    r"(min|max)(?:imi[sz]e|imise|imize|imum)?\s*(?:\})?\s*\}",
+    re.IGNORECASE,
+)
+
+
+def _lead_minmax_word(s: str) -> str:
+    """Rewrite a leading word-form min/max into the operator form.
+
+    An equation label in front of it (``(F 1) minimize ...``) is dropped, not
+    kept: it is bibliographic metadata, and left in place it juxtaposes with
+    the operator and displaces min/max from the tree root, which is exactly
+    the miss this rule exists to fix.
+    """
+    rest = s
+    for _ in range(3):  # label and spacing may alternate
+        m = _LEAD_NOISE.match(rest)
+        if m:
+            rest = rest[m.end() :]
+        m = _EQ_LABEL.match(rest)
+        if m:
+            rest = rest[m.end() :]
+        else:
+            break
+    m = _UNDERSET_WORD.match(rest)
+    if m:
+        return "\\" + m.group(2).lower() + "_{" + m.group(1) + "}" + rest[m.end() :]
+    m = _MINMAX_WORD.match(rest)
+    if m:
+        tail = rest[m.end() :]
+        # a bare "min"/"max" must actually head an expression; "min" alone, or
+        # followed by a closing brace or a script, is a fragment or a name
+        if tail.strip() and not tail.lstrip().startswith(("}", "_", "^")):
+            return "\\" + m.group(1).lower() + " " + tail
+    return s
+
 
 def _rewrite_ops(s: str) -> str:
     s = _ENV_CMD.sub(" ", s)
     s = _MINMAX_GLUED.sub(r"\1 ", s)
+    s = _lead_minmax_word(s)
     for _ in range(3):  # patterns may nest
         s2 = _UNDERSET_OP.sub(
             lambda m: (
@@ -936,6 +994,73 @@ def _paper_check(fs: list[list]) -> dict:
         "sym": len(sym2f),
         "coh": round(giant / n, 3) if n else 0.0,
         "comp": 1 if (obj >= 1 and con >= 1 and sym2f) else 0,
+        "oflag": _objective_flag(fs, obj),
+    }
+
+
+# A paper whose objective the deterministic rules cannot find is NOT silently
+# dropped: it is routed, and the route says what kind of help it needs.
+#   "ok"        an objective was detected -- nothing to do
+#   "unmarked"  min/max appears, but never as the head of a statement. The
+#               objective is probably there but stated without an optimization
+#               word ("Z = sum ...", with "we minimize Z" left to the prose),
+#               so deciding it needs the surrounding text -> LLM / HITL step.
+#   "absent"    no min/max token anywhere in any extracted formula. Usually not
+#               an optimization paper at all (reliability curves, distributions,
+#               a lone inequality) -> screening/exclusion candidate, not an LLM
+#               candidate. Feeds the PRISMA eligibility count.
+_ANY_MINMAX = re.compile(r"\\?(?:min|max)", re.IGNORECASE)
+
+
+def _objective_flag(fs: list[list], obj: int) -> str:
+    if obj >= 1:
+        return "ok"
+    return "unmarked" if any(_ANY_MINMAX.search(f[2] or "") for f in fs) else "absent"
+
+
+def _objective_flag_report(data: dict) -> dict:
+    """The routing queue: which papers need help finding their objective.
+
+    Deterministic (papers in payload order, formulas in paper order). For an
+    ``unmarked`` paper the report carries the formulas that mention min/max
+    somewhere, since those are where an objective is most likely hiding and
+    are the sensible input to an LLM pass; ``absent`` papers carry the first
+    few formulas instead, which is enough to judge whether the paper belongs
+    in an optimization corpus at all.
+    """
+    papers = [q for q in data["papers"] if q["f"]]
+    out: dict[str, list] = {"unmarked": [], "absent": []}
+    counts = {"ok": 0, "unmarked": 0, "absent": 0}
+    for q in papers:
+        flag = q["chk"]["oflag"]
+        counts[flag] += 1
+        if flag == "ok":
+            continue
+        if flag == "unmarked":
+            cands = [f for f in q["f"] if _ANY_MINMAX.search(f[2] or "")]
+        else:
+            cands = list(q["f"][:3])
+        out[flag].append(
+            {
+                "doi": q["k"],
+                "title": q.get("t") or "",
+                "n_formulas": len(q["f"]),
+                "coherence": q["chk"]["coh"],
+                "candidates": [{"id": f[0], "latex": f[2]} for f in cands[:8]],
+            }
+        )
+    return {
+        "schema_version": "1",
+        "counts": counts,
+        "note": (
+            "'unmarked' = min/max occurs but never heads a statement; the objective is "
+            "probably stated without an optimization word and deciding needs the paper's "
+            "prose, so this is the LLM/HITL queue. Any objective recovered this way MUST be "
+            "recorded as non-deterministically sourced. 'absent' = no min/max token at all; "
+            "usually not an optimization paper, so this is a screening/PRISMA question, "
+            "not an LLM one."
+        ),
+        "papers": out,
     }
 
 
@@ -2684,6 +2809,16 @@ def main(argv: list[str] | None = None) -> None:
         metavar="PATH",
         help=f"output HTML path (default: {OUT})",
     )
+    ap.add_argument(
+        "--flags",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="also write the objective-flag queue as JSON: the papers whose objective the "
+        "deterministic rules could not find, split into 'unmarked' (an objective is likely "
+        "there but stated without an optimization word — the LLM/HITL work queue) and "
+        "'absent' (no min/max at all — a screening candidate)",
+    )
     args = ap.parse_args(argv)
 
     include: set[str] | None = None
@@ -2709,6 +2844,18 @@ def main(argv: list[str] | None = None) -> None:
         f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB, "
         f"{len(data['papers'])} papers, {data['n_formulas']} formulas)"
     )
+
+    if args.flags is not None:
+        report = _objective_flag_report(data)
+        args.flags.parent.mkdir(parents=True, exist_ok=True)
+        args.flags.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        c = report["counts"]
+        print(
+            f"wrote {args.flags} (ok={c['ok']}, "
+            f"unmarked={c['unmarked']} -> LLM/HITL queue, absent={c['absent']} -> screening)"
+        )
 
 
 if __name__ == "__main__":

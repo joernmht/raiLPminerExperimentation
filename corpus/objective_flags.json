@@ -1,0 +1,963 @@
+{
+  "schema_version": "1",
+  "counts": {
+    "ok": 197,
+    "unmarked": 27,
+    "absent": 14
+  },
+  "note": "'unmarked' = min/max occurs but never heads a statement; the objective is probably stated without an optimization word and deciding needs the paper's prose, so this is the LLM/HITL queue. Any objective recovered this way MUST be recorded as non-deterministically sourced. 'absent' = no min/max token at all; usually not an optimization paper, so this is a screening/PRISMA question, not an LLM one.",
+  "papers": {
+    "unmarked": [
+      {
+        "doi": "10.1016_j.trb.2018.02.003",
+        "title": "Service-oriented train timetabling with collaborative passenger flow control on an oversaturated metro line: An integer linear optimization approach",
+        "n_formulas": 46,
+        "coherence": 0.978,
+        "candidates": [
+          {
+            "id": "eq-0009",
+            "latex": "T_{\\text{min}}^{\\text{h}} \\leq \\underset{t \\in \\mathcal{T}}{\\sum} \\left(d_{i , 1 , f} \\left(t\\right) - d_{i + 1 , 1 , f} \\left(t\\right)\\right) \\cdot t_{\\text{unit}} \\leq T_{\\text{max}}^{\\text{h}} , i , i + 1 \\in I_{f} , f \\in F ."
+          },
+          {
+            "id": "eq-0011",
+            "latex": "\\underset{t \\in \\mathcal{T}}{\\sum} \\left(a_{i , m , f} \\left(t\\right) - d_{i + u_{3 - f} , 1 , 3 - f} \\left(t\\right)\\right) \\cdot t_{\\text{unit}} \\geq t_{\\text{min}}^{\\text{r}} , i \\in I_{f} , i + u_{3 - f} \\in I_{3 - f} , f \\in F ."
+          },
+          {
+            "id": "eq-0012",
+            "latex": "\\begin{cases} 0 \\leq \\eta_{k , s , f} \\left(t\\right) \\leq N_{k , s , f}^{\\text{max}} \\\\ G_{k , s , f}^{\\text{min}} \\leq \\eta_{k , s , f} \\left(t\\right) - \\eta_{k , s , f} \\left(t - 1\\right) \\leq G_{k , s , f}^{\\text{max}} \\end{cases} , t - 1 , t \\in \\mathcal{T} , k < s \\in S_{f} , f \\in F ."
+          },
+          {
+            "id": "eq-0037",
+            "latex": "\\begin{cases} \\left(\\mathbf{JPFCTT}\\right) min \\underset{f \\in F}{\\sum} \\underset{k \\in S_{f}}{\\sum} \\left(t_{k , f}^{\\text{ws}} + t_{k , f}^{\\text{wp}}\\right) \\\\ s . t . \\\\ \\text{constraints} \\left(1\\right) - \\left(12\\right) , \\left(14\\right) - \\left(21\\right) , \\left(23\\right) - \\left(28\\right) . \\\\ a_{i , k , f} \\left(t\\right) , d_{i , k , f} \\left(t\\right) \\in \\left\\{0 , 1\\right\\} , t \\in \\mathcal{T} , i \\in I_{f} , k \\in S_{f} , f \\in F . \\end{cases}"
+          },
+          {
+            "id": "eq-0038",
+            "latex": "\\begin{cases} \\left(\\mathbf{PFC}\\right) min \\underset{f \\in F}{\\sum} \\underset{k \\in S_{f}}{\\sum} \\left(t_{k , f}^{\\text{ws}} + t_{k , f}^{\\text{wp}}\\right) \\\\ s . t . \\\\ \\text{constraints} \\left(8\\right) - \\left(25\\right) . \\end{cases}"
+          },
+          {
+            "id": "eq-0039",
+            "latex": "\\begin{cases} \\left(\\mathbf{JPFCTT}^{\\#}\\right) min \\underset{f \\in F}{\\sum} \\underset{k \\in S_{f}}{\\sum} t_{k , f}^{\\text{ws}} \\\\ s . t . \\\\ \\text{constraints} \\left(1\\right) - \\left(12\\right) , \\left(14\\right) - \\left(21\\right) , \\left(26\\right) - \\left(27\\right) . \\\\ a_{i , k , f} \\left(t\\right) , d_{i , k , f} \\left(t\\right) \\in \\left\\{0 , 1\\right\\} , t \\in \\mathcal{T} , i \\in I_{f} , k \\in S_{f} , f \\in F . \\end{cases}"
+          },
+          {
+            "id": "eq-0043",
+            "latex": "n_{i , k , f}^{\\text{b}} = \\begin{cases} min \\left\\{n_{i , k , f}^{\\text{w}} , C\\right\\} , & \\text{if} k = 1 \\\\ min \\left\\{n_{i , k , f}^{\\text{w}} , C - n_{i , k - 1 , f}^{\\text{on}} + n_{i , k , f}^{\\text{al}}\\right\\} , & \\text{if} 1 < k < m \\end{cases} , i \\in I_{f} , f \\in F ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2015.07.012",
+        "title": "Passenger-demands-oriented train scheduling for an urban rail transit network",
+        "n_formulas": 53,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0017",
+            "latex": "n_{i_{k} , p_{k}}^{board} = min \\left(n_{i_{k} , p_{k}}^{remain} , w_{p_{k}}^{wait , before} \\left(t_{k}\\right)\\right) ."
+          },
+          {
+            "id": "eq-0018",
+            "latex": "n_{i_{k} , p_{k}}^{remain} = C_{max , i_{k}} - n_{i_{k}} , \\mathfrak{p}^{pla} \\left(p_{k}\\right) - n_{i_{k}} , p_{k}^{alight} ,"
+          },
+          {
+            "id": "eq-0048",
+            "latex": "a_{i_{k} , p_{k}} - d_{\\mathfrak{p}^{tra} \\left(i_{k}\\right) , p_{k}} \\geq h_{p_{k} , min} ,"
+          },
+          {
+            "id": "eq-0049",
+            "latex": "d_{\\mathfrak{s}^{tra} \\left(i_{k}\\right) , p_{k}} - d_{i_{k} , p_{k}} \\geq h_{min , turn} ,"
+          },
+          {
+            "id": "eq-0050",
+            "latex": "\\begin{aligned} & d_{i_{k} , p_{k}} \\geq a_{i_{k} , p_{k}} + \\tau_{i_{k} , p_{k} , n} , \\\\ & d_{i_{k} , p_{k}} \\leq a_{i_{k} , p_{k}} + \\tau_{i_{k} , p_{k} , max} ,\\end{aligned}"
+          },
+          {
+            "id": "eq-0051",
+            "latex": "\\tau_{i_{k} , p_{k} , min} = min \\left(\\overset{̃}{\\tau}_{min} , \\alpha_{1 , d} + \\alpha_{2 , d} n_{i_{k} , p_{k}}^{alight} + \\alpha_{3 , d} n_{i_{k} , p_{k}}^{board} + \\alpha_{4 , d} \\left(\\frac{w_{p_{k}}^{wait} \\left(t_{k}\\right)}{n^{door}}\\right)^{3} n_{i_{k} , p_{k}}^{board}\\right) ,"
+          },
+          {
+            "id": "eq-0052",
+            "latex": "d_{i_{k} , p_{k}} - d_{\\mathfrak{p}^{tra} \\left(i_{k}\\right) , p_{k}} \\leq h_{p_{k} , max} ,"
+          },
+          {
+            "id": "eq-0053",
+            "latex": "r_{i_{k} , p_{k} , min} \\leq r_{i_{k} , p_{k}} \\leq r_{i_{k} , p_{k} , max} ,"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2016.11.018",
+        "title": "An eigenmodel for iterative line planning, timetabling and vehicle scheduling in public transportation",
+        "n_formulas": 33,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\begin{aligned} & \\left(\\rightarrow L\\right) min f_{L} \\left(x^{L}\\right) \\\\ & \\text{s} . \\text{t} . x^{L} \\in F_{L}\\end{aligned}"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "f_{e}^{min} \\leq \\underset{l : e \\in l}{\\sum} x_{l}^{L} \\leq f_{e}^{max} ."
+          },
+          {
+            "id": "eq-0005",
+            "latex": "\\begin{aligned} & \\left(L \\rightarrow T\\right) \\left(x^{L}\\right) min f_{T} \\left(x^{T}\\right) \\\\ & \\text{s} . \\text{t} . x^{T} \\in F_{T} \\left(x^{L}\\right)\\end{aligned}"
+          },
+          {
+            "id": "eq-0006",
+            "latex": "\\begin{aligned} & \\left(\\mathit{LT} \\rightarrow S\\right) \\left(x^{L} , x^{T}\\right) min f_{S} \\left(x^{S}\\right) \\\\ & \\text{s} . \\text{t} . x^{S} \\in F_{S} \\left(x^{L} , x^{T}\\right)\\end{aligned}"
+          },
+          {
+            "id": "eq-0009",
+            "latex": "\\begin{aligned} & \\left(\\rightarrow \\mathit{LTS}\\right) min \\begin{pmatrix} \\begin{matrix}f_{\\mathit{cost}} \\left(x^{L} , x^{T} , x^{S}\\right) \\\\ f_{\\mathit{time}} \\left(x^{L} , x^{T}\\right)\\end{matrix} \\end{pmatrix} \\\\ & \\text{s} . \\text{t} . x^{L} \\in F_{L} \\\\ & x^{T} \\in F_{T} \\left(x^{L}\\right) \\\\ & x^{S} \\in F_{S} \\left(x^{L} , x^{T}\\right)\\end{aligned}"
+          },
+          {
+            "id": "eq-0010",
+            "latex": "\\begin{aligned} & \\left(\\rightarrow \\mathit{LTS}\\right)_{s_{1}} min \\alpha f_{\\mathit{cost}} \\left(x^{L} , x^{T} , x^{S}\\right) + \\beta f_{\\mathit{time}} \\left(x^{L} , x^{T}\\right) \\\\ & \\text{s} . \\text{t} . \\left(x^{L} , x^{T} , x^{S}\\right) \\in I\\end{aligned}"
+          },
+          {
+            "id": "eq-0011",
+            "latex": "\\begin{aligned} & \\left(\\rightarrow \\mathit{LTS}\\right)_{s_{2}} min f_{\\mathit{time}} \\left(x^{L} , x^{T}\\right) \\\\ & \\text{s} . \\text{t} . \\left(x^{L} , x^{T} , x^{S}\\right) \\in I \\\\ & f_{\\mathit{cost}} \\left(x^{L} , x^{T} , x^{S}\\right) \\leq B_{\\mathit{cost}}\\end{aligned}"
+          },
+          {
+            "id": "eq-0012",
+            "latex": "\\begin{aligned} & \\left(\\rightarrow \\mathit{LTS}\\right)_{s_{3}} min f_{\\mathit{cost}} \\left(x^{L} , x^{T} , x^{S}\\right) \\\\ & \\text{s} . \\text{t} . \\left(x^{L} , x^{T} , x^{S}\\right) \\in I \\\\ & f_{\\mathit{time}} \\left(x^{L} , x^{T}\\right) \\leq B_{\\mathit{time}}\\end{aligned}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trb.2017.05.008",
+        "title": "A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system",
+        "n_formulas": 28,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0006",
+            "latex": "\\text{objective} 1 : min : \\underset{t \\in T}{\\sum} \\omega_{t , e n d} - e_{t , s} - c_{t} - d t_{t}"
+          },
+          {
+            "id": "eq-0007",
+            "latex": "\\text{objective} 2 : \\begin{cases} min : \\underset{t \\in T}{\\sum} y_{t} \\\\ y_{t} \\geq \\omega_{t , e n d} - e_{t , s} - c_{t} - d t_{t} t \\in T , s \\in R_{t} \\\\ y_{t} \\geq 0 t \\in T \\end{cases}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.jrtpm.2011.06.001",
+        "title": "Optimal multi-class rescheduling of railway traffic",
+        "n_formulas": 3,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\begin{aligned} & u_{h}^{*} = \\mathit{min} \\left\\{\\mathit{max}_{i \\in \\mathcal{C}_{h}} \\left\\{t_{i} - d_{i}\\right\\} ; 0\\right\\} \\\\ & s . t . t_{j} - t_{i} \\geq w_{\\mathit{ij}} \\left(i , j\\right) \\in F\\end{aligned}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ejor.2021.11.019",
+        "title": "Integrated optimization of train timetable, rolling stock assignment and short-turning strategy for a metro line",
+        "n_formulas": 75,
+        "coherence": 0.973,
+        "candidates": [
+          {
+            "id": "eq-0044",
+            "latex": "c_{k , i}^{b} = min \\left\\{C - c_{k , i - 1} + c_{k , i}^{a} , w_{k , i}^{b}\\right\\} , \\forall k \\in \\mathbf{K}^{\\left(u\\right)} , i \\in \\mathbf{S}^{\\left(u\\right)} ."
+          },
+          {
+            "id": "eq-0052",
+            "latex": "\\left(\\text{model}\\right) \\begin{cases} \\underset{\\mathbf{\\mathit{\\tau}} , \\mathbf{\\mathit{z}} , \\mathbf{\\mathit{\\lambda}} , \\mathbf{\\mathit{h}} , \\mathbf{\\mathit{d}} , \\mathbf{\\mathit{a}} , \\mathbf{\\mathit{\\gamma}}}{min} F \\\\ s . t . \\\\ \\text{Constraints} \\left(1\\right) - \\left(45\\right) \\end{cases}"
+          },
+          {
+            "id": "eq-0053",
+            "latex": "\\left(\\text{submodel}\\right) \\begin{cases} \\underset{\\mathbf{\\mathit{h}} , \\mathbf{\\mathit{d}} , \\mathbf{\\mathit{a}} , \\mathbf{\\mathit{z}} , \\mathbf{\\mathit{\\lambda}} , \\mathbf{\\mathit{\\gamma}}}{min} \\left|h_{k , k + 1} - h_{k , k + 1}^{'}\\right| \\\\ s . t . \\\\ \\text{Constraints} \\left(1\\right) - \\left(37\\right) . \\end{cases}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cie.2012.08.004",
+        "title": "Modelling disruptions and resolving conflicts optimally in a railway schedule",
+        "n_formulas": 40,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0005",
+            "latex": "\\mathit{Minimize} \\underset{i \\in \\mathit{TU}}{\\sum} w_{i} X \\left(\\bar{a_{i}^{N}} - a_{i}^{N}\\right) + \\underset{j \\in \\mathit{TD}}{\\sum} w_{j} X \\left(\\bar{a_{j}^{1}} - a_{j}^{1}\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.tre.2017.06.001",
+        "title": "Integrated optimization of regular train schedule and train circulation plan for urban rail transit lines",
+        "n_formulas": 50,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0003",
+            "latex": "h_{\\text{min}} \\leq H_{k} \\leq h_{\\text{max}} , \\forall k \\in \\left\\{1 , 2 , \\ldots , K\\right\\} ,"
+          },
+          {
+            "id": "eq-0007",
+            "latex": "r_{J , min}^{\\text{turn}} \\leq r_{i , J}^{\\text{turn}} \\leq r_{J , max}^{\\text{turn}} ,"
+          },
+          {
+            "id": "eq-0009",
+            "latex": "\\begin{aligned} & h_{\\text{min}} \\leq d_{i + 1 , j}^{\\text{up}} - d_{i , j}^{\\text{up}} \\leq h_{\\text{max}} , \\forall i \\in S_{\\text{service}} / \\left\\{I_{\\text{total}}\\right\\} , \\forall j \\in S_{\\text{station}} , \\\\ & h_{\\text{min}} \\leq d_{i + 1 , j}^{\\text{dn}} - d_{i , j}^{\\text{dn}} \\leq h_{\\text{max}} , \\forall i \\in S_{\\text{service}} / \\left\\{I_{\\text{total}}\\right\\} , \\forall j \\in S_{\\text{station}} .\\end{aligned}"
+          },
+          {
+            "id": "eq-0016",
+            "latex": "\\begin{aligned} & a_{i^{'} , 1}^{\\text{up}} - d_{i , 1}^{\\text{dn}} \\geq r_{1 , min}^{\\text{turn}} - M \\left(1 - \\gamma_{i , i^{'}}\\right) , \\\\ & a_{i^{'} , 1}^{\\text{up}} - d_{i , 1}^{\\text{dn}} \\leq r_{1 , max}^{\\text{turn}} + M \\left(1 - \\gamma_{i , i^{'}}\\right) ,\\end{aligned}"
+          },
+          {
+            "id": "eq-0026",
+            "latex": "f_{\\text{obj}, 3} = \\underset{i \\in S_{\\text{ts}} / \\left\\{1\\right\\} , j \\in S_{\\text{sta}}}{\\sum} \\left|\\left(d_{i , j}^{\\text{up}} - d_{i - 1 , j}^{\\text{up}}\\right) - \\frac{\\sum_{m = \\text{max} \\left(i - i_{1} , 2\\right)}^{\\text{min} \\left(i + i_{2} , I\\right)} \\left(d_{m , j}^{\\text{up}} - d_{m - 1 , j}^{\\text{up}}\\right)}{\\text{min} \\left(i + i_{2} , I\\right) - \\text{max} \\left(i - i_{1} , 2\\right)}\\right| ,"
+          },
+          {
+            "id": "eq-0027",
+            "latex": "f_{\\text{obj}, 3} = \\underset{i \\in S_{\\text{ts}} / \\left\\{1\\right\\} , j \\in S_{\\text{sta}}}{\\sum} \\left|\\left(d_{i , j}^{\\text{up}} - d_{i - 1 , j}^{\\text{up}}\\right) - \\frac{\\left(d_{\\text{min} \\left(i + i_{2} , I\\right) , j}^{\\text{up}} - d_{\\text{max} \\left(i - i_{1} , 2\\right) - 1 , j}^{\\text{up}}\\right)}{\\text{min} \\left(i + i_{2} , I\\right) - \\text{max} \\left(i - i_{1} , 2\\right)}\\right| ."
+          },
+          {
+            "id": "eq-0035",
+            "latex": "\\overset{̃}{f}_{\\text{max}} = \\underset{\\overset{̃}{x} \\in \\chi}{max} \\overset{̃}{f} \\left(\\overset{̃}{x}\\right) , \\overset{̃}{f}_{\\text{min}} = \\underset{\\overset{̃}{x} \\in \\chi}{min} \\overset{̃}{f} \\left(\\overset{̃}{x}\\right) ."
+          },
+          {
+            "id": "eq-0036",
+            "latex": "\\left[\\overset{̃}{f} \\left(\\overset{̃}{x}\\right) \\leq 0\\right] \\leftrightarrow \\left[\\delta = 1\\right] \\text{is true iff} \\left\\{\\begin{matrix} \\overset{̃}{f} \\left(\\overset{̃}{x}\\right) \\leq \\overset{̃}{f}_{\\text{max}} \\left(1 - \\delta\\right) , \\\\ \\overset{̃}{f} \\left(\\overset{̃}{x}\\right) \\geq ∊ + \\left(\\overset{̃}{f}_{\\text{min}} - ∊\\right) \\delta , \\end{matrix}\\right"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.simpat.2014.09.004",
+        "title": "Urban rail transit planning using a two-stage simulation-based optimization approach",
+        "n_formulas": 14,
+        "coherence": 0.929,
+        "candidates": [
+          {
+            "id": "eq-0002",
+            "latex": "R_{k} = \\text{max} \\left\\{\\frac{\\mathit{dis}_{k}}{V_{\\mathit{max}}} , \\mathit{Normal} \\left(\\mu , \\sigma^{2}\\right)\\right\\}"
+          },
+          {
+            "id": "eq-0004",
+            "latex": "\\mathit{dw}_{\\mathit{rkf}} = \\mathit{Dw}_{\\mathit{min}} + \\sigma_{\\mathit{rkf}} . \\tau_{\\mathit{rkf}} . \\mathit{CD}"
+          },
+          {
+            "id": "eq-0005",
+            "latex": "\\mathit{dep}_{r , 1 , f} = \\mathit{dep}_{r , m - 1 , f} + R_{m - 1} + \\mathit{Sh}_{\\mathit{min}}"
+          },
+          {
+            "id": "eq-0008",
+            "latex": "b_{\\mathit{rkf}} = \\mathit{min} \\left\\{\\mathit{Cap}^{\\mathit{max}} - n_{r , k - 1 , f} . \\left(1 - \\varphi_{\\mathit{kf}}^{\\left(t\\right)}\\right) , \\tau_{\\mathit{rkf}}\\right\\} , t = \\mathit{dep}_{\\mathit{rkf}}"
+          },
+          {
+            "id": "eq-0011",
+            "latex": "\\mathit{WT} = \\sum_{k = 1}^{m} \\sum_{f = 1}^{2} \\sum_{r = 2}^{r_{f}^{\\mathit{max}}} w_{r - 1 , \\mathit{kf}} . \\left(\\mathit{dep}_{\\mathit{rkf}} - \\mathit{dep}_{r - 1 , \\mathit{kf}}\\right) + \\frac{1}{2} \\cdot \\delta_{\\mathit{rkf}} . \\left(\\mathit{dep}_{\\mathit{rkf}} - \\mathit{dep}_{r - 1 , \\mathit{kf}}\\right)"
+          },
+          {
+            "id": "eq-0014",
+            "latex": "H_{\\mathit{fr}} = \\begin{bmatrix} H_{11} & H_{12} & H_{13} & \\ldots & H_{1 , r^{\\mathit{max}}} \\\\ H_{21} & H_{22} & H_{23} & \\ldots & H_{2 , r^{\\mathit{max}}} \\end{bmatrix}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ejor.2008.12.005",
+        "title": "A disjunctive graph model and framework for constructing new train schedules",
+        "n_formulas": 27,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0003",
+            "latex": "\\mathit{fstage}_{i , k} = min \\left\\{\\right. k^{'} \\left|\\right. k + 1 \\leq k^{'} \\leq K_{i} + 1 , \\mathit{dt}_{i , k^{'}} \\geq \\mathit{dt}_{i , k} + l_{i}^{J} \\left.\\right\\} \\forall i , k = 1 , \\ldots , K_{i} ,"
+          },
+          {
+            "id": "eq-0023",
+            "latex": "\\mathit{LB} = \\underset{j \\in M}{max} \\left\\{\\mathit{lb}_{j}\\right\\} , \\mathit{lb}_{j} = \\underset{o_{i , k} \\in U_{j}}{\\sum} \\left(\\bar{p}_{i , k}\\right) + \\underset{o_{i , k} \\in U_{j}}{min} \\left\\{\\tau_{i , k}\\right\\} + \\underset{o_{i , k} \\in U_{j}}{min} \\left\\{\\phi_{i , k}\\right\\} , \\forall j \\in M ,"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ejor.2020.03.034",
+        "title": "A multi-objective optimization-simulation approach for real time rescheduling in dense railway systems",
+        "n_formulas": 4,
+        "coherence": 0.75,
+        "candidates": [
+          {
+            "id": "eq-0004",
+            "latex": "P_{e} = \\underset{\\begin{matrix}\\forall e^{'} \\in \\mathbf{\\mathcal{N}} ; \\left(e^{'} , e\\right) \\in \\mathbf{\\mathcal{A}}\\end{matrix}}{max} \\left(P_{e^{'}} + d_{e^{'} e}\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cor.2012.08.018",
+        "title": "Improving the modulo simplex algorithm for large-scale periodic timetabling",
+        "n_formulas": 12,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0004",
+            "latex": "\\left(PESP\\right) min \\underset{\\left(i , j\\right) \\in \\mathcal{A}}{\\sum} \\omega_{\\mathit{ij}} y_{\\mathit{ij}} s . t \\Gamma \\left(y + l\\right) = \\mathit{Tz} 0 \\leq y_{\\mathit{ij}} \\leq u_{\\mathit{ij}} - l_{\\mathit{ij}} \\forall \\left(i , j\\right) \\in \\mathcal{A} y_{\\mathit{ij}} \\in \\mathbb{R} \\forall \\left(i , j\\right) \\in \\mathcal{A} z_{\\mathit{ij}} \\in \\mathbb{Z} \\forall \\left(i , j\\right) \\in \\mathcal{A} \\backslash \\mathcal{A}_{\\mathcal{T}}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cie.2008.09.031",
+        "title": "A hybrid artificial immune algorithm for a realistic variant of job shops to minimize the total completion time",
+        "n_formulas": 4,
+        "coherence": 0.75,
+        "candidates": [
+          {
+            "id": "eq-0004",
+            "latex": "\\text{RPD} = \\frac{\\mathit{Alg}_{\\mathit{sol}} - \\mathit{Min}_{\\mathit{sol}}}{\\mathit{Min}_{\\mathit{sol}}} \\times 100"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.disopt.2008.09.003",
+        "title": "Integral cycle bases for cyclic timetabling",
+        "n_formulas": 30,
+        "coherence": 0.867,
+        "candidates": [
+          {
+            "id": "eq-0002",
+            "latex": "P E S P : Maximize F_{PESP} \\left(\\pi , p\\right)"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "P E S P : Maximize F_{PESP} \\left(\\pi , p\\right)"
+          },
+          {
+            "id": "eq-0008",
+            "latex": "C P F : Minimize F_{CPF} \\left(x , q\\right)"
+          },
+          {
+            "id": "eq-0009",
+            "latex": "C P F : Minimize F_{CPF} \\left(x , q\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.conengprac.2017.02.006",
+        "title": "Train scheduling and circulation planning in urban rail transit lines",
+        "n_formulas": 32,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0003",
+            "latex": "r_{j , min} \\leq r_{i , j} \\leq r_{j , max} , \\tau_{j , min} \\leq \\tau_{i , j} \\leq \\tau_{j , max} ,"
+          },
+          {
+            "id": "eq-0004",
+            "latex": "h_{min} \\leq d_{i + 1 , j} - d_{i , j} \\leq h_{max} , h_{min} \\leq a_{i + 1 , j} - a_{i , j} \\leq h_{max} ,"
+          },
+          {
+            "id": "eq-0006",
+            "latex": "I_{min} \\leq I \\leq I_{max}"
+          },
+          {
+            "id": "eq-0007",
+            "latex": "I_{max} = \\frac{t_{end} - t_{start}}{h_{min}} , I_{min} = \\frac{t_{end} - t_{start}}{h_{max}} ,"
+          },
+          {
+            "id": "eq-0011",
+            "latex": "\\sigma_{i , j , j + 1} \\leq \\sigma_{max}"
+          },
+          {
+            "id": "eq-0014",
+            "latex": "f_{passenger} = \\phi_{2} S \\left(\\underset{j = 1 , 2 , \\ldots , 2 J - 1}{max} \\sigma_{i , j , j + 1}\\right) + \\phi_{3} \\underset{i = 2 , \\ldots I}{\\sum} \\left(\\right. \\left(\\right. d_{i , 1} - d_{i - 1 , 1} \\left.\\right) - \\frac{\\sum_{m = max \\left(i - i_{1} , 1\\right)}^{min \\left(i + i_{2} , I\\right)} \\left(d_{m , 1} - d_{m - 1 , 1}\\right)}{i_{1} + i_{2} + 1} \\left.\\right)^{2} ,"
+          },
+          {
+            "id": "eq-0023",
+            "latex": "a_{i ' , 1} - d_{i , 2 J} \\geq r_{2 J , 1}^{min} - M \\left(1 - \\beta_{i , i '}\\right) ,"
+          },
+          {
+            "id": "eq-0024",
+            "latex": "a_{i ' , 1} - d_{i , 2 J} \\leq r_{2 J , 1}^{max} + M \\left(1 - \\beta_{i , i '}\\right) ,"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2016.12.015",
+        "title": "Hybrid cyclicity: Combining the benefits of cyclic and non-cyclic timetables",
+        "n_formulas": 11,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0008",
+            "latex": "d_{v}^{ℓ} - d_{v - 1}^{ℓ} = c \\cdot z_{v}^{ℓ} , \\forall ℓ \\in L , \\forall v \\in V^{ℓ} : 1 < v \\leq \\eta = \\mathit{max} \\left(\\left|V^{ℓ}\\right|\\right) \\cdot \\frac{\\xi}{100} ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cie.2021.107858",
+        "title": "Train timetabling for a double-track urban rail transit line under dynamic passenger demand",
+        "n_formulas": 30,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0005",
+            "latex": "t_{f , i , k + 1} = t_{f , i , k} + h_{\\mathit{min}} + t_{s}^{f , i , k + 1} f ∊ F , i ∊ Y , k ∊ K \\backslash \\left\\{n\\right\\}"
+          },
+          {
+            "id": "eq-0008",
+            "latex": "t_{f , 1 , v_{f} + k} \\geq t_{3 - f , m , k} + \\tau_{\\mathit{min}} f ∊ F , v_{f} + k \\left(\\leq K\\right)_{f}"
+          },
+          {
+            "id": "eq-0028",
+            "latex": "\\mathit{Min} \\frac{\\sum_{f = 1}^{2} \\sum_{i = 1}^{Y_{f} - 1} \\sum_{k = 1}^{K_{f}} \\left(t_{f , i , k} - t_{f , i , k - 1}\\right) \\mathit{WSB}_{f , i , k}}{\\sum_{f = 1}^{2} \\sum_{i = 1}^{Y_{f} - 1} \\sum_{j = i + 1}^{K_{f}} D_{\\mathit{ij}}^{\\left[0 , T\\right]}}"
+          },
+          {
+            "id": "eq-0029",
+            "latex": "\\mathit{Min} \\sum_{f = 1}^{2} \\sum_{i = 1}^{Y_{f} - 1} \\sum_{k = 1}^{K_{f}} \\left(t_{f , i , k} - t_{f , i , k - 1}\\right) \\mathit{WSB}_{f , i , k} + M \\sum_{f = 1}^{2} \\sum_{i = 1}^{Y_{f} - 1} \\sum_{k = 1}^{K_{f}} \\left(\\mathit{pu}_{f , i , j , n} - \\mathit{wu}_{f , i , j , n}\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cor.2015.12.011",
+        "title": "Variable and adaptive neighbourhood search algorithms for rail rapid transit timetabling problem",
+        "n_formulas": 53,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\left[\\mathbf{MINLP}\\right] \\mathit{:} min z = \\sum_{i \\in I} \\left(w_{i} + \\frac{1}{2} \\delta_{i}\\right) . H_{i}"
+          },
+          {
+            "id": "eq-0004",
+            "latex": "h_{\\mathit{min}} \\leq H_{i} \\leq h_{\\mathit{max}} i \\in I / \\left\\{0 , D\\right\\}"
+          },
+          {
+            "id": "eq-0019",
+            "latex": "\\left[\\mathbf{MILP}\\right] : \\mathbf{min} z = \\sum_{t \\in \\mathcal{T}} w_{t}"
+          },
+          {
+            "id": "eq-0020",
+            "latex": "h_{\\mathit{min}} \\leq \\underset{t \\in \\mathcal{T}}{\\sum} \\alpha \\left(t - 1\\right) \\cdot x_{i + 1}^{\\left(t\\right)} \\alpha - \\underset{t \\in \\mathcal{T}}{\\sum} \\alpha \\cdot \\left(\\right. t - 1 \\left.\\right) \\cdot x_{i}^{\\left(\\right. t \\left.\\right)} \\leq h_{\\mathit{max}} i \\in I / \\left\\{0 , D\\right\\}"
+          },
+          {
+            "id": "eq-0026",
+            "latex": "\\left[\\mathbf{MiniMax}\\right] : \\mathbf{min} z = \\underset{t \\in \\mathcal{T}}{\\mathbf{max}} \\mathbf{\\mathit{{}} \\left( w\\right)_{t} }"
+          },
+          {
+            "id": "eq-0027",
+            "latex": "AWT \\leq \\beta \\cdot h_{\\mathit{min}}"
+          },
+          {
+            "id": "eq-0030",
+            "latex": "\\left[\\mathbf{MINLP}_{\\mathbf{\\mathit{d}}}\\right] : \\mathbf{min} z = \\sum_{i \\in I} \\left(w_{i} + \\frac{1}{2} \\delta_{i}\\right) \\cdot H_{i}"
+          },
+          {
+            "id": "eq-0032",
+            "latex": "Min \\left\\{F_{\\mathit{max}} , max \\left\\{F_{\\mathit{min}} , D - \\left(\\mathit{NT} - t\\right) \\star F_{\\mathit{max}} - \\sum_{t^{'} = 1}^{t - 1} F_{t^{'}}\\right\\}\\right\\} \\leq F_{t} \\leq D - \\sum_{t^{'} = 1}^{t - 1} F_{t^{'}} - max \\left\\{\\left(\\mathit{NT} - t\\right) \\star F_{\\mathit{min}} , D - \\sum_{t^{'} = 1}^{t - 1} F_{t^{'}} - F_{\\mathit{max}}\\right\\} t \\in \\mathcal{T} / \\left\\{\\right. 1 , \\mathit{NT} \\left.\\right\\}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ress.2022.108515",
+        "title": "A multi-modal evacuation-based response strategy for mitigating disruption in an intercity railway system",
+        "n_formulas": 38,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0030",
+            "latex": "\\begin{matrix}u p p e r : min \\left(C , R\\right) \\\\ l o w e r : min \\left(U\\right)\\end{matrix}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.jrtpm.2013.10.006",
+        "title": "Modeling capacity consumption considering disruption program characteristics and the transition phase to steady operations during disruptions",
+        "n_formulas": 11,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0003",
+            "latex": "\\overset{\\rightarrow}{k}_{s} \\leq \\text{max} \\left\\{\\begin{matrix} \\overset{\\rightarrow}{k}_{o} \\\\ \\mathit{GW}_{\\mathit{UIC} 406} \\end{matrix}\\right , \\forall s > 0"
+          },
+          {
+            "id": "eq-0004",
+            "latex": "\\overset{\\rightarrow}{k}_{s} > \\text{max} \\left\\{\\begin{matrix} \\overset{\\rightarrow}{k}_{o} \\\\ \\mathit{GW}_{\\mathit{UIC} 406} \\end{matrix}\\right , \\forall s > 0"
+          },
+          {
+            "id": "eq-0005",
+            "latex": "\\overset{\\rightarrow}{k}_{1} , \\overset{\\rightarrow}{k}_{2} \\leq \\text{max} \\left\\{\\begin{matrix} \\overset{\\rightarrow}{k}_{0} \\\\ \\mathit{GW}_{\\mathit{UIC} 406} \\end{matrix}\\right < \\overset{\\rightarrow}{k}_{3} ."
+          },
+          {
+            "id": "eq-0006",
+            "latex": "\\overset{\\rightarrow}{k}_{1} , \\overset{\\rightarrow}{k}_{2} , \\overset{\\rightarrow}{k}_{3} \\leq \\text{max} \\left\\{\\begin{matrix} \\overset{\\rightarrow}{k}_{0} \\\\ \\mathit{GW}_{\\mathit{UIC} 406} \\end{matrix}\\right"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2023.104155",
+        "title": "Train traffic control in merging stations: A data-driven approach",
+        "n_formulas": 18,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0009",
+            "latex": "\\mathit{AD} W_{s} - A D W_{p} \\geq P D W_{s} - P D W_{p} - H_{p - s}^{a} + H_{min}^{d}"
+          },
+          {
+            "id": "eq-0010",
+            "latex": "\\mathit{AD} W_{p} - A D W_{s} \\geq P D W_{p} - P D W_{s} - H_{p - s}^{a} + H_{min}^{d}"
+          },
+          {
+            "id": "eq-0017",
+            "latex": "\\begin{matrix}D D_{p - s} = \\text{Min} \\left(D_{p - s}^{p^{\\star}} , D_{p - s}^{s^{\\star}}\\right) , \\\\ D_{p - s}^{p^{\\star}} =\\text{ Max} \\left(a t_{p} + d t_{p} + h_{p - s} , a t_{s} + d t_{s}\\right) + a t_{p} + d t_{p} , \\\\ D_{p - s}^{s^{\\star}} =\\text{ Max} \\left(a t_{s} + d t_{s} + h_{p - s} , a t_{p} + d t_{p}\\right) + a t_{s} + d t_{s}\\end{matrix}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trb.2024.103067",
+        "title": "Adaptive rescheduling of rail transit services with short-turnings under disruptions via a multi-agent deep reinforcement learning approach",
+        "n_formulas": 49,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0008",
+            "latex": "\\hat{q}_{n_{r} , n_{r^{'}}^{'} , k_{r}} = q_{n_{r} , n_{r^{'}}^{'} , k_{r}} min \\left(\\frac{D - \\underset{n_{r^{'}}^{'} > n_{r} , r^{'} = r}{\\sum} b_{n_{r} , n_{r^{'}}^{'} , k_{r}}}{\\underset{n_{r^{'}}^{'} \\in \\mathbf{\\mathit{\\zeta}}_{k_{r}}}{\\sum} q_{n_{r} , n_{r^{'}}^{'} , k_{r}}} , 1\\right) ,"
+          },
+          {
+            "id": "eq-0023",
+            "latex": "\\underset{\\mathbf{\\mathit{X}}_{\\psi}}{max} C = \\underset{\\Psi \\rightarrow \\infty}{lim} \\sum_{\\psi = 1}^{\\Psi} \\underset{r \\in \\mathcal{R}}{\\sum} c_{r \\left(\\psi\\right)}"
+          },
+          {
+            "id": "eq-0024",
+            "latex": "H_{min} \\leq h_{k_{r} \\left(\\psi\\right)} \\leq H_{max} ,"
+          },
+          {
+            "id": "eq-0025",
+            "latex": "H_{min} \\leq h_{k_{r} \\left(\\psi\\right)} \\leq H_{max} ,"
+          },
+          {
+            "id": "eq-0029",
+            "latex": "h_{k_{r} \\left(\\psi\\right)} \\leq \\overset{̄}{\\tau}_{\\eta_{\\hat{r}} - 1 , K_{r}^{'}} + H_{max} + \\Delta_{\\eta_{r}} + \\omega_{\\eta_{r}} - \\left(K_{r}^{'} - k_{r \\left(\\psi\\right)} + 1\\right) H_{min} - \\tau_{\\eta_{r} , k_{r} \\left(\\psi\\right) - 1}"
+          },
+          {
+            "id": "eq-0030",
+            "latex": "\\tau_{\\eta_{\\hat{r}} - 1 , K_{r}^{'} + 1} \\leq \\overset{̄}{\\tau}_{\\eta_{\\hat{r}} - 1 , K_{r}^{'}} + H_{max}"
+          },
+          {
+            "id": "eq-0031",
+            "latex": "h_{K_{r}^{'} + 1} + \\tau_{\\eta_{r} , K_{r}^{'}} - \\Delta_{\\eta_{r}} - \\omega_{\\eta_{r}} \\leq \\overset{̄}{\\tau}_{\\eta_{\\hat{r}} - 1 , K_{r}^{'}} + H_{max} ."
+          },
+          {
+            "id": "eq-0032",
+            "latex": "\\tau_{\\eta_{r} , K_{r}^{'}} \\leq \\overset{̄}{\\tau}_{\\eta_{\\hat{r}} - 1 , K_{r}^{'}} + H_{max} + \\Delta_{\\eta_{r}} + \\omega_{\\eta_{r}} - H_{min}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.tre.2024.103605",
+        "title": "Enhancing the evacuation efficiency through the two-step optimization of train timetable and response vehicles during metro disruptions",
+        "n_formulas": 99,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\left(\\text{TTR}\\right) min Z_{1} = \\lambda_{1} \\underset{\\text{u} \\in \\left\\{1 , \\ldots 2 \\left|\\text{U}\\right|\\right\\}}{\\sum} a_{\\text{u}} + \\lambda_{2} \\underset{\\text{u} \\in \\left\\{1 , \\ldots 2 \\left|\\text{U}\\right|\\right\\}}{\\sum} \\underset{\\text{r} \\in \\text{R}}{\\sum} b_{\\text{u} , \\text{r}} + \\mu_{1} \\underset{\\text{p} \\in \\text{P}}{\\sum} w_{\\text{p}}"
+          },
+          {
+            "id": "eq-0050",
+            "latex": "\\left(\\text{RVS}\\right) min \\text{Z}_{\\text{2}} = \\underset{\\text{i} \\in \\text{I}_{\\text{M}}}{\\sum} \\left(\\overset{\\sim}{\\text{n}}\\right)_{\\text{i}} \\cdot \\left(\\omega_{\\text{i}} + \\left(\\overset{\\sim}{\\text{w}}\\right)_{\\text{i}} + \\left(\\overset{\\sim}{\\tau}\\right)_{\\text{i}} - \\left(\\overset{\\sim}{\\text{t}}\\right)_{\\text{i}}^{\\text{A}}\\right)"
+          },
+          {
+            "id": "eq-0085",
+            "latex": "\\left(\\text{PA}\\right) min Z_{3} = \\underset{\\text{p} \\in \\text{P}}{\\sum} \\text{w}_{\\text{p}}"
+          },
+          {
+            "id": "eq-0095",
+            "latex": "\\left(\\text{SBB}\\right) min \\text{Z}_{4} = \\underset{\\text{p} \\in \\overset{\\sim}{\\text{P}}}{\\sum} \\underset{\\text{k} \\in \\bar{\\text{K}}}{\\sum} \\left(\\bar{\\omega}\\right)_{\\text{k}}^{\\text{p}} y_{\\text{k}}^{\\text{p}}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.cie.2024.109999",
+        "title": "Demand-adapted train timetabling with coupling-decoupling operations on a bidirectional intercity railway line",
+        "n_formulas": 70,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0005",
+            "latex": "d_{j + 1}^{1} - d_{j}^{1} \\geq H_{\\mathit{min}} , j , j + 1 \\in J^{u}"
+          },
+          {
+            "id": "eq-0006",
+            "latex": "d_{j + 1}^{1} - d_{j}^{1} \\leq H_{\\mathit{max}} , j , j + 1 \\in J^{u}"
+          },
+          {
+            "id": "eq-0007",
+            "latex": "d_{j + 1}^{m + 1} - d_{j}^{m + 1} \\geq H_{\\mathit{min}} , j , j + 1 \\in J^{d}"
+          },
+          {
+            "id": "eq-0008",
+            "latex": "d_{j + 1}^{m + 1} - d_{j}^{m + 1} \\leq H_{\\mathit{max}} , j , j + 1 \\in J^{d}"
+          },
+          {
+            "id": "eq-0027",
+            "latex": "\\mathit{LP}_{j}^{s} = max \\left\\{\\left(\\tau \\left|\\sum_{t \\in \\left[\\mathit{LP}_{j - 1}^{s} , \\tau\\right)} \\sum_{v = s + 1}^{m} D_{S \\left(s\\right) , S \\left(v\\right)} \\left(t\\right) \\leq C_{j} - R P_{j}^{s - 1} + O P_{j}^{s}\\right)\\right\\} j \\in J^{u} , s ∊ S^{u} \\backslash \\left\\{m\\right\\} , L_{0}^{s} = 0 .\\right)"
+          },
+          {
+            "id": "eq-0028",
+            "latex": "\\mathit{LP}_{j}^{s} = \\mathit{min} \\left\\{\\left(D T_{j}^{s} , \\mathit{max} \\left\\{\\tau \\left(\\left|\\sum_{t \\in \\left[\\mathit{LP}_{j - 1}^{s} , \\tau\\right)} \\sum_{v = s + 1}^{M} D_{S \\left(s\\right) , S \\left(v\\right)} \\left(t\\right) \\leq C_{j} - R P_{j}^{s - 1} + O P_{j}^{s}\\right)\\right\\}\\right)\\right\\}\\right) \\forall j \\in J^{u} , s ∊ S^{u} \\backslash \\left\\{m\\right\\} , L_{0}^{s} = 0"
+          },
+          {
+            "id": "eq-0056",
+            "latex": "\\mathit{Min} Z_{1} = W^{u} + W^{d}"
+          },
+          {
+            "id": "eq-0057",
+            "latex": "\\mathit{Min} Z_{2} = \\underset{j \\in J^{u} \\cup J^{d}}{\\sum} \\left(C_{j} - \\mathit{DP}_{j}\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.jrtpm.2020.100200",
+        "title": "A disaggregate bundle method for train timetabling problems",
+        "n_formulas": 18,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\left(\\text{TTP}\\right) \\left\\{\\right. \\begin{matrix}\\underset{x_{p}}{max} \\underset{p \\in \\mathcal{P}}{\\sum} v_{p} x_{p} \\\\ s . t . \\left\\{\\right. \\begin{matrix}\\underset{p \\in \\mathcal{P}}{\\sum} d_{b t}^{p} x_{p} \\leq c_{b} , \\forall \\left(b , t\\right) \\in B \\times T \\left(i\\right) \\\\ \\underset{p \\in \\mathcal{P}_{r}}{\\sum} x_{p} = 1 , \\forall r \\in R \\left(i i\\right) \\\\ x_{p} \\in \\left\\{0,1\\right\\} , \\forall p \\in P \\left(i i i\\right)\\end{matrix}\\end{matrix} ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "\\left(\\text{TTP}\\right)_{\\mu} \\textrm{ } \\left\\{\\right. \\begin{matrix}\\phi \\left(\\mu\\right) : = \\underset{x_{p}}{max} \\underset{p \\in \\mathcal{P}}{\\sum} v_{p} x_{p} + \\underset{\\left(b , t\\right) \\in \\mathcal{B} \\times \\mathcal{T}}{\\sum} \\mu_{b t} \\left(c_{b} - \\underset{p \\in \\mathcal{P}}{\\sum} d_{b t}^{p} x_{p}\\right) \\\\ s . t . \\left\\{\\right. \\begin{matrix}\\underset{p \\in \\mathcal{P}_{r}}{\\sum} x_{p} = 1 , \\forall r \\in \\mathcal{R} \\\\ x_{p} \\in \\left\\{0,1\\right\\} , \\forall p \\in P \\end{matrix}\\end{matrix} ."
+          },
+          {
+            "id": "eq-0004",
+            "latex": "\\left(\\text{D}\\right) \\left\\{\\right. \\begin{matrix}\\mu^{*} : = \\text{argmin} \\phi \\left(\\mu\\right) \\\\ s . t . \\mu \\geq 0\\end{matrix} ."
+          },
+          {
+            "id": "eq-0006",
+            "latex": "\\left(\\overset{\\overline}{\\text{D}}_{k}^{\\text{agg}}\\right) \\textrm{ } \\left\\{\\right. \\begin{matrix}min \\overset{\\overline}{\\phi}^{k} \\left(\\mu\\right) + \\frac{u_{k}}{2} \\left|\\mu - \\mu_{k}\\right|^{2} \\\\ s . t . \\mu \\geq 0 ,\\end{matrix} ."
+          },
+          {
+            "id": "eq-0007",
+            "latex": "\\left(\\overset{\\overline}{\\text{D}}_{k}^{\\text{agg}}\\right) \\textrm{ } \\left\\{\\right. \\begin{matrix}\\underset{v , \\mu}{min} v + \\frac{u_{k}}{2} \\left|\\mu - \\mu_{k}\\right|^{2} \\\\ s . t . \\left\\{\\right. \\begin{matrix}v \\geq \\phi \\left(\\mu_{l}\\right) + g_{l} * \\left(\\mu - \\mu_{l}\\right) , \\forall l \\in \\mathcal{L}_{k} \\left(i\\right) \\\\ \\mu \\geq 0 \\left(i i\\right)\\end{matrix}\\end{matrix} ."
+          },
+          {
+            "id": "eq-0009",
+            "latex": "\\left(\\overset{\\overline}{\\text{D}}_{k}^{\\text{agg}}\\right) \\left\\{\\right. \\begin{matrix}\\underset{v , \\mu}{min} v + \\frac{u_{k}}{2} \\left|\\mu - \\mu_{k}\\right|^{2} \\\\ s . t . \\left\\{\\right. \\begin{matrix}v \\geq \\Psi_{k l} + g_{l} * \\left(\\mu - \\mu_{k}\\right) , \\forall l \\in \\mathcal{L}_{k} \\left(i\\right) \\\\ \\mu \\geq 0 \\left(i i\\right)\\end{matrix}\\end{matrix} ."
+          },
+          {
+            "id": "eq-0012",
+            "latex": "\\begin{matrix}\\phi_{r} \\left(\\mu\\right) : = \\underset{x_{p}}{max} \\underset{p \\in \\mathcal{P}_{r}}{\\sum} \\left(v_{p} - \\underset{\\left(b , t\\right) \\in \\mathcal{B} \\times \\mathcal{T}}{\\sum} \\mu_{b t} d_{b t}^{p}\\right) x_{p} \\\\ s . t . \\left\\{\\right. \\begin{matrix}\\underset{p \\in \\mathcal{P}_{r}}{\\sum} x_{p} = 1 \\left(i\\right) \\\\ x_{p} \\in \\left\\{0,1\\right\\} , \\forall p \\in \\mathcal{P}_{r} \\left(i i\\right)\\end{matrix}\\end{matrix} ."
+          },
+          {
+            "id": "eq-0013",
+            "latex": "\\left(\\text{D}^{\\text{dis}}\\right) \\left\\{\\right. \\begin{matrix}\\underset{\\mu}{min} \\underset{r \\in \\mathcal{R}}{\\sum} \\phi_{r} \\left(\\mu\\right) + \\underset{\\left(b , t\\right) \\in \\mathcal{B} \\times \\mathcal{T}}{\\sum} \\mu_{b t} c_{b} \\\\ s . t . \\mu \\geq 0\\end{matrix} ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.tre.2025.104210",
+        "title": "Real-time train rescheduling optimization with combined cross-line strategies for urban rail network",
+        "n_formulas": 37,
+        "coherence": 0.892,
+        "candidates": [
+          {
+            "id": "eq-0028",
+            "latex": "\\text{M1}: \\left\\{\\begin{matrix} min & Z_{h} = \\alpha P_{h}^{S} + \\beta P_{h}^{D} + \\gamma P_{h}^{F} & \\left(a\\right) \\\\ \\text{s}.\\text{t}. & \\text{Constraints} (\\text{1})–(\\text{27}) & \\left(b\\right) \\end{matrix}\\right"
+          },
+          {
+            "id": "eq-0029",
+            "latex": "\\text{M2}: \\left\\{\\begin{matrix} min & Q = \\underset{r \\in \\mathcal{R}_{h}}{\\sum} \\overset{̂}{C_{D}} \\cdot g_{r} & \\left(a\\right) \\\\ \\text{s}.\\text{t}. & g_{r} \\geq t_{r , i_{d}}^{A} - \\bar{t_{r , i_{d}}^{A}} - \\overset{̂}{H_{D}} \\forall r \\in \\mathcal{R}_{h} & \\left(b\\right) \\\\ & t_{r , i}^{A} - t_{r , \\sigma \\left(r , i\\right)}^{D} \\geq R_{r , \\sigma \\left(r , i\\right) , i} + d r_{r , \\sigma \\left(r , i\\right) , i} \\forall i \\in \\mathcal{I}_{r} , r \\in \\mathcal{R}_{h} & \\left(c\\right) \\\\ & t_{r , i}^{D} - t_{r , i}^{A} \\geq \\left(\\bar{t_{r , i}^{D}} - \\bar{t_{r , i}^{A}}\\right) + d d_{r , i} \\forall i \\in \\mathcal{I}_{r} , r \\in \\mathcal{R}_{h} & \\left(d\\right) \\\\ & t_{r , i}^{A} - t_{\\varphi \\left(r , i\\right) , i}^{A} \\geq h_{\\varphi \\left(r , i\\right) , r , i} \\forall i \\in \\mathcal{I}_{r} , r \\in \\mathcal{R}_{h} & \\left(e\\right) \\\\ & t_{r , i}^{D} - t_{\\varphi \\left(r , i\\right) , i}^{D} \\geq h_{\\varphi \\left(r , i\\right) , r , i} \\forall i \\in \\mathcal{I}_{r} , r \\in \\mathcal{R}_{h} & \\left(f\\right) \\\\ & \\text{Constraints }(\\text{12}),\\text{ }(\\text{15}) & \\left(g\\right) \\\\ & g_{r} , t_{r , i}^{A} , t_{r , i}^{D} \\in \\mathbb{Z}^{+} \\forall i \\in \\mathcal{I}_{r} , r \\in \\mathcal{R}_{h} \\end{matrix}\\right"
+          },
+          {
+            "id": "eq-0030",
+            "latex": "\\text{M3}: \\left\\{\\begin{matrix} min & P \\left(\\mathbf{t}_{h} , \\mathbf{e}_{h}\\right) = \\underset{r \\in \\mathcal{R}_{h}}{\\sum} \\underset{i \\in \\mathcal{I}_{r}^{O}}{\\sum} \\underset{\\left(r^{'} , i\\right) \\in \\delta_{h , r , i}^{D -}}{\\sum} y_{r^{'} , r , i} & \\left(a\\right) \\\\ \\text{s}.\\text{t}. & \\underset{\\left(r^{'} , i\\right) \\in \\delta_{r , i}^{-}}{\\sum} y_{r^{'} , r , i} = e_{r} i = i_{r}^{O} , \\forall r \\in \\mathcal{R}_{h} & \\left(b\\right) \\\\ & \\underset{\\left(r^{'} , i\\right) \\in \\delta_{r , i}^{+}}{\\sum} y_{r , r^{'} , i} = e_{r} i = i_{r}^{D} , \\forall r \\in \\mathcal{R}_{h} & \\left(c\\right) \\\\ & t_{r^{'} , i}^{A} - t_{r , i}^{D} \\geq C T_{r , r^{'} , i} + M \\left(y_{r , r^{'} , i} - 1\\right) i = i_{r}^{D} = i_{r^{'}}^{O} , \\forall r , r^{'} \\in \\mathcal{R}_{h} & \\left(d\\right) \\\\ & y_{r , r^{'} , i} \\in \\left\\{0 , 1\\right\\} , t_{r , i}^{A} , t_{r , i}^{D} \\in \\mathbb{Z}^{+} \\forall i \\in \\left\\{i_{r^{'}}^{O} , i_{r}^{D}\\right\\} , r , r^{'} \\in \\mathcal{R}_{h} & \\left(e\\right) \\end{matrix}\\right"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.eswa.2025.129131",
+        "title": "Weekly train timetabling integrating stop planning for high-speed rail lines",
+        "n_formulas": 29,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0005",
+            "latex": "\\mathit{Min} : Z = \\omega \\left(\\underset{l , a}{\\sum} c_{a}^{l} x_{a}^{l} + \\underset{l , t}{\\sum} c_{B}^{l} ϖ_{\\Delta t}^{l}\\right) + \\underset{u , a}{\\sum} \\theta_{a}^{u} y_{a}^{u} + \\varphi \\underset{u}{\\sum} z^{u}"
+          },
+          {
+            "id": "eq-0021",
+            "latex": "\\mathit{Min} : Z^{\\mathit{Rel}} = Z + \\underset{s , d , t}{\\sum} \\lambda_{\\mathit{sdt}} \\left(\\underset{l \\in L_{d} , t^{'} \\in \\left[t , t + \\tau_{s}^{\\mathit{Dep}}\\right] , a \\in \\left(A_{n_{\\mathit{sdt}} ' +} \\cap A^{R}\\right)}{\\sum} x_{a}^{l} - 1\\right) + \\underset{s , d , t}{\\sum} \\lambda^{'}_{\\mathit{sdt}} \\left(\\underset{l \\in L_{d} , t^{'} \\in \\left[t , t + \\tau_{s}^{\\mathit{Arr}}\\right] , a \\in \\left(A_{n_{\\mathit{sdt}} ' -} \\cap A^{R}\\right)}{\\sum} x_{a}^{l} - 1\\right) + \\underset{a \\in A^{R} , \\left(s , s^{'}\\right) \\in \\mathit{SS}_{a}}{\\sum} \\sigma_{\\mathit{as} s^{'}} \\left(\\underset{u \\in \\left(U_{s s^{'}} \\cap U_{d_{a}}\\right)}{\\sum} y_{a}^{u} - \\underset{l \\in L_{d_{a}}}{\\sum} \\epsilon_{l} x_{a}^{l}\\right)"
+          },
+          {
+            "id": "eq-0022",
+            "latex": "\\mathit{Min} : Z^{\\mathit{Rel}} = \\underset{L^{\\mathit{Sub}} \\in \\mathcal{L}}{\\sum} \\left(\\underset{l \\in L^{\\mathit{Sub}}}{\\sum} Z_{l}^{\\mathit{Rel}}\\right) + \\underset{u}{\\sum} Z_{u}^{\\mathit{Rel}} - \\underset{s , d , t}{\\sum} \\left(\\lambda_{\\mathit{sdt}} + \\lambda^{'}_{\\mathit{sdt}}\\right)"
+          }
+        ]
+      }
+    ],
+    "absent": [
+      {
+        "doi": "10.1016_j.ress.2011.09.002",
+        "title": "Generic metrics and quantitative approaches for system resilience as a function of time",
+        "n_formulas": 5,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "Я \\left(t\\right) = R e c o v e r y \\left(t\\right) / L o s s \\left(t_{d}\\right)"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "Я_{F} \\left(\\right. t_{r} \\left|\\right. e_{j} \\left.\\right) = \\frac{F \\left(\\right. t_{r} \\left|\\right. e_{j} \\left.\\right) - F \\left(\\right. t_{d} \\left|\\right. e_{j} \\left.\\right)}{F \\left(t_{0}\\right) - F \\left(\\right. t_{d} \\left|\\right. e_{j} \\left.\\right)} \\forall e_{j} \\in D"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "T_{Я} \\left(e_{j}\\right) = \\underset{s_{i} \\in S_{j}}{\\sum} t \\left(s_{i}\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ejor.2006.10.034",
+        "title": "A branch and bound algorithm for scheduling trains in a railway network",
+        "n_formulas": 2,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "t_{i} \\geq t_{k} + f_{k} ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "t_{k} \\geq t_{h} + f_{\\mathit{hk}} ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ress.2016.03.015",
+        "title": "A model to quantify the resilience of mass railway transportation systems",
+        "n_formulas": 12,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "R = \\int_{t_{0}}^{t_{1}} \\left(Q_{0} \\left(t\\right) - Q \\left(t\\right)\\right) \\mathit{dt}"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "P \\left(k\\right) \\sim k^{- \\gamma} , where \\gamma \\in \\left[2 , 3\\right]"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "S := \\left\\{the set of stations in the railway network\\right\\} L := \\left\\{the set of lines in the railway network\\right\\} := \\left\\{l = \\left\\{s_{1} , \\ldots , s_{k}\\right\\} : s_{i} \\in S \\land \\left\\{s_{1} , \\ldots , s_{k}\\right\\} is a path in the railway network\\right\\} V := \\left\\{the set of nodes of the network\\right\\} := \\left\\{\\left(s , l\\right) \\in S \\times L : s \\in l\\right\\}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2017.02.001",
+        "title": "The multi-objective railway timetable rescheduling problem",
+        "n_formulas": 16,
+        "coherence": 0.938,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "V_{j} = - \\left(\\mathit{VT}_{j} + \\beta_{1} \\cdot \\mathit{WT}_{j} + \\beta_{2} \\cdot \\mathit{NT}_{j} + \\beta_{3} \\cdot \\mathit{ED}_{j} + \\beta_{4} \\cdot \\mathit{LD}_{j}\\right) ,"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "z_{p} = \\underset{g \\in G}{\\sum} \\underset{a \\in A^{g}}{\\sum} t_{a}^{g} \\cdot n_{g} \\cdot w_{a}^{g}"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "z_{o} = \\underset{a \\in A^{*}}{\\sum} c_{a} \\cdot y_{a} + \\underset{k \\in K}{\\sum} \\underset{a \\in A_{k}}{\\sum} c_{a} \\cdot x_{a}^{k}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.ejor.2004.12.013",
+        "title": "Developing railway timetables which guarantee a better service",
+        "n_formulas": 11,
+        "coherence": 0.909,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "f \\left(d\\right) = \\frac{1}{\\lambda} e^{- \\frac{1}{\\lambda} d} \\left(d \\geq 0\\right) ,"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "F \\left(D\\right) = p \\left(D \\leq d\\right) = 1 - e^{- \\frac{1}{\\lambda} D} \\left(d \\geq 0\\right) ,"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "p \\left(d > B\\right) = 1 - F \\left(B\\right) = e^{- \\frac{1}{\\lambda} B} ,"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trb.2006.06.006",
+        "title": "Decreasing the passenger waiting time for an intercity rail network",
+        "n_formulas": 13,
+        "coherence": 0.923,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\begin{aligned} & f \\left(d\\right) = \\lambda e^{- \\lambda d} \\left(d \\geq 0\\right) , \\\\ & F \\left(D\\right) = p \\left(D \\leq d\\right) = 1 - e^{- \\lambda D} \\left(d \\geq 0\\right) ,\\end{aligned}"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "p \\left(d > S\\right) = 1 - F \\left(S\\right) = e^{- \\lambda_{X 0} S} ,"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "C_{\\text{mc}} \\left(B\\right) = 2.7 p_{Y 1} e^{- \\lambda_{X 0} S} ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2016.04.018",
+        "title": "Modeling railway disruption lengths with Copula Bayesian Networks",
+        "n_formulas": 6,
+        "coherence": 0.667,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\mathbb{P} \\left(\\right. \\mathit{Group} = i \\left|\\right. 0.975 r_{j} \\leq R \\leq 1.025 r_{j} , T = t_{j} \\left.\\right) = \\frac{\\mathbb{P} \\left(\\right. 0.975 r_{j} \\leq R \\leq 1.025 r_{j} , T = t_{j} \\left|\\right. \\mathit{Group} = i \\left.\\right) \\mathbb{P} \\left(\\mathit{Group} = i\\right)}{\\mathbb{P} \\left(0.975 r_{j} \\leq R \\leq 1.025 r_{j} , T = t_{j}\\right)} ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "F_{1 , \\ldots , n} \\left(x_{1} , \\ldots , x_{n}\\right) = C \\left(F_{1} \\left(x_{1}\\right) , \\ldots , F_{n} \\left(x_{n}\\right)\\right)"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "C_{\\Sigma} \\left(u_{1} , \\ldots , u_{n}\\right) = \\Phi_{\\Sigma} \\left(\\Phi^{- 1} \\left(u_{1}\\right) , \\ldots , \\Phi^{- 1} \\left(u_{n}\\right)\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.eswa.2007.11.050",
+        "title": "A hybrid electromagnetism-like algorithm for single machine scheduling problem",
+        "n_formulas": 4,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "q^{i} = exp \\left(- n \\frac{f \\left(x^{i}\\right) - f \\left(x^{\\text{best}}\\right)}{\\sum_{k = 1}^{m} \\left(f \\left(x^{k}\\right) - f \\left(x^{\\text{best}}\\right)\\right)}\\right) , \\forall i ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "F^{i} = \\sum_{j \\neq i}^{m} \\begin{Bmatrix} \\left(x^{j} - x^{i}\\right) \\frac{q^{i} q^{j}}{\\left\\|x^{j} - x^{i}\\right\\|^{2}} & \\text{if} & f \\left(x^{j}\\right) < f \\left(x^{i}\\right) \\\\ \\left(x^{i} - x^{j}\\right) \\frac{q^{i} q^{j}}{\\left\\|x^{j} - x^{i}\\right\\|^{2}} & \\text{else} & f \\left(x^{j}\\right) \\geq f \\left(x^{i}\\right) \\end{Bmatrix} , \\forall i ."
+          },
+          {
+            "id": "eq-0003",
+            "latex": "q_{ij} = \\frac{f \\left(x^{i}\\right) - f \\left(x^{j}\\right)}{f \\left(x^{\\text{worst}}\\right) - f \\left(x^{\\text{best}}\\right)}"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trc.2021.103170",
+        "title": "An integrated approach of train scheduling and rolling stock circulation with skip-stopping pattern for urban rail transit lines",
+        "n_formulas": 1,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "q_{u , v} \\left(t\\right) = \\left\\{\\begin{matrix} 1 , if there exists a passenger arriving at time t \\\\ 0 , otherwise \\end{matrix}\\right"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.trb.2020.09.001",
+        "title": "Integrated timetable rescheduling and passenger reassignment during railway disruptions",
+        "n_formulas": 59,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "c_{e^{'}} = c_{e} , e^{'} \\in E_{\\text{dde}}^{\\star} , e \\in E_{\\text{de}}^{\\text{plan}} , \\lambda_{e^{'}} = e ,"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "x_{e^{'}} = x_{e} , e^{'} \\in E_{\\text{dde}}^{\\star} , e \\in E_{\\text{de}}^{\\text{plan}} , \\lambda_{e^{'}} = e ,"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "\\mathit{y}_{\\mathit{a}} = 1 , a \\in A_{\\text{enpenal}}^{\\text{plan}} \\cup A_{\\text{expenal}}^{\\text{plan}} ,"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.dam.2006.06.007",
+        "title": "Classes of cycle bases",
+        "n_formulas": 19,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\lambda_{1} \\gamma_{C_{1}} + \\hdots + \\lambda_{\\nu} \\gamma_{C_{\\nu}} = 0 ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "\\exists \\lambda_{i} \\in \\mathbb{Z} : \\gamma_{C} = \\lambda_{1} \\gamma_{C_{1}} + \\hdots + \\lambda_{\\nu} \\gamma_{C_{\\nu}} ."
+          },
+          {
+            "id": "eq-0003",
+            "latex": "C_{\\sigma \\left(i\\right)} \\backslash \\left(C_{\\sigma \\left(1\\right)} \\cup \\hdots \\cup C_{\\sigma \\left(i - 1\\right)}\\right) \\neq \\emptyset \\forall i = 2 , \\ldots , \\nu ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.jrtpm.2014.04.001",
+        "title": "Automatic generation of railway timetables based on a mesoscopic infrastructure model",
+        "n_formulas": 3,
+        "coherence": 0.667,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "\\mathit{OVERALL}_{-} \\mathit{NUMBER}_{-} \\mathit{OF}_{-} \\mathit{ITERATIONS} = \\mathit{NUMBER}_{-} \\mathit{OF}_{-} \\mathit{INTERNAL}_{-} \\mathit{ITERATIONS} \\times \\mathit{NUMBER}_{-} \\mathit{OF}_{-} \\mathit{EXTERNAL}_{-} \\mathit{ITERATIONS}"
+          },
+          {
+            "id": "eq-0002",
+            "latex": "w \\left(i , j\\right) = c \\left(i , j\\right) \\left(t \\left(j\\right) - t \\left(i\\right) - p \\left(i , j\\right)\\right) + \\underset{c^{'} ∊ C^{'}}{\\sum} \\underset{\\xi ∊ \\Xi \\left(c^{'}\\right)}{\\sum} \\left(\\right. l_{\\xi} \\left(j\\right) \\left(\\right. t \\left(j\\right) - \\tau_{\\xi} \\left(j\\right)^{+} + e_{\\xi} \\left(j\\right) \\left(\\tau_{\\xi} \\left(j\\right) - t \\left(j\\right)\\right)^{+} + L_{\\xi} \\left(j\\right) 1 \\left\\{t \\left(j\\right) - \\tau_{\\xi} \\left(j\\right)^{+}\\right\\} + E_{\\xi} \\left(j\\right) 1 \\left\\{\\left(\\tau_{\\xi} \\left(j\\right) - t \\left(j\\right)^{+}\\right\\} + F_{\\xi} \\left(j\\right) 1 \\left\\{s \\left(j\\right) \\neq s_{\\xi}\\right\\}\\right)"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "\\text{COST} = \\underset{c ∊ C}{\\sum} \\left(I \\left(c\\right) 1 \\left\\{c \\text{is} \\text{not} \\text{inserted} \\text{inTT}\\right\\} + 1 \\left\\{c \\text{is} \\text{inserted} \\text{in} \\text{TT}\\right\\} \\left(\\underset{\\left(i , j\\right) ∊ P \\left(c\\right)}{\\sum} w \\left(i , j\\right) + 1 \\left\\{c \\text{includes} \\text{symmetric} \\text{trains}\\right\\} \\underset{\\left(i , j\\right) ∊ P ' \\left(c\\right)}{\\sum} w \\left(i , j\\right)\\right)\\right)"
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.physa.2022.126957",
+        "title": "Jointly optimized demand-oriented train timetable and passenger flow control strategy for a congested subway line under a short-turning operation pattern",
+        "n_formulas": 32,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "h^{m i n} \\leq h_{i , r}^{g} \\leq h^{m a x} , i \\in I_{S}^{g} / \\left\\{n\\right\\} , g \\in G ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "T_{n , r}^{d , g} = T_{r}^{e n d} , g \\in G ."
+          },
+          {
+            "id": "eq-0003",
+            "latex": "T_{i - 1 , r}^{d , g} = T_{i , r}^{d , g} - h_{i - 1 , r}^{g} , i \\in I_{S}^{g} / \\left\\{1\\right\\} , g \\in G ."
+          }
+        ]
+      },
+      {
+        "doi": "10.1016_j.orl.2008.06.005",
+        "title": "High-multiplicity cyclic job shop scheduling",
+        "n_formulas": 4,
+        "coherence": 1.0,
+        "candidates": [
+          {
+            "id": "eq-0001",
+            "latex": "Pr \\left[X > \\left(1 + \\delta\\right) \\mu\\right] < e^{- \\mu \\delta^{2} / 4} , Pr \\left[X < \\left(1 - \\delta\\right) \\mu\\right] < e^{- \\mu \\delta^{2} / 2} ."
+          },
+          {
+            "id": "eq-0002",
+            "latex": "\\frac{\\overset{̄}{\\tau}}{B} = \\frac{\\overset{̄}{\\tau}}{3 \\sqrt{\\overset{̄}{\\tau}} / \\left(C \\sqrt{log m \\overset{̄}{\\tau}}\\right)} = C \\sqrt{\\overset{̄}{\\tau}} \\sqrt{log m \\overset{̄}{\\tau}} / 3"
+          },
+          {
+            "id": "eq-0003",
+            "latex": "e^{- \\delta^{2} \\mu_{t} / 4} = e^{- \\mu_{t} / \\left(4 t^{2}\\right)} \\leq e^{- \\left(C \\sqrt{\\overset{̄}{\\tau}} \\sqrt{log m \\overset{̄}{\\tau}} / 3\\right) / \\left(4 B\\right)} = e^{- C^{2} log m \\overset{̄}{\\tau} / 36} = \\left(\\frac{1}{m \\overset{̄}{\\tau}}\\right)^{C^{2} / 36} ."
+          }
+        ]
+      }
+    ]
+  }
+}
