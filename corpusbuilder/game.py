@@ -424,7 +424,9 @@ def _group_end(s: str, i: int) -> int:
     return len(s)
 
 
-def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
+def extract_symbols(
+    latex: str, *, limit: int | None = 12
+) -> tuple[list[list], list[list], str]:
     """Deterministically extract (symbols, operators, relation) from LaTeX.
 
     Returns ``(syms, ops, rel)`` where ``syms``/``ops`` are
@@ -432,6 +434,12 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
     ``rel`` is the first top-level relation's display symbol (or ``""``).
     Sub-/superscript contents are treated as indices and skipped, so
     ``x_{ij}`` and ``x_{ik}`` are the same symbol ``x``.
+
+    ``syms`` is truncated to the ``limit`` most frequent symbols, which is what
+    the review UI displays; pass ``limit=None`` for the complete set, as the
+    symbol-resolution measure of :mod:`corpusbuilder.resolution` requires (a
+    truncated set would score a long formula as fully resolved while symbols
+    beyond the cut are still untyped).
     """
     s = _rewrite_ops(_collapse_words(latex))
     syms: dict[str, int] = {}
@@ -500,7 +508,8 @@ def extract_symbols(latex: str) -> tuple[list[list], list[list], str]:
         else:
             i += 1
 
-    top_syms = sorted(syms.items(), key=lambda kv: (-kv[1], kv[0]))[:12]
+    ordered = sorted(syms.items(), key=lambda kv: (-kv[1], kv[0]))
+    top_syms = ordered if limit is None else ordered[:limit]
     top_ops = sorted(ops.items(), key=lambda kv: (-kv[1], kv[0]))[:6]
     return ([[k, v] for k, v in top_syms], [[k, v] for k, v in top_ops], rel)
 
