@@ -79,6 +79,7 @@ from railpminer import _lp2graph  # noqa: F401
 
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex
+from corpusbuilder.symbols import binder_roles, paper_evidence
 from lp2graph import loads as load_formulation
 from lp2graph.mining import REWRITE_RULES_VERSION
 from lp2graph.mining.corpusmgr import PRIORITY_CELLS, QUALITY_TIERS
@@ -532,12 +533,25 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
     return "\n".join(lines) + "\n"
 
 
-#: What the review game's symbol classifier can already answer for a stub.
+#: One declaration line per kind, with the facts a stub cannot know left as ``?``.
 _KIND_LINE = {
     "index": "%@ index {i} ordered=0 cyclic=0 :: ?",
     "parameter": "%@ param {i} shape=- kind=scalar domain=- :: ?",
-    "variable": "%@ var {i} shape=- domain=? role=primary drole=- lo=- hi=- :: ?",
+    "variable": "%@ var {i} shape=- domain={d} role=primary drole=- lo=- hi=- :: ?",
 }
+
+#: Why a symbol arrived pre-classified, so the reviewer can judge the claim
+#: instead of trusting it. Algebraic evidence is weaker than a human verdict and
+#: says so.
+_KIND_SOURCE = {
+    "review": "classified as {kind} during review",
+    "index": "an index family: a big operator or quantifier binds over it",
+    "variable": "a decision variable: a domain row declares it {domain}",
+}
+
+
+def _kind_line(kind: str, ident: str, domain: str | None) -> str:
+    return _KIND_LINE[kind].format(i=ident, d=domain or "?")
 
 
 def declaration_stub(
@@ -546,22 +560,38 @@ def declaration_stub(
     """A fill-in-the-blank declaration sidecar for a paper awaiting one.
 
     Every line the reviewer must supply is present with the symbol or row name
-    already filled in; only the modelling facts (which symbols are index families
-    versus parameters versus variables, their shapes and domains) are left as
-    ``?`` placeholders. A stub used unedited fails loudly rather than promoting a
+    already filled in; only the modelling facts left genuinely open are ``?``
+    placeholders. A stub used unedited fails loudly rather than promoting a
     guessed model.
 
-    ``symbols`` is the reviewer's own answer to the first of those questions,
-    carried over from the review game's symbol classifier (export key
-    ``symbol_tables``). A symbol it classifies gets *only* its declared line;
-    the rest still get all three for the reviewer to choose between. Shapes and
-    domains stay ``?`` either way: the game asks what a symbol *is*, not how it
-    is indexed.
+    Two sources pre-classify a symbol. :func:`corpusbuilder.symbols.paper_evidence`
+    reads what the algebra states outright, index families off the binders and
+    decision variables (with their domains) off domain rows, and ``symbols`` is
+    the reviewer's own answer carried over from the review game's classifier
+    (export key ``symbol_tables``). The reviewer wins where they disagree: a
+    human verdict supersedes an inference. A symbol either source settles gets
+    *only* its declared line; the rest still get all three to choose between.
+
+    Index families are collected from the binders as well as from the formula
+    bodies. They have to be: a family named only inside ``\\sum_{i \\in I}``
+    never appears in a body, yet ``%@ index I`` is the one declaration the model
+    cannot be assembled without, so a stub omitting it is unfillable as written.
     """
+    evidence = paper_evidence([row.latex for row in rows])
+    kinds = {**evidence.kinds, **(symbols or {})}
+    reviewed = set(symbols or {})
+    # A quantifier's bound letter needs no declaration of its own, and offering
+    # one invites the reviewer to invent an index family the model never had.
+    # It is listed at the foot of the stub instead of being silently dropped.
+    bound = {name for name in evidence.bound if name not in reviewed}
+
     symbol_names: list[str] = []
     for row in rows:
-        for name, _ in extract_symbols(row.latex)[0]:
-            if name not in symbol_names:
+        for name, _ in extract_symbols(row.latex, limit=None)[0]:
+            if name not in symbol_names and name not in bound:
+                symbol_names.append(name)
+        for name in sorted(binder_roles(row.latex).families):
+            if name not in symbol_names and name not in bound:
                 symbol_names.append(name)
 
     out = [
@@ -572,10 +602,12 @@ def declaration_stub(
         "% Fill in the ? placeholders, delete the lines that do not apply, then save",
         f"% this file as corpus/declarations/{dossier.key}.tex and re-run promote.",
         "%",
-        "% Every symbol below was read out of the accepted formulas; decide for each",
-        "% whether it is an index family, a parameter or a variable, and delete the",
-        "% two lines that are wrong. Bibliographic lines (meta/name/desc/prov) are",
-        "% generated from the dossier — do not add them here.",
+        "% Every symbol below was read out of the accepted formulas. Where a line",
+        "% already carries a kind, the algebra or the reviewer settled it and the",
+        "% comment above it says which; check it, do not assume it. Where three lines",
+        "% appear, decide whether the symbol is an index family, a parameter or a",
+        "% variable and delete the two that are wrong. Bibliographic lines",
+        "% (meta/name/desc/prov) are generated from the dossier — do not add them here.",
         "%",
         "% index NAME  ordered=0|1 cyclic=0|1",
         "% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance",
@@ -587,7 +619,6 @@ def declaration_stub(
         "%@ obj sense=? name=objective combination=sum :: ?",
         "",
     ]
-    kinds = symbols or {}
     for symbol in symbol_names:
         ident = _NON_IDENT.sub("_", symbol).strip("_")
         if not ident or not re.match(r"^[A-Za-z_]", ident):
@@ -595,11 +626,22 @@ def declaration_stub(
             continue
         kind = kinds.get(symbol)
         if kind in _KIND_LINE:
-            out.append(f"% {symbol}: classified as {kind} during review")
-            out.append(_KIND_LINE[kind].format(i=ident))
+            if symbol in reviewed:
+                why = _KIND_SOURCE["review"].format(kind=kind)
+            else:
+                why = _KIND_SOURCE[kind].format(domain=evidence.domains.get(symbol, "?"))
+            out.append(f"% {symbol}: {why}")
+            out.append(_kind_line(kind, ident, evidence.domains.get(symbol)))
         else:
-            for line in _KIND_LINE.values():
-                out.append(line.format(i=ident))
+            for name in _KIND_LINE:
+                out.append(_kind_line(name, ident, None))
+        out.append("")
+    if bound:
+        out.append(
+            "% Bound by a quantifier or big operator, so no declaration of their own: "
+            + ", ".join(sorted(bound))
+        )
+        out.append("% (If one of these is really an index family, add a %@ index line for it.)")
         out.append("")
     out.append("% Constraint rows (optional — they default to kind=linear):")
     for row in rows:

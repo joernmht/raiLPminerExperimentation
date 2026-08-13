@@ -18,7 +18,14 @@ from lp2graph.codec import to_canonical_latex
 
 from corpusbuilder import promote
 from corpusbuilder.dossier import Dossier, ExtractionMethod, FormulaRecord, SourceInfo
-from corpusbuilder.promote import PaperDecisions, load_decisions, promote_all, promote_paper
+from corpusbuilder.promote import (
+    PaperDecisions,
+    Row,
+    declaration_stub,
+    load_decisions,
+    promote_all,
+    promote_paper,
+)
 
 DECL_RECORDS = ("index", "param", "var", "obj", "con")
 
@@ -299,6 +306,60 @@ def test_missing_declarations_fail_and_leave_a_fillable_stub(workspace):
         assert f"%@ var {symbol} " in stub
     # Every constraint row is pre-named so the reviewer never invents a binding.
     assert "%@ con eq_0001 " in stub
+
+
+def test_the_stub_declares_the_index_families_the_binders_name(workspace):
+    """A family lives only inside "\\sum_{i \\in I}", never in a formula body.
+
+    Deriving the stub's symbols from the bodies alone therefore omitted every
+    "%@ index" line, and a sidecar without them cannot be assembled into a model
+    at all: the stub was unfillable as written.
+    """
+    (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.tex").unlink()
+    _write_decisions(workspace, _accept_all(workspace))
+    _promote(workspace)
+    stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text()
+
+    families = {
+        line.split()[2] for line in stub.splitlines() if line.startswith("%@ index ")
+    }
+    assert "I" in families
+
+    # A bound letter is not a family: offering "%@ index i" invites the reviewer
+    # to invent one. It is named at the foot of the stub instead.
+    assert "%@ index i " not in stub
+    assert "no declaration of their own" in stub
+
+
+def test_the_stub_fills_in_domains_it_can_read_off_a_domain_row():
+    """"y \\in {0,1}" is an explicit statement; the reviewer confirms, not guesses."""
+    dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
+    rows = [
+        Row(formula_id="eq-0001", name="eq_0001", latex=r"\min \sum_{i \in I} c_i y_i",
+            is_objective=True),
+        Row(formula_id="eq-0002", name="eq_0002", latex=r"y_{i} \in \{0,1\}",
+            is_objective=False),
+    ]
+    stub = declaration_stub(dossier, rows)
+
+    assert "%@ var y shape=- domain=binary" in stub
+    # Pre-classified symbols get one line, not a three-way choice.
+    assert "%@ param y " not in stub
+    assert "%@ index y " not in stub
+    # A symbol nothing settles still gets all three.
+    assert "%@ param c " in stub and "%@ var c " in stub and "%@ index c " in stub
+
+
+def test_a_reviewer_verdict_outranks_the_algebra_in_the_stub():
+    dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
+    rows = [Row(formula_id="eq-0001", name="eq_0001", latex=r"\sum_{t = 1}^{T} x_t",
+                is_objective=False)]
+
+    assert "%@ index T " in declaration_stub(dossier, rows)
+    reviewed = declaration_stub(dossier, rows, {"T": "parameter"})
+    assert "%@ param T " in reviewed
+    assert "%@ index T " not in reviewed
+    assert "classified as parameter during review" in reviewed
 
 
 def test_a_stub_left_unedited_does_not_promote_a_guessed_model(workspace):
