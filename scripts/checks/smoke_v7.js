@@ -108,8 +108,12 @@ okIf('10.1016/j.trc.2021.103368', () => JSON.stringify(objIds('10.1016/j.trc.202
 okIf('10.1016/j.trc.2021.103080', () => objIds('10.1016/j.trc.2021.103080').length === 1 &&
    objIds('10.1016/j.trc.2021.103080')[0] === 'eq-0006',
    'pointwise max{…} constraints no longer flagged; real minimize kept');
-okIf('10.1016/j.omega.2022.102796', () => JSON.stringify(objIds('10.1016/j.omega.2022.102796')) === JSON.stringify(['eq-0013','eq-0017']),
-   'η_u = max(0,…) definitions no longer flagged');
+// eq-0024 joined the expected set when the word-form detector landed (game
+// 67b8ac1): it is "\begin{aligned}\mathbf{min} … \mathbf{s}.\mathbf{t}. …", an
+// aligned model block headed by min, which the v8 rule counts as an objective.
+// The two η_u = max(0,…) definitions must still stay out.
+okIf('10.1016/j.omega.2022.102796', () => JSON.stringify(objIds('10.1016/j.omega.2022.102796')) === JSON.stringify(['eq-0013','eq-0017','eq-0024']),
+   'η_u = max(0,…) definitions no longer flagged; \\mathbf{min} model block is');
 if (data.papers.length <= 3) {
   ok(data.papers.every(pp => pp.f.some(f => f[9] === 1)),
      'every demo paper has at least one objective');

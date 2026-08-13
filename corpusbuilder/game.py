@@ -1165,6 +1165,24 @@ def _logo_svg() -> str:
     return svg
 
 
+#: Evidence kinds in the game's own one-letter codes (see ``KINDS`` in the
+#: template). ``parameter`` never appears: no construct in the algebra declares
+#: one, which is precisely why parameters are the reviewer's job.
+_EVIDENCE_CODE = {"index": "i", "variable": "v", "parameter": "p"}
+
+
+def _evidence_codes(dossier) -> dict[str, str]:
+    """Deterministic symbol kinds for one paper, as the payload carries them.
+
+    Imported lazily: :mod:`corpusbuilder.symbols` reads this module's tokenizer,
+    so a module-level import here would close the cycle.
+    """
+    from corpusbuilder.symbols import paper_evidence
+
+    kinds = paper_evidence([f.latex for f in dossier.formulas]).kinds
+    return {name: _EVIDENCE_CODE[kind] for name, kind in sorted(kinds.items())}
+
+
 def _payload(include: set[str] | None = None) -> dict:
     """Build the embedded game payload from all dossiers.
 
@@ -1198,6 +1216,12 @@ def _payload(include: set[str] | None = None) -> dict:
             # deterministic multi-formula detection (corpusbuilder.split):
             # slot 11 = 0 (single) | [conf, part1, part2, ...] (suggested
             # split) | [0] (multiple statements suspected, no clean cut)
+            # Slot 5 stays the *display* list (top 12); the breakdown
+            # coefficient needs every symbol, so the tail rides along in slot 12.
+            # Scoring off the truncated list would call a 41-symbol formula
+            # fully broken down with 29 of its symbols still untyped.
+            shown = {name for name, _ in syms}
+            extra = sorted({name for name, _ in extract_symbols(f.latex, limit=None)[0]} - shown)
             sp = split_latex(f.latex)
             if sp.is_split:
                 auto = [1 if sp.confident else 0, *sp.parts]
@@ -1219,6 +1243,7 @@ def _payload(include: set[str] | None = None) -> dict:
                     1 if _is_objective(tree, ops, rel, f.latex) else 0,
                     disp if disp != f.latex else 0,
                     auto,
+                    extra or 0,
                 ]
             )
         if include is not None:  # public demo: drop exact re-extractions
@@ -1243,6 +1268,9 @@ def _payload(include: set[str] | None = None) -> dict:
                 "f": fs,
                 "g": _dup_groups(fs),
                 "chk": _paper_check(fs),
+                # What the algebra already settles, so the reviewer is never
+                # asked about a symbol a binder or a domain row has answered.
+                "ev": _evidence_codes(d),
             }
         )
     return {"papers": papers, "n_formulas": sum(len(p["f"]) for p in papers)}
@@ -1319,6 +1347,12 @@ section{display:none}section.on{display:block}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--muted)}
 .chip{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:2px 9px}
 .chip b{font-variant-numeric:tabular-nums}
+/* per-row breakdown coefficient: muted while symbols are still open,
+   good once every symbol of the row carries a kind */
+.bchip{font-size:11.5px;color:var(--muted);border:1px solid var(--line);
+  border-radius:9px;padding:1px 7px;font-variant-numeric:tabular-nums}
+.bchip.full{color:var(--good);border-color:var(--good)}
+.bchip:empty{display:none}
 .games{display:flex;flex-direction:column;gap:10px;margin-top:10px}
 .game{display:flex;align-items:center;gap:12px;background:var(--card);
   border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow);
@@ -1594,6 +1628,9 @@ a{color:var(--accent)}
   <ul class="days" id="daylog"></ul>
   <h2>Completed papers</h2>
   <ul class="days" id="donepapers"></ul>
+  <h2>Breakdown history <span class="mut" id="steps-sub"></span></h2>
+  <p class="mut" style="margin:0 0 6px">Every step that finished a formula off, newest first. A formula is broken down when every symbol it uses carries a kind, which is what makes it ingestible.</p>
+  <ul class="days" id="steplog"></ul>
 </section>
 
 <!-- ============ PAPER LIST ============ -->
@@ -1698,7 +1735,7 @@ function load(){
      is where the reviewer supplies it. Paper-scoped, not formula-scoped: a
      symbol means the same thing throughout one model, which is what makes one
      tap propagate to every formula that uses it. */
-  const s = {dec:{}, cells:{}, sym:{}, xp:0, days:{}, best:0, badges:{}};
+  const s = {dec:{}, cells:{}, sym:{}, steps:[], xp:0, days:{}, best:0, badges:{}};
   try{
     for (let i=0;i<localStorage.length;i++){
       const k = localStorage.key(i);
@@ -1721,26 +1758,83 @@ function today(){ return dayKey(0); }
 const KINDS = [["p","◆ parameter"],["v","◇ variable"],["i","▫ index"]];
 const KIND_NAME = {p:"parameter", v:"variable", i:"index"};
 function symKind(pk, name){ return ((S.sym||{})[pk]||{})[name] || null; }
+/* what the reviewer said, else what the algebra already settled at build time
+   (p.ev: index families and the letters they bind, decision variables read off
+   domain rows). A reviewer verdict always outranks the inference. */
+function kindOf(p, name){ return symKind(p.k, name) || (p.ev||{})[name] || null; }
+function fromEvidence(p, name){ return !symKind(p.k, name) && !!(p.ev||{})[name]; }
+/* every symbol of a formula: slot 5 is the display list (top 12), slot 12 the
+   tail. Scoring on slot 5 alone would call a long formula fully broken down. */
+function symsOf(f){
+  const out=(f[5]||[]).map(s=>s[0]);
+  if (f[12]) for (const nm of f[12]) out.push(nm);
+  return out;
+}
 /* every formula of this paper whose symbol list contains `name` — this is the
    "where else does it occur" the classifier propagates over */
 function symUses(p, name){
-  return p.f.filter(f=>(f[5]||[]).some(s=>s[0]===name));
+  return p.f.filter(f=>symsOf(f).includes(name));
+}
+/* ---------- breakdown coefficient ----------
+   beta(f) = share of f's distinct symbols that carry a kind. It is what says
+   whether a formula can become a canonical model at all, and it is defined per
+   formula but driven by the paper: a symbol means one thing throughout a model,
+   so one tap lifts beta on every formula that uses it. Recomputed after every
+   decision rather than cached, because every tap moves it. */
+function betaOf(p, f){
+  const names=symsOf(f);
+  if (!names.length) return 1;
+  let typed=0; for (const nm of names) if (kindOf(p, nm)) typed++;
+  return typed/names.length;
+}
+function openSymsOf(p, f){
+  return symsOf(f).filter(nm=>!kindOf(p, nm));
+}
+/* how far the whole paper is broken down: formulas at beta = 1, and the mean */
+function paperBeta(p){
+  let full=0, sum=0;
+  for (const f of p.f){ const b=betaOf(p,f); sum+=b; if (b>=1) full++; }
+  return {full, n:p.f.length, mean:p.f.length?sum/p.f.length:1};
 }
 function setSymKind(p, name, code){
   S.sym = S.sym || {};
   const tab = S.sym[p.k] = S.sym[p.k] || {};
   const uses = symUses(p, name).length;
-  if (tab[name]===code){ delete tab[name]; save();
+  const before = paperBeta(p);
+  if (tab[name]===code){ delete tab[name]; logStep(p, "untype:"+name, before); save();
     toast("cleared "+name); return; }
-  tab[name]=code; save();
+  tab[name]=code; logStep(p, "type:"+name+"="+code, before); save();
   toast(name+" → "+KIND_NAME[code]+", in "+uses+" formula"+(uses===1?"":"s"));
+}
+
+/* ---------- step log ----------
+   Every event that can move a beta is recorded with the paper's breakdown
+   before and after it, so the run is a replayable history rather than just a
+   final state: which tap unlocked which formulas, and in what order. Capped,
+   because localStorage is not a database. */
+const STEP_CAP = 4000;
+function logStep(p, action, before){
+  const after = paperBeta(p);
+  S.steps = S.steps || [];
+  S.steps.push({t:new Date().toISOString(), p:p.k, a:action,
+    b:[before.full, after.full], m:[+before.mean.toFixed(3), +after.mean.toFixed(3)],
+    n:after.n});
+  if (S.steps.length > STEP_CAP){
+    S.steps.splice(0, S.steps.length - STEP_CAP);
+  } else if (S.steps.length === Math.floor(STEP_CAP*0.9)){
+    toast("📔 history nearly full — export to keep it");
+  }
+}
+/* the steps that changed something, newest first — what the journal shows */
+function unlockingSteps(){
+  return (S.steps||[]).filter(s=>s.b[1]>s.b[0]).slice().reverse();
 }
 /* how much of a paper's symbol table is still open — shown on the run header
    so "what is left" is answerable without opening every formula */
 function symOpen(p){
   const seen=new Set();
-  for (const f of p.f) for (const s of (f[5]||[])) seen.add(s[0]);
-  let open=0; for (const nm of seen) if (!symKind(p.k, nm)) open++;
+  for (const f of p.f) for (const nm of symsOf(f)) seen.add(nm);
+  let open=0; for (const nm of seen) if (!kindOf(p, nm)) open++;
   return [open, seen.size];
 }
 
@@ -1902,6 +1996,15 @@ function symChip(p){
   const col = open===0 ? "var(--good)" : done ? "var(--warn)" : "var(--muted)";
   return `<span class="chip" style="color:${col}">◆ symbols typed <b>${done}/${total}</b></span>`;
 }
+/* how much of the paper is fully broken down. The count is what promotion
+   cares about (a formula at beta = 1 is ingestible); the mean is what shows
+   movement on the taps that have not finished anything off yet. */
+function betaChip(p){
+  if (!p.f.length) return "";
+  const b=paperBeta(p);
+  const col = b.full===b.n ? "var(--good)" : b.full ? "var(--warn)" : "var(--muted)";
+  return `<span class="chip" style="color:${col}" title="a formula is broken down when every symbol it uses has a kind — that is what makes it ingestible">◈ broken down <b>${b.full}/${b.n}</b> · mean ${Math.round(b.mean*100)}%</span>`;
+}
 function chkChips(p){
   const ck=p.chk||{}; if (!p.f.length) return "";
   const coh=Math.round((ck.coh||0)*100);
@@ -1912,7 +2015,7 @@ function chkChips(p){
     <span class="chip">▦ <b>${ck.con}</b> constraints</span>
     <span class="chip">◇ <b>${ck.sym}</b> symbols</span>
     <span class="chip" style="color:${ck.comp?"var(--good)":"var(--warn)"}">${ck.comp?"✓ complete":"⚠ incomplete"}</span>
-    ${symChip(p)}
+    ${symChip(p)}${betaChip(p)}
   </div>
   <div class="mut" style="margin-top:4px">pre-review structural check — heuristic Level-M analogue (completeness &amp; coherence); the canonical check runs after ingest</div>`;
 }
@@ -2054,29 +2157,22 @@ function drawPaperGraph(host, p){
     });
   }
   paintSymNodes();
+  pgraphRepaint = paintSymNodes;
   /* clicking a node lifts its defining formula row(s) to the top of the
      review list: the formula itself, or (for a symbol) every formula that
      uses it, in paper order — so the first row is the definition site. */
-  const frows=document.getElementById("frows");
-  let rowOrder0=null;
   function reorderRows(){
-    if (!frows) return;
-    if (!rowOrder0) rowOrder0=[...frows.children];
     const top=new Set();
     if (sel!==null){
       const nd=g.nodes[sel];
-      if (nd.t==="f") top.add("fr-"+nd.id);
+      if (nd.t==="f") top.add(nd.id);
       else adj[sel].forEach(j=>{ const n2=g.nodes[j];
-        if (n2.t==="f") top.add("fr-"+n2.id); });
+        if (n2.t==="f") top.add(n2.id); });
     }
-    rowOrder0.filter(r=>top.has(r.id))
-      .concat(rowOrder0.filter(r=>!top.has(r.id)))
-      .forEach(r=>frows.appendChild(r));
-    // heal renders that ended up as raw code (failed/interrupted typeset)
-    frows.querySelectorAll(".render").forEach(el=>{
-      if (el.dataset.tex && el.childElementCount && !el.querySelector("mjx-container"))
-        renderMath(el, texOf(el));
-    });
+    /* a trace lifts rows above the standing order; it never replaces it, so
+       deselecting drops straight back to objective-then-least-broken-down */
+    traceLift = top.size ? top : null;
+    applyRowOrder(p);
   }
   function select(i){ sel = (sel===i) ? null : i; paintSel(); reorderRows(); }
   svg.addEventListener("click", e=>{
@@ -2259,7 +2355,9 @@ function setDec(p, fid, st, note, extra){
   return prev;
 }
 function decide(p, f, st, note, ev, mode, extra){
+  const before = paperBeta(p);
   const prev = setDec(p, f[0], st, note, extra);
+  logStep(p, "decide:"+f[0]+"="+st, before);
   const xp = award(mode==="blitz" ? XP_BASE.blitz : XP_BASE[st], ev);
   undoStack.push({kind:"dec", pk:p.k, items:[[f[0],prev]], xp, n:1});
   if (undoStack.length>25) undoStack.shift();
@@ -2268,7 +2366,9 @@ function decide(p, f, st, note, ev, mode, extra){
   save();
 }
 function bulkDecide(p, fids, st, ev){
+  const before = paperBeta(p);
   const items = fids.map(fid=>[fid, setDec(p, fid, st, null)]);
+  logStep(p, "bulk:"+st+"×"+fids.length, before);
   const xp = award(XP_BASE[st]*fids.length, ev, fids.length);
   undoStack.push({kind:"dec", pk:p.k, items, xp, n:fids.length});
   if (undoStack.length>25) undoStack.shift();
@@ -2312,24 +2412,82 @@ function nextRunPaper(){
 }
 function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 function statSym(st){ return st==="a"?"✓":st==="c"?"✎":st==="r"?"✗":st==="d"?"⧉":""; }
+/* ---------- review order: objective first, then least broken down ----------
+   The objective is the one row the rest of the model is read against, so it
+   leads. After it the list is sorted by breakdown coefficient ascending: the
+   formula whose symbols are least accounted for is the one whose symbols the
+   reviewer should type next, because typing them lifts beta on every other
+   formula that shares them. Decided rows sink to the bottom rather than
+   vanishing, so a verdict stays visible and undoable.
+
+   Similarity groups stay adjacent: a group travels as a block, positioned by
+   its leading member, so near-identical extractions are still judged together.
+   The order is a pure function of (decisions, symbol table), which is what lets
+   it be recomputed from scratch after every step instead of patched. */
+function baseOrder(p){
+  const dec=S.dec[p.k]||{};
+  const gOf={}; (p.g||[]).forEach((ids,gi)=>ids.forEach(id=>{ gOf[id]=gi; }));
+  const pos={}; p.f.forEach((f,i)=>{ pos[f[0]]=i; });
+  const rank=f=>{
+    const done=dec[f[0]]?1:0;
+    const obj=isObjective(f)?0:1;
+    const open=openSymsOf(p,f).length;
+    /* ties: more open symbols first (a bigger unlock), then paper order — so
+       the sequence is stable and reproducible, never dependent on sort luck */
+    return [done, obj, betaOf(p,f), -open, pos[f[0]]];
+  };
+  const keys={}; p.f.forEach(f=>{ keys[f[0]]=rank(f); });
+  const cmp=(a,b)=>{ const x=keys[a], y=keys[b];
+    for (let i=0;i<x.length;i++) if (x[i]!==y[i]) return x[i]<y[i]?-1:1;
+    return 0; };
+  /* a group is placed where its strongest member would go */
+  const lead={};
+  for (const f of p.f){
+    const gi=gOf[f[0]]; if (gi===undefined) continue;
+    if (lead[gi]===undefined || cmp(f[0], lead[gi])<0) lead[gi]=f[0];
+  }
+  const heads=p.f.map(f=>f[0]).filter(id=>gOf[id]===undefined || lead[gOf[id]]===id);
+  heads.sort(cmp);
+  const out=[], seen=new Set();
+  for (const id of heads){
+    if (seen.has(id)) continue;
+    out.push(id); seen.add(id);
+    const gi=gOf[id];
+    if (gi!==undefined)
+      for (const mid of [...p.g[gi]].sort(cmp))
+        if (!seen.has(mid)){ out.push(mid); seen.add(mid); }
+  }
+  for (const f of p.f) if (!seen.has(f[0])){ out.push(f[0]); seen.add(f[0]); }
+  return out;
+}
+/* Re-lay the rows in the current base order, optionally lifting a traced set to
+   the top. One function so the graph's tap-to-trace and the post-decision
+   restack cannot disagree about what the order is. */
+let traceLift=null, pgraphRepaint=null;
+function applyRowOrder(p){
+  const frows=document.getElementById("frows"); if (!frows) return;
+  const order=baseOrder(p);
+  const lift=traceLift||new Set();
+  const rows={};
+  frows.querySelectorAll(".frow").forEach(r=>{ rows[r.dataset.fid]=r; });
+  const lifted=order.filter(id=>lift.has(id)), rest=order.filter(id=>!lift.has(id));
+  for (const id of lifted.concat(rest)) if (rows[id]) frows.appendChild(rows[id]);
+  /* heal renders that ended up as raw code (failed/interrupted typeset) */
+  frows.querySelectorAll(".render").forEach(el=>{
+    if (el.dataset.tex && el.childElementCount && !el.querySelector("mjx-container"))
+      renderMath(el, texOf(el));
+  });
+}
 function paintRun(){
   const slot=document.getElementById("run-slot");
+  traceLift=null; pgraphRepaint=null;
   const p=nextRunPaper();
   document.getElementById("run-info").textContent =
     donePapers().length+"/"+RUSHP.length+" papers";
   if (!p){ slot.innerHTML='<div class="card" style="text-align:center"><div style="font-size:44px">🏆</div><p>Every paper reviewed. Legendary.</p></div>'; confetti(40); return; }
-  /* similarity groups (p.g, computed at build): members are pulled next to
-     their group's first formula so near-identical extractions sit together */
   const gOf={}; (p.g||[]).forEach((ids,gi)=>ids.forEach(id=>{ gOf[id]=gi; }));
   const byId={}; p.f.forEach(f=>{ byId[f[0]]=f; });
-  const ordered=[], seen=new Set();
-  for (const f of p.f){
-    if (seen.has(f[0])) continue;
-    ordered.push(f); seen.add(f[0]);
-    if (gOf[f[0]]!==undefined)
-      for (const id of p.g[gOf[f[0]]])
-        if (!seen.has(id) && byId[id]){ ordered.push(byId[id]); seen.add(id); }
-  }
+  const ordered=baseOrder(p).map(id=>byId[id]);
   const rows = ordered.map(f=>`
     <div class="frow" id="fr-${f[0]}" data-fid="${f[0]}">
       <div class="fhead"><span class="chip">${f[0]}</span>
@@ -2338,6 +2496,7 @@ function paintRun(){
         <span class="chip">${f[3]}</span>${f[4]?'<span class="mut">p.'+f[4]+"</span>":""}
         ${gOf[f[0]]!==undefined?'<span class="chip gchip" data-g="'+gOf[f[0]]+'" title="near-identical group — tap to keep THIS one and mark the others as duplicates">≈ ×'+p.g[gOf[f[0]]].length+"</span>":""}
         ${f[11]?'<span class="chip achip" style="color:var(--warn);font-weight:750" title="'+(f[11].length>1?"looks like "+(f[11].length-1)+" glued formulas — tap to open the fix sheet pre-split":"several statements suspected — tap to cut by hand")+'">⚡'+(f[11].length>1?"×"+(f[11].length-1):" multi?")+"</span>":""}
+        <span class="bchip"></span>
         <span class="st"></span></div>
       <div class="render"></div>
       <div class="fx">
@@ -2358,9 +2517,9 @@ function paintRun(){
         ${p.d?` · <a href="https://doi.org/${encodeURIComponent(p.d)}" target="_blank" rel="noopener">DOI</a>`:""}</div>
       ${p.ot?'<span class="hint-ot">⚠ topical screen: looks off-topic</span>':""}
       ${S.cells[p.k]?'<span class="cellchip">🧭 '+(S.cells[p.k]==="X"?"out of scope":S.cells[p.k])+"</span>":""}
-      ${chkChips(p)}
+      <div id="run-chips">${chkChips(p)}</div>
       <div class="gwrap" id="pgraph"></div>
-      <div class="glegend">top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row. In the list, <span style="color:var(--tier3);font-weight:700">≈ ×n</span> marks near-identical formulas (bidirectional token similarity, computed at build; grouped together below): tap ≈ on the copy you want to KEEP to mark the rest ⧉ duplicate, or ⧉ dup a single formula. <span style="color:var(--warn);font-weight:700">⚡×n</span> marks an extraction that glued n formulas into one record (deterministic split, computed at build): tap it to open the fix sheet pre-filled with the parts — check, adjust, save; <span style="color:var(--warn);font-weight:700">⚡ multi?</span> = several statements suspected but no clean cut, split by hand with ✂</div>
+      <div class="glegend">The list below is ordered for breakdown: the <b>objective first</b>, then the formulas whose symbols are <b>least accounted for</b>, because typing those lifts every other formula that shares them. It re-sorts itself after every verdict and every symbol tap, and decided rows sink to the bottom. ◈ on a row is its breakdown coefficient, the share of its symbols that carry a kind; at 100% the row is ingestible. Graph: top: objective · middle: formulas in paper order (coloured by your ✓✎✗) · bottom: <span style="color:var(--accent)">●</span> shared variables &amp; parameters — tap any node (objective, formula or symbol) to trace it: its direct connections highlight, everything else dims; its defining formula(s) jump to the top of the list below and the chips list the tapped entity first, then its neighbours — tap a formula chip to open its row. In the list, <span style="color:var(--tier3);font-weight:700">≈ ×n</span> marks near-identical formulas (bidirectional token similarity, computed at build; grouped together below): tap ≈ on the copy you want to KEEP to mark the rest ⧉ duplicate, or ⧉ dup a single formula. <span style="color:var(--warn);font-weight:700">⚡×n</span> marks an extraction that glued n formulas into one record (deterministic split, computed at build): tap it to open the fix sheet pre-filled with the parts — check, adjust, save; <span style="color:var(--warn);font-weight:700">⚡ multi?</span> = several statements suspected but no clean cut, split by hand with ✂</div>
     </div>
     <div class="bulk">
       <button class="b-acc" id="bk-acc">✓ accept rest</button>
@@ -2462,6 +2621,12 @@ function attachRunSwipe(slot){
     if (Math.abs(dx)>70 && Math.abs(dx)>2*Math.abs(dy)) skipRun(dx<0?1:-1);
   }, {passive:true});
 }
+/* Re-run the whole per-paper analysis. Every step (a verdict, a symbol tap, an
+   undo) can move a breakdown coefficient, and beta is deliberately not cached:
+   it is recomputed here from the current symbol table, the chips and the graph
+   are repainted from it, and the rows are re-laid in the new order. That is
+   what makes the list self-sorting — finish a formula and the next least
+   broken down one rises to meet you. */
 function refreshRun(p){
   const d=S.dec[p.k]||{};
   let done=0;
@@ -2473,6 +2638,15 @@ function refreshRun(p){
     const m=(d[f[0]]||{}).m;
     stEl.textContent=statSym(st)+(st==="c"&&m&&m.length?"×"+(m.length+1):"");
     stEl.className="st"+(st?" s"+st:"");
+    const b=betaOf(p,f), open=openSymsOf(p,f);
+    const bEl=row.querySelector(".bchip");
+    if (bEl){
+      bEl.textContent = b>=1 ? "◈ broken down"
+        : "◈ "+Math.round(b*100)+"% · "+open.length+" open";
+      bEl.className="bchip"+(b>=1?" full":"");
+      bEl.title = b>=1 ? "every symbol has a kind — this row is ingestible"
+        : "still untyped: "+open.join(", ");
+    }
     if (st) done++;
   }
   const host=document.getElementById("pgraph");
@@ -2482,6 +2656,10 @@ function refreshRun(p){
       c.classList.remove("sa","sc","sr"); if (st) c.classList.add("s"+st);
     });
   }
+  if (pgraphRepaint) pgraphRepaint();
+  const chips=document.getElementById("run-chips");
+  if (chips) chips.innerHTML=chkChips(p);
+  applyRowOrder(p);
   const acc=document.getElementById("bk-acc");
   if (acc) acc.textContent="✓ accept rest ("+(p.f.length-done)+")";
   const fin=document.getElementById("bk-fin");
@@ -2772,6 +2950,16 @@ function paintJournal(){
   document.getElementById("donepapers").innerHTML = dp.length
     ? dp.map(p=>`<li><span style="max-width:75%">${escapeHtml(p.t.slice(0,70))}</span><span>✓ ${p.f.length}</span></li>`).join("")
     : '<li><span class="mut">none complete yet</span></li>';
+  const steps=unlockingSteps();
+  document.getElementById("steps-sub").textContent =
+    (S.steps||[]).length ? "· "+steps.length+" of "+S.steps.length+" steps unlocked a formula" : "";
+  document.getElementById("steplog").innerHTML = steps.length
+    ? steps.slice(0,60).map(st=>{
+        const p=PAPERS.find(x=>x.k===st.p);
+        return `<li><span style="max-width:62%">${escapeHtml(st.a)}<br><span class="mut">${escapeHtml((p&&p.t||st.p).slice(0,52))}</span></span>
+          <span><b>+${st.b[1]-st.b[0]}</b> → ${st.b[1]}/${st.n}</span></li>`;
+      }).join("")
+    : '<li><span class="mut">no formula fully broken down yet — tap symbols in Paper Run</span></li>';
 }
 
 /* ---------- PAPERS ---------- */
@@ -2797,7 +2985,7 @@ function openSheet(id){ document.getElementById(id).classList.add("on");
 function closeSheets(){ document.querySelectorAll(".sheet").forEach(s=>s.classList.remove("on"));
   document.getElementById("scrim").classList.remove("on"); }
 
-/* ---------- export / import (schema unchanged: game-decisions-1) ---------- */
+/* ---------- export / import (game-decisions-3: + steps) ---------- */
 function buildExport(){
   const fd=[];
   for (const p of PAPERS){
@@ -2829,12 +3017,19 @@ function buildExport(){
     symtab.push({paper_key:p.k, doi:p.d||null, symbols:syms,
       classified:total-open, total_symbols:total});
   }
+  /* the step history: what was typed or decided, in order, with the paper's
+     breakdown before and after. Not needed to promote a model, but it is the
+     record of how the corpus was resolved, which is the reportable half of a
+     human-in-the-loop stage. */
+  const steps=(S.steps||[]).map(st=>({at:st.t, paper_key:st.p, action:st.a,
+    broken_down:{before:st.b[0], after:st.b[1]}, mean_beta:{before:st.m[0], after:st.m[1]},
+    formulas:st.n}));
   const sc=statusCounts();
-  return {schema_version:"game-decisions-2", exported:new Date().toISOString(),
+  return {schema_version:"game-decisions-3", exported:new Date().toISOString(),
     totals:{reviewed:sc.a+sc.c+sc.r+sc.d, accepted:sc.a, corrected:sc.c, rejected:sc.r,
       duplicates:sc.d, papers_sorted:cells.length, xp:S.xp,
-      papers_with_symbols:symtab.length},
-    formula_decisions:fd, paper_cells:cells, symbol_tables:symtab,
+      papers_with_symbols:symtab.length, steps:steps.length},
+    formula_decisions:fd, paper_cells:cells, symbol_tables:symtab, steps:steps,
     stats:{xp:S.xp, days:S.days, best_blitz:S.best, badges:S.badges}};
 }
 function expName(){ return "game_decisions_"+today()+".json"; }
@@ -2892,6 +3087,23 @@ document.getElementById("imp-file").addEventListener("change", async e=>{
         const code=CODE[t.symbols[nm]];
         if (code && !tab[nm]){ tab[nm]=code; merged++; }
       }
+    }
+    /* steps merge by (timestamp, action): the history is append-only, and
+       re-importing yesterday's export must not duplicate yesterday's steps */
+    if (Array.isArray(j.steps) && j.steps.length){
+      S.steps = S.steps || [];
+      const have=new Set(S.steps.map(x=>x.t+"|"+x.a));
+      for (const x of j.steps){
+        const key=(x.at||"")+"|"+(x.action||"");
+        if (have.has(key)) continue;
+        have.add(key);
+        S.steps.push({t:x.at, p:x.paper_key, a:x.action,
+          b:[(x.broken_down||{}).before|0, (x.broken_down||{}).after|0],
+          m:[+((x.mean_beta||{}).before||0), +((x.mean_beta||{}).after||0)],
+          n:x.formulas|0});
+      }
+      S.steps.sort((a,b)=> a.t<b.t ? -1 : a.t>b.t ? 1 : 0);
+      if (S.steps.length > STEP_CAP) S.steps.splice(0, S.steps.length - STEP_CAP);
     }
     const st=(j.stats||{});
     if (st.xp>S.xp) S.xp=st.xp;
