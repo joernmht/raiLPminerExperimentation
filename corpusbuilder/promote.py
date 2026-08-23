@@ -801,6 +801,10 @@ def promote_paper(
     if len(objectives) > 1:
         return fail("multiple_objectives", ", ".join(objectives))
 
+    cell = decisions.cell
+    if cell is None or cell not in PRIORITY_CELLS:
+        return fail("not_sorted", str(cell))
+
     decl_path = dirs["declarations"] / f"{dossier.key}.tex"
     if not decl_path.exists():
         written: tuple[str, ...] = ()
@@ -830,10 +834,6 @@ def promote_paper(
         }.get(stage, "outside_grammar")
         detail = "; ".join(f.message for f in result.failures)
         return fail(cause, _oneline(detail)[:400], tuple(written_paths))
-
-    cell = decisions.cell
-    if cell is None or cell not in PRIORITY_CELLS:
-        return fail("not_sorted", str(cell), tuple(written_paths))
 
     formulation = result.formulation
     assert formulation is not None  # guaranteed by IngestionResult.ok
