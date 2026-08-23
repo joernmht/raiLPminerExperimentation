@@ -1,0 +1,158 @@
+% Declaration sidecar for 10.1016_j.trc.2021.103080
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-23.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2021.103080
+% Dynamic railway timetable rescheduling for multiple connected disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2021.103080.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted cancellations plus total delays.
+%
+% c: classified as variable during review
+%@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary cancellation decision for event e.
+%
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e relative to original schedule.
+%
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar :: Fixed penalty for each cancelled service.
+%
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures).
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant used in big-M constraints (M1=1440, M2=2*M1).
+%
+% o: classified as parameter during review
+%@ param o shape=E kind=vector :: Original scheduled time of event e.
+%
+% x: classified as variable during review
+%@ var x shape=E domain=continuous role=primary drole=- lo=- hi=- :: Rescheduled time of event e.
+%
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar :: Maximum allowed delay for events not in E_NMdelay.
+%
+% s: classified as variable during review
+%@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating an added stop for station activity a.
+%
+% n: classified as parameter during review
+%@ param n shape=- kind=scalar :: Number of disruptions; the current emerging disruption is the n-th.
+%
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (run, dwell/pass, short-turn, OD-turn).
+%
+% y: classified as variable during review
+%@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating the station of event e is chosen as short-turn station.
+%
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar :: Required recovery time length after disruptions.
+%
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Time-related parameters such as disruption start and end times.
+%
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar :: Station-related parameters for entry/exit stations and tracks.
+%
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Activity index, e.g. a=(e,e') in A_turn.
+%
+% m: classified as variable during review
+%@ var m shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating short-turn activity a is selected.
+%
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar :: Platform track index i at a station.
+%
+% tail: classified as parameter during review
+%@ param tail shape=- kind=scalar :: Function returning the tail event of an activity.
+%
+% head: classified as parameter during review
+%@ param head shape=- kind=scalar :: Function returning the head event of an activity.
+%
+% L: classified as parameter during review
+%@ param L shape=A kind=vector :: Minimum duration required for short-turn activity a.
+%
+% u: classified as variable during review
+%@ var u shape=E,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train of event e occupies platform track i.
+%
+% v: classified as variable during review
+%@ var v shape=E,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train of event e occupies pass-through track j.
+%
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of platform or pass-through tracks at a station.
+%
+% h: classified as parameter during review
+%@ param h shape=E,E kind=matrix :: Minimum time interval required between events e and e' using the same station track.
+%
+% q: classified as variable during review
+%@ var q shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating event e occurs before event e'.
+%
+% Bound by a quantifier or big operator, so no declaration of their own: e, i, j, r, t
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0007 kind=linear domain=- indicator=- :: Rescheduled time of a cancelled event is fixed to original time plus M1.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Rescheduled time equals original time plus delay plus M1 cancellation penalty.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Delay of an event is non-negative.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Delay of events not in E_NMdelay is bounded by D.
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Trains are forbidden to enter disrupted sections during the disruption period.
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Trains are forbidden to enter disrupted sections in the other direction/condition.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Cancellation status is consistent across the two events of each running activity.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Cancellation status is consistent across station activity events when no short-turn is possible.
+%@ con eq_0015 kind=linear domain=- indicator=- :: If the arrival event has a short-turn possibility, its cancellation implies cancellation of the departure event.
+%@ con eq_0017 kind=linear domain=- indicator=- :: If the arrival station is not chosen for short-turn, departure cancellation is bounded by arrival cancellation plus y_e.
+%@ con eq_0018 kind=linear domain=- indicator=- :: If the arrival station is chosen for short-turn, the departure event without short-turn possibility is cancelled.
+%@ con eq_0019 kind=linear domain=- indicator=- :: If the departure event has a short-turn possibility, its cancellation implies cancellation of the arrival event.
+%@ con eq_0020 kind=linear domain=- indicator=- :: If the departure station is not chosen for short-turn, arrival cancellation is bounded by departure cancellation plus y_e'.
+%@ con eq_0021 kind=linear domain=- indicator=- :: If the departure station is chosen for short-turn, the arrival event without short-turn possibility is cancelled.
+%@ con eq_0022 kind=linear domain=- indicator=- :: When both events have short-turn possibilities, cancellation difference equals short-turn choice difference.
+%@ con eq_0024 kind=linear domain=- indicator=- :: At most one of the two short-turn possibilities at a station activity can be selected.
+%@ con eq_0025 kind=linear domain=- indicator=- :: If the arrival side is chosen for short-turn, the departure event must be cancelled.
+%@ con eq_0026 kind=linear domain=- indicator=- :: If the arrival side is chosen for short-turn, the arrival event must be kept.
+%@ con eq_0027 kind=linear domain=- indicator=- :: If the departure side is chosen for short-turn, the arrival event must be cancelled.
+%@ con eq_0028 kind=linear domain=- indicator=- :: If the departure side is chosen for short-turn, the departure event must be kept.
+%@ con eq_0029 kind=linear domain=- indicator=- :: At least one short-turn station is chosen at the entry side of each disrupted section for cancelled trains.
+%@ con eq_0031 kind=linear domain=- indicator=- :: At least one short-turn station is chosen at the exit side of each disrupted section for cancelled trains.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Number of short-turn stations chosen at entry sides cannot exceed cancelled departure events there.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Number of short-turn stations chosen at exit sides cannot exceed cancelled arrival events there.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Selected short-turn activities tailing at e equal the cancellation difference in the single-disruption station case.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Selected short-turn activities heading at e' equal the cancellation difference in the opposite single-disruption case.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Selected short-turn activities tailing at e equal the cancellation difference plus y_e' in the multi-disruption case.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Selected short-turn activities heading at e' equal the cancellation difference plus y_e in the multi-disruption case.
+%@ con eq_0040 kind=linear domain=- indicator=- :: A selected short-turn activity must respect the minimum short-turn duration.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Events that already occurred before the new disruption starts cannot be cancelled.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Events that already occurred keep their previous rescheduled time.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Events with previous rescheduled time after the new disruption start cannot be scheduled before it.
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Departures planned within R after the maximum disruption end cannot be cancelled.
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Departures planned within R after the maximum disruption end keep their original times.
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Arrivals whose corresponding departure lies within R after the maximum disruption end cannot be cancelled.
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Arrivals whose corresponding departure lies within R after the maximum disruption end keep their original times.
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Each arriving train is assigned exactly one platform or pass-through track at its station unless cancelled.
+%@ con eq_0048_b kind=linear domain=- indicator=- :: The platform and pass-through track choice is linked to the cancellation status of the arrival event.
+%@ con eq_0050_a kind=linear domain=- indicator=- :: An arriving train that stops at a station must occupy a platform track.
+%@ con eq_0050_b kind=linear domain=- indicator=- :: An arriving train that short-turns at a station must occupy a platform track.
+%@ con eq_0051 kind=linear domain=- indicator=- :: A platform track is required for arrival events that are tails of short-turn activities.
+%@ con eq_0053 kind=linear domain=- indicator=- :: A platform track is required for arrival events at OD-turn destinations.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same platform track for a station activity.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same platform track for a short-turn or OD-turn activity.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same pass-through track for a station activity.
+%@ con eq_0058 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same pass-through track for a short-turn or OD-turn activity.
+%@ con eq_0059 kind=linear domain=- indicator=- :: Constraints determining the added-stop variable s_a for station activities.
+%@ con eq_0060 kind=ordering domain=- indicator=- :: Constraints determining the ordering variable q_{e,e'} for same-track occupations.
