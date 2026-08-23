@@ -970,7 +970,15 @@ def normalize_objective_head(latex: str) -> str:
     detecting a row as the objective and then assembling its raw word form
     hands the canonical parser a token it has no rule for.
     """
-    return _lead_minmax_word(latex)
+    s = _MINMAX_GLUED.sub(r"\1 ", latex)
+    # MathML sometimes spaces the word itself: "min i m i z e (...)"
+    s = re.sub(
+        r"\b(m\s*i\s*n\s*i\s*m\s*i\s*[sz]\s*e|m\s*a\s*x\s*i\s*m\s*i\s*[sz]\s*e|m\s*i\s*n|m\s*a\s*x)\b(?=\s*[\\(A-Za-z0-9])",
+        lambda m: m.group(1).replace(" ", ""),
+        s,
+        count=1,
+    )
+    return _lead_minmax_word(s)
 
 
 def is_objective_latex(latex: str) -> bool:

@@ -200,6 +200,7 @@ def _payload(system: str, user: str, *, stage: str) -> dict:
     return {
         "model": model_id(),
         "temperature": 0,
+        "max_tokens": 8192,
         "response_format": {"type": "json_object"},
         **_stage_extras(stage),
         "messages": [
@@ -486,6 +487,12 @@ S = \\{(e, e') \\in X \\times Y : condition\\} (set-builder), and any row with \
 English words inside the math (", and t goes directly from station ..."). \
 Their content belongs to the symbol table, not the model body. Reason: \
 "set definition".
+- Model-reference blobs ("min F, s.t., Constraints (2)-(5)" citing equations \
+by number): if F (or Z) is DEFINED algebraically in another extracted formula, \
+mark this row "corrected" with parts = ["\\min <that expression>"] so the model \
+keeps its objective; reject it only when the objective expression appears \
+nowhere. Reason: "model reference". A multi-objective block (min Z_1 ..., \
+min Z_2 ...) keeps the FIRST objective; state the others in "reason".
 - A row must state one relation (=, <=, >=) or the objective; quantifier \
 tails (\\forall i \\in S, tuple pairs, side conditions) are fine as written.
 - Trailing prose ("; and", "where Q is ...") must be cut: mark "corrected" \
@@ -562,6 +569,38 @@ def validate_triage(reply: dict, formula_ids: list[str]) -> list[str]:
     if missing:
         errors.append("missing decisions for: " + ", ".join(missing))
     return errors
+
+
+def validate_triage_objectives(reply: dict, dossier: Dossier) -> list[str]:
+    """At most ONE accepted/corrected row may state an objective.
+
+    The canonical model admits exactly one objective, and promotion refuses
+    ``multiple_objectives`` outright — enforcing it here lets the re-ask carry
+    the exact offending ids instead of a generic downstream cause. Zero
+    objectives is NOT an error here: an extraction may genuinely carry none
+    (that is the ``no_objective`` finding).
+    """
+    raw = {f.id: f.latex for f in dossier.formulas}
+    winners = []
+    for entry in reply.get("decisions") or []:
+        if not isinstance(entry, dict):
+            continue
+        fid = str(entry.get("id") or "")
+        status = entry.get("status")
+        if status == "accepted" and is_objective_latex(raw.get(fid, "")):
+            winners.append(fid)
+        elif status == "corrected":
+            parts = entry.get("parts") or []
+            if any(is_objective_latex(str(p)) for p in parts):
+                winners.append(fid)
+    if len(winners) > 1:
+        return [
+            "more than one accepted row states an objective: "
+            + ", ".join(winners)
+            + " — keep exactly one (the main model's), mark restatements "
+            "duplicate_of it, and reject stage/secondary objectives with a reason"
+        ]
+    return []
 
 
 # --------------------------------------------------------------------------- #
@@ -1018,7 +1057,10 @@ def annotate_paper(
             "a",
             SYSTEM_TRIAGE,
             lambda notes: triage_input(dossier, prose, notes),
-            lambda reply: validate_triage(reply, [f.id for f in dossier.formulas]),
+            lambda reply: (
+                validate_triage(reply, [f.id for f in dossier.formulas])
+                + validate_triage_objectives(reply, dossier)
+            ),
             run.usage,
             retries=1,
             force="a" in force,
@@ -1103,35 +1145,56 @@ def annotate_paper(
         return run
 
     # ---- stage R: row repair ----------------------------------------------
+    # An inner loop, not one shot: each round probes, repairs only the rows
+    # that still fail, and feeds the FRESH parser error for each back to the
+    # model. The changing failure payload changes the cache key, so rounds
+    # never replay a stale reply. The parser decides what is accepted.
     failures, objective_failed = probe_row_failures(dossier, triage, sidecar)
+    initial = len(failures)
     if not failures:
         run.stages["r"] = "skipped: clean"
         return run
-    try:
-        reply = _ask(
-            ws,
-            key,
-            "r",
-            SYSTEM_ROWFIX,
-            lambda notes: rowfix_input(dossier, failures, table, notes),
-            lambda r: validate_rowfix(r, failures),
-            run.usage,
-            retries=1,
-            force="r" in force,
-            feedback=feedback.get("r", []),
-        )
-    except (AssistError, StageError) as exc:
-        run.errors.append(str(exc))
-        run.stages["r"] = "failed: invalid_reply"
-        return run
-    fixes = {str(k): [str(p) for p in v] for k, v in reply["rows"].items()}
-    fixed, still_bad = apply_rowfixes(dossier, triage, sidecar, fixes)
+    total_fixed = 0
+    for round_no in range(5):
+        current = sidecar
+        try:
+            reply = _ask(
+                ws,
+                key,
+                "r",
+                SYSTEM_ROWFIX,
+                lambda notes, _f=failures: rowfix_input(dossier, _f, table, notes),
+                lambda r, _f=failures, _s=current: validate_rowfix(r, _f, _s),
+                run.usage,
+                retries=1,
+                force=("r" in force and round_no == 0),
+                feedback=feedback.get("r", []) + (
+                    [f"repair round {round_no + 1}: the rows listed are the ones STILL failing"]
+                    if round_no
+                    else []
+                ),
+            )
+        except (AssistError, StageError) as exc:
+            run.errors.append(str(exc))
+            run.stages["r"] = f"failed: invalid_reply (round {round_no + 1})"
+            return run
+        additions = [str(a) for a in reply.get("declarations_add") or []]
+        if additions:
+            sidecar = sidecar.rstrip() + "\n" + "\n".join(additions) + "\n"
+        fixes = {str(k): [str(p) for p in v] for k, v in reply["rows"].items()}
+        fixed, _still = apply_rowfixes(dossier, triage, sidecar, fixes)
+        total_fixed += fixed
+        if fixed and additions:
+            (ws.declarations / f"{dossier.key}.tex").write_text(sidecar, encoding="utf-8")
+        failures, objective_failed = probe_row_failures(dossier, triage, sidecar)
+        if not failures:
+            break
     run.statuses = dict(Counter(str(d["status"]) for d in triage["decisions"]))
     _write_export(ws, dossier, export_payload(dossier, triage, table, today=today))
-    note = f"fixed {fixed}/{len(failures)}"
+    note = f"fixed {total_fixed}/{initial}"
     if objective_failed:
         note += " (objective)"
-    run.stages["r"] = note if still_bad == 0 else note + f", {still_bad} still failing"
+    run.stages["r"] = note if not failures else note + f", {len(failures)} still failing"
     return run
 
 
@@ -1140,23 +1203,39 @@ LaTeX parser; the parser's message is attached. Rewrite each minimally so it \
 parses, preserving the mathematical meaning exactly. You are given the paper's \
 symbol table (kind per symbol).
 
-Reply with ONE JSON object: {"rows": {"<formula id>": ["<latex>", ...]}} \
-covering exactly the failing ids (several strings = the row splits into \
-several formulas).
+Reply with ONE JSON object:
+{"rows": {"<formula id>": ["<latex>", ...]},
+ "declarations_add": ["%@ var z shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Epigraph bound", ...]}
+"declarations_add" is optional: %@ index / %@ param / %@ var lines for NEW \
+symbols your rewrite introduces (an epigraph variable, a renamed set). Never \
+redeclare an existing symbol.
 
-Rules (learned from this corpus):
-- MathML extraction writes multi-letter identifiers spaced: "t r_{e}" is ONE \
-identifier tr_{e}, not a product. Collapse spaced letters into one identifier \
-when the symbol table or context says they name one thing.
-- The grammar needs explicit products: write w \\cdot c_{e} when w and c really \
-are two symbols multiplied.
-- Cut trailing commas, periods and prose fragments. Keep quantifier tails \
-(\\forall i \\in S, tuple pairs, side conditions) as written.
-- One relation (=, <=, >=) per row; a glued block becomes several strings.
-- Range tails like ", 1 \\leq i \\leq n" are not in the grammar: rewrite as \
-\\forall i \\in <an index set the symbol table declares>; if none fits, drop \
-the tail rather than invent a set.
-- Do not rename symbols, do not change coefficients, do not add or drop terms."""
+Canonical style (from the corpus's own seed models):
+  \\min\\quad \\sum_{w \\in \\mathcal{W}, j \\in \\mathcal{J}} c \\cdot x_{w,j}
+  t_{i} \\ge \\mathit{earliest}_{i} \\qquad \\forall i \\in \\mathcal{I}
+
+Rules (measured against this parser):
+- THE COEFFICIENT RULE: in a product, the parameter is written BARE: \
+w \\cdot c_{e}, NEVER w_{e} \\cdot c_{e} — the binder carries the index. A \
+parameter standing alone (e.g. an RHS) keeps its subscripts.
+- Binders are flexible: \\sum_{e \\in E}, \\mathcal/\\mathbb sets, subscripted \
+or superscripted sets, set unions/differences, tuples (e,f) \\in A and double \
+binders all parse. Do NOT restructure binders that are already of these forms.
+- MathML writes multi-letter identifiers spaced: "t r_{e}" is ONE identifier \
+tr_{e}, not a product. Collapse using the symbol table.
+- Objectives: drop leading equation labels ("(F 1)", "L ="), write the \
+operator as \\min or \\max. A min over decision variables with an inner max \
+(minimax) must be reformulated as an epigraph: minimize a new auxiliary \
+variable z (declare it via declarations_add) and add rows z >= <inner term> \
+with the appropriate \\forall tail, as extra strings for the same formula id.
+- Function application like D_{i}(x_{k}) is not linear algebra: if the row \
+cannot be stated linearly, return the original unchanged (it will be recorded \
+as outside the grammar).
+- Cut trailing commas, periods and prose fragments; one relation per string; \
+range tails ", 1 <= i <= n" become \\forall i \\in <a declared index set>.
+- Do not change coefficients or drop terms; rename a symbol only to collapse \
+spacing or replace a decoration (\\tilde, \\hat, prime) with a plain \
+identifier, consistently within the affected rows, declaring it if new."""
 
 
 def _effective_parts(triage: dict, formula_id: str, dossier: Dossier) -> list[str]:
@@ -1166,6 +1245,11 @@ def _effective_parts(triage: dict, formula_id: str, dossier: Dossier) -> list[st
         return [str(p) for p in entry["parts"]]
     raw = {f.id: f.latex for f in dossier.formulas}[formula_id]
     return [raw]
+
+
+#: Failing rows offered to one repair call. More than this provokes reply
+#: truncation; the inner loop reaches the rest in later rounds.
+ROWFIX_BATCH = 12
 
 
 @dataclass(frozen=True, slots=True)
@@ -1235,16 +1319,58 @@ def rowfix_input(
         },
         "failing_rows": [
             {"id": f.formula_id, "latex": f.latex, "parser_error": f.error}
-            for f in failures
+            for f in failures[:ROWFIX_BATCH]
         ],
     }
+    if len(failures) > ROWFIX_BATCH:
+        payload["note"] = (
+            f"{len(failures) - ROWFIX_BATCH} more failing rows follow in later rounds"
+        )
     if feedback:
         payload["feedback"] = feedback
     return payload
 
 
-def validate_rowfix(reply: dict, failures: list[RowFailure]) -> list[str]:
+_ADDABLE_RECORDS = ("index", "param", "var")
+
+
+def validate_decl_additions(lines: list, existing: str) -> list[str]:
+    """Token-validate ``declarations_add`` lines; refuse redeclarations."""
     errors: list[str] = []
+    have = {
+        parsed[1]
+        for parsed in (
+            _parse_decl_line(ln.strip())
+            for ln in existing.splitlines()
+            if ln.strip().startswith("%@")
+        )
+        if parsed[1]
+    }
+    for i, raw in enumerate(lines, 1):
+        if not isinstance(raw, str) or not raw.strip().startswith("%@"):
+            errors.append(f"declarations_add {i}: must be a %@ line")
+            continue
+        record, name, _kv, token_errors = _parse_decl_line(raw.strip())
+        if record not in _ADDABLE_RECORDS:
+            errors.append(f"declarations_add {i}: only index/param/var may be added")
+            continue
+        if not name or not _IDENT.match(name):
+            errors.append(f"declarations_add {i}: {name!r} is not an identifier")
+            continue
+        if name in have:
+            errors.append(f"declarations_add {i}: {name!r} is already declared")
+        errors.extend(f"declarations_add {i}: {e}" for e in token_errors)
+    return errors
+
+
+def validate_rowfix(reply: dict, failures: list[RowFailure], declarations: str = "") -> list[str]:
+    errors: list[str] = []
+    additions = reply.get("declarations_add")
+    if additions is not None:
+        if not isinstance(additions, list):
+            errors.append("declarations_add must be a list of %@ lines")
+        else:
+            errors.extend(validate_decl_additions(additions, declarations))
     rows = reply.get("rows")
     if not isinstance(rows, dict):
         return ["rows must be an object mapping formula ids to LaTeX lists"]
@@ -1258,9 +1384,11 @@ def validate_rowfix(reply: dict, failures: list[RowFailure]) -> list[str]:
         )
         if not ok:
             errors.append(f"{fid}: needs a non-empty list of LaTeX strings")
-    missing = sorted(wanted - set(rows))
-    if missing:
-        errors.append("missing fixes for: " + ", ".join(missing))
+    # Partial coverage is acceptable: rows the reply omits simply stay in the
+    # failing set for the next inner round (a 30-row demand in one reply just
+    # provokes truncation).
+    if not rows:
+        errors.append("rows fixed nothing")
     return errors
 
 
