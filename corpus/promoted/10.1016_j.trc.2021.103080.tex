@@ -1,0 +1,135 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2021.103080
+%@ meta id=10.1016_j.trc.2021.103080 family=milp schema=0.1.0
+%@ name :: Dynamic railway timetable rescheduling for multiple connected disruptions
+%@ desc :: Mined from Dynamic railway timetable rescheduling for multiple connected disruptions (Transportation Research Part C Emerging Technologies, 2021).
+%@ prov source :: 10.1016/j.trc.2021.103080
+%@ prov reference :: Dynamic railway timetable rescheduling for multiple connected disruptions
+%@ prov author :: Yongqiu Zhu; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted cancellations plus total delays.
+%@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary cancellation decision for event e.
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e relative to original schedule.
+%@ param w shape=- kind=scalar :: Fixed penalty for each cancelled service.
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures).
+%@ param M shape=- kind=big_m :: Large positive constant used in big-M constraints (M1=1440, M2=2*M1).
+%@ param o shape=E kind=vector :: Original scheduled time of event e.
+%@ var x shape=E domain=continuous role=primary drole=- lo=- hi=- :: Rescheduled time of event e.
+%@ param D shape=- kind=scalar :: Maximum allowed delay for events not in E_NMdelay.
+%@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating an added stop for station activity a.
+%@ param n shape=- kind=scalar :: Number of disruptions; the current emerging disruption is the n-th.
+%@ index A ordered=0 cyclic=0 :: Set of activities (run, dwell/pass, short-turn, OD-turn).
+%@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating the station of event e is chosen as short-turn station.
+%@ param R shape=- kind=scalar :: Required recovery time length after disruptions.
+%@ param T shape=- kind=scalar :: Time-related parameters such as disruption start and end times.
+%@ param S shape=- kind=scalar :: Station-related parameters for entry/exit stations and tracks.
+%@ index a ordered=0 cyclic=0 :: Activity index, e.g. a=(e,e') in A_turn.
+%@ var m shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating short-turn activity a is selected.
+%@ param pt shape=- kind=scalar :: Platform track index i at a station.
+%@ param tail shape=- kind=scalar :: Function returning the tail event of an activity.
+%@ param head shape=- kind=scalar :: Function returning the head event of an activity.
+%@ param L shape=A kind=vector :: Minimum duration required for short-turn activity a.
+%@ var u shape=E,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train of event e occupies platform track i.
+%@ var v shape=E,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train of event e occupies pass-through track j.
+%@ index N ordered=0 cyclic=0 :: Number of platform or pass-through tracks at a station.
+%@ param h shape=E,E kind=matrix :: Minimum time interval required between events e and e' using the same station track.
+%@ var q shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating event e occurs before event e'.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Rescheduled time of a cancelled event is fixed to original time plus M1.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Rescheduled time equals original time plus delay plus M1 cancellation penalty.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Delay of an event is non-negative.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Delay of events not in E_NMdelay is bounded by D.
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Trains are forbidden to enter disrupted sections during the disruption period.
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Trains are forbidden to enter disrupted sections in the other direction/condition.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Cancellation status is consistent across the two events of each running activity.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Cancellation status is consistent across station activity events when no short-turn is possible.
+%@ con eq_0015 kind=linear domain=- indicator=- :: If the arrival event has a short-turn possibility, its cancellation implies cancellation of the departure event.
+%@ con eq_0017 kind=linear domain=- indicator=- :: If the arrival station is not chosen for short-turn, departure cancellation is bounded by arrival cancellation plus y_e.
+%@ con eq_0018 kind=linear domain=- indicator=- :: If the arrival station is chosen for short-turn, the departure event without short-turn possibility is cancelled.
+%@ con eq_0019 kind=linear domain=- indicator=- :: If the departure event has a short-turn possibility, its cancellation implies cancellation of the arrival event.
+%@ con eq_0020 kind=linear domain=- indicator=- :: If the departure station is not chosen for short-turn, arrival cancellation is bounded by departure cancellation plus y_e'.
+%@ con eq_0021 kind=linear domain=- indicator=- :: If the departure station is chosen for short-turn, the arrival event without short-turn possibility is cancelled.
+%@ con eq_0022 kind=linear domain=- indicator=- :: When both events have short-turn possibilities, cancellation difference equals short-turn choice difference.
+%@ con eq_0024 kind=linear domain=- indicator=- :: At most one of the two short-turn possibilities at a station activity can be selected.
+%@ con eq_0025 kind=linear domain=- indicator=- :: If the arrival side is chosen for short-turn, the departure event must be cancelled.
+%@ con eq_0026 kind=linear domain=- indicator=- :: If the arrival side is chosen for short-turn, the arrival event must be kept.
+%@ con eq_0027 kind=linear domain=- indicator=- :: If the departure side is chosen for short-turn, the arrival event must be cancelled.
+%@ con eq_0028 kind=linear domain=- indicator=- :: If the departure side is chosen for short-turn, the departure event must be kept.
+%@ con eq_0029 kind=linear domain=- indicator=- :: At least one short-turn station is chosen at the entry side of each disrupted section for cancelled trains.
+%@ con eq_0031 kind=linear domain=- indicator=- :: At least one short-turn station is chosen at the exit side of each disrupted section for cancelled trains.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Number of short-turn stations chosen at entry sides cannot exceed cancelled departure events there.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Number of short-turn stations chosen at exit sides cannot exceed cancelled arrival events there.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Selected short-turn activities tailing at e equal the cancellation difference in the single-disruption station case.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Selected short-turn activities heading at e' equal the cancellation difference in the opposite single-disruption case.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Selected short-turn activities tailing at e equal the cancellation difference plus y_e' in the multi-disruption case.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Selected short-turn activities heading at e' equal the cancellation difference plus y_e in the multi-disruption case.
+%@ con eq_0040 kind=linear domain=- indicator=- :: A selected short-turn activity must respect the minimum short-turn duration.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Events that already occurred before the new disruption starts cannot be cancelled.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Events that already occurred keep their previous rescheduled time.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Events with previous rescheduled time after the new disruption start cannot be scheduled before it.
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Departures planned within R after the maximum disruption end cannot be cancelled.
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Departures planned within R after the maximum disruption end keep their original times.
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Arrivals whose corresponding departure lies within R after the maximum disruption end cannot be cancelled.
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Arrivals whose corresponding departure lies within R after the maximum disruption end keep their original times.
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Each arriving train is assigned exactly one platform or pass-through track at its station unless cancelled.
+%@ con eq_0048_b kind=linear domain=- indicator=- :: The platform and pass-through track choice is linked to the cancellation status of the arrival event.
+%@ con eq_0050_a kind=linear domain=- indicator=- :: An arriving train that stops at a station must occupy a platform track.
+%@ con eq_0050_b kind=linear domain=- indicator=- :: An arriving train that short-turns at a station must occupy a platform track.
+%@ con eq_0051 kind=linear domain=- indicator=- :: A platform track is required for arrival events that are tails of short-turn activities.
+%@ con eq_0053 kind=linear domain=- indicator=- :: A platform track is required for arrival events at OD-turn destinations.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same platform track for a station activity.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same platform track for a short-turn or OD-turn activity.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same pass-through track for a station activity.
+%@ con eq_0058 kind=linear domain=- indicator=- :: Minimum headway is enforced between two trains using the same pass-through track for a short-turn or OD-turn activity.
+%@ con eq_0059 kind=linear domain=- indicator=- :: Constraints determining the added-stop variable s_a for station activities.
+%@ con eq_0060 kind=ordering domain=- indicator=- :: Constraints determining the ordering variable q_{e,e'} for same-track occupations.
+\begin{align}
+  \min\quad & \sum_{e \in E_{ar}} w \cdot c_{e} + \sum_{e \in E_{ar} \cup E_{de}} d_{e} \tag{eq\_0006} \\
+  & M_{1} c_{e} \leq x_{e} - o_{e} \leq M_{1} , e \in E_{ar} \cup E_{de} , \tag{eq\_0007} \\
+  & x_{e} - o_{e} = d_{e} + M_{1} c_{e} , e \in E_{ar} \cup E_{de} , \tag{eq\_0009} \\
+  & d_{e} \geq 0 , e \in E_{ar} \cup E_{de} , \tag{eq\_0010} \\
+  & d_{e} \leq D , e \in \left(E_{ar} \cup E_{de}\right) \backslash E^{NMdelay} . \tag{eq\_0011} \\
+  & x_{e} \geq t_{end}^{i} \left(1 - c_{e}\right) , e \in E_{de} , s t_{e} = s t_{en}^{i , t r_{e}} \tag{eq\_0012\_a} \\
+  & t_{start}^{i} \leq o_{e} < t_{end}^{i} , 1 \leq i \leq n \tag{eq\_0012\_b} \\
+  & c_{e^{'}} - c_{e} = 0 , \left(e , e^{'}\right) \in A_{run} , \tag{eq\_0013} \\
+  & c_{e} - c_{e^{'}} = 0 , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , e^{'} \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0014} \\
+  & c_{e} \leq c_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0015} \\
+  & c_{e^{'}} \leq c_{e} + y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0017} \\
+  & c_{e^{'}} \geq y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0018} \\
+  & c_{e^{'}} \leq c_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0019} \\
+  & c_{e} \leq c_{e^{'}} + y_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0020} \\
+  & c_{e} \geq y_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0021} \\
+  & c_{e} - c_{e^{'}} = y_{e^{'}} - y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0022} \\
+  & y_{e} + y_{e^{'}} \leq 1 , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0024} \\
+  & c_{e^{'}} \geq y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0025} \\
+  & c_{e} \leq 1 - y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0026} \\
+  & c_{e} \geq y_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0027} \\
+  & c_{e^{'}} \leq 1 - y_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , . \tag{eq\_0028} \\
+  & \underset{e : t r_{e} = t r}{\sum} y_{e} \geq c_{e^{'}} , t r \in \left(T R\right)_{turn}^{i} , e \in E_{ar}^{i , turn} , e^{'} \in E_{de} , t r_{e^{'}} = t r , s t_{e^{'}} = s t_{en}^{i , d r_{e^{'}}} , 1 \leq i \leq n , \tag{eq\_0029} \\
+  & \underset{e^{'} : t r_{e^{'}} = t r}{\sum} y_{e^{'}} \geq c_{e} , t r \in \left(T R\right)_{turn}^{i} , e^{'} \in E_{de}^{i , turn} , e \in E_{ar} , t r_{e} = t r , s t_{e} = s t_{ex}^{i , d r_{e}} , 1 \leq i \leq n , \tag{eq\_0031} \\
+  & \underset{e : t r_{e} = t r}{\sum} y_{e} \leq \underset{e^{'}}{\sum} c_{e^{'}} , t r \in \left(T R\right)_{turn} , e \in E_{ar}^{turn} , e^{'} \in E_{de} , t r_{e^{'}} = t r , s t_{e^{'}} \in \left(S T\right)_{en}^{d r_{e^{'}}} , 1 \leq i \leq n , \tag{eq\_0032} \\
+  & \underset{e^{'} : t r_{e^{'}} = t r}{\sum} y_{e^{'}} \leq \underset{e}{\sum} c_{e} , t r \in \left(T R\right)_{turn} , e^{'} \in E_{de}^{turn} , e \in E_{ar} , t r_{e} = t r , s t_{e} \in \left(S T\right)_{ex}^{d r_{e}} , 1 \leq i \leq n , \tag{eq\_0034} \\
+  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{t a i l \left(a\right) = e}}{\sum} m_{a} = c_{e^{'}} - c_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0035} \\
+  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{h e a d \left(a\right) = e^{'}}}{\sum} m_{a} = c_{e} - c_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0037} \\
+  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{t a i l \left(a\right) = e}}{\sum} m_{a} = c_{e^{'}} - c_{e} + y_{e^{'}} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} , \tag{eq\_0038} \\
+  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{h e a d \left(a\right) = e^{'}}}{\sum} m_{a} = c_{e} - c_{e^{'}} + y_{e} , \left(e , e^{'}\right) \in A_{station} , e \in E_{ar}^{turn} , e^{'} \in E_{de}^{turn} . \tag{eq\_0039} \\
+  & M_{1} c_{e} + 2 D \left(1 - m_{a}\right) + x_{e^{'}} - x_{e} \geq m_{a} L_{a} , a = \left(e , e^{'}\right) \in A_{turn} , \tag{eq\_0040} \\
+  & c_{e} = 0 , e \in E_{ar} \cup E_{de} , r_{e} < t_{start}^{n} , n \geq 2 , \tag{eq\_0041} \\
+  & x_{e} - r_{e} = 0 , e \in E_{ar} \cup E_{de} , r_{e} < t_{start}^{n} , n \geq 2 , \tag{eq\_0043} \\
+  & x_{e} \geq t_{start}^{n} , e \in E_{ar} \cup E_{de} , r_{e} \geq t_{start}^{n} , n \geq 2 . \tag{eq\_0044} \\
+  & c_{e} = 0 , e \in E_{de} \tag{eq\_0045\_a} \\
+  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0045\_b} \\
+  & x_{e} - o_{e} = 0 , e \in E_{de} \tag{eq\_0047\_a} \\
+  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0047\_b} \\
+  & c_{e^{'}} = 0 , \left(e , e^{'}\right) \in A_{run} \tag{eq\_0048\_a} \\
+  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0048\_b} \\
+  & x_{e^{'}} - o_{e^{'}} = 0 , \left(e , e^{'}\right) \in A_{run} \tag{eq\_0050\_a} \\
+  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0050\_b} \\
+  & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} + \sum_{j = 1}^{N_{s t_{e}}^{t h}} v_{e , j} = 1 - c_{e} , e \in E_{ar} , \tag{eq\_0051} \\
+  & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} \geq 1 - s_{a} - c_{e} - c_{e^{'}} e \in E_{ar} , a = \left(e , e^{'}\right) \in A_{station} , \tag{eq\_0053} \\
+  & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} \geq \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{t a i l \left(a\right) = e}}{\sum} m_{a} e \in E_{ar}^{turn} , \tag{eq\_0054} \\
+  & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} = 1 - c_{e} , e \in E_{ar}^{odturn} , \tag{eq\_0055} \\
+  & x_{e^{'}} - x_{e^{' '}} \geq h_{e , e^{'}} + M_{2} \left(q_{e , e^{'}} - c_{e} - c_{e^{'}} - c_{e^{' '}} + u_{e , i} + u_{e^{'} , i} - 3\right) , e , e^{'} \in E_{ar} , s t_{e^{'}} = s t_{e} , \left(e , e^{' '}\right) \in A_{station} , \tag{eq\_0056} \\
+  & x_{e^{'}} - x_{e^{' '}} \geq h_{e , e^{'}} + M_{2} \left(q_{e , e^{'}} - c_{e} - c_{e^{'}} - \left(1 - m_{a}\right) + u_{e , i} + u_{e^{'} , i} - 3\right) , e , e^{'} \in E_{ar} , s t_{e^{'}} = s t_{e} , a = \left(e , e^{' '}\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0058} \\
+  & x_{e^{'}} - x_{e^{' '}} \geq h_{e , e^{'}} + M_{2} \left(q_{e , e^{'}} - c_{e} - c_{e^{'}} - c_{e^{' '}} + v_{e , j} + v_{e^{'} , j} - 3\right) , e , e^{'} \in E_{ar} , s t_{e^{'}} = s t_{e} , \left(e , e^{' '}\right) \in A_{station} , \tag{eq\_0059} \\
+  & x_{e^{'}} - x_{e^{' '}} \geq h_{e , e^{'}} + M_{2} \left(q_{e , e^{'}} - c_{e} - c_{e^{'}} - \left(1 - m_{a}\right) + v_{e , j} + v_{e^{'} , j} - 3\right) , e , e^{'} \in E_{ar} , s t_{e^{'}} = s t_{e} , a = \left(e , e^{' '}\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0060} \\
+\end{align}
