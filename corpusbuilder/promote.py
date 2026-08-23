@@ -78,7 +78,7 @@ from pathlib import Path
 from railpminer import _lp2graph  # noqa: F401
 
 from corpusbuilder.dossier import Dossier
-from corpusbuilder.game import extract_symbols, is_objective_latex
+from corpusbuilder.game import extract_symbols, is_objective_latex, normalize_objective_head
 from corpusbuilder.symbols import binder_roles, paper_evidence
 from lp2graph import loads as load_formulation
 from lp2graph.mining import REWRITE_RULES_VERSION
@@ -523,7 +523,7 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
     for row in rows:
         tag = row.name.replace("_", r"\_")
         if row.is_objective:
-            body = strip_objective_label(row.latex)
+            body = strip_objective_label(normalize_objective_head(row.latex))
             body = re.sub(r"^\\(min|max)(?:imi[sz]e)?\b", r"\\\1", body)
             operator, rest = body.split(None, 1) if " " in body else (body, "")
             lines.append(rf"  {operator}\quad & {rest.strip()} \tag{{{tag}}} \\")
