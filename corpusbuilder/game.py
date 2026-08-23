@@ -961,6 +961,18 @@ def _is_objective(tree, ops, rel, latex: str = "") -> bool:
     return (not rel) and any(o[0] in ("min", "max") for o in ops)
 
 
+def normalize_objective_head(latex: str) -> str:
+    """Word-form objective head normalized to operator form, publicly.
+
+    The same rewrite :func:`is_objective_latex` applies before *detecting* an
+    objective (``\\text{Minimise}:`` / ``(F 1) minimize`` / ``\\underset{U}{min}``
+    -> ``\\min``). Promotion must render the row through the identical rewrite:
+    detecting a row as the objective and then assembling its raw word form
+    hands the canonical parser a token it has no rule for.
+    """
+    return _lead_minmax_word(latex)
+
+
 def is_objective_latex(latex: str) -> bool:
     """Public wrapper: does this LaTeX statement *state an objective*?
 
