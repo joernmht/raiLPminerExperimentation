@@ -197,17 +197,23 @@ def _stage_extras(stage: str) -> dict:
 
 
 def _payload(system: str, user: str, *, stage: str) -> dict:
-    return {
+    extras = _stage_extras(stage)
+    payload = {
         "model": model_id(),
         "temperature": 0,
-        "max_tokens": 8192,
         "response_format": {"type": "json_object"},
-        **_stage_extras(stage),
+        **extras,
         "messages": [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
     }
+    # Cap output only where thinking is OFF: on a thinking stage the reasoning
+    # tokens count against max_tokens, and a cap the reasoning can exhaust
+    # returns 0 content chars (measured: completion 8192 = reasoning 8192).
+    if "thinking" in extras:
+        payload["max_tokens"] = 8192
+    return payload
 
 
 _FENCE = re.compile(r"^\s*```[a-zA-Z]*\s*|\s*```\s*$")
@@ -472,6 +478,9 @@ Rules:
 - Give a decision for EVERY formula id you were shown.
 - REJECT non-optimization content: metaheuristic position updates (PSO/GWO), ML losses, \
 numeric worked examples, prose fragments, pure quantifier tails.
+- REJECT non-linear analytic content: rows with integrals, derivatives, recursive or \
+function definitions f(x) = ..., piecewise interpolation. The corpus holds LP/MILP \
+algebra only; such rows cannot be stated linearly.
 - "duplicate" = the same statement re-extracted; set "duplicate_of" to the kept id.
 - "corrected" + "parts" for glued multi-formula blobs: parts = the separated formulas, \
 in order. A split suggestion, when given, is usually the right correction.
@@ -600,6 +609,22 @@ def validate_triage_objectives(reply: dict, dossier: Dossier) -> list[str]:
             + " — keep exactly one (the main model's), mark restatements "
             "duplicate_of it, and reject stage/secondary objectives with a reason"
         ]
+    if not winners:
+        shaped = [
+            str(e.get("id"))
+            for e in reply.get("decisions") or []
+            if isinstance(e, dict)
+            and e.get("status") in ("rejected", "duplicate")
+            and is_objective_latex(raw.get(str(e.get("id") or ""), ""))
+        ]
+        if shaped:
+            return [
+                "no accepted row states an objective, but objective-shaped rows "
+                "were rejected/duplicated: " + ", ".join(shaped) + " — correct "
+                "one of them into a proper \\min/\\max row (recover the "
+                "expression from the formula it references) unless the paper "
+                "truly states none"
+            ]
     return []
 
 
@@ -1062,7 +1087,7 @@ def annotate_paper(
                 + validate_triage_objectives(reply, dossier)
             ),
             run.usage,
-            retries=1,
+            retries=2,
             force="a" in force,
             feedback=feedback.get("a", []),
         )
@@ -1178,7 +1203,9 @@ def annotate_paper(
             run.errors.append(str(exc))
             run.stages["r"] = f"failed: invalid_reply (round {round_no + 1})"
             return run
-        additions = [str(a) for a in reply.get("declarations_add") or []]
+        additions = filter_decl_additions(
+            [str(a) for a in reply.get("declarations_add") or []], sidecar
+        )
         if additions:
             sidecar = sidecar.rstrip() + "\n" + "\n".join(additions) + "\n"
         fixes = {str(k): [str(p) for p in v] for k, v in reply["rows"].items()}
@@ -1221,10 +1248,16 @@ parameter standing alone (e.g. an RHS) keeps its subscripts.
 - Binders are flexible: \\sum_{e \\in E}, \\mathcal/\\mathbb sets, subscripted \
 or superscripted sets, set unions/differences, tuples (e,f) \\in A and double \
 binders all parse. Do NOT restructure binders that are already of these forms.
+- CONSECUTIVE big operators do NOT parse: \\sum_{a \\in A} \\sum_{b \\in B} x \
+must merge into ONE operator with a double binder: \\sum_{a \\in A, b \\in B} x.
+- Decorated symbols (\\overset/\\tilde/\\hat/\\bar wrappers, combining accents) \
+do not parse as identifiers: rename to a plain identifier (beta_up, tc_hat) \
+consistently within the affected rows and declare it via declarations_add.
 - MathML writes multi-letter identifiers spaced: "t r_{e}" is ONE identifier \
 tr_{e}, not a product. Collapse using the symbol table.
-- Objectives: drop leading equation labels ("(F 1)", "L ="), write the \
-operator as \\min or \\max. A min over decision variables with an inner max \
+- Objectives: state them as "\\min <expression>" — the operator, ONE space, \
+then the expression. No \\quad after the operator, no "(F 1)" label, no "Z =" \
+prefix, and numeric factors need \\cdot (2 \\cdot n, never 2n). A min over decision variables with an inner max \
 (minimax) must be reformulated as an epigraph: minimize a new auxiliary \
 variable z (declare it via declarations_add) and add rows z >= <inner term> \
 with the appropriate \\forall tail, as extra strings for the same formula id.
@@ -1335,17 +1368,9 @@ _ADDABLE_RECORDS = ("index", "param", "var")
 
 
 def validate_decl_additions(lines: list, existing: str) -> list[str]:
-    """Token-validate ``declarations_add`` lines; refuse redeclarations."""
+    """Token-validate ``declarations_add`` lines (redeclarations are dropped later)."""
+    del existing  # kept in the signature for the call sites' clarity
     errors: list[str] = []
-    have = {
-        parsed[1]
-        for parsed in (
-            _parse_decl_line(ln.strip())
-            for ln in existing.splitlines()
-            if ln.strip().startswith("%@")
-        )
-        if parsed[1]
-    }
     for i, raw in enumerate(lines, 1):
         if not isinstance(raw, str) or not raw.strip().startswith("%@"):
             errors.append(f"declarations_add {i}: must be a %@ line")
@@ -1357,10 +1382,30 @@ def validate_decl_additions(lines: list, existing: str) -> list[str]:
         if not name or not _IDENT.match(name):
             errors.append(f"declarations_add {i}: {name!r} is not an identifier")
             continue
-        if name in have:
-            errors.append(f"declarations_add {i}: {name!r} is already declared")
+        # A redeclaration is dropped at application time, not failed here: the
+        # model re-listing an existing symbol is noise, not a defect.
         errors.extend(f"declarations_add {i}: {e}" for e in token_errors)
     return errors
+
+
+def filter_decl_additions(lines: list[str], existing: str) -> list[str]:
+    """Additions minus redeclarations (the existing sidecar wins)."""
+    have = {
+        parsed[1]
+        for parsed in (
+            _parse_decl_line(ln.strip())
+            for ln in existing.splitlines()
+            if ln.strip().startswith("%@")
+        )
+        if parsed[1]
+    }
+    out = []
+    for raw in lines:
+        record, name, _kv, _errs = _parse_decl_line(raw.strip())
+        if record in _ADDABLE_RECORDS and name and name not in have:
+            out.append(raw.strip())
+            have.add(name)
+    return out
 
 
 def validate_rowfix(reply: dict, failures: list[RowFailure], declarations: str = "") -> list[str]:
