@@ -1,0 +1,188 @@
+{
+  "schema_version": "0.1.0",
+  "id": "lintim__openlintim__vehicle-scheduling-ip",
+  "name": "vehicle-scheduling-ip",
+  "family": "milp",
+  "description": "Vehicle scheduling problem (VSP) as a minimum-cost flow / assignment IP on a trip-connection graph. Each trip node must be entered and left exactly once via selected connections (including deadhead/depot connections); minimizes total connection cost. Equivalent to an integer min-cost circulation covering all trips.",
+  "tags": [],
+  "provenance": {
+    "source": "https://gitlab.com/lintim/openlintim",
+    "reference": "",
+    "author": "lintim/openlintim",
+    "date": ""
+  },
+  "indices": [
+    {
+      "name": "N",
+      "description": "set of trip nodes of the trip graph (each non-depot node is one scheduled trip); depot nodes are excluded from the degree constraints",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "set of trip connections (edges of the trip graph), including deadhead and depot connections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta__n",
+      "description": "incoming connections of trip node n",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "cost of using trip connection a (objective coefficient) [domain R_>=0]",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "v",
+      "description": "1 if trip connection a is used in the vehicle schedule, 0 otherwise",
+      "shape": [
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "incoming_degree",
+      "description": "each (non-depot) trip is served by exactly one incoming connection [capture: sum over a widened to family A; source binder: 'a \\\\in \\\\mathit{delta}^-(n)']",
+      "quantifiers": [
+        {
+          "index": "n",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "v",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "outgoing_degree",
+      "description": "each (non-depot) trip is left by exactly one outgoing connection [capture: sum over a widened to family A; source binder: 'a \\\\in \\\\mathit{delta}^+(n)']",
+      "quantifiers": [
+        {
+          "index": "n",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "v",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "minimize total cost of the selected trip connections",
+    "terms": [
+      {
+        "ref": "v",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "A",
+            "expr": "a",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "A"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -1,0 +1,31 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.repo_corpus
+% Source repository: romain-montagne/vrpy
+%@ meta id=romain-montagne__vrpy__vrp-set-covering-master family=milp schema=0.1.0
+%@ name :: vrp-set-covering-master
+%@ desc :: Restricted master problem of the column-generation procedure for the Vehicle Routing Problem. A set-covering/set-partitioning LP selects a minimum-cost subset of feasible routes (columns) such that every customer node is visited. During column generation the route-selection variables are continuous (LP relaxation, 0<=y<=1); the final iteration is solved as a MIP with y binary. Implemented in PuLP via LpConstraintVar 'column' construction (each route variable carries its coefficients into the covering constraints and objective).
+%@ prov source :: https://github.com/romain-montagne/vrpy
+%@ prov reference :: doi:10.21105/joss.02408
+%@ prov author :: romain-montagne/vrpy
+%@ index V ordered=0 cyclic=0 :: set of customer nodes that must be visited (graph nodes excluding Source, Sink and depot_from/depot_to markers)
+%@ index Omega ordered=0 cyclic=0 :: set of feasible routes (columns); only a subset is present at any iteration of column generation
+%@ index Omega_v ordered=0 cyclic=0 :: routes r in Omega that visit node v
+%@ index K ordered=0 cyclic=0 :: set of vehicle types (heterogeneous fleet); index k
+%@ param c shape=Omega kind=vector domain=- :: cost of route r (sum of edge costs along the route for its vehicle type) [domain R_>=0]
+%@ param f shape=V kind=vector domain=- :: required visit frequency / RHS of covering constraint for node v (1 in the standard case, frequency in the periodic case) [domain Z_>=1]
+%@ param U shape=K kind=vector domain=- :: upper bound on number of vehicles of type k [domain Z_>=0]
+%@ param p shape=- kind=scalar domain=- :: per-node drop penalty added to objective when node-dropping is allowed [domain R_>=0]
+%@ var lambda shape=Omega domain=binary role=primary drole=- lo=- hi=- :: 1 if and only if route r is selected
+%@ var drop shape=V domain=binary role=primary drole=- lo=- hi=- :: 1 if and only if node v is dropped (left unserved), only present when drop_penalty is set
+%@ var periodic shape=V domain=non_negative role=primary drole=- lo=- hi=- :: artificial variable used only in the periodic case to find an initial feasible solution (huge 1e10 objective penalty)
+%@ var artificial_bound shape=K domain=non_negative role=primary drole=- lo=- hi=- :: artificial variable relaxing the vehicle-count constraint for type k (huge 1e10 objective penalty), forced to 0 in the final MIP
+%@ var makespan shape=- domain=non_negative role=primary drole=- lo=- hi=- :: global span (max route cost) auxiliary variable, only present when minimize_global_span is set
+%@ obj sense=min name=objective combination=sum :: minimize the total cost of the selected routes (with optional additive drop penalties and big-1e10 artificial-variable penalties)
+%@ con set_covering_visit_node kind=linear domain=- indicator=- :: every customer node v must be covered by at least f_v selected routes (eq. 1). The constraint sense is >= during the LP relaxation and is switched to = (set-partitioning, exactly f_v) when the master is solved as a MIP. [capture: sum restriction not representable: 'v \\in r']
+%@ con vehicle_count_bound kind=linear domain=- indicator=- :: the number of selected routes of vehicle type k may not exceed the available vehicles U_k. Sense becomes = (use all vehicles) if use_all_vehicles is set; an artificial_bound_k variable relaxes it during pricing. [capture: sum restriction not representable: '\\mathrm{type}(r)=k']
+%@ con makespan_definition kind=linear domain=- indicator=- :: when minimizing the global span, an auxiliary makespan variable bounds the cost of every selected route from above and is minimized instead of the total cost.
+\begin{align}
+  \min\quad & \sum_{r \in \mathcal{Omega}} c \cdot \mathit{lambda}_{r} \tag{objective} \\
+  & \sum_{r \in \mathcal{Omega}} \mathit{lambda}_{r} \ge f_{v} \qquad \forall v \in \mathcal{V} \tag{set\_covering\_visit\_node} \\
+  & \sum_{r \in \mathcal{Omega}} \mathit{lambda}_{r} \le U_{k} \qquad \forall k \in \mathcal{K} \tag{vehicle\_count\_bound} \\
+  & c \cdot \mathit{lambda}_{r} \le \mathit{makespan} \qquad \forall r \in \mathcal{Omega} \tag{makespan\_definition} \\
+\end{align}

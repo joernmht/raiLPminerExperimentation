@@ -1,0 +1,34 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.repo_corpus
+% Source repository: INFORMSJoC/2024.0698
+%@ meta id=informsjoc__2024.0698__mdvsp-ts-arc-flow-time-expanded family=milp schema=0.1.0
+%@ name :: mdvsp-ts-arc-flow-time-expanded
+%@ desc :: Arc-flow (multi-commodity, one commodity per depot) formulation of the Multi-Depot Vehicle Scheduling Problem with Trip Shifting on a fully time-expanded network. Each depot has its own copy of the time-space graph; integer arc-flow variables route vehicles from a source depot node to a sink depot node. Trip shifting is modelled implicitly: each timetabled trip is expanded into multiple parallel trip arcs, one per admissible departure-time deviation in [-maxDeviation, +maxDeviation] (TimeSpaceGraph.initNodes/addTripArcs), and a cover constraint forces exactly one of these copies (across all depots) to be used. Objective minimizes total cost = fixed cost per vehicle (pull-in/pull-out arcs) + variable deadheading cost. This is the model solved both by the MIP baseline (SolverMIP on the full network) and, on iteratively refined sparser networks, by the DDD algorithm; the formulation is identical, only the underlying TimeSpaceGraph differs.
+%@ prov source :: https://github.com/INFORMSJoC/2024.0698
+%@ prov reference :: doi:10.1287/ijoc.2024.0698
+%@ prov author :: INFORMSJoC/2024.0698
+%@ index D ordered=0 cyclic=0 :: set of depots (vehicle types / commodities)
+%@ index T ordered=0 cyclic=0 :: set of timetabled trips that must be covered
+%@ index L ordered=0 cyclic=0 :: set of locations (depots + stations)
+%@ index G_d_V_d_A_d ordered=0 cyclic=0 :: per-depot time-space network: timed nodes V_d (station x time) and timed arcs A_d
+%@ index A_d ordered=0 cyclic=0 :: timed arcs for depot d (trip, deadhead, waiting, pull-in, pull-out arcs)
+%@ index A_trip_d ordered=0 cyclic=0 :: subset of A_d that are trip arcs (type==1); each is a (trip, departure-deviation) copy
+%@ index in_n ordered=0 cyclic=0 :: arcs entering timed node n
+%@ index out_n ordered=0 cyclic=0 :: arcs leaving timed node n
+%@ index arcs_t ordered=0 cyclic=0 :: all trip arcs (over all depots) that represent some departure-time copy of trip t
+%@ param c shape=D,A_trip_d kind=matrix domain=- :: cost of using arc a in depot layer d: 0 for trip/waiting arcs, VARIABLE_COST*travelTime for deadhead arcs, FIXED_COST+VARIABLE_COST*travelTime for pull-in/pull-out arcs [domain Z_>=0]
+%@ param FIXED_COST shape=- kind=scalar domain=- :: fixed cost charged on each pull-in and pull-out arc (so 2*FIXED_COST = 1000 per vehicle) [domain Z_>=0]
+%@ param VARIABLE_COST shape=- kind=scalar domain=- :: variable cost per minute of driving (deadhead / pull travel time) [domain Z_>=0]
+%@ param maxDeviation shape=- kind=scalar domain=- :: maximum allowed forward/backward shift (in minutes) of a trip's departure time; controls how many parallel trip-arc copies exist per trip [domain Z_>=0]
+%@ param tau_ij shape=- kind=scalar domain=- :: travel (deadhead/pull) time between locations i and j, from the instance travel-time matrix [domain Z_>=0]
+%@ param maxVehicles shape=- kind=scalar domain=- :: optional cap on number of vehicles dispatched (total depot outflow); only enforced when nonzero [domain Z_>=0]
+%@ var x shape=D,A_trip_d domain=integer role=primary drole=- lo=- hi=- :: flow on arc a in the time-space network of depot d (number of vehicles of depot d using arc a)
+%@ obj sense=min name=objective combination=sum :: minimize total vehicle-scheduling cost = fixed cost per dispatched vehicle (on pull-in/pull-out arcs) plus variable deadheading/pull travel cost summed over all depot layers and arcs
+%@ con flow_conservation kind=linear domain=- indicator=- :: at every non-depot timed node, inflow equals outflow in each depot layer (vehicles are conserved; depot source/sink nodes are unconstrained so they emit/absorb the fleet) [capture: sum over a widened to family A_trip_d; source binder: 'a \\in in(n)'; sum over a widened to family A_trip_d; source binder: 'a \\in out(n)']
+%@ con trip_cover kind=linear domain=- indicator=- :: each timetabled trip is served exactly once, by exactly one depot and exactly one of its admissible departure-time (shift) copies [capture: sum condition not representable: 'trip(a)=t']
+%@ con depot_outflow_cap kind=linear domain=- indicator=- :: optional: total number of vehicles leaving the depots at time 0 is fixed to maxVehicles [capture: sum over a widened to family A_trip_d; source binder: 'a \\in out(\\mathrm{depot}_d, t=0)']
+\begin{align}
+  \min\quad & \sum_{d \in \mathcal{D}, a \in \mathcal{A_d}} c \cdot x_{d,a} \tag{objective} \\
+  & \sum_{a \in \mathcal{A_trip_d}} x_{d,a} = \sum_{a \in \mathcal{A_trip_d}} x_{d,a} \qquad \forall d \in \mathcal{D} \tag{flow\_conservation} \\
+  & \sum_{d \in \mathcal{D}, a \in \mathcal{A_trip_d}} x_{d,a} = 1 \qquad \forall t \in \mathcal{T} \tag{trip\_cover} \\
+  & \sum_{d \in \mathcal{D}, a \in \mathcal{A_trip_d}} x_{d,a} = \mathit{maxVehicles} \tag{depot\_outflow\_cap} \\
+\end{align}

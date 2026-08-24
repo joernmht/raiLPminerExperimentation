@@ -91,6 +91,7 @@ import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
 from matplotlib.patches import Patch, Rectangle
 
+from corpusbuilder.fingerprint import cluster_label
 from corpusbuilder.game import (
     _paper_check,
     extract_symbols,
@@ -106,6 +107,7 @@ PRISMA = CORPUS / "prisma.json"
 PROMOTION = CORPUS / "promotion.json"
 FORMULATIONS = CORPUS / "formulations"
 VDEMO = CORPUS / "vdemo"
+FINGERPRINT = CORPUS / "fingerprint"
 OUT_DEFAULT = CORPUS / "talkpack"
 
 #: "more than 20 real Formulations" gate for the architecture/taxonomy figures.
@@ -471,6 +473,114 @@ def data_vdemo(vdemo_dir: Path = VDEMO) -> dict | None:
     if not scenarios:
         return None
     return {"scenarios": {k: scenarios[k] for k in sorted(scenarios)}}
+
+
+
+def _fingerprint_inputs(fingerprint_dir: Path, dossier_dir: Path) -> tuple[dict, dict, dict] | None:
+    """clusters.json + features.json + a key -> year map, or None if unbuilt.
+
+    The fingerprint layer is its own artifact (``python3 -m
+    corpusbuilder.fingerprint``); the talk pack only *reads* it, so a missing
+    directory is the normal graceful-skip case, not an error.
+    """
+    clusters_path = Path(fingerprint_dir) / "clusters.json"
+    features_path = Path(fingerprint_dir) / "features.json"
+    if not clusters_path.exists() or not features_path.exists():
+        return None
+    clusters = json.loads(clusters_path.read_text(encoding="utf-8"))
+    features = json.loads(features_path.read_text(encoding="utf-8"))
+    years: dict[str, int | None] = {}
+    for path in sorted(Path(dossier_dir).glob("*.json")):
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        years[path.stem] = (raw.get("source") or {}).get("year")
+    return clusters, features, years
+
+
+def data_fingerprint_families(
+    fingerprint_dir: Path = FINGERPRINT, dossier_dir: Path = DOSSIERS
+) -> dict | None:
+    loaded = _fingerprint_inputs(fingerprint_dir, dossier_dir)
+    if loaded is None:
+        return None
+    clusters, features, years = loaded
+    fams = []
+    undated = 0
+    for c in clusters.get("clusters") or []:
+        members = []
+        for key in c["papers"]:
+            year = years.get(key)
+            if year is None:
+                undated += 1
+            members.append(
+                {
+                    "key": key,
+                    "year": year,
+                    "n_formulas": int((features["papers"].get(key) or {}).get("n_formulas") or 0),
+                }
+            )
+        fams.append(
+            {
+                "id": c["id"],
+                "label": cluster_label(c.get("top_features") or []),
+                "size": c["size"],
+                "top_features": c.get("top_features") or [],
+                "papers": members,
+            }
+        )
+    if not fams:
+        return None
+    return {
+        "note": clusters.get("label", "pre-canonical structural fingerprints"),
+        "k": clusters.get("k"),
+        "silhouette": clusters.get("silhouette"),
+        "n_papers": clusters.get("n_papers"),
+        "undated": undated,
+        "clusters": fams,
+    }
+
+
+#: Centered moving-sum window for the timeline shares. Raw per-year shares over
+#: ~10 papers/year flicker too hard to read from the back of a room; a 3-year
+#: window is still fully deterministic and is disclosed in the axis label.
+_FP_WINDOW = 3
+
+
+def data_fingerprint_timeline(
+    fingerprint_dir: Path = FINGERPRINT, dossier_dir: Path = DOSSIERS
+) -> dict | None:
+    fams = data_fingerprint_families(fingerprint_dir, dossier_dir)
+    if fams is None:
+        return None
+    dated_years = sorted(
+        m["year"] for c in fams["clusters"] for m in c["papers"] if m["year"] is not None
+    )
+    if not dated_years:
+        return None
+    lo, hi = dated_years[0], dated_years[-1]
+    span = list(range(lo, hi + 1))
+    counts = {c["id"]: dict.fromkeys(span, 0) for c in fams["clusters"]}
+    for c in fams["clusters"]:
+        for m in c["papers"]:
+            if m["year"] is not None:
+                counts[c["id"]][m["year"]] += 1
+    half = _FP_WINDOW // 2
+    shares: dict[int, list[float]] = {cid: [] for cid in counts}
+    for y in span:
+        window = [w for w in range(y - half, y + half + 1) if lo <= w <= hi]
+        totals = {cid: sum(counts[cid][w] for w in window) for cid in counts}
+        grand = sum(totals.values())
+        for cid in counts:
+            shares[cid].append(round(totals[cid] / grand, 4) if grand else 0.0)
+    return {
+        "note": fams["note"],
+        "k": fams["k"],
+        "silhouette": fams["silhouette"],
+        "window_years": _FP_WINDOW,
+        "years": span,
+        "labels": {c["id"]: c["label"] for c in fams["clusters"]},
+        "sizes": {c["id"]: c["size"] for c in fams["clusters"]},
+        "shares": shares,
+    }
 
 
 def paper_check_summary(papers: list[dict]) -> dict:
@@ -931,6 +1041,139 @@ def fig_vdemo(outdir: Path, vdemo_dir: Path = VDEMO, data: dict | None = None):
     return _save(fig, outdir, "fig_vdemo")
 
 
+
+def _fp_colors(k: int) -> list:
+    """A deterministic colour per cluster: the CD series, lightened per cycle.
+
+    The lightening factor compounds (0.55 ** cycle), otherwise the third
+    cycle would repeat the second one's colours exactly and C5/C10 would be
+    indistinguishable in a k = 11 plot.
+    """
+    cols = []
+    for i in range(k):
+        cycle, idx = divmod(i, len(SERIES))
+        base = mcolors.to_rgb(SERIES[idx])
+        if cycle:
+            factor = 0.55**cycle
+            base = tuple(1 - (1 - c) * factor for c in base)
+        cols.append(base)
+    return cols
+
+
+def fig_fingerprint_families(
+    outdir: Path,
+    fingerprint_dir: Path = FINGERPRINT,
+    dossier_dir: Path = DOSSIERS,
+    data: dict | None = None,
+):
+    """Fingerprint clusters as rows, one dot per paper at its publication year.
+
+    The corpus-scale version of the architecture-families slide: it does not
+    wait for canonical promotion, so it is explicitly labeled pre-canonical.
+    """
+    data = data or data_fingerprint_families(fingerprint_dir, dossier_dir)
+    if data is None:
+        return _skip(
+            "fig_fingerprint_families",
+            f"no fingerprint artifacts under {fingerprint_dir} "
+            "(run python3 -m corpusbuilder.fingerprint first)",
+        )
+    _style()
+    fams = data["clusters"]
+    colors = _fp_colors(len(fams))
+    fig, ax = plt.subplots(
+        figsize=(11, 1.9 + 0.62 * len(fams)), constrained_layout=True
+    )
+    labels = []
+    all_years: list[int] = []
+    for row, (fam, color) in enumerate(zip(fams, colors, strict=True)):
+        pts = [m for m in fam["papers"] if m["year"] is not None]
+        years = [m["year"] for m in pts]
+        all_years += years
+        if years:
+            ax.plot(
+                [min(years), max(years)], [row, row], color=GRID, linewidth=1.5, zorder=1
+            )
+        ax.scatter(
+            years,
+            [row] * len(pts),
+            s=[26 + 3.2 * m["n_formulas"] for m in pts],
+            color=[color],
+            alpha=0.75,
+            zorder=2,
+            edgecolors="white",
+            linewidths=1.0,
+        )
+        labels.append(f"C{fam['id']} · {fam['label']} · {fam['size']}")
+    ax.set_yticks(range(len(fams)), labels)
+    ax.invert_yaxis()
+    undated = data.get("undated") or 0
+    ax.set_xlabel(
+        "publication year (dot area ~ formulas per paper"
+        + (f"; {undated} undated papers not shown)" if undated else ")")
+    )
+    ax.set_title(
+        f"Architecture families over {data['n_papers']} papers: pre-canonical "
+        f"structural fingerprints (k = {data['k']}, silhouette = {data['silhouette']:.2f})"
+    )
+    _despine(ax, left=False)
+    ax.tick_params(axis="y", length=0)
+    ax.grid(axis="x", color=GRID, linewidth=0.8)
+    ax.set_axisbelow(True)
+    if all_years:
+        _year_axis(ax, all_years)
+    return _save(fig, outdir, "fig_fingerprint_families")
+
+
+def fig_fingerprint_timeline(
+    outdir: Path,
+    fingerprint_dir: Path = FINGERPRINT,
+    dossier_dir: Path = DOSSIERS,
+    data: dict | None = None,
+):
+    """Stacked shares of the fingerprint families per publication year."""
+    data = data or data_fingerprint_timeline(fingerprint_dir, dossier_dir)
+    if data is None:
+        return _skip(
+            "fig_fingerprint_timeline",
+            f"no fingerprint artifacts under {fingerprint_dir} "
+            "(run python3 -m corpusbuilder.fingerprint first)",
+        )
+    _style()
+    years = data["years"]
+    cids = sorted(data["shares"], key=int)
+    colors = _fp_colors(len(cids))
+    fig, ax = plt.subplots(figsize=(12.5, 5.6), constrained_layout=True)
+    ax.stackplot(
+        years,
+        [data["shares"][cid] for cid in cids],
+        colors=colors,
+        alpha=0.85,
+        linewidth=0.6,
+        edgecolor="white",
+    )
+    handles = [
+        Patch(
+            facecolor=color,
+            label=f"C{cid} · {data['labels'][cid]} ({data['sizes'][cid]})",
+        )
+        for cid, color in zip(cids, colors, strict=True)
+    ]
+    ax.legend(handles=handles, loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=12)
+    ax.set_ylim(0, 1)
+    ax.set_ylabel("share of papers")
+    ax.set_xlabel(f"publication year ({data['window_years']}-year centered window)")
+    ax.set_title(
+        f"Evolution of architecture families: pre-canonical structural "
+        f"fingerprints (k = {data['k']})"
+    )
+    _despine(ax)
+    ax.grid(axis="y", color=GRID, linewidth=0.8)
+    ax.set_axisbelow(True)
+    _year_axis(ax, years)
+    return _save(fig, outdir, "fig_fingerprint_timeline")
+
+
 # ---------------------------------------------------------------------------
 # The pack: registry, numbers.json, RESULTS.md, CLI.
 # ---------------------------------------------------------------------------
@@ -943,6 +1186,7 @@ _ALIASES = {
     "fig5": ("promotion",),
     "fig6": ("architectures", "taxonomy"),
     "fig7": ("vdemo",),
+    "fig8": ("fingerprint_families", "fingerprint_timeline"),
 }
 _ORDER = [
     "timeline",
@@ -953,6 +1197,8 @@ _ORDER = [
     "architectures",
     "taxonomy",
     "vdemo",
+    "fingerprint_families",
+    "fingerprint_timeline",
 ]
 
 
@@ -971,7 +1217,7 @@ def _select(only: str | None) -> list[str]:
         elif token.removeprefix("fig_") in _ORDER:
             picked.add(token.removeprefix("fig_"))
         else:
-            raise SystemExit(f"unknown figure selector: {token!r} (use fig1..fig7 or names)")
+            raise SystemExit(f"unknown figure selector: {token!r} (use fig1..fig8 or names)")
     return [name for name in _ORDER if name in picked]
 
 
@@ -1028,6 +1274,18 @@ def _caption(name: str, numbers: dict) -> str:
             "Verifier demo A/B: valid rate and mean rounds to valid, with and without "
             "structural verifier feedback."
         )
+    if name == "fingerprint_families":
+        return (
+            f"Pre-canonical structural fingerprints over {n.get('n_papers', '?')} papers: "
+            f"k = {n.get('k', '?')} architecture families (silhouette "
+            f"{n.get('silhouette', '?')}), one dot per paper at its publication year."
+        )
+    if name == "fingerprint_timeline":
+        return (
+            f"Evolution of the k = {n.get('k', '?')} pre-canonical fingerprint families: "
+            f"stacked share of papers per publication year "
+            f"({n.get('window_years', '?')}-year centered window)."
+        )
     return ""
 
 
@@ -1042,6 +1300,7 @@ def run(
     promotion_path: Path = PROMOTION,
     formulations_dir: Path = FORMULATIONS,
     vdemo_dir: Path = VDEMO,
+    fingerprint_dir: Path = FINGERPRINT,
 ) -> dict:
     """Build the pack; return {"rendered": [...], "skipped": {...}, "out": str}."""
     out = Path(out)
@@ -1066,6 +1325,10 @@ def run(
         numbers["taxonomy"] = data_taxonomy(formulations_dir, dossier_dir)
     if "vdemo" in selected:
         numbers["vdemo"] = data_vdemo(vdemo_dir)
+    if "fingerprint_families" in selected:
+        numbers["fingerprint_families"] = data_fingerprint_families(fingerprint_dir, dossier_dir)
+    if "fingerprint_timeline" in selected:
+        numbers["fingerprint_timeline"] = data_fingerprint_timeline(fingerprint_dir, dossier_dir)
 
     figures = {
         "timeline": lambda: fig_timeline(out, dossier_dir, data=numbers.get("timeline")),
@@ -1086,6 +1349,12 @@ def run(
             out, formulations_dir, dossier_dir, data=numbers.get("taxonomy")
         ),
         "vdemo": lambda: fig_vdemo(out, vdemo_dir, data=numbers.get("vdemo")),
+        "fingerprint_families": lambda: fig_fingerprint_families(
+            out, fingerprint_dir, dossier_dir, data=numbers.get("fingerprint_families")
+        ),
+        "fingerprint_timeline": lambda: fig_fingerprint_timeline(
+            out, fingerprint_dir, dossier_dir, data=numbers.get("fingerprint_timeline")
+        ),
     }
 
     rendered: list[str] = []
@@ -1236,7 +1505,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--only",
         default=None,
-        help="comma-separated figure selectors (fig1..fig7 or names like structural_yield)",
+        help="comma-separated figure selectors (fig1..fig8 or names like structural_yield)",
     )
     args = parser.parse_args(argv)
     summary = run(out=args.out, only=args.only)

@@ -1,0 +1,21 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.repo_corpus
+% Source repository: lintim/openlintim
+%@ meta id=lintim__openlintim__line-planning-cost-model family=milp schema=0.1.0
+%@ name :: line-planning-cost-model
+%@ desc :: Cost model of line planning: choose an integer frequency for each candidate line in a given line pool so that the total operating cost is minimized while every edge of the public transportation network (PTN) carries a number of line frequencies within its lower and upper frequency bounds. Pure integer program over line frequencies.
+%@ prov source :: https://gitlab.com/lintim/openlintim
+%@ prov author :: lintim/openlintim
+%@ index L ordered=0 cyclic=0 :: set of candidate lines in the line pool
+%@ index E ordered=0 cyclic=0 :: set of edges (links) of the PTN
+%@ param cost shape=L kind=vector domain=- :: operating cost of line l (used as objective coefficient on its frequency) [domain R_>=0]
+%@ param f_min shape=E kind=vector domain=- :: lower frequency bound on edge e [domain Z_>=0]
+%@ param f_max shape=E kind=vector domain=- :: upper frequency bound on edge e [domain Z_>=0]
+%@ var f shape=L domain=integer role=primary drole=- lo=- hi=- :: frequency of line l (number of times line l is operated per period)
+%@ obj sense=min name=objective combination=sum :: minimize total operating cost = sum over lines of (line cost * line frequency)
+%@ con edge_lower_frequency_bound kind=linear domain=- indicator=- :: for each PTN edge, the sum of frequencies of lines passing over that edge is at least the edge lower frequency bound [capture: sum restriction not representable: 'e \\in l']
+%@ con edge_upper_frequency_bound kind=linear domain=- indicator=- :: for each PTN edge, the sum of frequencies of lines passing over that edge is at most the edge upper frequency bound [capture: sum restriction not representable: 'e \\in l']
+\begin{align}
+  \min\quad & \sum_{l \in \mathcal{L}} \mathit{cost} \cdot f_{l} \tag{objective} \\
+  & \sum_{l \in \mathcal{L}} f_{l} \ge \mathit{f\_min}_{e} \qquad \forall e \in \mathcal{E} \tag{edge\_lower\_frequency\_bound} \\
+  & \sum_{l \in \mathcal{L}} f_{l} \le \mathit{f\_max}_{e} \qquad \forall e \in \mathcal{E} \tag{edge\_upper\_frequency\_bound} \\
+\end{align}

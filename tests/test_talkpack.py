@@ -308,6 +308,9 @@ def _run_all(corpus: dict, only: str | None = None) -> dict:
         promotion_path=corpus["promotion"],
         formulations_dir=corpus["formulations"],
         vdemo_dir=corpus["vdemo"],
+        # Point at a directory that does not exist: the fingerprint figures
+        # must gracefully skip, and the test must never read the real corpus.
+        fingerprint_dir=corpus["out"] / "no-fingerprint",
     )
 
 
@@ -321,7 +324,12 @@ def test_run_full_pack(corpus: dict) -> None:
         "promotion",
         "vdemo",
     ]
-    assert set(summary["skipped"]) == {"architectures", "taxonomy"}
+    assert set(summary["skipped"]) == {
+        "architectures",
+        "taxonomy",
+        "fingerprint_families",
+        "fingerprint_timeline",
+    }
 
     numbers = json.loads((corpus["out"] / "numbers.json").read_text(encoding="utf-8"))
     head = numbers["headline"]

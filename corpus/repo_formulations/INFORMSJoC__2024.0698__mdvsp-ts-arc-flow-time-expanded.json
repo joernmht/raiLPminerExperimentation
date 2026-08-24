@@ -1,0 +1,345 @@
+{
+  "schema_version": "0.1.0",
+  "id": "informsjoc__2024.0698__mdvsp-ts-arc-flow-time-expanded",
+  "name": "mdvsp-ts-arc-flow-time-expanded",
+  "family": "milp",
+  "description": "Arc-flow (multi-commodity, one commodity per depot) formulation of the Multi-Depot Vehicle Scheduling Problem with Trip Shifting on a fully time-expanded network. Each depot has its own copy of the time-space graph; integer arc-flow variables route vehicles from a source depot node to a sink depot node. Trip shifting is modelled implicitly: each timetabled trip is expanded into multiple parallel trip arcs, one per admissible departure-time deviation in [-maxDeviation, +maxDeviation] (TimeSpaceGraph.initNodes/addTripArcs), and a cover constraint forces exactly one of these copies (across all depots) to be used. Objective minimizes total cost = fixed cost per vehicle (pull-in/pull-out arcs) + variable deadheading cost. This is the model solved both by the MIP baseline (SolverMIP on the full network) and, on iteratively refined sparser networks, by the DDD algorithm; the formulation is identical, only the underlying TimeSpaceGraph differs.",
+  "tags": [],
+  "provenance": {
+    "source": "https://github.com/INFORMSJoC/2024.0698",
+    "reference": "doi:10.1287/ijoc.2024.0698",
+    "author": "INFORMSJoC/2024.0698",
+    "date": ""
+  },
+  "indices": [
+    {
+      "name": "D",
+      "description": "set of depots (vehicle types / commodities)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "set of timetabled trips that must be covered",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "set of locations (depots + stations)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "G_d_V_d_A_d",
+      "description": "per-depot time-space network: timed nodes V_d (station x time) and timed arcs A_d",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_d",
+      "description": "timed arcs for depot d (trip, deadhead, waiting, pull-in, pull-out arcs)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_trip_d",
+      "description": "subset of A_d that are trip arcs (type==1); each is a (trip, departure-deviation) copy",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "in_n",
+      "description": "arcs entering timed node n",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "out_n",
+      "description": "arcs leaving timed node n",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "arcs_t",
+      "description": "all trip arcs (over all depots) that represent some departure-time copy of trip t",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "cost of using arc a in depot layer d: 0 for trip/waiting arcs, VARIABLE_COST*travelTime for deadhead arcs, FIXED_COST+VARIABLE_COST*travelTime for pull-in/pull-out arcs [domain Z_>=0]",
+      "shape": [
+        "D",
+        "A_trip_d"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "FIXED_COST",
+      "description": "fixed cost charged on each pull-in and pull-out arc (so 2*FIXED_COST = 1000 per vehicle) [domain Z_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "VARIABLE_COST",
+      "description": "variable cost per minute of driving (deadhead / pull travel time) [domain Z_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "maxDeviation",
+      "description": "maximum allowed forward/backward shift (in minutes) of a trip's departure time; controls how many parallel trip-arc copies exist per trip [domain Z_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_ij",
+      "description": "travel (deadhead/pull) time between locations i and j, from the instance travel-time matrix [domain Z_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "maxVehicles",
+      "description": "optional cap on number of vehicles dispatched (total depot outflow); only enforced when nonzero [domain Z_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "description": "flow on arc a in the time-space network of depot d (number of vehicles of depot d using arc a)",
+      "shape": [
+        "D",
+        "A_trip_d"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "flow_conservation",
+      "description": "at every non-depot timed node, inflow equals outflow in each depot layer (vehicles are conserved; depot source/sink nodes are unconstrained so they emit/absorb the fleet) [capture: sum over a widened to family A_trip_d; source binder: 'a \\\\in in(n)'; sum over a widened to family A_trip_d; source binder: 'a \\\\in out(n)']",
+      "quantifiers": [
+        {
+          "index": "d",
+          "over": "D",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "D",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A_trip_d",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A_trip_d"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "D",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A_trip_d",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "A_trip_d"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "trip_cover",
+      "description": "each timetabled trip is served exactly once, by exactly one depot and exactly one of its admissible departure-time (shift) copies [capture: sum condition not representable: 'trip(a)=t']",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "D",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A_trip_d",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "D",
+            "A_trip_d"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "depot_outflow_cap",
+      "description": "optional: total number of vehicles leaving the depots at time 0 is fixed to maxVehicles [capture: sum over a widened to family A_trip_d; source binder: 'a \\\\in out(\\\\mathrm{depot}_d, t=0)']",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "D",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A_trip_d",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "D",
+            "A_trip_d"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "maxVehicles",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "minimize total vehicle-scheduling cost = fixed cost per dispatched vehicle (on pull-in/pull-out arcs) plus variable deadheading/pull travel cost summed over all depot layers and arcs",
+    "terms": [
+      {
+        "ref": "x",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "D",
+            "expr": "d",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "A_trip_d",
+            "expr": "a",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "D",
+          "A_d"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}
