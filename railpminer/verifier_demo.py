@@ -185,11 +185,23 @@ Every symbol used in the align body must be declared in the %@ block, and
 every declared index / parameter / variable should be used. The model must be
 linear: products of two decision variables are not allowed.
 
-Two strict grammar rules (the verifier rejects violations):
+Strict grammar rules, measured against this parser (the verifier rejects
+violations):
+- THE COEFFICIENT RULE: in a product, write the parameter BARE:
+  c \\cdot x_{{i,j}}, NEVER c_{{i,j}} \\cdot x_{{i,j}} and never c_{{i,j}} x_{{i,j}} —
+  the sum's binder carries the indices. A parameter standing ALONE (e.g. as a
+  right-hand side, t_{{i}} \\ge r_{{i}}) keeps its subscripts.
+- Products always use an explicit \\cdot; juxtaposition (c x, 2n) does not parse.
+- One big operator per aggregation: \\sum_{{a \\in A, b \\in B}} x — consecutive
+  operators \\sum_{{a \\in A}} \\sum_{{b \\in B}} do not parse.
+- Identifiers are plain: no primes, no \\hat/\\tilde/\\bar decorations, no Greek
+  commands as names (write cost, xbar, delta as plain words; multi-character
+  names render as \\mathit{{name}}).
 - The fields domain=, drole=, kind= take values from closed vocabularies.
   When you are not certain a value is allowed, write `-` (always accepted).
 - Expressions are flat signed sums of terms; parenthesized grouping with
   \\left( ... \\right) is not part of the grammar. Distribute instead.
+- One relation per row (no chained a \\le e \\le b: write two rows).
 
 Here is a complete valid example document:
 
