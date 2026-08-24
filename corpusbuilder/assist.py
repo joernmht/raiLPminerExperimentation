@@ -1264,6 +1264,12 @@ with the appropriate \\forall tail, as extra strings for the same formula id.
 - Function application like D_{i}(x_{k}) is not linear algebra: if the row \
 cannot be stated linearly, return the original unchanged (it will be recorded \
 as outside the grammar).
+- CHAINED relations "a <= expr <= b" are one row too many: return TWO strings, \
+["a <= expr TAIL", "expr <= b TAIL"], each carrying the row's quantifier tail.
+- LOST quantifiers: extraction often drops \\forall — a trailing fragment like \
+"x_{i} \\in \\mathcal{N} i \\in \\mathcal{E}" or "... u_{ij} (i,j) \\in \\mathcal{A}" \
+means "\\qquad \\forall i \\in \\mathcal{E}" (resp. \\forall (i,j) \\in \\mathcal{A}): \
+restore the \\forall, separated from the algebra by \\qquad.
 - Cut trailing commas, periods and prose fragments; one relation per string; \
 range tails ", 1 <= i <= n" become \\forall i \\in <a declared index set>.
 - Do not change coefficients or drop terms; rename a symbol only to collapse \
@@ -1279,6 +1285,10 @@ def _effective_parts(triage: dict, formula_id: str, dossier: Dossier) -> list[st
     raw = {f.id: f.latex for f in dossier.formulas}[formula_id]
     return [raw]
 
+
+#: Sentinel id for "every row pair parses but the assembled document fails" —
+#: the repair call may then fix ANY row it suspects.
+DOCUMENT_FAILURE = "__document__"
 
 #: Failing rows offered to one repair call. More than this provokes reply
 #: truncation; the inner loop reaches the rest in later rounds.
@@ -1336,6 +1346,12 @@ def probe_row_failures(
                     err[:400],
                 )
             )
+    if not failures:
+        # Pairwise health does not imply document health (duplicate names,
+        # cross-row interactions): the whole assembly is the promotion truth.
+        ok, err = parse_ok(rows)
+        if not ok:
+            failures.append(RowFailure(DOCUMENT_FAILURE, [], err[:400]))
     return failures, False
 
 
@@ -1420,8 +1436,9 @@ def validate_rowfix(reply: dict, failures: list[RowFailure], declarations: str =
     if not isinstance(rows, dict):
         return ["rows must be an object mapping formula ids to LaTeX lists"]
     wanted = {f.formula_id for f in failures}
+    doc_mode = DOCUMENT_FAILURE in wanted
     for fid, parts in rows.items():
-        if fid not in wanted:
+        if fid not in wanted and not doc_mode:
             errors.append(f"unknown failing id {fid!r}")
             continue
         ok = isinstance(parts, list) and parts and all(
@@ -1449,14 +1466,16 @@ def apply_rowfixes(
     by_id = {str(d["id"]): d for d in triage["decisions"]}
     fixed = kept = 0
     for fid, parts in sorted(fixes.items()):
-        entry = by_id[fid]
+        entry = by_id.get(fid)
+        if entry is None:
+            continue  # a document-mode guess at a nonexistent row
         before = dict(entry)
         entry["status"] = "corrected"
         entry["parts"] = [p.strip() for p in parts if p.strip()]
         entry.setdefault("reason", "")
         entry["reason"] = (entry["reason"] + " | rowfix").strip(" |")[:100]
         failures, _ = probe_row_failures(dossier, triage, declarations)
-        if any(f.formula_id == fid for f in failures):
+        if any(f.formula_id in (fid, DOCUMENT_FAILURE) for f in failures):
             entry.clear()
             entry.update(before)
             kept += 1
