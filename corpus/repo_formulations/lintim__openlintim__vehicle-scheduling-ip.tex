@@ -1,0 +1,20 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.repo_corpus
+% Source repository: lintim/openlintim
+%@ meta id=lintim__openlintim__vehicle-scheduling-ip family=milp schema=0.1.0
+%@ name :: vehicle-scheduling-ip
+%@ desc :: Vehicle scheduling problem (VSP) as a minimum-cost flow / assignment IP on a trip-connection graph. Each trip node must be entered and left exactly once via selected connections (including deadhead/depot connections); minimizes total connection cost. Equivalent to an integer min-cost circulation covering all trips.
+%@ prov source :: https://gitlab.com/lintim/openlintim
+%@ prov author :: lintim/openlintim
+%@ index N ordered=0 cyclic=0 :: set of trip nodes of the trip graph (each non-depot node is one scheduled trip); depot nodes are excluded from the degree constraints
+%@ index A ordered=0 cyclic=0 :: set of trip connections (edges of the trip graph), including deadhead and depot connections
+%@ index delta__n ordered=0 cyclic=0 :: incoming connections of trip node n
+%@ param c shape=A kind=vector domain=- :: cost of using trip connection a (objective coefficient) [domain R_>=0]
+%@ var v shape=A domain=binary role=primary drole=- lo=- hi=- :: 1 if trip connection a is used in the vehicle schedule, 0 otherwise
+%@ obj sense=min name=objective combination=sum :: minimize total cost of the selected trip connections
+%@ con incoming_degree kind=linear domain=- indicator=- :: each (non-depot) trip is served by exactly one incoming connection [capture: sum over a widened to family A; source binder: 'a \\in \\mathit{delta}^-(n)']
+%@ con outgoing_degree kind=linear domain=- indicator=- :: each (non-depot) trip is left by exactly one outgoing connection [capture: sum over a widened to family A; source binder: 'a \\in \\mathit{delta}^+(n)']
+\begin{align}
+  \min\quad & \sum_{a \in \mathcal{A}} c \cdot v_{a} \tag{objective} \\
+  & \sum_{a \in \mathcal{A}} v_{a} = 1 \qquad \forall n \in \mathcal{N} \tag{incoming\_degree} \\
+  & \sum_{a \in \mathcal{A}} v_{a} = 1 \qquad \forall n \in \mathcal{N} \tag{outgoing\_degree} \\
+\end{align}

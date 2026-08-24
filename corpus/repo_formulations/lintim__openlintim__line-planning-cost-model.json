@@ -1,0 +1,214 @@
+{
+  "schema_version": "0.1.0",
+  "id": "lintim__openlintim__line-planning-cost-model",
+  "name": "line-planning-cost-model",
+  "family": "milp",
+  "description": "Cost model of line planning: choose an integer frequency for each candidate line in a given line pool so that the total operating cost is minimized while every edge of the public transportation network (PTN) carries a number of line frequencies within its lower and upper frequency bounds. Pure integer program over line frequencies.",
+  "tags": [],
+  "provenance": {
+    "source": "https://gitlab.com/lintim/openlintim",
+    "reference": "",
+    "author": "lintim/openlintim",
+    "date": ""
+  },
+  "indices": [
+    {
+      "name": "L",
+      "description": "set of candidate lines in the line pool",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "set of edges (links) of the PTN",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "cost",
+      "description": "operating cost of line l (used as objective coefficient on its frequency) [domain R_>=0]",
+      "shape": [
+        "L"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "f_min",
+      "description": "lower frequency bound on edge e [domain Z_>=0]",
+      "shape": [
+        "E"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "f_max",
+      "description": "upper frequency bound on edge e [domain Z_>=0]",
+      "shape": [
+        "E"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "f",
+      "description": "frequency of line l (number of times line l is operated per period)",
+      "shape": [
+        "L"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "edge_lower_frequency_bound",
+      "description": "for each PTN edge, the sum of frequencies of lines passing over that edge is at least the edge lower frequency bound [capture: sum restriction not representable: 'e \\\\in l']",
+      "quantifiers": [
+        {
+          "index": "e",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "f",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "L"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "f_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "edge_upper_frequency_bound",
+      "description": "for each PTN edge, the sum of frequencies of lines passing over that edge is at most the edge upper frequency bound [capture: sum restriction not representable: 'e \\\\in l']",
+      "quantifiers": [
+        {
+          "index": "e",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "f",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "L"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "f_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "minimize total operating cost = sum over lines of (line cost * line frequency)",
+    "terms": [
+      {
+        "ref": "f",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "L",
+            "expr": "l",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "cost",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "L"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

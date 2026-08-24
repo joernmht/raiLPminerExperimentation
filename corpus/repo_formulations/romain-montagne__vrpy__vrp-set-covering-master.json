@@ -1,0 +1,327 @@
+{
+  "schema_version": "0.1.0",
+  "id": "romain-montagne__vrpy__vrp-set-covering-master",
+  "name": "vrp-set-covering-master",
+  "family": "milp",
+  "description": "Restricted master problem of the column-generation procedure for the Vehicle Routing Problem. A set-covering/set-partitioning LP selects a minimum-cost subset of feasible routes (columns) such that every customer node is visited. During column generation the route-selection variables are continuous (LP relaxation, 0<=y<=1); the final iteration is solved as a MIP with y binary. Implemented in PuLP via LpConstraintVar 'column' construction (each route variable carries its coefficients into the covering constraints and objective).",
+  "tags": [],
+  "provenance": {
+    "source": "https://github.com/romain-montagne/vrpy",
+    "reference": "doi:10.21105/joss.02408",
+    "author": "romain-montagne/vrpy",
+    "date": ""
+  },
+  "indices": [
+    {
+      "name": "V",
+      "description": "set of customer nodes that must be visited (graph nodes excluding Source, Sink and depot_from/depot_to markers)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Omega",
+      "description": "set of feasible routes (columns); only a subset is present at any iteration of column generation",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Omega_v",
+      "description": "routes r in Omega that visit node v",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "set of vehicle types (heterogeneous fleet); index k",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "cost of route r (sum of edge costs along the route for its vehicle type) [domain R_>=0]",
+      "shape": [
+        "Omega"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "f",
+      "description": "required visit frequency / RHS of covering constraint for node v (1 in the standard case, frequency in the periodic case) [domain Z_>=1]",
+      "shape": [
+        "V"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "U",
+      "description": "upper bound on number of vehicles of type k [domain Z_>=0]",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "p",
+      "description": "per-node drop penalty added to objective when node-dropping is allowed [domain R_>=0]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "lambda",
+      "description": "1 if and only if route r is selected",
+      "shape": [
+        "Omega"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "drop",
+      "description": "1 if and only if node v is dropped (left unserved), only present when drop_penalty is set",
+      "shape": [
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "periodic",
+      "description": "artificial variable used only in the periodic case to find an initial feasible solution (huge 1e10 objective penalty)",
+      "shape": [
+        "V"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "artificial_bound",
+      "description": "artificial variable relaxing the vehicle-count constraint for type k (huge 1e10 objective penalty), forced to 0 in the final MIP",
+      "shape": [
+        "K"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "makespan",
+      "description": "global span (max route cost) auxiliary variable, only present when minimize_global_span is set",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "set_covering_visit_node",
+      "description": "every customer node v must be covered by at least f_v selected routes (eq. 1). The constraint sense is >= during the LP relaxation and is switched to = (set-partitioning, exactly f_v) when the master is solved as a MIP. [capture: sum restriction not representable: 'v \\\\in r']",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "f",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "vehicle_count_bound",
+      "description": "the number of selected routes of vehicle type k may not exceed the available vehicles U_k. Sense becomes = (use all vehicles) if use_all_vehicles is set; an artificial_bound_k variable relaxes it during pricing. [capture: sum restriction not representable: '\\\\mathrm{type}(r)=k']",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "U",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "makespan_definition",
+      "description": "when minimizing the global span, an auxiliary makespan variable bounds the cost of every selected route from above and is minimized instead of the total cost.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "c",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "makespan",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "minimize the total cost of the selected routes (with optional additive drop penalties and big-1e10 artificial-variable penalties)",
+    "terms": [
+      {
+        "ref": "lambda",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "Omega",
+            "expr": "r",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "Omega"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}
