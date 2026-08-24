@@ -124,7 +124,20 @@ class StageError(AssistError):
     """A stage's reply never validated within its retry budget."""
 
 
-def model_id() -> str:
+def model_id(stage: str | None = None) -> str:
+    """The model a stage runs on — and half of its cache identity.
+
+    ``ASSIST_BACKEND=claude-cli`` moves every stage to the local claude CLI;
+    ``ASSIST_CLAUDE_STAGES=r`` (comma list) moves only the named stages, so
+    the other stages keep replaying their API-backend caches for free. The
+    returned id lands in the request payload, hence in the cache key: backends
+    never share cached replies.
+    """
+    claude_stages = {
+        s.strip() for s in os.environ.get("ASSIST_CLAUDE_STAGES", "").split(",") if s.strip()
+    }
+    if os.environ.get("ASSIST_BACKEND") == "claude-cli" or (stage and stage in claude_stages):
+        return "claude-cli/" + os.environ.get("ASSIST_CLAUDE_MODEL", "sonnet")
     return os.environ.get("ASSIST_MODEL") or DEFAULT_MODEL
 
 
@@ -147,6 +160,45 @@ def _api_key() -> str:
 _sleep = time.sleep
 
 
+_CLAUDE_BIN = os.path.expanduser("~/.nvm/versions/node/v24.14.1/bin/claude")
+
+
+def _chat_claude_cli(payload: dict) -> tuple[str, dict]:
+    """Fallback backend: headless ``claude -p`` on the local subscription.
+
+    Exists because an unattended overnight run must survive the primary API
+    running dry (measured 2026-08-24: HTTP 402 mid-sweep). No token usage is
+    reported (subscription, not metered API), so cost accounting records
+    zeros. Selected via ``ASSIST_BACKEND=claude-cli``; the model comes from
+    ``ASSIST_CLAUDE_MODEL`` (default sonnet) and is folded into the payload's
+    ``model`` field by :func:`model_id`, so cache keys never collide with
+    API-backend replies.
+    """
+    import subprocess
+
+    system = payload["messages"][0]["content"]
+    user = payload["messages"][1]["content"]
+    prompt = (
+        system
+        + "\n\n---\n\n"
+        + user
+        + "\n\nReply with ONLY the JSON object. No prose, no code fences."
+    )
+    model = os.environ.get("ASSIST_CLAUDE_MODEL", "sonnet")
+    try:
+        proc = subprocess.run(
+            [_CLAUDE_BIN, "-p", prompt, "--model", model],
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        raise AssistError(f"claude-cli backend failed: {type(exc).__name__}") from exc
+    if proc.returncode != 0:
+        raise AssistError(f"claude-cli backend rc={proc.returncode}: {proc.stderr[-200:]}")
+    return proc.stdout.strip(), {}
+
+
 def _chat(payload: dict) -> tuple[str, dict]:
     """One chat completion; returns ``(content, usage)``.
 
@@ -155,6 +207,8 @@ def _chat(payload: dict) -> tuple[str, dict]:
     not a fault, and raises immediately. The API key is sent in the header and
     never appears in logs, errors, or cache files.
     """
+    if str(payload.get("model", "")).startswith("claude-cli/"):
+        return _chat_claude_cli(payload)
     headers = {"Authorization": f"Bearer {_api_key()}"}
     delay = BACKOFF_BASE_S
     last = "no attempt made"
@@ -199,7 +253,7 @@ def _stage_extras(stage: str) -> dict:
 def _payload(system: str, user: str, *, stage: str) -> dict:
     extras = _stage_extras(stage)
     payload = {
-        "model": model_id(),
+        "model": model_id(stage),
         "temperature": 0,
         "response_format": {"type": "json_object"},
         **extras,
