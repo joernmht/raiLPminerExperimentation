@@ -971,6 +971,9 @@ def normalize_objective_head(latex: str) -> str:
     hands the canonical parser a token it has no rule for.
     """
     s = _MINMAX_GLUED.sub(r"\1 ", latex)
+    # a spacing macro glued to the operator (\min\quad x) splits wrongly at
+    # assembly time (operator token becomes "\min\quad"): drop the macro
+    s = re.sub(r"^(\s*\\(?:min|max))(?:\\quad|\\;|\\,|\\ )\s*", r"\1 ", s)
     # MathML sometimes spaces the word itself: "min i m i z e (...)"
     s = re.sub(
         r"\b(m\s*i\s*n\s*i\s*m\s*i\s*[sz]\s*e|m\s*a\s*x\s*i\s*m\s*i\s*[sz]\s*e|m\s*i\s*n|m\s*a\s*x)\b(?=\s*[\\(A-Za-z0-9])",
