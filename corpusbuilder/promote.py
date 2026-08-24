@@ -77,13 +77,14 @@ from pathlib import Path
 # "where is lp2graph".
 from railpminer import _lp2graph  # noqa: F401
 
+from corpusbuilder.algebra import declared_names, declared_products
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex, normalize_objective_head
 from corpusbuilder.symbols import binder_roles, paper_evidence
 from lp2graph import loads as load_formulation
 from lp2graph.mining import REWRITE_RULES_VERSION
 from lp2graph.mining.corpusmgr import PRIORITY_CELLS, QUALITY_TIERS
-from lp2graph.mining.ingest import ingest_latex
+from lp2graph.mining.ingest import ingest_latex, normalize_latex
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
@@ -519,16 +520,26 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
         lines.append(f"%@ prov date :: {source.retrieved}")
     lines.extend(_declaration_lines(declarations))
 
+    # Deterministic algebra normalization, in dependency order: M1b's rewrite
+    # rules first (Greek -> \mathit{name}, \underset big operators, unicode
+    # operators), THEN declared-name juxtaposition resolution — the sidecar's
+    # names are spelled out, so Greek must already be \mathit{...} to match.
+    names = declared_names(declarations)
+
+    def _row_latex(latex: str) -> str:
+        normalized, _prov = normalize_latex(latex, source="corpusbuilder.promote/assemble")
+        return declared_products(normalized, names)
+
     lines.append(rf"\begin{{{_ALIGN}}}")
     for row in rows:
         tag = row.name.replace("_", r"\_")
         if row.is_objective:
-            body = strip_objective_label(normalize_objective_head(row.latex))
+            body = strip_objective_label(_row_latex(normalize_objective_head(row.latex)))
             body = re.sub(r"^\\(min|max)(?:imi[sz]e)?\b", r"\\\1", body)
             operator, rest = body.split(None, 1) if " " in body else (body, "")
             lines.append(rf"  {operator}\quad & {rest.strip()} \tag{{{tag}}} \\")
         else:
-            lines.append(rf"  & {row.latex} \tag{{{tag}}} \\")
+            lines.append(rf"  & {_row_latex(row.latex)} \tag{{{tag}}} \\")
     lines.append(rf"\end{{{_ALIGN}}}")
     return "\n".join(lines) + "\n"
 
