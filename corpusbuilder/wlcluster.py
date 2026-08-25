@@ -45,7 +45,7 @@ def _ascii(s: object) -> str:
     return str(s).encode("ascii", "backslashreplace").decode()
 
 
-def wl_features(formulation, iterations: int = WL_ITERATIONS) -> Counter:
+def wl_features(formulation, iterations: int = WL_ITERATIONS, *, core: bool = True) -> Counter:
     """WL subtree-hash counts over the M6 schema graph, per iteration depth.
 
     The multigraph is collapsed to a DiGraph whose edge label is the sorted
@@ -53,8 +53,19 @@ def wl_features(formulation, iterations: int = WL_ITERATIONS) -> Counter:
     refuses multigraphs); node labels are ``cls|subtype`` — exactly the
     attributes :func:`lp2graph.mining.isomorphism.report.are_isomorphic`
     matches on, so this is a graded relaxation of the same equivalence.
+
+    ``core=True`` (the default) drops isolated nodes first. Measured: two
+    papers whose declaration sidecars each carry many unreferenced indices
+    score 0.90 on full graphs but 0.05 on their connected cores — identical
+    iteration-0 hashes of declared-only scaffolding masquerade as structural
+    similarity. Core similarity is the honest number; the full-graph value
+    is still recorded in :func:`similarity_report` for comparison.
     """
     g = schema_nx(formulation)
+    if core:
+        und = g.to_undirected()
+        keep = [n for n in und if und.degree(n) > 0]
+        g = g.subgraph(keep)
     h = nx.DiGraph()
     for n, data in g.nodes(data=True):
         h.add_node(n, label=_ascii(f"{data.get('cls')}|{data.get('subtype')}"))
@@ -106,6 +117,7 @@ def load_universe(include_generated: bool = False) -> dict:
 def similarity_report(include_generated: bool = False) -> dict:
     models = load_universe(include_generated)
     feats = {k: wl_features(f) for k, f in sorted(models.items())}
+    full = {k: wl_features(f, core=False) for k, f in sorted(models.items())}
     names = sorted(feats)
     matrix = {
         a: {b: round(cosine(feats[a], feats[b]), 4) for b in names} for a in names
@@ -116,10 +128,17 @@ def similarity_report(include_generated: bool = False) -> dict:
     )
     return {
         "iterations": WL_ITERATIONS,
+        "similarity": "connected-core WL cosine (full-graph value recorded per pair)",
         "models": names,
         "matrix": matrix,
         "top_pairs": [
-            {"a": a, "b": b, "similarity": s} for s, a, b in pairs[:15]
+            {
+                "a": a,
+                "b": b,
+                "similarity": s,
+                "full_graph_similarity": round(cosine(full[a], full[b]), 4),
+            }
+            for s, a, b in pairs[:15]
         ],
     }
 
