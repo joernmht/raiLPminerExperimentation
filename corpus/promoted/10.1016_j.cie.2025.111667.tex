@@ -1,0 +1,53 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2025.111667
+%@ meta id=10.1016_j.cie.2025.111667 family=milp schema=0.1.0
+%@ name :: A Lagrangian relaxation-based approach for integrated optimization of line planning and additional trains scheduling
+%@ desc :: Mined from A Lagrangian relaxation-based approach for integrated optimization of line planning and additional trains scheduling (Computers & Industrial Engineering, 2025).
+%@ prov source :: 10.1016/j.cie.2025.111667
+%@ prov reference :: A Lagrangian relaxation-based approach for integrated optimization of line planning and additional trains scheduling
+%@ prov author :: Tianyin Zhao; Yongxiang Zhang; Nikola Bešinović; Shuguang Zhan; S. Zhang; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of railway operator and passenger costs
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ var x shape=K,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k selects stopping pattern l
+%@ index L ordered=0 cyclic=0 :: Set of stopping patterns
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param F shape=K kind=vector domain=- :: Maximum loading capacity of train k
+%@ var p shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers from i to j assigned to train k
+%@ index j ordered=0 cyclic=0 :: Index for stations
+%@ param P shape=S,S kind=matrix domain=- :: Passenger demand between stations i and j
+%@ param q shape=S,S kind=matrix domain=- :: Minimum number of trains serving OD pair (i,j) before optimization
+%@ param M shape=- kind=big_m domain=- :: Large number, set to train capacity
+%@ var y shape=K,L,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ param d shape=K kind=vector domain=- :: Destination station of train k
+%@ param dep shape=K kind=vector domain=- :: Departure time of train k at origin
+%@ param o shape=K kind=vector domain=- :: Origin station of train k
+%@ index E ordered=0 cyclic=0 :: Set of space-time arcs for train k
+%@ index G ordered=0 cyclic=0 :: Set of physical sections
+%@ con eq_0007 kind=linear domain=- indicator=- :: Each train selects at most one stopping pattern; canceled trains select none
+%@ con eq_0008 kind=capacity domain=- indicator=- :: Passenger load on each train at any station does not exceed its capacity
+%@ con eq_0009 kind=linear domain=- indicator=- :: Total passengers assigned to trains for each OD pair cannot exceed demand
+%@ con eq_0010 kind=linear domain=- indicator=- :: Number of trains serving each OD pair is at least the original service level
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Passengers can be assigned to a train only if the selected stopping pattern includes both origin and destination
+%@ con eq_0012 kind=flow_balance domain=- indicator=- :: Space-time flow balance at each station for every train and stopping pattern
+%@ con eq_0013 kind=headway domain=- indicator=- :: Headway constraints: incompatible space-time arcs cannot be used simultaneously
+%@ con eq_0014 kind=linear domain=- indicator=- :: Arc selection for a pattern requires selecting that pattern; otherwise only dummy arc is used
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary domain for stopping pattern selection variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Binary domain for space-time arc selection variables
+%@ con eq_0017 kind=linear domain=- indicator=- :: Non-negativity of passenger flow variables
+\begin{align}
+  \min\quad & \mathit{alpha} \cdot \left(Z_{1} + Z_{2} + Z_{3} + Z_{4}\right) + \left(1 - \mathit{alpha}\right) Z_{5} \tag{eq\_0006} \\
+  & \sum_{l \in L_{k}} x_{k}^{l} \leq 1 , \forall k \in K \tag{eq\_0007} \\
+  & \sum_{i^{'} \in S , i^{'} \leq i} \sum_{j \in S , j > i} p_{i^{'} j}^{k} \leq F_{k} , \forall k \in K , i \in S \backslash \left\{\left|S\right|\right\} \tag{eq\_0008} \\
+  & \sum_{k \in K} p_{i j}^{k} \leq P_{i j} , \forall i , j \in S , i < j \tag{eq\_0009} \\
+  & \sum_{k \in K} \sum_{l \in L_{k}} x_{k}^{l} \mathit{theta}_{l}^{i} \mathit{theta}_{l}^{j} \geq q_{i j}^{o} , \forall i , j \in S , i < j \tag{eq\_0010} \\
+  & p_{i j}^{k} \leq M \sum_{l \in L_{k}} x_{k}^{l} \mathit{theta}_{l}^{i} \mathit{theta}_{l}^{i} , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0011} \\
+  & \sum_{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{k}} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) - \sum_{i , t : \left(i^{'} , i , t^{'} , t\right) \in E_{k}} y_{k}^{l} \left(i^{'} , i , t^{'} , t\right) = \left\{\begin{matrix} - 1 i^{'} = o_{k} , t^{'} = \mathit{dep}_{k}^{s} \\ 1 i^{'} = d_{k} , t^{'} = T \\ 0 \cdot o t h e r w i s e \end{matrix}\right \forall k \in K , l \in L \tag{eq\_0012} \\
+  & \sum_{k \in K} \sum_{l \in L_{k}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{phi} \left(j , j^{'} , \mathit{tau}\right)} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) \leq 1 , \forall \left(j , j^{'}\right) \in G^{' '} , \mathit{tau} \in T \tag{eq\_0013} \\
+  & \sum_{t , t^{'} : \left(i , i^{'} , t , t^{'}\right) \in E_{k}} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) = x_{k}^{l} , \forall k \in K , l \in L , \left(i , i^{'}\right) \in G_{k}^{' '} \tag{eq\_0014} \\
+  & x_{k}^{l} \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} \tag{eq\_0015} \\
+  & y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} , \left(i , i^{'} , t , t^{'}\right) \in E_{k} \tag{eq\_0016} \\
+  & p_{i j}^{k} \geq 0 , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0017} \\
+\end{align}

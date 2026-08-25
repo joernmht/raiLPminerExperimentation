@@ -1,0 +1,145 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2021.102963
+%@ meta id=10.1016_j.trc.2021.102963 family=milp schema=0.1.0
+%@ name :: Train timetabling with dynamic and random passenger demand: A stochastic optimization method
+%@ desc :: Mined from Train timetabling with dynamic and random passenger demand: A stochastic optimization method (Transportation Research Part C Emerging Technologies, 2021).
+%@ prov source :: 10.1016/j.trc.2021.102963
+%@ prov reference :: Train timetabling with dynamic and random passenger demand: A stochastic optimization method
+%@ prov author :: Congcong Gong; Jungang Shi; Yanhui Wang; Housheng Zhou; Lixing Yang; Dewang Chen; Hanchuan Pan
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted total cost of fixed costs, passenger waiting time, and energy consumption
+%@ var z shape=i,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k departs from station i at or before time t
+%@ index K ordered=0 cyclic=0 :: Set of candidate train services
+%@ index N ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of time intervals in planning horizon
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ index k ordered=0 cyclic=0 :: Service index (k ∈ K)
+%@ index t ordered=0 cyclic=0 :: Time interval index (t ∈ T)
+%@ index f ordered=0 cyclic=0 :: Speed profile index on segment i (f ∈ F)
+%@ index j ordered=0 cyclic=0 :: Destination station index (j ∈ N)
+%@ index omega ordered=0 cyclic=0 :: Scenario index (ω ∈ Ω)
+%@ var d shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Departure time of service k at station i
+%@ var y shape=k domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k is effective
+%@ var a shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
+%@ var s shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of service k at station i
+%@ var r shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Running time of service k on segment i
+%@ param H shape=- kind=scalar domain=- :: Minimum and maximum headway bounds
+%@ var h shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Headway between departure times of services k and k-1 at station i
+%@ var C shape=i,k,omega domain=non_negative role=primary drole=- lo=- hi=- :: Number of in-vehicle passengers for service k at station i under scenario omega
+%@ var L shape=i,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if passengers arriving at time t can board service k at station i
+%@ param P shape=i,j,t,omega kind=matrix domain=- :: Number of arriving passengers with journey i->j in time interval [t,t+1) under scenario omega
+%@ index F ordered=0 cyclic=0 :: Set of candidate speed profiles on segment i
+%@ var x shape=i,k,f domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k selects speed profile f on segment i
+%@ var FC shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total fixed costs of effective services
+%@ param Q shape=- kind=scalar domain=- :: Fixed operational cost for executing one effective service
+%@ var S shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time under scenario omega
+%@ var E shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total energy consumption under scenario omega
+%@ param e shape=i,f kind=matrix domain=- :: Energy consumption of empty train selecting speed profile f on segment i
+%@ var u shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Traction energy consumption of empty train for service k on segment i
+%@ param m shape=- kind=scalar domain=- :: Mass ratio of passenger to empty train
+%@ var PW shape=i,k,omega domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary power consumed by service k on segment i under scenario omega
+%@ param beta shape=- kind=scalar domain=- :: Weight coefficients for fixed costs, passenger waiting time, and energy
+%@ param Constraints shape=- kind=scalar domain=- :: Set of constraints in the model
+%@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total weighted cost)
+%@ param Z shape=- kind=scalar domain=- :: Set of integers for departure time domain
+%@ param alpha shape=omega kind=vector domain=- :: Probability of scenario omega
+%@ param U shape=- kind=big_m domain=- :: Large positive constant for linearization
+%@ var theta shape=i,k,f domain=binary role=primary drole=- lo=- hi=- :: Binary auxiliary variable equal to y_k * x_{i,k,f}
+%@ var R shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger travel time under scenario omega
+%@ con eq_0002 kind=linear domain=- indicator=- :: Nondecreasing constraint for departure indicator z_{i,k}(t)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Coupling between departure time d_{i,k} and departure indicator z_{i,k}(t)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of effective loading indicator L_{i,k}(t) from departure indicators
+%@ con eq_0006 kind=linear domain=- indicator=- :: Nonincreasing constraint for effective service indicator y_k
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure time of last effective service at station i not earlier than ideal last service time
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure time of secondary last effective service at station i strictly earlier than ideal last service time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Arrival time at next station equals departure time plus running time
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure and arrival times belong to the set of time intervals
+%@ con eq_0013 kind=linear domain=- indicator=- :: Headway calculation for first and subsequent services
+%@ con eq_0014 kind=linear domain=- indicator=- :: Headway must lie between minimum safety headway and maximum allowed headway
+%@ con eq_0016 kind=linear domain=- indicator=- :: Number of boarding passengers for service k at station i under scenario omega
+%@ con eq_0017 kind=linear domain=- indicator=- :: Number of alighting passengers from service k at station i under scenario omega
+%@ con eq_0018 kind=linear domain=- indicator=- :: Dynamic evolution of in-vehicle passenger count along the line under scenario omega
+%@ con eq_0019 kind=linear domain=- indicator=- :: Train capacity constraint: in-vehicle passengers cannot exceed maximum capacity
+%@ con eq_0020 kind=linear domain=- indicator=- :: Running time on segment expressed as selected speed profile running time
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exactly one speed profile selected for each service on each segment
+%@ con eq_0022 kind=linear domain=- indicator=- :: Total fixed cost as sum of fixed costs of effective services
+%@ con eq_0023 kind=linear domain=- indicator=- :: Cumulative number of arriving passengers at station i in each time interval
+%@ con eq_0025 kind=linear domain=- indicator=- :: Passenger waiting time for service k at station i under scenario omega
+%@ con eq_0026 kind=linear domain=- indicator=- :: Total passenger waiting time under scenario omega
+%@ con eq_0027 kind=linear domain=- indicator=- :: Total energy consumption under scenario omega as sum of traction and auxiliary energy
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Linearization of last effective service: upper bound on auxiliary departure time d_hat_{i,k}
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Linearization of last effective service: upper bound on (d_{i,k} - d_hat_{i,k})
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearized last effective service departure time constraint at each station
+%@ con eq_0033_a kind=linear domain=- indicator=- :: Linearization of secondary last effective service: upper bound on auxiliary departure time d_check_{i,k}
+%@ con eq_0033_b kind=linear domain=- indicator=- :: Linearization of secondary last effective service: upper bound on (d_{i,k} - d_check_{i,k})
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearized secondary last effective service departure time constraint at each station
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of passenger waiting time: bound on auxiliary waiting time S_tilde_{i,k}^omega(t)
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Linearization of passenger waiting time: lower bound on deviation of passenger waiting term from S_tilde
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Linearization of passenger waiting time: upper bound on deviation of passenger waiting term from S_tilde
+%@ con eq_0037 kind=linear domain=- indicator=- :: Service waiting time as sum of auxiliary waiting times over time intervals
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of product of effective service and speed profile selection indicators
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization of traction energy: bound on auxiliary traction energy E_tilde_tra
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Linearization of traction energy: lower bound on deviation of traction energy term
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Linearization of traction energy: upper bound on deviation of traction energy term
+%@ con eq_0041 kind=linear domain=- indicator=- :: Traction energy as sum of auxiliary traction energy over speed profiles
+%@ con eq_0042_a kind=linear domain=- indicator=- :: Linearization of auxiliary energy: bound on auxiliary auxiliary energy E_tilde_aux
+%@ con eq_0042_b kind=linear domain=- indicator=- :: Linearization of auxiliary energy: lower bound on deviation of auxiliary energy term
+%@ con eq_0043 kind=linear domain=- indicator=- :: Auxiliary energy as sum of auxiliary auxiliary energy over speed profiles
+%@ con eq_0047 kind=linear domain=- indicator=- :: Constraint for total passenger travel time calculation (from appendix)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linearization constraint for passenger travel time
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint for travel time waiting time relation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint for in-vehicle time calculation
+%@ con eq_0053_a kind=linear domain=- indicator=- :: Lower bound on auxiliary travel time variable
+%@ con eq_0053_b kind=linear domain=- indicator=- :: Upper bound on auxiliary travel time variable
+%@ con eq_0054 kind=linear domain=- indicator=- :: Aggregation of travel time components into total travel time
+\begin{align}
+  & z_{i , k} \left(t\right) \geq z_{i , k} \left(t - 1\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} \backslash \left\{1\right\} \tag{eq\_0002} \\
+  & d_{i , k} = z_{i , k} \left(1\right) + \underset{t \in \mathbf{\mathcal{T}} \backslash \left\{1\right\}}{\sum} t \cdot \left[z_{i , k} \left(t\right) - z_{i , k} \left(t - 1\right)\right] , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0003} \\
+  & y_{k} \leq y_{k - 1} , k \in \mathbf{\mathcal{K}} \backslash \left\{1\right\} \tag{eq\_0005} \\
+  & \sum_{k = 1}^{K - 1} d_{i , k} \cdot \left(y_{k} - y_{k + 1}\right) + d_{i , K} \cdot y_{K} \geq {T}_{i} , i \in \mathbf{\mathcal{N}} \tag{eq\_0006} \\
+  & \sum_{k = 1}^{K - 2} d_{i , k} \cdot \left(y_{k + 1} - y_{k + 2}\right) + d_{i , K - 1} \cdot y_{K} < {T}_{i} , i \in \mathbf{\mathcal{N}} \tag{eq\_0007} \\
+  & d_{i , k} = a_{i , k} + s_{i , k} , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0008} \\
+  & a_{i + 1 , k} = d_{i , k} + r_{i , k} , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} \tag{eq\_0009} \\
+  & d_{i , k} , a_{i , k} \in \mathbf{\mathcal{T}} , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0010} \\
+  & \underset{̲}{H} \leq h_{i , k} \leq {H} , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0012} \\
+  & C_{i , k , b}^{\mathit{omega}} = \sum_{j = i + 1}^{N} \underset{t \in \mathbf{\mathcal{T}}}{\sum} P_{i , j}^{\mathit{omega}} \left(t\right) \cdot L_{i , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0013} \\
+  & C_{i , k , a}^{\mathit{omega}} = \sum_{j = 1}^{i - 1} \underset{t \in \mathbf{\mathcal{T}}}{\sum} P_{j , i}^{\mathit{omega}} \left(t\right) \cdot L_{j , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0014} \\
+  & C_{i , k}^{\mathit{omega}} \leq C_{\mathit{max}} , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0016} \\
+  & r_{i , k} = \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} x_{i , k , f} \cdot t_{i , f} , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} \tag{eq\_0017} \\
+  & \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} x_{i , k , f} = 1 , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} \tag{eq\_0018} \\
+  & \mathit{FC} = \underset{k \in \mathbf{\mathcal{K}}}{\sum} y_{k} \cdot Q_{0} \tag{eq\_0019} \\
+  & P_{i}^{\mathit{omega}} \left(t\right) = \sum_{j = i + 1}^{N} P_{i , j}^{\mathit{omega}} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0020} \\
+  & S_{i , k}^{\mathit{omega}} = \underset{t \in \mathbf{\mathcal{T}}}{\sum} P_{i}^{\mathit{omega}} \left(t\right) \cdot \left(d_{i , k} - t\right) \cdot L_{i , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0021} \\
+  & S^{\mathit{omega}} = \underset{k \in \mathbf{\mathcal{K}}}{\sum} \underset{i \in \mathbf{\mathcal{N}}}{\sum} S_{i , k}^{\mathit{omega}} , \forall \mathit{omega} \in \mathit{Omega} \tag{eq\_0022} \\
+  & \begin{matrix}E^{\mathit{omega}} & = \underset{i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\}}{\sum} \underset{k \in \mathbf{\mathcal{K}}}{\sum} E_{i , k}^{\mathit{omega}} \\ & = \underset{i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\}}{\sum} \underset{k \in \mathbf{\mathcal{K}}}{\sum} \left(E_{i , k , \mathit{tra}}^{\mathit{omega}} + E_{i , k , \mathit{aux}}^{\mathit{omega}}\right) , \forall \mathit{omega} \in \mathit{Omega}\end{matrix} \tag{eq\_0023} \\
+  & u_{i , k} = \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} x_{i , k , f} \cdot e_{i , f} , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} \tag{eq\_0025} \\
+  & E_{i , k , \mathit{tra}}^{\mathit{omega}} = \left(1 + m_{p} \cdot C_{i , k}^{\mathit{omega}}\right) \cdot u_{i , k} \cdot y_{k} , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0026} \\
+  & \begin{matrix}E_{i , k , \mathit{aux}}^{\mathit{omega}} & = \mathit{PW}_{i , k , \mathit{aux}}^{\mathit{omega}} \cdot r_{i , k} \cdot y_{k} \\ & = \left(P_{\mathit{ac}} \cdot C_{i , k}^{\mathit{omega}} + P_{\mathit{lc}}\right) \cdot r_{i , k} \cdot y_{k} , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega}\end{matrix} \tag{eq\_0027} \\
+  \left\{\begin{matrix}\quad & min & \mathbf{\mathcal{J}} = \mathit{beta}_{c} \cdot \mathit{FC} + \sum_{\mathit{omega} \in \mathit{Omega}} \mathit{alpha}_{\mathit{omega}} \cdot \left(\mathit{beta}_{t} \cdot S^{\mathit{omega}} + \mathit{beta}_{e} \cdot E^{\mathit{omega}}\right) \\ s . t . & \\ & Constraints \left(1\right) - \left(25\right) \\ & y_{k} , x_{i , k , f} \in \left\{0 , 1\right\} , d_{1 , k} \in \mathcal{Z} , i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} \end{matrix}\right \tag{eq\_0028} \\
+  & 0 \leq {d}_{i , k} \leq {y}_{k} \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0030\_a} \\
+  & 0 \leq d_{i , k} - {d}_{i , k} \leq \left(1 - {y}_{k}\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0030\_b} \\
+  & \sum_{k = 1}^{K} {d}_{i , k} \geq {T}_{i} , \forall i \in \mathbf{\mathcal{N}} \tag{eq\_0031} \\
+  & 0 \leq {d}_{i , k} \leq {y}_{k} \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \backslash \left\{K\right\} \tag{eq\_0033\_a} \\
+  & 0 \leq d_{i , k} - {d}_{i , k} \leq \left(1 - {y}_{k}\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \backslash \left\{K\right\} \tag{eq\_0033\_b} \\
+  & \sum_{k = 1}^{K - 1} {d}_{i , k} < {T}_{i} , \forall i \in \mathbf{\mathcal{N}} \tag{eq\_0034} \\
+  & {S}_{i , k}^{\mathit{omega}} \left(t\right) = P_{i}^{\mathit{omega}} \left(t\right) \cdot \left(d_{i , k} - t\right) \cdot L_{i , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0035} \\
+  & 0 \leq {S}_{i , k}^{\mathit{omega}} \left(t\right) \leq L_{i , k} \left(t\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0036\_a} \\
+  & \left(L_{i , k} \left(t\right) - 1\right) \cdot U \leq P_{i}^{\mathit{omega}} \left(t\right) \cdot \left(d_{i , k} - t\right) - {S}_{i , k}^{\mathit{omega}} \left(t\right) \leq \left(1 - L_{i , k} \left(t\right)\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0036\_b} \\
+  & S_{i , k}^{\mathit{omega}} = \underset{t \in \mathbf{\mathcal{T}}}{\sum} {S}_{i , k}^{\mathit{omega}} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0037} \\
+  & E_{i , k , \mathit{tra}}^{\mathit{omega}} = \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} \left[\left(1 + m_{p} \cdot C_{i , k}^{\mathit{omega}}\right) \cdot x_{i , k , f} \cdot e_{i , f} \cdot y_{k}\right] , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0038} \\
+  & 2 \cdot \mathit{theta}_{i , k , f} \leq y_{k} + x_{i , k , f} \leq \mathit{theta}_{i , k , f} + 1 , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} \tag{eq\_0039} \\
+  & 0 \leq {E}_{i , k , \mathit{tra}}^{\mathit{omega}} \left(f\right) \leq \mathit{theta}_{i , k , f} \cdot U , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0040\_a} \\
+  & 0 \leq \left(1 + m_{p} \cdot C_{i , k}^{\mathit{omega}}\right) \cdot e_{i , f} - {E}_{i , k , \mathit{tra}}^{\mathit{omega}} \left(f\right) \leq \left(1 - \mathit{theta}_{i , k , f}\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0040\_b} \\
+  & E_{i , k , \mathit{tra}}^{\mathit{omega}} = \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} {E}_{i , k , \mathit{tra}}^{\mathit{omega}} \left(f\right) , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0041} \\
+  & 0 \leq {E}_{i , k , \mathit{aux}}^{\mathit{omega}} \left(f\right) \leq \mathit{theta}_{i , k , f} \cdot U , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0042\_a} \\
+  & 0 \leq \mathit{PW}_{i , k , \mathit{aux}}^{\mathit{omega}} \cdot t_{i , f} - {E}_{i , k , \mathit{aux}}^{\mathit{omega}} \left(f\right) \leq \left(1 - \mathit{theta}_{i , k , f}\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , f \in \mathbf{\mathcal{F}}_{i} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0042\_b} \\
+  & E_{i , k , \mathit{aux}}^{\mathit{omega}} = \underset{f \in \mathbf{\mathcal{F}}_{i}}{\sum} {E}_{i , k , \mathit{aux}}^{\mathit{omega}} \left(f\right) , \forall i \in \mathbf{\mathcal{N}} \backslash \left\{N\right\} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0043} \\
+  & h_{i , k} + r_{i , k} + s_{i + 1 , k} = r_{i , k - 1} + s_{i + 1 , k - 1} + h_{i + 1 , k} , \forall i , i + 1 \in \mathbf{\mathcal{N}} , k - 1 , k \in \mathbf{\mathcal{K}} \tag{eq\_0047} \\
+  & R_{i , k}^{\mathit{omega}} = \sum_{j = i + 1}^{N} \underset{t \in \mathbf{\mathcal{T}}}{\sum} P_{i , j}^{\mathit{omega}} \left(t\right) \cdot \left(a_{j , k} - t\right) \cdot L_{i , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} , \tag{eq\_0050} \\
+  & R^{\mathit{omega}} = \underset{k \in \mathbf{\mathcal{K}}}{\sum} \underset{i \in \mathbf{\mathcal{N}}}{\sum} R_{i , k}^{\mathit{omega}} , \forall \mathit{omega} \in \mathit{Omega} \tag{eq\_0051} \\
+  & {R}_{i , k}^{\mathit{omega}} \left(t\right) = \sum_{j = i + 1}^{N} P_{i , j}^{\mathit{omega}} \left(t\right) \cdot \left(a_{j , k} - t\right) \cdot L_{i , k} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0052} \\
+  & 0 \leq {R}_{i , k}^{\mathit{omega}} \left(t\right) \leq L_{i , k} \left(t\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0053\_a} \\
+  & \left(L_{i , k} \left(t\right) - 1\right) \cdot U \leq \sum_{j = i + 1}^{N} P_{i , j}^{\mathit{omega}} \left(t\right) \cdot \left(a_{j , k} - t\right) - {R}_{i , k}^{\mathit{omega}} \left(t\right) \leq \left(1 - L_{i , k} \left(t\right)\right) \cdot U , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0053\_b} \\
+  & R_{i , k}^{\mathit{omega}} = \underset{t \in \mathbf{\mathcal{T}}}{\sum} {R}_{i , k}^{\mathit{omega}} \left(t\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , \mathit{omega} \in \mathit{Omega} \tag{eq\_0054} \\
+\end{align}

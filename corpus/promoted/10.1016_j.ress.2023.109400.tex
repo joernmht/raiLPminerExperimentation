@@ -1,0 +1,86 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ress.2023.109400
+%@ meta id=10.1016_j.ress.2023.109400 family=milp schema=0.1.0
+%@ name :: Railway operation recovery method of regional high-speed railway based on optimal resilience after earthquakes
+%@ desc :: Mined from Railway operation recovery method of regional high-speed railway based on optimal resilience after earthquakes (Reliability Engineering & System Safety, 2023).
+%@ prov source :: 10.1016/j.ress.2023.109400
+%@ prov reference :: Railway operation recovery method of regional high-speed railway based on optimal resilience after earthquakes
+%@ prov author :: Yumeng Tang; Shuang Li; Changhai Zhai; Jianjun Zhao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted train delay, cancellation and passenger deviation penalties while maximizing special train arrangement benefits.
+%@ index T ordered=0 cyclic=0 :: Set of train services.
+%@ index t ordered=0 cyclic=0 :: Train service index.
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train service is canceled (1) or not (0).
+%@ index P ordered=0 cyclic=0 :: Set of passengers.
+%@ index E ordered=0 cyclic=0 :: Set of train events (arrivals and departures).
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay variable for train events.
+%@ index e ordered=0 cyclic=0 :: Train event index.
+%@ index in ordered=0 cyclic=0 :: Subset of events in the in-area.
+%@ param M shape=- kind=big_m domain=- :: Large positive constant (big-M).
+%@ param time shape=- kind=scalar domain=- :: Function returning the planned time of a train event.
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled time of a train event.
+%@ param D shape=- kind=scalar domain=- :: Maximum allowed deviation from original timetable.
+%@ index f ordered=0 cyclic=0 :: Train event index (destination of an activity).
+%@ index A ordered=0 cyclic=0 :: Set of activities (train running and dwelling).
+%@ param L shape=- kind=scalar domain=- :: Minimum time for an activity (running or dwelling).
+%@ index a ordered=0 cyclic=0 :: Activity index.
+%@ param line shape=- kind=scalar domain=- :: Function returning the line of a train service.
+%@ param C shape=S kind=vector domain=- :: Capacity of a station (number of arrival-departure tracks).
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index p ordered=0 cyclic=0 :: Passenger index.
+%@ var z shape=P,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger p is assigned to train t.
+%@ index out ordered=0 cyclic=0 :: Subset of events in the out-area.
+%@ param O shape=P kind=vector domain=- :: Origin station of a passenger.
+%@ param V shape=T kind=vector domain=- :: Rated capacity of a train.
+%@ param v shape=T,S kind=matrix domain=- :: Number of occupied seats on a train at a station.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Rescheduled departure time of an original train cannot be earlier than the originally planned time.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Deviation of original train events from the original timetable is not more than maximum allowed deviation D.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Train running time at a segment is at least the minimum running time.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Train stopping time at a station is at least the minimum stopping time.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Ordering constraint ensuring any two events occur sequentially.
+%@ con eq_0008 kind=linear domain=- indicator=- :: No overtaking on segments: departure order at the previous station equals arrival order at the next station.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Receiving trains at stations must satisfy minimum headway intervals.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Departure interval constraint for two trains on the same main track and direction.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival interval constraint for two trains on the same main track and direction.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station capacity constraint: a train arrival requires at least one spare arrival-departure track.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Each passenger is either assigned to a matching train or not assigned at all.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Each passenger can be rearranged to at most one train.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Train capacity constraint: passengers on a train at any station do not exceed rated capacity.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Scheduled time of additional passenger trains must be within the timetable cycle, otherwise the train is canceled.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Rescheduled time of original trains must be within the timetable cycle and cannot be canceled.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Deviation of rescheduled original train time from the original timetable is at most D.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train running time at a segment is at least the minimum running time (out-area).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train stopping time at a station is at least the minimum stopping time (out-area).
+%@ con eq_0023 kind=linear domain=- indicator=- :: Ordering constraint ensuring any two events occur sequentially (out-area).
+%@ con eq_0024 kind=linear domain=- indicator=- :: No overtaking on segments (out-area).
+%@ con eq_0025 kind=linear domain=- indicator=- :: Receiving trains at stations must satisfy minimum headway intervals (out-area).
+%@ con eq_0026 kind=linear domain=- indicator=- :: Departure interval constraint for trains on the same main track and direction (out-area).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Arrival interval constraint for trains on the same main track and direction (out-area).
+%@ con eq_0028 kind=linear domain=- indicator=- :: Station capacity constraint (out-area).
+\begin{align}
+  \min\quad & \underset{t_{o \underline \mathit{in}} \in T}{\sum} y_{t_{o \underline \mathit{in}}} \cdot P_{o \underline \mathit{in}}^{\mathit{canc} \mathit{el}} + \underset{e_{o \underline \mathit{in}} \in E \underline \mathit{in}}{\sum} d_{o \underline \mathit{in}}^{+} \cdot P_{o \underline \mathit{in}}^{+} + \underset{e_{o \underline \mathit{in}} \in E \underline \mathit{in}}{\sum} d_{o \underline \mathit{in}}^{-} \cdot P_{o \underline \mathit{in}}^{-} - \left(\underset{t_{\mathit{wou}} \in T}{\sum} \left(1 - y_{t_{\mathit{wou}}}\right) \cdot \mathit{eta}_{\mathit{wou}} + \underset{t_{\mathit{doc}} \in T}{\sum} \left(1 - y_{t_{\mathit{doc}}}\right) \cdot \mathit{eta}_{\mathit{doc}} + \underset{t_{\mathit{supp}} \in T}{\sum} \left(1 - y_{\mathit{supp}}\right) \cdot \mathit{eta}_{\mathit{supp}}\right) \tag{eq\_0002} \\
+  & M_{1} \cdot y_{t_{o}} \leq x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right) \leq M_{1} + M_{1} \cdot y_{t_{o}} \forall e_{o} \in E^{d e p} \tag{eq\_0003} \\
+  & \left|x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right)\right| - M_{1} \cdot y_{t_{o}} \leq D \tag{eq\_0004} \\
+  & x_{f} - x_{e} \geq L_{_{a}}^{S e g} \forall a = \left(e , f\right) \in A_{_{t}}^{s e g} , e \in E^{d e p} , f \in E^{a r r} , e \notin E^{d} \tag{eq\_0005} \\
+  & x_{f} - x_{e} \geq L_{_{a}}^{D w e l l} \forall a = \left(e , f\right) \in A_{_{t}}^{s} , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0006} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A \land a^{'} = \left(f , e\right) \in A \tag{eq\_0007} \\
+  & \mathit{lambda}_{a} = \mathit{lambda}_{a^{'}} \forall a = \left(e , f\right) \in A^{s} \land a^{'} = \left(e^{'} , f^{'}\right) \in A^{s} \land e , f \in E_{^{s}}^{\mathit{dep}} \land e^{'} , f^{'} \in E_{s + 1}^{\mathit{arr}} \land t_{e} = t_{e^{'}} \land t_{f} = t_{f^{'}} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \tag{eq\_0008} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{varphi}_{a}\right) \geq L^{i n t e r v a l} \forall a = \left(e , f\right) \in A , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0009} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{\mathit{dep} \underline \mathit{inte} \mathit{rval}} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{\mathit{dep}} \land t_{e} \neq t_{f} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \land t_{e} , t_{f} \in T^{\mathit{up}} \lor t_{e} , t_{f} \in T^{\mathit{down}} \tag{eq\_0010} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{\mathit{arr} \underline \mathit{inte} \mathit{rval}} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{\mathit{arr}} \land t_{e} \neq t_{f} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \land t_{e} , t_{f} \in T^{\mathit{up}} \lor t_{e} , t_{f} \in T^{\mathit{down}} \tag{eq\_0011} \\
+  & \sum_{a = \left(e_{1} , f\right) \in A^{s}} \mathit{lambda}_{a} - \sum_{a = \left(e_{2} , f\right) \in A^{s}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in S^{m} , f \in E_{s}^{a r r} , e_{1} \in E_{s}^{a r r} , e_{2} \in E_{s}^{d e p} \tag{eq\_0012} \\
+  & \sum_{t \in t \left(p\right)} z_{p , t} + y_{p} = 1 \forall p \in P \tag{eq\_0014} \\
+  & \sum_{t \in T \underline o u t_{o}} z_{p , t} \leq 1 \forall p \in P \tag{eq\_0015} \\
+  & \sum_{p \in P} z_{p , t} + \sum_{p_{1} , p \in P} z_{p_{1} , t} - \sum_{p_{2} , p \in P} z_{p_{2} , t} \leq V_{t} - v_{t}^{s} \forall s \in S_{t} , O_{p} = s , O_{p_{1}} = s_{1} , D_{p_{2}} = s_{2} , s_{1} , s_{2} \leq s \tag{eq\_0016} \\
+  & M_{1} \cdot y_{t_{a d d}} \leq x_{e_{a d d}} \leq M_{1} + M_{1} \cdot y_{t_{a d d}} \tag{eq\_0018} \\
+  & 0 \leq x_{e_{o}} \leq M_{1} \tag{eq\_0019} \\
+  & \left|x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right)\right| \leq D \tag{eq\_0020} \\
+  & x_{f} - x_{e} \geq L_{_{a}}^{S e g} \forall a = \left(e , f\right) \in A_{_{t}}^{s e g} , e \in E^{d e p} , f \in E^{a r r} , e \notin E^{d} \tag{eq\_0021} \\
+  & x_{f} - x_{e} \geq L_{_{a}}^{D w e l l} \forall a = \left(e , f\right) \in A_{_{t}}^{s} , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0022} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A \land a^{'} = \left(f , e\right) \in A \tag{eq\_0023} \\
+  & \mathit{lambda}_{a} = \mathit{lambda}_{a^{'}} \forall a = \left(e , f\right) \in A^{s} \land a^{'} = \left(e^{'} , f^{'}\right) \in A^{s} \land e , f \in E_{^{s}}^{\mathit{dep}} \land e^{'} , f^{'} \in E_{s + 1}^{\mathit{arr}} \land t_{e} = t_{e^{'}} \land t_{f} = t_{f^{'}} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \tag{eq\_0024} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{varphi}_{a}\right) \geq L^{i n t e r v a l} \forall a = \left(e , f\right) \in A , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0025} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{\mathit{dep} \underline \mathit{inte} \mathit{rval}} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{\mathit{dep}} \land t_{e} \neq t_{f} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \land t_{e} , t_{f} \in T^{\mathit{up}} \lor t_{e} , t_{f} \in T^{\mathit{down}} \tag{eq\_0026} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{\mathit{arr} \underline \mathit{inte} \mathit{rval}} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{\mathit{arr}} \land t_{e} \neq t_{f} \land \mathit{line} \left(t_{e}\right) = \mathit{line} \left(t_{f}\right) \land t_{e} , t_{f} \in T^{\mathit{up}} \lor t_{e} , t_{f} \in T^{\mathit{down}} \tag{eq\_0027} \\
+  & \sum_{a = \left(e_{1} , f\right) \in A^{s}} \mathit{lambda}_{a} - \sum_{a = \left(e_{2} , f\right) \in A^{s}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in S^{m} , f \in E_{s}^{a r r} , e_{1} \in E_{s}^{a r r} , e_{2} \in E_{s}^{d e p} \tag{eq\_0028} \\
+\end{align}

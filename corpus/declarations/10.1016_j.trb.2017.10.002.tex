@@ -1,0 +1,130 @@
+% Declaration sidecar for 10.1016_j.trb.2017.10.002
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.10.002
+% A microscopic model for optimal train short-turnings during complete blockages
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2017.10.002.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of delays and cancelled services
+
+% unusable as an identifier, rename or drop: ω
+% c: classified as variable during review
+%@ var c shape=V domain=binary role=primary :: Binary variable indicating cancellation of service
+
+% d: classified as variable during review
+%@ var d shape=V domain=non_negative role=primary :: Delay of service
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of all train services
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Index for train services
+
+% Pair: classified as index during review
+%@ index Pair ordered=0 cyclic=0 :: Set of pairs of services for short-turning
+
+% unusable as an identifier, rename or drop: λ
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for scheduled departure in a line
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for line
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of routes for a service
+
+% e: classified as variable during review
+%@ var e shape=V,R,S domain=non_negative role=primary :: Entrance time of train on track section
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of short-turning stations
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Big M constant
+
+% x: classified as variable during review
+%@ var x shape=R,V domain=binary role=primary :: Binary variable indicating route selection
+
+% unusable as an identifier, rename or drop: θ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of platforms
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for track sections
+
+% b: classified as variable during review
+%@ var b shape=V,S domain=non_negative role=primary :: Start or end blocking time
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Function indicating rolling stock connection
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Previous track section function
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of track sections
+
+% unusable as an identifier, rename or drop: τ
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar :: Running, clearance, or release time
+
+% unusable as an identifier, rename or drop: δ
+% q: classified as index during review
+%@ index q ordered=0 cyclic=0 :: Reservation track section function
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of interlocking sections
+
+% O: classified as index during review
+%@ index O ordered=0 cyclic=0 :: Set of open track sections
+
+% y: classified as variable during review
+%@ var y shape=V,V,S domain=binary role=primary :: Binary variable for ordering trains on track section
+
+% Bound by a quantifier or big operator, so no declaration of their own: h, k, r, v̂, v̄
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear :: Ensure every approaching service short-turns at one of the short-turning stations
+%@ con eq_0003 kind=linear :: Scheduled opposite-direction service is either formed by a short-turn or cancelled
+%@ con eq_0004 kind=linear :: Cancelling a scheduled service forces cancellation of all later services in the line
+%@ con eq_0005 kind=linear :: Short-turn at the secondary short-turning station cancels the following same-direction service
+%@ con eq_0006 kind=linear :: A short-turned departure requires cancellation of the preceding service
+%@ con eq_0007 kind=big_m :: Enforce the minimum short-turning time between paired services
+%@ con eq_0008 kind=big_m :: Departure route of a short-turned train uses the platform selected by its arrival route
+%@ con eq_0009 kind=big_m :: Arrival route of a short-turned train uses the platform selected by its departure route
+%@ con eq_0010 kind=big_m :: Keep the platform track occupied during a short-turn by ordering the blocking times
+%@ con eq_0011 kind=linear :: Each running service selects exactly one route; cancelled services select no route
+%@ con eq_0012 kind=big_m :: Force zero entrance times on track sections of unselected routes
+%@ con eq_0013 kind=linear :: Entrance time on the selected route is at least the scheduled departure time
+%@ con eq_0014 kind=linear :: Propagate entrance times along the selected route using running times
+%@ con eq_0015 kind=linear :: Compute arrival delay as actual arrival minus scheduled arrival for running services
+%@ con eq_0016 kind=big_m :: Enforce the minimum dwell time between rolling-stock-connected services
+%@ con eq_0017 kind=big_m :: Keep the platform block occupied during the dwell time of a connection
+%@ con eq_0018 kind=big_m :: Connected services use the same platform track (first direction)
+%@ con eq_0019 kind=big_m :: Connected services use the same platform track (second direction)
+%@ con eq_0020 kind=linear :: Define the start of blocking time for normal train movements
+%@ con eq_0021 kind=linear :: Define the start of blocking time after short-turning or dwelling
+%@ con eq_0022 kind=linear :: Set the end of blocking time in interlocking sections with sectional release
+%@ con eq_0023 kind=linear :: Set the end of blocking time on open track sections
+%@ con eq_0024 kind=ordering :: Choose a train order on each shared track section
+%@ con eq_0025 kind=big_m :: Prevent simultaneous occupation of a track section by two trains

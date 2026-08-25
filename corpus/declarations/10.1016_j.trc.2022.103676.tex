@@ -1,0 +1,84 @@
+% Declaration sidecar for 10.1016_j.trc.2022.103676
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2022.103676
+% Flexible train capacity allocation for an overcrowded metro line: A new passenger flow control approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2022.103676.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total passenger waiting time, passenger accumulation risk, and carriage reservation cost
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% n: classified as variable during review
+%@ var n shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved carriages for train i at station k
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of trains
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Station index
+
+% b: classified as variable during review
+%@ var b shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers for train i at station k
+
+% l: classified as variable during review
+%@ var l shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers left behind by train i at station k
+
+% w: classified as variable during review
+%@ var w shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers for train i at station k
+
+% a: classified as variable during review
+%@ var a shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of alighting passengers for train i at station k
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Passenger flow index
+
+% A: classified as parameter during review
+%@ param A shape=S kind=vector domain=- :: Maximum average waiting time limit at station k
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passenger flows
+
+% o: classified as parameter during review
+%@ param o shape=P kind=vector domain=- :: Origin station of passenger flow p
+
+% unusable as an identifier, rename or drop: θ
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Unit cost of reserving one carriage in a train at a station
+
+% r: classified as variable during review
+%@ var r shape=S domain=non_negative role=primary drole=- lo=- hi=- :: Risk value of passenger accumulation at station k
+
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: ν
+% Bound by a quantifier or big operator, so no declaration of their own: i, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Bound the number of reserved carriages for each train at each station between 0 and n_max
+%@ con eq_0002 kind=linear domain=- indicator=- :: Ensure reserved carriages of each train are non-increasing along stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Compute left passengers as waiting passengers minus boarding passengers at each station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Compute alighting passengers at a station as the sum of boarding passengers from previous stations to that destination
+%@ con eq_0012 kind=linear domain=- indicator=- :: Require no passengers are left by the last train at any station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Update waiting passenger count for the next train from left passengers and newly arriving passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Objective function minimizing the weighted sum of passenger waiting time, accumulation risk, and carriage reservation cost

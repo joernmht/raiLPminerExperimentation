@@ -1,0 +1,102 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.03.009
+%@ meta id=10.1016_j.trb.2020.03.009 family=milp schema=0.1.0
+%@ name :: Robust optimization models for integrated train stop planning and timetabling with passenger demand uncertainty
+%@ desc :: Mined from Robust optimization models for integrated train stop planning and timetabling with passenger demand uncertainty (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.03.009
+%@ prov reference :: Robust optimization models for integrated train stop planning and timetabling with passenger demand uncertainty
+%@ prov author :: Valentina Cacchiani; Jianguo Qi; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=TT combination=sum :: Minimize total travel time TT
+%@ var t shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure and arrival times of train k at station i
+%@ var TT shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total travel time of all trains
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ var x shape=K,S domain=binary role=primary drole=- lo=- hi=- :: Binary stop indicator for train k at station i
+%@ index s ordered=0 cyclic=0 :: Index for stations
+%@ index i ordered=0 cyclic=0 :: Index for stations
+%@ index j ordered=0 cyclic=0 :: Index for stations
+%@ param Q shape=S,S kind=matrix domain=- :: Nominal passenger demand between stations i and j
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var q shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train k from i to j
+%@ param D shape=K kind=vector domain=- :: Destination station of train k
+%@ param O shape=K kind=vector domain=- :: Origin station of train k
+%@ param C shape=K kind=vector domain=- :: Capacity of train k
+%@ param N shape=K kind=vector domain=- :: Maximum number of stops for train k
+%@ param R shape=S kind=vector domain=- :: Minimum number of stops at station i
+%@ param T shape=K kind=vector domain=- :: Earliest departure time for train k
+%@ index l ordered=0 cyclic=0 :: Index for trains
+%@ param M shape=- kind=scalar domain=- :: Large constant for linearization
+%@ param h shape=- kind=scalar domain=- :: Headway time between trains
+%@ var y shape=K,K,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train ordering
+%@ param integer shape=- kind=scalar domain=- :: Indicator for integer variables
+%@ var p shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Additional passengers on train k from i to j
+%@ param H shape=K kind=vector domain=- :: Maximum additional passengers on train k
+%@ con eq_0002 kind=linear domain=- indicator=- :: Train stops at origin and destination
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Nominal demand transported between each OD pair
+%@ con eq_0004 kind=linear domain=- indicator=- :: No passengers depart from i unless train stops at i
+%@ con eq_0005 kind=linear domain=- indicator=- :: No passengers arrive at i unless train stops at i
+%@ con eq_0006 kind=capacity domain=- indicator=- :: Capacity constraint on each train segment
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum number of stops per train
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum number of stops per station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time within allowable window
+%@ con eq_0010 kind=linear domain=- indicator=- :: Minimum dwell time at stop
+%@ con eq_0011 kind=linear domain=- indicator=- :: Running time between successive stations
+%@ con eq_0012 kind=headway domain=- indicator=- :: Headway and ordering at departure
+%@ con eq_0013 kind=headway domain=- indicator=- :: Headway and ordering at departure (reverse)
+%@ con eq_0014 kind=headway domain=- indicator=- :: Headway and ordering at arrival
+%@ con eq_0015 kind=headway domain=- indicator=- :: Headway and ordering at arrival (reverse)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure time variable domain
+%@ con eq_0017 kind=linear domain=- indicator=- :: Arrival time variable domain
+%@ con eq_0018 kind=linear domain=- indicator=- :: Stop variable binary domain
+%@ con eq_0019 kind=linear domain=- indicator=- :: Passenger flow variable domain
+%@ con eq_0020 kind=linear domain=- indicator=- :: Ordering variable binary domain
+%@ con eq_0021 kind=linear domain=- indicator=- :: Limit on total number of stops
+%@ con eq_0023 kind=flow_balance domain=- indicator=- :: Nominal demand must be satisfied
+%@ con eq_0024 kind=flow_balance domain=- indicator=- :: Protection level and slack balance
+%@ con eq_0025 kind=linear domain=- indicator=- :: Limit on travel time increase
+%@ con eq_0026 kind=linear domain=- indicator=- :: Limit on stop plan changes
+%@ con eq_0027 kind=linear domain=- indicator=- :: Unsatisfied demand variable domain
+%@ con eq_0029 kind=capacity domain=- indicator=- :: Capacity constraint with protection buffer
+%@ con eq_0030 kind=linear domain=- indicator=- :: Unavailable capacity variable domain
+%@ con eq_0032 kind=flow_balance domain=- indicator=- :: Additional demand split among trains
+%@ con eq_0033 kind=capacity domain=- indicator=- :: Capacity constraint with additional passengers
+%@ con eq_0034 kind=capacity domain=- indicator=- :: Limit on additional passengers per train
+%@ con eq_0035 kind=linear domain=- indicator=- :: No additional departures unless train stops
+%@ con eq_0036 kind=linear domain=- indicator=- :: No additional arrivals unless train stops
+%@ con eq_0037 kind=linear domain=- indicator=- :: Additional passenger flow variable domain
+\begin{align}
+  \min\quad & \mathit{TT} = \sum_{k \in K} \left(t_{k D_{k}}^{a} - t_{k O_{k}}^{d}\right) \tag{eq\_0001} \\
+  & \begin{matrix} & s . t . \\ & x_{k O_{k}} = x_{k D_{k}} = 1 , k \in K\end{matrix} \tag{eq\_0002} \\
+  & \sum_{k \in K : i , j \in S_{k}} q_{i j}^{k} = Q_{i j} , i , j \in S , i < j \tag{eq\_0003} \\
+  & \sum_{j \in S_{k} , j > i} q_{\mathit{ij}}^{k} \leq \sum_{j \in S_{k} , j > i} Q_{\mathit{ij}} \cdot x_{\mathit{ki}} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0004} \\
+  & \sum_{j \in S_{k} , j < i} q_{\mathit{ji}}^{k} \leq \sum_{j \in S_{k} , j < i} Q_{\mathit{ji}} \cdot x_{\mathit{ki}} , k \in K , i \in S_{k} \backslash \left\{O_{k}\right\} \tag{eq\_0005} \\
+  & \sum_{i^{'} \in S_{k} , i^{'} \leq i} \sum_{j \in S_{k} , j > i} q_{i^{'} j}^{k} \leq C_{k} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0006} \\
+  & \sum_{i \in S_{k}} x_{k i} \leq N_{k} , k \in K \tag{eq\_0007} \\
+  & \sum_{k \in K : i \in S_{k}} x_{k i} \geq R_{i} , i \in S \tag{eq\_0008} \\
+  & T_{k} \leq t_{k O_{k}}^{d} \leq T_{k} + \mathit{Delta} T_{k} , k \in K \tag{eq\_0009} \\
+  & t_{k i}^{d} - t_{k i}^{a} \geq t_{k i}^{d w e l l} \cdot x_{k i} , k \in K , i \in S_{k} \backslash \left\{O_{k} , D_{k}\right\} \tag{eq\_0010} \\
+  & t_{k i + 1}^{a} - t_{k i}^{d} = t_{k i}^{r u n} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0011} \\
+  & t_{k i}^{d} + h_{d} \leq t_{l i}^{d} + M \left(1 - y_{k l i}\right) , i \in \left(S_{k} \backslash \left\{D_{k}\right\}\right) \cap \left(S_{l} \backslash \left\{D_{l}\right\}\right) , k , l \in K , k < l \tag{eq\_0012} \\
+  & t_{l i}^{d} + h_{d} \leq t_{k i}^{d} + M \cdot y_{k l i} , i \in \left(S_{k} \backslash \left\{D_{k}\right\}\right) \cap \left(S_{l} \backslash \left\{D_{l}\right\}\right) , k , l \in K , k < l \tag{eq\_0013} \\
+  & t_{k i + 1}^{a} + h_{a} \leq t_{l i + 1}^{a} + M \left(1 - y_{k l i}\right) , i \in \left(S_{k} \backslash \left\{D_{k}\right\}\right) \cap \left(S_{l} \backslash \left\{D_{l}\right\}\right) , k , l \in K , k < l \tag{eq\_0014} \\
+  & t_{l i + 1}^{a} + h_{a} \leq t_{k i + 1}^{a} + M \cdot y_{k l i} , i \in \left(S_{k} \backslash \left\{D_{k}\right\}\right) \cap \left(S_{l} \backslash \left\{D_{l}\right\}\right) , k , l \in K k < l \tag{eq\_0015} \\
+  & t_{k i}^{d} \geq 0 , \mathit{integer} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0016} \\
+  & t_{k i}^{a} \geq 0 , \mathit{integer} , k \in K , i \in S_{k} \backslash \left\{O_{k}\right\} \tag{eq\_0017} \\
+  & x_{k i} \in \left\{0 , 1\right\} , k \in K , i \in S_{k} \tag{eq\_0018} \\
+  & q_{i j}^{k} \geq 0 , \mathit{integer} , k \in K , i , j \in S_{k} , i < j \tag{eq\_0019} \\
+  & y_{k l i} \in \left\{0 , 1\right\} , i \in \left(S_{k} \backslash \left\{D_{k}\right\}\right) \cap \left(S_{l} \backslash \left\{D_{l}\right\}\right) , k , l \in K , k < l . \tag{eq\_0020} \\
+  & \sum_{k \in K} \sum_{i \in S_{k}} x_{k i} \leq \left(1 + \mathit{beta}\right) N \cdot S^{\star} , \tag{eq\_0021} \\
+  & \sum_{k \in K : i , j \in S_{k}} q_{i j}^{k} \geq Q_{i j} , i , j \in S , i < j \tag{eq\_0023} \\
+  & \sum_{k \in K : i , j \in S_{k}} q_{i j}^{k} + \mathit{gamma}_{i j} = Q_{i j} + \mathit{Delta}_{i j} , i , j \in S , i < j \tag{eq\_0024} \\
+  & \sum_{k \in K} \left(t_{k D_{k}}^{a} - t_{k O_{k}}^{d}\right) \leq \left(1 + \mathit{alpha}\right) \mathit{TT}^{\star} \tag{eq\_0025} \\
+  & \sum_{k \in K} \sum_{i \in S_{k}^{s t o p}} \left(x_{k i}^{\star} - x_{k i}\right) + \sum_{k \in K} \sum_{i \in S_{k} \backslash S_{k}^{s t o p}} x_{k i} \leq N^{c h a n g e} \tag{eq\_0026} \\
+  & \mathit{gamma}_{i j} \geq 0 , \mathit{integer} , i , j \in S , i < j . \tag{eq\_0027} \\
+  & \sum_{i^{'} \in S_{k} , i^{'} \leq i} \sum_{j \in S_{k} , j > i} \left(q_{i^{'} j}^{k} + \mathit{Delta}_{i^{'} \mathit{jk}}\right) \leq C_{k} + \mathit{gamma}_{k} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0029} \\
+  & \mathit{gamma}_{k} \geq 0 , \mathit{integer} , k \in K . \tag{eq\_0030} \\
+  & \sum_{k \in K} p_{i j}^{k} = \mathit{Delta}_{i j} , i , j \in S , i < j \tag{eq\_0032} \\
+  & \sum_{i^{'} \in S_{k} , i^{'} \leq i} \sum_{j \in S_{k} , i < j} \left(q_{i^{'} j}^{k} + p_{i^{'} j}^{k}\right) \leq C_{k} + \mathit{gamma}_{k} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0033} \\
+  & \sum_{i^{'} \in S_{k} , i^{'} \leq i} \sum_{j \in S_{k} , j > i} p_{i^{'} j}^{k} \leq H_{k} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0034} \\
+  & \sum_{j \in S_{k} , j > i} p_{\mathit{ij}}^{k} \leq \sum_{j \in S_{k} , j > i} Q_{\mathit{ij}} \cdot x_{\mathit{ki}} , k \in K , i \in S_{k} \backslash \left\{D_{k}\right\} \tag{eq\_0035} \\
+  & \sum_{j \in S_{k} j < i} p_{\mathit{ji}}^{k} \leq \sum_{j \in S_{k} , j < i} Q_{\mathit{ji}} \cdot x_{\mathit{ki}} , k \in K , i \in S_{k} \backslash \left\{O_{k}\right\} \tag{eq\_0036} \\
+  & p_{i j}^{k} \geq 0 , \mathit{integer} , k \in K , i , j \in S_{k} , i < j \tag{eq\_0037} \\
+\end{align}

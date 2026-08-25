@@ -1,0 +1,161 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2021.11.019
+%@ meta id=10.1016_j.ejor.2021.11.019 family=milp schema=0.1.0
+%@ name :: Integrated optimization of train timetable, rolling stock assignment and short-turning strategy for a metro line
+%@ desc :: Mined from Integrated optimization of train timetable, rolling stock assignment and short-turning strategy for a metro line (European Journal of Operational Research, 2021).
+%@ prov source :: 10.1016/j.ejor.2021.11.019
+%@ prov reference :: Integrated optimization of train timetable, rolling stock assignment and short-turning strategy for a metro line
+%@ prov author :: Jiawei Yuan; Yuan Gao; Shukai Li; Pei Liu; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time over all services.
+%@ index K ordered=1 cyclic=0 :: Set of potential services in a direction
+%@ var z shape=K,S,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service k serves operation zone from m to n
+%@ index S ordered=1 cyclic=0 :: Set of stations in a direction
+%@ index i ordered=1 cyclic=0 :: Station index
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+%@ var a shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
+%@ var d shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of service k at station i
+%@ param s shape=S kind=vector domain=- :: Running time on segment between stations i-1 and i
+%@ param e shape=S kind=vector domain=- :: Dwelling time at station i
+%@ var h shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Headway between service k-1 and k
+%@ index R ordered=1 cyclic=0 :: Number of time intervals for passenger arrival rates
+%@ var w shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting for service k at station i with destination j
+%@ index N ordered=0 cyclic=0 :: Number of stations in one direction
+%@ var c shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers in service k after station i
+%@ var v shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers left behind by service k at station i with destination j
+%@ var f shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting time for service k
+%@ param pt shape=- kind=scalar domain=- :: Passenger arrival rate function
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting time objective
+%@ param T shape=R kind=vector domain=- :: Time point for interval r
+%@ param P shape=S,S,R kind=matrix domain=- :: Passenger arrival rate matrix
+%@ index r ordered=1 cyclic=0 :: Time interval index
+%@ var Q shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting for service k at station i with destination j
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ con eq_0001 kind=linear domain=- indicator=- :: Operation zone selection for upstream services
+%@ con eq_0002 kind=linear domain=- indicator=- :: Operation zone selection for downstream services
+%@ con eq_0003 kind=linear domain=- indicator=- :: Selected upstream service serves no unserved station
+%@ con eq_0004 kind=linear domain=- indicator=- :: Upstream service cannot serve stations before its start station
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upstream service cannot serve stations after its end station
+%@ con eq_0006 kind=linear domain=- indicator=- :: Upstream service must serve every station in its operation zone
+%@ con eq_0007 kind=linear domain=- indicator=- :: Downstream served-station bound
+%@ con eq_0008 kind=linear domain=- indicator=- :: Downstream service cannot serve stations before its start station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Downstream service cannot serve stations after its end station
+%@ con eq_0010 kind=linear domain=- indicator=- :: Downstream service must serve every station in its operation zone
+%@ con eq_0011 kind=linear domain=- indicator=- :: At least one of two consecutive upstream services serves each station
+%@ con eq_0012 kind=linear domain=- indicator=- :: At least one of two consecutive downstream services serves each station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Running time relation for upstream services
+%@ con eq_0014 kind=linear domain=- indicator=- :: Running time relation for downstream services
+%@ con eq_0015 kind=linear domain=- indicator=- :: Dwelling time relation for upstream services
+%@ con eq_0016 kind=linear domain=- indicator=- :: Dwelling time relation for downstream services
+%@ con eq_0018 kind=linear domain=- indicator=- :: Headway bounds for downstream services
+%@ con eq_0019 kind=linear domain=- indicator=- :: Departure time headway relation for upstream services
+%@ con eq_0020 kind=linear domain=- indicator=- :: Departure time headway relation for downstream services
+%@ con eq_0021 kind=linear domain=- indicator=- :: Turnaround consistency from upstream service k to downstream service l at station m
+%@ con eq_0022 kind=linear domain=- indicator=- :: Minimum turnaround time from upstream to downstream service
+%@ con eq_0024 kind=linear domain=- indicator=- :: Turnaround consistency from downstream service k to upstream service l at station m
+%@ con eq_0025 kind=linear domain=- indicator=- :: Minimum turnaround time from downstream to upstream service
+%@ con eq_0026 kind=linear domain=- indicator=- :: Maximum turnaround time from downstream to upstream service
+%@ con eq_0027 kind=linear domain=- indicator=- :: Origin of train for upstream service from depot or turnaround
+%@ con eq_0028 kind=linear domain=- indicator=- :: Origin of train for downstream service from depot or turnaround
+%@ con eq_0029 kind=linear domain=- indicator=- :: Destination of train after upstream service to depot or turnaround
+%@ con eq_0030 kind=linear domain=- indicator=- :: Destination of train after downstream service to depot or turnaround
+%@ con eq_0031 kind=linear domain=- indicator=- :: Depot 1 allocated trains capacity
+%@ con eq_0032 kind=linear domain=- indicator=- :: Depot 2 allocated trains capacity
+%@ con eq_0033 kind=linear domain=- indicator=- :: Total available train fleet constraint
+%@ con eq_0034 kind=linear domain=- indicator=- :: Upstream service from depot 1 starts at terminal station 1
+%@ con eq_0035 kind=linear domain=- indicator=- :: Upstream service returning to depot 2 ends at terminal station N
+%@ con eq_0036 kind=linear domain=- indicator=- :: Downstream service from depot 2 starts at terminal station N+1
+%@ con eq_0037 kind=linear domain=- indicator=- :: Downstream service returning to depot 1 ends at terminal station 2N
+%@ con eq_0038 kind=linear domain=- indicator=- :: Total boarding passengers at station i split by destination
+%@ con eq_0039 kind=linear domain=- indicator=- :: Waiting passenger accumulation with time-dependent arrival rate
+%@ con eq_0040 kind=linear domain=- indicator=- :: Boarding only when service serves both origin and destination stations
+%@ con eq_0042 kind=linear domain=- indicator=- :: Boarding passengers limited by remaining train capacity
+%@ con eq_0043 kind=linear domain=- indicator=- :: Total alighting passengers at station i from previous stations
+%@ con eq_0045 kind=linear domain=- indicator=- :: Remaining passengers after boarding
+%@ con eq_0047 kind=linear domain=- indicator=- :: Total waiting time of passengers for an upstream service
+%@ con eq_0049 kind=linear domain=- indicator=- :: Objective sum of total waiting time over all services
+%@ con eq_0050 kind=linear domain=- indicator=- :: Integrated optimization model with objective F
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linearization constraint (51)
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linearization constraint (57)
+%@ con eq_0058 kind=linear domain=- indicator=- :: Linearization constraint (58)
+%@ con eq_0059 kind=linear domain=- indicator=- :: Linearization constraint (59)
+%@ con eq_0060 kind=linear domain=- indicator=- :: Linearization constraint (60)
+%@ con eq_0062 kind=linear domain=- indicator=- :: Linearization constraint (62)
+%@ con eq_0063 kind=linear domain=- indicator=- :: Linearization constraint (63)
+%@ con eq_0064 kind=linear domain=- indicator=- :: Linearization constraint (64)
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization constraint (65)
+%@ con eq_0066 kind=linear domain=- indicator=- :: Linearization constraint (66)
+%@ con eq_0067 kind=linear domain=- indicator=- :: Linearization constraint (67)
+%@ con eq_0068 kind=linear domain=- indicator=- :: Linearization constraint (68)
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization constraint (69)
+%@ con eq_0071 kind=linear domain=- indicator=- :: Linearization constraint (71)
+%@ con eq_0072 kind=linear domain=- indicator=- :: Linearization constraint (72)
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint (73)
+%@ con eq_0074 kind=linear domain=- indicator=- :: Linearization constraint (74)
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint (75)
+%@ var tau shape=- domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
+\begin{align}
+  & \sum_{m \in \mathbf{S}_{M}^{(u)}, n \in \mathbf{S}_{M}^{(u)}} z_{k,m,n} = tau_{k} \qquad \forall k \in \mathbf{K}^{(u)} \tag{eq\_0001} \\
+  & \sum_{m \in \mathbf{S}_{M}^{(d)}, n \in \mathbf{S}_{M}^{(d)}} z_{k,m,n} = tau_{k} \qquad \forall k \in \mathbf{K}^{(d)} \tag{eq\_0002} \\
+  & \mathit{lambda}_{k,i} \leq tau_{k} \qquad \forall k \in \mathbf{K}^{(u)}, i \in \mathbf{S}^{(u)} \tag{eq\_0003} \\
+  & \sum_{i < m} \mathit{lambda}_{k,i} \leq M \cdot (1 - \sum_{n \in \mathbf{S}_{M}^{(u)}} z_{k,m,n}) \qquad \forall k \in \mathbf{K}^{(u)}, m \in \mathbf{S}_{M}^{(u)}, i \in \mathbf{S}^{(u)} \tag{eq\_0004} \\
+  & \sum_{i > n} \mathit{lambda}_{k,i} \leq M \cdot (1 - \sum_{m \in \mathbf{S}_{M}^{(u)}} z_{k,m,n}) \qquad \forall k \in \mathbf{K}^{(u)}, n \in \mathbf{S}_{M}^{(u)}, i \in \mathbf{S}^{(u)} \tag{eq\_0005} \\
+  & \mathit{lambda}_{k,i} \geq z_{k,m,n} \qquad \forall k \in \mathbf{K}^{(u)}, m,n \in \mathbf{S}_{M}^{(u)}, i \in \{m,\ldots,n\} \tag{eq\_0006} \\
+  & \mathit{lambda}_{k,i} \leq tau_{k} \qquad \forall k \in \mathbf{K}^{(d)}, i \in \mathbf{S}^{(d)} \tag{eq\_0007} \\
+  & \sum_{i < m} \mathit{lambda}_{k,i} \leq M \cdot (1 - \sum_{n \in \mathbf{S}_{M}^{(d)}} z_{k,m,n}) \qquad \forall k \in \mathbf{K}^{(d)}, m \in \mathbf{S}_{M}^{(d)}, i \in \mathbf{S}^{(d)} \tag{eq\_0008} \\
+  & \sum_{i > n} \mathit{lambda}_{k,i} \leq M \cdot (1 - \sum_{m \in \mathbf{S}_{M}^{(d)}} z_{k,m,n}) \qquad \forall k \in \mathbf{K}^{(d)}, n \in \mathbf{S}_{M}^{(d)}, i \in \mathbf{S}^{(d)} \tag{eq\_0009} \\
+  & \mathit{lambda}_{k,i} \geq z_{k,m,n} \qquad \forall k \in \mathbf{K}^{(d)}, m,n \in \mathbf{S}_{M}^{(d)}, i \in \{m,\ldots,n\} \tag{eq\_0010} \\
+  & \mathit{lambda}_{k-1,i} + \mathit{lambda}_{k,i} \geq 1 \qquad \forall k \in \mathbf{K}^{(u)}, i \in \mathbf{S}^{(u)} \tag{eq\_0011} \\
+  & \mathit{lambda}_{k-1,i} + \mathit{lambda}_{k,i} \geq 1 \qquad \forall k \in \mathbf{K}^{(d)}, i \in \mathbf{S}^{(d)} \tag{eq\_0012} \\
+  & a_{k , i} - d_{k , i - 1} = s_{i - 1 , i} , \forall k \in \mathbf{K}^{\left(u\right)} , i - 1 , i \in \mathbf{S}^{\left(u\right)} , \tag{eq\_0013} \\
+  & a_{k , i} - d_{k , i - 1} = s_{i - 1 , i} , \forall k \in \mathbf{K}^{\left(d\right)} , i - 1 , i \in \mathbf{S}^{\left(d\right)} , \tag{eq\_0014} \\
+  & d_{k , i} - a_{k , i} = e_{i} , \forall k \in \mathbf{K}^{\left(u\right)} , i \in \mathbf{S}^{\left(u\right)} , \tag{eq\_0015} \\
+  & d_{k , i} - a_{k , i} = e_{i} , \forall k \in \mathbf{K}^{\left(d\right)} , i \in \mathbf{S}^{\left(d\right)} . \tag{eq\_0016} \\
+  & h_{m i n} \cdot \mathit{tau}_{k} \leq h_{k - 1 , k} \leq h_{m a x} \cdot \mathit{tau}_{k} , \forall k - 1 , k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0018} \\
+  & h_{m i n} \cdot \mathit{tau}_{k} \leq h_{k - 1 , k} \leq h_{m a x} \cdot \mathit{tau}_{k} , \forall k - 1 , k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0019} \\
+  & d_{k , i} = d_{k - 1 , i} + h_{k - 1 , k} , \forall k - 1 , k \in \mathbf{K}^{\left(u\right)} , i \in \mathbf{S}^{\left(u\right)} , \tag{eq\_0020} \\
+  & d_{k , i} = d_{k - 1 , i} + h_{k - 1 , k} , \forall k - 1 , k \in \mathbf{K}^{\left(d\right)} , i \in \mathbf{S}^{\left(d\right)} . \tag{eq\_0021} \\
+  & 2 \cdot \mathit{gamma}_{k , l , m} \leq \sum_{i \in \mathbf{S}_{M}^{\left(u\right)}} z_{k , i , m} + \sum_{i \in \mathbf{S}_{M}^{\left(d\right)}} z_{l , 2 N + 1 - m , i} , \forall k \in \mathbf{K}^{\left(u\right)} , l \in \mathbf{K}^{\left(d\right)} , m \in \mathbf{S}_{M}^{\left(u\right)} . \tag{eq\_0022} \\
+  & a_{l , 2 N + 1 - m} - d_{k , m} \geq \mathit{delta}_{m}^{m i n} + M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(u\right)} , l \in \mathbf{K}^{\left(d\right)} , m \in \mathbf{S}_{M}^{\left(u\right)} , \tag{eq\_0024} \\
+  & a_{l , 2 N + 1 - m} - d_{k , m} \leq \mathit{delta}_{m}^{m a x} - M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(u\right)} , l \in \mathbf{K}^{\left(d\right)} , m \in \mathbf{S}_{M}^{\left(u\right)} . \tag{eq\_0025} \\
+  & 2 \cdot \mathit{gamma}_{k , l , m} \leq \sum_{i \in \mathbf{S}_{M}^{\left(d\right)}} z_{k , i , m} + \sum_{i \in \mathbf{S}_{M}^{\left(u\right)}} z_{l , 2 N + 1 - m , i} , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} , \tag{eq\_0026} \\
+  & a_{l , 2 N + 1 - m} - d_{k , m} \geq \mathit{delta}_{m}^{m i n} + M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} , \tag{eq\_0027} \\
+  & a_{l , 2 N + 1 - m} - d_{k , m} \leq \mathit{delta}_{m}^{m a x} - M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} . \tag{eq\_0028} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}} \sum_{l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0029} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}} \sum_{l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0030} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}} \sum_{l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0031} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}} \sum_{l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0032} \\
+  & R \cdot S^{1} \geq \sum_{k \in \mathbf{K}^{\left(u\right)}} \mathit{alpha}_{k}^{\left(u\right)} . \tag{eq\_0033} \\
+  & R \cdot S^{2} \geq \sum_{k \in \mathbf{K}^{\left(d\right)}} \mathit{alpha}_{k}^{\left(d\right)} . \tag{eq\_0034} \\
+  & R \cdot S^{1} + R \cdot S^{2} \leq R \cdot S . \tag{eq\_0035} \\
+  & \mathit{alpha}_{k}^{\left(u\right)} \leq \sum_{n \in \mathbf{S}_{M}^{\left(u\right)}} z_{k , 1 , n} , \tag{eq\_0036} \\
+  & \mathit{beta}_{k}^{\left(u\right)} \leq \sum_{n \in \mathbf{S}_{M}^{\left(u\right)}} z_{k , n , N} . \tag{eq\_0037} \\
+  & \mathit{alpha}_{k}^{\left(d\right)} \leq \sum_{n \in \mathbf{S}_{M}^{\left(d\right)}} z_{k , N + 1 , n} , \tag{eq\_0038} \\
+  & \mathit{beta}_{k}^{\left(d\right)} \leq \sum_{n \in \mathbf{S}_{M}^{\left(d\right)}} z_{k , n , 2 N} . \tag{eq\_0039} \\
+  & w_{k , i}^{b} = \sum_{j = i + 1}^{N} w_{k , i , j}^{b} , \forall k \in \mathbf{K}^{\left(u\right)} , i \in \mathbf{S}^{\left(u\right)} , \tag{eq\_0040} \\
+  & w_{k , i , j}^{b} = w_{k , i , j} \cdot \mathit{lambda}_{k , i} \cdot \mathit{lambda}_{k , j} , \forall k \in \mathbf{K}^{\left(u\right)} , i , j \in \mathbf{S}^{\left(u\right)} , i < j . \tag{eq\_0042} \\
+  & c_{k , i} = c_{k , i - 1} - c_{k , i}^{a} + c_{k , i}^{b} , \forall k \in \mathbf{K}^{\left(u\right)} , i \in \mathbf{S}^{\left(u\right)} . \tag{eq\_0043} \\
+  & c_{k , i}^{a} = \sum_{j = 1}^{i - 1} c_{k , j , i}^{b} , \forall k \in \mathbf{K}^{\left(u\right)} , i \in \mathbf{S}^{\left(u\right)} . \tag{eq\_0045} \\
+  & v_{k , i , j} = w_{k , i , j} - c_{k , i , j}^{b} , \forall k \in \mathbf{K}^{\left(u\right)} , i , j \in \mathbf{S}^{\left(u\right)} , i < j . \tag{eq\_0047} \\
+  & f_{k}^{\left(u\right)} = \sum_{i \in \mathbf{S}^{\left(u\right)}} \underset{\genfrac{}{}{0pt}{}{j \in \mathbf{S}^{\left(u\right)} ,}{j > i}}{\sum} \frac{\left(v_{k - 1 , i , j} + w_{k , i , j}\right) \cdot \left(d_{k , i} - d_{k - 1 , i}\right)}{2} . \tag{eq\_0049} \\
+  & f_{k}^{\left(d\right)} = \sum_{i \in \mathbf{S}^{\left(d\right)}} \underset{\genfrac{}{}{0pt}{}{j \in \mathbf{S}^{\left(d\right)} ,}{j > i}}{\sum} \frac{\left(v_{k - 1 , i , j} + w_{k , i , j}\right) \cdot \left(d_{k , i} - d_{k - 1 , i}\right)}{2} . \tag{eq\_0050} \\
+  & F = \sum_{k \in \mathbf{K}^{\left(u\right)}} f_{k}^{\left(u\right)} + \sum_{k \in \mathbf{K}^{\left(d\right)}} f_{k}^{\left(d\right)} . \tag{eq\_0051} \\
+  \min\quad & F \tag{eq\_0052} \\
+  & \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} = 1 . \tag{eq\_0057} \\
+  & d_{k , i} = \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} \cdot T_{r} + \mathit{mu}_{k , i}^{r} . \tag{eq\_0058} \\
+  & \mathit{mu}_{k , i}^{r} \leq \left(\mathit{rho} - \mathit{epsilon}\right) \cdot \mathit{theta}_{k , i}^{r} . \tag{eq\_0059} \\
+  & Q_{k , i , j} = \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} \cdot \left(\sum_{r^{'} = 1}^{r - 1} P_{i , j} \left[r^{'}\right] \cdot \mathit{rho}\right) + \sum_{r = 1}^{R} \mathit{mu}_{k , i}^{r} \cdot P_{i , j} \left[r\right] . \tag{eq\_0060} \\
+  & 0 \leq w_{k , i , j}^{b} \leq w_{k , i , j} , \tag{eq\_0062} \\
+  & w_{k , i , j}^{b} \leq M \cdot \mathit{lambda}_{k , i} , \tag{eq\_0063} \\
+  & w_{k , i , j}^{b} \leq M \cdot \mathit{lambda}_{k , j} , \tag{eq\_0064} \\
+  & w_{k , i , j}^{b} \geq w_{k , i , j} - M \cdot \left(2 - \mathit{lambda}_{k , i} - \mathit{lambda}_{k , j}\right) . \tag{eq\_0065} \\
+  & c_{k , i}^{b} \leq w_{k , i}^{b} , \tag{eq\_0066} \\
+  & c_{k , i}^{b} \leq C - c_{k , i - 1} + c_{k , i}^{a} , \tag{eq\_0067} \\
+  & c_{k , i}^{b} \geq w_{k , i}^{b} - M \cdot \left(1 - \mathit{psi}_{k , i}\right) , \tag{eq\_0068} \\
+  & c_{k , i}^{b} \geq C - c_{k , i - 1} + c_{k , i}^{a} - M \cdot \mathit{psi}_{k , i} . \tag{eq\_0069} \\
+  & \mathit{psi}_{k , i} > \frac{\left(C - c_{k , i - 1} + c_{k , i}^{a}\right) - w_{k , i}^{b}}{M} , \tag{eq\_0071} \\
+  & \mathit{psi}_{k , i} \leq 1 + \frac{\left(C - c_{k , i - 1} + c_{k , i}^{a}\right) - w_{k , i}^{b}}{M} , \tag{eq\_0072} \\
+  & \mathit{psi}_{k , i} \in \left\{0 , 1\right\} . \tag{eq\_0073} \\
+  & c_{k , i , j}^{b} = \mathit{phi}_{k , i , j} \cdot c_{k , i}^{b} , \tag{eq\_0074} \\
+  & w_{k , i , j}^{b} = \mathit{phi}_{k , i , j} \cdot w_{k , i}^{b} . \tag{eq\_0075} \\
+\end{align}

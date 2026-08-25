@@ -1,0 +1,69 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2016.11.002
+%@ meta id=10.1016_j.jrtpm.2016.11.002 family=milp schema=0.1.0
+%@ name :: Models for railway timetable optimization: Applicability and applications in practice
+%@ desc :: Mined from Models for railway timetable optimization: Applicability and applications in practice (Journal of Rail Transport Planning & Management, 2016).
+%@ prov source :: 10.1016/j.jrtpm.2016.11.002
+%@ prov reference :: Models for railway timetable optimization: Applicability and applications in practice
+%@ prov author :: Gabrio Caimi; Leo Kroon; Christian Liebchen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted objective over feasible periodic timetables
+%@ var x shape=A domain=continuous role=primary drole=- lo=- hi=- :: Periodic tension variables representing durations of processes between events
+%@ index X ordered=0 cyclic=0 :: Set of timetables of the more general strategy
+%@ param f shape=- kind=scalar domain=- :: Quality measure for timetables
+%@ index Y ordered=0 cyclic=0 :: Set defining more restrictive strategy timetables
+%@ param T shape=- kind=scalar domain=- :: Period time
+%@ param mod shape=- kind=scalar domain=- :: Modulo operator
+%@ param u shape=A kind=vector domain=- :: Upper bounds for periodic constraints
+%@ var p shape=A domain=integer role=primary drole=- lo=- hi=- :: Integer variables indicating period crossings
+%@ param B shape=V,A kind=matrix domain=- :: Vertex-arc incidence matrix of constraint graph
+%@ param MIP shape=- kind=scalar domain=- :: Mixed integer programming formulation
+%@ param PESP shape=- kind=scalar domain=- :: Periodic Event Scheduling Problem
+%@ param w shape=A kind=vector domain=- :: Weights on arcs for objective function
+%@ index Z ordered=0 cyclic=0 :: Set of integers
+%@ param IP shape=- kind=scalar domain=- :: Integer programming formulation
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variables for cycle periodicity
+%@ index R ordered=0 cyclic=0 :: Set of real numbers
+%@ param s shape=- kind=scalar domain=- :: Symmetry time
+%@ var q shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variables for symmetry constraints
+%@ index A ordered=0 cyclic=0 :: Set of periodic constraints (arcs)
+%@ index V ordered=0 cyclic=0 :: Set of events in the periodic event scheduling problem
+%@ con eq_0002 kind=linear domain=- indicator=- :: PESP constraint: 0 ≤ (π_j − π_i − ℓ_a) mod T ≤ u_a − ℓ_a
+%@ con eq_0004 kind=linear domain=- indicator=- :: Equivalent integer PESP constraint: ℓ_a ≤ π_j − π_i + T p_a ≤ u_a
+%@ con eq_0005 kind=linear domain=- indicator=- :: Objective of PESP-MIP: minimize w^T (B^T π + T p)
+%@ con eq_0006 kind=linear domain=- indicator=- :: PESP-MIP constraint: ℓ ≤ B^T π + T p ≤ u
+%@ con eq_0007 kind=linear domain=- indicator=- :: PESP-MIP constraint: 0 ≤ π < T 1
+%@ con eq_0008 kind=linear domain=- indicator=- :: PESP-MIP integrality: p_a ∈ Z^A
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of periodic tension variable x_a
+%@ con eq_0010 kind=linear domain=- indicator=- :: Relation between tension and event times: x_a = π_j − π_i + T p_a
+%@ con eq_0011 kind=linear domain=- indicator=- :: Objective of PESP-IP: minimize w^T x
+%@ con eq_0012 kind=linear domain=- indicator=- :: PESP-IP constraint: ℓ ≤ x ≤ u
+%@ con eq_0013 kind=linear domain=- indicator=- :: Cycle periodicity constraint: Γ^T x − T z = 0
+%@ con eq_0014 kind=linear domain=- indicator=- :: Integrality of cycle variables: z ∈ Z^v
+%@ con eq_0015 kind=linear domain=- indicator=- :: Domain of tension variables: x ∈ R^A
+%@ con eq_0016 kind=linear domain=- indicator=- :: Symmetry constraint: π_i + π_j = 2 s mod T
+%@ con eq_0017 kind=linear domain=- indicator=- :: Linearized symmetry constraint: π_i + π_j + T q_ij = 2 s
+%@ con eq_0018 kind=linear domain=- indicator=- :: Symmetric tension constraint: x_a = x_{ \bar a }
+%@ con eq_0019 kind=linear domain=- indicator=- :: FDP constraint: ℓ_a ≤ π_j − π_i ≤ u_a
+%@ con eq_0020 kind=linear domain=- indicator=- :: FPESP constraint: ℓ_a + δ_i ≤ π_j − π_i + T p_a ≤ u_a − δ_j
+\begin{align}
+  \max\quad & \{ f(x) | x \in X \} \geq \max \{ f(x) | x \in X \cap Y \} \tag{eq\_0001} \\
+  & 0 \leq \left(\mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{a}\right) \text{mod} T \leq u_{a} - \mathit{ell}_{a} \tag{eq\_0002} \\
+  & \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{a} \leq u_{a} . \tag{eq\_0004} \\
+  & \mathbf{PESP} - \mathbf{MIP:} \mathbf{minimize} w^{T} \cdot \left(B^{T} \mathit{pi} + T \cdot p\right) \tag{eq\_0005} \\
+  & \text{Subject} \text{to} \mathit{ell} \leq B^{T} \mathit{pi} + T \cdot p \leq u \tag{eq\_0006} \\
+  & 0 \leq \mathit{pi} < T 1 \tag{eq\_0007} \\
+  & p_{a} \in \mathcal{Z}^{A} \tag{eq\_0008} \\
+  & x_{a} : = \left(\mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{a}\right) \text{mod} T + \mathit{ell}_{a} , \tag{eq\_0009} \\
+  & x_{a} = \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{a} . \tag{eq\_0010} \\
+  & \mathbf{PESP} - \mathbf{IP} - x - z \mathbf{:} \mathbf{minimize} w^{T} \cdot x \tag{eq\_0011} \\
+  & \text{Subject} \text{to} \mathit{ell} \leq x \leq u \tag{eq\_0012} \\
+  & \mathit{Gamma}^{T} x - T \cdot z = 0 \tag{eq\_0013} \\
+  & z \in \mathcal{Z}^{v} \tag{eq\_0014} \\
+  & x \in \mathcal{R}^{A} \tag{eq\_0015} \\
+  & \mathit{pi}_{i} + \mathit{pi}_{j} = 2 \cdot s \text{mod} T \tag{eq\_0016} \\
+  & \mathit{pi}_{i} + \mathit{pi}_{j} + T \cdot q_{i j} = 2 \cdot s \tag{eq\_0017} \\
+  & x_{a} = x_{\bar{a}} . \tag{eq\_0018} \\
+  & \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} \leq u_{a} , \tag{eq\_0019} \\
+  & \mathit{ell}_{a} + \mathit{delta}_{i} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{a} \leq u_{a} - \mathit{delta}_{j} \textrm{ } \forall a \in A , \tag{eq\_0020} \\
+\end{align}

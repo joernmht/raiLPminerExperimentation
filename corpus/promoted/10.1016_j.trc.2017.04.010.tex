@@ -1,0 +1,92 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2017.04.010
+%@ meta id=10.1016_j.trc.2017.04.010 family=milp schema=0.1.0
+%@ name :: Integrated optimization on train scheduling and preventive maintenance time slots planning
+%@ desc :: Mined from Integrated optimization on train scheduling and preventive maintenance time slots planning (Transportation Research Part C Emerging Technologies, 2017).
+%@ prov source :: 10.1016/j.trc.2017.04.010
+%@ prov reference :: Integrated optimization on train scheduling and preventive maintenance time slots planning
+%@ prov author :: Xiaojie Luan; Jianrui Miao; Lingyun Meng; Francesco Corman; Gabriël Lodewijks
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total absolute arrival time deviations of real trains at destinations from ideal timetable
+%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative arrival flow variable for train f on cell (i,j) at time t
+%@ index i ordered=0 cyclic=0 :: Index for nodes in the railway network
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative departure flow variable for train f on cell (i,j) at time t
+%@ param P shape=- kind=scalar domain=- :: Problem identifier (e.g., P1, PLR)
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (e.g., Z_P1, Z_LR)
+%@ param q shape=- kind=vector domain=- :: Ideal arrival time of real train r at its destination
+%@ index E ordered=0 cyclic=0 :: Set of cells (edges) in the railway network
+%@ index R ordered=0 cyclic=0 :: Set of real trains
+%@ index F ordered=0 cyclic=0 :: Set of all trains (real and virtual)
+%@ index o ordered=0 cyclic=0 :: Origin node of a train
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f uses cell (i,j)
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the railway network
+%@ var tau shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train f on cell (i,j)
+%@ param delta shape=- kind=matrix domain=- :: Minimum or maximum dwell time of real train r on cell (i,j)
+%@ param sigma shape=- kind=matrix domain=- :: Free flow running time of real train r on cell (i,j)
+%@ index V ordered=0 cyclic=0 :: Set of virtual trains (PMTSs)
+%@ param w shape=- kind=matrix domain=- :: Duration of PMTS (virtual train) on cell (i,j)
+%@ param g shape=- kind=matrix domain=- :: Time interval between cell blockage and train arrival
+%@ param h shape=- kind=matrix domain=- :: Time interval between train departure and cell release
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Cell occupancy indicator for train f on cell (i,j) at time t
+%@ param C shape=- kind=matrix domain=- :: Capacity of cell (i,j) at time t
+%@ var LR shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian subproblem objective for a train
+%@ param lambda shape=u kind=vector domain=- :: Step size in subgradient method
+%@ index u ordered=0 cyclic=0 :: Iteration index in Lagrangian relaxation
+%@ var z shape=u domain=continuous role=primary drole=- lo=- hi=- :: Local lower or upper bound at iteration u
+%@ con eq_0001 kind=linear domain=- indicator=- :: Transforms arrival time variable to cumulative arrival flow
+%@ con eq_0002 kind=linear domain=- indicator=- :: Transforms departure time variable to cumulative departure flow
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Flow balance at origin: each train chooses exactly one outgoing cell
+%@ con eq_0004 kind=flow_balance domain=- indicator=- :: Flow balance at intermediate nodes: flow conservation
+%@ con eq_0005 kind=flow_balance domain=- indicator=- :: Flow balance at destination: each train chooses exactly one incoming cell
+%@ con eq_0006 kind=linear domain=- indicator=- :: Within-cell transition: departure cannot occur before arrival
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cell-to-cell transition: departure from a node equals arrival at next cell
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maps time-space cumulative flow to physical network cell selection
+%@ con eq_0009 kind=linear domain=- indicator=- :: Computes running time from cumulative departure and arrival times
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bounds running time by free-flow time and minimum/maximum dwell time
+%@ con eq_0011 kind=linear domain=- indicator=- :: Time-connectivity: cumulative arrival variables are non-decreasing
+%@ con eq_0012 kind=linear domain=- indicator=- :: Time-connectivity: cumulative departure variables are non-decreasing
+%@ con eq_0013 kind=linear domain=- indicator=- :: Virtual train cannot depart origin before PMTS duration has elapsed
+%@ con eq_0014 kind=linear domain=- indicator=- :: Virtual train running time on each cell is zero
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cell occupancy of real train in initial time segment
+%@ con eq_0016 kind=linear domain=- indicator=- :: Cell occupancy of real train in middle time segment
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cell occupancy of real train in final time segment
+%@ con eq_0018 kind=linear domain=- indicator=- :: Cell occupancy of virtual train in middle time segment
+%@ con eq_0019 kind=linear domain=- indicator=- :: Cell occupancy of virtual train in final time segment
+%@ con eq_0020 kind=capacity domain=- indicator=- :: Cell capacity constraint limiting simultaneous train occupancy
+%@ con eq_0021 kind=linear domain=- indicator=- :: Lagrangian relaxation objective penalizing capacity usage
+%@ con eq_0022 kind=linear domain=- indicator=- :: Lagrangian dual objective maximizing lower bound
+%@ con eq_0024 kind=linear domain=- indicator=- :: Lagrangian subproblem objective for a real train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Lagrangian subproblem objective for a virtual train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Multiplier update by subgradient method
+%@ con eq_0027 kind=linear domain=- indicator=- :: Initialization of multipliers, step size, local and global bounds
+%@ con eq_0028 kind=linear domain=- indicator=- :: Update of global upper bound from feasible solutions
+\begin{align}
+  & {a}_{r} \left(i , j\right) = \sum_{1 \leq t \leq T} t \cdot \left[a_{r} \left(i , j , t\right) - a_{r} \left(i , j , t - 1\right)\right] \tag{eq\_0001} \\
+  & {d}_{r} \left(i , j\right) = \sum_{1 \leq t \leq T} t \cdot \left[d_{r} \left(i , j , t\right) - d_{r} \left(i , j , t - 1\right)\right] \tag{eq\_0002} \\
+  & \left(\text{P}_{1}\right) : Z_{\text{P}_{1}} = \text{min} \sum_{r \in R} \sum_{\left(i , s_{r}\right) \in E_{S}} \left|\sum_{1 \leq t \leq T} \left[t \cdot \left(d_{r} \left(i , s_{r} , t\right) - d_{r} \left(i , s_{r} , t - 1\right)\right)\right] - q_{r}\right| \tag{eq\_0003} \\
+  & \sum_{j : \left(o_{f} , j\right) \in E_{f}} x_{f} \left(o_{f} , j\right) = 1 \forall f \in F \tag{eq\_0004} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} x_{f} \left(i , j\right) = \sum_{k : \left(j , k\right) \in E_{f}} x_{f} \left(j , k\right) \forall f \in F , j \in N \backslash \left\{o_{f} , s_{f}\right\} \tag{eq\_0005} \\
+  & \sum_{i : \left(i , s_{f}\right) \in E_{f}} x_{f} \left(i , s_{f}\right) = 1 \forall f \in F \tag{eq\_0006} \\
+  & d_{f} \left(i , j , t\right) \leq a_{f} \left(i , j , t\right) \forall f \in F , \left(i , j\right) \in E_{f} , 1 \leq t \leq T \tag{eq\_0007} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} d_{f} \left(i , j , t\right) = \sum_{k : \left(j , k\right) \in E_{f}} a_{f} \left(j , k , t\right) \forall f \in F , j \in N \backslash \left\{o_{f} , s_{f}\right\} , 1 \leq t \leq T \tag{eq\_0008} \\
+  & x_{f} \left(i , j\right) = a_{f} \left(i , j , T\right) \forall f \in F , \left(i , j\right) \in E_{f} \tag{eq\_0009} \\
+  & \mathit{tau}_{f} \left(i , j\right) = \sum_{1 \leq t \leq T} \left[t \cdot \left(d_{f} \left(i , j , t\right) - d_{f} \left(i , j , t - 1\right)\right)\right] - \sum_{1 \leq t \leq T} \left[t \cdot \left(a_{f} \left(i , j , t\right) - a_{f} \left(i , j , t - 1\right)\right)\right] \forall f \in F , \left(i , j\right) \in E_{f} \tag{eq\_0010} \\
+  & \left[\mathit{delta}_{r}^{\text{max}} \left(i , j\right) + \mathit{sigma}_{r} \left(i , j\right)\right] \cdot x_{r} \left(i , j\right) \geq \mathit{tau}_{r} \left(i , j\right) \geq \left[\mathit{delta}_{r}^{\text{min}} \left(i , j\right) + \mathit{sigma}_{r} \left(i , j\right)\right] \cdot x_{r} \left(i , j\right) \forall r \in R , \left(i , j\right) \in E_{r} \tag{eq\_0011} \\
+  & a_{f} \left(i , j , t\right) \geq a_{f} \left(i , j , t - 1\right) \forall f \in F , \left(i , j\right) \in E_{f} , 1 \leq t \leq T \tag{eq\_0012} \\
+  & d_{f} \left(i , j , t\right) \geq d_{f} \left(i , j , t - 1\right) \forall f \in F , \left(i , j\right) \in E_{f} , 1 \leq t \leq T \tag{eq\_0013} \\
+  & \sum_{1 \leq t \leq T} \left[t \cdot \left(a_{v} \left(o_{v} , j , t\right) - a_{v} \left(o_{v} , j , t - 1\right)\right)\right] \geq w_{v} \left(o_{v} , j\right) \forall v \in V , \left(o_{v} , j\right) \in E_{v} \tag{eq\_0014} \\
+  & \mathit{tau}_{v} \left(i , j\right) = 0 \forall v \in V , \left(i , j\right) \in E_{v} \tag{eq\_0015} \\
+  & y_{r} \left(i , j , t\right) = a_{r} \left(i , j , t + g_{r} \left(i , j\right)\right) - 0 \forall r \in R , \left(i , j\right) \in E_{r} , 1 \leq t < h_{r} \left(i , j\right) + 1 \tag{eq\_0016} \\
+  & y_{r} \left(i , j , t\right) = a_{r} \left(i , j , t + g_{r} \left(i , j\right)\right) - d_{r} \left(i , j , t - h_{r} \left(i , j\right)\right) \forall r \in R , \left(i , j\right) \in E_{r} , h_{r} \left(i , j\right) + 1 \leq t \leq T - g_{r} \left(i , j\right) \tag{eq\_0017} \\
+  & y_{r} \left(i , j , t\right) = x_{r} \left(i , j\right) - d_{r} \left(i , j , t - h_{r} \left(i , j\right)\right) \forall r \in R , \left(i , j\right) \in E_{r} , T - g_{r} \left(i , j\right) < t \leq T \tag{eq\_0018} \\
+  & y_{v} \left(i , j , t\right) = a_{v} \left(i , j , t + w_{v} \left(i , j\right)\right) - d_{v} \left(i , j , t\right) \forall v \in V , \left(i , j\right) \in E_{v} , 1 \leq t \leq T - w_{v} \left(i , j\right) \tag{eq\_0019} \\
+  & y_{v} \left(i , j , t\right) = x_{v} \left(i , j\right) - d_{v} \left(i , j , t\right) \forall v \in V , \left(i , j\right) \in E_{v} , T - w_{v} \left(i , j\right) < t \leq T \tag{eq\_0020} \\
+  & \frac{\sum_{v \in V : \left(i , j\right) \in E_{v}} y_{v} \left(i , j , t\right)}{\left|V\right|} + \sum_{r \in R : \left(i , j\right) \in E_{r}} y_{r} \left(i , j , t\right) + \underset{r^{'} \in R : \left(j , i\right) \in E_{r^{'}}}{\sum} y_{r^{'}} \left(j , i , t\right) \leq C \left(i , j , t\right) \forall \left(i , j\right) \in E , 1 \leq t \leq T \tag{eq\_0021} \\
+  & \left(\text{P}_{\text{LR}}\right) : Z_{\text{P}_{\text{LR}}} = \text{min} \sum_{r \in R} \sum_{\left(i , s_{r}\right) \in E_{S}} \left|\sum_{1 \leq t \leq T} \left[t \cdot \left(d_{r} \left(i , s_{r} , t\right) - d_{r} \left(i , s_{r} , t - 1\right)\right)\right] - q_{r}\right| + \sum_{\left(i , j\right) \in E} \sum_{1 \leq t \leq T} \mathit{alpha}_{i , j , t} \cdot \left[\frac{\sum_{v \in V : \left(i , j\right) \in E_{v}} y_{v} \left(i , j , t\right)}{\left|V\right|} + \sum_{r \in R : \left(i , j\right) \in E_{r}} y_{r} \left(i , j , t\right) + \underset{r^{'} \in R : \left(j , i\right) \in E_{r^{'}}}{\sum} y_{r^{'}} \left(j , i , t\right) - C \left(i , j , t\right)\right] \tag{eq\_0022} \\
+  \max_{\mathit{alpha}_{i\quad & , j , t} \geq 0} Z_{\text{LR}} = - \sum_{\left(i , j\right) \in E} \sum_{1 \leq t \leq T} \left[\mathit{alpha}_{i , j , t} \cdot C \left(i , j , t\right)\right] + min \text{LR}_{r} + min \frac{\text{LR}_{v}}{\left|V\right|} \tag{eq\_0023} \\
+  & \text{LR}_{r} = \sum_{\left(i , s_{r}\right) \in E_{S}} \left|\sum_{1 \leq t \leq T} \left[t \cdot \left(d_{r} \left(i , s_{r} , t\right) - d_{r} \left(i , s_{r} , t - 1\right)\right)\right] - q_{r}\right| + \sum_{\left(i , j\right) \in E} \sum_{1 \leq t \leq T} \left[\mathit{alpha}_{i , j , t} \cdot y_{r} \left(i , j , t\right)\right] \tag{eq\_0024} \\
+  & \text{LR}_{v} = \sum_{\left(i , j\right) \in E} \sum_{1 \leq t \leq T} \left[\mathit{alpha}_{i , j , t} \cdot y_{v} \left(i , j , t\right)\right] \tag{eq\_0025} \\
+  & \mathit{alpha}_{i , j , t}^{u + 1} = max \left\{0 , \mathit{alpha}_{i , j , t}^{u} + \mathit{lambda}^{u} \cdot \left[\frac{\sum_{v \in V : \left(i , j\right) \in E_{v}} y_{v} \left(i , j , t\right)}{\left|V\right|} + \sum_{r \in R : \left(i , j\right) \in E_{r}} y_{r} \left(i , j , t\right) + \underset{r^{'} \in R : \left(j , i\right) \in E_{r^{'}}}{\sum} y_{r^{'}} \left(j , i , t\right) - C \left(i , j , t\right)\right]\right\} \tag{eq\_0026} \\
+  & Z_{\text{LB}}^{u} = \left\{\begin{matrix} z_{\text{LB}}^{1} , & \text{if} u = 1 \\ max \left\{z_{\text{LB}}^{u} , Z_{\text{LB}}^{u - 1}\right\} , & \text{if} u > 1 \end{matrix}\right \tag{eq\_0027} \\
+  & Z_{\text{UB}}^{u} = \left\{\begin{matrix} z_{\text{UB}}^{1} , & \text{if} u = 1 \\ min \left\{z_{\text{UB}}^{u} , Z_{\text{UB}}^{u - 1}\right\} , & \text{if} u > 1 \end{matrix}\right \tag{eq\_0028} \\
+\end{align}

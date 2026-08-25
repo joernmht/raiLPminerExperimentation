@@ -1,0 +1,102 @@
+% Declaration sidecar for 10.1016_j.trb.2015.03.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2015.03.004
+% Train scheduling for minimizing passenger waiting time with time-dependent demand and skip-stop patterns: Nonlinear integer programming models with linear constraints
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2015.03.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time at stations
+
+% TD: classified as variable during review
+%@ var TD shape=- domain=non_negative role=primary :: Departure time of train j at station u
+
+% P: classified as parameter during review
+%@ param P shape=- kind=matrix :: Passenger demand flow rate from station u to v at time t
+
+% unusable as an identifier, rename or drop: τ
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of trains
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Number of stations
+
+% Q: classified as variable during review
+%@ var Q shape=- domain=non_negative role=primary :: Number of passengers in train j after departing station u
+
+% c: classified as parameter during review
+%@ param c shape=- kind=vector :: Capacity of train j
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Station index
+
+% unusable as an identifier, rename or drop: μ
+% TA: classified as variable during review
+%@ var TA shape=- domain=non_negative role=primary :: Arrival time of train j at station u
+
+% TR: classified as variable during review
+%@ var TR shape=- domain=non_negative role=primary :: Buffer time of train j at segment u to u+1
+
+% r: classified as parameter during review
+%@ param r shape=- kind=vector :: Running time of train on segment u
+
+% unusable as an identifier, rename or drop: ε
+% TS: classified as variable during review
+%@ var TS shape=- domain=non_negative role=primary :: Stopping time of train j at station u
+
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: Δ
+% TL: classified as variable during review
+%@ var TL shape=- domain=binary role=primary :: Loading time indicator for train j at station u for destination v at time t
+
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary :: Cumulative binary variable for departure time of train j at station u
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive number
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary :: Binary variable indicating if train j departs station u in hour k
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Number of one-hour periods
+
+% Bound by a quantifier or big operator, so no declaration of their own: j, k, t, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0009 kind=capacity :: Train capacity constraint
+%@ con eq_0010 kind=linear :: Linking arrival time to previous departure, running time, acceleration/deceleration and buffer time
+%@ con eq_0011 kind=linear :: Linking departure time to arrival time and stopping time
+%@ con eq_0012 kind=headway :: Departure headway constraint between consecutive trains
+%@ con eq_0013 kind=headway :: Arrival headway constraint between consecutive trains
+%@ con eq_0014 kind=headway :: Station headway constraint between arrival of train j and departure of previous train
+%@ con eq_0015 kind=linear :: Stopping time feasible range constraint
+%@ con eq_0016 kind=linear :: Total buffer time upper bound constraint
+%@ con eq_0017 kind=linear :: First-station departure time bounds
+%@ con eq_0020 kind=capacity :: Capacity constraint with loading time variables
+%@ con eq_0021 kind=linear :: Monotonicity of cumulative departure binary variables
+%@ con eq_0022 kind=linear :: Departure time expressed through cumulative binary variables
+%@ con eq_0032 kind=big_m :: Linking x_j^u(k) to lower bound of one-hour period
+%@ con eq_0033 kind=big_m :: Linking x_j^u(k) to upper bound of one-hour period
+%@ con eq_0034 kind=linear :: Exactly one one-hour period selected for each departure
+%@ con eq_0035 kind=linear :: Linking train departure time and one-hour demand period

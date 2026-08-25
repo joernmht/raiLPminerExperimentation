@@ -1,0 +1,219 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2025.105001
+%@ meta id=10.1016_j.trc.2025.105001 family=milp schema=0.1.0
+%@ name :: Rolling stock rescheduling in high-speed railway networks via a nested Benders decomposition approach
+%@ desc :: Mined from Rolling stock rescheduling in high-speed railway networks via a nested Benders decomposition approach (Transportation Research Part C Emerging Technologies, 2025).
+%@ prov source :: 10.1016/j.trc.2025.105001
+%@ prov reference :: Rolling stock rescheduling in high-speed railway networks via a nested Benders decomposition approach
+%@ prov author :: Denghui Li; Jun Zhao; Qiyuan Peng; Dian Wang; Qingwei Zhong
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of canceled trips, seat-shortage penalties, connection deviations, maintenance costs, (un)couplings, deadheading distance and service time
+%@ var x shape=c,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if composition c serves arc a
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of the rolling stock rescheduling model
+%@ var y shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if trip i is canceled
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the directed acyclic graphs of units/compositions
+%@ index C ordered=0 cyclic=0 :: Set of compositions (single units or coupled pairs)
+%@ index K ordered=0 cyclic=0 :: Set of rolling stock units
+%@ index N ordered=0 cyclic=0 :: Set of nodes (trips) in the time-space network
+%@ var F shape=k domain=integer role=primary drole=- lo=- hi=- :: Actual departure time of unit k from its origin depot
+%@ var G shape=k domain=integer role=primary drole=- lo=- hi=- :: Actual arrival time of unit k at its destination depot
+%@ var L shape=k domain=non_negative role=primary drole=- lo=- hi=- :: Total distance traveled by unit k (including deadheading)
+%@ var z shape=N domain=integer role=primary drole=- lo=- hi=- :: Number of (un)couplings before/after serving trip i
+%@ index D ordered=0 cyclic=0 :: Set of depots
+%@ index k ordered=0 cyclic=0 :: Index for units
+%@ param l shape=- kind=scalar domain=- :: Length or distance parameter
+%@ var f shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual departure time of composition c from station s on deadheading arc a
+%@ var g shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual arrival time of composition c at station s on deadheading arc a
+%@ param n shape=- kind=scalar domain=- :: Number of units or trips
+%@ index c ordered=0 cyclic=0 :: Index for compositions
+%@ param pt shape=- kind=scalar domain=- :: Origin depot of duty
+%@ index B ordered=0 cyclic=0 :: Set of unit types at depot
+%@ index U ordered=0 cyclic=0 :: Set of duties for the following day
+%@ index p ordered=0 cyclic=0 :: Index for stations or depots
+%@ index d ordered=0 cyclic=0 :: Index for depots or duties
+%@ param v shape=- kind=scalar domain=- :: Connection time or speed parameter
+%@ index Q ordered=0 cyclic=0 :: Set of sections
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index P ordered=0 cyclic=0 :: Set of adjacent-trip pairs in sections
+%@ param e shape=- kind=scalar domain=- :: Arrival time of a trip at a station
+%@ param M shape=- kind=scalar domain=- :: Large positive constant used in big-M constraints
+%@ var w shape=A,A,Q domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if deadheading arc a enters section q before arc a'
+%@ index T ordered=0 cyclic=0 :: Set of trips at a station
+%@ index R ordered=0 cyclic=0 :: Set of maintenance limits
+%@ index H ordered=0 cyclic=0 :: Set of maintenance appointments at depots
+%@ param m shape=- kind=scalar domain=- :: Start or end time of a maintenance appointment
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of actual departure time F_k
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of actual arrival time G_k
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum train length constraint
+%@ con eq_0008 kind=linear domain=- indicator=- :: At most one composition per arc
+%@ con eq_0010 kind=linear domain=- indicator=- :: Coupling restriction before trip i
+%@ con eq_0011 kind=linear domain=- indicator=- :: Coupling rule restriction before trip i
+%@ con eq_0012 kind=linear domain=- indicator=- :: Uncoupling rule restriction after trip i
+%@ con eq_0013 kind=linear domain=- indicator=- :: Definition of number of (un)couplings z_i
+%@ con eq_0015 kind=linear domain=- indicator=- :: Following-day duty requires specified number of units
+%@ con eq_0016 kind=linear domain=- indicator=- :: Each unit serves at most one following-day duty
+%@ con eq_0017 kind=linear domain=- indicator=- :: End-of-day depot matches duty origin depot
+%@ con eq_0018 kind=linear domain=- indicator=- :: Fixed departure time for sign-on arcs before disruption
+%@ con eq_0019 kind=linear domain=- indicator=- :: Bounds for uncoupling indicator
+%@ con eq_0020 kind=linear domain=- indicator=- :: Bounds for coupling indicator
+%@ con eq_0021 kind=linear domain=- indicator=- :: Minimum connection time after trip
+%@ con eq_0022 kind=linear domain=- indicator=- :: Deadheading running time bounds in sections
+%@ con eq_0023 kind=linear domain=- indicator=- :: Dwell time limits at intermediate stations
+%@ con eq_0024 kind=linear domain=- indicator=- :: Arrival time and connection time before next trip
+%@ con eq_0025 kind=linear domain=- indicator=- :: Unit arrival time before following-day duty departure
+%@ con eq_0026 kind=linear domain=- indicator=- :: Departure headway between deadheading and timetable trips
+%@ con eq_0027 kind=linear domain=- indicator=- :: Arrival headway between deadheading and timetable trips
+%@ con eq_0028 kind=linear domain=- indicator=- :: Departure ordering between deadheading arcs (big-M)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Arrival ordering between deadheading arcs (big-M)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Consistency of ordering between deadheading arcs
+%@ con eq_0031 kind=linear domain=- indicator=- :: Deadheading arc inserted at most once in adjacent-trip pair
+%@ con eq_0032 kind=linear domain=- indicator=- :: Deadheading arc inserted in every section if used
+%@ con eq_0034 kind=linear domain=- indicator=- :: Count of deadheading arrivals before trip i at station
+%@ con eq_0036 kind=linear domain=- indicator=- :: Total trip distance of unit k
+%@ con eq_0038 kind=linear domain=- indicator=- :: Service time limit for unit k
+%@ con eq_0040 kind=linear domain=- indicator=- :: Service time plus following-day duty triggers maintenance
+%@ con eq_0042 kind=linear domain=- indicator=- :: Selection of one maintenance appointment for unit k
+%@ con eq_0043 kind=linear domain=- indicator=- :: Maintenance start time feasible for unit k
+%@ con eq_0044 kind=linear domain=- indicator=- :: Available time after maintenance before duty departure
+%@ con eq_0046 kind=linear domain=- indicator=- :: Avoid overlapping maintenance appointments on same track
+%@ con eq_0048 kind=linear domain=- indicator=- :: Maintenance track length capacity
+%@ con eq_0050 kind=linear domain=- indicator=- :: Binary domain for x
+%@ con eq_0052 kind=linear domain=- indicator=- :: Binary domain for y
+%@ con eq_0053 kind=linear domain=- indicator=- :: Domain for z (0,1,2)
+%@ con eq_0054 kind=linear domain=- indicator=- :: Binary domain for gamma
+%@ con eq_0056 kind=linear domain=- indicator=- :: Nonnegativity of L_k^trip and L_k^dead
+%@ con eq_0058 kind=linear domain=- indicator=- :: Integer domain for f and g
+%@ con eq_0060 kind=linear domain=- indicator=- :: Binary domain for z^-
+%@ con eq_0061 kind=linear domain=- indicator=- :: Binary domain for z^+
+%@ con eq_0063 kind=linear domain=- indicator=- :: Binary domain for epsilon
+%@ con eq_0064 kind=linear domain=- indicator=- :: Binary domain for w
+%@ con eq_0065 kind=linear domain=- indicator=- :: Integer domain for N_arr_dead and N_dep_dead
+%@ con eq_0066 kind=linear domain=- indicator=- :: Integer domain for F and G
+%@ con eq_0067 kind=linear domain=- indicator=- :: Binary domain for chi
+%@ con eq_0070 kind=linear domain=- indicator=- :: Integer domain for delta
+%@ con eq_0073 kind=linear domain=- indicator=- :: OSP(s): each maintenance unit selects an appointment
+%@ con eq_0074 kind=linear domain=- indicator=- :: OSP(s): maintenance start before unit completion
+%@ con eq_0075 kind=linear domain=- indicator=- :: OSP(s): available time before duty departure
+%@ con eq_0076 kind=linear domain=- indicator=- :: OSP(s): available time at least maintenance end
+%@ con eq_0077 kind=linear domain=- indicator=- :: OSP(s): track overlap avoidance
+%@ con eq_0078 kind=linear domain=- indicator=- :: OSP(s): track length capacity
+%@ con eq_0079 kind=linear domain=- indicator=- :: OSP(s): binary domain for chi
+%@ con eq_0080 kind=linear domain=- indicator=- :: Definition of approximate departure time F_k^ap
+%@ con eq_0081 kind=linear domain=- indicator=- :: Definition of approximate arrival time G_k^ap
+%@ con eq_0082 kind=linear domain=- indicator=- :: Valid inequality: approximate arrival before duty departure
+%@ con eq_0083 kind=linear domain=- indicator=- :: Valid inequality: service time limit with approximations
+%@ con eq_0084 kind=linear domain=- indicator=- :: Valid inequality: maintenance trigger with approximations
+%@ con eq_0085 kind=linear domain=- indicator=- :: Valid inequality: theta lower bound on service time
+%@ con eq_0089 kind=linear domain=- indicator=- :: Feasibility cut excluding fixed arcs or duties
+%@ con eq_0090 kind=linear domain=- indicator=- :: Feasibility cut requiring change in x, gamma, or phi
+%@ con eq_0093 kind=linear domain=- indicator=- :: Feasibility cut excluding deadheading arc for composition
+%@ con eq_0094 kind=linear domain=- indicator=- :: Feasibility cut excluding at least one arc of unit k
+%@ con eq_0095 kind=linear domain=- indicator=- :: Feasibility cut requiring change in arc, duty, or maintenance
+%@ con eq_0096 kind=linear domain=- indicator=- :: Symmetry-breaking inequality for coupled compositions
+%@ con eq_0097 kind=linear domain=- indicator=- :: Inner feasibility cut for fixed x, gamma, phi
+%@ con eq_0098 kind=linear domain=- indicator=- :: Inner optimality cut using theta sum
+%@ con eq_0099 kind=linear domain=- indicator=- :: Feasibility cut excluding fixed x, gamma, or phi
+%@ con eq_0100 kind=linear domain=- indicator=- :: Feasibility cut requiring an arc value change
+%@ con eq_0101 kind=linear domain=- indicator=- :: Feasibility cut requiring arc, duty, or phi change
+%@ con eq_0104 kind=linear domain=- indicator=- :: Valid inequality: approximate arrival before duty departure (inner)
+%@ con eq_0105 kind=linear domain=- indicator=- :: Valid inequality: service time upper bound (inner)
+%@ con eq_0106 kind=linear domain=- indicator=- :: Valid inequality: maintenance trigger with approximations (inner)
+%@ con eq_0107 kind=linear domain=- indicator=- :: Valid inequality: theta lower bound (inner)
+%@ con eq_0108 kind=linear domain=- indicator=- :: Symmetry-breaking inequality for coupled units
+%@ con eq_0109 kind=linear domain=- indicator=- :: Outer feasibility cut for unit k
+%@ con eq_0111 kind=linear domain=- indicator=- :: Outer optimality cut lower bound on theta sum
+%@ con eq_0113 kind=linear domain=- indicator=- :: Inner feasibility cut changing fixed variables
+%@ con eq_0114 kind=linear domain=- indicator=- :: Inner feasibility cut for maintenance-related infeasibility
+%@ con eq_0116 kind=linear domain=- indicator=- :: Feasibility cut excluding deadheading arc
+%@ con eq_0117 kind=linear domain=- indicator=- :: Feasibility cut excluding at least one served arc
+%@ con eq_0118 kind=linear domain=- indicator=- :: Feasibility cut changing arc, duty, or maintenance
+%@ con eq_0119 kind=linear domain=- indicator=- :: Valid inequality: total distance symmetry break
+\begin{align}
+  Z\quad & = min \mathit{alpha}_{0} \sum_{i \in N^{trip}} y_{i} + \sum_{c \in C} \sum_{a \in A_{c}^{on} \cup A_{c}^{con}} \mathit{alpha}_{c , i_{a}^{+}}^{1} x_{a}^{c} + \sum_{k \in K} \sum_{c \in C_{k}} \sum_{a \in A_{c}^{nv}} \mathit{alpha}_{k , a}^{2} x_{a}^{c} \tag{eq\_0001} \\
+  & + \sum_{k \in K} \sum_{s \in D_{1}} \mathit{beta}_{k , s}^{0} \mathit{varphi}_{s}^{k} + \mathit{beta}_{1} \sum_{i \in N^{trip}} z_{i} + \mathit{beta}_{2} \sum_{k \in K} \mathit{lambda}_{k}^{unit} L_{k}^{dead} + \mathit{beta}_{3} \sum_{k \in K} \left(G_{k} - F_{k}\right) \tag{eq\_0003} \\
+  & L_{k}^{dead} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{dead}} l_{a}^{dead} \cdot x_{a}^{c} , \forall k \in K , \tag{eq\_0004} \\
+  & F_{k} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{on}} f_{a , p_{i_{a}^{-}}^{des}}^{c} , \forall k \in K , \tag{eq\_0006} \\
+  & G_{k} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{off}} g_{a , p_{i_{a}^{+}}^{ori}}^{c} , \forall k \in K , \tag{eq\_0008} \\
+  & \sum_{c \in C_{k}} \sum_{a \in A_{c , i}^{-}} x_{a}^{c} - \sum_{c \in C_{k}} \sum_{a \in A_{c , i}^{+}} x_{a}^{c} = \left\{\begin{matrix} 1 , & i = n_{k}^{ori} \\ - 1 , & i = n_{sink} \\ 0 , & otherwise \end{matrix}\right , \forall k \in K , \forall i \in N_{k} , \tag{eq\_0010} \\
+  & \sum_{c \in C} \sum_{a \in A_{c , i}^{+}} \sum_{k \in K_{c}} \mathit{rho}_{k} x_{a}^{c} \leq ϖ_{i} , \forall i \in N^{trip} , \tag{eq\_0011} \\
+  & \sum_{c \in C} \sum_{a \in A_{c , i}^{+}} x_{a}^{c} + y_{i} \geq 1 , \forall i \in N^{t r i p} , \tag{eq\_0012} \\
+  & \sum_{c \in C_{a}} x_{a}^{c} \leq 1 , \forall a \in A_{1} , \tag{eq\_0013} \\
+  & 2 \sum_{a \in {A}_{c , i}^{+}} x_{a}^{c} + \underset{c^{'} \in C_{i}^{\text{al}} \backslash \left\{c\right\}}{\sum} \underset{a \in A_{c^{'} , i}^{+}}{\sum} x_{a}^{c^{'}} \leq 2 , \forall i \in N^{\text{trip}} , \forall c \in C_{i}^{\text{al}} , \tag{eq\_0015} \\
+  & 2 \sum_{a \in {A}_{c , i}^{-}} x_{a}^{c} + \underset{c^{'} \in C_{i}^{\text{al}} \backslash \left\{c\right\}}{\sum} \underset{a \in A_{c^{'} , i}^{-}}{\sum} x_{a}^{c^{'}} \leq 2 , \forall i \in N^{\text{trip}} , \forall c \in C_{i}^{\text{al}} , \tag{eq\_0016} \\
+  & \sum_{a \in A_{c , i}^{+} \backslash {A}_{c , i}^{+}} x_{a}^{c} + \sum_{c^{'} \in C_{c}^{inc}} \underset{a \in A_{c^{'} , i}^{-}}{\sum} x_{a}^{c^{'}} \leq 1 , \forall i \in N^{trip} , \forall c \in C_{i}^{al} , \tag{eq\_0017} \\
+  & \sum_{c^{'} \in C_{c}^{inc}} \underset{a \in A_{c^{'} , i}^{+}}{\sum} x_{a}^{c^{'}} + \sum_{a \in A_{c , i}^{-} \backslash {A}_{c , i}^{-}} x_{a}^{c} \leq 1 , \forall i \in N^{trip} , \forall c \in C_{i}^{al} , \tag{eq\_0018} \\
+  & z_{i} = \sum_{c \in C} \sum_{a \in A_{c , i}^{+}} x_{a}^{c} + \sum_{c \in C} \sum_{a \in A_{c , i}^{-}} x_{a}^{c} + 2 \cdot y_{i} - 2 , \forall i \in N^{trip} , \tag{eq\_0019} \\
+  & n_{s , b}^{ori} - \sum_{c \in C} \sum_{a \in A_{c , s}^{on}} \underset{\genfrac{}{}{0pt}{}{k \in K_{c} :}{\mathit{xi}_{k} = b}}{\sum} x_{a}^{c} + \sum_{c \in C} \sum_{a \in A_{c , s}^{off}} \underset{\genfrac{}{}{0pt}{}{k \in K_{c} :}{\mathit{xi}_{k} = b}}{\sum} x_{a}^{c} = n_{s , b}^{end} , \forall s \in D , \forall b \in B_{s} , \tag{eq\_0020} \\
+  & \underset{\genfrac{}{}{0pt}{}{k \in K :}{\mathit{xi}_{k} = \mathit{xi}_{u}}}{\sum} \mathit{gamma}_{u}^{k} = n_{u} , \forall u \in U , \tag{eq\_0021} \\
+  & \underset{\genfrac{}{}{0pt}{}{u \in U :}{\mathit{xi}_{u} = \mathit{xi}_{k}}}{\sum} \mathit{gamma}_{u}^{k} = 1 , \forall k \in K , \tag{eq\_0022} \\
+  & \sum_{u \in U} p_{u}^{duty} \mathit{gamma}_{u}^{k} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{off}} p_{i_{a}^{+}}^{des} \cdot x_{a}^{c} , \forall k \in K , \tag{eq\_0023} \\
+  & f_{a , p_{i_{a}^{-}}^{des}}^{c} = d_{c}^{com} \cdot x_{a}^{c} , \forall c \in C : d_{c}^{com} < \mathit{sigma}_{1} , \forall a \in A_{c}^{on} , \tag{eq\_0024} \\
+  & x_{a}^{c} + \sum_{c^{'} \in C \backslash \left\{c\right\}} \underset{a^{'} \in A_{c^{'} , i_{a}^{-}}^{-}}{\sum} x_{a^{'}}^{c^{'}} / 2 + y_{i_{a}^{-}} - 1 \leq z_{c , a}^{-} \leq x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{dead,con} \cup A_{c}^{off} , \tag{eq\_0025} \\
+  & x_{a}^{c} + \sum_{c^{'} \in C \backslash \left\{c\right\}} \underset{a^{'} \in A_{c^{'} , i_{a}^{+}}^{+}}{\sum} x_{a^{'}}^{c^{'}} / 2 + y_{i_{a}^{+}} - 1 \leq z_{c , a}^{+} \leq x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} , \tag{eq\_0026} \\
+  & f_{a , p_{i_{a}^{-}}^{des}}^{c} \geq a_{i_{a}^{-} , p_{i_{a}^{-}}^{des}} x_{a}^{c} + \left(x_{a}^{c} - z_{c , a}^{-}\right) v_{p_{i_{a}^{-}}^{des}}^{con} + z_{c , a}^{-} \cdot v_{p_{i_{a}^{-}}^{des}}^{unc} , \forall c \in C , \forall a \in A_{c}^{dead , con} \cup A_{c}^{off} , \tag{eq\_0027} \\
+  & \mathit{tau}_{q}^{min} x_{a}^{c} \leq g_{a , s_{q}^{+}}^{c} - f_{a , s_{q}^{-}}^{c} \leq \mathit{tau}_{q}^{max} x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall q \in Q_{a} , \tag{eq\_0028} \\
+  & 0 \leq f_{a , s}^{c} - g_{a , s}^{c} \leq v_{s}^{max} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall s \in S_{a} \backslash \left\{p_{i_{a}^{-}}^{des} , p_{i_{a}^{+}}^{ori}\right\} , \tag{eq\_0029} \\
+  & g_{a , p_{i_{a}^{+}}^{ori}}^{c} \leq \left\{\begin{matrix} d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} - \left(x_{a}^{c} - z_{c , a}^{+}\right) v_{p_{i_{a}^{+}}^{ori}}^{con} - z_{c , a}^{+} \cdot v_{p_{i_{a}^{+}}^{ori}}^{cou} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} \\ d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{off} \end{matrix}\right , \tag{eq\_0030} \\
+  & G_{k} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0031} \\
+  & \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \left(d_{i , s_{q}^{-}} + \mathit{Delta}_{s_{q}^{-}}^{d}\right) \mathit{varepsilon}_{a , q}^{i , i^{'}} \leq \sum_{c \in C_{a}} f_{a , s_{q}^{-}}^{c} \leq \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \left(d_{i^{'} , s_{q}^{-}} - \mathit{Delta}_{s_{q}^{-}}^{d}\right) \mathit{varepsilon}_{a , q}^{i , i^{'}} , \forall a \in A^{dead} , \forall q \in Q_{a} , \tag{eq\_0032} \\
+  & \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \left(e_{i , s_{q}^{+}} + \mathit{Delta}_{s_{q}^{+}}^{a}\right) \mathit{varepsilon}_{a , q}^{i , i^{'}} \leq \sum_{c \in C_{a}} g_{a , s_{q}^{+}}^{c} \leq \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \left(e_{i^{'} , s_{q}^{+}} - \mathit{Delta}_{s_{q}^{+}}^{a}\right) \mathit{varepsilon}_{a , q}^{i , i^{'}} , \forall a \in A^{dead} , \forall q \in Q_{a} , \tag{eq\_0034} \\
+  & \underset{c \in C_{a^{'}}}{\sum} f_{a^{'} , s_{q}^{-}}^{c} - \sum_{c \in C_{a}} f_{a , s_{q}^{-}}^{c} \geq \mathit{Delta}_{s_{q}^{-}}^{d} - M \left(1 - w_{a , a^{'}}^{q}\right) , \forall q \in Q , \forall \left(a , a^{'}\right) \in \mathcal{A}_{q}^{dead} , \tag{eq\_0036} \\
+  & \underset{c \in C_{a^{'}}}{\sum} g_{a^{'} , s_{q}^{+}}^{c} - \sum_{c \in C_{a}} g_{a , s_{q}^{+}}^{c} \geq \mathit{Delta}_{s_{q}^{+}}^{a} - M \left(1 - w_{a , a^{'}}^{q}\right) , \forall q \in Q , \forall \left(a , a^{'}\right) \in \mathcal{A}_{q}^{dead} , \tag{eq\_0038} \\
+  & \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \mathit{varepsilon}_{a , q}^{i , i^{'}} + \underset{\left(i , i^{'}\right) \in P_{a^{'}}^{q}}{\sum} \mathit{varepsilon}_{a^{'} , q}^{i , i^{'}} - 1 \leq w_{a , a^{'}}^{q} + w_{a^{'} , a}^{q} \leq \frac{1}{2} \left(\sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \mathit{varepsilon}_{a , q}^{i , i^{'}} + \underset{\left(i , i^{'}\right) \in P_{a^{'}}^{q}}{\sum} \mathit{varepsilon}_{a^{'} , q}^{i , i^{'}}\right) , \forall q \in Q , \forall \left(a , a^{'}\right) \in \mathcal{A}_{q}^{dead} , \tag{eq\_0040} \\
+  & \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \mathit{varepsilon}_{a , q}^{i , i^{'}} \leq 1 , \forall a \in A^{dead} , \forall q \in Q_{a} , \tag{eq\_0042} \\
+  & \sum_{q \in Q_{a}} \sum_{\left(i , i^{'}\right) \in P_{a}^{q}} \mathit{varepsilon}_{a , q}^{i , i^{'}} = \left|Q_{a}\right| \sum_{c \in C_{a}} x_{a}^{c} , \forall a \in A^{dead} , \tag{eq\_0043} \\
+  & N_{i , s}^{arr , dead} = \sum_{a \in A^{dead}} \underset{\genfrac{}{}{0pt}{}{q \in Q_{a} :}{s_{q}^{+} = s}}{\sum} \underset{\genfrac{}{}{0pt}{}{\left(i^{'} , i^{' '}\right) \in P_{a}^{q} :}{e_{i^{' '} , s} \leq e_{i , s}}}{\sum} \mathit{varepsilon}_{a , q}^{i^{'} , i^{' '}} , \forall s \in S \backslash D , \forall i \in T_{s} , \tag{eq\_0044} \\
+  & N_{i , s}^{dep , dead} = \sum_{a \in A^{dead}} \underset{\genfrac{}{}{0pt}{}{q \in Q_{a} :}{s_{q}^{-} = s}}{\sum} \underset{\genfrac{}{}{0pt}{}{\left(i^{'} , i^{' '}\right) \in P_{a}^{q} :}{d_{i^{' '} , s} - \mathit{Delta}_{s}^{d} < e_{i , s}}}{\sum} \mathit{varepsilon}_{a , q}^{i^{'} , i^{' '}} , \forall s \in S \backslash D , \forall i \in T_{s} , \tag{eq\_0046} \\
+  & \left(N_{i , s}^{arr} + N_{i , s}^{arr , dead}\right) - \left(N_{i , s}^{dep} + N_{i , s}^{dep , dead}\right) \leq \mathit{sigma}_{s} - 1 , \forall s \in S \backslash D , \forall i \in T_{s} , \tag{eq\_0048} \\
+  & L_{k}^{trip} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{on} \cup A_{c}^{con}} l_{i_{a}^{+}}^{trip} \cdot x_{a}^{c} , \forall k \in K , \tag{eq\_0050} \\
+  & L_{k}^{trip} + L_{k}^{dead} \leq l_{k} , \forall k \in K , \tag{eq\_0052} \\
+  & G_{k} - F_{k} \leq r_{k} , \forall k \in K , \tag{eq\_0053} \\
+  & L_{k}^{trip} + L_{k}^{dead} + \sum_{u \in U} l_{u}^{duty} \mathit{gamma}_{u}^{k} \leq l_{k} + L_{\mathit{xi}_{k}} \cdot \sum_{s \in D_{1}} \mathit{varphi}_{s}^{k} , \forall k \in K , \tag{eq\_0054} \\
+  & G_{k} - F_{k} + \sum_{u \in U} r_{u}^{duty} \mathit{gamma}_{u}^{k} \leq r_{k} + R_{\mathit{xi}_{k}} \cdot \sum_{s \in D_{1}} \mathit{varphi}_{s}^{k} , \forall k \in K , \tag{eq\_0056} \\
+  & \mathit{varphi}_{p_{i_{a}^{+}}^{des}}^{k} \leq \sum_{c \in C_{k}} x_{a}^{c} , \forall k \in K , \forall a \in A_{k}^{off} : p_{i_{a}^{+}}^{des} \in D_{1} , \tag{eq\_0058} \\
+  & \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} \mathit{chi}_{k , s}^{t r , h} = \mathit{varphi}_{s}^{k} , \forall k \in K , \forall s \in D_{1} , \tag{eq\_0060} \\
+  & G_{k} - \sum_{s \in D_{1}} \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} m_{s , t r , h}^{start} \mathit{chi}_{k , s}^{t r , h} \leq M \left(1 - \sum_{s \in D_{1}} \mathit{varphi}_{s}^{k}\right) , \forall k \in K , \tag{eq\_0061} \\
+  & \mathit{delta}_{k} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0063} \\
+  & \mathit{delta}_{k} \geq \sum_{s \in D_{1}} \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} m_{s , t r , h}^{end} \mathit{chi}_{k , s}^{t r , h} , \forall k \in K , \tag{eq\_0064} \\
+  & \begin{matrix}\mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{k^{'} \in K} \mathit{chi}_{k^{'} , s}^{t r , h^{'}} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , h^{'}}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall s \in D_{1} , \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , h^{'} \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} ,\end{matrix} \tag{eq\_0065} \\
+  & \sum_{k \in K} \mathit{vartheta}_{k} \cdot \mathit{varphi}_{s}^{k} \leq n_{s}^{mm} , \forall s \in D_{1} , \tag{eq\_0066} \\
+  & \sum_{k \in K} \sum_{h^{'} \in H_{s , t r , h}^{c}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h^{'}} \leq \mathit{ell}_{s , t r} - \sum_{k \in K} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h} , \forall s \in D_{1} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0067} \\
+  & + \sum_{k \in K} \sum_{s \in D_{1}} \mathit{beta}_{k , s}^{0} \mathit{varphi}_{s}^{k} + \mathit{beta}_{1} \sum_{i \in N^{trip}} z_{i} + \mathit{beta}_{2} \sum_{k \in K} \mathit{lambda}_{k}^{unit} L_{k}^{dead} + \mathit{beta}_{3} \sum_{k \in K} \left(G_{k} - F_{k}\right) \tag{eq\_0070} \\
+  & x_{a}^{c} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c} , \tag{eq\_0073} \\
+  & y_{i} \in \left\{0 , 1\right\} , \forall i \in N^{trip} , \tag{eq\_0074} \\
+  & z_{i} \in \left\{0 , 1 , 2\right\} , \forall i \in N^{trip} , \tag{eq\_0075} \\
+  & \mathit{gamma}_{u}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \forall u \in U , \tag{eq\_0076} \\
+  & \mathit{varphi}_{s}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \forall s \in D_{1} , \tag{eq\_0077} \\
+  & L_{k}^{trip} , L_{k}^{dead} \geq 0 , \forall k \in K , \tag{eq\_0078} \\
+  & f_{a , s}^{c} , g_{a , s}^{c} \in Z^{+} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall s \in S_{a} , \tag{eq\_0079} \\
+  & z_{c , a}^{-} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c}^{dead,con} \cup A_{c}^{off} , \tag{eq\_0080} \\
+  & z_{c , a}^{+} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} , \tag{eq\_0081} \\
+  & \mathit{varepsilon}_{a , q}^{i , i^{'}} \in \left\{0 , 1\right\} , \forall a \in A^{dead} , \forall q \in Q_{a} , \forall \left(i , i^{'}\right) \in P_{a}^{q} , \tag{eq\_0082} \\
+  & w_{a , a^{'}}^{q} \in \left\{0 , 1\right\} , \forall q \in Q , \forall \left(a , a^{'}\right) \in \mathcal{A}_{q}^{dead} , \tag{eq\_0083} \\
+  & N_{t , s}^{arr , dead} , N_{t , s}^{dep , dead} \in Z^{+} , \forall s \in S \backslash D , \forall t \in T_{s} , \tag{eq\_0084} \\
+  & F_{k} , G_{k} \in Z^{+} , \forall k \in K . \tag{eq\_0085} \\
+  & \mathit{chi}_{k , s}^{t r , h} \in \left\{0 , 1\right\} , \forall k \in K , \forall s \in D_{1} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0089} \\
+  & \mathit{delta}_{k} \in Z^{+} , \forall k \in K , \tag{eq\_0090} \\
+  & s . t . \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} \mathit{chi}_{k , s}^{t r , h} = 1 , \forall k \in K_{s} , \tag{eq\_0093} \\
+  & {G}_{k} - \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} m_{s , t r , h}^{start} \mathit{chi}_{k , s}^{t r , h} \leq 0 , \forall k \in K_{s} , \tag{eq\_0094} \\
+  & \mathit{delta}_{k} \leq \sum_{u \in U} d_{u}^{duty} {\mathit{gamma}}_{u}^{k} , \forall k \in K_{s} , \tag{eq\_0095} \\
+  & \mathit{delta}_{k} \geq \sum_{t r \in T R_{s}} \sum_{h \in H_{s , t r}} m_{s , t r , h}^{end} \mathit{chi}_{k , s}^{t r , h} , \forall k \in K_{s} , \tag{eq\_0096} \\
+  & \begin{matrix}\mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{k^{'} \in K} \mathit{chi}_{k^{'} , s}^{t r , h^{'}} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , h^{'}}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , h^{'} \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} \cap K_{s} ,\end{matrix} \tag{eq\_0097} \\
+  & \sum_{k \in K_{s}} \sum_{h^{'} \in H_{s , t r , h}^{c}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h^{'}} \leq \mathit{ell}_{s , t r} - \sum_{k \in K_{s}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0098} \\
+  & \mathit{chi}_{k , s}^{t r , h} \in \left\{0 , 1\right\} , \forall k \in K_{s} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0099} \\
+  & \mathit{delta}_{k} \in Z^{+} , \forall k \in K_{s} . \tag{eq\_0100} \\
+  & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{{x}_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \underset{\genfrac{}{}{0pt}{}{u \in U :}{{\mathit{gamma}}_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) \geq 1 , \tag{eq\_0101} \\
+  & \sum_{c \in C} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{\hat{x}_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \sum_{k \in K} \underset{\genfrac{}{}{0pt}{}{u \in U :}{\hat{\mathit{gamma}}_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) + \sum_{k \in K} \underset{\genfrac{}{}{0pt}{}{s \in D_{1} :}{\hat{\mathit{varphi}}_{s}^{k} = 0}}{\sum} \mathit{varphi}_{s}^{k} \geq 1 . \tag{eq\_0104} \\
+  & \sum_{k \in K} \mathit{theta}_{k} \geq \mathit{pi}_{\left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right)} \left(\mathbf{\mathit{x}}\right) , \tag{eq\_0105} \\
+  & 1 - x_{a}^{c} \geq 1 , \tag{eq\_0106} \\
+  & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{\hat{x}_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) \geq 1 , \tag{eq\_0107} \\
+  & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{\hat{x}_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \underset{\genfrac{}{}{0pt}{}{u \in U :}{\hat{\mathit{gamma}}_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) + \underset{\genfrac{}{}{0pt}{}{s \in D_{1} :}{\hat{\mathit{varphi}}_{s}^{k} = 0}}{\sum} \mathit{varphi}_{s}^{k} \geq 1 . \tag{eq\_0108} \\
+  & F_{k}^{ap} = \left\{\begin{matrix} \sum_{c \in C_{k}} \sum_{a \in A_{c}^{on}} \left(d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} - v_{p_{i_{a}^{+}}^{ori}}^{con} - r_{k , a}^{dead}\right) x_{a}^{c} , d_{k}^{unit} \geq \mathit{sigma}_{1} \\ \sum_{c \in C_{k}} \sum_{a \in A_{c}^{on}} d_{k}^{unit} \cdot x_{a}^{c} , d_{k}^{unit} < \mathit{sigma}_{1} \end{matrix}\right , \forall k \in K . \tag{eq\_0109} \\
+  & G_{k}^{ap} = \sum_{c \in C_{k}} \sum_{a \in A_{c}^{off}} \left(e_{i_{a}^{-} , p_{i_{a}^{-}}^{des}} + v_{p_{i_{a}^{-}}^{des}}^{con} + r_{k , a}^{dead}\right) x_{a}^{c} , \forall k \in K . \tag{eq\_0111} \\
+  & G_{k}^{ap} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0113} \\
+  & G_{k}^{ap} - F_{k}^{ap} \leq r_{k} , \forall k \in K , \tag{eq\_0114} \\
+  & G_{k}^{ap} - F_{k}^{ap} + \sum_{u \in U} r_{u}^{duty} \mathit{gamma}_{u}^{k} \leq r_{k} + R_{\mathit{xi}_{k}} \cdot \sum_{k \in K} \sum_{s \in D_{1}} \mathit{varphi}_{s}^{k} , \forall k \in K . \tag{eq\_0116} \\
+  & \mathit{theta}_{k} \geq \mathit{beta}_{3} \cdot \left(G_{k}^{ap} - F_{k}^{ap}\right) , \forall k \in K . \tag{eq\_0117} \\
+  & L_{k}^{trip} + L_{k}^{dead} \leq L_{k^{'}}^{trip} + L_{k^{'}}^{dead} , \forall c \in C^{cou} , k , k^{'} \in K_{c} : k < k^{'} . \tag{eq\_0118} \\
+  & \begin{matrix}\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \cdot \sum_{c \in C} \sum_{a \in A_{c}^{nv} : \hat{x}_{a}^{c} = 1} \left(1 - {x}_{a}^{c}\right) \\ \leq \mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \leq L \cdot B 0 ,\end{matrix} \tag{eq\_0119} \\
+\end{align}

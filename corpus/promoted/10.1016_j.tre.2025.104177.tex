@@ -1,0 +1,93 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2025.104177
+%@ meta id=10.1016_j.tre.2025.104177 family=milp schema=0.1.0
+%@ name :: Integrated train rescheduling and passenger reassignment for disrupted high-speed railway networks: A hierarchical Benders decomposition and column generation approach
+%@ desc :: Mined from Integrated train rescheduling and passenger reassignment for disrupted high-speed railway networks: A hierarchical Benders decomposition and column generation approach (Transportation Research Part E Logistics and Transportation Review, 2025).
+%@ prov source :: 10.1016/j.tre.2025.104177
+%@ prov reference :: Integrated train rescheduling and passenger reassignment for disrupted high-speed railway networks: A hierarchical Benders decomposition and column generation approach
+%@ prov author :: Cong Xiu; Jinyi Pan; Andrea D’Ariano; Shuguang Zhan; Marta Leonina Tessitore; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total train delay cost plus weighted passenger travel cost.
+%@ param D shape=F kind=vector domain=- :: Passenger demand for passenger group f.
+%@ index F ordered=0 cyclic=0 :: Set of passenger groups.
+%@ index R ordered=0 cyclic=0 :: Set of feasible routes for passenger group f.
+%@ var w shape=F,R domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers from group f assigned to route r.
+%@ var u shape=K,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k uses path p.
+%@ index K ordered=0 cyclic=0 :: Set of trains.
+%@ index P ordered=0 cyclic=0 :: Set of feasible paths for train k.
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs.
+%@ index a ordered=0 cyclic=0 :: Index for space-time arc.
+%@ param Ca shape=K kind=vector domain=- :: Capacity of train k.
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value (train delay cost or passenger travel cost).
+%@ param C shape=K,F kind=matrix domain=- :: Penalty cost for cancelling train k or abandoning passenger group f.
+%@ param c shape=K,P,F,R kind=matrix domain=- :: Cost of train path p or passenger route r.
+%@ param T shape=K,S kind=matrix domain=- :: Scheduled departure/arrival time of train k at station s.
+%@ index E ordered=0 cyclic=0 :: Set of early departure arcs.
+%@ index L ordered=0 cyclic=0 :: Set of late departure arcs.
+%@ index N ordered=0 cyclic=0 :: Set of transfer arcs.
+%@ index V ordered=0 cyclic=0 :: Set of in-vehicle arcs.
+%@ index W ordered=0 cyclic=0 :: Set of waiting arcs.
+%@ param u_bar shape=K,P kind=matrix domain=- :: Fixed train path variables from BMP.
+%@ param Cap shape=K kind=vector domain=- :: Capacity of train k (alternative notation).
+%@ index Q ordered=0 cyclic=0 :: Set of Benders cuts.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ param others shape=- kind=scalar domain=- :: Other cases in piecewise cost function.
+%@ var UB shape=- domain=continuous role=primary drole=- lo=- hi=- :: Upper bound of objective.
+%@ var LB shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lower bound of objective.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passenger route flow bounds: 0 <= w_{f,r} <= D_f.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Abandoned passenger flow bounds: 0 <= w_{f,abandon} <= D_f.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Train covering: each train selects one path or is cancelled.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Train headway constraints on drive arcs.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Station capacity constraints on track arcs.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Unified train incompatibility constraints on drive and track arcs.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger demand satisfaction: all demand assigned or abandoned.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Train capacity constraints on coupled passenger-train arcs.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Valid inequalities linking passenger arc usage to train path availability.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Seat reservation constraints for unaffected reserved passenger groups.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Train path delay cost definition.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Passenger route travel cost definition.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Passenger capacity constraint given fixed train paths in BSP.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Passenger route availability constraint given fixed train paths in BSP.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Seat reservation constraint given fixed train paths in BSP.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Dual constraint for passenger route reduced cost in DBSP.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Nonpositive dual variable bound for capacity constraints.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Dual variable bound for passenger demand constraints.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Benders optimality cut for passenger cost approximation.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Relaxed bounds for train path variables in RMP.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Relaxed bounds for train cancellation variables in RMP.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Reduced cost of a train path.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Revised train arc cost with dual adjustments.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost of a passenger route.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Revised passenger arc cost with dual adjustments.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Upper bound from current train and passenger solutions.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Lower bound from BMP objective with passenger cost estimate.
+\begin{align}
+  & 0 \leq w_{f , r} \leq D_{f} , \forall f \in F , r \in R_{f} \tag{eq\_0003} \\
+  & 0 \leq w_{f}^{\mathit{abandon}} \leq D_{f} , \forall f \in F \tag{eq\_0004} \\
+  & \sum_{p \in P_{k}} u_{k , p} + u_{k}^{\mathit{cancel}} = 1 , \forall k \in K \tag{eq\_0005} \\
+  & \sum_{k \in K} \sum_{p \in P_{k}} \sum_{a^{'} \in \mathit{Phi}_{h} \left(a\right)} \mathit{alpha}_{p , a^{'}} u_{k , p} \leq 1 , \forall a \in A_{\mathit{drive}} \tag{eq\_0007} \\
+  & \sum_{k \in K} \sum_{p \in P_{k}} \sum_{a^{'} \in \mathit{Phi}_{s} \left(a\right)} \mathit{alpha}_{p , a^{'}} u_{k , p} \leq 1 , \forall a \in A_{\mathit{track}} \tag{eq\_0009} \\
+  & \sum_{k \in K} \sum_{p \in P_{k}} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{alpha}_{p , a^{'}} u_{k , p} \leq 1 , \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0011} \\
+  & \sum_{r \in R_{f}} w_{f , r} + w_{f}^{\mathit{abandon}} = D_{f} , \forall f \in F \tag{eq\_0012} \\
+  & \sum_{f \in F} \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} \leq \sum_{k \in K} \sum_{p \in P_{k}} \mathit{Ca} p_{k} \mathit{alpha}_{p , a} u_{k , p} , \forall a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0013} \\
+  & \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} / D_{f} \leq \sum_{k \in K} \sum_{p \in P_{k}} \mathit{alpha}_{p , a} u_{k , p} , \forall f \in F , a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0014} \\
+  & \mathit{eta}_{k , f} \cdot \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} / D_{f} \geq \mathit{eta}_{k , f} \cdot \sum_{p \in P_{k}} \mathit{alpha}_{p , a} u_{k , p} , \forall k \in K , f \in F_{0} , a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0015} \\
+  \mathit{min\quad & Z} = Z_{\mathit{tra}} + \mathit{delta} \cdot Z_{\mathit{pax}} = ( \sum_{k \in K} \sum_{p \in P_{k}} c_{k , p} \cdot u_{k , p} + \sum_{k \in K} C_{k} \cdot u_{k}^{\mathit{cancel}} \left.\right) + \mathit{delta} \cdot \left(\sum_{f \in F} \sum_{r \in R_{f}} c_{f , r} \cdot w_{f , r} + \sum_{f \in F} C_{f} \cdot w_{f}^{\mathit{abandon}}\right) \tag{eq\_0016} \\
+  & c_{k , p} = \sum_{a \in A_{k}} c_{k , a} \mathit{alpha}_{p , a} = \underset{a \in A_{k , s}^{\mathit{dep}}}{\sum} \left(\right. \mathit{tau}_{1} \left(a\right) - T_{k , s}^{\mathit{dep}} ) \cdot \mathit{alpha}_{p , a} + \underset{a \in A_{k , s}^{\mathit{arr}}}{\sum} \left|\right. \mathit{tau}_{2} \left(a\right) - T_{k , s}^{\mathit{arr}} \left|\right. \cdot \mathit{alpha}_{p , a} \tag{eq\_0017} \\
+  & c_{f , r} = V \cdot T_{f , r} + \mathit{omega}_{1} \cdot W \cdot T_{f , r} + \mathit{omega}_{2} \cdot N \cdot T_{f , r} + \mathit{omega}_{3} \cdot E \cdot D_{f , r} + \mathit{omega}_{4} \cdot L \cdot D_{f , r} \tag{eq\_0018} \\
+  & \sum_{f \in F} \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} \leq \sum_{k \in K} \sum_{p \in P_{k}} \mathit{Ca} p_{k} \mathit{alpha}_{p , a} \left(\bar{u}\right)_{k , p} , \forall a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0021} \\
+  & \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} / D_{f} \leq \sum_{k \in K} \sum_{p \in P_{k}} \mathit{alpha}_{p , a} \left(\bar{u}\right)_{k , p} , \forall f \in F , a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0022} \\
+  & \mathit{eta}_{k , f} \cdot \sum_{r \in R_{f}} \mathit{beta}_{r , a} w_{f , r} / D_{f} \geq \mathit{eta}_{k , f} \cdot \sum_{p \in P_{k}} \mathit{alpha}_{p , a} \left(\bar{u}\right)_{k , p} , \forall k \in K , f \in F_{0} , a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0023} \\
+  & \underset{a \in A^{\mathit{pas}} \cap A^{\mathit{train}}}{\sum} \mathit{beta}_{r , a} \mathit{lambda}_{a}^{2} + \mathit{lambda}_{f}^{1} \leq c_{f , r} , \forall f \in F , r \in R_{f} \tag{eq\_0025} \\
+  & \mathit{lambda}_{a}^{2} \leq 0 , \forall a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \tag{eq\_0026} \\
+  & \mathit{lambda}_{f}^{1} \leq C_{f} , \forall f \in F \tag{eq\_0027} \\
+  & \mathit{varphi} \geq \sum_{k \in K} \mathit{Ca} p_{k} \sum_{p \in P_{k}} \underset{a \in A^{\mathit{tra}} \cap A^{\mathit{pax}}}{\sum} \mathit{alpha}_{p , a} \mathit{lambda}_{a}^{2} u_{k , p} + \sum_{f \in F} D_{f} \mathit{lambda}_{f}^{1} , \forall \left(\mathit{lambda}_{f}^{1} , \mathit{lambda}_{a}^{2}\right) \in E \cdot P_{\mathit{Delta}} \tag{eq\_0029} \\
+  & 0 \leq u_{k , p} \leq 1 , \forall k \in K , p \in \left({P}\right)_{k} \tag{eq\_0031} \\
+  & 0 \leq u_{k}^{\mathit{cancel}} \leq 1 , \forall k \in K \tag{eq\_0032} \\
+  & \begin{matrix}\left({c}\right)_{k , p} = c_{k , p} - \underset{A_{\mathit{drive}} \cup A_{\mathit{track}}}{\sum} \mathit{mu}_{a}^{2} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{alpha}_{p , a^{'}} - \underset{a \in A^{\mathit{tra}} \cap A^{\mathit{pax}}}{\sum} \mathit{Ca} p_{k} \mathit{lambda}_{a}^{2} \mathit{alpha}_{p , a} \cdot \sum_{q \in Q} \mathit{mu}_{q}^{3} - \mathit{mu}_{k}^{1} \\ = \sum_{a \in A_{k}} \left(\right. c_{k , a} - \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{mu}_{a^{'}}^{2} - \mathit{Cap}_{k} \mathit{lambda}_{a}^{2} \sum_{q \in Q} \mathit{mu}_{q}^{3} \left.\right) \cdot \mathit{alpha}_{p , a} - \mathit{mu}_{k}^{1} \\ = \sum_{a \in A_{k}} \left({c}\right)_{k , a} \mathit{alpha}_{p , a} - \mathit{mu}_{k}^{1}\end{matrix} \tag{eq\_0033} \\
+  & \left({c}\right)_{k , a} = \left\{\begin{matrix} c_{k , a} - \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{mu}_{a^{'}}^{2} - \mathit{Cap}_{k} \mathit{lambda}_{a}^{2} \sum_{q \in Q} \mathit{mu}_{q}^{3} , \text{if} a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \text{and} a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \\ c_{k , a} - \mathit{Cap}_{k} \mathit{lambda}_{a}^{2} \sum_{q \in Q} \mathit{mu}_{q}^{3} , \text{if} a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \text{and} a \notin A_{\mathit{drive}} \cup A_{\mathit{track}} \\ c_{k , a} , \text{others} \end{matrix}\right \tag{eq\_0034} \\
+  & \left({c}\right)_{f , r} = c_{f , r} - \underset{a \in A^{\mathit{tra}} \cap A^{\mathit{pax}}}{\sum} \mathit{beta}_{r , a} \mathit{lambda}_{a}^{2} - \mathit{lambda}_{f}^{1} = \sum_{a \in A_{f}} \left({c}\right)_{f , a} \mathit{beta}_{r , a} - \mathit{lambda}_{f}^{1} \tag{eq\_0036} \\
+  & \left({c}\right)_{f , a} = \left\{\begin{matrix} c_{f , a} - \mathit{lambda}_{a}^{2} , \text{if} a \in A^{\mathit{tra}} \cap A^{\mathit{pax}} \\ c_{f , a} , \text{others} \end{matrix}\right \tag{eq\_0037} \\
+  & \mathit{UB} = \left(\sum_{k \in K} \sum_{p \in P_{k}} c_{k , p} \left(\bar{u}\right)_{k , p} + \sum_{k \in K} C_{k} \left(\bar{u}\right)_{k}^{\mathit{cancel}}\right) + \mathit{delta} \cdot \left(\sum_{f \in F} \sum_{r \in R_{f}} c_{f , r} \cdot w_{f , r} + \sum_{f \in F} C_{f} \cdot w_{f}^{\mathit{abandon}}\right) \tag{eq\_0038} \\
+  & \mathit{LB} = \left(\sum_{k \in K} \sum_{p \in P_{k}} c_{k , p} \cdot u_{k , p} + \sum_{k \in K} C_{k} \cdot u_{k}^{\mathit{cancel}}\right) + \mathit{delta} \cdot \mathit{varphi} \tag{eq\_0039} \\
+\end{align}

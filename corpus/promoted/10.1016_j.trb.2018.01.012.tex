@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2018.01.012
+%@ meta id=10.1016_j.trb.2018.01.012 family=milp schema=0.1.0
+%@ name :: A matheuristic for transfer synchronization through integrated timetabling and vehicle scheduling
+%@ desc :: Mined from A matheuristic for transfer synchronization through integrated timetabling and vehicle scheduling (Transportation Research Part B Methodological, 2018).
+%@ prov source :: 10.1016/j.trb.2018.01.012
+%@ prov reference :: A matheuristic for transfer synchronization through integrated timetabling and vehicle scheduling
+%@ prov author :: Joao Filipe Paiva Fonseca; Evelien van der Hurk; Roberto Roberti; Allan Larsen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of operational costs and transfer costs
+%@ param c shape=- kind=matrix domain=continuous :: Cost coefficients for vehicle movements and dwell time
+%@ param f shape=- kind=vector domain=continuous :: Transfer frequency weight for transfer opportunity r
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if vehicle k serves trip i then j
+%@ index Q ordered=0 cyclic=0 :: Set of feasible vehicle movements (i,j,k)
+%@ index R ordered=0 cyclic=0 :: Set of transfer opportunities
+%@ index T ordered=0 cyclic=0 :: Set of timetabled trips
+%@ param t shape=- kind=vector domain=continuous :: Minimum travel time of trip i
+%@ index K ordered=0 cyclic=0 :: Set of vehicles
+%@ index V ordered=0 cyclic=0 :: Set of trips that can be served by vehicle k
+%@ param v shape=- kind=vector domain=integer :: Number of available vehicles of type k
+%@ param d shape=- kind=matrix domain=continuous :: Earliest and latest departure times for trip i at stop s
+%@ param w shape=- kind=matrix domain=continuous :: Minimum and maximum dwell time at stop s for trip i
+%@ index J ordered=0 cyclic=0 :: Set of stops with transfer opportunities for trip i
+%@ param h shape=- kind=matrix domain=continuous :: Minimum and maximum headway between consecutive trips on line l at stop s
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constant
+%@ param b shape=- kind=matrix domain=continuous :: Travel time from end of trip i to start of trip j
+%@ param q shape=- kind=scalar domain=continuous :: Minimum connection time between trips
+%@ index r ordered=0 cyclic=0 :: Transfer opportunity index
+%@ index W ordered=0 cyclic=0 :: Set of all possible transfer triplets (i,j,s)
+%@ param e shape=- kind=vector domain=continuous :: Minimum transfer time for transfer opportunity r
+%@ index Z ordered=0 cyclic=0 :: Set of non-negative integers
+%@ con eq_0002 kind=linear domain=- indicator=- :: Each trip is served by exactly one vehicle
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Vehicle flow conservation for each vehicle at each node
+%@ con eq_0004 kind=capacity domain=- indicator=- :: Limit on the number of vehicles of each type used
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time of each trip within its time window
+%@ con eq_0006 kind=linear domain=- indicator=- :: Dwell time at transfer stops within allowed bounds
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum added dwell time for each trip
+%@ con eq_0008 kind=linear domain=- indicator=- :: Definition of added dwell time for each trip
+%@ con eq_0009 kind=headway domain=- indicator=- :: Headway constraints between consecutive trips on a line
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Connection time between consecutive trips assigned to the same vehicle
+%@ con eq_0011 kind=linear domain=- indicator=- :: Exactly one transfer is selected for each transfer opportunity
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Selected transfer satisfies minimum transfer time
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Ensure transfer time not below minimum when no earlier transfer is used
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Definition of transfer time violation for each transfer
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary domain for vehicle movement variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure times are non-negative integers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Arrival times are non-negative integers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Added dwell times are non-negative integers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Transfer time violations are non-negative reals
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain for transfer selection variables
+%@ con eq_0027 kind=linear domain=- indicator=- :: Additional constraint from the integrated timetabling and vehicle scheduling model
+\begin{align}
+  \begin{aligned}min\quad & & \sum_{\left(i , j , k\right) \in Q} c_{i j k} \cdot x_{i j k} + \sum_{i \in T} c_{i}^{D W} \mathit{delta}_{i} + c^{T R} \sum_{r \in R} f_{r} \mathit{gamma}_{r}\end{aligned} \tag{eq\_0001} \\
+  & \begin{matrix}\text{s}.\text{t}. \sum_{\left(i , j , k\right) \in Q} x_{i j k} = 1 i \in T\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}\sum_{\left(i , j , k\right) \in Q} x_{i j k} - \sum_{\left(j , i , k\right) \in Q} x_{j i k} = 0 k \in K j \in V_{k}\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}\sum_{\left(i , j , k\right) \in Q^{O}} x_{i j k} \leq v_{k} k \in K\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}d_{i , s t_{i}}^{-} \leq \mathit{tau}_{i , s t_{i}}^{d} \leq d_{i , s t_{i}}^{+} i \in T\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}0 \leq \mathit{tau}_{i s}^{d} - \mathit{tau}_{i s}^{a} - w_{i s}^{-} \leq w_{i s}^{+} i \in T s \in J_{i}\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}\mathit{delta}_{i} \leq w i \in T\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix}\mathit{delta}_{i} = \mathit{tau}_{i , e t_{i}}^{a} - \mathit{tau}_{i , s t_{i}}^{d} - t_{i} i \in T\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}h_{i s}^{-} \leq \mathit{tau}_{i s}^{d} - \mathit{tau}_{i - 1 , s}^{d} \leq h_{i s}^{+} \cdot l \in L i \in T_{l} : i \notin T^{1} s \in J_{i} \cup \left\{s t_{i}\right\}\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}\mathit{tau}_{i , e t_{i}}^{a} + b_{i j} + q^{-} - \mathit{delta}_{i} - M \left(1 - \sum_{\left(i , j , k\right) \in Q} x_{i j k}\right) \leq \mathit{tau}_{j , s t_{j}}^{d} \left(i , j\right) \in T \left(Q\right)\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix}\sum_{\left(i , j , s\right) \in W \left(r\right)} \mathit{alpha}_{i j s} = 1 \cdot r = \left(i , l , s\right) \in R\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}\mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} \geq M \left(\mathit{alpha}_{i j s} - 1\right) r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix}M \sum_{\begin{matrix}\left(i , k , s\right) \in W \left(r\right) , \\ k \leq j\end{matrix}} \mathit{alpha}_{i k s} \geq \mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} \cdot r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix}\mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} - M \left(1 - \mathit{alpha}_{i j s}\right) \leq \mathit{gamma}_{r} r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix}x_{i j k} \in \left\{0 , 1\right\} \left(i , j , k\right) \in Q\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}\mathit{tau}_{i s}^{d} \in \mathcal{Z}_{+} i \in T s \in J_{i} \cup \left\{s t_{i}\right\}\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix}\mathit{tau}_{i s}^{a} \in \mathcal{Z}_{+} i \in T s \in J_{i} \cup \left\{e \cdot t_{i}\right\}\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}\mathit{delta}_{i} \in \mathcal{Z}_{+} i \in T\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix}\mathit{gamma}_{r} \in \mathcal{R}_{+} r \in R\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix}\mathit{alpha}_{i j s} \in \left\{0 , 1\right\} \left(i , j , s\right) \in W\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix} & \sum_{\left(i , j , k\right) \in Q} c_{i j k} \cdot x_{i j k} + c_{i}^{D W} \sum_{i \in T} \mathit{delta}_{i} \leq \mathit{Delta}\end{matrix} \tag{eq\_0027} \\
+\end{align}

@@ -1,0 +1,86 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2023.104150
+%@ meta id=10.1016_j.trc.2023.104150 family=lp schema=0.1.0
+%@ name :: ADMM-based joint rescheduling method for high-speed railway timetabling and platforming in case of uncertain perturbation
+%@ desc :: Mined from ADMM-based joint rescheduling method for high-speed railway timetabling and platforming in case of uncertain perturbation (Transportation Research Part C Emerging Technologies, 2023).
+%@ prov source :: 10.1016/j.trc.2023.104150
+%@ prov reference :: ADMM-based joint rescheduling method for high-speed railway timetabling and platforming in case of uncertain perturbation
+%@ prov author :: Xuan Liu; Min Zhou; Hairong Dong; Xingtang Wu; Yidong Li; Fei–Yue Wang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total delay of all scheduled arrival and departure events
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value representing total delay
+%@ param P shape=E kind=vector domain=- :: Scheduled time of event e
+%@ var r shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled time of event e or of possible event e^t
+%@ index E ordered=0 cyclic=0 :: Set of all scheduled events
+%@ index R ordered=0 cyclic=0 :: Set of possible events for a scheduled event
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for big-M constraints
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index Y ordered=0 cyclic=0 :: Set of activity pairs for no-overtaking constraints
+%@ con eq_0002 kind=linear domain=- indicator=- :: Exactly one possible event is selected for each scheduled event
+%@ con eq_0003 kind=linear domain=- indicator=- :: If a possible event is selected, its rescheduled time is bounded by M
+%@ con eq_0004 kind=linear domain=- indicator=- :: A train's arrival and departure events at a station use the same track
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwell/pass-through status of an in-station activity determined by scheduled times
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Rescheduled dwell duration is nonnegative
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Minimum dwell time is enforced when the activity is a dwell activity
+%@ con eq_0007 kind=linear domain=- indicator=- :: A train either dwells on a sideline or passes through on the mainline
+%@ con eq_0008 kind=linear domain=- indicator=- :: Rescheduled event time is not earlier than the scheduled time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Detect whether arrival at virtual station occurs after perturbation ends
+%@ con eq_0010 kind=linear domain=- indicator=- :: Detect whether departure from virtual station occurs before perturbation starts
+%@ con eq_0011_a kind=linear domain=- indicator=- :: Affected train implies arrival after perturbation end
+%@ con eq_0011_b kind=linear domain=- indicator=- :: Affected train implies departure before perturbation start
+%@ con eq_0011_c kind=linear domain=- indicator=- :: Set affected indicator when both arrival-after-end and departure-before-start hold
+%@ con eq_0012 kind=linear domain=- indicator=- :: Enforce minimum running time for each section activity
+%@ con eq_0013 kind=linear domain=- indicator=- :: Impose additional dwell at virtual station for trains affected by speed restriction
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Headway constraint for same-direction arrival/departure activities (first ordering case)
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Headway constraint for same-direction arrival/departure activities (second ordering case)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Forbid overtaking in sections by linking departure and arrival headway orders
+%@ con eq_0016_a kind=linear domain=- indicator=- :: Same-platform headway constraint (first order case)
+%@ con eq_0016_b kind=linear domain=- indicator=- :: Same-platform headway constraint (second order case)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Prohibit overtaking on the same track for a train's arrival and departure
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Platform-order variable is active only if both trains select the platform (first event)
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Platform-order variable is active only if both trains select the platform (second event)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Link platform order to arrival/departure order between trains
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Headway constraint for reverse-direction platform use (first case)
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Headway constraint for reverse-direction platform use (second case)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exactly one order holds for a reverse-direction arrival/departure pair
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (first constraint)
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (second constraint)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (third constraint)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (fourth constraint)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (fifth constraint)
+\begin{align}
+  \min\quad & \sum_{e \in E} \left(\sum_{e^{t} \in R_{e}} r_{e^{t}} - P_{e}\right) \tag{eq\_0001} \\
+  & \sum_{e^{t} \in R_{e}} \mathit{lambda}_{e^{t}} = 1 \forall e \in E \tag{eq\_0002} \\
+  & \mathit{lambda}_{e^{t}} \leq r_{e^{t}} + \left(1 - \mathit{lambda}_{e^{t}}\right) \cdot M \leq M \forall e \in E , \forall e^{t} \in R_{e} \tag{eq\_0003} \\
+  & \mathit{lambda}_{e_{a}^{t}} = \mathit{lambda}_{e_{d}^{t}} \forall s t a \in S , \forall \left(e_{a} , e_{d}\right) \in A_{s t a} , \forall e_{a}^{t} \in R_{e_{a}} , \forall e_{d}^{t} \in R_{e_{d}} , \tag{eq\_0004} \\
+  & 0 \leq P_{e_{d}} - P_{e_{a}} + \left(1 - \mathit{tau}_{q}\right) \cdot M \leq M \forall s t a \in S , \forall q = \left(e_{a} , e_{d}\right) \in A_{s t a} \tag{eq\_0005} \\
+  & \underset{e_{d}^{t} \in R_{e_{d}}}{\sum} r_{e_{d}^{t}} - \underset{e_{a}^{t} \in R_{e_{a}}}{\sum} r_{e_{a}^{t}} \geq 0 \tag{eq\_0006\_a} \\
+  & \mathit{omega}_{q} \leq \underset{e_{d}^{t} \in R_{e_{d}}}{\sum} r_{e_{d}^{t}} - \underset{e_{a}^{t} \in R_{e_{a}}}{\sum} r_{e_{a}^{t}} + \left(1 - \mathit{tau}_{q}\right) \cdot M \forall s t a \in S , \forall q = \left(e_{a} , e_{d}\right) \in A_{s t a} \tag{eq\_0006\_b} \\
+  & \mathit{tau}_{q} + \underset{e_{a}^{t} \in R_{e_{a}}^{m}}{\sum} \mathit{lambda}_{e_{a}^{t}} = 1 \forall s t a \in S , \forall q = \left(e_{a} , e_{d}\right) \in A_{s t a} \tag{eq\_0007} \\
+  & \sum_{e^{t} \in R_{e}} r_{e^{t}} \geq P_{e} \forall e \in E \tag{eq\_0008} \\
+  & 0 \leq \bar{\mathit{omega}} - r_{e} + \left(1 - \mathit{gamma}_{e_{a}}^{1}\right) \cdot M \leq M \forall s_{v} \in \mathit{Gamma} , \forall e_{a} \in E_{a r r}^{s_{v}} \tag{eq\_0009} \\
+  & 0 \leq r_{e} - {\mathit{omega}} + \left(1 - \mathit{gamma}_{e_{a}}^{2}\right) \cdot M \leq M \forall s_{v} \in \mathit{Gamma} , \forall e_{a} \in E_{d e p}^{s_{v}} \tag{eq\_0010} \\
+  & \mathit{gamma}_{e_{a}}^{1} \geq \mathit{gamma}_{q} \tag{eq\_0011\_a} \\
+  & \mathit{gamma}_{e_{d}}^{2} \geq \mathit{gamma}_{q} \tag{eq\_0011\_b} \\
+  & \frac{\mathit{gamma}_{e_{a}}^{1} + \mathit{gamma}_{e_{d}}^{2}}{2} - 0 . 5 \leq \mathit{gamma}_{q} \forall s_{v} \in \mathit{Gamma} , \forall e_{a} \in E_{a r r}^{s_{v}} , \forall e_{d} \in E_{d e p}^{s_{v}} , q = \left(e_{a} , e_{d}\right) \in A_{s_{v}} \tag{eq\_0011\_c} \\
+  & \underset{e_{a}^{t} \in R_{e_{a}}}{\sum} \left(r_{e_{a}^{t}} - \mathit{lambda}_{e_{a}^{t}} \cdot \mathit{kappa}_{i n}^{t}\right) - \underset{e_{d}^{t} \in R_{e_{d}}}{\sum} \left(r_{e_{d}^{t}} + \mathit{lambda}_{e_{d}^{t}} \cdot \mathit{kappa}_{o u t}^{t}\right) \geq \mathit{omega}_{q} \forall s e c \in S^{'} , \forall q = \left(e_{a} , e_{d}\right) \in A_{s e c} \tag{eq\_0012} \\
+  & r_{e_{a}} - r_{e_{d}} \geq \mathit{gamma}_{q} \mathit{omega}_{s_{v}} + \mathit{omega}_{q} \forall s_{v} \in \mathit{Gamma} , \forall q = \left(e_{a} , e_{d}\right) \in A_{s_{v}} \tag{eq\_0013} \\
+  & \mathit{omega}_{q} + \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + \bar{\mathit{kappa}^{j , t}}\right) \leq \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + \bar{\mathit{kappa}^{i , t}}\right) + \left(1 - \mathit{zeta}_{q}\right) \cdot M \tag{eq\_0014\_a} \\
+  & \mathit{omega}_{q} + \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + \bar{\mathit{kappa}^{i , t}}\right) \leq \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + \bar{\mathit{kappa}^{j , t}}\right) + \mathit{zeta}_{q} \cdot M \forall q = \left(e^{i} , e^{j}\right) \in A_{a r r}^{H} \cup A_{d e p}^{H} \tag{eq\_0014\_b} \\
+  & \mathit{zeta}_{q_{1}} - \mathit{zeta}_{q_{2}} = 0 \forall \mathit{upsilon} \in Y_{s} \tag{eq\_0015} \\
+  & \mathit{omega}_{q} + r_{e^{j , t}} \leq r_{e^{i , t}} + \left(3 - \mathit{lambda}_{e^{i , t}} - \mathit{lambda}_{e^{j , t}} - \mathit{zeta}_{q}\right) \cdot M \tag{eq\_0016\_a} \\
+  & \mathit{omega}_{q} + r_{e^{i , t}} \leq r_{e^{j , t}} + \left(2 - \mathit{lambda}_{e^{i , t}} - \mathit{lambda}_{e^{j , t}} + \mathit{zeta}_{q}\right) \cdot M \forall q = \left(e^{i , t} , e^{j , t}\right) \in A_{p l a t}^{H} \tag{eq\_0016\_b} \\
+  & \begin{matrix}\mathit{zeta}_{q_{1}} = \mathit{zeta}_{q_{2}} \forall q_{1} = \left(e^{i , t} , e^{j , t}\right) \in A_{p l a t}^{H} , q_{2} = \left(e^{i^{'} , t} , e^{j^{'} , t}\right) \in A_{p l a t}^{H}\end{matrix} \tag{eq\_0017} \\
+  & \mathit{lambda}_{e^{i , t}} \geq \mathit{zeta}^{q} \tag{eq\_0018\_a} \\
+  & \mathit{lambda}_{e^{j , t}} \geq \mathit{zeta}^{q} \forall q = \left(e^{i , t} , e^{j , t}\right) \in A_{p l a t}^{H} \tag{eq\_0018\_b} \\
+  & \begin{matrix}\mathit{zeta}_{q_{1}} \geq {\sum} \mathit{zeta}_{q_{2}} \forall q_{1} = \left(e^{i} , e^{j}\right) \in A_{a r r}^{H} \cup A_{d e p}^{H} , q_{2} = \left(e^{i , t} , e^{j , t}\right) \in A_{p l a t}^{H}\end{matrix} \tag{eq\_0019} \\
+  & \mathit{omega}_{q_{1}} \cdot \sum_{t \in R_{e}^{r}} \mathit{lambda}_{e^{t}} \leq \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + {\mathit{kappa}^{i , t}}\right) - \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + {\mathit{kappa}^{j , t}}\right) + \left(1 - \mathit{zeta}^{q_{1}}\right) \cdot M \tag{eq\_0020\_a} \\
+  & \mathit{omega}_{q_{2}} \cdot \sum_{t \in R_{e}^{r}} \mathit{lambda}_{e^{t}} \leq \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + {\mathit{kappa}^{j , t}}\right) - \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + {\mathit{kappa}^{i , t}}\right) + \left(1 - \mathit{zeta}^{q_{2}}\right) \cdot M \forall q_{1} = \left(e^{i} , e^{j}\right) \in A_{{r r}}^{H} , q_{2} = \left(e^{j} , e^{i}\right) \in A_{{r r}}^{H} \tag{eq\_0020\_b} \\
+  & \begin{matrix}\mathit{zeta}^{q_{1}} + \mathit{zeta}^{q_{2}} = 1 \\ \forall q_{1} = \left(e^{i} , e^{j}\right) \in A_{{r r}}^{H} , q_{2} = \left(e^{j} , e^{i}\right) \in A_{{r r}}^{H}\end{matrix} \tag{eq\_0021} \\
+  & \left\{\begin{matrix} \mathit{sigma}^{0} \leq \mathit{lambda}_{e^{i , t}} \\ \mathit{sigma}^{0} \leq \mathit{zeta}_{q} \\ \mathit{sigma}^{0} \geq \mathit{lambda}_{e^{i , t}} + \mathit{zeta}_{q} - 1 \end{matrix}\right \tag{eq\_0035} \\
+  & \begin{matrix}\mathit{omega}_{q} + r_{e^{j , 3}} + \mathit{kappa}_{o u t}^{3} \cdot \mathit{zeta}_{q} \leq r_{e^{k , 6}} + \mathit{kappa}_{o u t}^{6} \cdot \left(1 - \mathit{zeta}_{q}\right) + \left(1 - \mathit{zeta}_{q}\right) \cdot M \\ \mathit{omega}_{q} + r_{e^{k , 6}} + \mathit{kappa}_{o u t}^{6} \cdot \left(1 - \mathit{zeta}_{q}\right) \leq r_{e^{j , 3}} + \mathit{kappa}_{o u t}^{3} \cdot \mathit{zeta}_{q} + \mathit{zeta}_{q} \cdot M\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix}\mathit{omega}_{q} + r_{e^{j , 3}} - \mathit{kappa}_{i n}^{3} \cdot \left(1 - \mathit{zeta}_{q}\right) \leq r_{e^{k , 6}} - \mathit{kappa}_{i n}^{6} \cdot \mathit{zeta}_{q} + \left(1 - \mathit{zeta}_{q}\right) \cdot M \\ \mathit{omega}_{q} + r_{e^{k , 6}} - \mathit{kappa}_{i n}^{6} \cdot \mathit{zeta}_{q} \leq r_{e^{j , 3}} - \mathit{kappa}_{i n}^{3} \cdot \left(1 - \mathit{zeta}_{q}\right) + \mathit{zeta}_{q} \cdot M\end{matrix} \tag{eq\_0037} \\
+  & \left\{\begin{matrix} \mathit{sigma}^{1} \geq \mathit{zeta}_{q_{1}} - \mathit{zeta}_{q_{2}} \\ \mathit{sigma}^{1} \geq \mathit{zeta}_{q_{2}} - \mathit{zeta}_{q_{1}} \\ \mathit{sigma}^{1} \leq \mathit{zeta}_{q_{1}} + \mathit{zeta}_{q_{1}} \\ \mathit{sigma}^{1} \leq 2 - \mathit{zeta}_{q_{1}} - \mathit{zeta}_{q_{1}} \end{matrix}\right \tag{eq\_0038} \\
+  & \left\{\begin{matrix} \mathit{sigma}^{2} \leq \mathit{zeta}_{q_{1}} \\ \mathit{sigma}^{2} \leq \mathit{zeta}_{q_{2}} \\ \mathit{sigma}^{2} \geq \mathit{zeta}_{q_{1}} + \mathit{zeta}_{q_{1}} - 1 \end{matrix}\right \tag{eq\_0039} \\
+\end{align}

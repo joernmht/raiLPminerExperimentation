@@ -1,0 +1,126 @@
+% Declaration sidecar for 10.1016_j.cie.2020.106374
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2020.106374
+% Integrated timetable synchronization optimization with capacity constraint under time-dependent demand for a rail transit network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2020.106374.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize passenger total waiting time and penalty for failed transfers
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Time horizon index
+
+% Objective: classified as parameter during review
+%@ param Objective shape=- kind=scalar domain=- :: Objective function value
+
+% function: classified as parameter during review
+%@ param function shape=- kind=scalar domain=- :: Objective function consisting of waiting and penalty terms
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time interval index
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Line index
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at original station
+
+% d: classified as variable during review
+%@ var d shape=- domain=integer role=primary drole=- lo=- hi=- :: Departure time of train i at station m on line l
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Passenger demand rate between origin and destination
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of trains on a line
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Number of stations on a line
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Running time index
+
+% P: classified as variable during review
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Penalty value for failed transfer
+
+% Y: classified as variable during review
+%@ var Y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating successful transfer
+
+% unusable as an identifier, rename or drop: α
+%@ param alpha shape=- kind=scalar domain=- :: Penalty factor for failed transfer
+% a: classified as variable during review
+%@ var a shape=- domain=integer role=primary drole=- lo=- hi=- :: Arrival time of train i at station m on line l
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Station index
+
+% w: classified as variable during review
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time at station
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway bounds
+
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger can board train i at time t
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large constant for linearization
+
+% X: classified as variable during review
+%@ var X shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train i' is the first connection after train i
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% Nu: classified as variable during review
+%@ var Nu shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train i after station m
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, l, n
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting time at original station
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passenger transfer waiting time
+%@ con eq_0004 kind=linear domain=- indicator=- :: Penalty for failed transfers
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure minus arrival equals dwell time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival at next station equals departure plus running time
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint
+%@ con eq_0008 kind=headway domain=- indicator=- :: Departure headway constraint
+%@ con eq_0009 kind=ordering domain=- indicator=- :: Non-increasing boarding indicator z
+%@ con eq_0010 kind=linear domain=- indicator=- :: Relationship between departure time and boarding indicator
+%@ con eq_0011 kind=linear domain=- indicator=- :: Relationship between boarding variable and z difference
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger train choice sum to one
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Transfer connection timing lower bound
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Transfer connection timing upper bound
+%@ con eq_0015 kind=linear domain=- indicator=- :: Successful transfer indicator from X difference
+%@ con eq_0018 kind=linear domain=- indicator=- :: Transfer waiting time lower bound linearization
+%@ con eq_0019 kind=linear domain=- indicator=- :: Transfer waiting time upper bound linearization
+%@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegative transfer waiting time
+%@ con eq_0021 kind=capacity domain=- indicator=- :: Train capacity constraint
+%@ con eq_0022 kind=flow_balance domain=- indicator=- :: Passenger load before transfer station
+%@ con eq_0023 kind=flow_balance domain=- indicator=- :: Passenger load after transfer station
+%@ con eq_0024 kind=linear domain=- indicator=- :: Linearized load constraint for after transfer
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Linearization product variable upper bound by L
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Linearization product variable upper bound by Y
+%@ con eq_0025_c kind=linear domain=- indicator=- :: Linearization product variable lower bound
+%@ con eq_0026 kind=linear domain=- indicator=- :: Study horizon bounds for departure time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Study horizon bounds for arrival time

@@ -1,0 +1,118 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2019.04.031
+%@ meta id=10.1016_j.cie.2019.04.031 family=milp schema=0.1.0
+%@ name :: A flexible metro train scheduling approach to minimize energy cost and passenger waiting time
+%@ desc :: Mined from A flexible metro train scheduling approach to minimize energy cost and passenger waiting time (Computers & Industrial Engineering, 2019).
+%@ prov source :: 10.1016/j.cie.2019.04.031
+%@ prov reference :: A flexible metro train scheduling approach to minimize energy cost and passenger waiting time
+%@ prov author :: Pengli Mo; Lixing Yang; Yanhui Wang; Jianguo Qi
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time and total energy cost (λ1·W + λ2·(CR+CB))
+%@ index d ordered=0 cyclic=0 :: Index for potential services (trains) in the set N
+%@ param h shape=- kind=scalar domain=- :: Headway bounds h_min and h_max between consecutive trains
+%@ index N ordered=0 cyclic=0 :: Set of potential services (trains) in a direction
+%@ index u ordered=0 cyclic=0 :: Index for stations or segments
+%@ index S ordered=0 cyclic=0 :: Set of stations in one direction
+%@ var a shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train j at station u
+%@ param s shape=- kind=scalar domain=- :: Dwelling time at station u
+%@ param P shape=- kind=scalar domain=- :: Passenger demand from station u to v at time t
+%@ var Q shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers remaining in train j after departing station u
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train j departs station u before time t
+%@ index T ordered=0 cyclic=0 :: Set of time intervals
+%@ param c shape=- kind=scalar domain=- :: Capacity of train type k
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train j is assigned type k in direction up/dn
+%@ index K ordered=0 cyclic=0 :: Set of train types
+%@ param CT shape=- kind=scalar domain=- :: Initial number of k-type inventory trains in depot
+%@ var e shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicator: 1 if service j is effective in direction up/dn
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
+%@ var EA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption in acceleration phase for train j at time t
+%@ param M shape=- kind=scalar domain=- :: Mass of empty train type k
+%@ param m shape=- kind=scalar domain=- :: Average mass per passenger
+%@ param vs shape=- kind=scalar domain=- :: Final speed of acceleration phase on segment u
+%@ param R shape=- kind=scalar domain=- :: Davis equation coefficients R0, R1, R2
+%@ param f shape=- kind=scalar domain=- :: Unit resistance in cruising phase on segment u
+%@ var EB shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption in cruising phase for train j at time t
+%@ var EC shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption in coasting phase (always zero)
+%@ var ED shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Regenerative energy in braking phase for train j at time t
+%@ param vt shape=- kind=scalar domain=- :: Original speed of braking phase on segment u
+%@ param fe shape=- kind=scalar domain=- :: Time-dependent energy price
+%@ var CR shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Regular energy cost
+%@ param PD shape=- kind=scalar domain=- :: Capacitance of k-type train
+%@ param fb shape=- kind=scalar domain=- :: Basic energy price
+%@ var CB shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Basic energy cost
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ con eq_0004 kind=linear domain=- indicator=- :: Headway constraint for upstream direction: h_min <= departure headway at origin <= h_max
+%@ con eq_0005 kind=linear domain=- indicator=- :: Headway constraint for downstream direction: h_min <= departure headway at origin <= h_max
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival time propagation: arrival at station u equals departure from u-1 plus running time
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure time at station u equals arrival time plus dwelling time
+%@ con eq_0008 kind=linear domain=- indicator=- :: Passenger load for first upstream train at station u (explicit time form)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger load for subsequent upstream trains at station u (explicit time form)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Passenger load for first upstream train using departure-time binary z
+%@ con eq_0011 kind=linear domain=- indicator=- :: Passenger load for subsequent upstream trains using departure-time binary z
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger load for first downstream train using departure-time binary z
+%@ con eq_0013 kind=linear domain=- indicator=- :: Passenger load for subsequent downstream trains using departure-time binary z
+%@ con eq_0014 kind=linear domain=- indicator=- :: Loading capacity constraint for upstream trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Loading capacity constraint for downstream trains
+%@ con eq_0016 kind=linear domain=- indicator=- :: Link departure time to binary z variables
+%@ con eq_0017 kind=linear domain=- indicator=- :: Nondecreasing condition of binary z variables
+%@ con eq_0018 kind=linear domain=- indicator=- :: Inventory train constraint for upstream direction
+%@ con eq_0019 kind=linear domain=- indicator=- :: Inventory train constraint for downstream direction
+%@ con eq_0020 kind=linear domain=- indicator=- :: Train type assignment constraint for upstream services (one type per train)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train type assignment constraint for downstream services (one type per train)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Effective service variables are nonincreasing for upstream services
+%@ con eq_0023 kind=linear domain=- indicator=- :: Last effective upstream service departs no earlier than ideal boundary
+%@ con eq_0024 kind=linear domain=- indicator=- :: Penultimate effective upstream service departs before ideal boundary
+%@ con eq_0025 kind=linear domain=- indicator=- :: Effective service variables are nonincreasing for downstream services
+%@ con eq_0026 kind=linear domain=- indicator=- :: Last effective downstream service departs no earlier than ideal boundary
+%@ con eq_0027 kind=linear domain=- indicator=- :: Penultimate effective downstream service departs before ideal boundary
+%@ con eq_0028 kind=linear domain=- indicator=- :: Total passenger waiting time W calculation
+%@ con eq_0029 kind=linear domain=- indicator=- :: Acceleration energy consumption EA for upstream trains
+%@ con eq_0030 kind=linear domain=- indicator=- :: Acceleration energy consumption EA for downstream trains
+%@ con eq_0031 kind=linear domain=- indicator=- :: Davis equation for unit cruising resistance f_u
+%@ con eq_0032 kind=linear domain=- indicator=- :: Cruising energy consumption EB for upstream trains
+%@ con eq_0033 kind=linear domain=- indicator=- :: Cruising energy consumption EB for downstream trains
+%@ con eq_0034 kind=linear domain=- indicator=- :: Coasting energy consumption EC is always zero
+%@ con eq_0035 kind=linear domain=- indicator=- :: Regenerative braking energy ED for upstream trains
+%@ con eq_0036 kind=linear domain=- indicator=- :: Regenerative braking energy ED for downstream trains
+%@ con eq_0037 kind=linear domain=- indicator=- :: Regular energy cost CR from acceleration, cruising and regenerative braking
+%@ con eq_0038 kind=linear domain=- indicator=- :: Basic energy cost CB from train capacitance and train type scheme
+%@ con eq_0039 kind=linear domain=- indicator=- :: Objective function Z = λ1·W + λ2·(CR+CB)
+\begin{align}
+  & h_{\mathit{min}} \leq d_{j}^{1} - d_{j - 1}^{1} \leq h_{\mathit{max}} \forall j , j - 1 \in {N} . \tag{eq\_0004} \\
+  & h_{\mathit{min}} \leq d_{j}^{\left|S\right| + 1} - d_{j - 1}^{\left|S\right| + 1} \leq h_{\mathit{max}} \forall j , j - 1 \in \underset{̲}{N} . \tag{eq\_0005} \\
+  & a_{j}^{u} = d_{j}^{u - 1} + r^{u - 1} , \forall u , u - 1 \in {S} , \forall j \in {N} \text{or} \forall u , u - 1 \in \underset{̲}{S} , \forall j \in \underset{̲}{N} . \tag{eq\_0006} \\
+  & d_{j}^{u} = a_{j}^{u} + s^{u} \forall u \in {S} , \forall j \in {N} \text{or} \forall u \in \underset{̲}{S} , \forall j \in \underset{̲}{N} . \tag{eq\_0007} \\
+  & Q_{j}^{u} = \sum_{u ' = 1}^{u} \sum_{v = u + 1}^{\left|S\right|} \sum_{t = 1}^{d_{j}^{u '}} P^{u ' , v} \left(t\right) , 1 \leq u < \left|S\right| , j = 1 . \tag{eq\_0008} \\
+  & Q_{j}^{u} = \sum_{u ' = 1}^{u} \sum_{v = u + 1}^{\left|S\right|} \sum_{t = d_{j - 1}^{u '} + 1}^{d_{j}^{u '}} P^{u ' , v} \left(t\right) , 1 \leq u < \left|S\right| , 1 < j \leq \left|{N}\right| . \tag{eq\_0009} \\
+  & Q_{j}^{u} = \sum_{u ' = 1}^{u} \sum_{v = u + 1}^{\left|S\right|} \sum_{t \in T} P^{u ' , v} \left(t\right) \cdot \left[1 - z_{j}^{u '} \left(t\right)\right] 1 \leq u < \left|S\right| , j = 1 \tag{eq\_0010} \\
+  & Q_{j}^{u} = \sum_{u ' = 1}^{u} \sum_{v = u + 1}^{\left|S\right|} \sum_{t \in T} P^{u ' , v} \left(t\right) \cdot \left[z_{j - 1}^{u '} \left(t\right) - z_{j}^{u '} \left(t\right)\right] 1 \leq u < \left|S\right| , 1 < j \leq \left|{N}\right| . \tag{eq\_0011} \\
+  & Q_{j}^{u} = \sum_{u ' = \left|S\right| + 1}^{u} \sum_{v = u + 1}^{\left|2 S\right|} \sum_{t \in T} P^{u ' , v} \left(t\right) \cdot \left[1 - z_{j}^{u '} \left(t\right)\right] \left|S\right| + 1 \leq u < \left|2 \cdot S\right| , j = 1 . \tag{eq\_0012} \\
+  & Q_{j}^{u} = \sum_{u ' = \left|S\right| + 1}^{u} \sum_{v = u + 1}^{\left|2 S\right|} \sum_{t \in T} P^{u ' , v} \left(t\right) \cdot \left[z_{j - 1}^{u '} \left(t\right) - z_{j}^{u '} \left(t\right)\right] \left|S\right| + 1 \leq u < \left|2 \cdot S\right| , 1 < j \leq \left|\underset{̲}{N}\right| . \tag{eq\_0013} \\
+  & Q_{j}^{u} \leq \sum_{k \in K} y_{j , k}^{\mathit{up}} \cdot c_{k} \forall u \in {S} , \forall j \in {N} . \tag{eq\_0014} \\
+  & Q_{j}^{u} \leq \sum_{k \in K} y_{j , k}^{\mathit{dn}} \cdot c_{k} \forall u \in \underset{̲}{S} , \forall j \in \underset{̲}{N} . \tag{eq\_0015} \\
+  & d_{j}^{u} = \sum_{t = 1}^{\left|T\right|} \left(t - 1\right) \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u \in {S} , \forall j \in {N} , t > 1 \text{or} \forall u \in \underset{̲}{S} , \forall j \in \underset{̲}{N} , t > 1 . \tag{eq\_0016} \\
+  & z_{j}^{u} \left(t - 1\right) \leq z_{j}^{u} \left(t\right) \forall u \in {S} , \forall j \in {N} , t > 1 \text{or} \forall u \in \underset{̲}{S} , \forall j \in \underset{̲}{N} , t > 1 . \tag{eq\_0017} \\
+  & 0 \leq {\mathit{CT}}_{k} - \sum_{j \in {N}} y_{j , k}^{\mathit{up}} \cdot z_{j}^{1} \left(t\right) + \sum_{j ' \in \underset{̲}{N}} y_{j ' , k}^{\mathit{dn}} \cdot z_{j '}^{\left|2 S\right|} \left(t - \mathit{sigma}\right) \forall k \in K , t > \mathit{sigma} . \tag{eq\_0018} \\
+  & 0 \leq \underset{̲}{\mathit{CT}}_{k} - \sum_{j ' \in \underset{̲}{N}} y_{j ' , k}^{\mathit{dn}} \cdot z_{j '}^{\left|S\right| + 1} \left(t\right) + \sum_{j \in {N}} y_{j , k}^{\mathit{up}} \cdot z_{j}^{\left|S\right|} \left(t - \mathit{sigma}\right) \forall k \in K , t > \mathit{sigma} . \tag{eq\_0019} \\
+  & \sum_{k \in K} y_{j , k}^{\mathit{up}} = 1 \forall j \in {N} . \tag{eq\_0020} \\
+  & \sum_{k \in K} y_{j , k}^{\mathit{dn}} = 1 \forall j \in \underset{̲}{N} . \tag{eq\_0021} \\
+  & e_{j}^{\mathit{up}} \leq e_{j - 1}^{\mathit{up}} , 1 < j \leq \left|{N}\right| , \tag{eq\_0022} \\
+  & \sum_{j = 1}^{\left|{N}\right| - 1} d_{j}^{1} \cdot \left(e_{j}^{\mathit{up}} - e_{j + 1}^{\mathit{up}}\right) + d_{\left|{N}\right|}^{1} \cdot e_{\left|{N}\right|}^{\mathit{up}} \geq {T}^{\mathit{up}} , \tag{eq\_0023} \\
+  & \sum_{j = 1}^{\left|{N}\right| - 2} d_{j}^{1} \cdot \left(e_{j + 1}^{\mathit{up}} - e_{j + 2}^{\mathit{up}}\right) + d_{\left|{N}\right| - 1}^{1} \cdot e_{\left|{N}\right|}^{\mathit{up}} < {T}^{\mathit{up}} . \tag{eq\_0024} \\
+  & e_{j}^{\mathit{dn}} \leq e_{j - 1}^{\mathit{dn}} , 1 < j \leq \left|\underset{̲}{N}\right| , \tag{eq\_0025} \\
+  & \sum_{j = 1}^{\left|\underset{̲}{N}\right| - 1} d_{j}^{\left|S\right| + 1} \cdot \left(e_{j}^{\mathit{dn}} - e_{j + 1}^{\mathit{dn}}\right) + d_{\left|\underset{̲}{N}\right|}^{\left|S\right| + 1} \cdot e_{\left|\underset{̲}{N}\right|}^{\mathit{dn}} \geq {T}^{\mathit{down}} , \tag{eq\_0026} \\
+  & \sum_{j = 1}^{\left|\underset{̲}{N}\right| - 2} d_{j}^{\left|S\right| + 1} \cdot \left(e_{j + 1}^{\mathit{dn}} - e_{j + 2}^{\mathit{dn}}\right) + d_{\left|\underset{̲}{N}\right| - 1}^{\left|S\right| + 1} \cdot e_{\left|\underset{̲}{N}\right|}^{\mathit{dn}} < {T}^{\mathit{down}} . \tag{eq\_0027} \\
+  & \begin{matrix}W = \sum_{j \in {N}} \sum_{u = 1}^{\left|S\right| - 1} \sum_{v = u + 1}^{\left|S\right|} \sum_{t \in T} P^{u , v} \left(t\right) \cdot \left[z_{j - 1}^{u} \left(t\right) - z_{j}^{u} \left(t\right)\right] \cdot \left(d_{j}^{u} - t + 1\right) + \\ \sum_{j \in \underset{̲}{N}} \sum_{u = \left|S\right| + 1}^{\left|2 S\right| - 1} \sum_{v = u + 1}^{\left|2 S\right|} \sum_{t \in T} P^{u , v} \left(t\right) \cdot \left[z_{j - 1}^{u} \left(t\right) - z_{j}^{u} \left(t\right)\right] \cdot \left(d_{j}^{u} - t + 1\right) .\end{matrix} \tag{eq\_0028} \\
+  & \mathit{EA}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = 1}^{\left|S\right| - 1} \frac{1}{2 t_{\mathit{ab}}^{u}} y_{j , k}^{\mathit{up}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot \left(\mathit{vs}^{u}\right)^{2} \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - t_{\mathit{ab}}^{u}\right)\right] , \forall j \in {N} , t > t_{\mathit{ab}}^{1} . \tag{eq\_0029} \\
+  & \mathit{EA}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = \left|S\right| + 1}^{\left|2 S\right| - 1} \frac{1}{2 t_{\mathit{ab}}^{u}} y_{j , k}^{\mathit{dn}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot \left(\mathit{vs}^{u}\right)^{2} \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - t_{\mathit{ab}}^{u}\right)\right] , \forall j \in \underset{̲}{N} , t > t_{\mathit{ab}}^{\left|S\right| + 1} . \tag{eq\_0030} \\
+  & f^{u} = R_{0} + R_{1} \cdot \mathit{vs}^{u} + R_{2} \cdot \left(\mathit{vs}^{u}\right)^{2} , \forall u \in {S} \cup \underset{̲}{S} . \tag{eq\_0031} \\
+  & \mathit{EB}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = 1}^{\left|S\right| - 1} y_{j , k}^{\mathit{up}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot f^{u} \cdot \mathit{vs}^{u} \cdot \left[z_{j}^{u} \left(t - t_{\mathit{ab}}^{u}\right) - z_{j}^{u} \left(t - t_{\mathit{bc}}^{u}\right)\right] , \forall j \in {N} , t > t_{\mathit{bc}}^{1} . \tag{eq\_0032} \\
+  & \mathit{EB}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = \left|S\right| + 1}^{\left|2 S\right| - 1} y_{j , k}^{\mathit{dn}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot f^{u} \cdot \mathit{vs}^{u} \cdot \left[z_{j}^{u} \left(t - t_{\mathit{ab}}^{u}\right) - z_{j}^{u} \left(t - t_{\mathit{bc}}^{u}\right)\right] , \forall j \in \underset{̲}{N} , t > t_{\mathit{bc}}^{\left|S\right| + 1} . \tag{eq\_0033} \\
+  & \mathit{EC}_{j} \left(t\right) = 0 , \forall j \in {S} \cup \underset{̲}{S} , t \in T . \tag{eq\_0034} \\
+  & \mathit{ED}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = 1}^{\left|S\right| - 1} \frac{\mathit{eta}}{2 \left(r^{u} - t_{c d}^{u}\right)} \cdot y_{j , k}^{\mathit{up}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot \left(\mathit{vt}^{u}\right)^{2} \cdot \left[z_{j}^{u} \left(t - t_{c d}^{u}\right) - z_{j}^{u} \left(t - r^{u}\right)\right] , \forall j \in {N} , t > r^{1} . \tag{eq\_0035} \\
+  & \mathit{ED}_{j} \left(t\right) = \sum_{k \in K} \sum_{u = \left|S\right| + 1}^{\left|2 S\right| - 1} \frac{\mathit{eta}}{2 \left(r^{u} - t_{c d}^{u}\right)} \cdot y_{j , k}^{\mathit{dn}} \cdot \left(M_{k} + m \cdot Q_{j}^{u}\right) \cdot \left(\mathit{vt}^{u}\right)^{2} \cdot \left[z_{j}^{u} \left(t - t_{c d}^{u}\right) - z_{j}^{u} \left(t - r^{u}\right)\right] , \forall j \in \underset{̲}{N} , t > r^{\left|S\right| + 1} . \tag{eq\_0036} \\
+  & \begin{matrix}\mathit{CR} = \sum_{j \in {N}} e_{j}^{\mathit{up}} \cdot \left(\sum_{t = t_{\mathit{ab}}^{1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{EA}_{j} \left(t\right) + \sum_{t = t_{\mathit{bc}}^{1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{EB}_{j} \left(t\right) - \sum_{t = r^{1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{ED}_{j} \left(t\right)\right) \\ + \sum_{j \in {N}} e_{j}^{\mathit{dn}} \cdot \left(\sum_{t = t_{\mathit{ab}}^{\left|S\right| + 1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{EA}_{j} \left(t\right) + \sum_{t = t_{\mathit{bc}}^{\left|S\right| + 1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{EB}_{j} \left(t\right) - \sum_{t = r_{}^{\left|S\right| + 1} + 1}^{\left|T\right|} \mathit{fe} \left(t\right) \cdot \mathit{ED}_{j} \left(t\right)\right) .\end{matrix} \tag{eq\_0037} \\
+  & \mathit{CB} = \sum_{k \in K} \left(\sum_{j \in {N}} e_{j}^{\mathit{up}} \cdot y_{j , k}^{\mathit{up}} \cdot \mathit{fb} \cdot \mathit{PD}_{k} + \sum_{j \in \underset{̲}{N}} e_{j}^{\mathit{dn}} \cdot y_{j , k}^{\mathit{dn}} \cdot \mathit{fb} \cdot \mathit{PD}_{k}\right) . \tag{eq\_0038} \\
+  & Z = \mathit{lambda}_{1} \cdot W + \mathit{lambda}_{2} \cdot \left(\mathit{CR} + \mathit{CB}\right) \tag{eq\_0039} \\
+  \min\quad & \mathit{lambda}_{1} \cdot W + \mathit{lambda}_{2} \cdot \left(\mathit{CR} + \mathit{CB}\right) \tag{eq\_0040} \\
+\end{align}

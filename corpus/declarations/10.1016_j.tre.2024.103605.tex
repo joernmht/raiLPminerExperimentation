@@ -1,0 +1,263 @@
+% Declaration sidecar for 10.1016_j.tre.2024.103605
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2024.103605
+% Enhancing the evacuation efficiency through the two-step optimization of train timetable and response vehicles during metro disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2024.103605.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total generalized cost (train operating cost plus passenger waiting time in TTR; passenger total travel time in RVS).
+%
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of normal train services
+%
+% unusable as an identifier, rename or drop: λ
+%@ param lambda shape=- kind=scalar domain=- :: Cost conversion factors for train running and turnaround operations
+% TTR: classified as parameter during review
+%@ param TTR shape=- kind=scalar domain=- :: Train timetable rescheduling (TTR) model label
+%
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total generalized cost)
+%
+% a: classified as variable during review
+%@ var a shape=U domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether normal train service u is activated
+%
+% b: classified as variable during review
+%@ var b shape=U,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service u turns around at station r
+%
+% w: classified as variable during review
+%@ var w shape=P domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time for demand p
+%
+% unusable as an identifier, rename or drop: μ
+%@ param mu shape=- kind=scalar domain=- :: Weight for passenger waiting time in the TTR objective
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passenger demands
+%
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of stations
+%
+% t: classified as variable during review
+%@ var t shape=U,R domain=integer role=primary drole=- lo=- hi=- :: Arrival and departure times of train services at stations
+%
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Index for turnaround train service v = u + |U|
+%
+% f: classified as variable during review
+%@ var f shape=U domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating upward/downward direction of train service
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant for linearization
+%
+% s: classified as variable during review
+%@ var s shape=U,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service visits station r
+%
+% unusable as an identifier, rename or drop: ε
+% unusable as an identifier, rename or drop: τ
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant
+%@ param tau shape=R,R kind=matrix domain=- :: Line section travel time between stations
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Headway times between trains
+%
+% n: classified as parameter during review
+%@ param n shape=P kind=vector domain=- :: Number of passengers in demand p
+%
+% x: classified as variable during review
+%@ var x shape=P,U domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers assigned to train service
+%
+% unusable as an identifier, rename or drop: σ
+% unusable as an identifier, rename or drop: ρ
+%@ param sigma shape=P kind=vector domain=- :: Binary parameter indicating whether passengers can board trains during disruption
+%@ var rho shape=U,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger p can catch train service u
+% o: classified as parameter during review
+%@ param o shape=P kind=vector domain=- :: Origin station of passenger demand p
+%
+% unusable as an identifier, rename or drop: θ
+%@ param theta shape=P kind=vector domain=- :: Binary parameter indicating whether passenger p is affected by the disruption
+% c: classified as variable during review
+%@ var c shape=U,R domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train service u at station r
+%
+% unusable as an identifier, rename or drop: φ
+%@ param phi shape=P,R kind=matrix domain=- :: Binary parameter indicating whether station r is on passenger p's route
+% C: classified as variable during review
+%@ var C shape=U,R domain=non_negative role=primary drole=- lo=- hi=- :: Passenger count at platform or train capacity
+%
+% C̄: classified as parameter during review
+%@ param Cbar shape=R kind=vector domain=- :: Platform holding capacity at station r
+%
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of nodes in response vehicle network
+%
+% RVS: classified as parameter during review
+%@ param RVS shape=- kind=scalar domain=- :: Response vehicle scheduling (RVS) model label
+%
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for nodes in response vehicle network
+%
+% unusable as an identifier, rename or drop: ω
+%@ var omega shape=I domain=integer role=primary drole=- lo=- hi=- :: Arrival time of response vehicle at node i
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of response vehicles
+%
+% unusable as an identifier, rename or drop: α
+%@ var alpha shape=E,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether response vehicle k traverses arc e
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of arcs in response vehicle network
+%
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for nodes in response vehicle network
+%
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Natural numbers used for arrival time variables
+%
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: π
+%@ var xi shape=P,U domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating passenger assignment to train (linearization)
+%@ var pi shape=U,U,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable for linearizing absolute value in headway constraints
+% PA: classified as parameter during review
+%@ param PA shape=- kind=scalar domain=- :: Passenger assignment (PA) model label
+%
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: Set of stations (unclear role)
+%
+% unusable as an identifier, rename or drop: Δ
+%@ param Delta shape=- kind=scalar domain=- :: Maximum waiting time bound
+% K̄: classified as index during review
+%@ index Kbar ordered=0 cyclic=0 :: Set of response vehicles in school bus bridging (SBB) model
+%
+% SBB: classified as parameter during review
+%@ param SBB shape=- kind=scalar domain=- :: School bus bridging (SBB) model label
+%
+% y: classified as variable during review
+%@ var y shape=P,K domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers assigned to response vehicle
+%
+% unusable as an identifier, rename or drop: ω̄
+% unusable as an identifier, rename or drop: φ̄
+%@ param omega_bar shape=K,P kind=matrix domain=- :: Travel time of response vehicle to passenger
+%@ param phi_bar shape=K,P kind=matrix domain=- :: Binary parameter indicating whether response vehicle can serve passenger
+% R̄: classified as index during review
+%@ index Rbar ordered=0 cyclic=0 :: Set of stations in school bus bridging (SBB) model
+%
+% V: classified as parameter during review
+%@ param V shape=- kind=scalar domain=- :: Vehicle capacity
+%
+% Bound by a quantifier or big operator, so no declaration of their own: k, p, r, u
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0002 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0003 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0004 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0005 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0006 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0024 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0026 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0027 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0028 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0029 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0030 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0031 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0037 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0038 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0039 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0043 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0044 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0045 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0046 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0047 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0048 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0049 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0054 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0055 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0056 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0057 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0058 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0059 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0060 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0061 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0062 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0063 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0064 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0065 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0066 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0067 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0068 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0069 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0070 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0071 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0072 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0073 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0074 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0075 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0076 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0077 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0078 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0079 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0080 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0081 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0082 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0083 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0084 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0085 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0086 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0087 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0088 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0089 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0090 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0091 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0092 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0093 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0094 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0095 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0096 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0097 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0098 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model
+%@ con eq_0099 kind=linear domain=- indicator=- :: Constraint of the two-step TTR/RVS metro disruption model

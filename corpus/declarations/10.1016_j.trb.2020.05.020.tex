@@ -1,0 +1,128 @@
+% Declaration sidecar for 10.1016_j.trb.2020.05.020
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2020.05.020
+% An MIP-based heuristic solution approach for the locomotive assignment problem focussing on (dis-)connecting processes
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2020.05.020.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Total cost: fixed, penalty, light travel, active/passive travel, and busting costs.
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the network.
+
+% unusable as an identifier, rename or drop: γ
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Index for arcs.
+
+% x: classified as variable during review
+%@ var x shape=C,A domain=integer role=primary drole=- lo=- hi=- :: Number of locomotives of consist c assigned to arc a.
+
+% s: classified as variable during review
+%@ var s shape=L domain=integer role=primary drole=- lo=- hi=- :: Violation of locomotive type limit.
+
+% u: classified as variable during review
+%@ var u shape=L domain=non_negative role=primary drole=- lo=- hi=- :: Number of used locomotives of type l.
+
+% w: classified as variable during review
+%@ var w shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if busting occurs on arc a.
+
+% y: classified as variable during review
+%@ var y shape=C,A domain=integer role=primary drole=- lo=- hi=- :: Number of locomotives of consist c used for connection on arc a.
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of all consists.
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of locomotive types.
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes (stations).
+
+% t: classified as parameter during review
+%@ param t shape=L kind=vector domain=- :: Tractive effort of locomotive type l.
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Maximum number of locomotives per train.
+
+% T: classified as parameter during review
+%@ param T shape=A kind=vector domain=- :: Minimum required tractive effort for train arc a.
+
+% r: classified as variable during review
+%@ var r shape=C,A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if consist c is used on train arc a.
+
+% Ĉ: classified as index during review
+%@ index C_hat ordered=0 cyclic=0 :: Set of consists incompatible with consist c.
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for locomotive types.
+
+% B: classified as parameter during review
+%@ param B shape=L kind=vector domain=- :: Maximum number of locomotives of type l available.
+
+% v: classified as variable during review
+%@ var v shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if connection arc a is used.
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Set of real locomotives (not consists).
+
+% Â: classified as index during review
+%@ index A_hat ordered=0 cyclic=0 :: Reduced set of light arcs.
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Index for trains in merge pairs.
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of merged train pairs.
+
+% Bound by a quantifier or big operator, so no declaration of their own: c, ĉ, f, i
+% (If one of these is really an index family, add a %@ index line for it.)
+
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow conservation for each node and consist.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Limit on number of locomotives per train arc.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum tractive effort requirement for pull arcs.
+%@ con eq_0005 kind=linear domain=- indicator=- :: At least one consist on push arcs.
+%@ con eq_0006 kind=linear domain=- indicator=- :: At least one consist on task arcs.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Link x and y to binary r on train arcs.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Prevent incompatible consists on same train arc.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of used locomotives u_l.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Limit on available locomotives of each type.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Limit on locomotives on connection arcs via v_a.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Exactly one outgoing connection from arrival nodes.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Exactly one incoming connection to departure nodes.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Indicator for consist busting on bust arcs.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Domain of x on train arcs (nonnegative integer).
+%@ con eq_0016 kind=linear domain=- indicator=- :: Domain of x on light arcs (nonnegative integer).
+%@ con eq_0017 kind=linear domain=- indicator=- :: Domain of y (nonnegative integer).
+%@ con eq_0018 kind=linear domain=- indicator=- :: Domain of r (binary).
+%@ con eq_0019 kind=linear domain=- indicator=- :: Domain of v (binary).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain of w (binary).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain of u (nonnegative real).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Domain of s (nonnegative integer).
+%@ con eq_0023 kind=linear domain=- indicator=- :: Forbid x for non-real consists (LFF transformation).
+%@ con eq_0024 kind=linear domain=- indicator=- :: Forbid y for non-real consists (LFF transformation).
+%@ con eq_0025 kind=linear domain=- indicator=- :: At most one consist per train arc (CFF restriction).
+%@ con eq_0026 kind=linear domain=- indicator=- :: x binary on train arcs (CFF restriction).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Transformation of x from consists to real locomotives.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Transformation of y from consists to real locomotives.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Forbid y on change arcs (Ignore-Heuristic).
+%@ con eq_0030 kind=linear domain=- indicator=- :: Forbid x on non-reduced light arcs (Light-Heuristic).
+%@ con eq_0031 kind=linear domain=- indicator=- :: Enforce same consist on merged trains (Merge-Heuristic).

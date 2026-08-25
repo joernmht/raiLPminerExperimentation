@@ -1,0 +1,105 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.eswa.2023.121515
+%@ meta id=10.1016_j.eswa.2023.121515 family=milp schema=0.1.0
+%@ name :: Integrating stop planning, timetabling and rolling stock planning on high-speed railway lines: A multi-objective optimization approach
+%@ desc :: Mined from Integrating stop planning, timetabling and rolling stock planning on high-speed railway lines: A multi-objective optimization approach (Expert Systems with Applications, 2023).
+%@ prov source :: 10.1016/j.eswa.2023.121515
+%@ prov reference :: Integrating stop planning, timetabling and rolling stock planning on high-speed railway lines: A multi-objective optimization approach
+%@ prov author :: Lin Yang; Dewei Li; Hui Wang; Yuan Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total train dwell time, running distance and rolling stock resources (multi-objective)
+%@ index S ordered=0 cyclic=0 :: Set of stations on the line
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ index t ordered=0 cyclic=0 :: Station index used in sums
+%@ index T ordered=0 cyclic=0 :: Set of all trains
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train i starts at s and ends at t
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train i stops at station s
+%@ param M shape=- kind=scalar domain=- :: Large positive constant (big-M)
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating departure order of trains i and j at station s (1 if i departs before j)
+%@ param d shape=- kind=scalar domain=- :: Distance of section k
+%@ param v shape=- kind=scalar domain=- :: Train speed (high or normal)
+%@ var r shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating connection between trains i and j at station s
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating rolling stock type of train i
+%@ param Cap shape=- kind=scalar domain=- :: Capacity of rolling stock (upper-case)
+%@ param q shape=- kind=scalar domain=- :: Passenger demand at station s
+%@ index N ordered=0 cyclic=0 :: Set of normal trains
+%@ index H ordered=0 cyclic=0 :: Set of high-quality trains
+%@ param cap shape=- kind=scalar domain=- :: Capacity of rolling stock (lowercase)
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ con eq_0001 kind=linear domain=- indicator=- :: Unique starting and ending stations for downstream trains
+%@ con eq_0002 kind=linear domain=- indicator=- :: Unique starting and ending stations for upstream trains
+%@ con eq_0003 kind=linear domain=- indicator=- :: Stops at the starting station
+%@ con eq_0004 kind=linear domain=- indicator=- :: Stops at the ending station
+%@ con eq_0005 kind=linear domain=- indicator=- :: Skip stations before the starting station (downstream)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Skip stations after the ending station (downstream)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Skip stations before the starting station (upstream)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Skip stations after the ending station (upstream)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time window constraints
+%@ con eq_0010 kind=linear domain=- indicator=- :: Departure headway constraints for downstream trains
+%@ con eq_0011 kind=linear domain=- indicator=- :: Departure headway constraints for upstream trains
+%@ con eq_0012 kind=linear domain=- indicator=- :: Arrival headway constraints for downstream trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Arrival headway constraints for upstream trains
+%@ con eq_0014 kind=linear domain=- indicator=- :: Departure sequence constraints for downstream trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure sequence constraints for upstream trains
+%@ con eq_0016 kind=linear domain=- indicator=- :: Dwell time constraints
+%@ con eq_0017 kind=linear domain=- indicator=- :: Section running time calculation
+%@ con eq_0018 kind=linear domain=- indicator=- :: Section running time constraints for downstream trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Section running time constraints for upstream trains
+%@ con eq_0020 kind=linear domain=- indicator=- :: Rolling stock connection constraints at the same station
+%@ con eq_0021 kind=linear domain=- indicator=- :: Minimum connection time constraints
+%@ con eq_0022 kind=linear domain=- indicator=- :: Maximum connection time constraints
+%@ con eq_0023 kind=linear domain=- indicator=- :: Rolling stock type compatibility constraints
+%@ con eq_0024 kind=linear domain=- indicator=- :: Unique outgoing connection per train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Unique incoming connection per train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger demand constraints for downstream trains
+%@ con eq_0027 kind=linear domain=- indicator=- :: Passenger demand constraints for upstream trains
+%@ con eq_0028 kind=linear domain=- indicator=- :: Minimum service frequency constraints (downstream)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Maximum number of stops per train
+%@ con eq_0030 kind=linear domain=- indicator=- :: High-quality trains stop no more than normal trains
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization of rolling stock type compatibility (upper bound)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Linearization of rolling stock type compatibility (lower bound)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearization of passenger demand: auxiliary upper bound
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearization of passenger demand: auxiliary big-M bound
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of passenger demand: auxiliary lower bound
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized passenger demand constraints (downstream)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Linearized passenger demand constraints (upstream)
+\begin{align}
+  & \underset{s \in S^{\mathit{od}}}{\sum} \underset{t \in S^{\mathit{od}} : t \geq s}{\sum} z_{i , s , t} = 1 , \forall i \in {T} , \tag{eq\_0001} \\
+  & \underset{s \in S^{\mathit{od}}}{\sum} \underset{t \in S^{\mathit{od}} : t \leq s}{\sum} z_{i , s , t} = 1 , \forall i \in {T} . \tag{eq\_0002} \\
+  & x_{i , s} \geq \underset{t \in S^{\mathit{od}}}{\sum} z_{i , s , t} , \forall i \in T , s \in S^{\mathit{od}} , \tag{eq\_0003} \\
+  & x_{i , t} \geq \underset{s \in S^{\mathit{od}}}{\sum} z_{i , s , t} , \forall i \in T , t \in S^{\mathit{od}} . \tag{eq\_0004} \\
+  & \sum_{\left(s^{'} \in S : s\right)^{'} < s} x_{i , s^{'}} \leq M \cdot \left(1 - \underset{t \in S^{\mathit{od}}}{\sum} z_{i , s , t}\right) , \forall i \in {T} , s \in S^{\mathit{od}} , \tag{eq\_0005} \\
+  & \sum_{\left(t^{'} \in S : t\right)^{'} > t} x_{i , t^{'}} \leq M \cdot \left(1 - \underset{s \in S^{\mathit{od}}}{\sum} z_{i , s , t}\right) , \forall i \in {T} , t \in S^{\mathit{od}} . \tag{eq\_0006} \\
+  & \sum_{\left(s^{'} \in S : s\right)^{'} > s} x_{m , s^{'}} \leq M \cdot \left(1 - \underset{t \in S^{\mathit{od}}}{\sum} z_{m , s , t}\right) , \forall m \in {T} , s \in S^{\mathit{od}} , \tag{eq\_0007} \\
+  & \sum_{\left(t^{'} \in S : t\right)^{'} < t} x_{m , t^{'}} \leq M \cdot \left(1 - \underset{s \in S^{\mathit{od}}}{\sum} z_{m , s , t}\right) , \forall m \in {T} , t \in S^{\mathit{od}} . \tag{eq\_0008} \\
+  & t_{i}^{ \cdot } - \mathit{Delta} t \leq t_{i , s^{ \cdot }}^{d} \leq t_{i}^{ \cdot } + \mathit{Delta} t , \forall i \in T , \tag{eq\_0009} \\
+  & t_{i , s}^{d} + t_{d} \leq t_{j , s}^{d} + M \cdot \left(1 - y_{i , j , s}\right) , \forall i , j \in {T} , i \neq j , s \in \left\{1 , 2 , \hdots , \left|S\right| - 1\right\} , \tag{eq\_0010} \\
+  & t_{m , s}^{d} + t_{d} \leq t_{n , s}^{d} + M \cdot \left(1 - y_{m , n , s}\right) , \forall m , n \in {T} , m \neq n ; s \in \left\{2 , \hdots , \left|S\right|\right\} . \tag{eq\_0011} \\
+  & t_{i , s + 1}^{a} + t_{a} \leq t_{j , s + 1}^{a} + M \cdot \left(1 - y_{i , j , s}\right) , \forall i , j \in {T} , i \neq j , s \in \left\{1 , 2 , \hdots , \left|S\right| - 1\right\} , \tag{eq\_0012} \\
+  & t_{m , s - 1}^{a} + t_{a} \leq t_{n , s - 1}^{a} + M \cdot \left(1 - y_{m , n , s}\right) , \forall m , n \in {T} , m \neq n , s \in \left\{2 , \hdots , \left|S\right|\right\} . \tag{eq\_0013} \\
+  & y_{i , j , s} + y_{j , i , s} = 1 , \forall i , j \in {T} , i < j , s \in \left\{1 , 2 , \hdots , \left|S\right| - 1\right\} , \tag{eq\_0014} \\
+  & y_{m , n , s} + y_{n , m , s} = 1 , \forall m , n \in {T} , m < n , s \in \left\{2 , \hdots , \left|S\right|\right\} . \tag{eq\_0015} \\
+  & t_{i , s}^{d} - t_{i , s}^{a} \geq x_{i , s} \cdot t_{\mathit{tau}} , \forall i \in T , s \in S . \tag{eq\_0016} \\
+  & t_{i , k}^{p} = \mathit{chi}_{i} \cdot \frac{d_{k}}{v_{h}} + \left(1 - \mathit{chi}_{i}\right) \frac{d_{k}}{v_{n}} , \forall i \in T , k \in \left\{1 , 2 , \hdots , \left|S\right| - 1\right\} , \tag{eq\_0017} \\
+  & t_{i , k}^{p} = t_{i , k + 1}^{a} - t_{i , k}^{d} , \forall i \in {T} , k \in \left\{1 , 2 , \hdots , \left|S\right| - 1\right\} , \tag{eq\_0018} \\
+  & t_{m , k}^{p} = t_{m , k - 1}^{a} - t_{m , k}^{d} , \forall m \in {T} , k \in \left\{2 , \hdots , \left|S\right|\right\} . \tag{eq\_0019} \\
+  & 2 \cdot r_{i , j , s} \leq \underset{t^{'} \in S^{\mathit{od}}}{\sum} z_{i , t^{'} , s} + \underset{t^{''} \in S^{\mathit{od}}}{\sum} z_{j , s , t^{''}} , \forall i , j \in T , s \in S^{\mathit{od}} . \tag{eq\_0020} \\
+  & M \cdot \left(r_{i , j , s} - 1\right) \leq t_{j , s}^{d} - t_{i , s}^{a} - t_{c}^{\mathit{min}} , \forall i , j \in T , s \in S^{\mathit{od}} . \tag{eq\_0021} \\
+  & M \cdot \left(1 - r_{i , j , s}\right) \geq t_{j , s}^{d} - t_{i , s}^{a} - t_{c}^{\mathit{max}} , \forall i , j \in T , s \in S^{\mathit{od}} . \tag{eq\_0022} \\
+  & 1 - \underset{s \in S^{\mathit{od}}}{\sum} r_{i , j , s} \geq \left|c_{i} - c_{j}\right| , \forall i , j \in T . \tag{eq\_0023} \\
+  & \sum_{j \in T} \underset{s \in S^{\mathit{od}}}{\sum} r_{i , j , s} \leq 1 , \forall i \in T , \tag{eq\_0024} \\
+  & \sum_{i \in T} \underset{s \in S^{\mathit{od}}}{\sum} r_{i , j , s} \leq 1 , \forall j \in T . \tag{eq\_0025} \\
+  & \sum_{i \in {T}} \mathit{delta}_{i , s} \cdot \mathit{Cap} \cdot x_{i , s} \cdot \left(\left(\right. 1 + c\right)_{i} \left.\right) \geq \left|\right. \left({q}\right)_{s} \left|\right. , \forall s \in S , \tag{eq\_0026} \\
+  & \sum_{i \in {T}} \mathit{delta}_{i , s} \cdot \mathit{Cap} \cdot x_{i , s} \cdot \left(1 + c_{i}\right) \geq \left|\left({q}\right)_{s}\right| , \forall s \in S , \tag{eq\_0027} \\
+  & \sum_{i \in {T}} x_{i , s} \geq \left|\left({k}\right)_{s}\right| , \forall s \in S , \tag{eq\_0028} \\
+  & \sum_{s \in S} x_{i , s} \leq N_{\mathit{max}} , \forall i \in T . \tag{eq\_0029} \\
+  & \sum_{s \in S} x_{i , s} \leq \sum_{s \in S} x_{j , s} , \forall i \in H , j \in N . \tag{eq\_0030} \\
+  & c_{i} - c_{j} \leq 1 - \underset{s \in S^{\mathit{od}}}{\sum} r_{i , j , s} , \forall i , j \in T , \tag{eq\_0031} \\
+  & c_{i} - c_{j} \geq \underset{s \in S^{\mathit{od}}}{\sum} r_{i , j , s} - 1 , \forall i , j \in T . \tag{eq\_0032} \\
+  & \mathit{varphi}_{i , s} \leq \mathit{delta}_{i , s} \cdot \mathit{cap} \cdot \left(1 + c_{i}\right) , \forall i \in T , s \in S , \tag{eq\_0033} \\
+  & \mathit{varphi}_{i , s} \leq M \cdot x_{i , s} , \forall i \in T , s \in S , \tag{eq\_0034} \\
+  & \mathit{varphi}_{i , s} \geq \mathit{delta}_{i , s} \cdot \mathit{cap} \cdot \left(1 + c_{i}\right) - M \cdot \left(1 - x_{i , s}\right) , \forall i \in T , s \in S , \tag{eq\_0035} \\
+  & \sum_{i \in {T}} \mathit{varphi}_{i , s} \geq \left|\left({q}\right)_{s}\right| , \forall s \in S , \tag{eq\_0036} \\
+  & \sum_{i \in {T}} \mathit{varphi}_{i , s} \geq \left|\left({q}\right)_{s}\right| , \forall s \in S . \tag{eq\_0037} \\
+  \min\quad & \sum_{i \in T} \sum_{s \in S} \left(t_{i , s}^{d} - t_{i , s}^{a}\right) \tag{eq\_0038} \\
+\end{align}

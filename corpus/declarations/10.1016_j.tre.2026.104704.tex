@@ -1,0 +1,232 @@
+% Declaration sidecar for 10.1016_j.tre.2026.104704
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2026.104704
+% Real-time metro train rescheduling under uncertainties: A hybrid machine learning and integer L-shaped approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2026.104704.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize backup dispatching cost plus mean-CVaR of second-stage costs
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of services (upstream/downstream)
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of potential short-turns of upstream/downstream services in first stage
+
+% r: classified as variable during review
+%@ var r shape=- domain=continuous role=primary :: Index of services appearing as a continuous variable
+
+% x: classified as index during review
+%@ index x ordered=0 cyclic=0 :: Index of short-turns, indicating service r short-turns at station p
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of stations
+
+% y: classified as parameter during review
+%@ param y shape=P kind=vector :: Capacity of turnaround tracks at station p
+
+% h: classified as variable during review
+%@ var h shape=R,P domain=binary role=primary :: Binary holding indicator for service r at station p
+
+% pt: classified as index during review
+%@ index pt ordered=0 cyclic=0 :: Set of stations equipped with turnaround track
+
+% a: classified as variable during review
+%@ var a shape=- domain=continuous role=primary :: Rescheduled arrival time of service r at station p in scenario ω
+
+% ā: classified as parameter during review
+%@ param a_plan shape=R,P kind=matrix :: Planned arrival time of service r at station p
+
+% d: classified as variable during review
+%@ var d shape=- domain=continuous role=primary :: Rescheduled departure time of service r at station p in scenario ω
+
+% d̄: classified as parameter during review
+%@ param d_plan shape=R,P kind=matrix :: Planned departure time of service r at station p
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar :: Time-related parameters (start, duration, delay, etc.)
+
+% unusable as an identifier, rename or drop: σ
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive number
+
+% unusable as an identifier, rename or drop: φ
+% v: classified as variable during review
+%@ var v shape=- domain=binary role=primary :: Binary indicator if operation zone of service r includes station p in scenario ω
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: ψ
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar :: Minimum/maximum dwell time
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar :: Minimum headway time
+
+% unusable as an identifier, rename or drop: π
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar :: Minimum turnaround time
+
+% z: classified as index during review
+%@ index z ordered=0 cyclic=0 :: Index of backup trains, indicating backup train j at station p
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of backup trains
+
+% unusable as an identifier, rename or drop: ρ
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: τ
+% k: classified as variable during review
+%@ var k shape=- domain=binary role=primary :: Binary indicator if service r skips stop at station p in scenario ω
+
+% Q: classified as variable during review
+%@ var Q shape=- domain=continuous role=primary :: Objective function components (deviation, cancel, variation, backup) in scenario ω
+
+% unusable as an identifier, rename or drop: λ
+% CVaR: classified as parameter during review
+%@ param CVaR shape=- kind=scalar :: Conditional value-at-risk measure
+
+% E: classified as parameter during review
+%@ param E shape=- kind=scalar :: Expectation operator
+
+% MCVaR: classified as parameter during review
+%@ param MCVaR shape=- kind=scalar :: Mean-conditional value-at-risk criterion
+
+% constraints: classified as parameter during review
+%@ param constraints shape=- kind=scalar :: Set of constraints in the model
+
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar :: Scenario type indicator (1 delay, 2 out-of-service, 3 rescue)
+
+% f: classified as parameter during review
+%@ param f shape=J kind=vector :: Cost of dispatching backup train j
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar :: Unspecified parameter s
+
+% unusable as an identifier, rename or drop: Ω
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of indices for optimality cuts
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar :: Large constant in optimality cuts
+
+% unusable as an identifier, rename or drop: θ
+% MP: classified as parameter during review
+%@ param MP shape=- kind=scalar :: Master problem notation
+
+% unusable as an identifier, rename or drop: ϰ
+% Bound by a quantifier or big operator, so no declaration of their own: I, i, j, n, p, ω
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Short-turn choice: each service selects at most one station for short-turning
+%@ con eq_0002 kind=linear domain=- indicator=- :: Short-turn capacity: short-turns at station p do not exceed turnaround track capacity y_p
+%@ con eq_0003 kind=linear domain=- indicator=- :: Holding location for upstream services behind the faulty train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Holding location for downstream services behind the faulty train
+%@ con eq_0005 kind=linear domain=- indicator=- :: Initialization of arrival/departure times and primary delay for services before/at fault
+%@ con eq_0006 kind=linear domain=- indicator=- :: Train holding during fault handling ensures departure after t_start + duration
+%@ con eq_0007 kind=linear domain=- indicator=- :: Definition of operation-zone indicator v for upstream services
+%@ con eq_0008 kind=linear domain=- indicator=- :: Definition of operation-zone indicator v for downstream services
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum dwell time for served stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum dwell time for served stations
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum running time in upstream segments
+%@ con eq_0012 kind=linear domain=- indicator=- :: Maximum running time in upstream segments
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum running time in downstream segments
+%@ con eq_0014 kind=linear domain=- indicator=- :: Maximum running time in downstream segments
+%@ con eq_0015 kind=linear domain=- indicator=- :: Headway constraint between services in the same planned/emergency set
+%@ con eq_0016_a kind=linear domain=- indicator=- :: Headway constraint when an upstream emergency service precedes a planned service
+%@ con eq_0016_b kind=linear domain=- indicator=- :: Headway constraint when a downstream emergency service precedes a planned service
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Headway constraint when an upstream planned service precedes an emergency service
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Headway constraint when a downstream planned service precedes an emergency service
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Minimum turnaround time for upstream-to-downstream connections
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Minimum turnaround time for downstream-to-upstream connections
+%@ con eq_0019 kind=linear domain=- indicator=- :: Each upstream service receives at most one incoming train or backup train
+%@ con eq_0020 kind=linear domain=- indicator=- :: Each downstream service receives at most one incoming train or backup train
+%@ con eq_0021 kind=linear domain=- indicator=- :: Virtual backup train assigned to ongoing upstream services
+%@ con eq_0022 kind=linear domain=- indicator=- :: Virtual backup train assigned to ongoing downstream services
+%@ con eq_0023 kind=linear domain=- indicator=- :: No turnaround connection into upstream emergency services in delay scenario
+%@ con eq_0024 kind=linear domain=- indicator=- :: No turnaround connection into downstream emergency services in delay scenario
+%@ con eq_0025 kind=linear domain=- indicator=- :: Backup trains used in second stage cannot exceed those dispatched in first stage
+%@ con eq_0026 kind=linear domain=- indicator=- :: Second-stage connections obey first-stage short-turn decisions for upstream services
+%@ con eq_0027 kind=linear domain=- indicator=- :: Second-stage connections obey first-stage short-turn decisions for downstream services
+%@ con eq_0028 kind=linear domain=- indicator=- :: Rolling-stock flow balance for upstream services after completion
+%@ con eq_0029 kind=linear domain=- indicator=- :: Rolling-stock flow balance for downstream services after completion
+%@ con eq_0030 kind=linear domain=- indicator=- :: Operation zone of upstream service includes at least two stations
+%@ con eq_0031 kind=linear domain=- indicator=- :: Operation zone of downstream service includes at least two stations
+%@ con eq_0032 kind=linear domain=- indicator=- :: Consecutive services at a turnaround station definition
+%@ con eq_0033 kind=linear domain=- indicator=- :: Definition of departure-after-arrival indicator for turnaround track capacity
+%@ con eq_0034 kind=linear domain=- indicator=- :: Number of trains leaving turnaround track before upstream service r departs
+%@ con eq_0035 kind=linear domain=- indicator=- :: Number of trains leaving turnaround track before downstream service r departs
+%@ con eq_0036 kind=linear domain=- indicator=- :: Number of trains entering turnaround track before planned upstream service r
+%@ con eq_0037 kind=linear domain=- indicator=- :: Number of trains entering turnaround track before emergency upstream service r
+%@ con eq_0038 kind=linear domain=- indicator=- :: Number of trains entering turnaround track before planned downstream service r
+%@ con eq_0039 kind=linear domain=- indicator=- :: Number of trains entering turnaround track before emergency downstream service r
+%@ con eq_0040 kind=linear domain=- indicator=- :: Turnaround track capacity for upstream short-turning services
+%@ con eq_0041 kind=linear domain=- indicator=- :: Turnaround track capacity for downstream short-turning services
+%@ con eq_0042 kind=linear domain=- indicator=- :: Out-of-service scenario: faulty train return routing and special service sets
+%@ con eq_0043 kind=linear domain=- indicator=- :: Minimum dwell time excluding special out-of-service services
+%@ con eq_0044 kind=linear domain=- indicator=- :: Maximum dwell time excluding special out-of-service services
+%@ con eq_0045 kind=linear domain=- indicator=- :: Minimum upstream running time excluding special out-of-service services
+%@ con eq_0046 kind=linear domain=- indicator=- :: Minimum downstream running time excluding special out-of-service services
+%@ con eq_0047 kind=linear domain=- indicator=- :: No turnaround into upstream emergency services except special out-of-service services
+%@ con eq_0048 kind=linear domain=- indicator=- :: No turnaround into downstream emergency services except special out-of-service services
+%@ con eq_0049 kind=linear domain=- indicator=- :: Stop-skip indicator for special out-of-service services
+%@ con eq_0050 kind=linear domain=- indicator=- :: Minimum dwell time with stop-skipping for special out-of-service services
+%@ con eq_0051 kind=linear domain=- indicator=- :: Maximum dwell time with stop-skipping for special out-of-service services
+%@ con eq_0052 kind=linear domain=- indicator=- :: Minimum upstream running time with stop-skipping for special out-of-service services
+%@ con eq_0053 kind=linear domain=- indicator=- :: Minimum downstream running time with stop-skipping for special out-of-service services
+%@ con eq_0054_a kind=linear domain=- indicator=- :: Rescue scenario case 1 (τ=1, r̃ upstream)
+%@ con eq_0054_b kind=linear domain=- indicator=- :: Rescue scenario case 2 (τ=1, r̃ downstream)
+%@ con eq_0054_c kind=linear domain=- indicator=- :: Rescue scenario case 3 (τ=0, r̃ upstream, faulty train emergency service)
+%@ con eq_0054_d kind=linear domain=- indicator=- :: Rescue scenario case 4 (τ=0, r̃ upstream, rescue train emergency service)
+%@ con eq_0054_e kind=linear domain=- indicator=- :: Rescue scenario case 5 (τ=0, r̃ downstream, faulty train emergency service)
+%@ con eq_0054_f kind=linear domain=- indicator=- :: Rescue scenario case 6 (τ=0, r̃ downstream, rescue train emergency service)
+%@ con eq_0055 kind=linear domain=- indicator=- :: Synchronization of coupled trains at fault station after coupling
+%@ con eq_0056_a kind=linear domain=- indicator=- :: Synchronization of arrival times of coupled trains at all unserved stations
+%@ con eq_0056_b kind=linear domain=- indicator=- :: Synchronization of departure times of coupled trains at all unserved stations
+%@ con eq_0057 kind=linear domain=- indicator=- :: Synchronization of coupled trains on emergency return services
+%@ con eq_0058 kind=linear domain=- indicator=- :: Minimum dwell time excluding special rescue services
+%@ con eq_0059 kind=linear domain=- indicator=- :: Maximum dwell time excluding special rescue services
+%@ con eq_0060 kind=linear domain=- indicator=- :: Minimum upstream running time excluding special rescue services
+%@ con eq_0061 kind=linear domain=- indicator=- :: Maximum upstream running time excluding special rescue services
+%@ con eq_0062 kind=linear domain=- indicator=- :: Minimum downstream running time excluding special rescue services
+%@ con eq_0063 kind=linear domain=- indicator=- :: Maximum downstream running time excluding special rescue services
+%@ con eq_0064 kind=linear domain=- indicator=- :: Headway constraints excluding special rescue services
+%@ con eq_0065 kind=linear domain=- indicator=- :: No turnaround into upstream emergency services except special rescue services
+%@ con eq_0066 kind=linear domain=- indicator=- :: No turnaround into downstream emergency services except special rescue services
+%@ con eq_0067 kind=linear domain=- indicator=- :: Stop-skip indicator for special rescue services
+%@ con eq_0068 kind=linear domain=- indicator=- :: Minimum dwell time with stop-skipping for special rescue services
+%@ con eq_0069 kind=linear domain=- indicator=- :: Maximum dwell time with stop-skipping for special rescue services
+%@ con eq_0070 kind=linear domain=- indicator=- :: Minimum upstream running time with stop-skipping/coupling for special rescue services
+%@ con eq_0071 kind=linear domain=- indicator=- :: Maximum upstream running time with stop-skipping/coupling for special rescue services
+%@ con eq_0072 kind=linear domain=- indicator=- :: Minimum downstream running time with stop-skipping/coupling for special rescue services
+%@ con eq_0073 kind=linear domain=- indicator=- :: Maximum downstream running time with stop-skipping/coupling for special rescue services
+%@ con eq_0074 kind=linear domain=- indicator=- :: First performance indicator: timetable deviation
+%@ con eq_0075 kind=linear domain=- indicator=- :: Second performance indicator: trip cancellations
+%@ con eq_0076 kind=linear domain=- indicator=- :: Third performance indicator: headway variation between consecutive services
+%@ con eq_0077 kind=linear domain=- indicator=- :: Fourth performance indicator: number of backup trains used in second stage
+%@ con eq_0080 kind=linear domain=- indicator=- :: Mean-CVaR criterion: weighted sum of expectation and CVaR
+%@ con eq_0083 kind=linear domain=- indicator=- :: Integer optimality cut for the L-shaped master problem
+%@ con eq_0084_a kind=linear domain=- indicator=- :: Master problem objective: minimize dispatching cost plus θ
+%@ con eq_0084_b kind=linear domain=- indicator=- :: Master problem constraints: first-stage constraints and optimality cuts
+%@ con eq_0087 kind=linear domain=- indicator=- :: Definition of intermediate variable for operation-zone start station
+%@ con eq_0088 kind=linear domain=- indicator=- :: Definition of intermediate variable for operation-zone end station

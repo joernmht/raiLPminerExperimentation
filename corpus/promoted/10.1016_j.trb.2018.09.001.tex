@@ -1,0 +1,102 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2018.09.001
+%@ meta id=10.1016_j.trb.2018.09.001 family=lp schema=0.1.0
+%@ name :: Automatic train regulation of complex metro networks with transfer coordination constraints: A distributed optimal control framework
+%@ desc :: Mined from Automatic train regulation of complex metro networks with transfer coordination constraints: A distributed optimal control framework (Transportation Research Part B Methodological, 2018).
+%@ prov source :: 10.1016/j.trb.2018.09.001
+%@ prov reference :: Automatic train regulation of complex metro networks with transfer coordination constraints: A distributed optimal control framework
+%@ prov author :: Shukai Li; Xuesong Zhou; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted squared timetable deviation, headway deviation and control effort
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i at station j on line k
+%@ var r shape=- domain=continuous role=primary drole=- lo=- hi=- :: Running time of train i from station j to j+1 on line k
+%@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train i at station j+1 on line k
+%@ index E ordered=0 cyclic=0 :: Set of directed edges representing transfer connections between metro lines
+%@ param l shape=- kind=matrix domain=- :: Coordinated transfer time for passengers from line m to n at a transfer station
+%@ param lbar shape=- kind=matrix domain=- :: Constant scheduled transfer time
+%@ index m ordered=1 cyclic=0 :: Index of metro lines in transfer constraints
+%@ param delta shape=- kind=scalar domain=- :: Small adjustment to scheduled transfer time
+%@ param R shape=- kind=matrix domain=- :: Scheduled running time of train i between stations j and j+1 on line k
+%@ param w shape=- kind=matrix domain=- :: Disturbance variable in running time and dwell time
+%@ param D shape=- kind=matrix domain=- :: Scheduled dwell time at station j+1 on line k
+%@ param alpha shape=- kind=matrix domain=- :: Delay rate affecting dwell time based on passenger flow
+%@ param T shape=- kind=matrix domain=- :: Scheduled departure time of train i at station j on line k
+%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Deviation of actual departure time from scheduled departure time
+%@ param H shape=- kind=vector domain=- :: Scheduled headway between adjacent trains on line k
+%@ param p shape=- kind=vector domain=- :: Weight for squared timetable deviation in objective
+%@ param q shape=- kind=vector domain=- :: Weight for squared headway deviation in objective
+%@ param y shape=- kind=vector domain=- :: Weight for squared control input in objective
+%@ param B shape=- kind=matrix domain=- :: System matrix in state-space model
+%@ param A shape=- kind=matrix domain=- :: System matrix in state-space model
+%@ index Z ordered=1 cyclic=0 :: Number of metro lines in the network
+%@ param Y shape=- kind=matrix domain=- :: Weight matrix for control inputs in objective
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value for line k at stage j
+%@ param P shape=- kind=matrix domain=- :: Weight matrix for state error in objective
+%@ param Q shape=- kind=matrix domain=- :: Weight matrix for headway deviation in objective
+%@ index M ordered=1 cyclic=0 :: Prediction horizon length
+%@ var L shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian function of the overall optimization problem
+%@ param Ebar shape=- kind=matrix domain=- :: Matrix in transfer coordination constraint
+%@ var lambda shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian multiplier for transfer coordination constraints
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control input vector over prediction horizon
+%@ param F shape=- kind=matrix domain=- :: Matrix in state prediction equation
+%@ param Phi shape=- kind=matrix domain=- :: Matrix in state prediction equation
+%@ param G shape=- kind=matrix domain=- :: Matrix in objective transformation
+%@ param Pbar shape=- kind=matrix domain=- :: Block diagonal matrix of P over horizon
+%@ param Qbar shape=- kind=matrix domain=- :: Block diagonal matrix of Q over horizon
+%@ var Lambda shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Vector of Lagrangian multipliers over horizon
+%@ param Theta shape=- kind=scalar domain=- :: Constant term in objective expansion
+%@ con eq_0001 kind=linear domain=- indicator=- :: Train dynamic equation: departure time at next station equals departure time plus running and dwell times
+%@ con eq_0002 kind=linear domain=- indicator=- :: Transfer coordination constraint: departure time difference equals coordinated transfer time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running time definition: scheduled running time plus control and disturbance
+%@ con eq_0004 kind=linear domain=- indicator=- :: Dwell time model with passenger-flow effect, control and disturbance
+%@ con eq_0005 kind=linear domain=- indicator=- :: Combined train dynamic after substituting running and dwell time expressions
+%@ con eq_0006 kind=headway domain=- indicator=- :: Safety constraint: minimum headway between adjacent trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Control bound on running time adjustment u1
+%@ con eq_0008 kind=linear domain=- indicator=- :: Control bound on dwell time adjustment u2
+%@ con eq_0009 kind=linear domain=- indicator=- :: Scheduled train dynamics defining the nominal timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Error dynamics: evolution of deviation from scheduled departure time
+%@ con eq_0011 kind=linear domain=- indicator=- :: Transfer coordination constraint in error-variable form
+%@ con eq_0012 kind=headway domain=- indicator=- :: Safety constraint in error-variable form
+%@ con eq_0014_b kind=linear domain=- indicator=- :: State transition constraint of optimal control problem (14)
+%@ con eq_0014_c kind=linear domain=- indicator=- :: Transfer coordination coupling constraint in (14)
+%@ con eq_0014_d kind=headway domain=- indicator=- :: Safety headway constraint in (14)
+%@ con eq_0014_e kind=linear domain=- indicator=- :: Running time control bound u1 in (14)
+%@ con eq_0014_f kind=linear domain=- indicator=- :: Dwell time control bound u2 in (14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Real-time vector state-space model for line k
+%@ con eq_0017 kind=linear domain=- indicator=- :: Line-k objective over prediction horizon
+%@ con eq_0019 kind=linear domain=- indicator=- :: Lagrangian function with transfer coordination multipliers
+%@ con eq_0022 kind=linear domain=- indicator=- :: State prediction equation over finite horizon
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24) in the paper
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25) in the paper
+%@ con eq_0026 kind=linear domain=- indicator=- :: Equation (26) in the paper
+%@ con eq_0027 kind=linear domain=- indicator=- :: Equation (27) in the paper
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28) in the paper
+\begin{align}
+  & \begin{matrix}t_{i , j + 1 , k} = t_{i , j , k} + r_{i , j , k} + s_{i , j + 1 , k} ,\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix}t_{i , j , n} - t_{i^{'} , j^{'} , m} = l_{j , m , n} = \left(\bar{l}\right)_{j , m , n} + \mathit{delta} , \left(m , n\right) \in \mathbf{\mathcal{E}} ,\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}r_{i , j , k} = R_{i , j , k} + u_{1}_{i , j , k} + w_{1}_{i , j , k} ,\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}s_{i , j + 1 , k} = \mathit{alpha}_{i , j + 1 , k} \left(t_{i , j + 1 , k} - t_{i - 1 , j + 1 , k}\right) + D_{j + 1 , k} + u_{2}_{i , j + 1 , k} + w_{2}_{i , j + 1 , k} ,\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}t_{i , j + 1 , k} = t_{i , j , k} + \mathit{alpha}_{i , j + 1 , k} \left(t_{i , j + 1 , k} - t_{i - 1 , j + 1 , k}\right) + R_{i , j , k} + D_{j + 1 , k} + u_{1}_{i , j , k} + u_{2}_{i , j + 1 , k} + w_{i , j , k} ,\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}t_{i , j , k} - t_{i - 1 , j , k} \geq t_{min , k} ,\end{matrix} \tag{eq\_0006} \\
+  & u_{1}_{min , k} \leq u_{1}_{i , j , k} \leq u_{1}_{max , k} , \tag{eq\_0007} \\
+  & u_{2}_{min , k} \leq u_{2}_{i , j , k} \leq u_{2}_{max , k} , \tag{eq\_0008} \\
+  & \begin{matrix}T_{i , j + 1 , k} = T_{i , j , k} + R_{i , j , k} + \mathit{alpha}_{i , j + 1 , k} \left(T_{i , j + 1 , k} - T_{i - 1 , j + 1 , k}\right) + D_{j + 1 , k} ,\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}e_{i , j + 1 , k} = e_{i , j , k} + \mathit{alpha}_{i , j + 1 , k} \left(e_{i , j + 1 , k} - e_{i - 1 , j + 1 , k}\right) + u_{1}_{i , j , k} + u_{2}_{i , j , k} + w_{i , j , k} ,\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix}e_{i , j , n} - e_{i^{'} , j^{'} , m} = l_{j , m , n} - \left(T_{i , j , n} - T_{i^{'} , j^{'} , m}\right) , \left(m , n\right) \in \mathbf{\mathcal{E}} ,\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}e_{i , j , k} - e_{i - 1 , j , k} \geq t_{min , k} - H_{k} ,\end{matrix} \tag{eq\_0012} \\
+  \min_{u_{1}_{i\quad & , j , k} , u_{2}_{i , j , k}} \sum_{i} \sum_{j} \sum_{k} \left\{p_{k} \cdot e_{i , j , k}^{2} + q_{k} \left(e_{i , j , k} - e_{i - 1 , j , k}\right) ^{2} + y_{k} \left(u_{1}_{i , j , k}^{2} + u_{2}_{i , j , k}^{2}\right)\right\} \tag{eq\_0014\_a} \\
+  & e_{i , j + 1 , k} = e_{i , j , k} + \mathit{alpha}_{i , j + 1 , k} \left(e_{i , j + 1 , k} - e_{i - 1 , j + 1 , k}\right) + u_{1}_{i , j , k} + u_{2}_{i , j , k} + w_{i , j , k} \tag{eq\_0014\_b} \\
+  & e_{i , j , n} - e_{i^{'} , j^{'} , m} = l_{j , m , n} - \left(T_{i , j , n} - T_{i^{'} , j^{'} , m}\right) , \left(m , n\right) \in \mathbf{\mathcal{E}} \tag{eq\_0014\_c} \\
+  & e_{i , j , k} - e_{i - 1 , j , k} \geq t_{min , k} - H_{k} \tag{eq\_0014\_d} \\
+  & u_{1}_{min , k} \leq u_{1}_{i , j , k} \leq u_{1}_{max , k} \tag{eq\_0014\_e} \\
+  & u_{2}_{min , k} \leq u_{2}_{i , j , k} \leq u_{2}_{max , k} \tag{eq\_0014\_f} \\
+  & \begin{matrix}e_{k} \left(j + 1\right) = A_{k} \left(j\right) e_{k} \left(j\right) + B_{k} \left(j\right) u_{1}_{k} \left(j\right) + B_{k} \left(j\right) u_{2}_{k} \left(j\right) + B_{k} \left(j\right) w_{k} \left(j\right) , k = 1 , 2 , \ldots , Z ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & & J_{k} \left(j\right) = \sum_{i = 0}^{M - 1} \left\{\right. \left(e_{k} \left(j + i + 1\right)\right)^{T} P_{k} \cdot e_{k} \left(j + i + 1\right) + \left(e_{k} \left(j + i + 1\right) - e_{k} \left(j + i\right)\right) ^{T} Q_{k} \left(e_{k} \left(j + i + 1\right) - e_{k} \left(j + i\right)\right) \\ & & + \left(u_{1}_{k} \left(j + i\right)\right)^{T} Y_{k} u_{1}_{k} \left(j + i\right) + \left(u_{2}_{k} \left(j + i\right)\right)^{T} Y_{k} u_{2}_{k} \left(j + i\right) \left.\right\} .\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}L = \sum_{k = 1}^{Z} J_{k} \left(j\right) + \sum_{i = 0}^{M - 1} \underset{\left(m , n\right) \in \mathbf{\mathcal{E}}}{\sum} \mathit{lambda}_{m , n} \left(j + i\right) \left(E_{m , n} \cdot e_{n} \left(j + i\right) - \left(\bar{E}\right)_{m , n} e_{m} \left(j + i\right) - L_{m , n} + T_{m , n}\right) .\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix}E_{k} = F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right) , k = 1 , 2 \ldots , Z ,\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix}\left(1 - \mathit{alpha}_{i , j + 1 , k}\right) e_{i , j + 1 , k} = e_{i , j , k} - \mathit{alpha}_{i , j + 1 , k} \cdot e_{i - 1 , j + 1 , k} + u_{1}_{i , j , k} + u_{2}_{i , j , k} + w_{i , j , k} .\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix}e_{i , j + 1 , k} = \frac{1}{1 - \mathit{alpha}_{i , j + 1 , k}} e_{i , j , k} - \frac{\mathit{alpha}_{i , j + 1 , k}}{1 - \mathit{alpha}_{i , j + 1 , k}} e_{i - 1 , j + 1 , k} + \frac{1}{1 - \mathit{alpha}_{i , j + 1 , k}} \left(u_{1}_{i , j , k} + u_{2}_{i , j , k} + w_{i , j , k}\right) .\end{matrix} \tag{eq\_0025} \\
+  & \begin{aligned}e_{k} \left(j + 1\right) & = & \begin{bmatrix} \begin{matrix}\frac{- \mathit{alpha}_{j - 1 , 1 , k}}{1 - \mathit{alpha}_{j - 1 , 1 , k}} & 0 & 0 & 0 & \hdots \\ \frac{1}{1 - \mathit{alpha}_{j - 2 , 2 , k}} & \frac{- \mathit{alpha}_{j - 2 , 2 , k}}{1 - \mathit{alpha}_{j - 2 , 2 , k}} & 0 & 0 & \hdots \\ & \hdots & \hdots & \hdots & \\ 0 & \hdots & 0 & \frac{1}{1 - \mathit{alpha}_{j - N_{k} , N_{k} , k}} & \frac{- \mathit{alpha}_{j - N_{k} , N_{k} , k}}{1 - \mathit{alpha}_{N_{k} , k}}\end{matrix} \end{bmatrix} e_{k} \left(j\right) \\ & & + \begin{bmatrix} \begin{matrix}\frac{1}{1 - \mathit{alpha}_{j - 1 , 1 , k}} & 0 & 0 & \hdots \\ 0 & \frac{1}{1 - \mathit{alpha}_{j - 2 , 2 , k}} & 0 & \hdots \\ & \hdots & \hdots & \hdots \\ 0 & \hdots & \hdots & \frac{1}{1 - \mathit{alpha}_{j - N_{k} , N_{k} , k}}\end{matrix} \end{bmatrix} \left(u_{1}_{k} \left(j\right) + u_{2}_{k} \left(j\right) + w_{k} \left(j\right)\right) .\end{aligned} \tag{eq\_0026} \\
+  & \begin{matrix}E_{k}^{T} \bar{P} E_{k} + \left(G_{1} \cdot E_{k} - G_{2}\right) ^{T} \bar{Q} \left(G_{1} \cdot E_{k} - G_{2}\right) + U_{1 k}^{T} \cdot R_{k} \cdot U_{1 k} + U_{2 k}^{T} \cdot R_{k} \cdot U_{2 k} + \mathit{Lambda}_{k} \cdot E_{k} - \sum_{i = 1}^{m - 1} \sum_{n} \mathit{lambda}_{k , n} \left(j + i\right) \left(L_{k , n} - T_{k , n}\right) ,\end{matrix} \tag{eq\_0027} \\
+  & \begin{aligned} & & \left(F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right)\right) ^{T} \bar{P} \left(F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right)\right) \\ & & + \left(G_{1} \left(F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right)\right) - G_{2}\right) ^{T} \bar{Q} \left(G_{1} \left(F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right)\right) - G_{2}\right) \\ & & + U_{1 k}^{T} \cdot R_{k} \cdot U_{1 k} + U_{2 k}^{T} \cdot R_{k} \cdot U_{2 k} + \mathit{Lambda}_{k} \left(F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k} \left(U_{1 k} + U_{2 k}\right)\right) - \sum_{i = 1}^{m - 1} \sum_{n} \mathit{lambda}_{k , n} \left(j + i\right) \left(L_{k , n} - T_{k , n}\right) \\ & = & \left(U_{1 k} + U_{2 k}\right) ^{T} \left(\mathit{Phi}_{k}^{T} \bar{P} \mathit{Phi}_{k} + \mathit{Phi}_{k}^{T} \cdot G_{1}^{T} \bar{Q} G_{1} \cdot \mathit{Phi}_{k}\right) \left(U_{1 k} + U_{2 k}\right) + U_{1 k}^{T} \cdot R_{k} \cdot U_{1 k} + U_{2 k}^{T} \cdot R_{k} \cdot U_{2 k} \\ & & + 2 \left(U_{1 k} + U_{2 k}\right) ^{T} \left(\mathit{Phi}_{k}^{T} \bar{P} F_{k} \cdot e_{k} \left(j\right) + \mathit{Phi}_{k}^{T} \cdot G_{1}^{T} \bar{Q} G_{1} \cdot F_{k} \cdot e_{k} \left(j\right) - \mathit{Phi}_{k}^{T} \cdot G_{1}^{T} \bar{Q} G_{2} + \frac{1}{2} \mathit{Phi}_{k}^{T} \cdot \mathit{Lambda}_{k}^{T}\right) + \mathit{Theta}_{k} ,\end{aligned} \tag{eq\_0028} \\
+\end{align}

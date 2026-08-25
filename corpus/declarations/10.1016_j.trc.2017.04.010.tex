@@ -1,0 +1,134 @@
+% Declaration sidecar for 10.1016_j.trc.2017.04.010
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2017.04.010
+% Integrated optimization on train scheduling and preventive maintenance time slots planning
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2017.04.010.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total absolute arrival time deviations of real trains at destinations from ideal timetable
+
+% a: classified as variable during review
+%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative arrival flow variable for train f on cell (i,j) at time t
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for nodes in the railway network
+
+% d: classified as variable during review
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative departure flow variable for train f on cell (i,j) at time t
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Problem identifier (e.g., P1, PLR)
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (e.g., Z_P1, Z_LR)
+
+% q: classified as parameter during review
+%@ param q shape=- kind=vector domain=- :: Ideal arrival time of real train r at its destination
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of cells (edges) in the railway network
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of real trains
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of all trains (real and virtual)
+
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Origin node of a train
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f uses cell (i,j)
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the railway network
+
+% tau: variable renamed from τ
+%@ var tau shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train f on cell (i,j)
+
+% delta: parameter renamed from δ
+%@ param delta shape=- kind=matrix domain=- :: Minimum or maximum dwell time of real train r on cell (i,j)
+
+% sigma: parameter renamed from σ
+%@ param sigma shape=- kind=matrix domain=- :: Free flow running time of real train r on cell (i,j)
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of virtual trains (PMTSs)
+
+% w: classified as parameter during review
+%@ param w shape=- kind=matrix domain=- :: Duration of PMTS (virtual train) on cell (i,j)
+
+% g: classified as parameter during review
+%@ param g shape=- kind=matrix domain=- :: Time interval between cell blockage and train arrival
+
+% h: classified as parameter during review
+%@ param h shape=- kind=matrix domain=- :: Time interval between train departure and cell release
+
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Cell occupancy indicator for train f on cell (i,j) at time t
+
+% C: classified as parameter during review
+%@ param C shape=- kind=matrix domain=- :: Capacity of cell (i,j) at time t
+
+% LR: classified as variable during review
+%@ var LR shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian subproblem objective for a train
+
+% lambda: parameter renamed from λ
+%@ param lambda shape=u kind=vector domain=- :: Step size in subgradient method
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Iteration index in Lagrangian relaxation
+
+% z: classified as variable during review
+%@ var z shape=u domain=continuous role=primary drole=- lo=- hi=- :: Local lower or upper bound at iteration u
+
+% Bound by a quantifier or big operator, so no declaration of their own: T, f, j, k, r, s, t, v, α
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Transforms arrival time variable to cumulative arrival flow
+%@ con eq_0002 kind=linear domain=- indicator=- :: Transforms departure time variable to cumulative departure flow
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Flow balance at origin: each train chooses exactly one outgoing cell
+%@ con eq_0004 kind=flow_balance domain=- indicator=- :: Flow balance at intermediate nodes: flow conservation
+%@ con eq_0005 kind=flow_balance domain=- indicator=- :: Flow balance at destination: each train chooses exactly one incoming cell
+%@ con eq_0006 kind=linear domain=- indicator=- :: Within-cell transition: departure cannot occur before arrival
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cell-to-cell transition: departure from a node equals arrival at next cell
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maps time-space cumulative flow to physical network cell selection
+%@ con eq_0009 kind=linear domain=- indicator=- :: Computes running time from cumulative departure and arrival times
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bounds running time by free-flow time and minimum/maximum dwell time
+%@ con eq_0011 kind=linear domain=- indicator=- :: Time-connectivity: cumulative arrival variables are non-decreasing
+%@ con eq_0012 kind=linear domain=- indicator=- :: Time-connectivity: cumulative departure variables are non-decreasing
+%@ con eq_0013 kind=linear domain=- indicator=- :: Virtual train cannot depart origin before PMTS duration has elapsed
+%@ con eq_0014 kind=linear domain=- indicator=- :: Virtual train running time on each cell is zero
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cell occupancy of real train in initial time segment
+%@ con eq_0016 kind=linear domain=- indicator=- :: Cell occupancy of real train in middle time segment
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cell occupancy of real train in final time segment
+%@ con eq_0018 kind=linear domain=- indicator=- :: Cell occupancy of virtual train in middle time segment
+%@ con eq_0019 kind=linear domain=- indicator=- :: Cell occupancy of virtual train in final time segment
+%@ con eq_0020 kind=capacity domain=- indicator=- :: Cell capacity constraint limiting simultaneous train occupancy
+%@ con eq_0021 kind=linear domain=- indicator=- :: Lagrangian relaxation objective penalizing capacity usage
+%@ con eq_0022 kind=linear domain=- indicator=- :: Lagrangian dual objective maximizing lower bound
+%@ con eq_0024 kind=linear domain=- indicator=- :: Lagrangian subproblem objective for a real train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Lagrangian subproblem objective for a virtual train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Multiplier update by subgradient method
+%@ con eq_0027 kind=linear domain=- indicator=- :: Initialization of multipliers, step size, local and global bounds
+%@ con eq_0028 kind=linear domain=- indicator=- :: Update of global upper bound from feasible solutions

@@ -1,0 +1,109 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.eswa.2024.124173
+%@ meta id=10.1016_j.eswa.2024.124173 family=milp schema=0.1.0
+%@ name :: Joint optimization of train timetable and passing facility: A capacity allocation strategy
+%@ desc :: Mined from Joint optimization of train timetable and passing facility: A capacity allocation strategy (Expert Systems with Applications, 2024).
+%@ prov source :: 10.1016/j.eswa.2024.124173
+%@ prov reference :: Joint optimization of train timetable and passing facility: A capacity allocation strategy
+%@ prov author :: Zhao Peng; Yanfeng Li; Jie Zhang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of overcrowding on trains/platforms and passenger travel time
+%@ param TC shape=- kind=scalar domain=- :: Train capacity
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ var ni shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of in-vehicle passengers
+%@ index J ordered=1 cyclic=0 :: Set of trains
+%@ index K ordered=1 cyclic=0 :: Set of directions
+%@ index N ordered=1 cyclic=0 :: Set of stations
+%@ index i ordered=1 cyclic=0 :: Index for stations
+%@ var r shape=K,N,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on platform
+%@ param Y shape=K,N kind=matrix domain=- :: Island platform indicator
+%@ param A shape=K,N kind=matrix domain=- :: Platform capacity
+%@ index T ordered=1 cyclic=0 :: Set of time periods
+%@ var w shape=K,N,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of exiting passengers
+%@ param ps shape=K,J kind=matrix domain=- :: Planned start time
+%@ param psmax shape=- kind=scalar domain=- :: Maximum deviation from planned start time
+%@ param ifn shape=- kind=scalar domain=- :: Index for station
+%@ index ta ordered=1 cyclic=0 :: Actual arrival time
+%@ var td shape=K,J,N domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time
+%@ param tr shape=K,N kind=matrix domain=- :: Running time between stations
+%@ var dw shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time
+%@ param dwmax shape=- kind=scalar domain=- :: Maximum dwell time
+%@ param H shape=- kind=scalar domain=- :: Minimum headway
+%@ var nb shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers
+%@ var na shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of alighting passengers
+%@ var nw shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers
+%@ var rc shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train
+%@ var tt shape=K,J,N domain=non_negative role=primary drole=- lo=- hi=- :: Alighting time
+%@ param umax shape=- kind=scalar domain=- :: Maximum loading speed
+%@ param C shape=- kind=scalar domain=- :: Capacity
+%@ var v shape=K,N,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of entering passengers on platform
+%@ param ifj shape=- kind=scalar domain=- :: Index for train
+%@ index F ordered=0 cyclic=0 :: Set of passing facilities
+%@ var z shape=K,N,F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable for facility status
+%@ index P ordered=1 cyclic=0 :: Set of working statuses
+%@ param PC shape=K,N,F,P kind=matrix domain=- :: Passing facility capacity
+%@ var cc shape=K,N domain=non_negative role=primary drole=- lo=- hi=- :: Concentration capacity
+%@ var ec shape=K,N domain=non_negative role=primary drole=- lo=- hi=- :: Evacuation capacity
+%@ param ift shape=- kind=scalar domain=- :: Index for time
+%@ var u shape=K,J,N,T domain=continuous role=primary drole=- lo=- hi=- :: Number of on-off passengers per time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of overcrowding indicator on train
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of platform overcrowding degree (Z2)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of overcrowding indicator on platform
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of passenger travel time (Z3)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Weighted sum objective (Z)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Start time deviation limit
+%@ con eq_0008 kind=linear domain=- indicator=- :: Arrival time computation
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time computation
+%@ con eq_0010 kind=linear domain=- indicator=- :: Dwell time bounds
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum headway between consecutive trains
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger load dynamics between stations
+%@ con eq_0013 kind=linear domain=- indicator=- :: Boarding passengers limited by waiting demand, capacity, and time
+%@ con eq_0014 kind=linear domain=- indicator=- :: Alighting passengers proportional to load
+%@ con eq_0015 kind=linear domain=- indicator=- :: Alighting time sufficient for alighting passengers
+%@ con eq_0016 kind=linear domain=- indicator=- :: Remaining train capacity definition
+%@ con eq_0017 kind=linear domain=- indicator=- :: Waiting passengers cumulative count
+%@ con eq_0018 kind=linear domain=- indicator=- :: Each passing facility selects one working status
+%@ con eq_0019 kind=linear domain=- indicator=- :: Concentration capacity bounds
+%@ con eq_0020 kind=linear domain=- indicator=- :: Evacuation capacity bounds
+%@ con eq_0021 kind=linear domain=- indicator=- :: Total passing facility capacity definition
+%@ con eq_0022 kind=linear domain=- indicator=- :: Entering passengers dynamics on platform
+%@ con eq_0023 kind=linear domain=- indicator=- :: Non-negativity of waiting passengers
+%@ con eq_0024 kind=linear domain=- indicator=- :: Upper bound on on-off passengers during dwell time
+%@ con eq_0025 kind=linear domain=- indicator=- :: No on-off passengers outside dwell time
+%@ con eq_0026 kind=linear domain=- indicator=- :: Boarding passengers during available boarding time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Alighting passengers during alighting time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Exiting passengers dynamics on platform
+%@ con eq_0029 kind=linear domain=- indicator=- :: All tap-in passengers served
+%@ con eq_0030 kind=linear domain=- indicator=- :: Real-time passengers on platform balance
+\begin{align}
+  Z_{1}\quad & = \underset{k \in \mathcal{K} , j \in \mathcal{J} , n \in \mathcal{N}}{max} \frac{\mathit{ni}_{n}^{k , j}}{\mathit{TC}} \cdot \sum_{k \in \mathcal{K}} \sum_{j \in \mathcal{J}} \sum_{n \in \mathcal{N}} \mathit{theta}_{n}^{k , j} \tag{eq\_0001} \\
+  & \mathit{theta}_{n}^{k , j} = \left\{\begin{matrix} 1 , i f \frac{\mathit{ni}_{n}^{k , j}}{\mathit{TC}} > 1 \\ 0 , o t h e r \cdot w \cdot i s e , k \in \mathcal{K} , j \in \mathcal{J} , n \in \mathcal{N} \end{matrix}\right \tag{eq\_0002} \\
+  & Z_{2} = \underset{\begin{matrix}k \in \mathcal{K} , n \in \mathcal{N} , t \in \mathcal{T}\end{matrix}}{\text{max}} \frac{r_{n , t}^{k} + r_{n^{'} , t}^{k^{'}} - r_{n^{'} , t}^{k^{'}} \cdot Y_{n^{'}}^{k^{'}}}{A_{n}^{k}} \cdot \sum_{\begin{matrix}k \in \mathcal{K}\end{matrix}} \sum_{\begin{matrix}n \in \mathcal{N}\end{matrix}} \sum_{t \in \mathcal{T}} \left(\mathit{varphi}_{n , t}^{k} + \mathit{varphi}_{n^{'} , t}^{k^{'}} - \mathit{varphi}_{n^{'} , t}^{k^{'}} \cdot Y_{n^{'}}^{k^{'}}\right) \\ k^{'} \in K + 1 - k , n^{'} = N + 1 - n \tag{eq\_0003} \\
+  & \mathit{varphi}_{n , t}^{k} = \left\{\begin{matrix} 1 , i f \frac{r_{n , t}^{k} + r_{n^{'} , t}^{k^{'}} - r_{n^{'} , t}^{k^{'}} \cdot Y_{n^{'}}^{k^{'}}}{A_{n}^{k}} > \mathit{beta} \\ 0 , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \begin{matrix}k \in \mathcal{K}\end{matrix} , n \in \mathcal{N} , t \in \mathcal{T} , k^{'} = K + 1 - k , n^{'} = N + 1 - n \\ \tag{eq\_0004} \\
+  & Z_{3} = \sum_{\begin{matrix}k \in K\end{matrix}} \sum_{n \in \mathcal{N}} \sum_{t \in \mathcal{T}} w_{n , t}^{k} \cdot t - \sum_{\begin{matrix}k \in K\end{matrix}} \sum_{n \in \mathcal{N}} \sum_{t \in \mathcal{T}} \mathit{lambda}_{n , t}^{k} \cdot t \tag{eq\_0005} \\
+  & \mathit{min} Z = \mathit{delta}_{1} \cdot Z_{1} + \mathit{delta}_{2} \cdot Z_{2} + \mathit{delta}_{3} \cdot \mathit{epsilon} \cdot Z_{3} \tag{eq\_0006} \\
+  & \left|\mathit{st}^{k , j} - \mathit{ps}^{k , j}\right| \leq \bar{\mathit{ps}} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} \tag{eq\_0007} \\
+  & \mathit{ta}_{n}^{k , j} = \left\{\begin{matrix} \mathit{st}^{k , j} , \mathit{ifn} = 1 \\ \mathit{td}_{n - 1}^{k , j} + \mathit{tr}_{n - 1}^{k} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , n \in \mathcal{N} \tag{eq\_0008} \\
+  & \mathit{td}_{n}^{k , j} = \mathit{ta}_{n}^{k , j} + \mathit{dw}_{n}^{k , j} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0009} \\
+  & 0 \leq \mathit{dw}_{n}^{k , j} \leq \bar{\mathit{dw}} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0010} \\
+  & \mathit{td}_{n}^{k , j} - \mathit{td}_{n}^{k , j - 1} \geq H , \forall k \in \mathcal{K} , \forall j , j - 1 \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0011} \\
+  & \mathit{ni}_{n}^{k , j} = \left\{\begin{matrix} \mathit{nb}_{n}^{k , j} , \mathit{ifn} = 1 \\ \mathit{ni}_{n - 1}^{k , j} + \mathit{nb}_{n}^{k , j} - \mathit{na}_{n}^{k , j} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , n \in \mathcal{N} \tag{eq\_0012} \\
+  & \mathit{nb}_{n}^{k , j} = m i n \left\{\mathit{nw}_{n}^{k , j} , \mathit{rc}_{n}^{k , j} , \left(\mathit{dw}_{n}^{k , j} - \mathit{tt}_{n}^{k , j}\right) \cdot \bar{u}\right\} \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0013} \\
+  & \mathit{na}_{n}^{k , j} = \left\{\begin{matrix} 0 , \mathit{ifn} = 1 \\ \mathit{rho}_{n}^{k , j} \cdot \mathit{ni}_{n - 1}^{k , j} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0014} \\
+  & \mathit{tt}_{n}^{k , j} \cdot \bar{u} \geq \mathit{na}_{n}^{k , j} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0015} \\
+  & \mathit{rc}_{n}^{k , j} = \left\{\begin{matrix} \begin{matrix}\mathit{alpha} \cdot \mathit{TC} , \mathit{ifn} = 1\end{matrix} \\ \mathit{alpha} \cdot \mathit{TC} - \mathit{ni}_{n - 1}^{k , j} + \mathit{na}_{n}^{k , j} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0016} \\
+  & \mathit{nw}_{n}^{k , j} = \left\{\begin{matrix} \begin{matrix}\sum_{t \in \left[0 , \mathit{td}_{n}^{k , j}\right)} v_{n , t}^{k} , \mathit{ifj} = 1\end{matrix} \\ \sum_{t \in \left[0 , \mathit{td}_{n}^{k , j}\right)} v_{n , t}^{k} - \sum_{q \in \left[1 , j\right)} \mathit{nb}_{n}^{k , q} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0017} \\
+  & \sum_{p \in \mathcal{P}} z_{n , f}^{k , p} = 1 , \forall k \in \mathcal{K} , \forall n \in \mathcal{N} , \forall f \in \mathcal{F} \tag{eq\_0018} \\
+  & \sum_{f \in \mathcal{F}} z_{n , f}^{k , 1} \cdot \mathit{PC}_{n , f}^{k , 1} \leq \mathit{cc}_{n}^{k} \leq \sum_{f \in \mathcal{F}} \left(z_{n , f}^{k , 1} \cdot \mathit{PC}_{n , f}^{k , 1} + z_{n , f}^{k , 0} \cdot \mathit{PC}_{n , f}^{k , 0}\right) \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} \tag{eq\_0019} \\
+  & \sum_{f \in \mathcal{F}} z_{n , f}^{k , - 1} \cdot \mathit{PC}_{n , f}^{k , - 1} \leq \mathit{ec}_{n}^{k} \leq \sum_{f \in \mathcal{F}} \left(z_{n , f}^{k , - 1} \cdot \mathit{PC}_{n , f}^{k , - 1} + z_{n , f}^{k , 0} \cdot \mathit{PC}_{n , f}^{k , 0}\right) \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} \tag{eq\_0020} \\
+  & \mathit{cc}_{n}^{k} + \mathit{ec}_{n}^{k} = \sum_{\begin{matrix}f \in F\end{matrix}} \sum_{p \in \mathcal{P}} z_{n , f}^{k , p} \cdot \mathit{PC}_{n , f}^{k , p} , \forall k \in \mathcal{K} , \forall n \in \mathcal{N} \tag{eq\_0021} \\
+  & v_{n , t}^{k} = \left\{\begin{matrix} \mathit{min} \left\{\mathit{lambda}_{n , t}^{k} , \mathit{cc}_{n}^{k} - Y_{n}^{k} \cdot v_{n^{'} , t}^{k^{'}}\right\} , \mathit{ift} = 0 \\ \mathit{min} \begin{Bmatrix} \sum_{\begin{matrix}t^{'} \in \left[0 , t\right]\end{matrix}} \mathit{lambda}_{n , t^{'}}^{k} - \sum_{\begin{matrix}t^{'} \in \left[0 , t\right)\end{matrix}} v_{n , t^{'}}^{k} , \mathit{cc}_{n}^{k} - Y_{n}^{k} \cdot v_{n^{'} , t}^{k^{'}} \end{Bmatrix} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} , t \in \mathcal{T} , k^{'} = K + 1 - k , n^{'} = N + 1 - n \tag{eq\_0022} \\
+  & \sum_{\begin{matrix}t^{'} \in \left[0 , t\right]\end{matrix}} v_{n , t^{'}}^{k} + \sum_{\begin{matrix}j \in J\end{matrix}} \sum_{t^{'} \in \left[0 , t\right]} m i n \left\{u_{n , t^{'}}^{k , j} 0\right\} \geq 0 \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} , \forall t \in \mathcal{T} \tag{eq\_0023} \\
+  & \left|u_{n , t}^{k , j}\right| \leq \bar{u} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \\ \forall t \in \left[\mathit{ta}_{n}^{k , j} , \mathit{ta}_{n}^{k , j} + \mathit{td}_{n}^{k , j}\right) \tag{eq\_0024} \\
+  & u_{n , t}^{k , j} = 0 , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \\ \forall t \in \mathcal{T} \backslash \left[\mathit{ta}_{n}^{k , j} , \mathit{ta}_{n}^{k , j} + \mathit{td}_{n}^{k , j}\right) \tag{eq\_0025} \\
+  & \mathit{nb}_{n}^{k , j} = - \sum_{t \in \left[\mathit{ta}_{n}^{k , j} + \mathit{tt}_{n}^{k , j} , \mathit{td}_{n}^{k , j}\right)} u_{n , t}^{k , j} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0026} \\
+  & \mathit{na}_{n}^{k , j} = \sum_{t \in \left[\mathit{ta}_{n}^{k , j} , \mathit{ta}_{n}^{k , j} + \mathit{tt}_{n}^{k , j}\right)} u_{n , t}^{k , j} , \forall k \in \mathcal{K} , \forall j \in \mathcal{J} , \forall n \in \mathcal{N} \tag{eq\_0027} \\
+  & w_{n , t}^{k} = \left\{\begin{matrix} \text{min} \begin{Bmatrix} \sum_{\begin{matrix}j \in J\end{matrix}} \text{max} \left\{u_{n , t}^{k , j} , 0\right\} , \mathit{ec}_{n}^{k} - Y_{n}^{k} \cdot w_{n^{'} , t}^{k^{'}} \end{Bmatrix} , \mathit{ift} = 0 \\ \text{min} \begin{Bmatrix} \sum_{\begin{matrix}j \in J\end{matrix}} \sum_{t^{'} \in \left[0 , t\right]} \text{max} \left\{u_{n , t}^{k , j} , 0\right\} - \sum_{\begin{matrix}t^{'} \in \left[0 , t\right)\end{matrix}} w_{n , t^{'}}^{k} , \mathit{ec}_{n}^{k} - Y_{n}^{k} \cdot w_{n^{'} , t}^{k^{'}} \end{Bmatrix} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} , \forall t \in \mathcal{T} , k^{'} = K + 1 - k , n^{'} = N + 1 - n \tag{eq\_0028} \\
+  & \sum_{\begin{matrix}k \in K\end{matrix}} \sum_{n \in \mathcal{N}} \sum_{t \in \mathcal{T}} w_{n , t}^{k} = \sum_{\begin{matrix}k \in K\end{matrix}} \sum_{n \in \mathcal{N}} \sum_{t \in \mathcal{T}} \mathit{lambda}_{n , t}^{k} \tag{eq\_0029} \\
+  & r_{n , t}^{k} = \left\{\begin{matrix} v_{n , t}^{k} + \sum_{j \in \mathcal{J}} u_{n , t}^{k , j} - w_{n , t}^{k} , \mathit{ift} = 0 \\ r_{n , t - 1}^{k} + v_{n , t}^{k} + \sum_{j \in \mathcal{J}} u_{n , t}^{k , j} - w_{n , t}^{k} , o t h e r \cdot w \cdot i s e \end{matrix}\right \\ \forall k \in \mathcal{K} , \forall n \in \mathcal{N} , t \in \mathcal{T} \tag{eq\_0030} \\
+\end{align}

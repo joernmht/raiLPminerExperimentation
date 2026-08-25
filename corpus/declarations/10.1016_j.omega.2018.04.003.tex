@@ -1,0 +1,118 @@
+% Declaration sidecar for 10.1016_j.omega.2018.04.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2018.04.003
+% Last train timetabling optimization and bus bridging service management in urban railway transit networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2018.04.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize the total number of successful transfer passengers, combining rail-to-rail demand-weighted transfers, bus-bridging demand-weighted transfers, and a large bonus for total last-train connections.
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Index for transfer passenger groups from line l to line l' at station k or from station i to station j between lines.
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable, 1 if last-train passengers from line l can transfer to line l' at station k.
+
+% unusable as an identifier, rename or drop: α
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of subway lines.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations in a subway line.
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for subway lines.
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for stations in a line.
+
+% z: classified as index during review
+%@ index z ordered=0 cyclic=0 :: Number of stations in a line (z_l).
+
+% t: classified as variable during review
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of the last train in line l (also used for dwell-time notation in dwell-time formulas).
+
+% Arr: classified as variable during review
+%@ var Arr shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of the last train at station k in line l.
+
+% Dep: classified as variable during review
+%@ var Dep shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of the last train at station k in line l.
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Earliest and latest departure time bounds T_l^min and T_l^max for the last train in line l.
+
+% Tra: classified as parameter during review
+%@ param Tra shape=- kind=scalar domain=- :: Walking time from line l to line l' at station k, or from the subway platform to the bus platform.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large positive constant used in big-M linearizations.
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Maximum number of buses that can be employed for bridging services.
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Index of station k in line l, i.e., the station's position along the line.
+
+% unusable as an identifier, rename or drop: Δ
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Headway of trains (H_l^R) or of bridging buses (H_ij^B).
+
+% w: classified as variable during review
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Waiting time for transfer passengers, either for rail-to-rail transfers or for rail-to-bus transfers.
+
+% X: classified as variable during review
+%@ var X shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total number of successful last-train connections.
+
+% Bound by a quantifier or big operator, so no declaration of their own: b, d, i, j, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow conservation: transfer demand at station k equals the sum of O-D demands from preceding stations i to succeeding stations j.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Arrival time of the last train at station k in line l, computed from the line departure time plus running and dwell times.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure time of the last train at station k in line l', computed from the line departure time plus running times and dwell times including at station k.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Bounds on the last-train departure time: T_l^min <= t_l^R <= T_l^max.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Bounds on the last-train finishing/departure time at each terminal: Dep_min^l <= Dep_k^l <= Dep_max^l.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Definition of last-train transfer redundant time: Dep_k^{l'} - Arr_k^l - Tra_k^{l l'}.
+%@ con eq_0009 kind=big_m domain=- indicator=- :: Big-M linearization linking transfer redundant time to the binary transfer-success variable x.
+%@ con eq_0010 kind=capacity domain=- indicator=- :: Capacity constraint: the number of deployed bus bridging routes cannot exceed the available bus fleet N.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Bus bridging is not offered when a successful train transfer exists: the transfer-success and bus-route indicators cannot both be 1.
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Station ordering: origin station i must be before transfer station k in line l.
+%@ con eq_0013 kind=ordering domain=- indicator=- :: Station ordering: transfer station k must be before destination station j in line l'.
+%@ con eq_0014 kind=capacity domain=- indicator=- :: The number of bus bridging routes is no greater than the number of missed last-train connections.
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one origin station i is selected for bridging from each feeder line l to connecting line l'.
+%@ con eq_0016 kind=linear domain=- indicator=- :: At most one destination station j is selected for bridging from each feeder line l to connecting line l'.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Binary domain constraints for transfer-success variable x and bus-route variable alpha.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Nonnegativity of last-train departure time t, arrival times Arr, and departure times Dep.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Extended transfer redundant time including the dwell time of the connecting train at station k.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Definition of Delta_k^{l l' R} in terms of line departure times, running times, and walking time.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transfer redundant time expressed as Delta plus the dwell time at the connecting station.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Analytical (nonlinear) rail-to-rail transfer waiting time formula used for analysis only, not in the final MILP.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Definition of X, the total number of last-train connections, as the sum of transfer-success variables.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Nonlinear bus waiting time expression w = max{...}, used only for derivation and replaced by the linear form.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linear rail-to-bus waiting time: bus departure plus buffer minus train arrival and walking time, with a big-M penalty when the bus route is not selected.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Feasible range for bus bridging departure times: t_min^B <= t_ij^B + Delta_ij^B <= t_max^B.
+%@ con eq_0040 kind=linear domain=- indicator=- :: At most one bus deployment plan is adopted for each route of the bridging service.
+%@ con eq_0041 kind=ordering domain=- indicator=- :: Origin station ordering: if a bus is deployed from i to d, it must also be deployed from i to all earlier stations b.
+%@ con eq_0042 kind=ordering domain=- indicator=- :: Station ordering in the origin line: C[d]_{l'} - C[b]_{l'} > 0.
+%@ con eq_0043 kind=ordering domain=- indicator=- :: Destination station ordering: if a bus is deployed from b to j, it must also be deployed from all later stations d to j.
+%@ con eq_0044 kind=ordering domain=- indicator=- :: Station ordering in the destination line: C[d]_l - C[b]_l > 0.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Nonnegativity of bus waiting times w and bus departure times t_ij^B.

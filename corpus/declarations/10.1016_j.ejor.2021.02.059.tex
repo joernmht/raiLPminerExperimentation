@@ -1,0 +1,96 @@
+% Declaration sidecar for 10.1016_j.ejor.2021.02.059
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2021.02.059
+% Timetable coordination in a rail transit network with time-dependent passenger demand
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2021.02.059.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum station congestion level ξ
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% n: classified as variable during review
+%@ var n shape=S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers at station i and time t
+
+% b: classified as variable during review
+%@ var b shape=P,S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers on path p at station i and time t
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time index
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+
+% d: classified as parameter during review
+%@ param d shape=S,T kind=matrix domain=- :: Number of arriving passengers at station i and time t
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of paths
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% x: classified as variable during review
+%@ var x shape=L,T domain=binary role=primary drole=- lo=- hi=- :: Binary train departure variable on line l at time t
+
+% D: classified as parameter during review
+%@ param D shape=P,T kind=matrix domain=- :: Demand for path p at time t
+
+% K: classified as parameter during review
+%@ param K shape=L kind=vector domain=- :: Number of trains available on line l
+
+% CTT: classified as parameter during review
+%@ param CTT shape=- kind=scalar domain=- :: Original model acronym (not a model symbol)
+
+% c: classified as parameter during review
+%@ param c shape=S kind=vector domain=- :: Inverse of station capacity (1/SC_i)
+
+% unusable as an identifier, rename or drop: δ
+% Bound by a quantifier or big operator, so no declaration of their own: i, l, p, ξ, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0008 kind=flow_balance domain=- indicator=- :: Passenger flow balance at station i and time t
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Boarding at station i on line l limited by train departure and capacity C
+%@ con eq_0010 kind=linear domain=- indicator=- :: Cumulative boarding on origin path p cannot exceed cumulative demand
+%@ con eq_0011 kind=linear domain=- indicator=- :: Cumulative boarding on transfer path p cannot exceed available transferring passengers
+%@ con eq_0012 kind=headway domain=- indicator=- :: Minimum headway: at most one train departure on line l within T_min
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Rolling stock cycle: at most K_l train departures on line l within T_cycle
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary restriction on train departure variables
+%@ con eq_0015 kind=linear domain=- indicator=- :: Nonnegativity of boarding variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Nonnegativity of waiting passenger variables
+%@ con eq_0018 kind=capacity domain=- indicator=- :: Explicit train capacity constraint with in-vehicle passengers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linearized CTT objective: minimize ξ
+%@ con eq_0020 kind=linear domain=- indicator=- :: Congestion level linearization: ξ ≥ c_i n_i_t
+%@ con eq_0024 kind=linear domain=- indicator=- :: Initial timetable objective: maximize total train departures
+%@ con eq_0025 kind=headway domain=- indicator=- :: Minimum headway constraint for initial timetable
+%@ con eq_0026 kind=capacity domain=- indicator=- :: Rolling stock utilization constraint for initial timetable
+%@ con eq_0031 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (31)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (32)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (33)

@@ -1,0 +1,101 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.05.008
+%@ meta id=10.1016_j.trb.2017.05.008 family=milp schema=0.1.0
+%@ name :: A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system
+%@ desc :: Mined from A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.05.008
+%@ prov reference :: A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system
+%@ prov author :: Peijuan Xu; Francesco Corman; Qiyuan Peng; Xiaojie Luan
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total secondary delay of trains
+%@ var y shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Secondary delay of train t (positive part)
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index R ordered=0 cyclic=0 :: Set of block sections for each train
+%@ param c shape=T kind=vector domain=- :: Planned total travel time for train t
+%@ param d shape=T kind=vector domain=- :: Dwell time at station for train t
+%@ param e shape=T,S kind=matrix domain=- :: Planned entry time of train t at section s
+%@ index s ordered=0 cyclic=0 :: Index for block sections
+%@ index F ordered=0 cyclic=0 :: Set of consecutive section pairs
+%@ index S ordered=0 cyclic=0 :: Set of all block sections
+%@ index B ordered=0 cyclic=0 :: Set of speed levels
+%@ param M shape=- kind=big_m domain=- :: Big-M constant
+%@ index w ordered=0 cyclic=0 :: Set of switches
+%@ index E ordered=0 cyclic=0 :: Set of entrance arcs
+%@ index D ordered=0 cyclic=0 :: Set of departure sections
+%@ index Bbar ordered=0 cyclic=0 :: Set of speed levels for train t (maximum)
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs for train ordering
+%@ index Sbar ordered=0 cyclic=0 :: Set of sections impacted by disruption
+%@ param W shape=- kind=vector domain=- :: Start and end times of disruption
+%@ var x shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Indicator if train t passes after disruption start
+%@ var xbar shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Indicator if train t passes before disruption end
+%@ index G ordered=0 cyclic=0 :: Set of sections in disruption area
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Secondary delay definition: y_t >= ω_t,end - e_t,s - c_t - d_t
+%@ con eq_0007_c kind=linear domain=- indicator=- :: Secondary delay non-negativity: y_t >= 0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum running time on sections outside open track
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum running time on open track sections with speed level
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum running time on sections to match speed level
+%@ con eq_0011 kind=linear domain=- indicator=- :: Maximum running time on switches (no-stop sections)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Earliest start time at entrance sections
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum dwell time at station stops
+%@ con eq_0014 kind=linear domain=- indicator=- :: Earliest departure time from stops
+%@ con eq_0015 kind=linear domain=- indicator=- :: Each section assigned exactly one speed level
+%@ con eq_0016 kind=linear domain=- indicator=- :: Speed level transitions limited to adjacent levels
+%@ con eq_0017 kind=linear domain=- indicator=- :: Maximum speed level 1 near stops
+%@ con eq_0018 kind=linear domain=- indicator=- :: Indicator that train passes after disruption start
+%@ con eq_0019 kind=linear domain=- indicator=- :: Indicator that train passes before disruption end
+%@ con eq_0020 kind=linear domain=- indicator=- :: Link speed levels to disruption impact
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train ordering on conflicting sections (alternative 1)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train ordering on conflicting sections (alternative 2)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Distance headway requirement (following train)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Distance headway requirement (leading train)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Disruption area ordering definition
+%@ con eq_0026 kind=linear domain=- indicator=- :: Fix maximum speed for trains not affected by disruption
+%@ con eq_0027 kind=linear domain=- indicator=- :: Fix maximum speed for unaffected sections in disrupted area
+%@ con eq_0028 kind=linear domain=- indicator=- :: Fix maximum speed for sections impacted by disruption
+%@ param dt
+%@ param Dt
+%@ param DtPrev
+%@ param pt
+%@ param omega0
+%@ index sw
+%@ index AD
+%@ index vartheta
+%@ index Next
+%@ index B2
+%@ index B_diff
+%@ index V
+%@ index end
+%@ index eta
+%@ index Far shape=- domain=index role=auxiliary drole=- lo=- hi=- :: pairs with absolute difference > 1
+%@ param deltat shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Time increment
+%@ param dtprev shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Previous time increment
+%@ param planned shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Planned time
+%@ index B1 shape=- domain=- role=set drole=- lo=- hi=- :: Singleton braking level 1
+%@ index B_pair shape=- domain=- role=set drole=- lo=- hi=- :: Forbidden braking level pairs
+%@ index Dplus shape=- domain=- role=set drole=t lo=- hi=- :: Successor positions
+\begin{align}
+  \min\quad & \sum_{t \in T} y_{t} \tag{eq\_0007\_a} \\
+  & y_{t} \geq \mathit{omega}_{t , e n d} - e_{t , s} - c_{t} - \mathit{dt}_{t} t \in T , s \in R_{t} \tag{eq\_0007\_b} \\
+  & y_{t} \geq 0 t \in T \tag{eq\_0007\_c} \\
+  & \mathit{omega}_{t,q} - \mathit{omega}_{t,p} \ge \mathit{delta}_{p} \qquad \forall t \in T, p \in S, q \in S, p \notin V, q \notin V, p \in R_{t}, q \in R_{t}, (p,q) \in F \tag{eq\_0008} \\
+  & \mathit{omega}_{t,q} - \mathit{omega}_{t,p} \ge \mathit{delta}_{p} + \sum_{k \in B} deltat_{k} \cdot \mathit{beta}_{k,t,p} \qquad \forall t \in T, p \in V, q \in V, p \in R_{t}, q \in R_{t}, (p,q) \in F \tag{eq\_0009} \\
+  & \mathit{omega}_{t,q} - \mathit{omega}_{t,p} < \mathit{delta}_{p} + \sum_{l \in B_2} dtprev_{l} \cdot \mathit{beta}_{l,t,p} + M \cdot \mathit{beta}_{k,t,p} \qquad \forall t \in T, p \in V, q \in V, p \in R_{t}, q \in R_{t}, (p,q) \in F, k \in B_1 \tag{eq\_0010} \\
+  & \mathit{omega}_{t,q} - \mathit{omega}_{t,p} \le \mathit{delta}_{p} + deltat_{k} \qquad \forall t \in T, p \in S, q \in S, p \in R_{t}, q \in R_{t}, (p,q) \in sw, k \in B_1 \tag{eq\_0011} \\
+  & \mathit{omega}_{t,s} \ge e_{t,s} + dt_{t} + omega0 \qquad \forall (t,s) \in E_T \tag{eq\_0012} \\
+  & \mathit{omega}_{t,q} - \mathit{omega}_{t,p} \ge \mathit{delta}_{p} + d_{t,p} \qquad \forall t \in T, q \in R_{t}, p \in D_{t} \tag{eq\_0013} \\
+  & \mathit{omega}_{t,r} \ge planned_{t,r} + omega0 \qquad \forall t \in T, r \in Dplus_{t} \tag{eq\_0014} \\
+  & \sum_{k \in Bbar} \mathit{beta}_{k,t,s} = 1 \qquad \forall t \in T, s \in V, s \in R_{t} \tag{eq\_0015} \\
+  & \mathit{beta}_{k,t,p} + \mathit{beta}_{l,t,q} \le 1 \qquad \forall t \in T, p \in V, q \in V, p \in R_{t}, q \in R_{t}, (p,q) \in F, (k,l) \in B_{pair} \tag{eq\_0016} \\
+  & \mathit{beta}_{k,t,s} = 1 \qquad \forall t \in T, s \in V, s \in AD_{t}, k \in B_1 \tag{eq\_0017} \\
+  & M \cdot x_{t,s} \ge \mathit{omega}_{t,s} - W_{1} \qquad \forall t \in T, s \in Sbar, s \in R_{t} \tag{eq\_0018} \\
+  & \left(\bar{x}\right)_{t , s} \geq \frac{W_{2} - \mathit{omega}_{t , s}}{M} \forall t \in T , s \in \bar{S} \cap R_{t} \tag{eq\_0019} \\
+  & \sum_{\mathit{xi} = 1}^{B_{m}} \mathit{beta}_{\mathit{xi} , t , s} \geq x_{t , s} + \left(\bar{x}\right)_{t , s} - 1 \forall t \in T , s \in \bar{S} \cap R_{t} , \mathit{xi} \in B \tag{eq\_0020} \\
+  & \mathit{omega}_{j , q} - \mathit{omega}_{i , p} \geq \mathit{delta}_{p , q} - \left(1 - \mathit{lambda}_{i , j , p , q}\right) M \forall i , j \in T , \left(\left(p , q\right) , \left(h , k\right)\right) \in A , p , k \in R_{i} , q , h \in R_{j} , i \neq j \tag{eq\_0021} \\
+  & \mathit{omega}_{i , k} - \mathit{omega}_{j , h} \geq \mathit{delta}_{h , k} - \mathit{lambda}_{i , j , p , q} M \forall i , j \in T , \left(\left(p , q\right) , \left(h , k\right)\right) \in A , p , k \in R_{i} , q , h \in R_{j} , i \neq j \tag{eq\_0022} \\
+  & \begin{matrix}\mathit{omega}_{j , q} - \mathit{omega}_{i , p} \geq - \left(2 - \mathit{mu}_{i , j , \mathit{vartheta}_{\mathit{eta}}} - \mathit{beta}_{\mathit{xi} , j , q}\right) M \\ \forall i , j \in T , \mathit{xi} \in B , p , q \in \mathit{vartheta}_{\mathit{eta}} , q \in R_{j} , p \in R_{i} , i \neq j , p = q + \mathit{xi}\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix}\mathit{omega}_{i , q} - \mathit{omega}_{j , p} \geq - \left(1 + \mathit{mu}_{i , j , \mathit{vartheta}_{\mathit{eta}}} - \mathit{beta}_{\mathit{xi} , i , q}\right) M \\ \forall i , j \in T , \mathit{xi} \in B , p , q \in \mathit{vartheta}_{\mathit{eta}} , q \in R_{j} , p \in R_{i} , i \neq j , p = q + \mathit{xi}\end{matrix} \tag{eq\_0024} \\
+  & M \mathit{mu}_{i , j , \mathit{vartheta}_{\mathit{eta}}} \geq \mathit{omega}_{j , f_{\mathit{eta}}} - \mathit{omega}_{i , f_{\mathit{eta}}} \forall i , j \in T , f_{\mathit{eta}} \in R_{i} , f_{\mathit{eta}} \in R_{j} \tag{eq\_0025} \\
+  & \mathit{beta}_{\mathit{xi} , t , s} = 1 \forall t \in T - T_{0} , s \in \cup G_{\mathit{vartheta}} , \mathit{xi} = \bar{B_{m}} , s \in R_{t} \tag{eq\_0026} \\
+  & \mathit{beta}_{\mathit{xi} , t , s} = 1 \forall t \in T_{0} , s \in \cup G_{\mathit{vartheta}} - {S} , \mathit{xi} = \bar{B_{m}} , s \in R_{t} \tag{eq\_0027} \\
+  & \mathit{beta}_{\mathit{xi} , t , s} = 1 \forall t \in T_{0} , s \in \bar{S} , \mathit{xi} = B_{m} , s \in R_{t} \tag{eq\_0028} \\
+\end{align}

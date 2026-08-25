@@ -1,0 +1,172 @@
+% Declaration sidecar for 10.1016_j.trc.2023.104155
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-23.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2023.104155
+% Train traffic control in merging stations: A data-driven approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2023.104155.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize expected utility of the control action (sum of delay reductions).
+
+% X: classified as variable during review
+%@ var X shape=- domain=continuous role=primary drole=- lo=- hi=- :: Random variable in the Bayesian network
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Probability function/conditional probability table
+
+% Pa: classified as parameter during review
+%@ param Pa shape=- kind=scalar domain=- :: Parent nodes of a node in the BN/DG
+
+% Non: classified as parameter during review
+%@ param Non shape=- kind=scalar domain=- :: Non-descendant nodes of a node in the BN
+
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Instance/value of random variable X
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of random variables or trains considered
+
+% AO: classified as variable during review
+%@ var AO shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable: 1 if reordering action is taken, 0 otherwise
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Arrival time of a train
+
+% action: classified as parameter during review
+%@ param action shape=- kind=scalar domain=- :: Control action taken by the traffic controller
+
+% arrival: classified as parameter during review
+%@ param arrival shape=- kind=scalar domain=- :: Arrival order of trains
+
+% keep: classified as parameter during review
+%@ param keep shape=- kind=scalar domain=- :: Keep the arrival order (no reordering)
+
+% order: classified as parameter during review
+%@ param order shape=- kind=scalar domain=- :: Train order
+
+% reordering: classified as parameter during review
+%@ param reordering shape=- kind=scalar domain=- :: Reordering action between trains
+
+% take: classified as parameter during review
+%@ param take shape=- kind=scalar domain=- :: Take a reordering action
+
+% U: classified as variable during review
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Utility of a control action (sum of delay reductions)
+
+% log: classified as parameter during review
+%@ param log shape=- kind=scalar domain=- :: Logarithm function
+
+% W: classified as parameter during review
+%@ param W shape=- kind=scalar domain=- :: Number of instances in the data
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Number of categories of a random variable
+
+% BN: classified as parameter during review
+%@ param BN shape=- kind=scalar domain=- :: Bayesian network model
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Number of categories for expected utility
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number of variables or observations
+
+% q: classified as index during review
+%@ index q ordered=0 cyclic=0 :: Number of configurations of the parent set
+
+% unusable as an identifier, rename or drop: θ
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Number of observations in the data
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar domain=- :: Likelihood function
+
+% AD: classified as parameter during review
+%@ param AD shape=- kind=scalar domain=- :: Actual dwell time
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Headway
+
+% PDW: classified as parameter during review
+%@ param PDW shape=- kind=scalar domain=- :: Planned dwell time
+
+% ADW: classified as parameter during review
+%@ param ADW shape=- kind=scalar domain=- :: Actual dwell time
+
+% unusable as an identifier, rename or drop: τ
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Number of tracks at the merging station
+
+% unusable as an identifier, rename or drop: Φ
+% EU: classified as variable during review
+%@ var EU shape=- domain=continuous role=primary drole=- lo=- hi=- :: Expected utility of a control action
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Probability of a category
+
+% R: classified as variable during review
+%@ var R shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary node indicating whether reordering yields higher utility
+
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Feature space
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Departure time
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway
+
+% G: classified as parameter during review
+%@ param G shape=- kind=scalar domain=- :: Distribution
+
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar domain=- :: Distribution
+
+% CDF: classified as parameter during review
+%@ param CDF shape=- kind=scalar domain=- :: Cumulative distribution function
+
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Observation from distribution G
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Conditional independence of non-descendants given parents
+%@ con eq_0002 kind=linear domain=- indicator=- :: Joint conditional probability factorization over network variables
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of the reordering decision variable AO between two trains
+%@ con eq_0004 kind=linear domain=- indicator=- :: Utility of the control action as the sum of delay reductions for two trains
+%@ con eq_0005 kind=linear domain=- indicator=- :: K2 score for Bayesian network structure learning
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum likelihood parameter learning for the network
+%@ con eq_0007 kind=headway domain=- indicator=- :: Departure headway when keeping the arrival order (AO=0)
+%@ con eq_0008 kind=headway domain=- indicator=- :: Departure headway when reordering trains (AO=1)
+%@ con eq_0009 kind=headway domain=- indicator=- :: Minimum departure headway constraint when keeping the order
+%@ con eq_0010 kind=headway domain=- indicator=- :: Minimum departure headway constraint when reordering
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Track capacity constraint: dwelling services must not exceed station tracks
+%@ con eq_0012 kind=linear domain=- indicator=- :: Conditional probability of utility given no reordering action
+%@ con eq_0013 kind=linear domain=- indicator=- :: Conditional probability of utility given reordering action
+%@ con eq_0014 kind=linear domain=- indicator=- :: Expected utility as the sum over categories of probability times representative value
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary node R indicating whether reordering yields higher utility
+%@ con eq_0016 kind=linear domain=- indicator=- :: Posterior distribution of the feature space given evidence R=1
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Departure delay minimization: choose the minimum of no-overtaking and overtaking delays
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Departure delay under no overtaking for the two trains
+%@ con eq_0017_c kind=linear domain=- indicator=- :: Departure delay under overtaking for the two trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: CDF distance between two distributions G and Q

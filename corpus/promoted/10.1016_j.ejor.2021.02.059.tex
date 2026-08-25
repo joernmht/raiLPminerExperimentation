@@ -1,0 +1,64 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2021.02.059
+%@ meta id=10.1016_j.ejor.2021.02.059 family=milp schema=0.1.0
+%@ name :: Timetable coordination in a rail transit network with time-dependent passenger demand
+%@ desc :: Mined from Timetable coordination in a rail transit network with time-dependent passenger demand (European Journal of Operational Research, 2021).
+%@ prov source :: 10.1016/j.ejor.2021.02.059
+%@ prov reference :: Timetable coordination in a rail transit network with time-dependent passenger demand
+%@ prov author :: Jiateng Yin; Andrea D’Ariano; Yihui Wang; Lixing Yang; Tao Tang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum station congestion level ξ
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var n shape=S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers at station i and time t
+%@ var b shape=P,S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers on path p at station i and time t
+%@ index t ordered=0 cyclic=0 :: Time index
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ param d shape=S,T kind=matrix domain=- :: Number of arriving passengers at station i and time t
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ index P ordered=0 cyclic=0 :: Set of paths
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ var x shape=L,T domain=binary role=primary drole=- lo=- hi=- :: Binary train departure variable on line l at time t
+%@ param D shape=P,T kind=matrix domain=- :: Demand for path p at time t
+%@ param K shape=L kind=vector domain=- :: Number of trains available on line l
+%@ param CTT shape=- kind=scalar domain=- :: Original model acronym (not a model symbol)
+%@ param c shape=S kind=vector domain=- :: Inverse of station capacity (1/SC_i)
+%@ con eq_0008 kind=flow_balance domain=- indicator=- :: Passenger flow balance at station i and time t
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Boarding at station i on line l limited by train departure and capacity C
+%@ con eq_0010 kind=linear domain=- indicator=- :: Cumulative boarding on origin path p cannot exceed cumulative demand
+%@ con eq_0011 kind=linear domain=- indicator=- :: Cumulative boarding on transfer path p cannot exceed available transferring passengers
+%@ con eq_0012 kind=headway domain=- indicator=- :: Minimum headway: at most one train departure on line l within T_min
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Rolling stock cycle: at most K_l train departures on line l within T_cycle
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary restriction on train departure variables
+%@ con eq_0015 kind=linear domain=- indicator=- :: Nonnegativity of boarding variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Nonnegativity of waiting passenger variables
+%@ con eq_0018 kind=capacity domain=- indicator=- :: Explicit train capacity constraint with in-vehicle passengers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linearized CTT objective: minimize ξ
+%@ con eq_0020 kind=linear domain=- indicator=- :: Congestion level linearization: ξ ≥ c_i n_i_t
+%@ con eq_0024 kind=linear domain=- indicator=- :: Initial timetable objective: maximize total train departures
+%@ con eq_0025 kind=headway domain=- indicator=- :: Minimum headway constraint for initial timetable
+%@ con eq_0026 kind=capacity domain=- indicator=- :: Rolling stock utilization constraint for initial timetable
+%@ con eq_0031 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (31)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (32)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (33)
+\begin{align}
+  \min_{x}\quad & \underset{t , i}{max} \frac{n_{i}^{t}}{S \cdot C_{i}} , \tag{eq\_0007} \\
+  & \text{s}.\text{t}. n_{i}^{t} = \sum_{\mathit{tau} \in T_{t}} d_{i}^{\mathit{tau}} + \sum_{p \in \mathcal{P}_{i}^{r}} \sum_{\mathit{tau} \in T_{p i t}} b_{p i_{p}^{+}}^{\mathit{tau}} - \sum_{\mathit{tau} \in T_{t}} \sum_{p \in \mathcal{P}_{i}^{o} \cup \mathcal{P}_{i}^{r}} b_{p i}^{\mathit{tau}} , \forall i \in S , t \in T \tag{eq\_0008} \\
+  & \sum_{p \in \mathcal{P}_{i}} b_{p i}^{t} \leq C \cdot x_{l \left(t - t_{i}\right)} , \forall i \in S_{l} , l \in L , t \in T : t \geq t_{i} \tag{eq\_0009} \\
+  & \sum_{\mathit{tau} \in T_{t}} b_{p i}^{\mathit{tau}} \leq \sum_{\mathit{tau} \in T_{t}} D_{p}^{\mathit{tau}} , \forall i \in S_{l} , p \in \mathcal{P}_{i}^{o} , t \in T_{p i} \tag{eq\_0010} \\
+  & \sum_{\mathit{tau} \in T_{t}} b_{p i}^{\mathit{tau}} \leq \sum_{\mathit{tau} \in T_{p i t}} b_{p i_{p}^{+}}^{\mathit{tau}} , \forall i \in S_{p}^{r} , p \in \mathcal{P}_{i}^{r} , t \in T_{p i} \tag{eq\_0011} \\
+  & \sum_{t \leq t^{'} \leq t + T_{m i n}^{l}} x_{l t^{'}} \leq 1 , \forall l \in L , t \in T \tag{eq\_0012} \\
+  & \sum_{t \leq t^{'} \leq t + T_{c y c l e}^{l}} x_{l t^{'}} \leq K_{l} , \forall l \in L , t \in T \tag{eq\_0013} \\
+  & x_{l t} \in \left\{0 , 1\right\} , \forall l \in L , t \in T \tag{eq\_0014} \\
+  & b_{p i}^{t} \geq 0 , \forall p \in \mathcal{P} , i \in S , t \in T \tag{eq\_0015} \\
+  & n_{i}^{t} \geq 0 , \forall i \in S , t \in T \tag{eq\_0016} \\
+  & \sum_{p \in \mathcal{P}_{i}} b_{p i}^{t} \leq C - \sum_{i^{'} \in S_{i l}} \underset{p^{'} \in \mathcal{P}_{i^{'} i}}{\sum} b_{p i^{'}}^{t \left(i^{'} , i\right)} , \forall i \in S_{l} , l \in L , t \in T_{p i} \tag{eq\_0018} \\
+  & (\text{L}-\text{CTT}) \underset{x , \mathit{xi}}{min} \mathit{xi} \tag{eq\_0019} \\
+  & \text{s}.\text{t}. \mathit{xi} \geq c_{i} \left(\sum_{\mathit{tau} \in T_{t}} d_{i}^{\mathit{tau}} + \sum_{p \in \mathcal{P}_{i}^{r}} \sum_{\mathit{tau} \in T_{p i t}} b_{p i_{p}^{+}}^{\mathit{tau}} - \sum_{p \in \mathcal{P}_{i}^{o} \cup \mathcal{P}_{i}^{r}} \sum_{\mathit{tau} \in T_{p i t}} b_{p i}^{\mathit{tau}}\right) \forall i \in S , t \in T \tag{eq\_0020} \\
+  & \sum_{\mathit{tau} \in T_{t}} d_{i}^{\mathit{tau}} + \sum_{p \in \mathcal{P}_{i}^{r}} \sum_{\mathit{tau} \in T_{p i t}} b_{p i_{p}^{+}}^{\mathit{tau}} - \sum_{p \in \mathcal{P}_{i}^{o} \cup \mathcal{P}_{i}^{r}} \sum_{\mathit{tau} \in T_{p i t}} b_{p i}^{\mathit{tau}} \geq 0 \tag{eq\_0024} \\
+  & \sum_{t \leq t^{'} \leq t + T_{m i n}^{l}} \mathit{delta} \left(x\right)_{l t^{'}} \leq \sum_{t \leq t^{'} \leq t + T_{m i n}^{l}} x_{l t^{'}} \leq 1 , \forall l \in L , t \in T \tag{eq\_0025} \\
+  & \sum_{t \leq t^{'} \leq t + T_{c y c l e}^{l}} \mathit{delta} \left(x\right)_{l t} \leq \sum_{t \leq t^{'} \leq t + T_{c y c l e}^{l}} x_{l t} \leq K_{l} , \forall l \in L , t \in T . \tag{eq\_0026} \\
+  & \text{s}.\text{t}. \sum_{t \leq t^{'} \leq t + T_{m i n}^{l}} x_{l t^{'}} \leq 1 , \forall l \in L , t \in T \tag{eq\_0031} \\
+  & \sum_{t \leq t^{'} \leq t + T_{c y c l e}^{l}} x_{l t^{'}} \leq K_{l} , \forall l \in L , t \in T \tag{eq\_0032} \\
+  & x_{l t} \in \left\{0 , 1\right\} \tag{eq\_0033} \\
+\end{align}

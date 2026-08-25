@@ -1,0 +1,68 @@
+% Declaration sidecar for 10.1016_j.cor.2013.04.002
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2013.04.002
+% An experimental comparison of periodic timetabling models
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cor.2013.04.002.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger traveling time
+
+% π: unusable as an identifier, declared as pi
+%@ var pi shape=E domain=integer role=primary drole=- lo=- hi=- :: Event time variable π_i for each event i in the EAN
+
+% Tz: classified as variable during review
+%@ var Tz shape=A domain=integer role=primary drole=- lo=- hi=- :: Product of period T and modulo parameter z_ij for activity (i,j) in A
+
+% w: classified as parameter during review
+%@ param w shape=A kind=vector domain=- :: Passenger weight for activity a (number of passengers using that activity)
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (driving, waiting, changing, headway) in the event activity network
+
+% l: classified as parameter during review
+%@ param l shape=A kind=vector domain=- :: Minimal allowed activity duration for activity a
+
+% u: classified as parameter during review
+%@ param u shape=A kind=vector domain=- :: Maximal allowed activity duration for activity a
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures) in the event activity network
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of natural numbers (domain of event time variables π)
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of integers (domain of modulo parameters z)
+
+% z: classified as variable during review
+%@ var z shape=A domain=integer role=primary drole=- lo=- hi=- :: Modulo parameter for activity (i,j) in A, number of periods added to the duration
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Activity duration bounds: l_ij ≤ π_j − π_i + T z_ij ≤ u_ij for all (i,j) in A
+%@ con eq_0005 kind=linear domain=- indicator=- :: Event times are natural numbers: π_i ∈ N for all i in E
+%@ con eq_0006 kind=linear domain=- indicator=- :: Modulo parameters are integers: z_ij ∈ Z for all (i,j) in A
+%@ var piInt shape=- domain=integer role=auxiliary drole=- lo=0 hi=- :: auxiliary integer copy of pi
+%@ var zInt shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: auxiliary integer copy of z
+%@ var z_int shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: integer period offset

@@ -1,6 +1,6 @@
 % Declaration sidecar for 10.1016_j.ejor.2006.10.034
 % ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
-% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-23.
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
 % Non-deterministically sourced; pending human confirmation.
 %
 % Declaration sidecar for 10.1016_j.ejor.2006.10.034
@@ -24,14 +24,14 @@
 % obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
 % con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
 
-%@ index i ordered=1 cyclic=0 :: Operations (arrival/departure events) in the alternative graph
-%@ index j ordered=1 cyclic=0 :: Operations or resources paired with i for separation constraints
+%@ obj sense=min name=objective combination=sum :: minimize total deviation from original schedule
 
-%@ obj sense=min name=objective combination=sum :: Minimize total deviation from the original timetable
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: arrival or departure time of a train at a node
 
-%@ var t shape=i domain=non_negative role=primary drole=- lo=- hi=- :: Start time of operation (arrival/departure) in the alternative graph
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: minimum time separation between trains
 
-%@ param f shape=i,j kind=matrix domain=- :: Minimum time separation/duration between operations (f_k, f_hk)
-
-%@ con eq_0001 kind=linear domain=- indicator=- :: Time separation constraints ensuring minimum headway between consecutive operations on the same resource
-%@ con eq_0002 kind=linear domain=- indicator=- :: Alternative graph constraints selecting a feasible pair of arcs (no-store / blocking constraints)
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: time separation constraint between train movements at a node
+%@ con eq_0002 kind=linear domain=- indicator=- :: no-store constraint enforcing maximum waiting time at a node

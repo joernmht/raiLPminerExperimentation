@@ -1,0 +1,116 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2013.10.013
+%@ meta id=10.1016_j.trb.2013.10.013 family=milp schema=0.1.0
+%@ name :: Optimal train routing and scheduling for managing traffic perturbations in complex junctions
+%@ desc :: Mined from Optimal train routing and scheduling for managing traffic perturbations in complex junctions (Transportation Research Part B Methodological, 2013).
+%@ prov source :: 10.1016/j.trb.2013.10.013
+%@ prov reference :: Optimal train routing and scheduling for managing traffic perturbations in complex junctions
+%@ prov author :: Paola Pellegrini; Grégory Marlière; Joaquín Rodríguez
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total secondary delay suffered by trains (alternative objective: minimize maximum secondary delay D)
+%@ var U shape=t,tc domain=continuous role=primary drole=- lo=- hi=- :: Utilization time of a track-circuit by a train
+%@ param being shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param by shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param in shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param s shape=- kind=scalar domain=- :: Function returning successor track-circuit
+%@ param starts shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ index t ordered=0 cyclic=0 :: Train index
+%@ index tc ordered=0 cyclic=0 :: Track-circuit index
+%@ param time shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param utilized shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param which shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ param e shape=- kind=scalar domain=- :: Function indicating if track-circuit is in extreme block section
+%@ param ends shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+%@ var D shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Maximum secondary delay suffered by any train
+%@ index R ordered=0 cyclic=0 :: Set of routes
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index TC ordered=0 cyclic=0 :: Set of track-circuits
+%@ param init shape=t kind=vector domain=- :: Earliest start time for train t
+%@ var o shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Start time of occupation of track-circuit tc by train t on route r
+%@ var x shape=t,R domain=binary role=primary drole=- lo=- hi=- :: Binary route choice indicator for train t on route r
+%@ param Mx shape=t,R kind=matrix domain=- :: Upper bound for occupation start time of train t on route r
+%@ param rt shape=- kind=scalar domain=- :: Running time on track-circuit for a given train type (depends on route, train type, and track-circuit)
+%@ param pt shape=R,TC kind=matrix domain=- :: Preceding track-circuit function for route r and track-circuit tc
+%@ index c ordered=0 cyclic=0 :: Connection relation between trains
+%@ param ms shape=t,t kind=matrix domain=- :: Minimum separation time between train t and train t'
+%@ param p shape=R,TC kind=matrix domain=- :: Preceding track-circuit function for route r and track-circuit tc
+%@ param sched shape=t kind=vector domain=- :: Scheduled completion time for train t
+%@ param bs shape=R,TC kind=matrix domain=- :: Block section of track-circuit tc along route r
+%@ var d shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Delay suffered by train t in track-circuit tc along route r
+%@ index i ordered=0 cyclic=0 :: Turnaround/join/split relation between trains
+%@ var eU shape=t,tc domain=non_negative role=primary drole=- lo=- hi=- :: End time of utilization of track-circuit tc by train t
+%@ var sU shape=t,tc domain=non_negative role=primary drole=- lo=- hi=- :: Start time of utilization of track-circuit tc by train t
+%@ param PL shape=- kind=scalar domain=- :: Set of platforms
+%@ param ref shape=R,TC kind=matrix domain=- :: Reference track-circuit for a given track-circuit and route
+%@ var ul shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Utilization length of track-circuit tc by train t on route r
+%@ var y shape=t,t,tc domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for track-circuit utilization between trains
+%@ param M shape=- kind=big_m domain=- :: Large constant for disjunctive constraints
+%@ param My shape=- kind=big_m domain=- :: Large constant for disjunctive constraints (alternative)
+%@ param ct shape=- kind=scalar domain=- :: Clearing time on track-circuit (depends on route, train type, and track-circuit)
+%@ param rel shape=- kind=scalar domain=- :: Release time for a block section
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Constraint (3): trains cannot be operated earlier than init_t
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Constraint (4): start of occupation is zero if route not used
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (5): train cannot start occupying a track-circuit without spending running time in the preceding one
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (6): exactly one route is used by each train
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (7): minimum connection separation between trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (8): secondary delay of a train at completion
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (9): maximum secondary delay definition
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (10): delay variable definition
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (11): minimum separation for turnaround/join/split
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (12): platform reservation continuity for turnaround/join/split
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (13): local rolling-stock/platform coherence
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint (14): utilization start time equality
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint (15): utilization start time inequality for joined/split trains
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint (16): utilization end time definition
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint (17): disjunctive ordering variables are complementary
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint (18): capacity constraint: if t precedes t' on tc, t ends utilization before t' starts
+%@ con eq_0024 kind=linear domain=- indicator=- :: Constraint (19): capacity constraint: if t' precedes t on tc, t' ends utilization before t starts
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint (20): route-lock route-release utilization end bound
+%@ con eq_0026 kind=linear domain=- indicator=- :: Auxiliary definition of utilization length ul
+%@ con eq_0027 kind=linear domain=- indicator=- :: Additional capacity/disjunctive constraint (part of formulation)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Additional constraint (part of formulation)
+%@ index tp shape=- domain=T role=index drole=- lo=- hi=-
+%@ param ty shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ index tc0 shape=- domain=TC role=index drole=- lo=- hi=-
+%@ index tcinf shape=- domain=TC role=index drole=- lo=- hi=-
+%@ param conn shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ param incomp shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ param for domain=-
+%@ index k
+%@ param alpha shape=- domain=real role=coefficient drole=- lo=- hi=- :: predecessor indicator
+%@ param sigma shape=- domain=real role=coefficient drole=- lo=- hi=- :: successor indicator
+%@ param rho shape=- domain=real role=coefficient drole=- lo=- hi=- :: reference indicator
+%@ param piStart shape=- domain=real role=coefficient drole=- lo=- hi=- :: p start indicator
+%@ param sigEnd shape=- domain=real role=coefficient drole=- lo=- hi=- :: s end indicator
+%@ param mu shape=- domain=real role=coefficient drole=- lo=- hi=- :: tc in TC^r indicator
+%@ param phi shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq21
+%@ param psi shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq22
+%@ param theta shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq17
+%@ param cond shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq25/26
+%@ param fo shape=- domain=real role=coefficient drole=- lo=- hi=- :: follow-on headway
+%@ param inc shape=- domain=real role=coefficient drole=- lo=- hi=- :: precedence indicator
+%@ index tcEnd :: end track circuit
+\begin{align}
+  & \mathit{sU}_{t,\mathit{tc}} \ge 0 \qquad \forall t \in T, \mathit{tc} \in \mathit{TC} \tag{eq\_0005\_a} \\
+  & \mathit{eU}_{t,\mathit{tc}} \ge 0 \qquad \forall t \in T, \mathit{tc} \in \mathit{TC} \tag{eq\_0005\_b} \\
+  \min\quad & D \tag{eq\_0008} \\
+  & o_{t,r,tc} \geq \mathit{init}_{t} \cdot x_{t,r} \qquad \forall t \in T, r \in R_{t}, tc \in \mathit{TC}^{r} \tag{eq\_0010} \\
+  & o_{t,r,tc} \le Mx_{t,r} \qquad \forall t \in T, r \in R_{t}, tc \in TC^{r} \tag{eq\_0011} \\
+  & o_{t,r,tc} \geq \sum_{k \in \mathit{TC}^{r}} \mathit{alpha}_{r,tc,k} \cdot \left( o_{t,r,k} + \mathit{rt}_{r,\mathit{ty}_{t},k} \cdot x_{t,r} \right) \qquad \forall t \in T, r \in R_{t}, tc \in \mathit{TC}^{r} \tag{eq\_0012} \\
+  & \sum_{r \in R_{t}} x_{t,r} = 1 \qquad \forall t \in T \tag{eq\_0013} \\
+  & \mathit{conn}_{t,tp} \cdot \left( \sum_{r \in R_{tp}, tc \in \mathit{TC}^{r}} \mathit{piStart}_{r,tc} \cdot o_{tp,r,tc} \right) \geq \mathit{conn}_{t,tp} \cdot \left( \sum_{r \in R_{t}, tc \in \mathit{TC}^{r}} \mathit{sigEnd}_{r,tc} \cdot \left( o_{t,r,tc} + \left( \mathit{ms}_{t,tp,c} + \mathit{rt}_{r,\mathit{ty}_{t},tc} \right) \cdot x_{t,r} \right) \right) \qquad \forall t, tp \in T \tag{eq\_0014} \\
+  & D_{t} \geq \sum_{r \in R_{t}} o_{t,r,tcEnd} - \mathit{sched}_{t} \qquad \forall t \in T \tag{eq\_0015} \\
+  & D \geq D_{t} \qquad \forall t \in T \tag{eq\_0016} \\
+  & \mathit{theta}_{r,tc} \cdot d_{t,r,tc} = \mathit{theta}_{r,tc} \cdot \left( \sum_{k \in \mathit{TC}^{r}} \mathit{sigma}_{r,tc,k} \cdot o_{t,r,k} - o_{t,r,tc} - \mathit{rt}_{r,\mathit{ty}_{t},tc} \cdot x_{t,r} \right) \qquad \forall t \in T, r \in R_{t}, tc \in \mathit{TC}^{r} \tag{eq\_0017} \\
+  & \mathit{inc}_{tp,t} \cdot \left( \sum_{r \in R_{t}, tc \in \mathit{TC}^{r}} \mathit{piStart}_{r,tc} \cdot o_{t,r,tc} \right) \geq \mathit{inc}_{tp,t} \cdot \left( \sum_{r \in R_{tp}, tc \in \mathit{TC}^{r}} \mathit{sigEnd}_{r,tc} \cdot \left( o_{tp,r,tc} + \left( \mathit{ms}_{t,tp} + \mathit{rt}_{r,\mathit{ty}_{tp},tc} \right) \cdot x_{tp,r} \right) \right) \qquad \forall t, tp \in T \tag{eq\_0018} \\
+  & \sum_{r \in R_{t}, tc \in TC^{r} : p_{r,tc} = tc0} sU_{t,tc} \le \sum_{r \in R_{tp}, tc \in TC^{r} : s_{r,tc} = tcinf} eU_{tp,tc} \qquad \forall t, tp \in T : i(tp,t) = 1 \tag{eq\_0019} \\
+  & \sum_{r \in R_{t} : \mathit{tc} \in \mathit{TC}^{r}} x_{t,r} = \sum_{r \in R_{tp} : \mathit{tc} \in \mathit{TC}^{r}} x_{tp,r} \qquad \forall t, tp \in T : \mathit{incomp}_{tp,t}=1, \mathit{tc} \in \mathit{PL} \tag{eq\_0020} \\
+  & \mathit{phi}_{t,tc} \cdot \mathit{sU}_{t,tc} = \mathit{phi}_{t,tc} \cdot \sum_{r \in R_{t}} \mathit{mu}_{r,tc} \cdot \left( \sum_{k \in \mathit{TC}^{r}} \mathit{rho}_{r,tc,k} \cdot o_{t,r,k} - \mathit{fo}_{r,tc} \cdot x_{t,r} \right) \qquad \forall t \in T, tc \in \mathit{TC}_{t} \tag{eq\_0021} \\
+  & \mathit{psi}_{t,tc} \cdot \mathit{sU}_{t,tc} \leq \mathit{psi}_{t,tc} \cdot \sum_{r \in R_{t}} \mathit{mu}_{r,tc} \cdot \left( \sum_{k \in \mathit{TC}^{r}} \mathit{rho}_{r,tc,k} \cdot o_{t,r,k} - \mathit{fo}_{r,tc} \cdot x_{t,r} \right) \qquad \forall t \in T, tc \in \mathit{TC}_{t} \tag{eq\_0022} \\
+  & \mathit{eU}_{t,tc} = \sum_{r \in R_{t}} \mathit{mu}_{r,tc} \cdot \left( \sum_{k \in \mathit{TC}^{r}} \mathit{rho}_{r,tc,k} \cdot o_{t,r,k} + \mathit{ul}_{t,r,tc} \right) \qquad \forall t \in T, tc \in \mathit{TC}_{t} \tag{eq\_0023} \\
+  & y_{t,tp,tc} + y_{tp,t,tc} = 1 \qquad \forall t, tp \in T, tc \in TC_t \cap TC_{tp} \tag{eq\_0024} \\
+  & \mathit{cond}_{t,tp,tc} \cdot \left( \mathit{eU}_{t,tc} - M \cdot \left( 1 - y_{t,tp,tc} \right) \right) \leq \mathit{cond}_{t,tp,tc} \cdot \mathit{sU}_{tp,tc} \qquad \forall t, tp \in T, tc \in \mathit{TC}_{t} \cap \mathit{TC}_{tp} \tag{eq\_0025} \\
+  & \mathit{cond}_{t,tp,tc} \cdot \left( \mathit{eU}_{tp,tc} - \mathit{My}_{t,tp,tc} \right) \leq \mathit{cond}_{t,tp,tc} \cdot \mathit{sU}_{t,tc} \qquad \forall t, tp \in T, tc \in \mathit{TC}_{t} \cap \mathit{TC}_{tp} \tag{eq\_0026} \\
+  & \mathit{ul}_{t , r , \mathit{tc}} = \underset{\mathit{tc}^{'} \in \mathit{TC} \left(\mathit{ref}_{r , \mathit{tc}} , \mathit{tc} , r\right)}{\sum} \mathit{rt}_{r , \mathit{ty}_{t} , \mathit{tc}^{'}} \cdot x_{t , r} + \underset{\genfrac{}{}{0pt}{}{\mathit{tc}^{'} \in \mathit{TC} \left(\mathit{ref}_{r , \mathit{tc}} , \mathit{tc} , r\right) :}{\mathit{bs}_{r , \mathit{tc}^{'}} \neq \mathit{bs}_{r , s_{r , \mathit{tc}^{'}}}}}{\sum} d_{t , r , \mathit{tc}^{'}} + \left(\mathit{ct}_{r , \mathit{ty}_{t} , \mathit{tc}} + \mathit{for}_{\mathit{bs}_{r , \mathit{tc}}} + \mathit{rel}_{\mathit{bs}_{r , \mathit{tc}}}\right) x_{t , r} \tag{eq\_0027} \\
+  & \mathit{eU}_{t , \mathit{tc}} \geq \underset{\genfrac{}{}{0pt}{}{r \in R_{t} :}{\mathit{tc} \in \mathit{TC}^{r}}}{\sum} o_{t , r , s_{r , \mathit{refEnd}_{r , \mathit{tc}}}} + \left(\mathit{ct}_{r , \mathit{ty}_{t} , \mathit{refEnd}_{r , \mathit{tc}}} + \mathit{rel}_{\mathit{bs}_{r , \mathit{tc}}}\right) x_{t , r} \forall t \in T , \mathit{tc} \in \mathit{TC}_{t} . \tag{eq\_0028} \\
+\end{align}

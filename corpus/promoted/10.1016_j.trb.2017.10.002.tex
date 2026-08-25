@@ -1,0 +1,84 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.10.002
+%@ meta id=10.1016_j.trb.2017.10.002 family=milp schema=0.1.0
+%@ name :: A microscopic model for optimal train short-turnings during complete blockages
+%@ desc :: Mined from A microscopic model for optimal train short-turnings during complete blockages (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.10.002
+%@ prov reference :: A microscopic model for optimal train short-turnings during complete blockages
+%@ prov author :: Nadjla Ghaemi; Oded Cats; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of delays and cancelled services
+%@ var c shape=V domain=binary role=primary :: Binary variable indicating cancellation of service
+%@ var d shape=V domain=non_negative role=primary :: Delay of service
+%@ index V ordered=0 cyclic=0 :: Set of all train services
+%@ index v ordered=0 cyclic=0 :: Index for train services
+%@ index Pair ordered=0 cyclic=0 :: Set of pairs of services for short-turning
+%@ index j ordered=0 cyclic=0 :: Index for scheduled departure in a line
+%@ index l ordered=0 cyclic=0 :: Index for line
+%@ index R ordered=0 cyclic=0 :: Set of routes for a service
+%@ var e shape=V,R,S domain=non_negative role=primary :: Entrance time of train on track section
+%@ index H ordered=0 cyclic=0 :: Set of short-turning stations
+%@ param M shape=- kind=big_m :: Big M constant
+%@ var x shape=R,V domain=binary role=primary :: Binary variable indicating route selection
+%@ index P ordered=0 cyclic=0 :: Set of platforms
+%@ index s ordered=0 cyclic=0 :: Index for track sections
+%@ var b shape=V,S domain=non_negative role=primary :: Start or end blocking time
+%@ index f ordered=0 cyclic=0 :: Function indicating rolling stock connection
+%@ index p ordered=0 cyclic=0 :: Previous track section function
+%@ index S ordered=0 cyclic=0 :: Set of track sections
+%@ param t shape=- kind=scalar :: Running, clearance, or release time
+%@ index q ordered=0 cyclic=0 :: Reservation track section function
+%@ index I ordered=0 cyclic=0 :: Set of interlocking sections
+%@ index O ordered=0 cyclic=0 :: Set of open track sections
+%@ var y shape=V,V,S domain=binary role=primary :: Binary variable for ordering trains on track section
+%@ con eq_0002 kind=linear :: Ensure every approaching service short-turns at one of the short-turning stations
+%@ con eq_0003 kind=linear :: Scheduled opposite-direction service is either formed by a short-turn or cancelled
+%@ con eq_0004 kind=linear :: Cancelling a scheduled service forces cancellation of all later services in the line
+%@ con eq_0005 kind=linear :: Short-turn at the secondary short-turning station cancels the following same-direction service
+%@ con eq_0006 kind=linear :: A short-turned departure requires cancellation of the preceding service
+%@ con eq_0007 kind=big_m :: Enforce the minimum short-turning time between paired services
+%@ con eq_0008 kind=big_m :: Departure route of a short-turned train uses the platform selected by its arrival route
+%@ con eq_0009 kind=big_m :: Arrival route of a short-turned train uses the platform selected by its departure route
+%@ con eq_0010 kind=big_m :: Keep the platform track occupied during a short-turn by ordering the blocking times
+%@ con eq_0011 kind=linear :: Each running service selects exactly one route; cancelled services select no route
+%@ con eq_0012 kind=big_m :: Force zero entrance times on track sections of unselected routes
+%@ con eq_0013 kind=linear :: Entrance time on the selected route is at least the scheduled departure time
+%@ con eq_0014 kind=linear :: Propagate entrance times along the selected route using running times
+%@ con eq_0015 kind=linear :: Compute arrival delay as actual arrival minus scheduled arrival for running services
+%@ con eq_0016 kind=big_m :: Enforce the minimum dwell time between rolling-stock-connected services
+%@ con eq_0017 kind=big_m :: Keep the platform block occupied during the dwell time of a connection
+%@ con eq_0018 kind=big_m :: Connected services use the same platform track (first direction)
+%@ con eq_0019 kind=big_m :: Connected services use the same platform track (second direction)
+%@ con eq_0020 kind=linear :: Define the start of blocking time for normal train movements
+%@ con eq_0021 kind=linear :: Define the start of blocking time after short-turning or dwelling
+%@ con eq_0022 kind=linear :: Set the end of blocking time in interlocking sections with sectional release
+%@ con eq_0023 kind=linear :: Set the end of blocking time on open track sections
+%@ con eq_0024 kind=ordering :: Choose a train order on each shared track section
+%@ con eq_0025 kind=big_m :: Prevent simultaneous occupation of a track section by two trains
+\begin{align}
+  \min\quad & \sum_{v \in V} \mathit{omega}_{v}^{c} \cdot c_{v} + \sum_{v \in V} \mathit{omega}_{v}^{d} \cdot d_{v} . \tag{eq\_0001} \\
+  & \begin{matrix} & \underset{\left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{v_{l , n}^{i} , \star}^{h} \cup \mathit{Pair}_{v_{l , n}^{i + 1} , \star}^{h}}{\sum} \mathit{lambda}_{v^{'} , v^{^{' '}}} = 1 , & & \forall v_{l , n}^{i} \in V_{h_{a^{'}}}^{'} , & \end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix} & \underset{\left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{\star , v_{l , m}^{j}} \cup \mathit{Pair}_{\star , v_{l , m}^{j - 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{^{' '}}} + c_{v_{l , m}^{j}} = 1 , & & \forall v_{l , m}^{j} \in V_{h_{a^{'}}}^{^{' '}} , & \end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix} & c_{v_{l , m}^{j}} ⩽ c_{v_{l , m}^{k + 1}} , & & \forall v_{l , m}^{j} \in V_{h_{a^{'}}}^{^{' '}} , k \in \left[j , \left|l\right| - 1\right] , & \end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix} & \underset{\left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{v_{l , n}^{i} , \star}}{\sum} \mathit{lambda}_{v^{'} , v^{^{' '}}} = c_{v_{l , n}^{i + 1}} , & & \forall v_{l , n}^{i} \in V_{h_{a^{'}}}^{'} , & \end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix} & \underset{\left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{\star , v_{l , m}^{j}}^{h}}{\sum} \mathit{lambda}_{v^{'} , v^{^{' '}}} + c_{v_{l , m}^{j}} = c_{v_{l , m}^{j - 1}} , & & \forall v_{l , m}^{j} \in V_{h_{a^{'}}}^{^{' '}} , & \end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix} & \left(1 - \mathit{lambda}_{v^{'} , v^{^{' '}}}\right) \cdot M + \underset{r \in R_{v^{^{' '}}}}{\sum} e_{v^{^{' '}} , r , s_{0}} ⩾ \underset{r \in R_{v^{'}}}{\sum} e_{v^{'} , r , s_{D}} + \mathit{theta}_{v , v^{'}}^{m i n} \cdot x_{r , v^{'}} , & & \forall \left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{h} , h \in H_{s h t} , & \end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix} & \underset{r \in R_{v^{'} , s}}{\sum} x_{r , v^{'}} ⩽ \underset{r \in R_{v^{^{' '}} , s}}{\sum} x_{r , v^{^{' '}}} + \left(1 - \mathit{lambda}_{v^{'} , v^{^{' '}}}\right) \cdot M , & & \forall \left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{h} , h \in H_{s h t} , s \in P , & \end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix} & \underset{r \in R_{v^{^{' '}} , s}}{\sum} x_{r , v^{^{' '}}} ⩽ \underset{r \in R_{v^{'} , s}}{\sum} x_{r , v^{'}} + \left(1 - \mathit{lambda}_{v^{'} , v^{^{' '}}}\right) \cdot M , & & \forall \left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{h} , h \in H_{s h t} , s \in P , & \end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix} & \underset{r \in R_{v^{^{' '}} , s} : p_{r , s} = s_{O}}{\sum} b_{v^{^{' '}} , s}^{s} < \underset{r \in R_{v^{'} , s} : f_{r , s} = s_{D}}{\sum} b_{v^{'} , s}^{e} + \left(1 - \mathit{lambda}_{v^{'} , v^{^{' '}}}\right) \cdot M , & & \forall \left(v^{'} , v^{^{' '}}\right) \in \mathit{Pair}_{h} , h \in H_{s h t} . & \end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix} & \sum_{r \in R_{v}} x_{r , v} + c_{v} = 1 , & & \forall v \in V , & \end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & e_{v , r , s} ⩽ M \cdot x_{r , v} , & & \forall v \in V , r \in R_{v} , s \in S_{r} , & \end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix} & e_{v , r , s} ⩾ \mathit{tau}_{v}^{d} \cdot x_{r , v} , & & \forall v \in V , r \in R_{v} , s \in S_{r} , & \end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & e_{v , r , s} = e_{v , r , p_{r , s}} + t_{v , r , p_{r , s}}^{r u n} \cdot x_{r , v} , & & \forall v \in V , r \in R_{v} , s \in S_{r} , & \end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & d_{v} = \sum_{r \in R_{v}} e_{v , r , s_{D}} - \mathit{tau}_{v}^{a} \cdot \left(1 - c_{v}\right) , & & \forall v \in V , & & \end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & c_{\hat{v}} \cdot M + \underset{r \in R_{\hat{v}}}{\sum} e_{\hat{v} , r , s_{O}} ⩾ \sum_{r \in R_{v}} e_{v , r , s_{D}} + \mathit{delta}_{v , \hat{v}} \cdot x_{r , v} , & & \forall v , \hat{v} \in V : f \left(v , \hat{v}\right) = 1 , & \end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & \underset{r \in R_{\hat{v} , s} : p_{r , s} = s_{O}}{\sum} b_{\hat{v} , s}^{s} - c_{\hat{v}} \cdot M ⩽ \sum_{r \in R_{v , s} : f_{r , s} = s_{D}} b_{v , s}^{e} + c_{v} \cdot M , & & \forall v , \hat{v} \in V : f \left(v , \hat{v}\right) = 1 , & \end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & \sum_{r \in R_{v , s}} x_{r , v} - c_{v} \cdot M ⩽ \underset{r \in R_{\hat{v} , s}}{\sum} x_{r , \hat{v}} + c_{\hat{v}} \cdot M , & & \forall v , \hat{v} \in V : f \left(v , \hat{v}\right) = 1 , s \in P , & \end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & \underset{r \in R_{\hat{v} , s}}{\sum} x_{r , \hat{v}} - c_{\hat{v}} \cdot M ⩽ \sum_{r \in R_{v , s}} x_{r , v} + c_{v} \cdot M , & & \forall v , \hat{v} \in V : f \left(v , \hat{v}\right) = 1 , s \in P . & \end{matrix} \tag{eq\_0019} \\
+  & \begin{aligned}b_{v , s}^{s} = \sum_{r \in R_{v , s}} \left(e_{v , r , q_{r , s}} - t^{r} \cdot x_{r , v}\right) , \\ \forall v \in V , s \in S_{v} : \left(v \notin V_{h}^{^{' '}} , h \in H_{s h t}\right) , \left(∄ \hat{v} \in V : f \left(v , \hat{v}\right) = 1\right) \lor \left(\forall r \in R_{v} : q_{r , s} \neq f_{r , s_{O}}\right) ,\end{aligned} \tag{eq\_0020} \\
+  & \begin{aligned}b_{v , s}^{s} ⩽ \sum_{r \in R_{v , s}} \left(e_{v , r , q_{r , s}} - t^{r} \cdot x_{r , v}\right) , \\ \forall v \in V , s \in S_{v} , : \left(v \in V_{h}^{^{' '}} , h \in H_{s h t}\right) , \left(\exists \hat{v} \in V : f \left(v , \hat{v}\right) = 1\right) , \left(\forall r \in R_{v} : q_{r , s} = f_{r , s_{O}}\right) ,\end{aligned} \tag{eq\_0021} \\
+  & \begin{matrix} & b_{v , s}^{e} = \sum_{r \in R_{v , s}} \left(e_{v , r , s} + \left(t_{v , r , s}^{r u n} + t^{c} + t^{s}\right) x_{r , v}\right) , & & \forall v \in V , s \in S \cdot I , & \end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix} & b_{v , s}^{e} ⩾ \sum_{r \in R_{v , s}} \left(e_{v , r , f_{r , u_{r , s}}} + \left(t^{c} + t^{s}\right) x_{r , v}\right) , & & \forall v \in V , s \in S \cdot O , & \end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & y_{v , \bar{v} , s} + y_{\bar{v} , v , s} = 1 , & & \forall \left(v , \bar{v}\right) \in V , s \in S_{v} \cap S_{\bar{v}} , & \end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix} & b_{\bar{v} , s}^{e} ⩽ b_{v , s}^{s} + M \cdot y_{v , \bar{v} , s} , & & \forall \left(v , \bar{v}\right) \in V : s \in S_{v} \cap S_{\bar{v}} . & \end{matrix} \tag{eq\_0025} \\
+\end{align}

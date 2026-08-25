@@ -1,0 +1,99 @@
+% Declaration sidecar for 10.1016_j.trc.2017.02.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2017.02.001
+% The multi-objective railway timetable rescheduling problem
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2017.02.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize passenger inconvenience z_p; operational and deviation costs are epsilon-constrained
+
+% n: classified as parameter during review
+%@ param n shape=G kind=vector :: Number of passengers in passenger group g
+
+% w: classified as variable during review
+%@ var w shape=G,A domain=binary role=primary :: Binary variable indicating if passenger group g uses arc a
+
+% z: classified as variable during review
+%@ var z shape=- domain=non_negative role=primary :: Objective values z_p, z_o, z_d and train cancelation variables z_i^k
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the network
+
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of passenger groups
+
+% c: classified as parameter during review
+%@ param c shape=A kind=vector :: Cost of using arc a
+
+% x: classified as variable during review
+%@ var x shape=K,A domain=binary role=primary :: Binary variable indicating if original train k uses arc a
+
+% y: classified as variable during review
+%@ var y shape=A domain=binary role=primary :: Binary variable indicating if emergency train uses arc a
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of original trains
+
+% unusable as an identifier, rename or drop: δ
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Arc index
+
+% d: classified as parameter during review
+%@ param d shape=K,A kind=matrix :: Delay of train k on arc a
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the network
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of shunting yards
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% unusable as an identifier, rename or drop: Ω
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar :: Capacity of a train
+
+% Bound by a quantifier or big operator, so no declaration of their own: g, i, k, p, r, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear :: Passenger inconvenience objective z_p
+%@ con eq_0003 kind=linear :: Operational cost objective z_o
+%@ con eq_0004 kind=linear :: Deviation cost objective z_d
+%@ con eq_0005 kind=linear :: Original trains leave their shunting yard exactly once
+%@ con eq_0006 kind=flow_balance :: Flow conservation for original trains with cancelation option
+%@ con eq_0007 kind=linear :: Cancelations forbidden at stations without shunting yard
+%@ con eq_0008 kind=capacity :: Emergency train availability at shunting yards
+%@ con eq_0009 kind=flow_balance :: Flow conservation for emergency trains
+%@ con eq_0010 kind=capacity :: At most one incoming train per node
+%@ con eq_0011 kind=capacity :: Conflict avoidance on conflicting arcs
+%@ con eq_0012 kind=flow_balance :: Passenger groups leave origin exactly once
+%@ con eq_0013 kind=flow_balance :: Passenger groups arrive at destination exactly once
+%@ con eq_0014 kind=flow_balance :: Passenger flow conservation
+%@ con eq_0015 kind=linear :: Passengers only use arcs operated by a train
+%@ con eq_0016 kind=capacity :: Train passenger capacity not exceeded

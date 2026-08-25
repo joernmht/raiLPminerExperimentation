@@ -1,0 +1,52 @@
+% Declaration sidecar for 10.1016_j.apm.2013.07.023
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.apm.2013.07.023
+% Balanced train timetabling on a single-line railway with optimized velocity
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.apm.2013.07.023.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize the delay-ratio F(V), defined as the ratio of total delay time to total free-run time.
+
+% v: classified as variable during review
+%@ var v shape=N domain=continuous role=primary drole=- lo=- hi=- :: Velocity of train i, decision variable in the model.
+
+% unusable as an identifier, rename or drop: Δ
+%@ param delta_v shape=- kind=scalar :: Pre-specified degree of velocity relaxation.
+% V: classified as variable during review
+%@ var V shape=N domain=continuous role=primary drole=- lo=- hi=- :: Velocity vector for all trains (components v_i).
+
+% T: classified as variable during review
+%@ var T shape=N domain=continuous role=primary drole=- lo=- hi=- :: Time functions T_i^ob(v_i,V) and T_i^f(v_i,V): arrival time and free-run time of train i.
+
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Delay-ratio objective function F(V).
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of trains under consideration.
+
+% Bound by a quantifier or big operator, so no declaration of their own: i
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Lower bound of velocity relaxation: v_i >= v_i^c - delta_v.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Upper bound of velocity relaxation: v_i <= v_i^c + delta_v.
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Definition of the delay-ratio objective F(V) as the ratio of total delay time to total free-run time.

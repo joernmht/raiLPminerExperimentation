@@ -1,0 +1,153 @@
+% Declaration sidecar for 10.1016_j.asoc.2011.08.026
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.asoc.2011.08.026
+% The periodicity and robustness in a single-track train scheduling problem
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.asoc.2011.08.026.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: maximize the satisfaction degree
+
+% unusable as an identifier, rename or drop: λ
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: index for machines/block sections
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: required processing/travelling time
+
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=- :: operation index or capacity
+
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: completion time of job on machine
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: set of machines/block sections
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: set of jobs/trains
+
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: schedule or set
+
+% precedes: classified as parameter during review
+%@ param precedes shape=- kind=scalar domain=- :: precedence relation
+
+% P̄: classified as parameter during review
+%@ param P_bar shape=- kind=scalar domain=- :: upper bound of fuzzy due date
+
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar domain=- :: planned completion time of job
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: fuzzy buffer time
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: a big number
+
+% q̄: classified as parameter during review
+%@ param q_bar shape=- kind=scalar domain=- :: upper bound of fuzzy buffer time
+
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: binary precedence variable
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: fuzzy delivery time
+
+% del: classified as variable during review
+%@ var del shape=- domain=continuous role=primary drole=- lo=- hi=- :: delivery time of job
+
+% d̄: classified as parameter during review
+%@ param d_bar shape=- kind=scalar domain=- :: upper bound of fuzzy delivery time
+
+% unusable as an identifier, rename or drop: π
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: time period
+
+% z: classified as variable during review
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: periodic offset
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: stopping time
+
+% t̄: classified as parameter during review
+%@ param t_bar shape=- kind=scalar domain=- :: acceleration time
+
+% unusable as an identifier, rename or drop: δ
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: number of trains
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: combination operator
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: set of trains
+
+% unusable as an identifier, rename or drop: ρ
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: train index
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: headway time
+
+% h̄: classified as parameter during review
+%@ param h_bar shape=- kind=scalar domain=- :: upper bound of headway
+
+% Bound by a quantifier or big operator, so no declaration of their own: h, i, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0005 kind=linear domain=- indicator=- :: fuzzy decision membership constraint
+%@ con eq_0006 kind=linear domain=- indicator=- :: crisp equivalent of fuzzy decision
+%@ con eq_0007 kind=linear domain=- indicator=- :: satisfaction degree objective constraint
+%@ con eq_0008 kind=linear domain=- indicator=- :: precedence constraint for operations
+%@ con eq_0009 kind=linear domain=- indicator=- :: fuzzy due date constraint
+%@ con eq_0010 kind=linear domain=- indicator=- :: fuzzy buffer between operations on same machine
+%@ con eq_0012 kind=linear domain=- indicator=- :: reverse fuzzy buffer between operations
+%@ con eq_0013 kind=linear domain=- indicator=- :: fuzzy delivery time interval constraint
+%@ con eq_0014 kind=linear domain=- indicator=- :: reverse fuzzy delivery time interval
+%@ con eq_0015 kind=linear domain=- indicator=- :: periodic event scheduling constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: integer reformulation of periodic constraint
+%@ con eq_0017 kind=linear domain=- indicator=- :: periodic precedence with travelling time
+%@ con eq_0018 kind=linear domain=- indicator=- :: periodic fuzzy buffer lower bound
+%@ con eq_0019 kind=linear domain=- indicator=- :: periodic fuzzy buffer upper bound
+%@ con eq_0020 kind=linear domain=- indicator=- :: periodic fuzzy delivery time lower bound
+%@ con eq_0021 kind=linear domain=- indicator=- :: periodic fuzzy delivery time upper bound
+%@ con eq_0022 kind=linear domain=- indicator=- :: acceleration and deceleration time constraint
+%@ con eq_0023 kind=linear domain=- indicator=- :: fuzzy buffer with acceleration/deceleration lower bound
+%@ con eq_0024 kind=linear domain=- indicator=- :: fuzzy buffer with acceleration/deceleration upper bound
+%@ con eq_0025 kind=linear domain=- indicator=- :: train meet detection constraint
+%@ con eq_0026 kind=linear domain=- indicator=- :: reverse train meet detection constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: simultaneous meet counting constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: station capacity constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: headway constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: headway constraint with acceleration/deceleration
+%@ con eq_0036 kind=linear domain=- indicator=- :: fuzzy headway lower bound constraint
+%@ con eq_0037 kind=linear domain=- indicator=- :: fuzzy headway upper bound constraint
+%@ con eq_0038 kind=linear domain=- indicator=- :: fuzzy headway with acceleration/deceleration constraint
+%@ var lambda shape=- domain=continuous role=variable drole=- lo=- hi=- :: Lagrange multiplier
+%@ var pi shape=- domain=continuous role=variable drole=- lo=- hi=- :: potential variable
+%@ var z_prime shape=- domain=continuous role=variable drole=- lo=- hi=- :: auxiliary binary variable prime
+%@ param P_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of P
+%@ param q_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of q
+%@ param d_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of d
+%@ index u_prime shape=- domain=- role=index drole=- lo=- hi=- :: primed station index
+%@ index k_prime shape=- domain=- role=index drole=- lo=- hi=- :: primed event index

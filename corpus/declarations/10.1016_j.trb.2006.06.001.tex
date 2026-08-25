@@ -1,0 +1,147 @@
+% Declaration sidecar for 10.1016_j.trb.2006.06.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2006.06.001
+% N-tracked railway traffic re-scheduling during disturbances
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2006.06.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimise total final delay (1a) or weighted delay cost (1b)
+
+% z: classified as variable during review
+%@ var z shape=k domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event k
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Event index
+
+% x: classified as variable during review
+%@ var x shape=k domain=non_negative role=primary drole=- lo=- hi=- :: Start or end time of event k
+
+% K: classified as parameter during review
+%@ param K shape=T kind=vector domain=- :: Set of events for train i
+
+% n: classified as parameter during review
+%@ param n shape=T kind=vector domain=- :: Last event index for train i
+
+% E: classified as parameter during review
+%@ param E shape=- kind=scalar domain=- :: Set of all events
+
+% d: classified as parameter during review
+%@ param d shape=k kind=vector domain=- :: Minimum running time for event k
+
+% b: classified as parameter during review
+%@ param b shape=k kind=vector domain=- :: Earliest start time or static start time for event k
+
+% h: classified as parameter during review
+%@ param h shape=k kind=vector domain=- :: Indicator if event k has a planned stop
+
+% e: classified as parameter during review
+%@ param e shape=k kind=vector domain=- :: Initial or static end time for event k
+
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Set of segments
+
+% L: classified as parameter during review
+%@ param L shape=j kind=vector domain=- :: Set of events on segment j
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Segment index
+
+% q: classified as variable during review
+%@ var q shape=k,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k uses track t
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of tracks on segment j
+
+% k̂: classified as index during review
+%@ index k_hat ordered=0 cyclic=0 :: Another event index
+
+% unusable as an identifier, rename or drop: γ
+%@ var gamma shape=k,k_hat domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k occurs before event k_hat as in initial timetable
+
+% unusable as an identifier, rename or drop: λ
+%@ var lambda shape=k,k_hat domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k is re-scheduled after event k_hat
+
+% o: classified as parameter during review
+%@ param o shape=k kind=vector domain=- :: Train origin for event k
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant
+
+% unusable as an identifier, rename or drop: Δ
+%@ param Delta shape=j kind=vector domain=- :: Minimum headway time between events on segment j
+
+% g: classified as parameter during review
+%@ param g shape=k,k_bar kind=matrix domain=- :: Connection time (or train/track attribute, overloaded)
+
+% w: classified as parameter during review
+%@ param w shape=T kind=vector domain=- :: Threshold delay for train i
+
+% unusable as an identifier, rename or drop: ε
+%@ var epsilon shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train i has delay larger than w_i
+
+% k̄: classified as index during review
+%@ index k_bar ordered=0 cyclic=0 :: Another event index for connections
+
+% unusable as an identifier, rename or drop: Ω
+%@ param Omega shape=- kind=scalar domain=- :: Set of events of disturbed train
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Succession of consecutive events of a train
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum running time for each event
+%@ con eq_0006 kind=linear domain=- indicator=- :: Earliest start time after planned stop
+%@ con eq_0007 kind=linear domain=- indicator=- :: Fix start times of events already started
+%@ con eq_0008 kind=linear domain=- indicator=- :: Fix end times of events already ended
+%@ con eq_0009 kind=linear domain=- indicator=- :: Define delay of event k
+%@ con eq_0010 kind=capacity domain=- indicator=- :: Each event assigned exactly one track on its segment
+%@ con eq_0011 kind=linear domain=- indicator=- :: Track conflict resolved by ordering variables
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Headway when event k before k_hat, different origins
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Headway when event k before k_hat, same origin
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Headway when event k re-scheduled after k_hat, different origins
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Headway when event k re-scheduled after k_hat, same origin
+%@ con eq_0016 kind=ordering domain=- indicator=- :: Ordering variables mutually exclusive
+%@ con eq_0017 kind=capacity domain=- indicator=- :: Train/track compatibility
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Activate epsilon_i if final delay exceeds threshold
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum connection time between connecting events
+%@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegativity of event times and delays
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary ordering variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary track assignment variables
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary delay-threshold variables
+%@ con eq_0024 kind=ordering domain=- indicator=- :: Initial train sequence maintained (Strategy 1)
+%@ con eq_0025 kind=ordering domain=- indicator=- :: Disallow reordered overtaking (Strategy 1)
+%@ con eq_0026 kind=ordering domain=- indicator=- :: Limit reordering around disturbed train (Strategy 3)
+%@ con eq_0027 kind=ordering domain=- indicator=- :: Swaps only with events following disturbed train (Strategy 3)
+%@ index khat set=L_j
+%@ index kbar shape=- domain=- role=index drole=- lo=- hi=- :: bar k
+%@ var xbegin shape=- domain=continuous role=variable drole=- lo=- hi=- :: begin time
+%@ var xend shape=- domain=continuous role=variable drole=- lo=- hi=- :: end time
+%@ param binitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial b
+%@ param einitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial e
+%@ param gtrain shape=- domain=- role=parameter drole=- lo=- hi=- :: train capacity g
+%@ param gtrack shape=- domain=- role=parameter drole=- lo=- hi=- :: track capacity g
+%@ param gconn shape=- domain=- role=parameter drole=- lo=- hi=- :: connection time g
+%@ param Econn shape=- domain=- role=set drole=- lo=- hi=- :: connection set

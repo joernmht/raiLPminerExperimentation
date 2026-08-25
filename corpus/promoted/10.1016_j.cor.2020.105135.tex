@@ -1,0 +1,107 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2020.105135
+%@ meta id=10.1016_j.cor.2020.105135 family=milp schema=0.1.0
+%@ name :: Real-time optimization strategy for single-track high-speed train rescheduling with disturbance uncertainties: A scenario-based chance-constrained model predictive control approach
+%@ desc :: Mined from Real-time optimization strategy for single-track high-speed train rescheduling with disturbance uncertainties: A scenario-based chance-constrained model predictive control approach (Computers & Operations Research, 2020).
+%@ prov source :: 10.1016/j.cor.2020.105135
+%@ prov reference :: Real-time optimization strategy for single-track high-speed train rescheduling with disturbance uncertainties: A scenario-based chance-constrained model predictive control approach
+%@ prov author :: Huimin Zhang; Shukai Li; Yanhui Wang; Yihui Wang; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index N ordered=0 cyclic=0 :: Number of trains (summation bound)
+%@ index E ordered=0 cyclic=0 :: Set of train types
+%@ index L ordered=0 cyclic=0 :: Set of speed limitation sections
+%@ index THETA ordered=0 cyclic=0 :: Set of scenarios
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted normalized positive/negative arrival delays, departure delays, and dwelling plan change penalty
+%@ param Y shape=T,S kind=matrix domain=binary :: Binary parameter indicating scheduled dwelling or virtual station
+%@ param tau shape=T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
+%@ param omega shape=T,S kind=matrix domain=- :: Predictive disturbance for dwelling or running time (renamed from ω)
+%@ param M shape=- kind=big_m domain=- :: Large positive number for linearization
+%@ param Z shape=T,E kind=matrix domain=binary :: Binary parameter indicating train type
+%@ param H shape=L,S kind=matrix domain=- :: Speed limitation time horizon
+%@ param Td shape=T,S kind=matrix domain=- :: Planned departure time of train i at station s
+%@ param C shape=S kind=vector domain=- :: Capacity of station s
+%@ param Ta shape=T,S kind=matrix domain=- :: Scheduled arrival time of train i at station s
+%@ param alpha shape=- kind=scalar domain=- :: Weight for positive arrival delay (renamed from α)
+%@ param beta shape=- kind=scalar domain=- :: Weight for negative arrival delay (renamed from β)
+%@ param gamma shape=- kind=scalar domain=- :: Weight for departure delay (renamed from γ)
+%@ param delta shape=- kind=scalar domain=- :: Weight for dwelling plan change penalty (renamed from δ)
+%@ param g shape=- kind=scalar domain=- :: Function representing constraint violation
+%@ param P shape=THETA kind=vector domain=- :: Probability of scenario
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant for linearization (renamed from ε)
+%@ param m shape=- kind=scalar domain=- :: Lower bound for linearization
+%@ param Mu shape=- kind=scalar domain=- :: Upper bound for linearization
+%@ param mu shape=- kind=scalar domain=- :: Lower bound for linearization
+%@ var u shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or order of arrival/departure
+%@ var ta shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time of train i at station s
+%@ var td shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time of train i from station s
+%@ var x shape=T,T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
+%@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ var da shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Positive or negative arrival delay
+%@ var dd shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure delay
+%@ var f shape=L,THETA domain=non_negative role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for linearization of chance constraints
+%@ var I shape=THETA domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating scenario satisfaction
+%@ con eq_0001 kind=linear domain=- indicator=- :: Dwelling plan change constraint (1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Minimum dwelling time constraint with disturbance (2)
+%@ con eq_0003 kind=big_m domain=- indicator=- :: Upper bound dwelling time constraint (3)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time constraint for train maximum speed (4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upper bound running time under speed limitation (5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Lower bound running time under speed limitation (6)
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint (7)
+%@ con eq_0008 kind=headway domain=- indicator=- :: Departure headway constraint (8)
+%@ con eq_0009 kind=headway domain=- indicator=- :: Departure-arrival headway constraint (9)
+%@ con eq_0010 kind=headway domain=- indicator=- :: Departure-arrival headway constraint (10)
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Arrival order symmetry constraint (11)
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Departure order symmetry constraint (12)
+%@ con eq_0013 kind=ordering domain=- indicator=- :: Overtaking within section constraint (13)
+%@ con eq_0014 kind=ordering domain=- indicator=- :: No overtaking at virtual stations constraint (14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Timetable no-early-departure constraint (15)
+%@ con eq_0016 kind=capacity domain=- indicator=- :: Station capacity constraint (16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Objective term J1 positive arrival delay definition (17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Positive arrival delay lower bound (18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Positive arrival delay nonnegativity (19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Objective term J2 negative arrival delay definition (20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Negative arrival delay lower bound (21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Negative arrival delay nonnegativity (22)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Objective term J3 departure delay definition (23)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Departure delay definition (24)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Objective term J4 dwelling plan change penalty (25)
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Linearization constraint for auxiliary variable f (36)
+%@ con eq_0037 kind=big_m domain=- indicator=- :: Scenario-based chance constraints with dwelling plan changes (37)
+%@ con eq_0038 kind=big_m domain=- indicator=- :: Scenario-based chance constraints without dwelling plan changes (38)
+%@ con eq_0045 kind=linear domain=- indicator=- :: Linearized speed limitation stage model constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Linearized non-speed-limitation stage model constraint
+\begin{align}
+  & u_{i , s}^{d} \leq \left(1 - Y_{i , s}^{1}\right) \left(1 - Y_{s}^{2}\right) , s \in S_{i} , i \in T . \tag{eq\_0001} \\
+  & \mathit{td}_{i , s} - \mathit{ta}_{i , s} \geq \left(Y_{i , s}^{1} + u_{i , s}^{d}\right) \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) , s \in S_{i} , i \in T , \tag{eq\_0002} \\
+  & \mathit{td}_{i , s} - \mathit{ta}_{i , s} \leq M \left(Y_{i , s}^{1} + u_{i , s}^{d}\right) , s \in S_{i} , i \in T , \tag{eq\_0003} \\
+  & \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} \geq \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i} , i \in T , \tag{eq\_0004} \\
+  & \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} \leq \mathit{tau}_{\mathit{max} , i , s} - \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i , l} , i \in T , \mathit{td}_{i , s} \in H_{l , s} , \tag{eq\_0005} \\
+  & \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} \geq \mathit{tau}_{\mathit{min} , i , s} + \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i , l} , i \in T , \mathit{td}_{i , s} \in H_{l , s} , \tag{eq\_0006} \\
+  & \mathit{ta}_{j , s} - \mathit{ta}_{i , s} \geq \sum_{e} \mathit{tau}_{h , e}^{a} \cdot Z_{j}^{e} - M \left(1 - x_{i , j , s}^{a}\right) , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0007} \\
+  & \mathit{td}_{j , s} - \mathit{td}_{i , s} \geq \sum_{e} \mathit{tau}_{h , e}^{d} \cdot Z_{j}^{e} - M \left(1 - x_{i , j , s}^{d}\right) , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0008} \\
+  & \mathit{td}_{j , s} - \mathit{ta}_{i , s} \geq \mathit{tau}_{h , s}^{\mathit{ad}} - \left(1 - u_{i , j , s}\right) M , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0009} \\
+  & \mathit{ta}_{i , s} - \mathit{td}_{j , s} \geq \mathit{tau}_{h , s}^{\mathit{ad}} - u_{i , j , s} \cdot M , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0010} \\
+  & x_{i , j , s}^{a} + x_{j , i , s}^{a} = 1 , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0011} \\
+  & x_{i , j , s}^{d} + x_{j , i , s}^{d} = 1 , s \in S_{i , j} , i , j \in T , i \neq j . \tag{eq\_0012} \\
+  & x_{i , j , s + 1}^{a} = x_{i , j , s}^{d} , s , s + 1 \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0013} \\
+  & Y_{s}^{2} \left(x_{i , j , s}^{a} - x_{i , j , s}^{d}\right) = 0 , s \in S_{i , j} , i , j \in T , i \neq j . \tag{eq\_0014} \\
+  & \mathit{td}_{i , s} \geq \mathit{Td}_{i , s} \cdot Y_{i , s}^{1} , s \in S_{i} , i \in T , \tag{eq\_0015} \\
+  & \sum_{j = 1 , i \neq j}^{N} \left(u_{i , j , s} - x_{i , j , s}^{a}\right) \leq C_{s} - 1 , s \in S_{i , j} , i , j \in T , i \neq j , \tag{eq\_0016} \\
+  & J_{1} = \sum_{i} \sum_{s \in S_{i}} \mathit{da}_{i , s}^{+} , \tag{eq\_0017} \\
+  & \mathit{da}_{i , s}^{+} \geq \left(\mathit{ta}_{i , s} - \mathit{Ta}_{i , s}\right) Y_{i , s}^{1} , s \in S_{i} , i \in T , \tag{eq\_0018} \\
+  & \mathit{da}_{i , s}^{+} \geq 0 , s \in S_{i} , i \in T , \tag{eq\_0019} \\
+  & J_{2} = \sum_{i} \sum_{s \in S_{i}} \mathit{da}_{i , s}^{-} , \tag{eq\_0020} \\
+  & \mathit{da}_{i , s}^{-} \geq \left(\mathit{Ta}_{i , s} - \mathit{ta}_{i , s}\right) Y_{i , s}^{1} , s \in S_{i} , i \in T , \tag{eq\_0021} \\
+  & \mathit{da}_{i , s}^{-} \geq 0 , s \in S_{i} , i \in T . \tag{eq\_0022} \\
+  & J_{3} = \sum_{i} \sum_{s \in S_{i}} \mathit{dd}_{i , s} , \tag{eq\_0023} \\
+  & \mathit{dd}_{i , s} = \left(\mathit{td}_{i , s} - \mathit{Td}_{i , s}\right) Y_{i , s}^{1} , s \in S_{i} , i \in T . \tag{eq\_0024} \\
+  & J_{4} = \sum_{i} \sum_{s \in S_{i}} u_{i , s}^{d} . \tag{eq\_0025} \\
+  \min\quad & \mathit{alpha} \frac{J_{1} - J_{1 , min}}{J_{1 , max} - J_{1 , min}} + \mathit{beta} \frac{J_{2} - J_{2 , min}}{J_{2 , max} - J_{2 , min}} + \mathit{gamma} \frac{J_{3} - J_{3 , min}}{J_{3 , max} - J_{3 , min}} + \mathit{delta} \frac{J_{4} - J_{4 , min}}{J_{4 , max} - J_{4 , min}} , \tag{eq\_0026} \\
+  & \left\{\begin{matrix} & f_{l , \mathit{varphi}} = g_{2} \left(x , \mathit{omega} , \mathit{varphi}\right) , \\ & f_{l , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) \\ \end{matrix}\right \tag{eq\_0036} \\
+  & \left\{\begin{matrix} & \sum_{\mathit{varphi} \in {\mathit{theta}}_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = \left(Y_{i , s}^{1} + u_{i , s}^{d}\right) \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{3 , \mathit{varphi}} = \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} - \mathit{tau}_{\mathit{max} , i , s} - \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{4 , \mathit{varphi}} = \mathit{tau}_{\mathit{min} , i , s} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{3 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{4 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \end{matrix}\right \tag{eq\_0037} \\
+  & \left\{\begin{matrix} & \sum_{\mathit{varphi} \in {\mathit{theta}}_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = Y_{i , s}^{1} \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in {\mathit{theta}}_{k} \end{matrix}\right \tag{eq\_0038} \\
+  & \left\{\begin{matrix} & f \left(x\right) \leq M \left(1 - u\right) , \\ & f \left(x\right) \geq \mathit{epsilon} + \left(m - \mathit{epsilon}\right) u \end{matrix}\right \tag{eq\_0045} \\
+  & \left\{\begin{matrix} & Z \leq \mathit{Mu} , \\ & Z \geq \mathit{mu} , \\ & Z \leq f \left(x\right) - m \left(1 - u\right) , \\ & Z \geq f \left(x\right) - M \left(1 - u\right) . \end{matrix}\right \tag{eq\_0046} \\
+\end{align}

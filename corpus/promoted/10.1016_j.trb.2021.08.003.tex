@@ -1,0 +1,151 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2021.08.003
+%@ meta id=10.1016_j.trb.2021.08.003 family=milp schema=0.1.0
+%@ name :: Real-time integrated train rescheduling and rolling stock circulation planning for a metro line under disruptions
+%@ desc :: Mined from Real-time integrated train rescheduling and rolling stock circulation planning for a metro line under disruptions (Transportation Research Part B Methodological, 2021).
+%@ prov source :: 10.1016/j.trb.2021.08.003
+%@ prov reference :: Real-time integrated train rescheduling and rolling stock circulation planning for a metro line under disruptions
+%@ prov author :: Yihui Wang; Kangqi Zhao; Andrea D’Ariano; Ru Niu; Shukai Li; Xiaojie Luan
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of normalized timetable deviation, cancellation, and headway deviation.
+%@ index I ordered=1 cyclic=0 :: Set of all stations on the metro line.
+%@ index P ordered=1 cyclic=0 :: Set of turnaround stations.
+%@ index F ordered=1 cyclic=0 :: Set of train services in the up direction.
+%@ index i ordered=1 cyclic=0 :: Station index.
+%@ index p ordered=1 cyclic=0 :: Turnaround station index.
+%@ var x shape=F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between turnaround stations.
+%@ var y shape=F,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between consecutive stations.
+%@ index G ordered=1 cyclic=0 :: Set of train services in the down direction.
+%@ var a shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service at station.
+%@ var d shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train service from station.
+%@ var r shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train service between stations.
+%@ var w shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train service at station.
+%@ var t shape=G,P domain=non_negative role=primary drole=- lo=- hi=- :: Turnaround time of train service at turnaround station.
+%@ param o shape=F,P kind=matrix domain=- :: Time when rolling stock comes out from depot.
+%@ var c shape=F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train service operates at turnaround station.
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between trains.
+%@ param N shape=- kind=scalar domain=- :: Number of rolling stocks in depot at disruption.
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value.
+%@ var z shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for linearization.
+%@ index L ordered=1 cyclic=0 :: Set of predecessor train services.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Relates up-direction segment operation y to turnaround-station operation x.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Relates down-direction segment operation y to turnaround-station operation x.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Defines arrival time at normal station in up direction.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Defines arrival time at normal station in down direction.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Bounds running time between consecutive stations in up direction.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Bounds running time between consecutive stations in down direction.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Defines departure time from normal station in up direction.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Defines departure time from normal station in down direction.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds dwell time at normal station in up direction.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Bounds dwell time at normal station in down direction.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Defines arrival time at turnaround station when service operates the preceding segment.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Defines arrival time at turnaround station when service is connected from down direction.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Bounds turnaround time at turnaround station.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Defines arrival time at depot-connected station when rolling stock comes from depot.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Defines arrival time at depot-connected station for all three rolling-stock origins.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Defines arrival time at non-depot turnaround station for the two rolling-stock origins.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Defines departure time from turnaround station when service continues to next segment.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Defines departure time from non-depot turnaround station when service turns around.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Defines departure time from depot-connected station when rolling stock returns to depot.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Defines departure time from depot-connected station for all three destinations.
+%@ con eq_0028 kind=headway domain=- indicator=- :: Enforces minimum headway between a service and its predecessors.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Ensures each up-direction service is connected to at most one down-direction successor.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Balances operation and down-direction connection at non-depot turnaround station.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Balances operation, connection, and depot return at depot-connected turnaround station.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Balances arriving predecessor and preceding segment at non-depot turnaround station.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Balances arriving predecessor, preceding segment, and depot origin at depot-connected station.
+%@ con eq_0035 kind=big_m domain=- indicator=- :: Big-M linearization of arrival-order indicator at depot station (upper bound).
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Big-M linearization of arrival-order indicator at depot station (lower bound).
+%@ con eq_0037 kind=linear domain=- indicator=- :: Limits depot departures by available rolling stock inventory.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Computes total timetable deviation component of objective.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Allow only cancellation of planned train services (no extra services).
+%@ con eq_0041 kind=linear domain=- indicator=- :: Computes cancellation component of objective.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Computes headway deviation component of objective.
+%@ con eq_0050 kind=big_m domain=- indicator=- :: Filtering constraint preventing short-turning at intermediate turnaround stations after blockage clearance.
+%@ con eq_0054_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0054_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0056 kind=big_m domain=- indicator=- :: Linearization of product of binary variables (Appendix A).
+%@ con eq_0057_a kind=big_m domain=- indicator=- :: Linearization of order-indicator constraints (Appendix A).
+%@ con eq_0057_b kind=big_m domain=- indicator=- :: Linearization of order-indicator constraints (Appendix A).
+%@ con eq_0058_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0058_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0058_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_d kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0062 kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_c kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_d kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_c kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_d kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0066 kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+\begin{align}
+  & y_{f , i , i + 1}^{up} = x_{f , p , p + 1}^{up} , \forall f \in \mathbf{F} , \forall p \in \mathbf{P} / \left\{P\right\} , i \in \left\{I_{p} , I_{p} + 1 , \ldots , I_{p + 1} - 1\right\} , \tag{eq\_0002} \\
+  & y_{g , i , i - 1}^{dn} = x_{g , p , p - 1}^{dn} , \forall g \in \mathbf{G} , \forall p \in \mathbf{P} / \left\{1\right\} , i \in \left\{I_{p} , I_{p} - 1 , \ldots , I_{p - 1} + 1\right\} . \tag{eq\_0003} \\
+  & a_{f , i}^{up} = y_{f , i - 1 , i}^{up} \left(d_{f , i - 1}^{up} + r_{f , i - 1 , i}^{up}\right) , \forall f \in \mathbf{F} , i \in \mathbf{I}_{norm} , \tag{eq\_0005} \\
+  & a_{g , i}^{dn} = y_{g , i + 1 , i}^{dn} \left(d_{g , i + 1}^{dn} + r_{g , i + 1 , i}^{dn}\right) , \forall g \in \mathbf{G} , i \in \mathbf{I}_{norm} , \tag{eq\_0006} \\
+  & r_{i - 1 , i}^{up , min} \leq r_{f , i - 1 , i}^{up} \leq r_{i - 1 , i}^{up , max} , \forall f \in \mathbf{F} , i \in \mathbf{I}_{norm} , \tag{eq\_0008} \\
+  & r_{i + 1 , i}^{dn , min} \leq r_{g , i + 1 , i}^{dn} \leq r_{i + 1 , i}^{dn , max} , \forall g \in \mathbf{G} , i \in \mathbf{I}_{norm} . \tag{eq\_0009} \\
+  & d_{f , i}^{up} = y_{f , i - 1 , i}^{up} \left(a_{f , i}^{up} + w_{f , i}^{up}\right) , \forall f \in \mathbf{F} , i \in \mathbf{I}_{norm} , \tag{eq\_0011} \\
+  & d_{g , i}^{dn} = y_{g , i + 1 , i}^{dn} \left(a_{g , i}^{dn} + w_{g , i}^{dn}\right) , \forall g \in \mathbf{G} , i \in \mathbf{I}_{norm} , \tag{eq\_0012} \\
+  & w_{i}^{up , min} \leq w_{f , i}^{up} \leq w_{i}^{up , max} , \forall f \in \mathbf{F} , i \in \mathbf{I}_{norm} , \tag{eq\_0014} \\
+  & w_{i}^{dn , min} \leq w_{g , i}^{dn} \leq w_{i}^{dn , max} , \forall g \in \mathbf{G} , i \in \mathbf{I}_{norm} . \tag{eq\_0015} \\
+  & a_{f , i}^{up} = y_{f , i - 1 , i}^{up} \left(d_{f , i - 1}^{up} + r_{f , i - 1 , i}^{up}\right) , \forall f \in \mathbf{F} , i \in \mathbf{I}_{turn} , \tag{eq\_0016} \\
+  & a_{f , i}^{up} = \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p}^{dn} \left(d_{g , i}^{dn} + t_{g , p}^{turn}\right) , \forall f \in \mathbf{F} , p \in \mathbf{P} , i \in \mathbf{I}_{turn} , \tag{eq\_0017} \\
+  & t_{p}^{turn,min} \leq t_{g , p}^{turn} \leq t_{p}^{turn,max} , \forall g \in \mathbf{G} , p \in \mathbf{P} . \tag{eq\_0018} \\
+  & a_{f , i_{d}}^{up} = \mathit{theta}_{f , p_{d}}^{up} \left(o_{f , p_{d}}^{up} + r_{i_{d}}\right) , \forall f \in \mathbf{F} , \tag{eq\_0019} \\
+  & a_{f , i_{d}}^{up} = y_{f , i_{d} - 1 , i_{d}}^{up} \left(d_{f , i_{d} - 1}^{up} + r_{f , i_{d} - 1 , i_{d}}^{up}\right) + \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p_{d}}^{dn} \left(d_{g , i_{d}}^{dn} + t_{g , p_{d}}^{turn}\right) + \mathit{theta}_{f , p_{d}}^{up} \left(o_{f , p_{d}}^{up} + r_{i_{d}}\right) , \forall f \in \mathbf{F} . \tag{eq\_0020} \\
+  & a_{f , i}^{up} = y_{f , i - 1 , i}^{up} \left(d_{f , i - 1}^{up} + r_{f , i - 1 , i}^{up}\right) + \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p}^{dn} \left(d_{g , i}^{dn} + t_{g , p}^{turn}\right) , \forall f \in \mathbf{F} , i \in \mathbf{I}_{turn} / \left\{i_{d}\right\} , p \in \mathbf{P} / \left\{p_{d}\right\} . \tag{eq\_0021} \\
+  & d_{f , i}^{up} = y_{f , i - 1 , i}^{up} \left(a_{f , i}^{up} + w_{f , i}^{up}\right) , \forall f \in \mathbf{F} , i \in \mathbf{I}_{turn} , \tag{eq\_0022} \\
+  & d_{f , i}^{up} = \sum_{g \in \mathbf{G}} \mathit{beta}_{f , g , p}^{up} \left(a_{f , i}^{up} + w_{f , i}^{up} + w_{p}^{cr}\right) , \forall f \in \mathbf{F} , p \in \mathbf{P} / \left\{p_{d}\right\} , i \in \mathbf{I}_{turn} / \left\{i_{d}\right\} . \tag{eq\_0023} \\
+  & d_{f , i_{d}}^{up} = \mathit{alpha}_{f , p_{d}}^{up} \left(a_{f , i_{d}}^{up} + w_{f , i_{d}}^{up} + w_{p}^{cr}\right) , \forall f \in \mathbf{F} . \tag{eq\_0024} \\
+  & d_{f , i_{d}}^{up} = y_{f , i_{d} , i_{d} + 1}^{up} \left(a_{f , i_{d}}^{up} + w_{f , i_{d}}^{up}\right) + \sum_{g \in G} \mathit{beta}_{f , g , p_{d}}^{up} \left(a_{f , i_{d}}^{up} + w_{f , i_{d}}^{up} + w_{p}^{cr}\right) + \mathit{alpha}_{f , p_{d}}^{up} \left(a_{f , i_{d}}^{up} + w_{f , i_{d}}^{up} + w_{p}^{cr}\right) , \forall f \in \mathbf{F} . \tag{eq\_0026} \\
+  & c_{f - \mathit{ell} , i}^{up} \cdot c_{f , i}^{up} \left(d_{f , i}^{up} - d_{f - \mathit{ell} , i}^{up}\right) \geq c_{f - \mathit{ell} , i}^{up} \cdot c_{f , i}^{up} \cdot h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , f - 1\right\} , \tag{eq\_0028} \\
+  & \sum_{g \in \mathbf{G}} \mathit{beta}_{f , g , p}^{up} \leq 1 , \forall f \in \mathbf{F} , p \in \mathbf{P} . \tag{eq\_0029} \\
+  & \sum_{g \in \mathbf{G}} \mathit{beta}_{f , g , p}^{up} + x_{f , p , p + 1}^{up} = c_{f , p}^{up} , \forall f \in \mathbf{F} , p \in \mathbf{P} , \tag{eq\_0030} \\
+  & \sum_{g \in \mathbf{G}} \mathit{beta}_{f , g , p_{d}}^{up} + x_{f , p_{d} , p_{d} + 1}^{up} + \mathit{alpha}_{f , p_{d}}^{up} = c_{f , p_{d}}^{up} , \forall f \in \mathbf{F} , \tag{eq\_0031} \\
+  & \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p}^{dn} + x_{f , p - 1 , p}^{up} = c_{f , p}^{up} , \forall f \in \mathbf{F} , p \in \mathbf{P} , \tag{eq\_0032} \\
+  & \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p_{d}}^{dn} + x_{f , p_{d} - 1 , p_{d}}^{up} + \mathit{theta}_{f , p_{d}}^{up} = c_{f , p_{d}}^{up} , \forall f \in \mathbf{F} , \tag{eq\_0033} \\
+  & a_{f^{'} , i_{d}}^{up} - a_{f , i_{d}}^{up} \leq a_{f}^{UB} \cdot \left(1 - \mathit{delta}_{f , f^{'}}^{up}\right) , \tag{eq\_0035} \\
+  & a_{f^{'} , i_{d}}^{up} - a_{f , i_{d}}^{up} \geq \mathit{epsilon} + \left(- a_{f}^{LB} - \mathit{epsilon}\right) \cdot \mathit{delta}_{f , f^{'}}^{up} , \tag{eq\_0036} \\
+  & \mathit{theta}_{f , p_{d}}^{up} \leq N_{p_{d}} - \sum_{f^{'} \in \mathbf{F}} \mathit{delta}_{f , f^{'} , p_{d}}^{up} \mathit{theta}_{f^{'} , p_{d}}^{up} - \sum_{g^{'} \in \mathbf{G}} \mathit{zeta}_{f , g^{'} , p_{d}}^{up} \mathit{theta}_{g^{'} , p_{d}}^{dn} + \sum_{f^{'} \in \mathbf{F}} \mathit{eta}_{f , f^{'} , p_{d}}^{up} \mathit{alpha}_{f^{'} , p_{d}}^{up} + \sum_{g^{'} \in \mathbf{G}} \mathit{pi}_{f , g^{'} , p_{d}}^{up} \mathit{alpha}_{g^{'} , p_{d}}^{dn} - 1 , \tag{eq\_0037} \\
+  & Z_{deviation} = \sum_{f \in \mathbf{F}} \sum_{i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. d_{f , i}^{up} - {d}_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}} \sum_{i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. d_{g , i}^{dn} - {d}_{g , i}^{dn} \left|\right. + \sum_{f \in \mathbf{F}} \sum_{i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. a_{f , i}^{up} - {a}_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}} \sum_{i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. a_{g , i}^{dn} - {a}_{g , i}^{dn} \left|\right. , \tag{eq\_0039} \\
+  & x_{f , p , p + 1}^{up} \leq {x}_{f , p , p + 1}^{up} , \forall f \in \mathbf{F} , p \in \left\{1 , 2 , \ldots , P - 1\right\} , \tag{eq\_0040} \\
+  & Z_{cancel} = \sum_{f \in \mathbf{F}} \sum_{p \in \mathbf{P} , p \neq P} \left({x}_{f , p , p + 1}^{up} - x_{f , p , p + 1}^{up}\right) + \sum_{g \in \mathbf{G}} \sum_{p \in \mathbf{P} , p \neq 1} \left({x}_{g , p , p - 1}^{dn} - x_{g , p , p - 1}^{dn}\right) . \tag{eq\_0041} \\
+  & Z_{headway} = \sum_{f \in \mathbf{F} , f \neq 1 , f \neq F} \sum_{i \in \mathbf{I} , i \neq 1} \left(y_{f - 1 , i - 1 , i}^{up} \cdot y_{f , i - 1 , i}^{up} \cdot y_{f + 1 , i - 1 , i}^{up} \left(d_{f + 1 , i}^{up} + d_{f - 1 , i}^{up} - 2 \cdot d_{f , i}^{up}\right)\right) + \sum_{g \in \mathbf{G} , g \neq 1 , g \neq G} \sum_{i \in \mathbf{I} , i \neq I} \left(y_{g - 1 , i + 1 , i}^{dn} \cdot y_{g , i + 1 , i}^{dn} \cdot y_{g + 1 , i + 1 , i}^{dn} \left(d_{g + 1 , i}^{dn} + d_{g - 1 , i}^{dn} - 2 \cdot d_{g , i}^{dn}\right)\right) , \tag{eq\_0043} \\
+  \min\quad & w_{1} \cdot \frac{Z_{deviation}}{Z_{deviation,nom}} + w_{2} \cdot \frac{Z_{cancel}}{Z_{cancel,nom}} + w_{3} \cdot \frac{Z_{headway}}{Z_{headway,nom}} , \tag{eq\_0045} \\
+  & r_{i_{r} , i_{r}^{'}}^{up} = \sum_{\mathit{ell} =_{r}^{'}}^{i_{r}^{'} - 1} r_{\mathit{ell} , \mathit{ell} + 1}^{up} + \sum_{\mathit{ell} = i_{r} + 1}^{i_{r}^{'} - 1} w_{\mathit{ell}}^{up} . \tag{eq\_0050} \\
+  & \mathit{beta}_{f , g , p}^{up} = \hat{\mathit{beta}}_{f , g , p}^{up} \tag{eq\_0054\_a} \\
+  & \mathit{beta}_{g , f , p}^{dn} = \hat{\mathit{beta}}_{g , f , p}^{dn} \tag{eq\_0054\_b} \\
+  & \mathit{beta}_{f , g , p}^{up} \left(t_{d,end} - d_{f , p}^{up}\right) \geq 0 , \forall f \in \mathbf{F} , g \in \mathbf{G} , p \in \mathbf{P} / \left\{1 , P\right\} . \tag{eq\_0056} \\
+  & {f} \left(x\right) \leq {F}_{max} \left(1 - {\mathit{theta}}\right) \tag{eq\_0057\_a} \\
+  & {f} \left(x\right) \geq \mathit{epsilon} + \left({F}_{min} - \mathit{epsilon}\right) {\mathit{theta}} . \tag{eq\_0057\_b} \\
+  & - {\mathit{theta}}_{1} + {\mathit{theta}}_{3} \leq 0 \tag{eq\_0058\_a} \\
+  & - {\mathit{theta}}_{2} + {\mathit{theta}}_{3} \leq 0 \tag{eq\_0058\_b} \\
+  & {\mathit{theta}}_{1} + {\mathit{theta}}_{2} - {\mathit{theta}}_{3} \leq 1 . \tag{eq\_0058\_c} \\
+  & {z} \leq {F}_{max} {\mathit{theta}} \tag{eq\_0059\_a} \\
+  & {z} \geq {F}_{min} {\mathit{theta}} \tag{eq\_0059\_b} \\
+  & {z} \leq {f} \left(x\right) - {F}_{min} \left(1 - {\mathit{theta}}\right) \tag{eq\_0059\_c} \\
+  & {z} \geq {f} \left(x\right) - {F}_{max} \left(1 - {\mathit{theta}}\right) . \tag{eq\_0059\_d} \\
+  & - c_{f - \mathit{ell} , i - 1 , i}^{up} + {c}_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_a} \\
+  & - c_{f , i - 1 , i}^{up} + {c}_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_b} \\
+  & c_{f - \mathit{ell} , i}^{up} + c_{f , i}^{up} - {c}_{f - \mathit{ell} , f , i}^{up} \leq 1 \tag{eq\_0060\_c} \\
+  & {c}_{f - \mathit{ell} , f , i}^{up} \left(d_{f , i}^{up} - d_{f - \mathit{ell} , i}^{up}\right) \geq {c}_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} . \tag{eq\_0062} \\
+  & {z}_{f , i}^{up} \leq {d}_{max} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_a} \\
+  & {z}_{f , i}^{up} \geq {d}_{min} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_b} \\
+  & {z}_{f , i}^{up} \leq d_{f , i}^{up} - {d}_{min} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_c} \\
+  & {z}_{f , i}^{up} \geq d_{f , i}^{up} - {d}_{max} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_d} \\
+  & {z}_{f , i}^{up} \leq {d}_{max} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_a} \\
+  & {z}_{f , i}^{up} \geq {d}_{min} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_b} \\
+  & {z}_{f , i}^{up} \leq d_{f - \mathit{ell} , i}^{up} - {d}_{min} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0064\_c} \\
+  & {z}_{f , i}^{up} \geq d_{f - \mathit{ell} , i}^{up} - {d}_{max} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) . \tag{eq\_0064\_d} \\
+  & {z}_{f , i}^{up} - {z}_{f - \mathit{ell} , i}^{up} \geq {c}_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} , \tag{eq\_0066} \\
+\end{align}

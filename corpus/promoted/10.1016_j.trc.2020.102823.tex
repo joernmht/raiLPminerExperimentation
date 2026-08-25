@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2020.102823
+%@ meta id=10.1016_j.trc.2020.102823 family=milp schema=0.1.0
+%@ name :: Simultaneously re-optimizing timetables and platform schedules under planned track maintenance for a high-speed railway network
+%@ desc :: Mined from Simultaneously re-optimizing timetables and platform schedules under planned track maintenance for a high-speed railway network (Transportation Research Part C Emerging Technologies, 2020).
+%@ prov source :: 10.1016/j.trc.2020.102823
+%@ prov reference :: Simultaneously re-optimizing timetables and platform schedules under planned track maintenance for a high-speed railway network
+%@ prov author :: Qin Zhang; Richard Martin Lusby; Pan Shang; Xiaoning Zhu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cancellation cost plus weighted train travel time.
+%@ param C shape=- kind=scalar domain=- :: Cancellation cost per train.
+%@ param Z shape=- kind=scalar domain=- :: Objective function value.
+%@ param c shape=F,A kind=matrix domain=- :: Cost coefficient for arc g used by train f.
+%@ var x shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train f uses arc g.
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the space-time network.
+%@ index F ordered=0 cyclic=0 :: Set of trains.
+%@ index o ordered=0 cyclic=0 :: Origin node of an arc.
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the space-time network for a train.
+%@ param D shape=F,K kind=matrix domain=- :: Dwell time requirement for train f at station k.
+%@ index K ordered=0 cyclic=0 :: Set of stations.
+%@ index N ordered=0 cyclic=0 :: Set of nodes in a station.
+%@ param S shape=F,K kind=matrix domain=- :: Binary parameter indicating whether train f is planned to stop at station k.
+%@ index d ordered=0 cyclic=0 :: Destination node of an arc.
+%@ index j ordered=0 cyclic=0 :: Destination node index.
+%@ index t ordered=1 cyclic=0 :: Departure time index.
+%@ index i ordered=0 cyclic=0 :: Origin node index.
+%@ param T shape=- kind=scalar domain=- :: Headway or dwell time parameter.
+%@ param U shape=- kind=big_m domain=- :: Large constant used in linearization.
+%@ param l shape=- kind=scalar domain=- :: Parameter larger than 1 used in constraint (16).
+%@ var y shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating implicit occupation of waiting arc g by train f.
+%@ param R shape=- kind=scalar domain=- :: Residual or violation measure in Lagrangian relaxation.
+%@ con eq_0009 kind=linear domain=- indicator=- :: At most one outgoing arc from the origin node for each train.
+%@ con eq_0010 kind=flow_balance domain=- indicator=- :: Flow conservation at intermediate nodes of each train's space-time network.
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Minimum required dwell time for planned stopping trains.
+%@ con eq_0012 kind=capacity domain=- indicator=- :: Minimum dwell time on a platform track for revised stopping trains.
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Maximum permitted dwell time on stopping tracks.
+%@ con eq_0014 kind=ordering domain=- indicator=- :: No departure earlier than the planned departure time.
+%@ con eq_0015 kind=headway domain=- indicator=- :: Headway requirement on segment tracks via incompatible arc sets.
+%@ con eq_0016 kind=headway domain=- indicator=- :: Headway requirement between receiving routes.
+%@ con eq_0017 kind=headway domain=- indicator=- :: Headway requirement between departure routes.
+%@ con eq_0018 kind=headway domain=- indicator=- :: Headway requirement between receiving and departure routes.
+%@ con eq_0019 kind=big_m domain=- indicator=- :: Linearization linking implicit occupation y to explicit occupation x on waiting arcs.
+%@ con eq_0020 kind=headway domain=- indicator=- :: Stopping-track headway: at most one train explicitly or implicitly occupies a waiting arc.
+%@ con eq_0021 kind=linear domain=- indicator=- :: If train f uses any arc then it cannot be cancelled.
+%@ con eq_0022 kind=linear domain=- indicator=- :: A non-cancelled train must use at least one arc in its network.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary domain of x variables.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Binary domain of y variables.
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Constraint (26a) in the ADMM-based decomposition.
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Constraint (26b) in the ADMM-based decomposition.
+%@ con eq_0026_c kind=linear domain=- indicator=- :: Constraint (26c) in the ADMM-based decomposition.
+%@ con eq_0026_d kind=linear domain=- indicator=- :: Constraint (26d) in the ADMM-based decomposition.
+%@ con eq_0026_e kind=linear domain=- indicator=- :: Constraint (26e) in the ADMM-based decomposition.
+\begin{align}
+  \min\quad & \sum_{f \in F} \left(C \cdot \mathit{theta}_{f} + \sum_{g \in A_{f}} c_{}^{f} \cdot x_{g}^{f}\right) \tag{eq\_0008} \\
+  & \sum_{g \in \mathit{sigma}_{f}^{+}} x_{g}^{f} \leq 1 \forall f \in F \tag{eq\_0009} \\
+  & \underset{g \in \mathit{delta}_{o_{g} , {o}_{g}}^{+} \cap A_{f}}{\sum} x_{g}^{f} - \underset{g \in \mathit{delta}_{o_{g} , {o}_{g}}^{-} \cap A_{f}}{\sum} x_{g}^{f} = 0 \forall \left(o_{g} , {o}_{g}\right) \in V_{f} \backslash \left\{\mathit{beta}_{f} , \mathit{gamma}_{f}\right\} , \forall f \in F \tag{eq\_0010} \\
+  & \sum_{{o}_{g}} \underset{g \in A_{f}^{\mathit{st}} \left|\right. o_{g} \in N_{k}^{s}}{\sum} x_{g}^{f} \geq D_{k}^{f} \cdot \left(1 - \mathit{theta}_{f}\right) \forall f \in F , \forall k \in K_{f} \tag{eq\_0011} \\
+  & \sum_{{o}_{g}} \underset{g \in A_{f}^{\mathit{st}} \left|\right. o_{g} \in N_{k}^{s}}{\sum} x_{g}^{f} \leq D_{k}^{\mathit{fm}} \forall f \in F , \forall k \in K_{f} \tag{eq\_0012} \\
+  & \sum_{{o}_{g} < P_{k}^{f}} \sum_{g \in A_{f} \left|\right. \left(o_{g} \in N_{k}^{s} \cup d_{g} \neq o_{g}\right)} x_{g}^{f} \leq 1 - S_{k}^{f} \forall f \in F , \forall k \in K_{f} \tag{eq\_0013} \\
+  & \sum_{\left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{psi}_{g}^{a}} \sum_{f \left|\right. \left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} \leq 1 \forall g \in A^{\mathit{se}} \tag{eq\_0014} \\
+  & \sum_{t^{'} \in \left[{o}_{g} , {o}_{g} + T_{k}^{r} + T^{r}\right)} \underset{\left(o_{g} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{delta}_{o_{g} , t^{'}}^{+}}{\sum} \sum_{f \left|\right. \left(o_{g} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{o_{g} , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} \leq 1 \forall \left(o_{g} , {o}_{g}\right) \left|\right. o_{g} \in N_{k}^{a} , \forall k \in K \tag{eq\_0015} \\
+  & \sum_{\mathit{tau}^{'} \in \left[{d}_{g} , {d}_{g} + T_{k}^{r} + T^{r}\right)} \underset{\left(i^{'} , d_{g} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{delta}_{d_{g} , \mathit{tau}^{'}}^{-}}{\sum} \sum_{f \left|\right. \left(i^{'} , d_{g} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , d_{g} , t^{'} , \mathit{tau}^{'}}^{f} \leq 1 \forall \left(d_{g} , {d}_{g}\right) \left|\right. d_{g} \in N_{k}^{d} , \forall k \in K \tag{eq\_0016} \\
+  & \sum_{\left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{psi}_{g}^{a} \backslash \left(i^{'} = o_{g} , j^{'} \neq d_{g}\right)} \sum_{f \left|\right. \left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} \leq 1 \forall g \in A^{a} \tag{eq\_0017} \\
+  & \frac{\underset{{o}_{g} - T_{o_{g}}^{s} \leq t^{'} < {o}_{g}}{\sum} x_{o_{g} , d_{g} , t^{'} , t^{'} + 1}^{f}}{U_{1}} - x_{g}^{f} \leq y_{g}^{f} < 1 - \frac{1}{l} \left(x_{g}^{f} - \frac{\underset{{o}_{g} - T_{o_{g}}^{s} \leq t^{'} < {o}_{g}}{\sum} x_{o_{g} , d_{g} , t^{'} , t^{'} + 1}^{f}}{U_{1}}\right) \forall g \in A_{f}^{\mathit{st}} , \forall f \in F \tag{eq\_0018} \\
+  & \sum_{f \left|\right. g \in A_{f}} \left(x_{g}^{f} + y_{g}^{f}\right) \leq 1 \forall g \in A^{\mathit{st}} \tag{eq\_0019} \\
+  & \frac{\sum_{g \in A_{f}} x_{g}^{f}}{U_{2}} + \mathit{theta}_{f} \leq 1 \forall f \in F \tag{eq\_0020} \\
+  & \sum_{g \in A_{f}} x_{g}^{f} + \mathit{theta}_{f} \geq 1 \forall f \in F \tag{eq\_0021} \\
+  & x_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A \tag{eq\_0022} \\
+  & y_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A^{\mathit{st}} \tag{eq\_0023} \\
+  & \mathit{theta}_{f} \in \left\{0 , 1\right\} \forall f \in F \tag{eq\_0024} \\
+  & R_{1}^{g} = \sum_{\left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{psi}_{g}^{a}} \sum_{f \left|\right. \left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} - 1 \tag{eq\_0026\_a} \\
+  & R_{2}^{i , t , k} = \sum_{t^{'} \in \left[t , t + T_{k}^{r} + T^{r}\right)} \underset{\left(i , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{delta}_{i , t^{'}}^{+}}{\sum} \sum_{f \left|\right. \left(i , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} - 1 \tag{eq\_0026\_b} \\
+  & R_{3}^{j , \mathit{tau} , k} = \sum_{\mathit{tau}^{'} \in \left[\mathit{tau} , \mathit{tau} + T_{k}^{r} + T^{r}\right)} \underset{\left(i^{'} , j , t^{'} , \mathit{tau}^{'}\right) \in \mathit{delta}_{j , \mathit{tau}^{'}}^{-}}{\sum} \sum_{f \left|\right. \left(i^{'} , j , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , j , t^{'} , \mathit{tau}^{'}}^{f} - 1 \tag{eq\_0026\_c} \\
+  & R_{4}^{g} = \sum_{\left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in \mathit{psi}_{g}^{a} \backslash \left(i^{'} = o_{g} \cap j^{'} \neq d_{g}\right)} \sum_{f \left|\right. \left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} x_{i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}}^{f} - 1 \tag{eq\_0026\_d} \\
+  & R_{5}^{g} = \sum_{f \left|\right. \left(i^{'} , j^{'} , t^{'} , \mathit{tau}^{'}\right) \in A_{f}} \left(x_{g}^{f} + y_{g}^{f}\right) - 1 \tag{eq\_0026\_e} \\
+\end{align}

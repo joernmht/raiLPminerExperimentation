@@ -1,0 +1,141 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2025.100548
+%@ meta id=10.1016_j.jrtpm.2025.100548 family=milp schema=0.1.0
+%@ name :: Optimization method for maximizing capacity utilization of high-speed railway train timetable based on node routing model
+%@ desc :: Mined from Optimization method for maximizing capacity utilization of high-speed railway train timetable based on node routing model (Journal of Rail Transport Planning & Management, 2025).
+%@ prov source :: 10.1016/j.jrtpm.2025.100548
+%@ prov reference :: Optimization method for maximizing capacity utilization of high-speed railway train timetable based on node routing model
+%@ prov author :: Yuqi Gu; Yuguang Wei; Yang Xia
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Objective (6): maximize the number of trains accommodated on the timetable, z1 = sum_{v in V} x_{f(v)}
+%@ var x shape=L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether node l is selected in the route
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (maximize number of trains, minimize time-space resources, etc.)
+%@ index V ordered=0 cyclic=0 :: Set of trains
+%@ index K ordered=0 cyclic=0 :: Set of stations
+%@ param T shape=- kind=scalar domain=- :: Time bounds of the timetable (T1 start, T2 end)
+%@ var a shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train v at station k
+%@ var d shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train v at station k
+%@ index L ordered=0 cyclic=0 :: Set of nodes (train paths or overtaking combinations)
+%@ var c shape=L,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
+%@ var y shape=L domain=integer role=primary drole=- lo=- hi=- :: Routing sequence number of node l
+%@ var lambda shape=L,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node l is assigned sequence number i
+%@ index I ordered=0 cyclic=0 :: Set of possible routing sequence numbers
+%@ index r ordered=0 cyclic=0 :: Index for subsets of nodes (locally connected network)
+%@ index R ordered=0 cyclic=0 :: Set of subsets of nodes
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+%@ param h shape=- kind=scalar domain=- :: Headway times between trains (e.g., h_pp, h_dp, etc.)
+%@ var theta shape=V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train v stops at station k
+%@ index n ordered=0 cyclic=0 :: Number of stations (last station index)
+%@ param t shape=- kind=scalar domain=- :: Dwelling times (t_k^1, t_k^2) and running times (t_{k,k+1}^v)
+%@ var alpha shape=V,V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
+%@ param m shape=- kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
+%@ param o shape=- kind=scalar domain=- :: Time-space resources occupied between nodes or boundaries
+%@ param O shape=- kind=scalar domain=- :: Total amount of time-space resources available on the timetable
+%@ param b shape=- kind=scalar domain=- :: Threshold for difference in number of stops
+%@ param chi shape=V,V,K kind=matrix domain=- :: Departure interval time between trains in overtaking combination
+%@ param psi shape=V,V,K kind=matrix domain=- :: Arrival interval time between trains in overtaking combination
+%@ param s shape=- kind=scalar domain=- :: Time-space resource savings or internal resources (s1, s2, s3, s4)
+%@ param beta shape=- kind=scalar domain=- :: Penalty weight for unmapped train paths in objective
+%@ con eq_0006 kind=linear domain=- indicator=- :: Objective (6): maximize the number of trains accommodated on the timetable, z1 = sum_{v in V} x_{f(v)}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint (7): arrival time of train v at station k must not exceed timetable end time T2
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint (8): departure time of train v at station k must be no earlier than timetable start time T1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint (9): flow balance for outgoing arcs; selected non-terminal node has one outgoing selected arc, terminal node has none
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (10): flow balance for incoming arcs; selected non-starting node has one incoming selected arc, starting node has none
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (11): if arc from l' to l is selected then node l is routed immediately after node l'
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (12): routing sequence number y_l equals assigned index i when lambda_{l,i}=1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (13): each selected node is assigned at most one routing sequence number
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (14): locally connected network; no selected arcs from subset L_r to nodes outside L_r and L_{r+1}
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (15): locally connected network; no selected arcs from nodes outside L_{r-1} and L_r into L_r
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (16): at most one selected arc between adjacent subsets L_r and L_{r+1}, and none if L_r contains the terminal node
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (17): if any node in subset L_{r+1} is routed then all nodes in L_r are routed
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (18): running time from station k to k+1: a_{v,k+1} = d_{v,k} + h1_k*theta_{v,k} + t_{k,k+1}^v + h2_{k+1}*theta_{v,k+1}
+%@ con eq_0019_a kind=linear domain=- indicator=- :: Constraint (19a): departure headway between trains v and v' when v departs before or at v'
+%@ con eq_0019_b kind=linear domain=- indicator=- :: Constraint (19b): departure headway between trains v and v' when v' departs before v
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Constraint (20a): arrival headway between trains v and v' when v arrives before or at v'
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Constraint (20b): arrival headway between trains v and v' when v' arrives before v
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint (21): dwelling time at station k; stopping train departs after arrival plus regular dwell, extended dwell when yielding to overtaking train
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint (22): auxiliary overtaking indicator alpha'(v,v',k) is 1 if v' arrives after v
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint (23): auxiliary overtaking indicator alpha'(v,v',k) is 0 if v' arrives no later than v
+%@ con eq_0024 kind=linear domain=- indicator=- :: Constraint (24): auxiliary overtaking indicator alpha''(v,v',k) is 1 if v departs after v'
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint (25): auxiliary overtaking indicator alpha''(v,v',k) is 0 if v departs no later than v'
+%@ con eq_0026 kind=linear domain=- indicator=- :: Constraint (26): overtaking indicator alpha(v,v',k) is 1 when both alpha' and alpha'' are 1
+%@ con eq_0027 kind=linear domain=- indicator=- :: Constraint (27): overtaking indicator alpha(v,v',k) does not exceed alpha'(v,v',k)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Constraint (28): overtaking indicator alpha(v,v',k) does not exceed alpha''(v,v',k)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Constraint (29): time-space resources o1(f(v)) between a train path and the left timetable boundary without overtaking
+%@ con eq_0030 kind=linear domain=- indicator=- :: Constraint (30): time-space resources o2(f(v)) between a train path and the right timetable boundary without overtaking
+%@ con eq_0031 kind=linear domain=- indicator=- :: Constraint (31): time-space resources o(f(v),f(v')) between two consecutive train paths without overtaking
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constraint (32): time-space resources o1(l) between an overtaking combination and the left timetable boundary
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint (33): time-space resources o2(l) between an overtaking combination and the right timetable boundary
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint (34): time-space resources o(f(v'),l) between a normal train path and a following overtaking combination
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint (35): time-space resources o(l,f(v')) between an overtaking combination and a following normal train path
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint (36): time-space resources o(l,l') between two train overtaking combinations
+%@ con eq_0037 kind=linear domain=- indicator=- :: Constraint (37): internal time-space resources o3(l) occupied by train paths within an overtaking combination
+%@ con eq_0038 kind=linear domain=- indicator=- :: Constraint (38): total time-space resources occupied by selected arcs and nodes must not exceed total available resources O
+%@ con eq_0039 kind=linear domain=- indicator=- :: Formula (39): difference in number of stops between two trains must be at least b for an overtaking combination
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint (40): yielding train v departs no later than overtaking train v' at every station
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint (41): starting time of train v at the first station equals T1
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint (42): arrival time of overtaking train v' at the last station is no later than that of yielding train v
+%@ con eq_0043 kind=linear domain=- indicator=- :: Constraint (43): departure interval chi_{v,v',k} between trains in an overtaking combination at station k
+%@ con eq_0044 kind=linear domain=- indicator=- :: Constraint (44): arrival interval psi_{v,v',k} between trains in an overtaking combination at station k
+%@ con eq_0045 kind=linear domain=- indicator=- :: Formula (45): internal resources o3(l) of the chosen overtaking combination l equals the maximum saving s4(v,v') in its subset
+%@ con eq_0046 kind=linear domain=- indicator=- :: Constraint (46): no-overtaking order: train v arrives at station k no later than train v'
+%@ con eq_0047 kind=linear domain=- indicator=- :: Constraint (47): linearized lower bound for sequence order: if c(l',l)=1 then y_l - y_l' >= 1
+%@ con eq_0048 kind=linear domain=- indicator=- :: Constraint (48): linearized upper bound for sequence order: if c(l',l)=1 then y_l - y_l' - 1 <= 0
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint (50): all nodes are selected (x_l=1), so all train paths are drawn on the timetable
+%@ con eq_0051 kind=linear domain=- indicator=- :: Objective (51): minimize sum of final arrival times plus penalty beta for unmapped train paths
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint (52): if arc (f(v'),f(v)) is selected then train v arrives no earlier than v' at every station
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint (53): if final arrival time of train v exceeds T2 then its path is not accommodated (x_{f(v)}=0)
+%@ con eq_0054 kind=linear domain=- indicator=- :: Constraint (54): if final arrival time of train v is within T2 then its path is accommodated (x_{f(v)}=1)
+\begin{align}
+  & \begin{matrix}\mathit{max} z_{1} = \sum_{v \in V} x_{f \left(v\right)}\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}a_{v}^{k} \leq T_{2} \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix}d_{v}^{k} \geq T_{1} \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}\sum_{l^{'} \in L} c \left(l , l^{'}\right) = x_{l} - x_{l}^{''} \forall l \in L\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}\sum_{l^{'} \in L} c \left(l^{'} , l\right) = x_{l} - x_{l}^{'} \forall l \in L\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix}\left(y_{l} - y_{l^{'}} - 1\right) \cdot c \left(l^{'} , l\right) = 0 \forall l , l^{'} \in L\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}y_{l} = \sum_{i \in I} \mathit{lambda}_{l}^{i} \cdot i \forall l \in L\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix}\sum_{i \in I} \mathit{lambda}_{l}^{i} = x_{l} \forall l \in L\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix}\sum_{l \in L_{r}} \sum_{l^{'} \notin L_{r} , L_{r + 1}} c \left(l , l^{'}\right) = 0 \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix}\sum_{l \in L_{r}} \sum_{l^{'} \notin L_{r - 1} , L_{r}} c \left(l , l^{'}\right) = 0 \forall r \in R \backslash \left\{r_{1}\right\}\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}\sum_{l \in L_{r}} \sum_{l^{'} \in L_{r + 1}} c \left(l , l^{'}\right) + \sum_{l \in L_{r}} x_{l}^{''} \leq 1 \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix}M \cdot x_{l} \geq \sum_{l^{'} \in L_{r + 1}} x_{l^{'}} \forall l \in L_{r} , \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}a_{v}^{k + 1} = d_{v}^{k} + h_{1}^{k} \cdot \mathit{theta}_{v}^{k} + t_{k , k + 1}^{v} + h_{2}^{k + 1} \cdot \mathit{theta}_{v}^{k + 1} \forall v \in V , 1 \leq k \leq n - 1\end{matrix} \tag{eq\_0018} \\
+  & \left|\right. d_{v}^{k} - d_{v^{'}}^{k} \left|\right. \geq \left(1 - \mathit{theta}_{v^{'}}^{k}\right) \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{p p} + \mathit{theta}_{v^{'}}^{k} \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{d p} + \tag{eq\_0019\_a} \\
+  & \left(1 - \mathit{theta}_{v^{'}}^{k}\right) \cdot \mathit{theta}_{v}^{k} \cdot h_{p d} + \mathit{theta}_{v^{'}}^{k} \cdot \mathit{theta}_{v}^{k} \cdot h_{d d} \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K \tag{eq\_0019\_b} \\
+  & \left|a_{v}^{k} - a_{v^{'}}^{k}\right| \geq \left(1 - \mathit{theta}_{v^{'}}^{k}\right) \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{p p} + \mathit{theta}_{v^{'}}^{k} \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{a p} + \tag{eq\_0020\_a} \\
+  & \left(1 - \mathit{theta}_{v^{'}}^{k}\right) \cdot \mathit{theta}_{v}^{k} \cdot h_{p a} + \mathit{theta}_{v^{'}}^{k} \cdot \mathit{theta}_{v}^{k} \cdot h_{a a} \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K \tag{eq\_0020\_b} \\
+  & \begin{matrix}d_{v}^{k} = a_{v}^{k} + t_{k}^{1} \cdot \mathit{theta}_{v}^{k} + \left(t_{k}^{2} - t_{k}^{1}\right) \cdot \mathit{theta}_{v}^{k} \cdot \sum_{v^{'} \in V} \mathit{alpha} \left(v , v^{'} , k\right) \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix}a_{v^{'}}^{k} - a_{v}^{k} \geq - M \cdot \left(1 - \mathit{alpha}^{'} \left(v , v^{'} , k\right)\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix}a_{v^{'}}^{k} - a_{v}^{k} \leq M \cdot \mathit{alpha}^{'} \left(v , v^{'} , k\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix}d_{v}^{k} - d_{v^{'}}^{k} \geq - M \cdot \left(1 - \mathit{alpha}^{''} \left(v , v^{'} , k\right)\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix}d_{v}^{k} - d_{v^{'}}^{k} \leq M \cdot \mathit{alpha}^{''} \left(v , v^{'} , k\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix}\mathit{alpha} \left(v , v^{'} , k\right) \geq \mathit{alpha}^{'} \left(v , v^{'} , k\right) + \mathit{alpha}^{''} \left(v , v^{'} , k\right) - 1 \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0026} \\
+  & \begin{matrix}\mathit{alpha} \left(v , v^{'} , k\right) \leq \mathit{alpha}^{'} \left(v , v^{'} , k\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0027} \\
+  & \begin{matrix}\mathit{alpha} \left(v , v^{'} , k\right) \leq \mathit{alpha}^{''} \left(v , v^{'} , k\right) \forall v , v^{'} \in V , v \neq v^{'} , \forall k \in K\end{matrix} \tag{eq\_0028} \\
+  & \begin{matrix}o_{1} \left(f \left(v\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{v}^{k} - T_{1} + a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) \in L_{n}\end{matrix} \tag{eq\_0029} \\
+  & \begin{matrix}o_{2} \left(f \left(v\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - d_{v}^{k} + T_{2} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) \in L_{n}\end{matrix} \tag{eq\_0030} \\
+  & \begin{matrix}o \left(f \left(v\right) , f \left(v^{'}\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{v^{'}}^{k} - d_{v}^{k} + a_{v^{'}}^{k + 1} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) , f \left(v^{'}\right) \in L_{n}\end{matrix} \tag{eq\_0031} \\
+  & \begin{matrix}o_{1} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - T_{1} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0032} \\
+  & \begin{matrix}o_{2} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - \underset{v \in V_{l}}{max} d_{v}^{k} + T_{2} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0033} \\
+  & \begin{matrix}o \left(f \left(v^{'}\right) , l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - d_{v^{'}}^{k} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - a_{v^{'}}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f \left(v^{'}\right) \in L_{n}\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix}o \left(l , f \left(v^{'}\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{v^{'}}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + a_{v^{'}}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f \left(v^{'}\right) \in L_{n}\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix}o \left(l , l^{'}\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l^{'}}}{min} d_{v}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + \underset{v \in V_{l^{'}}}{min} a_{v}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l , l^{'} \in L_{g}\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix}o_{3} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{max} d_{v}^{k} - \underset{v \in V_{l}}{min} d_{v}^{k} + \underset{v \in V_{l}}{max} a_{v}^{k + 1} - \underset{v \in V_{l}}{min} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0037} \\
+  & \begin{matrix}\sum_{l^{'} \in L} \sum_{l \in L} o \left(l , l^{'}\right) \cdot c \left(l , l^{'}\right) + \sum_{l \in L} o_{1} \left(l\right) \cdot x_{l}^{'} + \sum_{l \in L} o_{2} \left(l\right) \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} \left(l\right) \cdot x_{l} \leq O\end{matrix} \tag{eq\_0038} \\
+  & \begin{matrix}\sum_{k \in K} \mathit{theta}_{v}^{k} - \sum_{k \in K} \mathit{theta}_{v^{'}}^{k} \geq b \forall f \left(v\right) , f \left(v^{'}\right) \in L_{r}\end{matrix} \tag{eq\_0039} \\
+  & \begin{matrix}d_{v}^{k} \leq d_{v^{'}}^{k} \forall k \in K\end{matrix} \tag{eq\_0040} \\
+  & \begin{matrix}d_{v}^{1} = T_{1}\end{matrix} \tag{eq\_0041} \\
+  & \begin{matrix}a_{v}^{n} \geq a_{v^{'}}^{n}\end{matrix} \tag{eq\_0042} \\
+  & \begin{matrix}d_{v^{'}}^{k} - d_{v}^{k} = \mathit{chi}_{v v^{'}}^{k} \forall k \in K\end{matrix} \tag{eq\_0043} \\
+  & \begin{matrix}a_{v^{'}}^{k} - a_{v}^{k} = \mathit{psi}_{v v^{'}}^{k} \forall k \in K\end{matrix} \tag{eq\_0044} \\
+  & \begin{matrix}o_{3} \left(l\right) = \underset{v , v^{'} \in V_{r}}{max} s_{4} \left(v , v^{'}\right) \forall l \in L_{r}\end{matrix} \tag{eq\_0045} \\
+  & \begin{matrix}a_{v}^{k} \leq a_{v^{'}}^{k} \forall k \in K\end{matrix} \tag{eq\_0046} \\
+  & \begin{matrix}y_{l} - y_{l^{'}} \geq c \left(l^{'} , l\right) - M \cdot \left(1 - c \left(l^{'} , l\right)\right) \forall l , l^{'} \in L\end{matrix} \tag{eq\_0047} \\
+  & \begin{matrix}y_{l} - y_{l^{'}} - 1 \leq M \cdot \left(1 - c \left(l^{'} , l\right)\right) \forall l , l^{'} \in L\end{matrix} \tag{eq\_0048} \\
+  \begin{matrix}min\quad & z_{2} = \sum_{l^{'} \in L} \sum_{l \in L} o \left(l , l^{'}\right) \cdot c \left(l , l^{'}\right) + \sum_{l \in L} o_{1} \left(l\right) \cdot x_{l}^{'} + \sum_{l \in L} o_{2} \left(l\right) \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} \left(l\right) \cdot x_{l}\end{matrix} \tag{eq\_0049} \\
+  & \begin{matrix}x_{l} = 1 \forall l \in L\end{matrix} \tag{eq\_0050} \\
+  & \begin{matrix}\mathit{min} z_{3} = \sum_{v \in V} a_{v}^{n} + \mathit{beta} \cdot \sum_{v \in V} \left(1 - x_{f \left(v\right)}\right)\end{matrix} \tag{eq\_0051} \\
+  & \begin{matrix}a_{v}^{k} \geq a_{v^{'}}^{k} \cdot c \left(\left(f \left(v\right)\right)^{'} , f \left(v\right)\right) \forall v , v^{'} \in V , \forall k \in K\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix}a_{v}^{n} - T_{2} \geq - M \cdot x_{f \left(v\right)} \forall v \in V\end{matrix} \tag{eq\_0053} \\
+  & \begin{matrix}a_{v}^{n} - T_{2} \leq M \cdot \left(1 - x_{f \left(v\right)}\right) \forall v \in V\end{matrix} \tag{eq\_0054} \\
+\end{align}

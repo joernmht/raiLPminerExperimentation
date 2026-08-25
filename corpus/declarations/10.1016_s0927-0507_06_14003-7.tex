@@ -1,0 +1,60 @@
+% Declaration sidecar for 10.1016_s0927-0507_06_14003-7
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_s0927-0507_06_14003-7
+% Chapter 3 Passenger Railway Optimization
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_s0927-0507_06_14003-7.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize weighted direct passenger count minus weighted operational cost
+%@ param w shape=- kind=scalar :: Weight for objective function terms
+%@ var d shape=L,P domain=non_negative role=primary :: Number of direct passengers on line l for pair p
+%@ param k shape=I kind=vector :: Operational cost for option i
+%@ var x shape=I domain=binary role=primary :: Binary variable indicating if line option i is selected
+%@ index I ordered=0 cyclic=0 :: Set of line options
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index P ordered=0 cyclic=0 :: Set of station pairs
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ index E ordered=0 cyclic=0 :: Set of track edges
+%@ index e ordered=0 cyclic=0 :: Track edge index
+%@ param c shape=I kind=vector :: Capacity option for a line
+%@ param f shape=I kind=vector :: Frequency option for a line
+%@ var y shape=P domain=binary role=primary :: Binary variable indicating direct connection for pair p
+%@ var v shape=E domain=continuous role=primary :: Timetable event time
+%@ param T shape=- kind=scalar :: Cycle time for timetable
+%@ var q shape=E,E domain=binary role=primary :: Binary variable for modulo constraint
+%@ param u shape=E,E kind=matrix :: Upper bound for process time
+%
+% Bound by a quantifier or big operator, so no declaration of their own: i, p
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: At most one line option selected for each line l
+%@ con eq_0004 kind=linear domain=- indicator=- :: Provided capacity on each track e is at least the passenger demand on e
+%@ con eq_0005 kind=linear domain=- indicator=- :: Direct passengers on line l over edge e do not exceed selected capacity on line l
+%@ con eq_0006 kind=linear domain=- indicator=- :: Direct passengers for station pair p do not exceed travel demand d_p
+%@ con eq_0007 kind=linear domain=- indicator=- :: Line option variables x_i are binary
+%@ con eq_0008 kind=linear domain=- indicator=- :: Direct passenger variables d_lp are nonnegative
+%@ con eq_0011 kind=linear domain=- indicator=- :: A direct connection for pair p requires at least one selected line option covering p
+%@ con eq_0012 kind=linear domain=- indicator=- :: If a line option covering pair p is selected, then y_p is 1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Capacity of selected lines accommodates all passengers on direct connections for pair p
+%@ con eq_0015 kind=linear domain=- indicator=- :: Direct connection variables y_p are binary
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linearized modulo constraint relating event times, bounds and binary q_ef

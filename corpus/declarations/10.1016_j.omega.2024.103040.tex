@@ -1,0 +1,156 @@
+% Declaration sidecar for 10.1016_j.omega.2024.103040
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2024.103040
+% Passenger service-oriented timetable rescheduling for large-scale disruptions in a railway network: A heuristic-based alternating direction method of multipliers
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2024.103040.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger delay and abandonment cost over all trains
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for nodes in the space-time network
+
+% x: classified as variable during review
+%@ var x shape=k,a domain=binary role=primary drole=- lo=- hi=- :: Binary path indicator: 1 if train k uses arc a
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+
+% d: classified as parameter during review
+%@ param d shape=k kind=vector domain=- :: Destination node of train k
+
+% e: classified as parameter during review
+%@ param e shape=k kind=vector domain=- :: Earliest departure time of train k
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for trains
+
+% l: classified as parameter during review
+%@ param l shape=k kind=vector domain=- :: Latest arrival time of train k
+
+% o: classified as parameter during review
+%@ param o shape=k kind=vector domain=- :: Origin node of train k
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the space-time network
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for stations
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes associated with a station
+
+% T: classified as parameter during review
+%@ param T shape=k,s kind=matrix domain=- :: Scheduled departure time of train k at station s
+
+% pt: classified as parameter during review
+%@ param pt shape=k,a kind=matrix domain=- :: Passenger-related cost coefficient for arc a of train k
+
+% unusable as an identifier, rename or drop: Φ
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total objective function value
+
+% c: classified as parameter during review
+%@ param c shape=k,a kind=matrix domain=- :: Cost coefficient for arc a of train k
+
+% L: classified as variable during review
+%@ var L shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian objective function value
+
+% unusable as an identifier, rename or drop: λ
+%@ var lambda shape=a domain=non_negative role=auxiliary drole=- lo=- hi=- :: Lagrangian multiplier for arc a
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Index for arcs
+
+% unusable as an identifier, rename or drop: δ
+%@ var delta shape=a domain=non_negative role=slack drole=- lo=- hi=- :: Slack variable for arc a
+
+% unusable as an identifier, rename or drop: ρ
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter in ADMM
+
+% unusable as an identifier, rename or drop: μ
+%@ var mu shape=k,a domain=non_negative role=auxiliary drole=- lo=- hi=- :: Total occupancy of incompatible set by other trains
+
+% Q: classified as variable during review
+%@ var Q shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Quadratic penalty term
+
+% ĉ: classified as parameter during review
+%@ param chat shape=k,a kind=matrix domain=- :: Modified arc cost for train k in augmented Lagrangian
+
+% res: classified as variable during review
+%@ var res shape=- domain=non_negative role=auxiliary drole=- lo=- hi=- :: Primary residual measuring violation of incompatible-arc constraints
+
+% q: classified as variable during review
+%@ var q shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Train-specific objective function value
+
+% x̂: classified as variable during review
+%@ var xhat shape=k,a domain=binary role=auxiliary drole=- lo=- hi=- :: Solution of an outer ADMM iteration
+
+% p: classified as variable during review
+%@ var p shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Train-specific dual cost value
+
+% Bound by a quantifier or big operator, so no declaration of their own: j, t, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=flow_balance domain=- indicator=- :: Flow balance: exactly one space-time path for each train
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time: no running arc before scheduled departure
+%@ con eq_0004 kind=linear domain=- indicator=- :: Schedule unchanged: unaffected trains keep planned departure
+%@ con eq_0005 kind=linear domain=- indicator=- :: Disruption: no train enters disrupted area
+%@ con eq_0007 kind=headway domain=- indicator=- :: Headway: at most one train in headway incompatible set
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Station capacity: at most one train in station incompatible set
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Unified conflict-free headway and station capacity constraints
+%@ con eq_0012 kind=linear domain=- indicator=- :: Objective definition F = sum of arc costs
+%@ con eq_0015 kind=linear domain=- indicator=- :: Lagrangian relaxation of conflict-free constraints
+%@ con eq_0016 kind=linear domain=- indicator=- :: Property 1: exchange summation over incompatible sets
+%@ con eq_0017 kind=linear domain=- indicator=- :: Train-specific Lagrangian objective L_k
+%@ con eq_0019 kind=linear domain=- indicator=- :: Augmented Lagrangian with quadratic penalty and slack
+%@ con eq_0020 kind=linear domain=- indicator=- :: Slack delta(a) = 1 - total occupancy
+%@ con eq_0021 kind=linear domain=- indicator=- :: Occupancy mu_a^k of incompatible set by other trains
+%@ con eq_0022 kind=linear domain=- indicator=- :: Split total occupancy into train-k part and mu
+%@ con eq_0023 kind=linear domain=- indicator=- :: Modified slack delta(a) using mu_a^k
+%@ con eq_0025 kind=linear domain=- indicator=- :: Train-specific augmented Lagrangian subproblem
+%@ con eq_0027 kind=linear domain=- indicator=- :: Lagrangian multiplier update with penalty rho
+%@ con eq_0028 kind=linear domain=- indicator=- :: Primary residual res = max violation
+%@ con eq_0030 kind=linear domain=- indicator=- :: Train-specific objective value q_k
+%@ con eq_0031 kind=linear domain=- indicator=- :: Train-specific dual cost p_k
+%@ con eq_0032 kind=linear domain=- indicator=- :: Decomposition of modified arc cost chat
+%@ con eq_0034 kind=linear domain=- indicator=- :: ADMM-H sorting rule row
+%@ con eq_0036 kind=linear domain=- indicator=- :: ADMM-H dual residual row
+%@ con eq_0037 kind=linear domain=- indicator=- :: ADMM-H stopping criterion row
+%@ index tp shape=- domain=- role=index drole=- lo=- hi=- :: primed time index
+%@ index tau shape=- domain=- role=index drole=- lo=- hi=- :: time index
+%@ index taup shape=- domain=- role=index drole=- lo=- hi=- :: primed time index
+%@ index ip shape=- domain=- role=index drole=- lo=- hi=- :: primed node index
+%@ index jp shape=- domain=- role=index drole=- lo=- hi=- :: primed node index
+%@ index ap shape=- domain=- role=index drole=- lo=- hi=- :: primed arc index
+%@ index headway shape=- domain=- role=index drole=- lo=- hi=- :: headway conflict set label
+%@ index safety shape=- domain=- role=index drole=- lo=- hi=- :: safety conflict set label
+%@ index drive shape=- domain=- role=index drole=- lo=- hi=- :: driving arc set label
+%@ index track shape=- domain=- role=index drole=- lo=- hi=- :: track arc set label
+%@ index disruption shape=- domain=- role=index drole=- lo=- hi=- :: disrupted arc set label
+%@ index stop shape=- domain=- role=index drole=- lo=- hi=- :: stop set label
+%@ index dep shape=- domain=- role=index drole=- lo=- hi=- :: departure label
+%@ param b shape=- domain=integer role=coefficient drole=- lo=-1 hi=1 :: net flow balance

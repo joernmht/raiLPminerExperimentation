@@ -1,0 +1,199 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.ejor.2008.12.005",
+      "doi": "10.1016/j.ejor.2008.12.005",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "corrected",
+          "note": "\\mathit{atl}_{i , K_{i}} = 0",
+          "parts": [
+            "\\mathit{atl}_{i , K_{i}} = 0",
+            "\\mathit{atl}_{i , k} = \\underset{k + 1 \\leq k^{'} \\leq K_{i} \\left|\\right. \\mathit{dt}_{i , k^{'}} - l_{i}^{J} < \\mathit{dt}_{i , k}}{\\sum} \\left(\\delta_{i , k^{'}}\\right) \\forall i \\in J , 1 \\leq k < K_{i} ."
+          ]
+        },
+        {
+          "id": "eq-0002",
+          "status": "corrected",
+          "note": "\\mathit{dt}_{i , 0} = 0",
+          "parts": [
+            "\\mathit{dt}_{i , 0} = 0",
+            "\\mathit{dt}_{i , k} = \\mathit{dt}_{i , k - 1} + l_{m_{i , k}}^{M} 1 \\leq k \\leq K_{i}",
+            "\\mathit{dt}_{i , K_{i} + 1} = \\mathit{dt}_{i , K_{i}} + l_{i}^{J} \\forall i"
+          ]
+        },
+        {
+          "id": "eq-0003",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0004",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0005",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0006",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "\\mathit{ina}_{i , 1} = 0",
+          "parts": [
+            "\\mathit{ina}_{i , 1} = 0",
+            "\\mathit{ina}_{i , k} = \\left\\{\\begin{matrix} 1 & \\text{for} \\delta_{i , k - 1} > 0 \\\\ 0 & \\text{for} \\delta_{i , k - 1} = 0 \\end{matrix}\\right , k = 2 , \\ldots , K_{i} ."
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0009",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0010",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0011",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0012",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0013",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0014",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0015",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0016",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0017",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0018",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0019",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0020",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0021",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0022",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0023",
+          "status": "corrected",
+          "note": "\\mathit{LB} = \\underset{j \\in M}{max} \\left\\{\\mathit{lb}_{j}\\right\\}",
+          "parts": [
+            "\\mathit{LB} = \\underset{j \\in M}{max} \\left\\{\\mathit{lb}_{j}\\right\\}",
+            "\\mathit{lb}_{j} = \\underset{o_{i , k} \\in U_{j}}{\\sum} \\left(\\bar{p}_{i , k}\\right) + \\underset{o_{i , k} \\in U_{j}}{min} \\left\\{\\tau_{i , k}\\right\\} + \\underset{o_{i , k} \\in U_{j}}{min} \\left\\{\\phi_{i , k}\\right\\} , \\forall j \\in M"
+          ]
+        },
+        {
+          "id": "eq-0024",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0025",
+          "status": "corrected",
+          "note": "\\tau_{i , 1} = \\mathit{rlt}_{i}",
+          "parts": [
+            "\\tau_{i , 1} = \\mathit{rlt}_{i}",
+            "\\tau_{i , k} = \\tau_{i , k - 1} + p_{i , k - 1}^{'} \\left[= \\underset{k^{'} = 1 , \\ldots , k - 1}{\\sum} \\left(p_{i , k^{'}}^{'}\\right)\\right] , k = 2 , \\ldots , K_{i}"
+          ]
+        },
+        {
+          "id": "eq-0026",
+          "status": "corrected",
+          "note": "\\phi_{i , K_{i}} = 0",
+          "parts": [
+            "\\phi_{i , K_{i}} = 0",
+            "\\phi_{i , k} = \\phi_{i , k + 1} + p_{i , k + 1}^{''} \\left[= \\underset{k^{'} = k + 1 , \\ldots , K_{i}}{\\sum} \\left(p_{i , k^{'}}^{''}\\right)\\right] , k = K_{i} - 1 , \\ldots , 1"
+          ]
+        },
+        {
+          "id": "eq-0027",
+          "status": "corrected",
+          "note": "p_{i , k}^{'} = p_{i , k} + \\delta_{i , k} + \\mathit{apt}_{i , k}",
+          "parts": [
+            "p_{i , k}^{'} = p_{i , k} + \\delta_{i , k} + \\mathit{apt}_{i , k}",
+            "p_{i , k}^{''} = p_{i , k} + \\mathit{apt}_{i , k} + \\mathit{atl}_{i , k} + \\left(\\delta_{i , k} \\text{if} \\mathit{atl}_{i , k - 1} = 0\\right) ."
+          ]
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.ejor.2008.12.005",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.ejor.2008.12.005",
+      "symbols": {
+        "J": "index",
+        "LB": "variable",
+        "M": "index",
+        "O": "index",
+        "U": "index",
+        "a": "parameter",
+        "apt": "variable",
+        "atl": "variable",
+        "d": "parameter",
+        "delay": "variable",
+        "dt": "variable",
+        "e": "variable",
+        "entry": "variable",
+        "exit": "variable",
+        "fpos": "variable",
+        "fstage": "variable",
+        "ina": "variable",
+        "ind": "variable",
+        "l": "parameter",
+        "lb": "variable",
+        "lpv": "variable",
+        "p": "parameter",
+        "p̄": "parameter",
+        "rlt": "parameter",
+        "s": "parameter",
+        "stl": "parameter",
+        "δ": "parameter",
+        "τ": "parameter",
+        "φ": "parameter"
+      }
+    }
+  ]
+}

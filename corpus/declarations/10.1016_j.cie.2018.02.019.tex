@@ -1,0 +1,172 @@
+% Declaration sidecar for 10.1016_j.cie.2018.02.019
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2018.02.019
+% Real-time optimal train regulation design for metro lines with energy-saving
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2018.02.019.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of timetable deviation, headway deviation, control action magnitudes, and energy consumption
+
+% td: classified as variable during review
+%@ var td shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train j from station i
+
+% r: classified as variable during review
+%@ var r shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual run time of train j from station i to i+1
+
+% s: classified as variable during review
+%@ var s shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual stop time of train j at station i+1
+
+% R: classified as parameter during review
+%@ param R shape=i kind=vector domain=- :: Nominal run time from station i to i+1
+
+% ur: classified as variable during review
+%@ var ur shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Control action for run time of train j from station i to i+1
+
+% unusable as an identifier, rename or drop: ω
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: Minimum stop time at a station
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Weight of timetable deviation in objective
+
+% ta: classified as variable during review
+%@ var ta shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival time of train j at station i+1
+
+% up: classified as variable during review
+%@ var up shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Control action for stop time of train j at station i+1
+
+% unusable as an identifier, rename or drop: λ
+% Td: classified as parameter during review
+%@ param Td shape=i,j kind=matrix domain=- :: Nominal departure time of train j from station i+1
+
+% X: classified as variable during review
+%@ var X shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Time deviation from nominal departure time
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Nominal headway
+
+% Y: classified as variable during review
+%@ var Y shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Headway deviation between trains
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Nominal arrival time or nominal time vector
+
+% unusable as an identifier, rename or drop: Λ
+% unusable as an identifier, rename or drop: α
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index of stations
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Number of stations
+
+% E: classified as variable during review
+%@ var E shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Energy consumption of train j between stations i and i+1
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Power consumption coefficients
+
+% u: classified as parameter during review
+%@ param u shape=i kind=vector domain=- :: Coefficients for traction energy consumption
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Identity matrix or minimum departure-arrival interval
+
+% J: classified as variable during review
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Weight of run-time control action
+
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar domain=- :: Weight of stop-time control action
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Weight of energy consumption
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: Weight of headway deviation
+
+% C: classified as parameter during review
+%@ param C shape=M kind=vector domain=- :: Row vector of energy consumption weights
+
+% UR: classified as parameter during review
+%@ param UR shape=i kind=vector domain=- :: Bounds for run-time control action
+
+% UP: classified as parameter during review
+%@ param UP shape=i kind=vector domain=- :: Bounds for stop-time control action
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index of trains
+
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: State variable representing time
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Stage index in real-time model
+
+% Bound by a quantifier or big operator, so no declaration of their own: l, θ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Recursive departure time update: td_{i+1}^j = td_i^j + r_i^j + s_{i+1}^j
+%@ con eq_0002 kind=linear domain=- indicator=- :: Actual run time decomposition: r_i^j = R_i + ur_i^j + ωr_i^j
+%@ con eq_0003 kind=linear domain=- indicator=- :: Actual stop time with control and delay rate: s_{i+1}^j = S0 + up_{i+1}^j + ωp_{i+1}^j + λ_{i+1}^j(ta_{i+1}^j - td_{i+1}^{j-1})
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival time update: ta_{i+1}^j = td_i^j + r_i^j
+%@ con eq_0005 kind=linear domain=- indicator=- :: Timetable deviation definition: X_{i+1}^j = td_{i+1}^j - Td_{i+1}^j
+%@ con eq_0006 kind=linear domain=- indicator=- :: Headway deviation definition: Y_{i+1}^j = (td_{i+1}^j - td_{i+1}^{j-1}) - H = X_{i+1}^j - X_{i+1}^{j-1}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Vector arrival time dynamic: ta_k = Λ·td_k + T0,k + R + ur_k + ωr_k
+%@ con eq_0008 kind=linear domain=- indicator=- :: Vector departure time dynamic: td_{k+1} = Λ·td_k + T0,k + R + ur_k + ωr_k + S0 + up_k + ωp_k + λ_k(ta_k - td_k)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Vector timetable deviation update: X_{k+1} = td_{k+1} - Td_{k+1}
+%@ con eq_0010 kind=linear domain=- indicator=- :: Vector headway deviation update: Y_{k+1} = X_{k+1} - X_k
+%@ con eq_0011 kind=linear domain=- indicator=- :: Onboard passenger flow balance for train j at station i
+%@ con eq_0012 kind=linear domain=- indicator=- :: Boundary condition: no onboard passengers at first station (αob,1^j = 0)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Vector passenger flow dynamic with boarding passengers and upstream destinations
+%@ con eq_0014 kind=linear domain=- indicator=- :: Total energy decomposition: E_{i+1}^j = E_tr,i+1^j + E_aux,i+1^j
+%@ con eq_0015 kind=linear domain=- indicator=- :: Auxiliary energy consumption: E_aux,i+1^j = (P_ac·αob,i+1^j + P_lc)(td_{i+1}^j - td_i^j)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Traction energy with no passengers: E_tr0,i+1^j = u1,i/(u2,i - r_i^j) + u3,i
+%@ con eq_0017 kind=linear domain=- indicator=- :: Traction energy with passengers: E_tr,i+1^j = (1 + ωp·αob,i+1^j)·u1,i/(u2,i - r_i^j) + u3,i
+%@ con eq_0018 kind=linear domain=- indicator=- :: Vector energy decomposition: E_{k+1} = E_tr,k+1 + E_aux,k+1
+%@ con eq_0019 kind=linear domain=- indicator=- :: Vector auxiliary energy: E_aux,k+1 = (P_ac·αob,k + P_lc·I)(td_{k+1} - Λ·td_k - T0,k)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Vector traction energy: E_tr,k+1 = (I + ωp·diag(αob,k))·E_tr0,k+1
+%@ con eq_0021 kind=linear domain=- indicator=- :: Objective function: minimize weighted sum of timetable deviation, headway deviation, control actions, and energy consumption
+%@ con eq_0022 kind=linear domain=- indicator=- :: Vector objective: J_k = p·X^T X + q·Y^T Y + a·ur^T ur + b·up^T up + C·E
+%@ con eq_0023 kind=linear domain=- indicator=- :: Safety constraint: ta_{i+1}^j - td_{i+1}^{j-1} ≥ I_{i+1,min}
+%@ con eq_0024 kind=linear domain=- indicator=- :: Stop-time constraint: s_{i+1}^j ≥ S0
+%@ con eq_0025 kind=linear domain=- indicator=- :: Transformed stop-time constraint: up + ωp + λ(ta - td) ≥ 0
+%@ con eq_0026 kind=linear domain=- indicator=- :: Run-time control bounds: UR_min ≤ ur_i^j ≤ UR_max
+%@ con eq_0027 kind=linear domain=- indicator=- :: Stop-time control bounds: UP_min ≤ up_i^j ≤ UP_max
+%@ con eq_0028 kind=linear domain=- indicator=- :: Vector safety constraint: ta_k - td_k ≥ I_min
+%@ con eq_0029 kind=linear domain=- indicator=- :: Vector stop-time constraint: up_k + ωp_k + λ_k(ta_k - td_k) ≥ 0
+%@ con eq_0030 kind=linear domain=- indicator=- :: Vector run-time control bounds: UR_min ≤ ur_k ≤ UR_max
+%@ con eq_0031 kind=linear domain=- indicator=- :: Vector stop-time control bounds: UP_min ≤ up_k ≤ UP_max
+%@ con eq_0032_b kind=linear domain=- indicator=- :: MPC state equation: ta_k = Λ·td_k + T0,k + R + ur_k + ωr_k
+%@ con eq_0032_c kind=linear domain=- indicator=- :: MPC state equation: td_{k+1} = Λ·td_k + T0,k + R + ur_k + ωr_k + S0 + up_k + ωp_k + λ_k(ta_k - td_k)
+%@ con eq_0032_d kind=linear domain=- indicator=- :: MPC state equation: X_{k+1} = td_{k+1} - Td_{k+1}
+%@ con eq_0032_e kind=linear domain=- indicator=- :: MPC state equation: Y_{k+1} = X_{k+1} - X_k
+%@ con eq_0032_f kind=linear domain=- indicator=- :: MPC passenger flow equation: αob,k = Λ[αob,k-1 + α_{k-1}(td_k - td_{k-1})] - Σ Λ^{θ+1} αl_k^θ (td_{k-θ} - td_{k-θ-1})
+%@ con eq_0032_g kind=linear domain=- indicator=- :: MPC auxiliary energy equation: E_aux,k+1 = (P_ac·αob,k + P_lc·I)(td_{k+1} - Λ·td_k - T0,k)
+%@ con eq_0032_h kind=linear domain=- indicator=- :: MPC traction energy equation: E_tr,k+1 = (I + ωp·diag(αob,k))·E_tr0,k+1
+%@ con eq_0032_i kind=linear domain=- indicator=- :: MPC total energy equation: E_{k+1} = E_tr,k+1 + E_aux,k+1
+%@ con eq_0032_j kind=linear domain=- indicator=- :: MPC safety constraint: ta_k - td_k ≥ I_min
+%@ con eq_0032_k kind=linear domain=- indicator=- :: MPC stop-time constraint: up_k + ωp_k + λ_k(ta_k - td_k) ≥ 0
+%@ con eq_0032_l kind=linear domain=- indicator=- :: MPC run-time control constraint: UR_min ≤ ur_k ≤ UR_max
+%@ con eq_0032_m kind=linear domain=- indicator=- :: MPC stop-time control constraint: UP_min ≤ up_k ≤ UP_max

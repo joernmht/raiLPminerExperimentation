@@ -1,0 +1,68 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.02.008
+%@ meta id=10.1016_j.trb.2020.02.008 family=milp schema=0.1.0
+%@ name :: Joint optimization of train scheduling and maintenance planning in a railway network: A heuristic algorithm using Lagrangian relaxation
+%@ desc :: Mined from Joint optimization of train scheduling and maintenance planning in a railway network: A heuristic algorithm using Lagrangian relaxation (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.02.008
+%@ prov reference :: Joint optimization of train scheduling and maintenance planning in a railway network: A heuristic algorithm using Lagrangian relaxation
+%@ prov author :: Chuntian Zhang; Yuan Gao; Lixing Yang; Ziyou Gao; Jianguo Qi
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the bi-objective F=(F1,F2): F1 is total passenger travel time, F2 is total maintenance cost; solved for a given maintenance budget via ω-constraint.
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the space-time network.
+%@ index M ordered=0 cyclic=0 :: Set of maintenance tasks.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the space-time network.
+%@ index a ordered=0 cyclic=0 :: Index for arcs, a∈A.
+%@ index v ordered=0 cyclic=0 :: Index for nodes, v∈V.
+%@ var x shape=V,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k visits node v, 0 otherwise (x_v^k).
+%@ var y shape=A,T,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if arc a is selected for train k or maintenance r, 0 otherwise (y_a^l, l∈T∪M).
+%@ index R ordered=0 cyclic=0 :: Set of incompatible node sets (R1–R4) and feasible maintenance arc pairs R_m^r.
+%@ index N ordered=0 cyclic=0 :: Set of stations in the railway network.
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes at a station.
+%@ index w ordered=0 cyclic=0 :: Index for departure nodes, w∈W_i.
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes at a station.
+%@ index u ordered=0 cyclic=0 :: Index for arrival nodes, u∈U_i.
+%@ param B shape=N kind=vector domain=- :: Station capacity in the upstream direction at station i (B_i^u).
+%@ index H ordered=0 cyclic=0 :: Set of time instants at which station capacity constraints are evaluated.
+%@ param C shape=A,T,M kind=matrix domain=- :: Cost/travel time on arc a: C_a^k is passenger travel time for train k, C_a^r is maintenance cost for maintenance r.
+%@ param Q shape=A,T kind=matrix domain=- :: Number of passengers on arc a in train k (Q_a^k).
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective vector (F1,F2), where F1 is total passenger travel time and F2 is total maintenance cost.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Connection constraints: x_v^l equals the sum of selected incoming arcs to node v for train/maintenance l.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow balance constraints: outgoing minus incoming arc selections equals 1 at origin σ_l, -1 at destination τ_l, and 0 otherwise for each l∈T∪M.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Maintenance constraints: y_{a1}^r - y_{a2}^r = 0 for every feasible arc pair (a1,a2) of maintenance r.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure headway constraints: at most one of two trains k,k′ can visit a node in the incompatible departure set R1(w).
+%@ con eq_0005 kind=linear domain=- indicator=- :: Arrival headway constraints: at most one of two trains k,k′ can visit a node in the incompatible arrival set R2(u).
+%@ con eq_0006 kind=linear domain=- indicator=- :: Overtaking constraints: sum of selected departure/arrival nodes at two consecutive stations is at most 3, preventing overtaking outside stations.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Station capacity constraints (upstream): number of selected waiting arcs crossing time t at station i does not exceed B_i^u.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Incompatible constraints for departures: if maintenance arc a is selected, no train can visit a node in the incompatible departure set R3(a).
+%@ con eq_0009 kind=linear domain=- indicator=- :: Incompatible constraints for arrivals: if maintenance arc a is selected, no train can visit a node in the incompatible arrival set R4(a).
+%@ con eq_0010 kind=linear domain=- indicator=- :: Definition of the objective vector F=(F1,F2) = (Σ_k Σ_{a∈A_k} C_a^k Q_a^k y_a^k, Σ_r Σ_{a∈A_r} C_a^r y_a^r).
+%@ con eq_0011_a kind=linear domain=- indicator=- :: Joint model, part (a): minimize the objective vector F.
+%@ con eq_0011_b kind=linear domain=- indicator=- :: Joint model, part (b): subject to constraints (1)–(9), including connection, flow balance, maintenance, headway, overtaking, station capacity, and incompatibility constraints.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Maintenance budget ω-constraint: total maintenance cost Σ_{r∈M}Σ_{a∈A_r} C_a^r y_a^r ≤ ω, with ω = ρ F_2,min.
+%@ index kp shape=- domain=- role=index drole=- lo=- hi=- :: Renamed k'
+%@ index b shape=- domain=- role=index drole=- lo=- hi=- :: Arc index
+%@ index w1 shape=- domain=- role=index drole=- lo=- hi=- :: Vertex index
+%@ index w2 shape=- domain=- role=index drole=- lo=- hi=- :: Vertex index
+%@ index u1 shape=- domain=- role=index drole=- lo=- hi=- :: Vertex index
+%@ index u2 shape=- domain=- role=index drole=- lo=- hi=- :: Vertex index
+%@ var Fmin shape=- domain=continuous role=variable drole=- lo=- hi=- :: Renamed F_{2,min}
+\begin{align}
+  & x_{v}^{l} = \sum_{a \in \mathit{eta}_{l,v}^{-}} y_{a}^{l} \qquad \forall l \in T \cup M, v \in \mathcal{V} \tag{eq\_0001} \\
+  & \sum_{a \in \mathit{eta}_{l,v}^{+}} y_{a}^{l} - \sum_{a \in \mathit{eta}_{l,v}^{-}} y_{a}^{l} = 1 \qquad \forall l \in T \cup M, v \in \{\mathit{sigma}^{l}\} \tag{eq\_0002\_a} \\
+  & \sum_{a \in \mathit{eta}_{l,v}^{+}} y_{a}^{l} - \sum_{a \in \mathit{eta}_{l,v}^{-}} y_{a}^{l} = -1 \qquad \forall l \in T \cup M, v \in \{\mathit{tau}^{l}\} \tag{eq\_0002\_b} \\
+  & \sum_{a \in \mathit{eta}_{l,v}^{+}} y_{a}^{l} - \sum_{a \in \mathit{eta}_{l,v}^{-}} y_{a}^{l} = 0 \qquad \forall l \in T \cup M, v \in \mathcal{V} \setminus \{\mathit{sigma}^{l}, \mathit{tau}^{l}\} \tag{eq\_0002\_c} \\
+  & y_{a}^{r} - y_{b}^{r} = 0 \qquad \forall r \in M, (a, b) \in R_{m}^{r} \tag{eq\_0003} \\
+  & \sum_{v \in R_{1,w}} (x_{v}^{k} + x_{v}^{kp}) \leq 1 \qquad \forall k \in T, kp \in T \setminus \{k\}, i \in N, w \in W^{i} \tag{eq\_0004} \\
+  & \sum_{v \in R_{2,u}} (x_{v}^{k} + x_{v}^{kp}) \leq 1 \qquad \forall k \in T, kp \in T \setminus \{k\}, i \in N, u \in U^{i} \tag{eq\_0005} \\
+  & x_{w1}^{k} + x_{u1}^{k} + x_{w2}^{kp} + x_{u2}^{kp} \leq 3 \tag{eq\_0006} \\
+  & \sum_{v \in W^{i} \cap \mathcal{V}^{k} : v \preceq w} x_{v}^{k} + \sum_{v \in U^{i + 1} \cap \mathcal{V}^{k} : v \succeq u} x_{v}^{k} + \underset{v \in W^{i} \cap \mathcal{V}^{k^{^{'}}} : v \succeq w}{\sum} x_{v}^{k^{^{'}}} + \underset{v \in U^{i + 1} \cap \mathcal{V}^{k^{^{'}}} : v \preceq u}{\sum} x_{v}^{k^{^{'}}} \leq 3 \tag{eq\_0007} \\
+  & \sum_{k \in T, a \in \mathit{varphi}_{i,t}} y_{a}^{k} \leq B_{i}^{u} \qquad \forall i \in N, t \in H \tag{eq\_0008} \\
+  & y_{a}^{r} + \sum_{k \in T, v \in R_{3,a}} x_{v}^{k} \leq 1 \qquad \forall r \in M, a \in \mathcal{A}^{r} \tag{eq\_0009} \\
+  & y_{a}^{r} + \sum_{k \in T, v \in R_{4,a}} x_{v}^{k} \leq 1 \qquad \forall r \in M, a \in \mathcal{A}^{r} \tag{eq\_0010} \\
+  & \sum_{k \in T} \underset{a \in \mathbf{\mathcal{A}}^{k}}{\sum} C_{a}^{k} \cdot Q_{a}^{k} \cdot y_{a}^{k} \tag{eq\_0011\_a} \\
+  & \sum_{r \in M} \underset{a \in \mathbf{\mathcal{A}}^{r}}{\sum} C_{a}^{r} \cdot y_{a}^{r} \tag{eq\_0011\_b} \\
+  \min\quad & F \tag{eq\_0012} \\
+  & \sum_{r \in M, a \in \mathcal{A}^{r}} C_{a}^{r} \cdot y_{a}^{r} \leq \mathit{omega} \tag{eq\_0013\_a} \\
+  & \mathit{omega} = \mathit{rho} \cdot Fmin \tag{eq\_0013\_b} \\
+\end{align}

@@ -1,0 +1,99 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ress.2022.108515
+%@ meta id=10.1016_j.ress.2022.108515 family=milp schema=0.1.0
+%@ name :: A multi-modal evacuation-based response strategy for mitigating disruption in an intercity railway system
+%@ desc :: Mined from A multi-modal evacuation-based response strategy for mitigating disruption in an intercity railway system (Reliability Engineering & System Safety, 2022).
+%@ prov source :: 10.1016/j.ress.2022.108515
+%@ prov reference :: A multi-modal evacuation-based response strategy for mitigating disruption in an intercity railway system
+%@ prov author :: Enze Liu; Kash Barker; Hong Chen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Bi-objective upper-level minimizes total evacuation cost and risk; lower-level minimizes system disutility.
+%@ param d shape=- kind=scalar domain=- :: Passenger demand quantity
+%@ param t shape=- kind=scalar domain=- :: Time variable
+%@ param GDP shape=- kind=scalar domain=- :: Gross domestic product of a city
+%@ param L shape=- kind=scalar domain=- :: Number of links in a path
+%@ index n ordered=0 cyclic=0 :: Index for city or station
+%@ param c shape=- kind=scalar domain=- :: Fare cost
+%@ param P shape=- kind=scalar domain=- :: Probability function
+%@ var q shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow quantity
+%@ index C ordered=0 cyclic=0 :: City index
+%@ param v shape=- kind=scalar domain=- :: Speed of bus
+%@ var u shape=- domain=continuous role=primary drole=- lo=- hi=- :: Passenger utility
+%@ index D ordered=0 cyclic=0 :: Destination index
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: System utility
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on a link
+%@ var INC shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Income of a transit line
+%@ index m ordered=0 cyclic=0 :: Transit mode index
+%@ var INV shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Investment cost of a transit line
+%@ var N shape=- domain=integer role=primary drole=- lo=- hi=- :: Number of carriages or vehicles
+%@ param a shape=- kind=scalar domain=- :: Fixed cost coefficient
+%@ var R shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Risk measure
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param A shape=- kind=scalar domain=- :: Set of links or arcs
+%@ param V shape=- kind=scalar domain=- :: Vacancy capacity
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total in-station passenger demand equals sum over services of arrival quantities.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Origin-destination demand between cities based on GDP gravity model.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Change in trip time between original and alternative routes.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Change in fare between original and alternative routes.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Expected OD demand is departure demand times willingness probability.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Total expected demand from an origin city is sum of OD demands.
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Actual evacuated quantity equals sum of evacuated passengers over all lines.
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Actual evacuated quantity does not exceed expected demand.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Arrival time equals departure time plus running and dwell times.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure time at station equals arrival time plus holding time.
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Bus bridging travel time relation between stations.
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Bus travel distance must not exceed maximum distance limit.
+%@ con eq_0017_c kind=linear domain=- indicator=- :: Bus bridging time must not exceed arrival time at the destination station.
+%@ con eq_0017_d kind=linear domain=- indicator=- :: Bus bridging time must not exceed arrival time at the origin station.
+%@ con eq_0017_e kind=linear domain=- indicator=- :: Bus bridging is confined to stations in the same city.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Passenger in-vehicle travel time is derived from timetable.
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Transfer waiting time equals the difference between arrival times of connecting services.
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Connecting service must arrive after the preceding service for a valid transfer.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Total transfer time combines walking and waiting time with penalty factors.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Passenger utility is a weighted sum of trip, transfer, fare change, and transfer count.
+%@ con eq_0024 kind=linear domain=- indicator=- :: System utility is the passenger-flow weighted sum of individual utilities.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Fare income of a transit line is total fares collected from passenger flows.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Investment cost of a transit line includes fixed cost and variable cost proportional to fleet size.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Total evacuation cost is the sum over lines of investment minus income.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Evacuated demand is assigned to alternative routes.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Evacuated passengers on a line cannot exceed its available vacancy.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Fleet size per mode is limited by maximum available vehicles.
+%@ index C_nplus_i shape=- domain=- role=index drole=- lo=- hi=- :: C_{n+i}
+%@ index I_nplus_i shape=- domain=- role=index drole=- lo=- hi=- :: I_{n+i}
+%@ index I_iplus1 shape=- domain=- role=index drole=- lo=- hi=- :: I_{i+1}
+%@ index I_n_prime shape=- domain=- role=index drole=- lo=- hi=- :: I_n^{'}
+%@ index m_n_prime shape=- domain=- role=index drole=- lo=- hi=- :: m_n^{'}
+%@ param Deltabar shape=- domain=- role=parameter drole=- lo=- hi=- :: \bar{\Delta}
+%@ index l shape=- domain=- role=index drole=- lo=- hi=- :: line index
+%@ param Delta_bar_u shape=- domain=continuous role=parameter drole=- lo=- hi=- :: upper bound for Delta_u
+\begin{align}
+  & d_{C_n,t} = \sum_{Kappa \in \mathcal{K}} d_{Kappa,C_n,t} \tag{eq\_0004} \\
+  & d_{C_{n + i}}^{C_{n}} \left(t\right) = d^{C_{n}} \left(t\right) \frac{\mathit{GDP}_{C_{n + i}}}{\sum_{i = 1} \mathit{GDP}_{C_{n + i}}} \tag{eq\_0005} \\
+  & \mathit{Delta}_{t}^{C_{n} C_{n + i}} = \frac{\sum_{l_{n}} \sum_{m_{n}} \sum_{i = 1}^{n - 1} t_{I_{n} I_{n + i}}^{m_{n}}}{L_{n}^{C_{n} C_{n + i}}} \tag{eq\_0006} \\
+  & \mathit{Delta}_{c}^{C_{n} C_{n + i}} = \frac{\sum_{l_{n}} \sum_{m_{n}} \sum_{i = 1}^{n - 1} c_{I_{n} I_{n + i}}^{m_{n}}}{L_{n}^{C_{n} C_{n + i}}} \tag{eq\_0007} \\
+  & q_{C_nplusi,C_n} = d_{C_nplusi,C_n} \cdot P_{par,Delta} \tag{eq\_0010} \\
+  & q_{C_n} = \sum_{i \in \mathcal{I}} q_{C_nplusi,C_n} \tag{eq\_0011} \\
+  & q_{ab,C_n} = \sum_{I_n \in C_n, m_n \in \mathcal{M}} q_{ab,m_n,I_n} \tag{eq\_0012\_a} \\
+  & q_{ab,C_n} \leq q_{C_n} \tag{eq\_0012\_b} \\
+  & t_{Arr,m_n,I_n} = t_{Dep,m_n,I_1} + \sum_{i = 1}^{n} t_{I_i,I_iplus1,m_n} + \sum_{i = 1}^{n - 1} t_{dwell,m_n,I_i} \tag{eq\_0014} \\
+  & t_{Dep,m_n,I_n} = t_{Arr,m_n,I_n} + t_{Hold,m_n,I_n} \tag{eq\_0015} \\
+  & t_{b u s}^{I_{n} I_{n ^{'}}} = \frac{\mathit{Delta}_{u}^{I_{n} I_{n ^{'}}}}{v_{b u s} \left(1 - q_{a b}^{m_{n} I_{n ^{'}}} / q_{a b}^{I_{n}} \right)} \tag{eq\_0017\_a} \\
+  & \mathit{Delta}_{u,I_n,I_nprime} \leq Delta_bar_u \tag{eq\_0017\_b} \\
+  & t_{bus,I_n,I_nprime} \leq t_{Arr,m_n,I_nprime} \tag{eq\_0017\_c} \\
+  & t_{bus,I_n,I_nprime} \leq t_{Arr,m_n,I_nprime} \tag{eq\_0017\_d} \\
+  & I_n \in C_n \tag{eq\_0017\_e} \\
+  & I_nprime \in C_n \tag{eq\_0017\_f} \\
+  & t_{travel,l_n} = t_{Arr,m_n,I_n} - t_{Dep,m_n,I_nplusi} \tag{eq\_0018} \\
+  & t_{wait,l_n} = t_{Arr,m_n_prime,I_n} - t_{Arr,m_n,I_n} \tag{eq\_0021\_a} \\
+  & t_{Arr,m_n_prime,I_n} > t_{Arr,m_n,I_n} \tag{eq\_0021\_b} \\
+  & t_{t r a n s f e r}^{l_{n}} = 2 \cdot t_{w a l k}^{l_{n}} + 1.5 \cdot t_{w a i t}^{l_{n}} \tag{eq\_0022} \\
+  & u_{l_{n}^{O D}} = \mathit{alpha}_{1} t_{t r i p}^{l_{n}} + \mathit{alpha}_{2} t_{t r a n s f e r}^{l_{n}} + \mathit{alpha}_{3} \left(\sum_{m_{n}} \sum_{i} c_{I_{n} I_{n + i}}^{m_{n}} - \sum_{i}^{D} c_{I_{i} I_{i + 1}}^{o r i g i n}\right) + \mathit{alpha}_{4} \left\{l_{n} \cap^{A_{2}}\right\} \tag{eq\_0023} \\
+  & U = \sum_{l_{n}^{O D}} u_{l_{n}^{O D}} \cdot f_{l_{n}^{O D}} \tag{eq\_0024} \\
+  & \mathit{INC}_{m_{n}} = \sum_{I_{i} I_{i + 1} \in m_{n}} c_{I_{i} I_{i + 1}}^{m_{n}} \cdot f_{I_{i} I_{i + 1}}^{m_{n}} \tag{eq\_0025} \\
+  & \mathit{INV}_{m_{n}} = a \cdot c_{m_{n}} + v \cdot c_{m_{n}} \cdot N_{m_{n}} \tag{eq\_0026} \\
+  & C = \sum_{m_{n}} \left(\mathit{INV}_{m_{n}} - \mathit{INC}_{m_{n}}\right) \tag{eq\_0027} \\
+  \min\quad & C + R \tag{eq\_0030} \\
+  & s . t . q_{a b}^{C_{n}} = \sum_{m_{n}} \sum_{i = 1} f_{I_{n} I_{n + i}}^{m_{n}} \tag{eq\_0031} \\
+  & q_{a b}^{m_{n} I_{n}} \leq V \cdot A_{I_{n}}^{m_{n}} \tag{eq\_0032} \\
+  & \sum_{n} N_{m_{n}} \leq N_{m}^{m a x} \tag{eq\_0033} \\
+\end{align}

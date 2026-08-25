@@ -1,0 +1,138 @@
+% Declaration sidecar for 10.1016_j.trb.2020.03.009
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2020.03.009
+% Robust optimization models for integrated train stop planning and timetabling with passenger demand uncertainty
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2020.03.009.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=TT combination=sum :: Minimize total travel time TT
+
+% t: classified as variable during review
+%@ var t shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure and arrival times of train k at station i
+
+% TT: classified as variable during review
+%@ var TT shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total travel time of all trains
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+
+% x: classified as variable during review
+%@ var x shape=K,S domain=binary role=primary drole=- lo=- hi=- :: Binary stop indicator for train k at station i
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for stations
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for stations
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for stations
+
+% Q: classified as parameter during review
+%@ param Q shape=S,S kind=matrix domain=- :: Nominal passenger demand between stations i and j
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% q: classified as variable during review
+%@ var q shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train k from i to j
+
+% D: classified as parameter during review
+%@ param D shape=K kind=vector domain=- :: Destination station of train k
+
+% O: classified as parameter during review
+%@ param O shape=K kind=vector domain=- :: Origin station of train k
+
+% C: classified as parameter during review
+%@ param C shape=K kind=vector domain=- :: Capacity of train k
+
+% N: classified as parameter during review
+%@ param N shape=K kind=vector domain=- :: Maximum number of stops for train k
+
+% R: classified as parameter during review
+%@ param R shape=S kind=vector domain=- :: Minimum number of stops at station i
+
+% T: classified as parameter during review
+%@ param T shape=K kind=vector domain=- :: Earliest departure time for train k
+
+% unusable as an identifier, rename or drop: Δ
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for trains
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large constant for linearization
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway time between trains
+
+% y: classified as variable during review
+%@ var y shape=K,K,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train ordering
+
+% integer: classified as parameter during review
+%@ param integer shape=- kind=scalar domain=- :: Indicator for integer variables
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: α
+% p: classified as variable during review
+%@ var p shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Additional passengers on train k from i to j
+
+% H: classified as parameter during review
+%@ param H shape=K kind=vector domain=- :: Maximum additional passengers on train k
+
+% Bound by a quantifier or big operator, so no declaration of their own: k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Train stops at origin and destination
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Nominal demand transported between each OD pair
+%@ con eq_0004 kind=linear domain=- indicator=- :: No passengers depart from i unless train stops at i
+%@ con eq_0005 kind=linear domain=- indicator=- :: No passengers arrive at i unless train stops at i
+%@ con eq_0006 kind=capacity domain=- indicator=- :: Capacity constraint on each train segment
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum number of stops per train
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum number of stops per station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time within allowable window
+%@ con eq_0010 kind=linear domain=- indicator=- :: Minimum dwell time at stop
+%@ con eq_0011 kind=linear domain=- indicator=- :: Running time between successive stations
+%@ con eq_0012 kind=headway domain=- indicator=- :: Headway and ordering at departure
+%@ con eq_0013 kind=headway domain=- indicator=- :: Headway and ordering at departure (reverse)
+%@ con eq_0014 kind=headway domain=- indicator=- :: Headway and ordering at arrival
+%@ con eq_0015 kind=headway domain=- indicator=- :: Headway and ordering at arrival (reverse)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure time variable domain
+%@ con eq_0017 kind=linear domain=- indicator=- :: Arrival time variable domain
+%@ con eq_0018 kind=linear domain=- indicator=- :: Stop variable binary domain
+%@ con eq_0019 kind=linear domain=- indicator=- :: Passenger flow variable domain
+%@ con eq_0020 kind=linear domain=- indicator=- :: Ordering variable binary domain
+%@ con eq_0021 kind=linear domain=- indicator=- :: Limit on total number of stops
+%@ con eq_0023 kind=flow_balance domain=- indicator=- :: Nominal demand must be satisfied
+%@ con eq_0024 kind=flow_balance domain=- indicator=- :: Protection level and slack balance
+%@ con eq_0025 kind=linear domain=- indicator=- :: Limit on travel time increase
+%@ con eq_0026 kind=linear domain=- indicator=- :: Limit on stop plan changes
+%@ con eq_0027 kind=linear domain=- indicator=- :: Unsatisfied demand variable domain
+%@ con eq_0029 kind=capacity domain=- indicator=- :: Capacity constraint with protection buffer
+%@ con eq_0030 kind=linear domain=- indicator=- :: Unavailable capacity variable domain
+%@ con eq_0032 kind=flow_balance domain=- indicator=- :: Additional demand split among trains
+%@ con eq_0033 kind=capacity domain=- indicator=- :: Capacity constraint with additional passengers
+%@ con eq_0034 kind=capacity domain=- indicator=- :: Limit on additional passengers per train
+%@ con eq_0035 kind=linear domain=- indicator=- :: No additional departures unless train stops
+%@ con eq_0036 kind=linear domain=- indicator=- :: No additional arrivals unless train stops
+%@ con eq_0037 kind=linear domain=- indicator=- :: Additional passenger flow variable domain

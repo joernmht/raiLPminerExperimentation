@@ -1,0 +1,42 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2013.06.003
+%@ meta id=10.1016_j.cie.2013.06.003 family=milp schema=0.1.0
+%@ name :: Mixed integer programming for minimizing the period of a cyclic railway timetable for a single track with two train types
+%@ desc :: Mined from Mixed integer programming for minimizing the period of a cyclic railway timetable for a single track with two train types (Computers & Industrial Engineering, 2013).
+%@ prov source :: 10.1016/j.cie.2013.06.003
+%@ prov reference :: Mixed integer programming for minimizing the period of a cyclic railway timetable for a single track with two train types
+%@ prov author :: Mojtaba Heydar; Matthew E.H. Petering; Dietrich R. Bergmann
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of cycle length and total dwell time
+%@ param w shape=- kind=vector :: Weight vector for objective function parts
+%@ var D shape=s domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of local train at station s
+%@ var Interval shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Cycle length (minutes)
+%@ index S ordered=0 cyclic=0 :: Number of stations
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param dMin shape=s kind=vector :: Minimum dwell time at station s
+%@ param dMax shape=- kind=scalar :: Maximum total dwell time
+%@ param hStation shape=s kind=vector :: Minimum headway at station s
+%@ param hTrack shape=- kind=scalar :: Minimum headway on main line
+%@ var Delta shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of first express train
+%@ param Expr shape=- kind=scalar :: Number of express trains considered
+%@ param MY shape=- kind=big_m :: Big-M constant for constraint 12
+%@ param M shape=- kind=big_m :: Big-M constant for constraint 13
+%@ index t ordered=0 cyclic=0 :: Express train index
+%@ var Y shape=s,t domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train sequence on main line
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum dwell time at each station
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maximum total dwell time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum headway at stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Main line headway at origin (departure)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Main line headway at origin (cycle end)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Main line headway: express train after local train
+%@ con eq_0013 kind=linear domain=- indicator=- :: Main line headway: local train after express train
+\begin{align}
+  \min\quad & w_{1} \cdot \mathit{Interval} + w_{2} \cdot \sum_{s = 1}^{S} D_{s} \tag{eq\_0006} \\
+  & \text{Subject to} D_{s} \geq \mathit{dMin}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0007} \\
+  & \sum_{s = 1}^{S} D_{s} \leq \mathit{dMax} \tag{eq\_0008} \\
+  & \mathit{Interval} \geq D_{s} + \mathit{hStation}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0009} \\
+  & \mathit{Delta} \geq \mathit{hTrack} \tag{eq\_0010} \\
+  & \mathit{Interval} - \mathit{Delta} \geq \mathit{hTrack} \tag{eq\_0011} \\
+  & \begin{aligned} & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} + \mathit{MY}_{\mathit{st}} \geq \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr}\end{aligned} \tag{eq\_0012} \\
+  & \begin{aligned} & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} - M \left(1 - Y_{\mathit{st}}\right) \leq - \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr} .\end{aligned} \tag{eq\_0013} \\
+\end{align}

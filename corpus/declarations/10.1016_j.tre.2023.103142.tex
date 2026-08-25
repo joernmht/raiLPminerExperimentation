@@ -1,0 +1,142 @@
+% Declaration sidecar for 10.1016_j.tre.2023.103142
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2023.103142
+% Synchronization of train timetables in an urban rail network: A bi-objective optimization approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2023.103142.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time and synchronization quality (weighted sum).
+
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train q at station s.
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines in the urban rail network.
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index.
+
+% t̄: classified as parameter during review
+%@ param tbar shape=L kind=vector domain=- :: Latest departure time for first train of line l at first station (\bar{t}).
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of trains on a line.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations on a line.
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway time between consecutive trains.
+
+% d: classified as variable during review
+%@ var d shape=- domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train q at station s.
+
+% P: classified as variable during review
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (various types) at station s for train q.
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Passenger arrival rate at station (or transfer rate).
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Time period endpoint or time point parameter.
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of lines connected to transfer station s.
+
+% C: classified as variable during review
+%@ var C shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train q at station s.
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at station s for train q.
+
+% unusable as an identifier, rename or drop: λ
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable in BCC reformulation.
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Synchronization quality index values (I_min, I_max).
+
+% BCC: classified as parameter during review
+%@ param BCC shape=- kind=scalar domain=- :: Basic convex combination reformulation parameters.
+
+% SQI: classified as variable during review
+%@ var SQI shape=- domain=continuous role=primary drole=- lo=- hi=- :: Synchronization quality indicator for a transfer connection.
+
+% unusable as an identifier, rename or drop: Δ
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: θ
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Number of time periods.
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Time period index.
+
+% b: classified as variable during review
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative binary variable indicating departure by time period k.
+
+% unusable as an identifier, rename or drop: δ
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Continuous variable in BCCxz reformulation.
+
+% z: classified as variable during review
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Nonnegative variable in BCCxz reformulation.
+
+% BCCxz: classified as parameter during review
+%@ param BCCxz shape=- kind=scalar domain=- :: Alternative reformulation parameters for SQI (BCCxz).
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, l, q
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Constraint (1): first train departure time at first station within earliest and latest bounds.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Constraint (2): running time relation between consecutive stations.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Constraint (3): dwell time relation between departure and arrival.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Constraint (4): headway between consecutive train departures within bounds.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Constraint (5): dwell time bounds at stations.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Constraint (6): stranded passengers equal waiting minus boarding.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint (7): entering passengers between adjacent train departures (later linearized).
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint (8): entering passengers before first train departure.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint (9): total transfer passengers to a train equals sum over feeder lines.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (10): transfer passengers from a feeder train to destination line equals alighting passengers times transfer rate.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (11): alighting passengers driven by in-vehicle passengers and alighting rate.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (12): no alighting at first station.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (13): in-vehicle passenger balance.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (14): boarding passengers equal minimum of waiting and remaining capacity (nonlinear).
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (15): boarding bounded by waiting passengers.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (16): boarding bounded by remaining capacity.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (17): remaining capacity at first station equals full capacity.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (18): remaining capacity at subsequent stations.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint (19): waiting passengers for subsequent trains (entering + transfer + stranded).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint (20): waiting passengers for first train (entering + transfer).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21): waiting time of stranded passengers.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23): transfer waiting time.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24): approximate waiting time of entering passengers.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Objective (26): minimize total passenger waiting time.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constraint (32): departure time decomposition into period start and offset.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint (33): each departure belongs to exactly one time interval.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint (34): offset bounds within chosen interval.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint (35): cumulative binary interval indicator.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint (36): linearized entering passenger count.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37): quadratic entering passenger waiting time reformulation.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Equation (38): auxiliary linearization constraint for BCCxz reformulation.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Equation (43): auxiliary linearization constraint for BCCxz reformulation.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Equation (44): auxiliary linearization constraint for BCCxz reformulation.

@@ -1,0 +1,103 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.sftr.2025.101084
+%@ meta id=10.1016_j.sftr.2025.101084 family=milp schema=0.1.0
+%@ name :: A new type of sustainable operation method for urban rail transit: Joint optimization of train route planning and timetabling
+%@ desc :: Mined from A new type of sustainable operation method for urban rail transit: Joint optimization of train route planning and timetabling (Sustainable Futures, 2025).
+%@ prov source :: 10.1016/j.sftr.2025.101084
+%@ prov reference :: A new type of sustainable operation method for urban rail transit: Joint optimization of train route planning and timetabling
+%@ prov author :: Guorong Fan; Chao Li; Xinyun Shao; Fangzheng Zhen; Yao Zhi Huang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted cost of enterprise operating cost and passenger waiting cost
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total objective cost combining operating and passenger waiting costs
+%@ param c shape=F kind=vector domain=- :: Cost per train-kilometer for composition f
+%@ param l shape=R kind=vector domain=- :: Length of route r
+%@ index D ordered=0 cyclic=0 :: Set of directions (1: up, 2: down)
+%@ index F ordered=0 cyclic=0 :: Set of train compositions
+%@ index R ordered=0 cyclic=0 :: Set of candidate routes
+%@ index T ordered=0 cyclic=0 :: Set of time periods (train slots)
+%@ index k ordered=0 cyclic=0 :: Time index for passenger boarding time window
+%@ index P ordered=0 cyclic=0 :: Set of passenger groups
+%@ var Y shape=R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if route r is selected
+%@ param e shape=F kind=vector domain=- :: Passenger capacity of composition f
+%@ index d ordered=0 cyclic=0 :: Direction index (1: up, 2: down)
+%@ index n ordered=0 cyclic=0 :: Station index
+%@ index N ordered=0 cyclic=0 :: Set of stations
+%@ index K ordered=0 cyclic=0 :: Set of time points for passenger boarding
+%@ var h shape=D,T,N domain=continuous role=primary drole=- lo=- hi=- :: Headway between train t and its forward train at station n in direction d
+%@ index i ordered=0 cyclic=0 :: Index for time periods (used in constraints)
+%@ var z shape=T,F,P domain=continuous role=primary drole=- lo=- hi=- :: Linearization variable for passenger waiting cost calculation
+%@ con eq_0002 kind=linear domain=- indicator=- :: Equation (2): enterprise operating cost Z1 calculation
+%@ con eq_0003 kind=linear domain=- indicator=- :: Equation (3): passenger waiting cost Z2 expression before linearization
+%@ con eq_0004 kind=linear domain=- indicator=- :: Equation (4): each station is served by at least one route
+%@ con eq_0005 kind=linear domain=- indicator=- :: Equation (5): number of train routes is bounded by omega
+%@ con eq_0006 kind=linear domain=- indicator=- :: Equation (6): train composition on selected route does not exceed route maximum
+%@ con eq_0007 kind=linear domain=- indicator=- :: Equation (7): section capacity meets passenger demand under load factor
+%@ con eq_0008 kind=linear domain=- indicator=- :: Equation (8): train arrival time calculation at stations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Equation (9): train departure time calculation at stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Equation (10): stop variable theta linked to route/composition operation delta
+%@ con eq_0011 kind=linear domain=- indicator=- :: Equation (11): headway calculation for train t=2 with forward train
+%@ con eq_0012 kind=linear domain=- indicator=- :: Equation (12): headway calculation for train t=3 with forward train
+%@ con eq_0013 kind=linear domain=- indicator=- :: Equation (13): headway calculation for train t>=4 with forward train
+%@ con eq_0014 kind=linear domain=- indicator=- :: Equation (14): maximum headway constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Equation (15): minimum headway constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Equation (16): departure-time-window variable rho defined by departure time xi
+%@ con eq_0017 kind=linear domain=- indicator=- :: Equation (17): passenger boarding eligibility requiring train serves both origin and destination
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equation (18): each passenger assigned to exactly one train/composition
+%@ con eq_0019 kind=linear domain=- indicator=- :: Equation (19): passenger load upsilon after departing station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Equation (20): train capacity constraint on passenger load
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21): route selection Y enables train operation on selected route
+%@ con eq_0022 kind=linear domain=- indicator=- :: Equation (22): train operation consecutiveness in each direction
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23): at most one route/composition operation per train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25): piecewise definition of linearization variable lz for waiting cost
+%@ con eq_0026 kind=linear domain=- indicator=- :: Equation (26): upper bound for lz linearization with departure time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Equation (27): lower bound for lz linearization with departure time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28): upper bound for lz using passenger assignment chi
+%@ con eq_0029 kind=linear domain=- indicator=- :: Equation (29): lower bound for lz using passenger assignment chi
+%@ con eq_0030 kind=linear domain=- indicator=- :: Equation (30): linearized passenger waiting cost objective term
+%@ con eq_0031 kind=linear domain=- indicator=- :: Equation (31): linearized arrival time equation for direction 1
+%@ con eq_0032 kind=linear domain=- indicator=- :: Equation (32): linearized arrival time equation for direction 2
+%@ con eq_0033 kind=linear domain=- indicator=- :: Equation (33): upper bound for product delta*xi with operation variable
+%@ con eq_0034 kind=linear domain=- indicator=- :: Equation (34): upper bound for product delta*xi with departure time
+%@ con eq_0035 kind=linear domain=- indicator=- :: Equation (35): lower bound for product delta*xi with departure time
+%@ con eq_0036 kind=linear domain=- indicator=- :: Equation (36): bounding product delta*xi between 0 and |K|
+%@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37): linearization of rho for departure time greater than k
+%@ con eq_0038 kind=linear domain=- indicator=- :: Equation (38): linearization of rho for departure time not greater than k
+\begin{align}
+  \min\quad & \mathit{lambda} Z_{1} + \left(1 - \mathit{lambda}\right) Z_{2} \tag{eq\_0001} \\
+  & Z_{1} = \sum_{d \in D} \sum_{r \in R} \sum_{t \in T_{d}} \sum_{f \in F} c_{f} \cdot l_{r} \mathit{delta}_{t , r , f}^{d} \tag{eq\_0002} \\
+  & Z_{2} = c_{w} \sum_{p \in P} \left[\sum_{t \in T_{d}} \sum_{f \in F} \left(\sum_{r \in R} \mathit{xi}_{t , r , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} - k_{p}\right) \cdot \mathit{chi}_{t , f}^{p}\right] \tag{eq\_0003} \\
+  & \sum_{r \in R} \mathit{alpha}_{r , n} Y_{r} \geq 1 \tag{eq\_0004} \\
+  & \sum_{r \in R} Y_{r} \leq \mathit{omega} \tag{eq\_0005} \\
+  & f \mathit{delta}_{t , r , f}^{d} \leq f_{r} \tag{eq\_0006} \\
+  & \mathit{eta} \sum_{r \in R} \sum_{t \in T_{d}} \sum_{f \in F} e_{f} \mathit{beta}_{r , s} \mathit{delta}_{t , r , f}^{d} \geq p_{s , d} \tag{eq\_0007} \\
+  & \mathit{epsilon}_{t , r , f}^{d , n} \begin{cases} = \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot \left(\mathit{xi}_{t , r , f}^{d , n - 1} + t_{d , n - 1}^{2}\right) \forall d = 1 , n \in N / \left\{n_{r , d}^{1}\right\} , r \in R , t \in T \cdot d , f \in F \\ = \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot \left(\mathit{xi}_{t , r , f}^{d , n + 1} + t_{d , n + 1}^{2}\right) \forall d = 2 , n \in N / \left\{n_{r , d}^{2}\right\} , r \in R , t \in T \cdot d , f \in F \\ \leq \left|K\right| \cdot \mathit{delta}_{t , r , f}^{d} \forall d \in D , n = n_{r , d}^{1} , r \in R , t \in T \cdot d , f \in F \end{cases} \tag{eq\_0008} \\
+  & \mathit{xi}_{t , r , f}^{d , n} = \mathit{epsilon}_{t , r , f}^{d , n} + t_{d , n}^{1} \cdot \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0009} \\
+  & \mathit{theta}_{t}^{d , n} = \sum_{r \in R} \sum_{f \in F} \mathit{delta}_{t , r , f}^{d} \cdot \mathit{alpha}_{r , n} \tag{eq\_0010} \\
+  & h_{t}^{d , n} = \mathit{theta}_{t - 1}^{d , n} \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 1 , r , f}^{d , n}\right) \forall d \in D , n \in N , t = 2 \tag{eq\_0011} \\
+  & h_{t}^{d , n} = \mathit{theta}_{t - 1}^{d , n} \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 1 , r , f}^{d , n}\right) + \mathit{theta}_{t - 2}^{d , n} \cdot \left(1 - \mathit{theta}_{t - 1}^{d , n}\right) \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 2 , r , f}^{d , n}\right) \forall d \in D , n \in N , t = 3 \tag{eq\_0012} \\
+  & h_{t}^{d , n} = \mathit{theta}_{t - 1}^{d , n} \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 1 , r , f}^{d , n}\right) + \mathit{theta}_{t - 2}^{d , n} \cdot \left(1 - \mathit{theta}_{t - 1}^{d , n}\right) \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 2 , r , f}^{d , n}\right) + \mathit{theta}_{t - 3}^{d , n} \cdot \left(1 - \mathit{theta}_{t - 2}^{d , n}\right) \cdot \left(1 - \mathit{theta}_{t - 1}^{d , n}\right) \cdot \left(\sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t , r , f}^{d , n} - \sum_{r \in R} \sum_{f \in F} \mathit{xi}_{t - 3 , r , f}^{d , n}\right) \forall d \in D , n \in N , t \in \left[4 , \left|T_{d}\right|\right] \tag{eq\_0013} \\
+  & h_{t}^{d , n} \leq h_{2} + F \left(1 - \mathit{theta}_{t}^{d , n}\right) \forall d \in D , n \in N , t \in \left[2 , \left|T_{d}\right|\right] \tag{eq\_0014} \\
+  & h_{t}^{d , n} \geq h_{1} - F \left(1 - \mathit{theta}_{t}^{d , n}\right) \forall d \in D , n \in N , t \in \left[2 , \left|T_{d}\right|\right] \tag{eq\_0015} \\
+  & \mathit{rho}_{t , r , f}^{d , n , k} = \begin{cases} 1 \cdot i f 0 < k < \mathit{xi}_{t , r , f}^{d , n} \\ 0 \cdot i f \mathit{xi}_{t , r , f}^{d , n} \leq k \leq \left|K\right| \end{cases} \tag{eq\_0016} \\
+  & \mathit{chi}_{t , f}^{p} \leq \sum_{r \in R} \mathit{rho}_{t , r , f}^{d , n_{p}^{1} , k_{p}} \cdot \mathit{alpha}_{r , n_{p}^{1}} \cdot \mathit{alpha}_{r , n_{p}^{2}} \tag{eq\_0017} \\
+  & \sum_{t \in T_{d}} \sum_{f \in F} \mathit{chi}_{t , f}^{p} = 1 \tag{eq\_0018} \\
+  & \mathit{upsilon}_{t . f}^{d , n} = \sum_{p \in P_{n , d}} \mathit{chi}_{t , f}^{p} \tag{eq\_0019} \\
+  & \mathit{upsilon}_{t . f}^{d , n} \leq e_{f} \tag{eq\_0020} \\
+  & \sum_{t \in T_{d}} \sum_{f \in F} \mathit{delta}_{t , r , f}^{d} \leq \left|T_{d}\right| Y_{r} \tag{eq\_0021} \\
+  & \sum_{r \in R} \sum_{f \in F} \mathit{delta}_{t + 1 , r , f}^{d} \leq \sum_{r \in R} \sum_{f \in F} \mathit{delta}_{t , r , f}^{d} \tag{eq\_0022} \\
+  & \sum_{r \in R} \sum_{f \in F} \mathit{delta}_{t , r , f}^{d} \leq 1 \tag{eq\_0023} \\
+  & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} = \begin{cases} \sum_{r \in R} \mathit{xi}_{t , r , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} - k_{p} \text{if} \mathit{chi}_{t , f}^{p} = 1 \\ 0 \text{if} \mathit{chi}_{t , f}^{p} = 0 \end{cases} \tag{eq\_0025} \\
+  & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \leq \sum_{r \in R} \mathit{xi}_{t , r , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} - k_{p} + \left(1 - \mathit{chi}_{t , f}^{p}\right) \cdot F \tag{eq\_0026} \\
+  & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \geq \sum_{r \in R} \mathit{xi}_{t , r , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} - k_{p} + \left(1 - \mathit{chi}_{t , f}^{p}\right) \cdot F \tag{eq\_0027} \\
+  & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \leq \mathit{chi}_{t , f}^{p} \cdot F \tag{eq\_0028} \\
+  & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \geq - \mathit{chi}_{t , f}^{p} \cdot F \tag{eq\_0029} \\
+  & Z_{2} = c_{1} \sum_{p \in P} \underset{t \in T_{d_{n_{p}^{1} , n_{p}^{2}}}}{\sum} \sum_{f \in F} l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \tag{eq\_0030} \\
+  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \mathit{xi}_{t , r , f}^{d , n - 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n - 1}^{2} \forall d = 1 \tag{eq\_0031} \\
+  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \mathit{xi}_{t , r , f}^{d , n + 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n + 1}^{2} \forall d = 2 \tag{eq\_0032} \\
+  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0033} \\
+  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \mathit{xi}_{t , r , f}^{d , n} \tag{eq\_0034} \\
+  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \geq \mathit{xi}_{t , r , f}^{d , n} - \left|K\right| \left(1 - \mathit{delta}_{t , r , f}^{d , n}\right) \tag{eq\_0035} \\
+  & 0 \leq \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \tag{eq\_0036} \\
+  & k - \mathit{xi}_{t , r , f}^{d , n} < F \cdot \left(1 - \mathit{rho}_{r , t , f}^{d , n , k}\right) \tag{eq\_0037} \\
+  & \mathit{xi}_{t , r , f}^{d , n} - k \leq F \cdot \mathit{rho}_{r , t , f}^{d , n , k} \tag{eq\_0038} \\
+\end{align}

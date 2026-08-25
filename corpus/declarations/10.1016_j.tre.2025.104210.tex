@@ -1,0 +1,181 @@
+% Declaration sidecar for 10.1016_j.tre.2025.104210
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2025.104210
+% Real-time train rescheduling optimization with combined cross-line strategies for urban rail network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2025.104210.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of skipped stop, destination delay, and low frequency penalties
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar :: Penalty cost for skipped stops, destination delays, or low frequency
+
+% p: classified as parameter during review
+%@ param p shape=R,I kind=scalar :: Individual stop-skip penalty at station i of trip r
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of trips
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant
+
+% x: classified as variable during review
+%@ var x shape=R,I domain=binary role=primary :: Binary variable indicating if stop at station i of trip r is skipped
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Cost per minute for destination delay or low frequency
+
+% g: classified as variable during review
+%@ var g shape=R domain=non_negative role=primary :: Destination delay of trip r
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar :: Cost efficiency for skipped stop penalties
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar :: Threshold headway time or planned arrival time
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar :: Fixed large value for canceled destination arrival
+
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar :: Cost efficiency for destination delay penalties
+
+% t: classified as variable during review
+%@ var t shape=R,I domain=integer role=primary :: Arrival or departure time of trip r at station i
+
+% t̄: classified as parameter during review
+%@ param t_hat shape=R,I kind=scalar :: Planned arrival or departure time
+
+% z: classified as variable during review
+%@ var z shape=R,I domain=binary role=primary :: Binary variable indicating if event at station i of trip r is canceled
+
+% h: classified as variable during review
+%@ var h shape=R,R,I domain=non_negative role=primary :: Excessive headway time or minimum headway time
+
+% w̄: classified as parameter during review
+%@ param w_hat shape=R,I kind=scalar :: Threshold headway time at station i between trip r and previous trip
+
+% unusable as an identifier, rename or drop: Ω
+% unusable as an identifier, rename or drop: η
+
+% e: classified as variable during review
+%@ var e shape=R domain=binary role=primary :: Binary variable indicating if trip r is canceled
+
+% d: classified as variable during review
+%@ var d shape=R,I domain=non_negative role=primary :: Extended running or dwelling time
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of delay types
+
+% d̄: classified as parameter during review
+%@ param d_hat shape=U,I kind=scalar :: Extended running or dwelling time for delay u
+
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: φ̄
+% unusable as an identifier, rename or drop: ψ
+
+% T: classified as parameter during review
+%@ param T shape=U,I kind=scalar :: Start time of time window for delay u at station i
+
+% T̄: classified as parameter during review
+%@ param T_hat shape=U,I kind=scalar :: End time of time window for delay u at station i
+
+% y: classified as variable during review
+%@ var y shape=R,R,I domain=binary role=primary :: Binary variable indicating if trip r' follows trip r at station i
+
+% unusable as an identifier, rename or drop: δ
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar :: Set of rolling stock units
+
+% unusable as an identifier, rename or drop: Ψ
+% unusable as an identifier, rename or drop: Φ
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar :: Objective function value
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of headway levels
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, n, r, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear :: Skipped stop penalty component definition
+%@ con eq_0002_a kind=linear :: Linearization of skipped stop penalty, upper bound
+%@ con eq_0002_b kind=linear :: Linearization of skipped stop penalty, upper bound
+%@ con eq_0002_c kind=linear :: Linearization of skipped stop penalty, lower bound
+%@ con eq_0003 kind=linear :: Destination delay penalty component definition
+%@ con eq_0004_a kind=linear :: Destination delay nonnegativity
+%@ con eq_0004_b kind=linear :: Destination delay calculation with cancellation
+%@ con eq_0005 kind=linear :: Low frequency penalty component definition
+%@ con eq_0006_a kind=linear :: Excessive headway lower bound
+%@ con eq_0006_b kind=linear :: Excessive headway nonnegativity
+%@ con eq_0007_a kind=linear :: Previous adjacent trip arrival time lower bound
+%@ con eq_0007_b kind=linear :: Previous adjacent trip arrival time upper bound
+%@ con eq_0008 kind=linear :: Exactly one previous adjacent trip selected
+%@ con eq_0009 kind=linear :: Stop-skip only if event not canceled
+%@ con eq_0010_a kind=linear :: Event cancellation consistency lower bound
+%@ con eq_0010_b kind=linear :: Event cancellation consistency upper bound
+%@ con eq_0011 kind=linear :: Running time constraint
+%@ con eq_0012_a kind=linear :: Extended running time activation
+%@ con eq_0012_b kind=linear :: Time window lower bound for extended running time
+%@ con eq_0012_c kind=linear :: Time window upper bound for extended running time
+%@ con eq_0012_d kind=linear :: Time window lower bound for extended running time
+%@ con eq_0012_e kind=linear :: Time window upper bound for extended running time
+%@ con eq_0012_f kind=linear :: Extended running time nonnegativity
+%@ con eq_0013 kind=linear :: Dwelling time requirement when stop is not skipped
+%@ con eq_0014_a kind=linear :: Dwelling time zero when stop skipped but event kept, lower
+%@ con eq_0014_b kind=linear :: Dwelling time zero when stop skipped but event kept, upper
+%@ con eq_0015_a kind=linear :: Extended dwelling time activation
+%@ con eq_0015_b kind=linear :: Time window lower bound for extended dwelling time
+%@ con eq_0015_c kind=linear :: Time window upper bound for extended dwelling time
+%@ con eq_0015_d kind=linear :: Time window lower bound for extended dwelling time
+%@ con eq_0015_e kind=linear :: Time window upper bound for extended dwelling time
+%@ con eq_0015_f kind=linear :: Extended dwelling time nonnegativity
+%@ con eq_0016_a kind=linear :: Safety headway for arrivals
+%@ con eq_0016_b kind=linear :: Safety headway for departures
+%@ con eq_0017 kind=linear :: Trip assignment by an incoming rolling stock arc
+%@ con eq_0018 kind=linear :: Rolling stock flow balance at each vertex
+%@ con eq_0019 kind=linear :: Rolling stock capacity limit
+%@ con eq_0020 kind=linear :: Minimum turn-around time between connected trips
+%@ con eq_0021 kind=linear :: Short-turning start cancels events before station
+%@ con eq_0022 kind=linear :: Short-turning end cancels events after station
+%@ con eq_0023 kind=linear :: Binary domain of stop-skipping variables
+%@ con eq_0024 kind=linear :: Binary domain of rolling stock connection variables
+%@ con eq_0025 kind=linear :: Binary domain of event cancellation variables
+%@ con eq_0026 kind=linear :: Binary domain of trip cancellation variables
+%@ con eq_0027 kind=linear :: Integer domain of arrival and departure times
+%@ con eq_0032_a kind=linear :: Additional constraint 32a
+%@ con eq_0032_b kind=linear :: Additional constraint 32b
+%@ con eq_0032_c kind=linear :: Additional constraint 32c
+%@ con eq_0032_d kind=linear :: Additional constraint 32d
+%@ con eq_0033_a kind=linear :: Additional constraint 33a
+%@ con eq_0033_b kind=linear :: Additional constraint 33b
+%@ con eq_0033_c kind=linear :: Additional constraint 33c

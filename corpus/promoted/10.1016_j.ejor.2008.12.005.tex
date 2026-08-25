@@ -1,0 +1,100 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2008.12.005
+%@ meta id=10.1016_j.ejor.2008.12.005 family=milp schema=0.1.0
+%@ name :: A disjunctive graph model and framework for constructing new train schedules
+%@ desc :: Mined from A disjunctive graph model and framework for constructing new train schedules (European Journal of Operational Research, 2008).
+%@ prov source :: 10.1016/j.ejor.2008.12.005
+%@ prov reference :: A disjunctive graph model and framework for constructing new train schedules
+%@ prov author :: Robert L. Burdett; Erhan Kozan
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimise total delay over all operations
+%@ var atl shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Additional time lag for operation o_i,k
+%@ var dt shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Distance travelled up to and including the k-th section
+%@ index J ordered=0 cyclic=0 :: Set of jobs
+%@ param l shape=i,j kind=matrix domain=- :: Length of train i or section j
+%@ param delta shape=i,k kind=matrix domain=- :: Planned dwell time for train i on its k-th section
+%@ var fstage shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Stage of the front when the rear is departing the k-th section
+%@ var fpos shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Position of the front when the rear is departing the k-th section
+%@ param a shape=i,k kind=matrix domain=- :: Time to accelerate for operation o_i,k
+%@ var apt shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Additional processing time for operation o_i,k
+%@ param d shape=i,k kind=matrix domain=- :: Time to decelerate for operation o_i,k
+%@ var ina shape=i,k domain=binary role=primary drole=- lo=- hi=- :: Binary flag for acceleration incurred
+%@ var ind shape=i,k domain=binary role=primary drole=- lo=- hi=- :: Binary flag for deceleration incurred
+%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Disjunctive arc weight
+%@ param p shape=i,k kind=matrix domain=- :: Processing time of operation o_i,k
+%@ param s shape=o,o kind=matrix domain=- :: Setup time or headway between operations
+%@ var entry shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Scheduled entry time for operation o_i,k
+%@ var lpv shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Longest path value to operation o_i,k
+%@ var exit shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Scheduled exit time for operation o_i,k
+%@ param stl shape=i kind=vector domain=- :: Standard time lag for train i
+%@ var delay shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Delay for operation o_i,k
+%@ var LB shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lower bound on makespan
+%@ var lb shape=j domain=continuous role=primary drole=- lo=- hi=- :: Lower bound for machine j
+%@ index M ordered=0 cyclic=0 :: Set of machines
+%@ param pbar shape=i,k kind=matrix domain=- :: Adjusted processing time including dwell and additional times
+%@ param tau shape=i,k kind=matrix domain=- :: Cumulative processing time up to operation o_i,k
+%@ param phi shape=i,k kind=matrix domain=- :: Cumulative processing time after operation o_i,k
+%@ index U ordered=0 cyclic=0 :: Set of operations using machine j
+%@ index O ordered=0 cyclic=0 :: Set of all operations
+%@ param rlt shape=i kind=vector domain=- :: Release time of job i
+%@ index i ordered=0 cyclic=0 :: Job index
+%@ index j ordered=0 cyclic=0 :: Machine index
+%@ index k ordered=0 cyclic=0 :: Stage (position in machine path) index
+%@ index o ordered=0 cyclic=0 :: Operation index
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Definition of operation set for job i
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Definition of union of operations
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Definition of machine usage set U_j
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Definition of machine visit frequency f_i,j
+%@ con eq_0002_c kind=linear domain=- indicator=- :: Definition of operation pairs on same machine E_j
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of disjunctive graph tuple
+%@ con eq_0004 kind=linear domain=- indicator=- :: Selection of disjunctive arcs S
+%@ con eq_0005 kind=linear domain=- indicator=- :: Additional processing time caused by planned dwell times
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Acceleration flag for first operation is zero
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Acceleration flag for subsequent operations based on previous dwell
+%@ con eq_0014 kind=linear domain=- indicator=- :: Disjunctive arc weight e_2 for front within system
+%@ con eq_0015 kind=linear domain=- indicator=- :: Disjunctive arc weight e_2 for front departed system
+%@ con eq_0016 kind=linear domain=- indicator=- :: Entry time from longest path value
+%@ con eq_0017 kind=linear domain=- indicator=- :: Exit time for last stage
+%@ con eq_0018 kind=linear domain=- indicator=- :: Exit time for intermediate stages by backward projection
+%@ con eq_0019 kind=linear domain=- indicator=- :: Exit time for intermediate stages by forward projection
+%@ con eq_0020 kind=linear domain=- indicator=- :: Delay computation for operation
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 22)
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 23b)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 24)
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 25a)
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 25b)
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 26a)
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 26b)
+%@ con eq_0027_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27a)
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27b)
+\begin{align}
+  & \mathit{atl}_{i , K_{i}} = 0 \tag{eq\_0001\_a} \\
+  & \mathit{atl}_{i , k} = \underset{k + 1 \leq k^{'} \leq K_{i} \left|\right. \mathit{dt}_{i , k^{'}} - l_{i}^{J} < \mathit{dt}_{i , k}}{\sum} \left(\mathit{delta}_{i , k^{'}}\right) \forall i \in J , 1 \leq k < K_{i} . \tag{eq\_0001\_b} \\
+  & \mathit{dt}_{i , 0} = 0 \tag{eq\_0002\_a} \\
+  & \mathit{dt}_{i , k} = \mathit{dt}_{i , k - 1} + l_{m_{i , k}}^{M} 1 \leq k \leq K_{i} \tag{eq\_0002\_b} \\
+  & \mathit{dt}_{i , K_{i} + 1} = \mathit{dt}_{i , K_{i}} + l_{i}^{J} \forall i \tag{eq\_0002\_c} \\
+  & \mathit{fstage}_{i , k} = min \left\{\right. k^{'} \left|\right. k + 1 \leq k^{'} \leq K_{i} + 1 , \mathit{dt}_{i , k^{'}} \geq \mathit{dt}_{i , k} + l_{i}^{J} \left.\right\} \forall i , k = 1 , \ldots , K_{i} , \tag{eq\_0003} \\
+  & \mathit{fpos}_{i , k} = \mathit{dt}_{i , k} + l_{i}^{J} - \mathit{dt}_{i , \mathit{fstage}_{i , k} - 1} \forall i , k . \tag{eq\_0004} \\
+  & \mathit{apt}_{i , k} = d_{i , k} \cdot \mathit{ind}_{i , k} + a_{i , k} \cdot \mathit{ina}_{i , k - 1} , k = 1 , \ldots , K_{i} , \tag{eq\_0005} \\
+  & \mathit{ina}_{i , 1} = 0 \tag{eq\_0007\_a} \\
+  & \mathit{ina}_{i , k} = \left\{\begin{matrix} 1 & \text{for} \mathit{delta}_{i , k - 1} > 0 \\ 0 & \text{for} \mathit{delta}_{i , k - 1} = 0 \end{matrix}\right , k = 2 , \ldots , K_{i} . \tag{eq\_0007\_b} \\
+  & e_{1} = \left(o_{i , k^{ \cdot }} , o_{i^{'} , k^{'}} , s_{o_{i , k} , o_{i^{'} , k^{'}}} - \mathit{delta}_{i , k^{ \cdot }} - p_{i , k^{ \cdot }} \left(1 - \mathit{fpos}_{i , k} / l_{m_{i , k^{ \cdot }}}^{M}\right)\right) , k^{ \cdot } = \mathit{fstage}_{i , k} \leq K_{i} , \tag{eq\_0014} \\
+  & e_{1} = \left(o_{i , k^{ \cdot }} , o_{i^{'} , k^{'}} , s_{o_{i , k} , o_{i^{'} , k^{'}}} + p_{i , k^{ \cdot }} \left(\mathit{fpos}_{i , k} / l_{m_{i , k^{ \cdot }}}^{M}\right)\right) , k^{ \cdot } = \mathit{fstage}_{i , k} > K_{i} , \tag{eq\_0015} \\
+  & e_{2} = \left(o_{i^{'} , k^{ \cdot }} , o_{i , k} , s_{o_{i^{'} , k^{'}} , o_{i , k} ,} - \mathit{delta}_{i^{'} , k^{ \cdot }} - p_{i^{'} , k^{ \cdot }} \left(1 - \mathit{fpos}_{i^{'} , k^{'}} / l_{m_{i^{'} , k^{ \cdot }}}^{M}\right)\right) , k^{ \cdot } = \mathit{fstage}_{i^{'} , k^{'}} \leq K_{i^{'}} , \tag{eq\_0016} \\
+  & e_{2} = \left(o_{i^{'} , k^{ \cdot }} , o_{i , k} , s_{o_{i^{'} , k^{'}} , o_{i , k}} + p_{i^{'} , k^{ \cdot }} \left(\mathit{fpos}_{i^{'} , k^{'}} / l_{m_{i^{'} , k^{ \cdot }}}^{M}\right)\right) , k^{ \cdot } = \mathit{fstage}_{i^{'} , k^{'}} > K_{i^{'}} . \tag{eq\_0017} \\
+  & \mathit{entry}_{i , k} ≔ \mathit{lpv}_{i , k} - p_{i , k} - \mathit{delta}_{i , k} - \mathit{atl}_{i , k} \forall i \in J , k = K_{i} , \ldots , 1 , \tag{eq\_0018} \\
+  & \mathit{exit}_{i , k} ≔ \mathit{lpv}_{i , k} + \mathit{stl}_{i} \forall i \in J , k = K_{i} , \tag{eq\_0019} \\
+  & \mathit{exit}_{i , k} ≔ \mathit{lpv}_{i , k^{ \cdot }} - \left(\mathit{delta}_{i , k^{ \cdot }} + p_{i , k^{ \cdot }} \left(1 - \mathit{fpos}_{i , k} / l_{m_{i , k^{ \cdot }}}^{M}\right)\right) - d_{i , k^{ \cdot }} \left(\mathit{ind}_{i , k^{ \cdot }}\right) \forall i \in J , k = K_{i} - 1 , \ldots , 1 \left|\right. k^{ \cdot } = \mathit{fstage}_{i , k} \leq K_{i} , \tag{eq\_0020} \\
+  & \mathit{exit}_{i , k} ≔ \mathit{lpv}_{i , k^{ \cdot } - 1} + p_{i , k^{ \cdot } - 1} \left(\mathit{fpos}_{i , k} / l_{m_{i , k^{ \cdot } - 1}}^{M}\right) \forall i \in J , k = K_{i} - 1 , \ldots , 1 \left|\right. k^{ \cdot } = \mathit{fstage}_{i , k} = K_{i} + 1 , \tag{eq\_0021} \\
+  & \mathit{delay}_{i , k} = \mathit{exit}_{i , k} - \left(\mathit{entry}_{i , k} + p_{i , k} + \mathit{delta}_{i , k} + \mathit{stl}_{i} + \mathit{atl}_{i , k} + \mathit{apt}_{i , k}\right) \forall i \in J , k = K_{i} , \ldots , 1 . \tag{eq\_0022} \\
+  \mathit{LB}\quad & = \underset{j \in M}{max} \left\{\mathit{lb}_{j}\right\} \tag{eq\_0023\_a} \\
+  & \mathit{lb}_{j} = \sum_{o_{i , k} \in U_{j}} \left(\bar{p}_{i , k}\right) + \underset{o_{i , k} \in U_{j}}{min} \left\{\mathit{tau}_{i , k}\right\} + \underset{o_{i , k} \in U_{j}}{min} \left\{\mathit{phi}_{i , k}\right\} , \forall j \in M \tag{eq\_0023\_b} \\
+  & \bar{p}_{i , k} = p_{i , k} + \mathit{delta}_{i , k} + \mathit{apt}_{i , k} + \mathit{atl}_{i , k} + \mathit{stl}_{i} , \forall o_{i , k} \in O , \tag{eq\_0024} \\
+  & \mathit{tau}_{i , 1} = \mathit{rlt}_{i} \tag{eq\_0025\_a} \\
+  & \mathit{tau}_{i , k} = \mathit{tau}_{i , k - 1} + p_{i , k - 1}^{'} \left[= \sum_{k^{'} = 1 , \ldots , k - 1} \left(p_{i , k^{'}}^{'}\right)\right] , k = 2 , \ldots , K_{i} \tag{eq\_0025\_b} \\
+  & \mathit{phi}_{i , K_{i}} = 0 \tag{eq\_0026\_a} \\
+  & \mathit{phi}_{i , k} = \mathit{phi}_{i , k + 1} + p_{i , k + 1}^{''} \left[= \sum_{k^{'} = k + 1 , \ldots , K_{i}} \left(p_{i , k^{'}}^{''}\right)\right] , k = K_{i} - 1 , \ldots , 1 \tag{eq\_0026\_b} \\
+  & p_{i , k}^{'} = p_{i , k} + \mathit{delta}_{i , k} + \mathit{apt}_{i , k} \tag{eq\_0027\_a} \\
+  & p_{i , k}^{''} = p_{i , k} + \mathit{apt}_{i , k} + \mathit{atl}_{i , k} + \left(\mathit{delta}_{i , k} \text{if} \mathit{atl}_{i , k - 1} = 0\right) . \tag{eq\_0027\_b} \\
+\end{align}

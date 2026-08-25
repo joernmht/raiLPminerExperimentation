@@ -1,0 +1,168 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2025.105441
+%@ meta id=10.1016_j.trc.2025.105441 family=milp schema=0.1.0
+%@ name :: Incorporating reservation strategies into demand management and train scheduling in metro systems
+%@ desc :: Mined from Incorporating reservation strategies into demand management and train scheduling in metro systems (Transportation Research Part C Emerging Technologies, 2025).
+%@ prov source :: 10.1016/j.trc.2025.105441
+%@ prov reference :: Incorporating reservation strategies into demand management and train scheduling in metro systems
+%@ prov author :: Yahan Lu; Lixing Yang; Dongyang Xia; Fanting Meng; Shadi Sharif Azadeh
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time and line congestion
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total objective value (weighted sum of passenger waiting time and line congestion)
+%@ var y shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: 1 if time t falls within headway between train i-1 and i at station s
+%@ param D shape=S,S,T kind=matrix domain=- :: Passenger demand from station s to station v at time step t
+%@ var r shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers stranded by train i at station s for destination v
+%@ index I ordered=0 cyclic=0 :: Set of train services
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of time steps
+%@ var z shape=I domain=integer role=primary drole=- lo=- hi=- :: Maximum number of waiting passengers for train i
+%@ var x shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: 1 if train i has not departed station s at time t, 0 otherwise
+%@ var d shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station s
+%@ param h shape=- kind=scalar domain=- :: Lower bound on headway between consecutive trains
+%@ param h_bar shape=- kind=scalar domain=- :: Upper bound on headway between consecutive trains
+%@ var a shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station s
+%@ var b_hat shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved passengers boarding train i from s to v
+%@ index Z ordered=0 cyclic=0 :: Set of nonnegative integers
+%@ var b shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers boarding train i from s to v
+%@ var w shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers waiting at station s for train i destined for v
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ var o shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers on board when train i leaves station s
+%@ var o_hat shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved passengers on board when train i leaves station s
+%@ var l shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers alighting from train i at station s
+%@ param M shape=I,S kind=big_m domain=- :: Big-M constant for linearization of product constraints
+%@ param TS shape=- kind=scalar domain=- :: Train scheduling subproblem
+%@ param DM shape=- kind=scalar domain=- :: Demand management subproblem
+%@ var y_hat shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: Binary headway variable in demand management subproblem
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of total waiting time Fe
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of line congestion Fc
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure time calculation from train operation variables
+%@ con eq_0007 kind=linear domain=- indicator=- :: Headway bounds between consecutive trains
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Arrival time equals departure from previous station plus running time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Definition of headway indicator y
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain for train operation variable x
+%@ con eq_0012 kind=linear domain=- indicator=- :: Reserved boarding amount from reservation slots
+%@ con eq_0013 kind=linear domain=- indicator=- :: Conservation of reserved passengers over time
+%@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound on reservation slots by demand
+%@ con eq_0015 kind=linear domain=- indicator=- :: Integer domain for reservation slots
+%@ con eq_0016 kind=linear domain=- indicator=- :: Number of waiting unreserved passengers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimum service ratio for unreserved passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Number of stranded unreserved passengers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Conservation of unreserved passengers over time
+%@ con eq_0020 kind=linear domain=- indicator=- :: Integer domain for unreserved boarding variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train capacity constraint
+%@ con eq_0022 kind=linear domain=- indicator=- :: Reserved passengers on board calculation
+%@ con eq_0023 kind=linear domain=- indicator=- :: Unreserved passengers on board calculation
+%@ con eq_0024 kind=linear domain=- indicator=- :: Alighting passengers calculation
+%@ con eq_0025 kind=linear domain=- indicator=- :: Upper bound on maximum waiting passengers per train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Original integrated model formulation
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization of product y*y (theta)
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Linearized Fe: term for newly arriving passengers
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Linearized Fe: term for stranded passengers
+%@ con eq_0029_c kind=linear domain=- indicator=- :: Linearized Fe equality
+%@ con eq_0029_d kind=linear domain=- indicator=- :: Linearized Fe (part d)
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Linearization of alpha: b_hat equals sum of alpha
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Linearization of alpha: alpha <= M*y
+%@ con eq_0030_c kind=linear domain=- indicator=- :: Linearization of alpha: alpha <= rho
+%@ con eq_0030_d kind=linear domain=- indicator=- :: Linearization of alpha: alpha >= rho - M*(1-y)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Reformulated waiting passengers w using beta
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Linearization of beta: beta <= M*x
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Linearization of beta: beta <= rho
+%@ con eq_0032_c kind=linear domain=- indicator=- :: Linearization of beta: beta >= rho - M*(1-x)
+%@ con eq_0032_d kind=linear domain=- indicator=- :: Linearization of beta: beta in [0,M]
+%@ con eq_0032_e kind=linear domain=- indicator=- :: Linearization of beta: additional domain constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Equivalent linear programming model formulation
+%@ con eq_0034_a kind=linear domain=- indicator=- :: Valid inequality: sum of headways at first station
+%@ con eq_0034_b kind=linear domain=- indicator=- :: Valid inequality: total trip time bound
+%@ con eq_0034_c kind=linear domain=- indicator=- :: Valid inequality: terminal station arrival bound
+%@ con eq_0034_d kind=linear domain=- indicator=- :: Valid inequality: derived from running times
+%@ con eq_0039 kind=linear domain=- indicator=- :: TS subproblem: train operation non-increasing
+%@ con eq_0040 kind=linear domain=- indicator=- :: TS subproblem: terminal time domain
+%@ con eq_0041_a kind=linear domain=- indicator=- :: TS subproblem: departure time calculation
+%@ con eq_0041_b kind=linear domain=- indicator=- :: TS subproblem: headway bounds
+%@ con eq_0041_c kind=linear domain=- indicator=- :: TS subproblem: departure/arrival link
+%@ con eq_0042 kind=linear domain=- indicator=- :: TS subproblem: arrival/departure link
+%@ con eq_0043_a kind=linear domain=- indicator=- :: DM subproblem: Fe definition
+%@ con eq_0043_b kind=linear domain=- indicator=- :: DM subproblem: Fc definition
+%@ con eq_0043_c kind=linear domain=- indicator=- :: DM subproblem: b_hat from reservation slots
+%@ con eq_0043_d kind=linear domain=- indicator=- :: DM subproblem: conservation of reserved
+%@ con eq_0043_e kind=linear domain=- indicator=- :: DM subproblem: upper bound on rho
+%@ con eq_0043_f kind=linear domain=- indicator=- :: DM subproblem: w definition
+%@ con eq_0043_g kind=linear domain=- indicator=- :: DM subproblem: minimum service ratio
+%@ con eq_0043_h kind=linear domain=- indicator=- :: DM subproblem: stranded passengers
+%@ con eq_0043_i kind=linear domain=- indicator=- :: DM subproblem: conservation of unreserved
+%@ con eq_0043_j kind=linear domain=- indicator=- :: DM subproblem: o_hat calculation
+%@ con eq_0043_k kind=linear domain=- indicator=- :: DM subproblem: o calculation
+%@ con eq_0043_l kind=linear domain=- indicator=- :: DM subproblem: l calculation
+%@ con eq_0043_m kind=linear domain=- indicator=- :: DM subproblem: z definition
+%@ con eq_0043_n kind=linear domain=- indicator=- :: DM subproblem: integer domain for rho
+%@ con eq_0043_o kind=linear domain=- indicator=- :: DM subproblem: integer domain for b
+%@ con eq_0043_p kind=linear domain=- indicator=- :: DM subproblem: capacity penalty constraint
+\begin{align}
+  \begin{aligned}min\quad & & \mathit{lambda}^{e} F^{e} + \mathit{lambda}^{c} F^{c}\end{aligned} \tag{eq\_0001} \\
+  & \begin{aligned}F^{e} & = \mathit{Delta} \left[\sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \left(y_{i s t} \sum_{t^{'} \in \mathcal{T} , t^{'} \leq t} y_{i s t^{'}} \sum_{v \in \mathcal{S} , v > s} D_{s v t}\right) + \sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \left(y_{i s t} \sum_{v \in \mathcal{S} , v > s} r_{i s v}\right)\right] , & \end{aligned} \tag{eq\_0002} \\
+  & \begin{aligned}F^{c} & = \sum_{i \in \mathcal{I}} z_{i} ,\end{aligned} \tag{eq\_0003} \\
+  & \begin{matrix} & x_{i s \left(t + 1\right)} \leq x_{i s t} & & \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \backslash \left\{\left|\mathcal{T}\right|\right\} ,\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix} & x_{i s \left|\mathcal{T}\right|} = 0 & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix} & d_{i s} = \sum_{t \in \mathcal{T} \backslash \left\{1\right\}} \left[t \left(x_{i s \left(t - 1\right)} - x_{i s t}\right)\right] & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix} & \underset{\overline}{h} \leq d_{i s} - d_{\left(i - 1\right) s} \leq {h} & & \forall i \in \mathcal{I} \backslash \left\{1\right\} , s \in \mathcal{S} ,\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix} & d_{i s} = a_{i s} + \mathit{epsilon}_{i s} & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix} & a_{i s} = d_{i \left(s - 1\right)} + \mathit{eta}_{i \left(s - 1\right)} & & \forall i \in \mathcal{I} , s \in \mathcal{S} \backslash \left\{1\right\} ,\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & y_{i s t} = \begin{cases} & x_{i s t} i = 1 \\ & x_{i s t} - x_{\left(i - 1\right) s t} i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & & \forall s \in \mathcal{S} , t \in \mathcal{T} ,\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix} & x_{i s t} \in \left\{0 , 1\right\} & & \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} .\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & \left(\hat{b}\right)_{i s v} = \sum_{t \in \mathcal{T}} y_{i s t} \mathit{varrho}_{s t} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & \sum_{i \in \mathcal{I}} \left(\hat{b}\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{varrho}_{s v t} & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & 0 \leq \mathit{varrho}_{s v t} \leq D_{s v t} & & \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & \mathit{varrho}_{s v t} \in \mathcal{Z}_{\geq 0} & & \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} .\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & w_{i s v} = \begin{cases} & \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) i = 1 \\ & \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) - \sum_{j \in \mathcal{I} , j < i} b_{j s v} i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & \mathit{kappa}_{i s v} w_{i s v} \leq b_{i s v} \leq w_{i s v} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix} & r_{i s v} = w_{i s v} - b_{i s v} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix} & \sum_{i \in \mathcal{I}} b_{i s v} = \sum_{t \in \mathcal{T}} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix} & b_{i s v} \in \mathcal{Z}_{\geq 0} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s .\end{matrix} \tag{eq\_0022} \\
+  & \begin{aligned}o_{i s} + \left(\hat{o}\right)_{i s} & \leq C & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{aligned} \tag{eq\_0023} \\
+  & \begin{aligned}\left(\hat{o}\right)_{i s} & = \sum_{m \in \mathcal{S} , m \leq s - 1} \sum_{v \in \mathcal{S} , v \geq s + 1} \left(\hat{b}\right)_{i m v} & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{aligned} \tag{eq\_0024} \\
+  & \begin{aligned}o_{i s} & = \begin{cases} \sum_{v \in \mathcal{S} , v > s} b_{i s v} & s = 1 \\ o_{i \left(s - 1\right)} - l_{i s} + \sum_{v \in \mathcal{S} , v > s} b_{i s v} & s \in \mathcal{S} \backslash \left\{1 , \left|\mathcal{S}\right|\right\} \\ 0 & s = \left|\mathcal{S}\right| \end{cases} & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{aligned} \tag{eq\_0025} \\
+  & \begin{aligned}l_{i s} & = \begin{cases} 0 & s = 1 \\ \sum_{m \in \mathcal{S} , m \leq s - 1} b_{i m s} & s \in \mathcal{S} \backslash \left\{1\right\} \end{cases} & & \forall i \in \mathcal{I} , s \in \mathcal{S} ,\end{aligned} \tag{eq\_0026} \\
+  & \begin{aligned}z_{i} & \geq \sum_{s , v \in \mathcal{S} , v > s} \left(w_{i s v} + \left(\hat{b}\right)_{i s v}\right) & & \forall i \in \mathcal{I} .\end{aligned} \tag{eq\_0027} \\
+  & \mathit{theta}_{i s t t^{'}} \leq y_{i s t} , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t , t^{'} \in \mathcal{T} , t^{'} \leq t \tag{eq\_0029\_a} \\
+  & \mathit{theta}_{i s t t^{'}} \leq y_{i s t^{'}} , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t , t^{'} \in \mathcal{T} , t^{'} \leq t \tag{eq\_0029\_b} \\
+  & \mathit{theta}_{i s t t^{'}} \geq y_{i s t} + y_{i s t^{'}} - 1 , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t , t^{'} \in \mathcal{T} , t^{'} \leq t \tag{eq\_0029\_c} \\
+  & \mathit{theta}_{i s t t^{'}} \in \left[0 , 1\right] , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t , t^{'} \in \mathcal{T} , t^{'} \leq t \tag{eq\_0029\_d} \\
+  & \mathit{gamma}_{i s t} \leq M_{i s} \cdot y_{i s t} , \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0030\_a} \\
+  & \mathit{gamma}_{i s t} \leq \sum_{v > s , v \in \mathcal{S}} r_{i s v} , \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0030\_b} \\
+  & \mathit{gamma}_{i s t} \geq \sum_{v > s , v \in \mathcal{S}} r_{i s v} - M_{i s} \left(1 - y_{i s t}\right) , \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0030\_c} \\
+  & \mathit{gamma}_{i s t} \in \left[0 , M_{i s}\right] , \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0030\_d} \\
+  & \begin{matrix}F^{e} = \mathit{Delta} \left[\sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \sum_{t^{'} \in \mathcal{T} , t^{'} \leq t} \left(\mathit{theta}_{i s t t^{'}} \sum_{v \in \mathcal{S} , v > s} D_{s v t^{'}}\right) + \sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \mathit{gamma}_{i s t}\right] .\end{matrix} \tag{eq\_0031} \\
+  & \left(\hat{b}\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{alpha}_{i s v t} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0032\_a} \\
+  & \mathit{alpha}_{i s v t} \leq M_{s v t} \cdot y_{i s t} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0032\_b} \\
+  & \mathit{alpha}_{i s v t} \leq \mathit{varrho}_{s v t} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0032\_c} \\
+  & \mathit{alpha}_{i s v t} \geq \mathit{varrho}_{s v t} - M_{s v t} \left(1 - y_{i s t}\right) \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0032\_d} \\
+  & \mathit{alpha}_{i s v t} \in \left[0 , M_{s v t}\right] \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} . \tag{eq\_0032\_e} \\
+  & \begin{aligned}w_{i s v} & = \begin{cases} \sum_{t \in \mathcal{T}} \left(x_{i s t} \cdot D_{s v t} - \mathit{beta}_{i s v t}\right) & i = 1 \\ \sum_{t \in \mathcal{T}} \left(x_{i s t} \cdot D_{s v t} - \mathit{beta}_{i s v t}\right) - \sum_{j \in \mathcal{I} , j < i} b_{j s v} & i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & & \forall s , v \in \mathcal{S} , v > s ,\end{aligned} \tag{eq\_0033} \\
+  & \mathit{beta}_{i s v t} \leq M_{s v t} \cdot x_{i s t} , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0034\_a} \\
+  & \mathit{beta}_{i s v t} \leq \mathit{varrho}_{s v t} , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0034\_b} \\
+  & \mathit{beta}_{i s v t} \geq \mathit{varrho}_{s v t} - M_{s v t} \left(1 - x_{i s t}\right) , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0034\_c} \\
+  & \mathit{beta}_{i s v t} \in \left[0 , M_{s v t}\right] , \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0034\_d} \\
+  & \begin{matrix}\sum_{i \in \mathcal{I} \backslash \left\{1\right\}} \left(d_{i 1} - d_{\left(i - 1\right) 1}\right) \leq \left|\mathcal{T}\right| - d_{11} - \underset{s \in \mathcal{S} \backslash \left\{\left|\mathcal{S}\right|\right\}}{\sum} \mathit{eta}_{\left|\mathcal{I}\right| s} ,\end{matrix} \tag{eq\_0039} \\
+  & \begin{matrix}d_{\left|\right. \mathcal{I} \parallel \mathcal{S} \left|\right.} \leq \left|\mathcal{T}\right| .\end{matrix} \tag{eq\_0040} \\
+  & d_{\left|\right. \mathcal{I} \parallel \mathcal{S} \left|\right.} \leq \left|\mathcal{T}\right| \tag{eq\_0041\_a} \\
+  & \Rightarrow d_{11} + \sum_{i \in \mathcal{I} \backslash \left\{1\right\}} \left(d_{i 1} - d_{\left(i - 1\right) 1}\right) + \underset{s \in \mathcal{S} \backslash \left\{\left|\mathcal{S}\right|\right\}}{\sum} \mathit{eta}_{\left|\mathcal{I}\right| s} \leq \left|\mathcal{T}\right| \tag{eq\_0041\_b} \\
+  & \Rightarrow \sum_{i \in \mathcal{I} \backslash \left\{1\right\}} \left(d_{i 1} - d_{\left(i - 1\right) 1}\right) \leq \left|\mathcal{T}\right| - d_{11} - \underset{s \in \mathcal{S} \backslash \left\{\left|\mathcal{S}\right|\right\}}{\sum} \mathit{eta}_{\left|\mathcal{I}\right| s} . \tag{eq\_0041\_c} \\
+  & \left[TS\right] \begin{cases} x_{i s \left(t + 1\right)} \leq x_{i s t} & \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} \backslash \left\{\left|\mathcal{T}\right|\right\} , \\ x_{i s \left|\mathcal{T}\right|} = 0 & \forall i \in \mathcal{I} , s \in \mathcal{S} , \\ d_{i s} = \sum_{t \in \mathcal{T} \backslash \left\{1\right\}} \left[t \left(x_{i s \left(t - 1\right)} - x_{i s t}\right)\right] & \forall i \in \mathcal{I} , s \in \mathcal{S} , \\ \underset{\overline}{h} \leq d_{i s} - d_{\left(i - 1\right) s} \leq {h} & \forall i \in \mathcal{I} \backslash \left\{1\right\} , s \in \mathcal{S} , \\ d_{i s} = a_{i s} + \mathit{epsilon}_{i s} & \forall i \in \mathcal{I} , s \in \mathcal{S} , \\ a_{i s} = d_{i \left(s - 1\right)} + \mathit{eta}_{i \left(s - 1\right)} & \forall i \in \mathcal{I} , s \in \mathcal{S} \backslash \left\{1\right\} , \\ y_{i s t} = \begin{cases} x_{i s t} & i = 1 \\ x_{i s t} - x_{\left(i - 1\right) s t} & i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & \forall s \in \mathcal{S} , t \in \mathcal{T} , \\ x_{i s t} \in \left\{0 , 1\right\} & \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} . \end{cases} \tag{eq\_0042} \\
+  & \left[\text{DM}\right] min \mathit{lambda}^{e} F^{e} + \mathit{lambda}^{c} F^{c} + \sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} M_{i s} max \left\{o_{i s} + \left(\hat{o}\right)_{i s} - C , 0\right\} \tag{eq\_0043\_a} \\
+  & F^{e} = \mathit{Delta} \left[\sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \left(\left(\hat{y}\right)_{i s t} \sum_{t^{'} \in \mathcal{T} , t^{'} \leq t} \left(\hat{y}\right)_{i s t^{'}} \sum_{v \in \mathcal{S} , v > s} D_{s v t}\right) + \sum_{i \in \mathcal{I}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T}} \left(\left(\hat{y}\right)_{i s t} \sum_{v \in \mathcal{S} , v > s} r_{i s v}\right)\right] \tag{eq\_0043\_b} \\
+  & F^{c} = \sum_{i \in \mathcal{I}} z_{i} \tag{eq\_0043\_c} \\
+  & \left(\hat{b}\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{varrho}_{s t} \left(\hat{y}\right)_{i s t} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_d} \\
+  & \sum_{i \in \mathcal{I}} \left(\hat{b}\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{varrho}_{s v t} \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_e} \\
+  & 0 \leq \mathit{varrho}_{s v t} \leq D_{s v t} \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0043\_f} \\
+  & w_{i s v} = \begin{cases} \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) & i = 1 \\ \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) - \sum_{j \in \mathcal{I} , j < i} b_{j s v} & i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_g} \\
+  & \mathit{kappa}_{i s v} w_{i s v} \leq b_{i s v} \leq w_{i s v} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_h} \\
+  & r_{i s v} = w_{i s v} - b_{i s v} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_i} \\
+  & \sum_{i \in \mathcal{I}} b_{i s v} = \sum_{t \in \mathcal{T}} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_j} \\
+  & \left(\hat{o}\right)_{i s} = \sum_{m \in \mathcal{S} , m \leq s - 1} \sum_{v \in \mathcal{S} , v \geq s + 1} \left(\hat{b}\right)_{i m v} \forall i \in \mathcal{I} , s \in \mathcal{S} \tag{eq\_0043\_k} \\
+  & o_{i s} = \begin{cases} \sum_{v \in \mathcal{S} , v > s} b_{i s v} & s = 1 \\ o_{i \left(s - 1\right)} - l_{i s} + \sum_{v \in \mathcal{S} , v > s} b_{i s v} & s \in \mathcal{S} \backslash \left\{1 , \left|\mathcal{S}\right|\right\} \\ 0 & s = \left|\mathcal{S}\right| \end{cases} \forall i \in \mathcal{I} , s \in \mathcal{S} \tag{eq\_0043\_l} \\
+  & l_{i s} = \begin{cases} 0 & s = 1 \\ \sum_{m \in \mathcal{S} , m \leq s - 1} b_{i m s} & s \in \mathcal{S} \backslash \left\{1\right\} \end{cases} \forall i \in \mathcal{I} , s \in \mathcal{S} \tag{eq\_0043\_m} \\
+  & z_{i} = \sum_{s , v \in \mathcal{S} , v > s} \left(w_{i s v} + \left(\hat{b}\right)_{i s v}\right) \forall i \in \mathcal{I} \tag{eq\_0043\_n} \\
+  & \mathit{varrho}_{s v t} \in \mathcal{Z}_{\geq 0} \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0043\_o} \\
+  & b_{i s v} \in \mathcal{Z}_{\geq 0} \forall s , v \in \mathcal{S} , v > s . \tag{eq\_0043\_p} \\
+\end{align}

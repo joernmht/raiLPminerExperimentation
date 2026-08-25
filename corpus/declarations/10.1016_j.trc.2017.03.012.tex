@@ -1,0 +1,105 @@
+% Declaration sidecar for 10.1016_j.trc.2017.03.012
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2017.03.012
+% Rescheduling through stop-skipping in dense railway systems
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2017.03.012.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Objective: minimize recovery time, passenger waiting time, weighted skipped stops, total delay and number of late events
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Event index representing a train event (arrival/departure) at a station
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of pairs of scheduled stops at the same station and direction
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar :: Number of passengers boarding or alighting at a stop event
+
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar :: Passenger weight for waiting time between stops
+
+% D: classified as variable during review
+%@ var D shape=- domain=binary role=primary :: Binary variable indicating if event e is late compared to original schedule
+
+% P: classified as variable during review
+%@ var P shape=- domain=continuous role=primary :: Rescheduled time of event e
+
+% RT: classified as variable during review
+%@ var RT shape=- domain=continuous role=primary :: Recovery time, maximum deviation from scheduled times
+
+% S: classified as variable during review
+%@ var S shape=- domain=binary role=primary :: Binary variable indicating if stop e is skipped
+
+% SN: classified as index during review
+%@ index SN ordered=0 cyclic=0 :: Set of events that can be skipped
+
+% WT: classified as variable during review
+%@ var WT shape=- domain=continuous role=primary :: Waiting time for passengers between scheduled stops e_i and e_j
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for scheduled time of event e
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar :: Weight for skipping stop e
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: η
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of all events
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of consecutive events with running/dwell times
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar :: Minimal running or dwell time between events
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Index for time period (used for scheduled times)
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events with minimal turning time
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar :: Minimal safe headway time between trains
+
+% DN: classified as index during review
+%@ index DN ordered=0 cyclic=0 :: Set of events that cannot be skipped
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large constant for linearization
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Minimal running/dwell time between non-skippable consecutive events (constraint 2)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Dwell time between skippable events with saved time if stop e is skipped (constraint 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimal turning time between trains using same rolling-stock unit (constraint 4)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimal safe headway time between consecutive trains on same infrastructure segment (constraint 5)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Respect scheduled time for events that cannot be skipped (constraint 6)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Link late indicator D_e to rescheduled time relative to scheduled time (constraint 7)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Define recovery time RT as maximum deviation from scheduled times (constraint 8)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bound passenger waiting time WT_ei,ej based on rescheduled times and skipped stops (constraint 9)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain for D_e (constraint 10)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary domain for S_e (constraint 11)

@@ -1,0 +1,229 @@
+% Declaration sidecar for 10.1016_j.trb.2024.103067
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2024.103067
+% Adaptive rescheduling of rail transit services with short-turnings under disruptions via a multi-agent deep reinforcement learning approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2024.103067.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize total reward across all agents and time steps
+
+% unusable as an identifier, rename or drop: τ
+% h: classified as variable during review
+%@ var h shape=k domain=integer role=primary :: Dispatch headway between consecutive services
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of station nodes on a line
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Total number of short-turned services
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Time horizon or disruption duration
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index of train service
+
+% unusable as an identifier, rename or drop: Δ
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: ω
+% v: classified as parameter during review
+%@ param v shape=n kind=vector domain=- :: Running time between stations
+
+% e: classified as variable during review
+%@ var e shape=k domain=continuous role=primary :: Temporal discrepancy from disruption resolution
+
+% U: classified as variable during review
+%@ var U shape=R,k domain=continuous role=primary :: Available deployment time of rolling stock
+
+% j: classified as variable during review
+%@ var j shape=n,k domain=integer role=primary :: Index of preceding service
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Station node index
+
+% q: classified as variable during review
+%@ var q shape=n,n,k domain=non_negative role=primary :: Number of passengers waiting to board
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Train capacity
+
+% b: classified as variable during review
+%@ var b shape=n,n,k domain=non_negative role=primary :: Number of passengers on board
+
+% q̂: classified as variable during review
+%@ var q_hat shape=n,n,k domain=non_negative role=primary :: Actual number of passengers boarding
+
+% l: classified as variable during review
+%@ var l shape=n,n,k domain=non_negative role=primary :: Number of passengers left waiting
+
+% s: classified as variable during review
+%@ var s shape=R domain=continuous role=primary :: Local state vector
+
+% x: classified as variable during review
+%@ var x shape=R domain=integer role=primary :: Local decision variable (headway)
+
+% z: classified as variable during review
+%@ var z shape=R domain=integer role=primary :: Countdown indicator for next dispatch
+
+% g: classified as variable during review
+%@ var g shape=R domain=binary role=primary :: Termination indicator
+
+% c: classified as variable during review
+%@ var c shape=R domain=continuous role=primary :: Reward signal
+
+% Q: classified as variable during review
+%@ var Q shape=n,k domain=continuous role=primary :: Passenger waiting time integral
+
+% unusable as an identifier, rename or drop: β
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Train or passenger mass
+
+% E: classified as parameter during review
+%@ param E shape=n kind=vector domain=- :: Energy consumption rate per unit train mass
+
+% d: classified as parameter during review
+%@ param d shape=n kind=vector domain=- :: Travel distance to station
+
+% u: classified as parameter during review
+%@ param u shape=n kind=vector domain=- :: Running time to station
+
+% C: classified as variable during review
+%@ var C shape=- domain=continuous role=primary :: Total reward objective
+
+% X: classified as variable during review
+%@ var X shape=R domain=continuous role=primary :: Global decision vector
+
+% lim: classified as parameter during review
+%@ param lim shape=- kind=scalar domain=- :: Limit operator
+
+% unusable as an identifier, rename or drop: Ψ
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of lines
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of admissible headways
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Set of positive integers
+
+% unusable as an identifier, rename or drop: η
+% ĥ: classified as variable during review
+%@ var h_hat shape=H domain=continuous role=primary :: Decision embedding vector
+
+% constraints: classified as parameter during review
+%@ param constraints shape=- kind=scalar domain=- :: Operational constraints
+
+% meets: classified as parameter during review
+%@ param meets shape=- kind=scalar domain=- :: Constraint satisfaction check
+
+% exp: classified as parameter during review
+%@ param exp shape=- kind=scalar domain=- :: Exponential function
+
+% unusable as an identifier, rename or drop: π
+% unusable as an identifier, rename or drop: θ
+% L: classified as variable during review
+%@ var L shape=- domain=continuous role=primary :: Loss function
+
+% B̂: classified as parameter during review
+%@ param B_hat shape=- kind=scalar domain=- :: Mini-batch size
+
+% arg: classified as parameter during review
+%@ param arg shape=- kind=scalar domain=- :: Argument operator
+
+% unusable as an identifier, rename or drop: ξ
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Batch of transitions
+
+% Â: classified as variable during review
+%@ var A_hat shape=- domain=continuous role=primary :: Advantage function
+
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: ρ
+% clip: classified as parameter during review
+%@ param clip shape=- kind=scalar domain=- :: Clipping function
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: ν
+% S: classified as variable during review
+%@ var S shape=- domain=continuous role=primary :: Global state vector
+
+% V: classified as variable during review
+%@ var V shape=R domain=continuous role=primary :: Value function approximation
+
+% log: classified as parameter during review
+%@ param log shape=- kind=scalar domain=- :: Logarithm function
+
+% V̂: classified as variable during review
+%@ var V_hat shape=- domain=continuous role=primary :: Reward-to-go estimate
+
+% unusable as an identifier, rename or drop: λ
+% Bound by a quantifier or big operator, so no declaration of their own: f, r, ψ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Eq (1) departure time of service k from previous departure plus headway
+%@ con eq_0002 kind=linear domain=- indicator=- :: Eq (2) determination of service route (short-turn, regular, or turn-back)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Eq (3) iterative departure times at each station along route
+%@ con eq_0004 kind=linear domain=- indicator=- :: Eq (4) temporal deviation e_k from disruption resolution time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Eq (5) rolling stock deployment time from short-turned service
+%@ con eq_0007 kind=linear domain=- indicator=- :: Eq (6) passenger queue formation at station for service k
+%@ con eq_0008 kind=linear domain=- indicator=- :: Eq (7) preceding service index for passenger queue
+%@ con eq_0009 kind=linear domain=- indicator=- :: Eq (8) actual boarding passengers constrained by capacity
+%@ con eq_0010 kind=linear domain=- indicator=- :: Eq (9) on-board passenger update after alighting
+%@ con eq_0011 kind=linear domain=- indicator=- :: Eq (10) total on-board passengers at next station
+%@ con eq_0012 kind=linear domain=- indicator=- :: Eq (11) passengers left behind after boarding
+%@ con eq_0013 kind=linear domain=- indicator=- :: Eq (12) total left-behind passengers at station
+%@ con eq_0014 kind=linear domain=- indicator=- :: Eq (13) event-space-time grid consistency
+%@ con eq_0015 kind=linear domain=- indicator=- :: Eq (14) local state transition dynamics
+%@ con eq_0016 kind=linear domain=- indicator=- :: Eq (15) countdown indicator update
+%@ con eq_0017 kind=linear domain=- indicator=- :: Eq (16) termination condition for line
+%@ con eq_0019 kind=linear domain=- indicator=- :: Eq (17) reward signal definition
+%@ con eq_0020 kind=linear domain=- indicator=- :: Eq (18) passenger waiting time integral
+%@ con eq_0021 kind=linear domain=- indicator=- :: Eq (19) waiting cost function
+%@ con eq_0022 kind=linear domain=- indicator=- :: Eq (20) operating cost decomposition
+%@ con eq_0023 kind=linear domain=- indicator=- :: Eq (21) energy cost component
+%@ con eq_0024 kind=linear domain=- indicator=- :: Eq (22) non-energy operating cost
+%@ con eq_0026 kind=linear domain=- indicator=- :: Eq (23) overall objective function
+%@ con eq_0027 kind=linear domain=- indicator=- :: Eq (24) headway lower and upper bounds
+%@ con eq_0028 kind=linear domain=- indicator=- :: Eq (25) headway integer constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Eq (26) rolling stock availability constraint for short-turned services
+%@ con eq_0030 kind=linear domain=- indicator=- :: Eq (27) short-turning capacity constraint
+%@ con eq_0031 kind=linear domain=- indicator=- :: Eq (28) upper bound on headway for feasibility
+%@ con eq_0032 kind=linear domain=- indicator=- :: Eq (29) minimum headway for short-turned services
+%@ con eq_0033 kind=linear domain=- indicator=- :: Eq (30) rolling stock circulation constraint for short-turned route
+%@ con eq_0034 kind=linear domain=- indicator=- :: Eq (31) post-disruption headway constraint
+%@ con eq_0035 kind=linear domain=- indicator=- :: Eq (32) rolling stock deployment during recovery
+%@ con eq_0036 kind=linear domain=- indicator=- :: Eq (33) mask scheme for infeasible decisions
+%@ con eq_0037 kind=linear domain=- indicator=- :: Eq (34) softmax policy distribution
+%@ con eq_0038 kind=linear domain=- indicator=- :: Eq (35) policy objective function
+%@ con eq_0039 kind=linear domain=- indicator=- :: Eq (36) policy parameter update rule
+%@ con eq_0040 kind=linear domain=- indicator=- :: Eq (37) truncated surrogate objective
+%@ con eq_0041 kind=linear domain=- indicator=- :: Eq (38) probability ratio definition
+%@ con eq_0042 kind=linear domain=- indicator=- :: Eq (39) generalized advantage estimation
+%@ con eq_0043 kind=linear domain=- indicator=- :: Eq (40) temporal difference residual
+%@ con eq_0044 kind=linear domain=- indicator=- :: Eq (41) entropy loss function
+%@ con eq_0045 kind=linear domain=- indicator=- :: Eq (42) reward-to-go estimation
+%@ con eq_0046 kind=linear domain=- indicator=- :: Eq (43) VFA parameter update rule
+%@ con eq_0047 kind=linear domain=- indicator=- :: Additional constraint from proof of upper bound
+%@ con eq_0048 kind=linear domain=- indicator=- :: Additional constraint from proof of upper bound
+%@ con eq_0049 kind=linear domain=- indicator=- :: Additional operational constraint

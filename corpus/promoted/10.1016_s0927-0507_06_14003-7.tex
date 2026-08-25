@@ -1,0 +1,52 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_s0927-0507_06_14003-7
+%@ meta id=10.1016_s0927-0507_06_14003-7 family=milp schema=0.1.0
+%@ name :: Chapter 3 Passenger Railway Optimization
+%@ desc :: Mined from Chapter 3 Passenger Railway Optimization (Handbooks in operations research and management science, 2006).
+%@ prov source :: 10.1016/s0927-0507(06)14003-7
+%@ prov reference :: Chapter 3 Passenger Railway Optimization
+%@ prov author :: Alberto Caprara; Leo Kroon; Michele Monaci; M.J.P. Peeters; Paolo Toth
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize weighted direct passenger count minus weighted operational cost
+%@ param w shape=- kind=scalar :: Weight for objective function terms
+%@ var d shape=L,P domain=non_negative role=primary :: Number of direct passengers on line l for pair p
+%@ param k shape=I kind=vector :: Operational cost for option i
+%@ var x shape=I domain=binary role=primary :: Binary variable indicating if line option i is selected
+%@ index I ordered=0 cyclic=0 :: Set of line options
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index P ordered=0 cyclic=0 :: Set of station pairs
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ index E ordered=0 cyclic=0 :: Set of track edges
+%@ index e ordered=0 cyclic=0 :: Track edge index
+%@ param c shape=I kind=vector :: Capacity option for a line
+%@ param f shape=I kind=vector :: Frequency option for a line
+%@ var y shape=P domain=binary role=primary :: Binary variable indicating direct connection for pair p
+%@ var v shape=E domain=continuous role=primary :: Timetable event time
+%@ param T shape=- kind=scalar :: Cycle time for timetable
+%@ var q shape=E,E domain=binary role=primary :: Binary variable for modulo constraint
+%@ param u shape=E,E kind=matrix :: Upper bound for process time
+%@ con eq_0003 kind=linear domain=- indicator=- :: At most one line option selected for each line l
+%@ con eq_0004 kind=linear domain=- indicator=- :: Provided capacity on each track e is at least the passenger demand on e
+%@ con eq_0005 kind=linear domain=- indicator=- :: Direct passengers on line l over edge e do not exceed selected capacity on line l
+%@ con eq_0006 kind=linear domain=- indicator=- :: Direct passengers for station pair p do not exceed travel demand d_p
+%@ con eq_0007 kind=linear domain=- indicator=- :: Line option variables x_i are binary
+%@ con eq_0008 kind=linear domain=- indicator=- :: Direct passenger variables d_lp are nonnegative
+%@ con eq_0011 kind=linear domain=- indicator=- :: A direct connection for pair p requires at least one selected line option covering p
+%@ con eq_0012 kind=linear domain=- indicator=- :: If a line option covering pair p is selected, then y_p is 1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Capacity of selected lines accommodates all passengers on direct connections for pair p
+%@ con eq_0015 kind=linear domain=- indicator=- :: Direct connection variables y_p are binary
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linearized modulo constraint relating event times, bounds and binary q_ef
+\begin{align}
+  \max\quad & w_{1} \sum_{l \in L} \sum_{p \in P} d_{l p} - w_{2} \sum_{i \in I} k_{i} \cdot x_{i} \tag{eq\_0002} \\
+  & \text{subject to} \sum_{i \in I : l_{i} = l} x_{i} \leq 1 , l \in L , \tag{eq\_0003} \\
+  & \underset{i \in I : e \in E_{l_{i}}}{\sum} f_{i} \cdot c_{i} \cdot x_{i} \geq d_{e} , e \in E , \tag{eq\_0004} \\
+  & \sum_{p \in P : e \in E_{p}} d_{l p} \leq \sum_{i \in I : l_{i} = l} f_{i} \cdot c_{i} \cdot x_{i} , l \in L , e \in E_{l} , \tag{eq\_0005} \\
+  & \sum_{l \in L : E_{p} \subset E_{l}} d_{l p} \leq d_{p} , p \in P , \tag{eq\_0006} \\
+  & x_{i} \in \left\{0 , 1\right\} , i \in I , \tag{eq\_0007} \\
+  & d_{l p} \geq 0 , l \in L , p \in P . \tag{eq\_0008} \\
+  & y_{p} \leq \underset{i \in I : E_{p} \subset E_{l_{i}}}{\sum} x_{i} , p \in P , \tag{eq\_0011} \\
+  & \sum_{i \in I : l_{i} = l} x_{i} \leq y_{p} , p \in P , l \in L , E_{p} \subset E_{l} , \tag{eq\_0012} \\
+  & \underset{p^{'} \in P : E_{p} \subset E_{p^{'}}}{\sum} d_{p^{'}} \cdot y_{p^{'}} \leq \underset{i \in I : E_{p} \subset E_{l_{i}}}{\sum} f_{i} \cdot c_{i} \cdot x_{i} , p \in P , \tag{eq\_0013} \\
+  & y_{p} \in \left\{0 , 1\right\} , p \in P . \tag{eq\_0015} \\
+  & l_{e f} \leq v_{e} - v_{f} + \mathcal{T} q_{e f} \leq u_{e f} . \tag{eq\_0023} \\
+\end{align}

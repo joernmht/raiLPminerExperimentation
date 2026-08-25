@@ -1,0 +1,58 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2014.02.023
+%@ meta id=10.1016_j.trc.2014.02.023 family=milp schema=0.1.0
+%@ name :: Multi-objective optimization of train routing problem combined with train scheduling on a high-speed railway network
+%@ desc :: Mined from Multi-objective optimization of train routing problem combined with train scheduling on a high-speed railway network (Transportation Research Part C Emerging Technologies, 2014).
+%@ prov source :: 10.1016/j.trc.2014.02.023
+%@ prov reference :: Multi-objective optimization of train routing problem combined with train scheduling on a high-speed railway network
+%@ prov author :: Yahua Sun; Chengxuan Cao; Chao Wu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the total travel time, energy consumption, and delayed times of trains.
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index k ordered=0 cyclic=0 :: Station index
+%@ index t ordered=0 cyclic=0 :: Time index
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Sensitivity function evaluating degree of deviation
+%@ index A ordered=0 cyclic=0 :: Actual arrival time of train i at station k
+%@ param D shape=i,k kind=matrix :: Actual departure time of train i at station k
+%@ index N ordered=0 cyclic=0 :: Number of trains
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fitness function combining objectives
+%@ var u shape=i,t domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if train i is accelerating at time t
+%@ var v shape=i,t domain=non_negative role=primary drole=- lo=- hi=- :: Instantaneous speed of train i at time t
+%@ param w shape=i kind=vector :: Weight of train i
+%@ index L ordered=0 cyclic=0 :: Length of route chosen by train i
+%@ param P shape=i,t kind=matrix :: Instantaneous tractive power per unit weight at time t
+%@ param sgn shape=- kind=scalar :: Sign function indicating delay
+%@ index M ordered=0 cyclic=0 :: Number of stations on route
+%@ param B shape=i,k kind=matrix :: Minimum dwelling time at station k for train i
+%@ var V shape=i,t domain=non_negative role=primary drole=- lo=- hi=- :: Speed of train i at time t
+%@ var X shape=i,t domain=non_negative role=primary drole=- lo=- hi=- :: Location of train i at time t
+%@ param d shape=- kind=scalar :: Minimum safe distance
+%@ param a shape=- kind=scalar :: Acceleration rate
+%@ param f_bar shape=- kind=scalar :: Expected value of objective function
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of average travel time objective f_t
+%@ con eq_0003_a kind=linear domain=- indicator=- :: First expression of traction energy consumption f_e
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Second expression of traction energy consumption f_e
+%@ con eq_0003_c kind=linear domain=- indicator=- :: Third expression of traction energy consumption f_e
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of total delayed time f_d
+%@ con eq_0005 kind=linear domain=- indicator=- :: Actual departure time not earlier than planned departure time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Actual dwelling time at least minimum dwelling time
+%@ con eq_0007 kind=linear domain=- indicator=- :: Train speed does not exceed maximum speed
+%@ con eq_0010 kind=linear domain=- indicator=- :: Train position at arrival equals route length
+%@ con eq_0011 kind=linear domain=- indicator=- :: Successive trains maintain minimum safe distance
+%@ con eq_0015 kind=linear domain=- indicator=- :: Fitness function as weighted sum of objectives
+%@ con eq_0016 kind=linear domain=- indicator=- :: Sensitivity function measuring deviation from expected values
+\begin{align}
+  \min\quad & \left\{f_{e} , f_{t} , f_{d}\right\} \tag{eq\_0001} \\
+  & f_{t} = \sum_{i = 1}^{N} \left(A_{i , a} - D_{i , a}\right) / N \tag{eq\_0002} \\
+  & f_{e} = \sum_{i = 1}^{N} \sum_{x = 0}^{L_{i}} u_{i , x} \cdot F_{i , x} \left(v\right) w_{i} \tag{eq\_0003\_a} \\
+  & f_{e} = \sum_{i = 1}^{N} \sum_{t = 0}^{A_{i , a}} u_{i , t} \cdot F_{i , t} \left(v\right) v_{i} \left(t\right) w_{i} \tag{eq\_0003\_b} \\
+  & f_{e} = \sum_{i = 1}^{N} \sum_{t = 0}^{A_{i , a}} u_{i , t} \cdot P_{i , t} \cdot w_{i} \tag{eq\_0003\_c} \\
+  & f_{n} = \sum_{i = 1}^{N} \sum_{k = 1}^{M} \text{sgn} \left(A_{i , k , a} - A_{i , k , o}\right) \tag{eq\_0004} \\
+  & D_{i , a , k} \geq D_{i , o , k} \tag{eq\_0005} \\
+  & D_{i , a , k} - A_{i , a , k} \geq B_{i , k}^{min} \tag{eq\_0006} \\
+  & V_{i} \left(t\right) \leq V_{i ,\text{max}} \tag{eq\_0007} \\
+  & X_{i} \left(A_{i , a}\right) = L_{i} \tag{eq\_0010} \\
+  & X_{i} \left(t\right) - X_{j} \left(t\right) \geq max \left\{\left[v_{j} \left(t\right)^{2} - v_{i} \left(t\right)^{2}\right] / 2 \cdot a + d_{min} , d_{min}\right\} \tag{eq\_0011} \\
+  & F = \mathit{alpha} \times f_{t} + \mathit{beta} \times f_{e} + \mathit{gamma} \times f_{d} \tag{eq\_0015} \\
+  & f = \mathit{alpha} \times \left|f_{t} - \bar{f}_{t}\right| / \bar{f}_{t} + \mathit{beta} \times \left|f_{e} - \bar{f}_{e}\right| / \bar{f}_{e} + \mathit{gamma} \times \left|f_{d} - \bar{f}_{d}\right| / \bar{f}_{d} \tag{eq\_0016} \\
+\end{align}

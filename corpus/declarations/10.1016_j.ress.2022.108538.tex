@@ -1,0 +1,119 @@
+% Declaration sidecar for 10.1016_j.ress.2022.108538
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ress.2022.108538
+% Resilience assessment of railway networks: Combining infrastructure restoration and transport management
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ress.2022.108538.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize transported passengers while minimizing travel time, cancellations, rerouting, and delays
+
+% c: classified as parameter during review
+%@ param c shape=P,K kind=matrix domain=- :: Travel cost for path p of OD pair k
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+
+% x: classified as variable during review
+%@ var x shape=A,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
+
+% C: classified as parameter during review
+%@ param C shape=A,T kind=matrix domain=- :: Generalized rerouting cost for train t on arc (i,j)
+
+% d: classified as variable during review
+%@ var d shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an ending node for train t
+
+% f: classified as variable during review
+%@ var f shape=P,K domain=continuous role=primary drole=- lo=- hi=- :: Fraction of passengers of OD pair k using path p
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of OD pairs
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of paths for OD pair k
+
+% node: classified as parameter during review
+%@ param node shape=- kind=scalar domain=- :: Node in the network
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Arc in the network
+
+% ending: classified as parameter during review
+%@ param ending shape=- kind=scalar domain=- :: Indicator for ending node
+
+% o: classified as variable during review
+%@ var o shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
+
+% starting: classified as parameter during review
+%@ param starting shape=- kind=scalar domain=- :: Indicator for starting node
+
+% O: classified as parameter during review
+%@ param O shape=T kind=vector domain=- :: Origin node of train t
+
+% D: classified as parameter during review
+%@ param D shape=T kind=vector domain=- :: Destination node of train t
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
+
+% unusable as an identifier, rename or drop: τ
+%@ param tau shape=A,T kind=matrix domain=- :: Travel time on arc (i,j) for train t
+
+% h: classified as parameter during review
+%@ param h shape=A,T,T kind=matrix domain=- :: Headway time between trains t and m on arc (i,j)
+
+% s: classified as parameter during review
+%@ param s shape=A,T kind=matrix domain=- :: Capacity of arc (i,j) at time t
+
+% unusable as an identifier, rename or drop: δ
+%@ param delta shape=A,P kind=matrix domain=- :: Indicator if arc (i,j) is on path p
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, m, n, p, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=flow_balance domain=- indicator=- :: Flow continuity for train t at node i
+%@ con eq_0006 kind=linear domain=- indicator=- :: Number of starting nodes equals number of ending nodes for each train t
+%@ con eq_0007 kind=linear domain=- indicator=- :: Original origin of train t is a starting node
+%@ con eq_0008 kind=linear domain=- indicator=- :: Original destination of train t is an ending node
+%@ con eq_0009 kind=linear domain=- indicator=- :: Rerouted trains cannot short-turn away from origin or destination
+%@ con eq_0010 kind=linear domain=- indicator=- :: Rerouted trains cannot short-turn away from destination or origin
+%@ con eq_0011 kind=linear domain=- indicator=- :: Short-turn origin must be adjacent to a disrupted link
+%@ con eq_0012 kind=linear domain=- indicator=- :: Short-turn destination must be adjacent to a disrupted link
+%@ con eq_0013 kind=linear domain=- indicator=- :: Limit number of short-turn origins to disrupted links plus one
+%@ con eq_0014 kind=linear domain=- indicator=- :: Limit number of short-turn destinations to disrupted links plus one
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Timing constraint linking departure, travel time and arrival for rerouted trains
+%@ con eq_0016 kind=linear domain=- indicator=- :: Timing constraint linking departure, travel time and arrival for short-turned trains
+%@ con eq_0017 kind=linear domain=- indicator=- :: Departure time at least as large as selected departure times
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Minimum dwell time at node i for rerouted trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum dwell time at node i for short-turned trains
+%@ con eq_0020 kind=headway domain=- indicator=- :: Headway constraint between trains t and m on arc (i,j)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Arrival time of train t at node i is at least departure time
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Capacity constraint: passenger flow on arc cannot exceed train capacity
+%@ con eq_0023 kind=linear domain=- indicator=- :: At most one path flow per OD pair k
+%@ con eq_0024 kind=linear domain=- indicator=- :: Integrality of train routing, short-turn origin and destination variables
+%@ con eq_0025 kind=linear domain=- indicator=- :: Passenger path flow bounds between 0 and 1

@@ -1,0 +1,70 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.06.018
+%@ meta id=10.1016_j.trb.2017.06.018 family=milp schema=0.1.0
+%@ name :: Train timetabling by skip-stop planning in highly congested lines
+%@ desc :: Mined from Train timetabling by skip-stop planning in highly congested lines (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.06.018
+%@ prov reference :: Train timetabling by skip-stop planning in highly congested lines
+%@ prov author :: Feng Jiang; Valentina Cacchiani; Paolo Toth
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total profit of selected arcs
+%@ param p shape=T kind=vector domain=- :: Profit of train t, used in objective to maximize total profit
+%@ var x shape=T,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc a is selected for train t
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the time-space network
+%@ index T ordered=0 cyclic=0 :: Set of trains, including existing and new ones
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the time-space network
+%@ index v ordered=0 cyclic=0 :: Node in the time-space network
+%@ var z shape=T,V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t stops at node v
+%@ var y shape=V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if any train stops at node v
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ index R ordered=0 cyclic=0 :: Set of tracks (routes) between stations
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes for a given station and track
+%@ index h ordered=0 cyclic=0 :: Station index (used in pairs with i)
+%@ index w ordered=0 cyclic=0 :: Departure node in the time-space network
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes for a given station and track
+%@ index H ordered=0 cyclic=0 :: Set of headway values (time intervals)
+%@ param c shape=S kind=vector domain=- :: Capacity of station i (maximum number of trains)
+%@ param q shape=- kind=scalar domain=- :: Headway value used in capacity constraints
+%@ param d shape=S kind=vector domain=- :: Minimum dwelling time at a station
+%@ param maxstr shape=T kind=vector domain=- :: Maximum total stretch (delay) allowed for train t
+%@ param maxcanc shape=T kind=vector domain=- :: Maximum number of cancellations (skipped stops) for train t
+%@ param l shape=T,S,S kind=matrix domain=- :: Minimum travel time of train t between stations h and i
+%@ param acc shape=T kind=vector domain=- :: Acceleration time of train t
+%@ param dec shape=T kind=vector domain=- :: Deceleration time of train t
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Flow conservation at intermediate nodes for each train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Relates stop variable z to selected incoming arc for each train and node
+%@ con eq_0005 kind=linear domain=- indicator=- :: Relates station stop indicator y to any train stopping at node
+%@ con eq_0006 kind=headway domain=- indicator=- :: Departure headway constraint: at most one train can depart within a headway time interval at each track
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint: at most one train can arrive within a headway time interval at each track
+%@ con eq_0008 kind=capacity domain=- indicator=- :: Station track capacity constraint limiting number of trains simultaneously at a station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraints on maximum total stretch (delay) allowed for each train
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraints on maximum number of skipped stops (cancellations) for each train
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Overtaking constraints on selected arcs to prevent train collisions
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary domain for arc selection and stop variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary domain for station stop indicator
+%@ con eq_0014 kind=ordering domain=- indicator=- :: Strengthened overtaking constraint based on departure nodes only
+%@ con eq_0015_a kind=linear domain=- indicator=- :: Overtaking constraint component (a)
+%@ con eq_0015_b kind=linear domain=- indicator=- :: Overtaking constraint component (b)
+%@ con eq_0015_c kind=linear domain=- indicator=- :: Overtaking constraint component (c)
+%@ con eq_0015_d kind=linear domain=- indicator=- :: Overtaking constraint component (d)
+%@ con eq_0015_e kind=linear domain=- indicator=- :: Overtaking constraint component (e)
+%@ con eq_0015_f kind=linear domain=- indicator=- :: Overtaking constraint component (f)
+%@ index T_new shape=- domain=- role=set drole=index lo=- hi=- :: New train indices
+%@ param qbar
+%@ index Hbar
+%@ param dw
+%@ param theta
+\begin{align}
+  \max\quad & \sum_{t \in T \cup T_{\mathrm{new}}, a \in A^{t}} p \cdot x_{t,a} \tag{eq\_0002} \\
+  & \sum_{a \in \mathit{delta}_{t}^{+}(\mathit{sigma})} x_{t,a} \le 1 \qquad \forall t \in T \cup T_{new} \tag{eq\_0003} \\
+  & \sum_{a \in \mathit{delta}_{t,v}^{-}} x_{t,a} = \sum_{a \in \mathit{delta}_{t,v}^{+}} x_{t,a} \qquad \forall t \in T \cup T_{\mathit{new}}, v \in V^{t} \setminus \{\mathit{sigma}, \mathit{tau}\} \tag{eq\_0004} \\
+  & z_{t,v} = \sum_{a \in \mathit{delta}_{t,v}^{-}} x_{t,a} \qquad \forall t \in T \cup T_{\mathit{new}}, v \in V^{t} \setminus \{\mathit{sigma}, \mathit{tau}\} \tag{eq\_0005} \\
+  & y_{v} = \sum_{t \in T \cup T_{\mathit{new}} : v \in V^{t}} z_{t,v} \qquad \forall v \in V \setminus \{\mathit{sigma}, \mathit{tau}\} \tag{eq\_0006} \\
+  & \sum_{v \in W(i,r) : v \succeq w, \mathit{Delta}_{v,w} < d_{i}} y_{v} \le 1 \qquad \forall i \in S, r=(i,h) \in R, w \in W(i,r) \tag{eq\_0007} \\
+  & \sum_{v \in U(h,r) : v \succeq u, \mathit{Delta}_{v,u} < a_{h}} y_{v} \le 1 \qquad \forall h \in S, r=(i,h) \in R, u \in U(h,r) \tag{eq\_0008} \\
+  & \sum_{t \in T \cup T_{new}, r \in R, u \in U(i,r) \cap V^{t}, v \in W(i,r) \cap V^{t}, a \in A^{t} : a=(u,v), theta_{u} \le qbar, theta_{v} \ge qbar} x_{t,a} \le c_{i} \qquad \forall i \in S, qbar \in Hbar \tag{eq\_0009} \\
+  & \sum_{r \in R, i \in S, u \in U(i,r) \cap V^{t}, v \in W(i,r) \cap V^{t}, a \in A^{t} : a=(u,v), \mathit{Delta}_{v,u} < dw_{t,i}} x_{t,a} \le maxcanc_{t} \qquad \forall t \in T \cup T_{new} \tag{eq\_0011} \\
+  & \sum_{w \in W(h,r) \cap V^{t}, v \in U(i,r) \cap V^{t}, a \in A^{t} : a=(w,v), w \prec w_3, v \succeq v_1} x_{t,a} + \sum_{w \in W(h,r) \cap V^{p}, v \in U(i,r) \cap V^{p}, a \in A^{p} : a=(w,v), w \succeq w_2, v \prec v_4} x_{p,a} \le 1 \qquad \forall t,p \in T \cup T_{new}, r=(h,i) \in R^{t} \cap R^{p}, w_1,w_3 \in W(h,r) \cap V^{t}, w_2 \in W(h,r) \cap V^{p}, v_1 \in U(i,r) \cap V^{t}, v_2,v_4 \in U(i,r) \cap V^{p}, w_1 \preceq w_2, v_2 \preceq v_1, (w_1,v_1) \in A^{t}, (w_2,v_2) \in A^{p}, \mathit{Delta}_{w_3,w_2}=d_{h}, \mathit{Delta}_{v_4,v_1}=a_{i} \tag{eq\_0012} \\
+  & \sum_{w \in W(h,r) \cap V^{t} : w_1 \preceq w \prec w_3} z_{t,w} + \sum_{w \in W(h,r) \cap V^{p} : w_2 \preceq w \prec w_4p} z_{p,w} \le 1 \qquad \forall t,p \in T \cup T_{new}, r=(h,i) \in R^{t} \cap R^{p}, w_1,w_3 \in W(h,r) \cap V^{t}, w_2,w_4p \in W(h,r) \cap V^{p}, v_1p \in U(i,r) \cap V^{t}, v_2p,v_4 \in U(i,r) \cap V^{p}, w_1 \preceq w_2, v_2p \preceq v_1p, (w_1,v_1p) \in A^{t}, (w_2,v_2p) \in A^{p}, \mathit{Delta}_{v_1p,w_1}=l_{t}^{h,i}, \mathit{Delta}_{v_2p,w_2}=l_{p}^{h,i}+acc_{p}+dec_{p}, \mathit{Delta}_{v_4,w_4p}=l_{p}^{h,i}+acc_{p}+dec_{p}, \mathit{Delta}_{w_3,w_2}=d_{h}, \mathit{Delta}_{v_4,v_1p}=a_{i} \tag{eq\_0015} \\
+\end{align}

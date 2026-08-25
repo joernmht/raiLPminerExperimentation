@@ -1,0 +1,107 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.03.008
+%@ meta id=10.1016_j.trb.2020.03.008 family=milp schema=0.1.0
+%@ name :: Passenger-centered vulnerability assessment of railway networks
+%@ desc :: Mined from Passenger-centered vulnerability assessment of railway networks (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.03.008
+%@ prov reference :: Passenger-centered vulnerability assessment of railway networks
+%@ prov author :: Christopher Szymula; Nikola Bešinović
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize adverse impact of disruptions via weighted disconnection, rerouting, and cancellation costs
+%@ index node ordered=0 cyclic=0 :: Node in the railway network
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the infrastructure network
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of a train
+%@ index a ordered=0 cyclic=0 :: Arc in the network
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an end node for train t
+%@ index end ordered=0 cyclic=0 :: End node of a train route
+%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
+%@ index starting ordered=0 cyclic=0 :: Starting node of a train route
+%@ param O shape=- kind=scalar domain=- :: Origin node of a train service
+%@ param D shape=- kind=scalar domain=- :: Destination node of a train service
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the infrastructure network
+%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
+%@ param CAP shape=- kind=scalar domain=- :: Capacity of arc (i,j)
+%@ param M shape=- kind=big_m domain=- :: Large constant for linearization
+%@ param h shape=- kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
+%@ index K ordered=0 cyclic=0 :: Set of OD pairs
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
+%@ index P ordered=0 cyclic=0 :: Set of paths for OD pair k
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
+%@ param s shape=- kind=scalar domain=- :: Capacity of train t
+%@ param C shape=- kind=scalar domain=- :: Cost coefficient
+%@ param c shape=- kind=scalar domain=- :: Cost factor or travel cost
+%@ param u shape=- kind=scalar domain=- :: Detour factor for cancellation cost
+%@ index P_bar ordered=0 cyclic=0 :: Subset of paths considered in restricted master problem
+%@ con eq_0001 kind=linear domain=- indicator=- :: Flow conservation for trains at nodes
+%@ con eq_0002 kind=linear domain=- indicator=- :: Equal number of origins and destinations for each train
+%@ con eq_0003 kind=linear domain=- indicator=- :: Fixed origin for originally scheduled train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Fixed destination for originally scheduled train
+%@ con eq_0005 kind=linear domain=- indicator=- :: No short-turn origin for rerouted trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: No short-turn destination for rerouted trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Short-turn origin forced when incident link disrupted
+%@ con eq_0008 kind=linear domain=- indicator=- :: Short-turn destination forced when incident link disrupted
+%@ con eq_0009 kind=linear domain=- indicator=- :: Origin count limited by number of disrupted links plus one
+%@ con eq_0010 kind=linear domain=- indicator=- :: Destination count limited by number of disrupted links plus one
+%@ con eq_0011 kind=linear domain=- indicator=- :: Link capacity bound by disruption status
+%@ con eq_0012 kind=linear domain=- indicator=- :: Maximum number of simultaneous disruptions
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary nature of train flow and disruption variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Minimal running time for rerouted trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Minimal running time for short-turned trains
+%@ con eq_0016 kind=linear domain=- indicator=- :: No early departure from originally scheduled time
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimal dwell time for rerouted trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Minimal dwell time for short-turned trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimal headway between trains on same link
+%@ con eq_0020 kind=linear domain=- indicator=- :: Non-negativity of time variables
+%@ con eq_0021 kind=linear domain=- indicator=- :: At least one path or disconnection per OD pair
+%@ con eq_0022 kind=linear domain=- indicator=- :: Disconnection implies no path used
+%@ con eq_0023 kind=linear domain=- indicator=- :: Path unavailable if any of its arcs disrupted
+%@ con eq_0024 kind=linear domain=- indicator=- :: Path flow limited by train service on arcs
+%@ con eq_0025 kind=linear domain=- indicator=- :: Zero passenger flow for disconnected OD pairs
+%@ con eq_0026 kind=linear domain=- indicator=- :: Arc capacity limits cumulative passenger flow
+%@ con eq_0027 kind=linear domain=- indicator=- :: Binary nature of disconnection and path choice variables
+%@ con eq_0028 kind=linear domain=- indicator=- :: Continuous passenger flow shares between zero and one
+%@ con eq_0029 kind=linear domain=- indicator=- :: Disconnection cost calculation
+%@ con eq_0031 kind=linear domain=- indicator=- :: Generalized routing cost coefficient
+%@ con eq_0032 kind=linear domain=- indicator=- :: Generalized train rerouting cost coefficient
+%@ con eq_0033 kind=linear domain=- indicator=- :: Generalized train cancellation cost coefficient
+%@ con eq_0035 kind=linear domain=- indicator=- :: Relaxation of binary variables to continuous in [0,1]
+%@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost condition for adding new passenger paths
+\begin{align}
+  & \begin{matrix}\sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \begin{cases} - o_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node} \\ d_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node} \\ 0 , \text{else} \end{cases} \forall t \in T , i \in N^{t}\end{matrix} \tag{eq\_0001} \\
+  & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0002} \\
+  & o_{i}^{t} = 1 \forall t \in T , i = N \left(O_{t}\right) \tag{eq\_0003} \\
+  & d_{i}^{t} = 1 \forall t \in T , i = N \left(D_{t}\right) \tag{eq\_0004} \\
+  & o_{i}^{t} = 0 \forall t \in T^{R R} , i \neq N \left(O_{t}\right) , N \left(D_{t}\right) \tag{eq\_0005} \\
+  & d_{i}^{t} = 0 \forall t \in T^{R R} , i \neq N \left(O_{t}\right) , N \left(D_{t}\right) \tag{eq\_0006} \\
+  & o_{j}^{t} \geq v_{i j} \forall t \in T^{S T} , i \in N^{t} , \left(i , j\right) \in A^{t} \tag{eq\_0007} \\
+  & d_{i}^{t} \geq v_{i j} \forall t \in T^{S T} , j \in N^{t} , \left(i , j\right) \in A^{t} \tag{eq\_0008} \\
+  & \sum_{i \in N^{t}} o_{i}^{t} \leq \sum_{\left(i , j\right) \in A^{t}} v_{i j} + 1 \forall t \in T \tag{eq\_0009} \\
+  & \sum_{j \in N^{t}} d_{j}^{t} \leq \sum_{\left(i , j\right) \in A^{t}} v_{i j} + 1 \forall t \in T \tag{eq\_0010} \\
+  & \sum_{t \in T} x_{i j}^{t} \leq \mathit{CAP}_{i j} \left(1 - v_{i j}\right) \forall \left(i , j\right) \in A^{t} \tag{eq\_0011} \\
+  & \sum_{\left(i , j\right) \in A} v_{i j} \leq n \tag{eq\_0012} \\
+  & x_{i j}^{t} , o_{i}^{t} , d_{i}^{t} , v_{i j} \in \left\{0 , 1\right\} \forall t \in T , n \in N^{t} \tag{eq\_0013} \\
+  & T_{{D} , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{{A} , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0014} \\
+  & T_{{D} , i}^{t} + \mathit{tau}_{i j}^{t} x_{i j}^{t} \leq T_{{A} , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0015} \\
+  & T_{{D} , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0016} \\
+  & T_{{D} , i}^{t} - T_{{A} , i}^{t} \geq t_{i}^{t} - M \cdot \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0017} \\
+  & T_{{D} , i}^{t} - T_{{A} , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
+  & T_{{D} , i}^{t} \geq T_{{D} , i}^{m} + h_{i j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0019} \\
+  & T_{{A} , i} , T_{{D} , i} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0020} \\
+  & \sum_{p \in P^{k}} y_{p}^{k} + z_{k} \geq 1 \forall k \in K \tag{eq\_0021} \\
+  & z_{k} \leq 1 - y_{p}^{k} \forall k \in K , p \in P^{k} \tag{eq\_0022} \\
+  & y_{p}^{k} \geq 1 - \sum_{\left(i , j\right) \in A^{p}} v_{i j} \forall k \in K , p \in P^{k} \tag{eq\_0023} \\
+  & \sum_{k \in K} \sum_{p \in P^{k}} \mathit{delta}_{i , j}^{p} y_{p}^{k} \leq \sum_{t \in T} M \cdot x_{i j}^{t} \left(i , j\right) \in A \tag{eq\_0024} \\
+  & \sum_{p \in P^{k}} f_{p}^{k} \leq \left(1 - z_{k}\right) \forall k \in K \tag{eq\_0025} \\
+  & \sum_{k \in K} \sum_{p \in P^{k}} \mathit{delta}_{i , j}^{p} d_{k} f_{p}^{k} \leq \sum_{t \in T} s^{t} \cdot x_{i j}^{t} \forall \left(i , j\right) \in A \tag{eq\_0026} \\
+  & z_{k} , y_{p}^{k} = \left\{0 , 1\right\} \forall k \in K , p \in P^{k} \tag{eq\_0027} \\
+  & f_{p}^{k} = \left[0 , 1\right] \forall k \in K , p \in P^{k} \tag{eq\_0028} \\
+  & C_{z}^{k} = c_{k} \cdot d_{k} \tag{eq\_0029} \\
+  & C_{f}^{p , k} = \frac{1}{c_{p}^{k}} d_{k} \tag{eq\_0031} \\
+  & C_{x}^{i , j , t} = c_{t} t_{i j}^{t} \tag{eq\_0032} \\
+  & C_{c}^{t} = u \cdot c_{s c h e d}^{t} \tag{eq\_0033} \\
+  \max\quad & \mathit{lambda} \sum_{k \in K} C_{z}^{k} \cdot z_{k} - \left(1 - \mathit{lambda}\right) \sum_{k \in K} \sum_{p \in P^{k}} C_{y}^{p , k} \cdot y_{p}^{k} + \mathit{omega} \left[\sum_{k \in K} \sum_{p \in P^{k}} C_{f}^{p , k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}} \sum_{i \in N} \sum_{j \in N} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} C_{c}^{t} \cdot d_{N \left(O_{t}\right)}\right] \tag{eq\_0034} \\
+  & z_{k} , y_{p}^{k} \in \left[0 , 1\right] \forall k \in K , p \in \bar{P^{k}} , t \in T , \left(i , j\right) \in A \tag{eq\_0035} \\
+  & \sum_{\left(i , j\right) \in A} \mathit{delta}_{i , j}^{p} \mathit{pi}_{i j} + \mathit{sigma}_{k} - \frac{\mathit{omega}}{c_{p}^{k}} \cdot d_{k} \geq 0 \forall k \in K \tag{eq\_0036} \\
+\end{align}

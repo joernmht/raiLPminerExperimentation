@@ -1,0 +1,170 @@
+% Declaration sidecar for 10.1016_j.trb.2018.10.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2018.10.006
+% Passenger demand oriented train scheduling and rolling stock circulation planning for an urban rail transit line
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2018.10.006.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of load factor variation, headway variation, and number of depot entering operations
+
+% a: classified as variable during review
+%@ var a shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service i at station j in direction up/dn
+
+% d: classified as variable during review
+%@ var d shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train service i at station j in direction up/dn
+
+% unusable as an identifier, rename or drop: τ
+% r: classified as variable during review
+%@ var r shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train service i from station j to next in direction up/dn
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway between consecutive trains, with min and max bounds
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of train services
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for train services
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive number for big-M constraints
+
+% unusable as an identifier, rename or drop: β
+% t: classified as parameter during review
+%@ param t shape=K kind=vector domain=- :: Time instants splitting operating period into K intervals
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of time intervals for passenger demand
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for time intervals
+
+% unusable as an identifier, rename or drop: κ
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: σ
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of stations
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% p: classified as variable during review
+%@ var p shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on board train service i between stations j and j+1
+
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: δ
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Number of available rolling stocks
+
+% y: classified as variable during review
+%@ var y shape=I,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable for depot operations or time interval indicators
+
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+
+% unusable as an identifier, rename or drop: γ
+% constraints: classified as parameter during review
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints in the optimization problem
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Abbreviation for subject to in optimization formulation
+
+% unusable as an identifier, rename or drop: ω
+% q: classified as variable during review
+%@ var q shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for headway variation in objective
+
+% x: classified as variable during review
+%@ var x shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating departure time interval for train service
+
+% z: classified as variable during review
+%@ var z shape=I,J,K domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for products of binary and real variables
+
+% unusable as an identifier, rename or drop: ε
+% Bound by a quantifier or big operator, so no declaration of their own: j, m, ℓ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Up-direction departure time equals arrival time plus dwell time at station j
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Up-direction arrival at station j+1 equals departure plus running time
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Down-direction departure time equals arrival time plus dwell time at station j
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Down-direction arrival at station j-1 equals departure plus running time
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Running time bounds for train services in both directions
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Dwell time bounds for train services at stations in both directions
+%@ con eq_0004_a kind=linear domain=- indicator=- :: Minimum and maximum headway between consecutive trains in up direction
+%@ con eq_0004_b kind=linear domain=- indicator=- :: Minimum and maximum headway between consecutive trains in down direction
+%@ con eq_0005 kind=linear domain=- indicator=- :: Turnaround time bounds at terminal station J
+%@ con eq_0006 kind=linear domain=- indicator=- :: Turnaround ordering at station J: next up service starts only after previous down arrival
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Lower bound on connection turnaround time at station 1 when services are connected
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Upper bound on connection turnaround time at station 1 when services are connected
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger traveling rate on section j in interval k equals counted demand divided by interval length
+%@ con eq_0010_a kind=linear domain=- indicator=- :: Maximum allowable load factor in up direction
+%@ con eq_0010_b kind=linear domain=- indicator=- :: Maximum allowable load factor in down direction
+%@ con eq_0011 kind=linear domain=- indicator=- :: Load factor equals onboard passenger count divided by train capacity
+%@ con eq_0014 kind=linear domain=- indicator=- :: Service i' draws rolling stock from depot if no predecessor service is connected to it
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one predecessor service connects to service i'
+%@ con eq_0016 kind=linear domain=- indicator=- :: Rolling stock enters depot after service i if no successor service is connected from it
+%@ con eq_0017 kind=linear domain=- indicator=- :: At most one successor service connects from service i
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Upper big-M constraint preventing simultaneous connection and depot exit/entry
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Lower big-M constraint preventing simultaneous connection and depot exit/entry
+%@ con eq_0019 kind=linear domain=- indicator=- :: Limited fleet: cumulative depot exits minus reusable entries does not exceed N
+%@ con eq_0020 kind=linear domain=- indicator=- :: Linear definition of y_{m,i}: returning stock from m can serve i only if arrival is early enough
+%@ con eq_0021 kind=linear domain=- indicator=- :: Load factor variation objective component
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Mean of maximal up-direction load factors
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Mean of maximal down-direction load factors
+%@ con eq_0023 kind=linear domain=- indicator=- :: Up-direction headway variation objective component
+%@ con eq_0024 kind=linear domain=- indicator=- :: Simplified up-direction headway variation using neighboring train headways
+%@ con eq_0025 kind=linear domain=- indicator=- :: Total headway variation objective component
+%@ con eq_0026 kind=linear domain=- indicator=- :: Number of depot entering operations objective component
+%@ con eq_0027 kind=linear domain=- indicator=- :: Weighted-sum objective of load, headway and depot components
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Auxiliary ω lower bound for positive up-direction load deviation
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Auxiliary ω lower bound for negative up-direction load deviation
+%@ con eq_0031_c kind=linear domain=- indicator=- :: Auxiliary ω lower bound for positive down-direction load deviation
+%@ con eq_0031_d kind=linear domain=- indicator=- :: Auxiliary ω lower bound for negative down-direction load deviation
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Auxiliary q lower bound for positive up-direction headway deviation
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Auxiliary q lower bound for negative up-direction headway deviation
+%@ con eq_0032_c kind=linear domain=- indicator=- :: Auxiliary q lower bound for positive down-direction headway deviation
+%@ con eq_0032_d kind=linear domain=- indicator=- :: Auxiliary q lower bound for negative down-direction headway deviation
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linear objective with auxiliary absolute-value variables
+%@ con eq_0035_a kind=linear domain=- indicator=- :: Departure time not later than interval end selected by x
+%@ con eq_0035_b kind=linear domain=- indicator=- :: Departure time not earlier than interval start selected by x
+%@ con eq_0035_c kind=linear domain=- indicator=- :: Departure time assigned to exactly one time interval
+%@ con eq_0036 kind=linear domain=- indicator=- :: Onboard passenger count when departures lie in the same time interval
+%@ con eq_0037 kind=linear domain=- indicator=- :: Onboard passenger count when departures lie in consecutive time intervals
+%@ con eq_0038 kind=linear domain=- indicator=- :: General onboard passenger count for any interval combination
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearized load factor constraint using passenger count expression
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Sum of auxiliary z variables equals departure time
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Auxiliary z is forced to zero when interval indicator is zero
+%@ con eq_0040_c kind=linear domain=- indicator=- :: Nonnegativity of auxiliary z variables
+%@ con eq_0041 kind=linear domain=- indicator=- :: Approximate onboard passengers using passenger rate at departure time
+%@ con eq_0043_a kind=linear domain=- indicator=- :: Indicator y upper-bound inequality for departure-time ordering
+%@ con eq_0043_b kind=linear domain=- indicator=- :: Indicator y lower-bound inequality for departure-time ordering
+%@ con eq_0044 kind=linear domain=- indicator=- :: Interval indicator x defined as difference of cumulative y indicators
+%@ con eq_0045 kind=linear domain=- indicator=- :: Passenger rate at departure time expressed via y indicators
+%@ con eq_0046_a kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 1
+%@ con eq_0046_b kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 2
+%@ con eq_0046_c kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 3
+%@ con eq_0047 kind=linear domain=- indicator=- :: Linear passenger rate expression with auxiliary ytilde variables
+%@ con eq_0048 kind=linear domain=- indicator=- :: Linearized onboard passenger approximation using z variables
+%@ con eq_0049_a kind=linear domain=- indicator=- :: Product z = y·d: upper bound using maximum time
+%@ con eq_0049_b kind=linear domain=- indicator=- :: Product z = y·d: lower bound using minimum time
+%@ con eq_0049_c kind=linear domain=- indicator=- :: Product z = y·d: upper bound using departure time
+%@ con eq_0049_d kind=linear domain=- indicator=- :: Product z = y·d: lower bound using departure time

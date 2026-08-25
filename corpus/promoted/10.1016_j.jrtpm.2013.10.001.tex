@@ -1,0 +1,29 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2013.10.001
+%@ meta id=10.1016_j.jrtpm.2013.10.001 family=milp schema=0.1.0
+%@ name :: A demand-based weighted train delay approach for rescheduling railway networks in real time
+%@ desc :: Mined from A demand-based weighted train delay approach for rescheduling railway networks in real time (Journal of Rail Transport Planning & Management, 2013).
+%@ prov source :: 10.1016/j.jrtpm.2013.10.001
+%@ prov reference :: A demand-based weighted train delay approach for rescheduling railway networks in real time
+%@ prov author :: José Luís Espinosa-Aranda; Ricardo Garćıa-Ródenas
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total passenger delay weighted by demand (sum_i g_i * d_i)
+%@ index i ordered=0 cyclic=0 :: Index over operations in sets N_STOP, F, A
+%@ var t shape=i domain=continuous role=primary drole=- lo=- hi=- :: Operational time of operation i
+%@ index j ordered=0 cyclic=0 :: Index over operations in sets F and A
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs in the alternative graph
+%@ index N ordered=0 cyclic=0 :: Set of all operations
+%@ var d shape=i domain=non_negative role=primary drole=- lo=- hi=- :: Delay of operation i
+%@ param f shape=i,j kind=matrix domain=- :: Minimum time between operations i and j
+%@ index h ordered=0 cyclic=0 :: Index for operations in alternative arcs
+%@ index k ordered=0 cyclic=0 :: Index for operations in alternative arcs
+%@ var y shape=i,j domain=binary role=primary drole=- lo=- hi=- :: Binary variable selecting alternative arc (i,j)
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs in the alternative graph
+%@ param M shape=- kind=big_m domain=- :: Large constant for disjunctive constraints
+%@ param My shape=- kind=scalar domain=- :: Product of M and y used in alternative arc constraints
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total passenger delay)
+%@ param g shape=i kind=vector domain=- :: Weight (number of passengers) for operation i
+%@ param t_hat shape=i kind=vector domain=- :: Scheduled time for operation i
+\begin{align}
+  \begin{matrix}Minimize\quad & & Z_{\mathtt{DELAY}} = \underset{i \in N_{\mathtt{STOP}}}{\sum} g_{i} \cdot d_{i} \\ Subject to : & & \\ & t_{i} - \hat{t}_{i} \leq d_{i} ; & i \in N_{\mathtt{STOP}} \\ & t_{j} - t_{i} \geq f_{\mathit{ij}} ; & \left(i , j\right) \in F \\ & t_{j} - t_{i} \geq f_{\mathit{ij}} - M \left(1 - y_{\mathit{ij}}\right) ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A \\ & t_{k} - t_{h} \geq f_{\mathit{hk}} - \mathit{My}_{\mathit{ij}} ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A \\ & d_{i} \geq 0 ; & i \in N_{\mathtt{STOP}} ; \\ & y_{\mathit{ij}} \in \left\{0 , 1\right\} ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A\end{matrix} \tag{eq\_0006} \\
+\end{align}

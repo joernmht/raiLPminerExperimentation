@@ -1,0 +1,180 @@
+% Declaration sidecar for 10.1016_j.trb.2019.08.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2019.08.001
+% Solving cyclic train timetabling problem through model reformulation: Extended time-space network construct and Alternating Direction Method of Multipliers methods
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2019.08.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total journey time of all trains over the master time-space schedule.
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for stations or time-space nodes.
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Objective value (total travel cost).
+
+% c: classified as parameter during review
+%@ param c shape=A,i,i,T,T kind=vector domain=- :: Cost of using time-space arc (i,i',t,t') by train a.
+
+% x: classified as variable during review
+%@ var x shape=A,i,i,T,T domain=binary role=primary drole=- lo=- hi=- :: Binary selection of master-schedule time-space arc (i,i',t,t') for train a.
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of trains.
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of track segments.
+
+% D: classified as parameter during review
+%@ param D shape=A kind=vector domain=- :: Destination station of train a.
+
+% O: classified as parameter during review
+%@ param O shape=A kind=vector domain=- :: Origin station of train a.
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=1 :: Set of time periods in the periodic cycle.
+
+% start: classified as parameter during review
+%@ param start shape=A kind=vector domain=- :: Planned start/departure time of train a.
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for track segments or stations in capacity constraints.
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of time-space arcs forming a capacity clique.
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of train lines.
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Frequency of a train line.
+
+% H: classified as index during review
+%@ index H ordered=1 cyclic=0 :: Number of periods in the extended horizon.
+
+% y: classified as variable during review
+%@ var y shape=A,i,i,T,T domain=binary role=primary drole=- lo=- hi=- :: Binary selection of extended-schedule time-space arc (i,i',tau,tau') for train a.
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: α
+
+% k: classified as index during review
+%@ index k ordered=1 cyclic=0 :: Iteration counter in dual updates.
+
+% s: classified as variable during review
+%@ var s shape=j,j,T domain=continuous role=slack drole=- lo=- hi=- :: Slack variable for capacity constraints in ADMM.
+
+% unusable as an identifier, rename or drop: ρ
+
+% n: classified as parameter during review
+%@ param n shape=A,j,j,T kind=vector domain=- :: Number of other trains occupying capacity resource (j,j',tau'') when current train is fixed.
+
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar domain=- :: Constant term in the quadratic expression independent of slack variable.
+
+% unusable as an identifier, rename or drop: σ
+
+% r: classified as parameter during review
+%@ param r shape=L,i,i,T,T kind=vector domain=- :: Arc usage cost in dynamic programming for the first train of line l.
+
+% unusable as an identifier, rename or drop: π
+
+% z: classified as variable during review
+%@ var z shape=i,j domain=binary role=primary drole=- lo=- hi=- :: Binary periodicity/ordering variable in PESP.
+
+% u: classified as parameter during review
+%@ param u shape=i,j kind=matrix domain=- :: Upper bound on arc duration in PESP.
+
+% h: classified as parameter during review
+%@ param h shape=i,j kind=matrix domain=- :: Minimum headway time between trains on resource (i,j).
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Tolerance parameter for regularity in PESP.
+
+% unusable as an identifier, rename or drop: ε
+
+% v: classified as variable during review
+%@ var v shape=i,i,j,j domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for trains on shared resources.
+
+% w: classified as variable during review
+%@ var w shape=i,i,j,j domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for trains on shared resources.
+
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Linear operator in the ADMM formulation.
+
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Linear/objective term in the ADMM formulation.
+
+% arg: classified as parameter during review
+%@ param arg shape=- kind=scalar domain=- :: Argument of the minimization in the ADMM derivation.
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, l, q, t, β, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=flow_balance domain=- indicator=- :: Flow balance in master schedule: each train selects one path from origin to destination.
+%@ con eq_0003 kind=capacity domain=- indicator=- :: Track capacity: at most one train occupies any capacity clique at a time.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Binary domain of master-schedule arc variables x.
+%@ con eq_0006 kind=flow_balance domain=- indicator=- :: Flow balance for the first train of each line in the master schedule.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Coupling constraint linking line-frequency shifted master schedule arcs to the line's first-train path.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Duplication constraint mapping master schedule arcs to extended schedule arcs.
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Track capacity in the extended time-space network.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain of extended-schedule arc variables y.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Non-negativity of Lagrangian multipliers for capacity constraints.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Train-specific Lagrangian subproblem objective.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Definition of modified extended arc cost from Lagrangian penalties.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Master schedule arc cost obtained by summing duplicated extended arcs.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Subgradient update of Lagrangian multipliers.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Subgradient step size rule.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Bounds on ADMM slack variables.
+%@ con eq_0021 kind=linear domain=- indicator=- :: ADMM multiplier update with penalty parameter.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Definition of n_a: number of other trains occupying a capacity resource.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linearization of the quadratic penalty term.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Function of slack variable in the linearized penalty.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Closed-form optimal slack value.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Case-wise linearized quadratic penalty.
+%@ con eq_0027 kind=linear domain=- indicator=- :: ADMM train-specific subproblem objective after linearization.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Unified modified arc cost gamma' for ADMM.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Improved arc usage cost for ADMM heuristic.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Master schedule arc usage cost in ADMM objective.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Label cost update condition in forward dynamic programming.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint/definition equation (33) from the paper.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint/definition equation (34) from the paper.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint/definition equation (35) from the paper.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint/definition equation (36) from the paper.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Constraint/definition equation (37) from the paper.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Constraint/definition equation (38) from the paper.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Constraint/definition equation (39) from the paper.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint/definition equation (40) from the paper.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint/definition equation (41) from the paper.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint/definition equation (42) from the paper.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Constraint/definition equation (43) from the paper.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Constraint/definition equation (44) from the paper.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Constraint/definition equation (45) from the paper.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Constraint/definition equation (46) from the paper.
+%@ con eq_0048 kind=linear domain=- indicator=- :: Constraint/definition equation (48) from the paper.
+%@ con eq_0049 kind=linear domain=- indicator=- :: Constraint/definition equation (49) from the paper.
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint/definition equation (50) from the paper.
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint/definition equation (51) from the paper.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint/definition equation (52) from the paper.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint/definition equation (53) from the paper.

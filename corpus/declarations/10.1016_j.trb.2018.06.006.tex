@@ -1,0 +1,80 @@
+% Declaration sidecar for 10.1016_j.trb.2018.06.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2018.06.006
+% Integration of real-time traffic management and train control for rail networks - Part 1: Optimization problems and solution approaches
+%
+%@ obj sense=min name=objective combination=sum :: Minimize total mean absolute delay at all visited stations
+%@ index E ordered=0 cyclic=0 :: Set of block sections (cells) in the rail network
+%@ index F ordered=0 cyclic=0 :: Set of trains
+%@ index p ordered=0 cyclic=0 :: Index for preceding cell in train path
+%@ index Y ordered=0 cyclic=0 :: Set of speed profile options for train f on cell (i,j)
+%@ param D shape=F,E kind=matrix :: Planned departure time for train f at cell (i,j)
+%@ param o shape=F kind=vector :: Origin node of train f
+%@ param c shape=F kind=vector :: Planned departure time of train f
+%@ param rho shape=F kind=vector :: Running direction of train f
+%@ param alpha shape=F,E kind=matrix :: Acceleration rate of train f on cell (i,j)
+%@ param beta shape=F,E kind=matrix :: Deceleration rate of train f on cell (i,j)
+%@ param M shape=- kind=big_m :: Large positive constant for big-M constraints
+%@ param epsilon shape=- kind=tolerance :: Small positive constant to avoid division by zero
+%@ param y shape=F,E,Y kind=matrix :: Pre-generated speed profile vector for train f on cell (i,j) option b
+%@ var Z shape=- domain=continuous role=primary :: Total delay objective value
+%@ var d shape=F,E domain=continuous role=primary :: Departure time of train f from cell (i,j)
+%@ var w shape=F,E domain=continuous role=primary :: Dwell time of train f at cell (i,j)
+%@ var v shape=F,E domain=continuous role=primary :: Speed of train f on cell (i,j)
+%@ var a shape=F,E domain=continuous role=primary :: Arrival time of train f at cell (i,j)
+%@ var L shape=F,E domain=continuous role=primary :: Distance traveled by train f in a phase on cell (i,j)
+%@ var g shape=F,E domain=continuous role=primary :: Safety time interval before train arrival on cell (i,j)
+%@ var h shape=F,E domain=continuous role=primary :: Safety time interval after train departure from cell (i,j)
+%@ var tau shape=F,E domain=continuous role=primary :: Safety time components (setup, sight, reaction, approach, release, clear)
+%@ var sigma shape=F,E domain=continuous role=primary :: Cell occupancy time for train f on cell (i,j)
+%@ var delta shape=F,E domain=continuous role=primary :: Cell release time for train f on cell (i,j)
+%@ var theta shape=F,F,E domain=binary role=primary :: Binary order indicator for train pairs on cell (i,j)
+%@ var zeta shape=F,E domain=binary role=primary :: Binary speed indicator for train f on cell (i,j)
+%@ var varpi shape=F,E domain=continuous role=primary :: Square of speed of train f on cell (i,j)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Consistency of outgoing speed on a cell with incoming speed on the next cell
+%@ con eq_0003 kind=linear domain=- indicator=- :: Train incoming speed is zero at its origin
+%@ con eq_0004 kind=linear domain=- indicator=- :: Train outgoing speed is zero at its destination
+%@ con eq_0005 kind=linear domain=- indicator=- :: Incoming speed bounded above by node speed limit
+%@ con eq_0006 kind=linear domain=- indicator=- :: Outgoing speed bounded above by node speed limit
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cruising speed between minimum and cell-specific speed limit
+%@ con eq_0008 kind=linear domain=- indicator=- :: Chronological sequence of arrival, turn, cruising and departure events on a cell
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure from a cell equals arrival on the successive cell
+%@ con eq_0010 kind=linear domain=- indicator=- :: Earliest departure from origin: arrival at origin cell at least planned departure plus primary delay
+%@ con eq_0011 kind=linear domain=- indicator=- :: Dwell time within minimum and maximum bounds
+%@ con eq_0012 kind=big_m domain=- indicator=- :: If dwell time is positive then outgoing speed is zero, otherwise positive
+%@ con eq_0013 kind=linear domain=- indicator=- :: Cell length equals sum of incoming, cruising and outgoing distances
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cruising distance equals cruising speed times cruising duration
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Approach time on a cell depends on whether train stops on the preceding cell
+%@ con eq_0019 kind=linear domain=- indicator=- :: Clearing time based on train length and incoming/cruising speeds
+%@ con eq_0020 kind=linear domain=- indicator=- :: Pre-arrival safety interval as sum of setup, sight, reaction and approach times
+%@ con eq_0021 kind=linear domain=- indicator=- :: Post-departure safety interval as sum of release and clearing times
+%@ con eq_0022 kind=linear domain=- indicator=- :: Occupancy time equals arrival time minus pre-arrival safety interval
+%@ con eq_0023 kind=linear domain=- indicator=- :: Release time equals departure time plus post-departure safety interval
+%@ con eq_0024 kind=ordering domain=- indicator=- :: Exactly one train order is selected for each pair of trains on a shared cell
+%@ con eq_0025 kind=capacity domain=- indicator=- :: Capacity/headway constraint for trains using the same cell in the same direction
+%@ con eq_0026 kind=capacity domain=- indicator=- :: Capacity/headway constraint for trains using the same cell in opposite directions
+%@ con eq_0027 kind=linear domain=- indicator=- :: Logical consistency of order variables on shared cells
+%@ con eq_0028 kind=big_m domain=- indicator=- :: Linear upper-bound encoding of speed indicator zeta1 for v_in <= v_cru
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Linear lower-bound encoding of speed indicator zeta1 for v_in <= v_cru
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Incoming phase time under uniform deceleration
+%@ con eq_0031 kind=big_m domain=- indicator=- :: Incoming phase time under uniform acceleration at alpha2 above switching speed
+%@ con eq_0032 kind=big_m domain=- indicator=- :: Incoming phase time under uniform acceleration at alpha1 below switching speed
+%@ con eq_0033 kind=big_m domain=- indicator=- :: First-stage acceleration time to switching speed in the incoming phase
+%@ con eq_0034 kind=big_m domain=- indicator=- :: Second-stage acceleration time from switching speed to cruising speed in the incoming phase
+%@ con eq_0035 kind=big_m domain=- indicator=- :: Outgoing phase motion constraints analogous to the incoming phase constraints
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Upper bound on time to reach switching speed when train stays below it
+%@ con eq_0037 kind=big_m domain=- indicator=- :: Lower bound on time to reach switching speed when train reaches it
+%@ con eq_0038 kind=big_m domain=- indicator=- :: Outgoing phase turn-time constraints analogous to the incoming phase constraints
+%@ con eq_0039 kind=big_m domain=- indicator=- :: Incoming distance under uniform deceleration
+%@ con eq_0040 kind=big_m domain=- indicator=- :: Incoming distance under uniform acceleration above switching speed
+%@ con eq_0041 kind=big_m domain=- indicator=- :: Incoming distance under uniform acceleration below switching speed
+%@ con eq_0048 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of incoming speed
+%@ con eq_0049 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of cruising speed
+%@ con eq_0050 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of outgoing speed
+%@ con eq_0051 kind=linear domain=- indicator=- :: Convex combination weighting of piecewise breakpoints for squared speed terms
+%@ con eq_0052 kind=linear domain=- indicator=- :: Selection of an active piecewise segment for each squared speed variable
+%@ con eq_0053 kind=linear domain=- indicator=- :: Special-ordered-set restriction on adjacent piecewise segment weights
+%@ con eq_0054 kind=linear domain=- indicator=- :: Incoming speed selected from pre-generated speed profile options in P_TSPO

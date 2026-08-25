@@ -1,0 +1,128 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2018.06.006
+%@ meta id=10.1016_j.trb.2018.06.006 family=milp schema=0.1.0
+%@ name :: Integration of real-time traffic management and train control for rail networks - Part 1: Optimization problems and solution approaches
+%@ desc :: Mined from Integration of real-time traffic management and train control for rail networks - Part 1: Optimization problems and solution approaches (Transportation Research Part B Methodological, 2018).
+%@ prov source :: 10.1016/j.trb.2018.06.006
+%@ prov reference :: Integration of real-time traffic management and train control for rail networks - Part 1: Optimization problems and solution approaches
+%@ prov author :: Xiaojie Luan; Yihui Wang; Bart De Schutter; Lingyun Meng; Gabriël Lodewijks; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total mean absolute delay at all visited stations
+%@ index E ordered=0 cyclic=0 :: Set of block sections (cells) in the rail network
+%@ index F ordered=0 cyclic=0 :: Set of trains
+%@ index p ordered=0 cyclic=0 :: Index for preceding cell in train path
+%@ index Y ordered=0 cyclic=0 :: Set of speed profile options for train f on cell (i,j)
+%@ param D shape=F,E kind=matrix :: Planned departure time for train f at cell (i,j)
+%@ param o shape=F kind=vector :: Origin node of train f
+%@ param c shape=F kind=vector :: Planned departure time of train f
+%@ param rho shape=F kind=vector :: Running direction of train f
+%@ param alpha shape=F,E kind=matrix :: Acceleration rate of train f on cell (i,j)
+%@ param beta shape=F,E kind=matrix :: Deceleration rate of train f on cell (i,j)
+%@ param M shape=- kind=big_m :: Large positive constant for big-M constraints
+%@ param epsilon shape=- kind=tolerance :: Small positive constant to avoid division by zero
+%@ param y shape=F,E,Y kind=matrix :: Pre-generated speed profile vector for train f on cell (i,j) option b
+%@ var Z shape=- domain=continuous role=primary :: Total delay objective value
+%@ var d shape=F,E domain=continuous role=primary :: Departure time of train f from cell (i,j)
+%@ var w shape=F,E domain=continuous role=primary :: Dwell time of train f at cell (i,j)
+%@ var v shape=F,E domain=continuous role=primary :: Speed of train f on cell (i,j)
+%@ var a shape=F,E domain=continuous role=primary :: Arrival time of train f at cell (i,j)
+%@ var L shape=F,E domain=continuous role=primary :: Distance traveled by train f in a phase on cell (i,j)
+%@ var g shape=F,E domain=continuous role=primary :: Safety time interval before train arrival on cell (i,j)
+%@ var h shape=F,E domain=continuous role=primary :: Safety time interval after train departure from cell (i,j)
+%@ var tau shape=F,E domain=continuous role=primary :: Safety time components (setup, sight, reaction, approach, release, clear)
+%@ var sigma shape=F,E domain=continuous role=primary :: Cell occupancy time for train f on cell (i,j)
+%@ var delta shape=F,E domain=continuous role=primary :: Cell release time for train f on cell (i,j)
+%@ var theta shape=F,F,E domain=binary role=primary :: Binary order indicator for train pairs on cell (i,j)
+%@ var zeta shape=F,E domain=binary role=primary :: Binary speed indicator for train f on cell (i,j)
+%@ var varpi shape=F,E domain=continuous role=primary :: Square of speed of train f on cell (i,j)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Consistency of outgoing speed on a cell with incoming speed on the next cell
+%@ con eq_0003 kind=linear domain=- indicator=- :: Train incoming speed is zero at its origin
+%@ con eq_0004 kind=linear domain=- indicator=- :: Train outgoing speed is zero at its destination
+%@ con eq_0005 kind=linear domain=- indicator=- :: Incoming speed bounded above by node speed limit
+%@ con eq_0006 kind=linear domain=- indicator=- :: Outgoing speed bounded above by node speed limit
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cruising speed between minimum and cell-specific speed limit
+%@ con eq_0008 kind=linear domain=- indicator=- :: Chronological sequence of arrival, turn, cruising and departure events on a cell
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure from a cell equals arrival on the successive cell
+%@ con eq_0010 kind=linear domain=- indicator=- :: Earliest departure from origin: arrival at origin cell at least planned departure plus primary delay
+%@ con eq_0011 kind=linear domain=- indicator=- :: Dwell time within minimum and maximum bounds
+%@ con eq_0012 kind=big_m domain=- indicator=- :: If dwell time is positive then outgoing speed is zero, otherwise positive
+%@ con eq_0013 kind=linear domain=- indicator=- :: Cell length equals sum of incoming, cruising and outgoing distances
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cruising distance equals cruising speed times cruising duration
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Approach time on a cell depends on whether train stops on the preceding cell
+%@ con eq_0019 kind=linear domain=- indicator=- :: Clearing time based on train length and incoming/cruising speeds
+%@ con eq_0020 kind=linear domain=- indicator=- :: Pre-arrival safety interval as sum of setup, sight, reaction and approach times
+%@ con eq_0021 kind=linear domain=- indicator=- :: Post-departure safety interval as sum of release and clearing times
+%@ con eq_0022 kind=linear domain=- indicator=- :: Occupancy time equals arrival time minus pre-arrival safety interval
+%@ con eq_0023 kind=linear domain=- indicator=- :: Release time equals departure time plus post-departure safety interval
+%@ con eq_0024 kind=ordering domain=- indicator=- :: Exactly one train order is selected for each pair of trains on a shared cell
+%@ con eq_0025 kind=capacity domain=- indicator=- :: Capacity/headway constraint for trains using the same cell in the same direction
+%@ con eq_0026 kind=capacity domain=- indicator=- :: Capacity/headway constraint for trains using the same cell in opposite directions
+%@ con eq_0027 kind=linear domain=- indicator=- :: Logical consistency of order variables on shared cells
+%@ con eq_0028 kind=big_m domain=- indicator=- :: Linear upper-bound encoding of speed indicator zeta1 for v_in <= v_cru
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Linear lower-bound encoding of speed indicator zeta1 for v_in <= v_cru
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Incoming phase time under uniform deceleration
+%@ con eq_0031 kind=big_m domain=- indicator=- :: Incoming phase time under uniform acceleration at alpha2 above switching speed
+%@ con eq_0032 kind=big_m domain=- indicator=- :: Incoming phase time under uniform acceleration at alpha1 below switching speed
+%@ con eq_0033 kind=big_m domain=- indicator=- :: First-stage acceleration time to switching speed in the incoming phase
+%@ con eq_0034 kind=big_m domain=- indicator=- :: Second-stage acceleration time from switching speed to cruising speed in the incoming phase
+%@ con eq_0035 kind=big_m domain=- indicator=- :: Outgoing phase motion constraints analogous to the incoming phase constraints
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Upper bound on time to reach switching speed when train stays below it
+%@ con eq_0037 kind=big_m domain=- indicator=- :: Lower bound on time to reach switching speed when train reaches it
+%@ con eq_0038 kind=big_m domain=- indicator=- :: Outgoing phase turn-time constraints analogous to the incoming phase constraints
+%@ con eq_0039 kind=big_m domain=- indicator=- :: Incoming distance under uniform deceleration
+%@ con eq_0040 kind=big_m domain=- indicator=- :: Incoming distance under uniform acceleration above switching speed
+%@ con eq_0041 kind=big_m domain=- indicator=- :: Incoming distance under uniform acceleration below switching speed
+%@ con eq_0048 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of incoming speed
+%@ con eq_0049 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of cruising speed
+%@ con eq_0050 kind=linear domain=- indicator=- :: Piecewise affine approximation of square of outgoing speed
+%@ con eq_0051 kind=linear domain=- indicator=- :: Convex combination weighting of piecewise breakpoints for squared speed terms
+%@ con eq_0052 kind=linear domain=- indicator=- :: Selection of an active piecewise segment for each squared speed variable
+%@ con eq_0053 kind=linear domain=- indicator=- :: Special-ordered-set restriction on adjacent piecewise segment weights
+%@ con eq_0054 kind=linear domain=- indicator=- :: Incoming speed selected from pre-generated speed profile options in P_TSPO
+\begin{align}
+  \begin{matrix}min\quad & Z = \sum_{f \in F} \underset{\left(i , j\right) \in E_{f}^{\text{stop}}}{\sum} \frac{\left|d_{f , i , j} - w_{f , i , j} - D_{f , i , j}\right|}{\left|E_{f}^{\text{stop}}\right|} ,\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix}v_{f , i , j}^{\text{out}} = v_{f , j , k}^{\text{in}} , \forall f \in F , j \neq o_{f} , \left(i , j\right) \in E_{f} , \left(j , k\right) \in E_{f}\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}v_{f , o_{f} , j}^{\text{in}} = 0 , \forall f \in F , \left(o_{f} , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}v_{f , j , s_{f}}^{\text{out}} = 0 , \forall f \in F , \left(j , s_{f}\right) \in E_{f}\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}0 \leq v_{f , i , j}^{\text{in}} \leq v_{i}^{\text{nlim}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}0 \leq v_{f , i , j}^{\text{out}} \leq v_{j}^{\text{nlim}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}v^{\text{mincru}} \leq v_{f , i , j}^{\text{cru}} \leq v_{i , j}^{\text{clim}} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix}a_{f , i , j} \leq a_{f , i , j}^{\text{turn}} \leq a_{f , i , j}^{\text{cru}} \leq d_{f , i , j}^{\text{cru}} \leq d_{f , i , j}^{\text{turn}} \leq d_{f , i , j} - w_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}d_{f , i , j} = a_{f , j , k} , \forall f \in F , \left(i , j\right) \in E_{f} , \left(j , k\right) \in E_{f}\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}a_{f , o_{f} , j} \geq c_{f} + c_{f}^{\text{pri}} , \forall f \in F , \left(o_{f} , j\right) \in E_{f}\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix}w_{f , i , j}^{min} \leq w_{f , i , j} \leq w_{f , i , j}^{max} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}\begin{cases} v_{f , i , j}^{\text{out}} = 0 , & \text{if} w_{f , i , j} > 0 \\ v_{f , i , j}^{\text{out}} > 0 , & \text{if} w_{f , i , j} = 0 \end{cases} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix}L_{i , j}^{\text{cell}} = L_{f , i , j}^{\text{in}} + L_{f , i , j}^{\text{cru}} + L_{f , i , j}^{\text{out}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & & L_{f , i , j}^{\text{cru}} = v_{f , i , j}^{\text{cru}} \cdot \left(d_{f , i , j}^{\text{cru}} - a_{f , i , j}^{\text{cru}}\right) ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}\mathit{tau}_{f , p , i}^{\text{clear}} = 2 \cdot L_{f}^{\text{train}} / \left(v_{f , p , i}^{\text{out}} + v_{f , i , j}^{\text{cru}}\right) , \forall f \in F , \left(p , i\right) \in E_{f} , \left(i , j\right) \in E_{f} .\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix}g_{f , i , j} = \mathit{tau}_{f , i , j}^{\text{setup}} + \mathit{tau}_{f , i , j}^{\text{sight}} + \mathit{tau}_{f , i , j}^{\text{reaction}} + \mathit{tau}_{f , i , j}^{\text{approach}} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix}h_{f , i , j} = \mathit{tau}_{f , i , j}^{\text{release}} + \mathit{tau}_{f , i , j}^{\text{clear}} , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix}\mathit{sigma}_{f , i , j} = a_{f , i , j} - g_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix}\mathit{delta}_{f , i , j} = d_{f , i , j} + h_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f} .\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix}\mathit{theta}_{f , f^{'} , i , j} + \mathit{theta}_{f^{'} , f , i , j} = 1 , \forall f \in F , f^{'} \in F , \left(i , j\right) \in E_{f} , \left(i , j\right) \in E_{f^{'}}\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix}\mathit{sigma}_{f^{'} , i , j} + \left(1 - \mathit{theta}_{f , f^{'} , i , j}\right) \cdot M \geq \mathit{delta}_{f , i , j} , \forall f \in F , f^{'} \in F , f \neq f^{'} , \mathit{rho}_{f} = \mathit{rho}_{f^{'}} , \left(i , j\right) \in E_{f} , \left(i , j\right) \in E_{f^{'}} ,\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix}\mathit{sigma}_{f^{'} , j , i} + \left(1 - \mathit{theta}_{f , f^{'} , i , j}\right) \cdot M \geq \mathit{delta}_{f , i , j} , \forall f \in F , f^{'} \in F , f \neq f^{'} , \mathit{rho}_{f} \neq \mathit{rho}_{f^{'}} , \left(i , j\right) \in E_{f} , \left(j , i\right) \in E_{f^{'}} .\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix} & & v_{f , i , j}^{\text{in}} - v_{f , i , j}^{\text{cru}} \leq v_{i}^{\text{nlim}} \cdot \left(1 - \mathit{zeta}_{1 , f , i , j}\right) ,\end{matrix} \tag{eq\_0026} \\
+  & \begin{matrix} & & v_{f , i , j}^{\text{in}} - v_{f , i , j}^{\text{cru}} \geq \mathit{varepsilon} + \left(- v_{i , j}^{\text{clim}} - \mathit{varepsilon}\right) \cdot \mathit{zeta}_{1 , f , i , j} ,\end{matrix} \tag{eq\_0027} \\
+  & - \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{beta}_{f , i , j}} - M \cdot \mathit{zeta}_{1 , f , i , j} \leq a_{f , i , j}^{\text{cru}} - a_{f , i , j} \leq - \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{beta}_{f , i , j}} + M \cdot \mathit{zeta}_{1 , f , i , j} \tag{eq\_0028} \\
+  & \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{2 , f , i , j}} - M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{3 , f , i , j}\right) \leq a_{f , i , j}^{\text{cru}} - a_{f , i , j} \leq \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{2 , f , i , j}} + M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{3 , f , i , j}\right) \tag{eq\_0029} \\
+  & \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{1 , f , i , j}} - M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{4 , f , i , j}\right) \leq a_{f , i , j}^{\text{cru}} - a_{f , i , j} \leq \frac{v_{f , i , j}^{\text{cru}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{1 , f , i , j}} + M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{4 , f , i , j}\right) \tag{eq\_0030} \\
+  & \begin{aligned}\frac{v_{f}^{\text{turn}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{1 , f , i , j}} & - & M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right) \leq a_{f , i , j}^{\text{turn}} - a_{f , i , j} \\ & & \leq \frac{v_{f}^{\text{turn}} - v_{f , i , j}^{\text{in}}}{\mathit{alpha}_{1 , f , i , j}} + M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right)\end{aligned} \tag{eq\_0031} \\
+  & \begin{aligned}\frac{v_{f , i , j}^{\text{cru}} - v_{f}^{\text{turn}}}{\mathit{alpha}_{2 , f , i , j}} & - & M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right) \leq a_{f , i , j}^{\text{cru}} - a_{f , i , j}^{\text{turn}} \\ & & \leq \frac{v_{f , i , j}^{\text{cru}} - v_{f}^{\text{turn}}}{\mathit{alpha}_{2 , f , i , j}} + M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right)\end{aligned} \tag{eq\_0032} \\
+  & \begin{matrix} & & a_{f , i , j}^{\text{turn}} \leq a_{f , i , j} + M \cdot \left|\mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{3 , f , i , j}\right| ,\end{matrix} \tag{eq\_0033} \\
+  & \begin{matrix} & & a_{f , i , j}^{\text{turn}} \geq a_{f , i , j}^{\text{cru}} - M \cdot \left|\mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{4 , f , i , j}\right| .\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix} & & - \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{beta}_{f , i , j}} - M \cdot \mathit{zeta}_{1 , f , i , j} \leq L_{f , i , j}^{\text{in}} \leq - \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{beta}_{f , i , j}} + M \cdot \mathit{zeta}_{1 , f , i , j} ,\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix} & & \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{2 , f , i , j}} - M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{3 , f , i , j}\right) \leq L_{f , i , j}^{\text{in}} \leq \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{2 , f , i , j}} + M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{3 , f , i , j}\right) ,\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix} & & \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{1 , f , i , j}} - M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{4 , f , i , j}\right) \leq L_{f , i , j}^{\text{in}} \leq \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{1 , f , i , j}} + M \cdot \left(2 - \mathit{zeta}_{1 , f , i , j} - \mathit{zeta}_{4 , f , i , j}\right) ,\end{matrix} \tag{eq\_0037} \\
+  & \begin{matrix} & & \frac{\left(v_{f}^{\text{turn}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{1 , f , i , j}} + \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f}^{\text{turn}}\right)^{2}}{2 \cdot \mathit{alpha}_{2 , f , i , j}} - M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right) \leq L_{f , i , j}^{\text{in}} \\ & & \leq \frac{\left(v_{f}^{\text{turn}}\right)^{2} - \left(v_{f , i , j}^{\text{in}}\right)^{2}}{2 \cdot \mathit{alpha}_{1 , f}} + \frac{\left(v_{f , i , j}^{\text{cru}}\right)^{2} - \left(v_{f}^{\text{turn}}\right)^{2}}{2 \cdot \mathit{alpha}_{2 , f , i , j}} + M \cdot \left(1 - \mathit{zeta}_{1 , f , i , j} + 2 \cdot \mathit{zeta}_{3 , f , i , j} + 2 \cdot \mathit{zeta}_{4 , f , i , j}\right) .\end{matrix} \tag{eq\_0038} \\
+  & \begin{matrix} & & ϖ_{f , i , j}^{\text{in}} = \left(v_{f , i , j}^{\text{in}}\right)^{2} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0039} \\
+  & \begin{matrix} & & ϖ_{f , i , j}^{\text{cru}} = \left(v_{f , i , j}^{\text{cru}}\right)^{2} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0040} \\
+  & \begin{matrix} & & ϖ_{f , i , j}^{\text{out}} = \left(v_{f , i , j}^{\text{out}}\right)^{2} , \forall f \in F , \left(i , j\right) \in E_{f} .\end{matrix} \tag{eq\_0041} \\
+  & \begin{matrix}v_{f , i , j}^{\text{in}} = \sum_{b = 1}^{\left|Y_{f , i , j}\right|} \mathit{vartheta}_{f , i , j , b} \cdot y_{f , i , j , b}^{\text{in}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0048} \\
+  & \begin{matrix}v_{f , i , j}^{\text{cru}} = \sum_{b = 1}^{\left|Y_{f , i , j}\right|} \mathit{vartheta}_{f , i , j , b} \cdot y_{f , i , j , b}^{\text{cru}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0049} \\
+  & \begin{matrix}v_{f , i , j}^{\text{out}} = \sum_{b = 1}^{\left|Y_{f , i , j}\right|} \mathit{vartheta}_{f , i , j , b} \cdot y_{f , i , j , b}^{\text{out}} , \forall f \in F , \left(i , j\right) \in E_{f} ,\end{matrix} \tag{eq\_0050} \\
+  & \begin{matrix}\sum_{b = 1}^{\left|Y_{f , i , j}\right|} \mathit{vartheta}_{f , i , j , b} = 1 , \forall f \in F , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0051} \\
+  & \begin{matrix}\mathit{vartheta}_{f , i , j , b} \cdot \frac{\left(L_{i , j}^{\text{cell}} - L_{f , i , j , b}^{\text{in}} - L_{f , i , j , b}^{\text{out}}\right)}{y_{f , i , j , b}^{\text{cru}}} \leq d_{f , i , j}^{\text{cru}} - a_{f , i , j}^{\text{cru}} \leq \frac{\left(L_{i , j}^{\text{cell}} - L_{f , i , j , b}^{\text{in}} - L_{f , i , j , b}^{\text{out}}\right)}{y_{f , i , j , b}^{\text{cru}}} + M \cdot \left(1 - \mathit{vartheta}_{f , i , j , b}\right)\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix} & & \frac{\left(d_{f , i , j}^{} - a_{f , i , j}^{}\right) \cdot y_{f , i , j , b}^{\text{out}}}{\mathit{varepsilon} + y_{f , i , j , b}^{\text{out}}} - M \cdot \left(1 - \mathit{vartheta}_{f , i , j , b}\right) \leq \mathit{tau}_{f , j , k}^{\text{approach}} \leq \frac{\left(d_{f , i , j}^{} - a_{f , i , j}^{}\right) \cdot y_{f , i , j , b}^{\text{out}}}{\mathit{varepsilon} + y_{f , i , j , b}^{\text{out}}} + M \cdot \left(1 - \mathit{vartheta}_{f , i , j , b}\right) , \\ & & \forall f \in F , \left(i , j\right) \in E_{f} , \left(j , k\right) \in E_{f} , b = 1 , \ldots , \left|Y_{f , i , j}\right|\end{matrix} \tag{eq\_0053} \\
+  & \begin{matrix}\mathit{tau}_{f , p , i}^{\text{clear}} = \sum_{b = 1}^{\left|Y_{f , i , j}\right|} \frac{2 \cdot L_{f}^{\text{train}} \cdot \mathit{vartheta}_{f , i , j , b}}{y_{f , i , j , b}^{\text{in}} + y_{f , i , j , b}^{\text{cru}}} , \forall f \in F , \left(p , i\right) \in E_{f} , \left(i , j\right) \in E_{f}\end{matrix} \tag{eq\_0054} \\
+\end{align}

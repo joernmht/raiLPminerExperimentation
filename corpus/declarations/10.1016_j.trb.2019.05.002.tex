@@ -1,0 +1,131 @@
+% Declaration sidecar for 10.1016_j.trb.2019.05.002
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2019.05.002
+% Multi-objective periodic railway timetabling on dense heterogeneous railway corridors
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the placeholder values, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2019.05.002.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total train journey time over running and dwell activities (primary objective in MOPRT)
+
+% unusable as an identifier, rename or drop: π
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Period length T
+
+% a: classified as variable during review
+%@ var a shape=A domain=continuous role=primary drole=- lo=- hi=- :: Time difference of activity (i,j)
+
+% z: classified as variable during review
+%@ var z shape=A domain=binary role=primary drole=- lo=- hi=- :: Modulo parameter indicating order of events i and j in a period
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (run, dwell, thru, head, regularity)
+
+% unusable as an identifier, rename or drop: α
+% u: classified as parameter during review
+%@ param u shape=A kind=vector domain=- :: Upper bound for duration of activity (i,j)
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events
+
+% c: classified as variable during review
+%@ var c shape=- domain=integer role=primary drole=- lo=- hi=- :: Auxiliary integer preventing illegal overtaking between running activities
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Number of trains in the corridor
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of train lines
+
+% f: classified as parameter during review
+%@ param f shape=L kind=vector domain=- :: Frequency of line L (trains per period)
+
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: β
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Reference headway h_p and maximum station headway h_s
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Maximum penalty value P_max
+
+% unusable as an identifier, rename or drop: φ
+% w: classified as variable during review
+%@ var w shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable selecting the active piece of the piecewise penalty function for a headway activity
+
+% unusable as an identifier, rename or drop: δ
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large constant for big-M constraints
+
+% d: classified as parameter during review
+%@ param d shape=A kind=vector domain=- :: Maximal dwell time supplement for activity (j,j')
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% o: classified as variable during review
+%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for overtaking modulo sum
+
+% p: classified as variable during review
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating whether overtaking occurs between two activities
+
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating overtaking order between two activities
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating whether dwell activity is overtaken by a through activity
+
+% O: classified as parameter during review
+%@ param O shape=S kind=vector domain=- :: Maximum overtaking capacity (number of siding tracks) at station S
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, l, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: PESP activity duration definition a_ij = π_j - π_i + z_ij·T
+%@ con eq_0003 kind=linear domain=- indicator=- :: Activity duration bounds: l_ij ≤ a_ij ≤ u_ij
+%@ con eq_0004 kind=linear domain=- indicator=- :: Event time periodicity bounds: 0 ≤ π_i < T
+%@ con eq_0005 kind=linear domain=- indicator=- :: Modulo parameters z_ij are binary
+%@ con eq_0006 kind=linear domain=- indicator=- :: Illegal-overtaking prevention: z_ij+z_i'j'+z_ii'+z_jj' = 2·c_ii'jj'
+%@ con eq_0007 kind=linear domain=- indicator=- :: Bounds on auxiliary c: 0 ≤ c_ii'jj' ≤ 2
+%@ con eq_0008 kind=linear domain=- indicator=- :: Auxiliary c is a nonnegative integer
+%@ con eq_0009 kind=linear domain=- indicator=- :: Regularity deviation definition θ_ij = |a_ij - [T/f_l]|
+%@ con eq_0011 kind=linear domain=- indicator=- :: Linearized regularity deviation: -θ_ij ≤ a_ij - [T/f_l] ≤ θ_ij
+%@ con eq_0012 kind=linear domain=- indicator=- :: Regularity deviation tolerance: 0 ≤ θ_ij ≤ β_l
+%@ con eq_0013 kind=linear domain=- indicator=- :: Reference headway definition h_p = ceil(T/N_t)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Maximum penalty definition P_max = φ·(h_p - l_min)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Lower reference headway h^{p_lower}_ij = l_ij + (h_p - l_min)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Upper reference headway h^{p_upper}_ij = u_ij - (h_p - l_min)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linearized piecewise penalty δ_ij for headway activity (i,j)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Exactly one piece of the piecewise penalty selected (w'+w''+w'''=1)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Piece-selection variables w', w'', w''' are binary
+%@ con eq_0022 kind=linear domain=- indicator=- :: Lower-piece range: a_ij ∈ [l_ij, h_lower] when w'=1
+%@ con eq_0023 kind=linear domain=- indicator=- :: Middle-piece range: a_ij ∈ (h_lower, h_upper] when w''=1
+%@ con eq_0024 kind=linear domain=- indicator=- :: Upper-piece range: a_ij ∈ (h_upper, u_ij] when w'''=1
+%@ con eq_0025 kind=linear domain=- indicator=- :: Objective: minimize total number of overtakings (sum of y)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Overtaking modulo relation: z_ij+z_i'j'+z_ii'+z_jj' = 2·o + p
+%@ con eq_0028 kind=linear domain=- indicator=- :: Binary restrictions on overtaking variables o, p, y
+%@ con eq_0029 kind=linear domain=- indicator=- :: Dwell-time/overtaking relation linking a_ii' and a_jj' to y
+%@ con eq_0030 kind=linear domain=- indicator=- :: x_ii' binary variable for through overtaking existence
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization of x_ii' via number of through overtakings
+%@ con eq_0032 kind=linear domain=- indicator=- :: Dwell time extension limited by overtaking count and station headway h_s
+%@ con eq_0033 kind=linear domain=- indicator=- :: Station capacity: total overtakings at station s_k ≤ O^{max}_{s_k}
+%@ con eq_0034 kind=linear domain=- indicator=- :: Epsilon-constraint bounding a secondary objective in MOPRT
+%@ con eq_0035 kind=linear domain=- indicator=- :: Epsilon-constraint bounding route/capacity-utilization indicator in MOPRT

@@ -1,0 +1,123 @@
+% Declaration sidecar for 10.1016_j.tre.2016.07.015
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2016.07.015
+% A rolling horizon approach to the high speed train rescheduling problem in case of a partial segment blockage
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2016.07.015.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted sum of train service cancelations and deviations
+
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Deviation variable for earliness or tardiness of event e
+
+% unusable as an identifier, rename or drop: μ
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures)
+
+% y: classified as variable during review
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train service t
+
+% unusable as an identifier, rename or drop: γ
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of train services
+
+% D: classified as parameter during review
+%@ param D shape=E kind=vector domain=continuous :: Maximum allowed deviation for event e
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constants (M1, M2)
+
+% q: classified as index during review
+%@ index q ordered=0 cyclic=0 :: Scheduled time of event e
+
+% x: classified as variable during review
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Actual time of event e
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Disruption start and end times
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (train, headway, etc.)
+
+% L: classified as parameter during review
+%@ param L shape=A kind=vector domain=continuous :: Minimum duration of activity a
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: χ
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of order activity pairs
+
+% C: classified as parameter during review
+%@ param C shape=S kind=vector domain=integer :: Station capacity (down/up)
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% unusable as an identifier, rename or drop: φ
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Subset of train services for balance constraints
+
+% PP: classified as index during review
+%@ index PP ordered=0 cyclic=0 :: Set of train service subset pairs
+
+% unusable as an identifier, rename or drop: δ
+% Seg: classified as index during review
+%@ index Seg ordered=0 cyclic=0 :: Set of segments
+
+% unusable as an identifier, rename or drop: ω
+% Bound by a quantifier or big operator, so no declaration of their own: a, e, f, s, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=big_m domain=- indicator=- :: Bounds for events of canceled train services moved beyond horizon
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure events cannot occur before scheduled time
+%@ con eq_0004 kind=big_m domain=- indicator=- :: Tardiness is at least actual minus scheduled delay
+%@ con eq_0005 kind=linear domain=- indicator=- :: Earliness is at least scheduled minus actual arrival time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum allowed tardiness
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum allowed earliness for arrivals
+%@ con eq_0008 kind=linear domain=- indicator=- :: Events before disruption keep scheduled times
+%@ con eq_0009 kind=linear domain=- indicator=- :: No cancelation for trains already departed before disruption
+%@ con eq_0010 kind=linear domain=- indicator=- :: Binary integrality of cancelation variables
+%@ con eq_0011 kind=linear domain=- indicator=- :: Non-negativity of time, tardiness, earliness variables
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum running and dwell times for train activities
+%@ con eq_0014 kind=ordering domain=- indicator=- :: One of two opposite segment headway orders is selected
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Minimum headway between same-direction trains in segment
+%@ con eq_0017 kind=big_m domain=- indicator=- :: Binary decision whether a train departs before disruption ends
+%@ con eq_0018 kind=ordering domain=- indicator=- :: One of two opposite-direction headway orders is selected
+%@ con eq_0019 kind=big_m domain=- indicator=- :: Minimum headway for opposite-direction trains on shared track
+%@ con eq_0020 kind=ordering domain=- indicator=- :: Overtaking forbidden within a segment
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Downside station capacity constraint
+%@ con eq_0023 kind=capacity domain=- indicator=- :: Upside station capacity constraint
+%@ con eq_0024 kind=big_m domain=- indicator=- :: Minimum station headway when a train departs before another arrives
+%@ con eq_0025 kind=linear domain=- indicator=- :: Balance constraint for cancelations in one direction
+%@ con eq_0026 kind=linear domain=- indicator=- :: Balance constraint for cancelations in the other direction
+%@ con eq_0027 kind=ordering domain=- indicator=- :: Order consistency between segment and station headway
+%@ con eq_0028 kind=linear domain=- indicator=- :: Blocked-track strategy: downside trains wait until disruption end
+%@ con eq_0029 kind=linear domain=- indicator=- :: Blocked-track strategy: upside trains wait until disruption end
+%@ con eq_0030 kind=linear domain=- indicator=- :: Maximum running time for disrupted downside trains before blocked segment
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maximum running time for disrupted upside trains before blocked segment
+%@ con eq_0033 kind=big_m domain=- indicator=- :: Headway constraint for BTWFS disrupted trains on reverse track
+%@ con eq_0034 kind=ordering domain=- indicator=- :: Ordering of departures for BTWFS strategy
+%@ con eq_0035 kind=ordering domain=- indicator=- :: Ordering of departures for BTWFS downside strategy
+%@ con eq_0036 kind=linear domain=- indicator=- :: Definition of trains dwelling at station at stage start
+%@ con eq_0039 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for downside trains
+%@ con eq_0040 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for upside trains

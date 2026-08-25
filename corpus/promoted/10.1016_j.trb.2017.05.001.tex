@@ -1,0 +1,57 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.05.001
+%@ meta id=10.1016_j.trb.2017.05.001 family=milp schema=0.1.0
+%@ name :: Two-phase decomposition method for the last train departure time choice in subway networks
+%@ desc :: Mined from Two-phase decomposition method for the last train departure time choice in subway networks (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.05.001
+%@ prov reference :: Two-phase decomposition method for the last train departure time choice in subway networks
+%@ prov author :: Liujiang Kang; Qiang Meng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total transfer connection time for last train passengers, weighted by passenger demand p_{ll'k}.
+%@ index l ordered=0 cyclic=0 :: Subway line index, l ∈ L.
+%@ index t ordered=0 cyclic=0 :: Time argument in Arr/Dep functions; also subscript in last-train departure time t_l^R.
+%@ param Arr shape=- kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
+%@ index L ordered=0 cyclic=0 :: Set of subway lines, L = {1,...,ϒ}.
+%@ index S ordered=0 cyclic=0 :: Set of station positions on a line, S(l).
+%@ index k ordered=0 cyclic=0 :: Station index, k ∈ S(l) ∩ S(l').
+%@ param t_hat shape=- kind=scalar :: Dwell time of the last train at station s on line l (constant t̂_s^l).
+%@ param t_bar shape=- kind=scalar :: Running time of the last train between consecutive stations s-1 and s on line l (constant t̄_{s-1,s}^l).
+%@ param Dep shape=- kind=scalar :: Departure time of the last train from station k on line l, Dep_k^l(t_l^R), Eq. (2).
+%@ param Tra shape=- kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
+%@ index p ordered=0 cyclic=0 :: Passenger demand coefficient p_{ll'k} (number of transferring passengers).
+%@ index w ordered=0 cyclic=0 :: Minimum connection time w_{ll'k} for last-train transfer passengers.
+%@ param H shape=- kind=scalar :: Headway of trains on line l' during last-train service period.
+%@ param M shape=- kind=big_m :: Big positive penalty for unsuccessful connection.
+%@ var x shape=l,l,k domain=binary role=primary :: Binary variable indicating whether passengers can successfully transfer from line l to line l' at station k (1 if yes, 0 otherwise).
+%@ var y shape=l,l,k domain=integer role=primary :: Non-negative integer variable for number of trains running to station k before the last train on the target line that the last train passengers can transfer.
+%@ param Z shape=- kind=scalar :: Set of non-negative integers (Z+) used for y domain.
+%@ param T shape=- kind=scalar :: Bounds T_l^min, T_l^max on last-train depot departure time.
+%@ con eq_0001 kind=linear :: Definition of arrival time at station k on line l (Eq. 1).
+%@ con eq_0002 kind=linear :: Definition of departure time from station k on line l (Eq. 2).
+%@ con eq_0003 kind=linear :: Definition of maximum connection time between last trains of lines l and l' at transfer station k (Eq. 3).
+%@ con eq_0007 kind=big_m :: Linear expression of minimum connection time w using x and y with big-M penalty (Eq. 7).
+%@ con eq_0008 kind=big_m :: Logical link: x=1 iff maximum connection time >=0 (Eq. 8).
+%@ con eq_0009 kind=linear :: Linear reformulation of floor(t/H) using integer y (Eq. 9).
+%@ con eq_0010 kind=linear :: Binary domain of transfer-success variable x (Eq. 10).
+%@ con eq_0011 kind=linear :: Integer (non-negative) domain of train-count variable y (Eq. 11).
+%@ con eq_0012 kind=linear :: Bounds on last-train departure time at every station (Eq. 12).
+%@ con eq_0013 kind=linear :: Bounds on last-train arrival time at every station (Eq. 13).
+%@ con eq_0014 kind=linear :: Bounds on last-train depot departure time t_l^R (Eq. 14).
+%@ con eq_0015 kind=linear :: Bounds on maximum connection time derived from constraints (12)-(14) (Eq. 15).
+%@ con eq_0016 kind=linear :: Upper bound on maximum connection time by M0 (Eq. 16).
+\begin{align}
+  & \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(\bar{t}\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k - 1} \left(\hat{t}\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L , \text{and} \tag{eq\_0001} \\
+  & \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(\bar{t}\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k} \left(\hat{t}\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L . \tag{eq\_0002} \\
+  & t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) = \mathit{Dep}_{k}^{l^{'}} \left(t_{l^{'}}^{R}\right) - \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) - \mathit{Tra}_{k}^{l l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L , \tag{eq\_0003} \\
+  \min\quad & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} \left[p_{l l^{'}}^{k} \cdot w_{l l^{'}}^{k} \left(t_{l}^{R} , t_{l^{'}}^{R}\right)\right] \tag{eq\_0006} \\
+  & w_{l l^{'}}^{k} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) = t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) - y_{l l^{'}}^{k} \cdot H_{l^{'}} + \left(1 - x_{l l^{'}}^{k}\right) \cdot M \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0007} \\
+  & M \cdot \left(x_{l l^{'}}^{k} - 1\right) \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq M \cdot x_{l l^{'}}^{k} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0008} \\
+  & \left[t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) / H_{l^{'}}\right] - 1 \leq y_{l l^{'}}^{k} \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) / H_{l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0009} \\
+  & x_{l l^{'}}^{k} \in \left\{0 , 1\right\} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0010} \\
+  & y_{l l^{'}}^{k} \in \mathcal{Z}^{+} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0011} \\
+  & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Dep}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0012} \\
+  & \mathit{Arr}_{min}^{l} \leq \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Arr}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0013} \\
+  & T_{l}^{min} \leq t_{l}^{R} \leq T_{l}^{max} \forall l \in L \tag{eq\_0014} \\
+  & \mathit{Dep}_{min}^{l^{'}} - \mathit{Arr}_{max}^{l} - \mathit{Tra}_{k}^{l l^{'}} \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq \mathit{Dep}_{max}^{l^{'}} - \mathit{Arr}_{min}^{l} - \mathit{Tra}_{k}^{l l^{'}} , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l \in L \tag{eq\_0015} \\
+  & t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq M_{0} , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l \in L \tag{eq\_0016} \\
+\end{align}

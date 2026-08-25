@@ -1,0 +1,220 @@
+% Declaration sidecar for 10.1016_j.trc.2024.104681
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2024.104681
+% Integrated capacity allocation and timetable coordination for multimodal railway networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2024.104681.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of rolling-stock operational cost, railway passenger travel time, metro passenger travel time, and transfer waiting time.
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=0 :: Set of time stamps for metro train departures.
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for metro stations.
+
+% w: classified as variable during review
+%@ var w shape=K,S,J domain=integer role=primary drole=- lo=- hi=- :: Departure time of metro train k at station s on line j.
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of metro lines.
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of metro trains on a line.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations on a metro line.
+
+% h: classified as parameter during review
+%@ param h shape=J kind=vector domain=- :: Minimum or maximum headway time between metro trains on line j.
+
+% unusable as an identifier, rename or drop: τ
+% b: classified as variable during review
+%@ var b shape=K,S,T,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether time stamp τ is between metro trains k-1 and k at station s on line j.
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of depots.
+
+% Z: classified as parameter during review
+%@ param Z shape=D kind=vector domain=- :: Maximum fleet size of rolling stock in depot d.
+
+% v: classified as variable during review
+%@ var v shape=D,J domain=integer role=primary drole=- lo=- hi=- :: Fleet size of rolling stock assigned to line j from depot d.
+
+% c: classified as variable during review
+%@ var c shape=K,J domain=integer role=primary drole=- lo=- hi=- :: Number of carriages coupled to metro train k on line j.
+
+% n: classified as variable during review
+%@ var n shape=K,S,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events in railway network.
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of railway lines.
+
+% N: classified as parameter during review
+%@ param N shape=P kind=vector domain=- :: Number of passengers in passenger group p.
+
+% R: classified as parameter during review
+%@ param R shape=I,J,V kind=matrix domain=- :: Transfer ratio at transfer station s between railway line i and metro line j.
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of transfer stations between metro line j and railway line i.
+
+% r: classified as variable during review
+%@ var r shape=P,E,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger group p chooses train l_e on railway line i.
+
+% unusable as an identifier, rename or drop: φ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passenger groups on railway line i.
+
+% Q: classified as parameter during review
+%@ param Q shape=S,J kind=matrix domain=- :: Proportion of passengers alighting at station s on line j.
+
+% q: classified as parameter during review
+%@ param q shape=E,I kind=matrix domain=- :: Earliest time for event e on railway line i.
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in railway network.
+
+% unusable as an identifier, rename or drop: λ
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization.
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of pairs of arcs with same order.
+
+% L: classified as parameter during review
+%@ param L shape=I,J,V kind=matrix domain=- :: Minimum coordination time at transfer station s between railway line i and metro line j.
+
+% x: classified as variable during review
+%@ var x shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k departs no earlier than the minimum coordination time after railway train l_e arrives at transfer station s.
+
+% L̄: classified as parameter during review
+%@ param Lmax shape=I,J,V kind=matrix domain=- :: Maximum coordination time at transfer station s between railway line i and metro line j.
+
+% z: classified as variable during review
+%@ var z shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k departs no later than the maximum coordination time after railway train l_e arrives at transfer station s.
+
+% y: classified as variable during review
+%@ var y shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k is the first connecting train for railway train l_e at transfer station s.
+
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Operational cost per carriage per service.
+
+% F: classified as variable during review
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function component (operational cost, rail/metro travel time, transfer time).
+
+% unusable as an identifier, rename or drop: θ
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of metro trains for branching strategy.
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: μ̂
+% Bound by a quantifier or big operator, so no declaration of their own: a, d, e, f, i, j, k, p, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Metro train departure time propagation between consecutive stations using running and dwell times.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Maximum headway constraint between successive metro trains.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of the interval-between-trains indicator b from departure indicators d.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Expression of metro departure time via time-indexed departure indicators.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Monotonicity of time-indexed departure indicators over time stamps.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Depot rolling stock capacity constraint.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Number of carriages used on a line does not exceed the fleet size allocated from a depot.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Number of boarding passengers equals number of waiting passengers at each metro station.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Boarding passengers cannot exceed residual train capacity.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Waiting passengers consist of new station arrivals and transferring railway passengers at transfer stations.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Number of alighting passengers is proportional to onboard passengers at the previous station.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Passenger flow balance giving remaining onboard passengers after boarding and alighting.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Earliest event time lower bound for adjustable railway events.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Earliest event time fixed for railway events that are not adjusted.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Railway running time equality for running activities.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum dwell time constraint for railway dwell activities.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary event-order variable definition for track activities.
+%@ con eq_0022 kind=linear domain=- indicator=- :: No-overtaking order consistency between departure and arrival event pairs.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Each passenger group selects exactly one departure event.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Each passenger group selects exactly one arrival event.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Passenger train-choice variables are consistent along train activities.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger departure choice limited by available time before departure.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Passenger arrival choice limited by dwell time at destination.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Railway train capacity constraint for each event.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Coordination lower-bound implication (reverse direction) using big-M.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Coordination upper-bound constraint for transfer time window.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Coordination upper-bound implication (reverse direction) using big-M.
+%@ con eq_0033 kind=linear domain=- indicator=- :: First connecting train indicator obtained from differences of lower-bound indicators.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Coordination indicator equals product of first-train and upper-bound indicators (linearized).
+%@ con eq_0035 kind=linear domain=- indicator=- :: Exactly one metro train coordinates with each railway arrival at a transfer station.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Metro total passenger travel time objective component.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Railway total passenger travel time objective component.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Passenger transfer waiting time objective component.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Objective: minimize weighted sum of operational cost and passenger time components.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Valid inequality: exactly one first connecting metro train for each railway train.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Valid inequality: coordination upper-bound variable z dominates first-train variable y.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Valid inequality: lower bound on total coordination-window indicators.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Valid inequality: upper bound on total coordination-window indicators.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Valid inequality: limit on coordinated metro trains per railway train imposed by headway and coordination window.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Special ordered set constraint used for branching on coordination variables.
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger travel time product terms.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger departure-time product.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger arrival-time product.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linearization constraint for metro transfer time product terms.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linearization constraint for coordination indicator product.
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linearization constraint for metro residual capacity product.
+%@ con eq_0058 kind=linear domain=- indicator=- :: Linearization constraint for metro waiting passenger product.
+%@ con eq_0062 kind=linear domain=- indicator=- :: Linearization constraint for event-time/passenger-choice product.
+%@ con eq_0063 kind=linear domain=- indicator=- :: Linearization constraint for transfer time difference product.
+%@ con eq_0064_a kind=linear domain=- indicator=- :: Linearization of transfer time term, first case.
+%@ con eq_0064_b kind=linear domain=- indicator=- :: Linearization of transfer time term, second case.
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time auxiliary variables.
+%@ con eq_0066 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time lower bound.
+%@ con eq_0067 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time upper bound.
+%@ con eq_0068 kind=linear domain=- indicator=- :: Linearization constraint for transfer time auxiliary variable.
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization constraint for transfer time lower bound.
+%@ con eq_0070 kind=linear domain=- indicator=- :: Linearization constraint for transfer time upper bound.
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint for rolling stock allocation product.
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint for carriage count product.
+%@ con eq_0076 kind=linear domain=- indicator=- :: Linearization constraint for passenger flow capacity product.
+%@ con eq_0078_a kind=linear domain=- indicator=- :: Linearization of coordination indicator product, first case.
+%@ con eq_0078_b kind=linear domain=- indicator=- :: Linearization of coordination indicator product, second case.
+%@ con eq_0078_c kind=linear domain=- indicator=- :: Linearization of coordination indicator product, third case.
+%@ con eq_0078_d kind=linear domain=- indicator=- :: Linearization of coordination indicator product, fourth case.
+%@ con eq_0079_a kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, first case.
+%@ con eq_0079_b kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, second case.
+%@ con eq_0079_c kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, third case.
+%@ con eq_0080 kind=linear domain=- indicator=- :: Linearization constraint for objective transfer time component.
+%@ con eq_0082_a kind=linear domain=- indicator=- :: Linearization of first-train indicator product, first case.
+%@ con eq_0082_b kind=linear domain=- indicator=- :: Linearization of first-train indicator product, second case.
+%@ con eq_0082_c kind=linear domain=- indicator=- :: Linearization of first-train indicator product, third case.
+%@ con eq_0082_d kind=linear domain=- indicator=- :: Linearization of first-train indicator product, fourth case.
+%@ con eq_0083 kind=linear domain=- indicator=- :: Linearization constraint for headway valid inequality.
+%@ con eq_0085_a kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, first case.
+%@ con eq_0085_b kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, second case.
+%@ con eq_0085_c kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, third case.
+%@ con eq_0085_d kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, fourth case.
+%@ con eq_0086_a kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, first case.
+%@ con eq_0086_b kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, second case.
+%@ con eq_0086_c kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, third case.
+%@ con eq_0086_d kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, fourth case.

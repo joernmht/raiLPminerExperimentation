@@ -1,0 +1,107 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2025.116670
+%@ meta id=10.1016_j.apm.2025.116670 family=milp schema=0.1.0
+%@ name :: An adaptive multi-agent deep reinforcement learning approach to unify disturbances and disruptions for high-speed railway rescheduling
+%@ desc :: Mined from An adaptive multi-agent deep reinforcement learning approach to unify disturbances and disruptions for high-speed railway rescheduling (Applied Mathematical Modelling, 2025).
+%@ prov source :: 10.1016/j.apm.2025.116670
+%@ prov reference :: An adaptive multi-agent deep reinforcement learning approach to unify disturbances and disruptions for high-speed railway rescheduling
+%@ prov author :: Haoyang Huo; Hongxia Lv; Yuhua Yang; Haonan Yang; Xuze Ye; Dingjun Chen; Miaomiao Lv
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total delay and cancellation penalties
+%@ var p shape=N,T domain=non_negative role=primary drole=- lo=- hi=- :: Estimated time of train n at time step t
+%@ index N ordered=0 cyclic=0 :: Set of all trains
+%@ var f shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Stop plan indicator for train n at time step t
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ var a shape=N,T domain=integer role=primary drole=- lo=- hi=- :: Action selected by train n at time step t
+%@ param t shape=N,I kind=matrix domain=- :: Reference running time of train n on segment i
+%@ param c shape=N,I kind=matrix domain=- :: Predetermined departure time of train n at station i
+%@ param w shape=N,I kind=matrix domain=- :: Predetermined arrival time of train n at station i
+%@ var y shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Constraints violation indicator for train n at time step t
+%@ param G shape=N kind=vector domain=- :: Final station index for train n
+%@ var g shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Completion indicator for train n at time step t
+%@ param o shape=K kind=vector domain=- :: Origin station for train k
+%@ var r shape=N,T domain=continuous role=primary drole=- lo=- hi=- :: Reward signal for train n at time step t
+%@ var s shape=N,T domain=continuous role=primary drole=- lo=- hi=- :: State of train n at time step t
+%@ var d shape=N,I domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled departure time of train n at station i
+%@ index I ordered=0 cyclic=0 :: Set of stations
+%@ var x shape=K,E domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable for train k on arc (i,i',t,t')
+%@ index H ordered=0 cyclic=0 :: Set of time points in rescheduling horizon
+%@ param M shape=I kind=vector domain=- :: Number of side tracks at station i
+%@ var z shape=N,I,H domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if train n occupies side track at station i at time h
+%@ param u shape=N,I kind=matrix domain=- :: Predetermined stop plan of train n at station i
+%@ param R shape=- kind=scalar domain=- :: Reward constants (R_v, R_m, R_p, R_d)
+%@ index E ordered=0 cyclic=0 :: Set of arcs in time-space network
+%@ index K ordered=0 cyclic=0 :: Set of trains in optimization model
+%@ param arr shape=K,I kind=matrix domain=- :: Scheduled arrival time of train k at station i
+%@ param dep shape=K,I kind=matrix domain=- :: Scheduled departure time of train k at station i
+%@ param e shape=K kind=vector domain=- :: Earliest departure time for train k
+%@ param l shape=K kind=vector domain=- :: Latest arrival time for train k
+%@ index j ordered=0 cyclic=0 :: Index for arcs in conflict set
+%@ param C shape=I,I kind=matrix domain=- :: Capacity of station i,i'
+%@ index T ordered=0 cyclic=0 :: Set of time points
+%@ index V ordered=0 cyclic=0 :: Set of station pairs
+%@ con eq_0004 kind=linear domain=- indicator=- :: State update for move-stop: position update (Eq. 4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Stop plan indicator set to 1 after move-stop (Eq. 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: State update for move-not-stop: position update (Eq. 6)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Stop plan indicator set to 0 after move-not-stop (Eq. 7)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Station index advances to next station (Eq. 8)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Adjusted running time based on acceleration/slowdown action (Eq. 9)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Position update for dwell action (Eq. 10)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Stop plan indicator set to 1 for dwell (Eq. 11)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station index unchanged for dwell (Eq. 12)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Deviation update for executed action (Eq. 13)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Completion indicator equation (Eq. 14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: State remains unchanged for unactivated trains (Eq. 15)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum departure headway constraint (Eq. 16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimum arrival headway constraint (Eq. 17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Block-section occupation and no-overtaking constraint (Eq. 18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Arrival time within rescheduling horizon (Eq. 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Disruption section entry constraint (Eq. 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Departure time not earlier than planned (Eq. 21)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Side-track occupation capacity constraint (Eq. 23)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Mandatory stop plan constraint (Eq. 24)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Reward signal definition for non-cancellation actions (Eq. 25)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Cancellation reward definition (Eq. 26)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Termination indicator definition (Eq. 28)
+%@ con eq_0048 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0049 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0052 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0053 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+\begin{align}
+  & p_{n}^{t + 1} = p_{n}^{t} + f_{n}^{t} \cdot t_{q} + t_{n , i_{n}^{t}} + t_{p} + t_{d} n \in N_{p}^{t} , \tag{eq\_0004} \\
+  & f_{n}^{t + 1} = 1 , n \in N_{p}^{t} . \tag{eq\_0005} \\
+  & p_{n}^{t + 1} = p_{n}^{t} + f_{n}^{t} \cdot t_{q} + t_{n , i_{n}^{t}} , n \in N_{p}^{t} , \tag{eq\_0006} \\
+  & f_{n}^{t + 1} = 0 , n \in N_{p}^{t} . \tag{eq\_0007} \\
+  & i_{n}^{t + 1} = i_{n}^{t} + 1 , n \in N_{p}^{t} , \tag{eq\_0008} \\
+  & t_{n , i_{n}^{t}} = \left\{\right. \begin{matrix}\left(\bar{t}\right)_{n , i_{n}^{t}} - \mathit{Delta} , a_{n}^{t} \in \left\{a_{1} , a_{4}\right\} \\ \left(\bar{t}\right)_{n , i_{n}^{t}} , a_{n}^{t} \in \left\{a_{2} , a_{5}\right\} \\ \left(\bar{t}\right)_{n , i_{n}^{t}} + \mathit{Delta} , a_{n}^{t} \in \left\{a_{3} , a_{6}\right\}\end{matrix} , n \in N_{p}^{t} , \tag{eq\_0009} \\
+  & p_{n}^{t + 1} = p_{n}^{t} + 1 , n \in N_{p}^{t} , \tag{eq\_0010} \\
+  & f_{n}^{t + 1} = 1 , n \in N_{p}^{t} , \tag{eq\_0011} \\
+  & i_{n}^{t + 1} = i_{n}^{t} , n \in N_{p}^{t} . \tag{eq\_0012} \\
+  & \mathit{tau}_{n}^{t + 1} = \left\{\right. \begin{matrix}p_{n}^{t + 1} - f_{n}^{t + 1} \cdot t_{d} - w_{n}^{i} , a_{n}^{t} \neq a_{7} \\ p_{n}^{t + 1} - c_{n}^{i} , a_{n}^{t} = a_{7}\end{matrix} , i = i_{n}^{t + 1} , n \in N_{p}^{t} , \tag{eq\_0013} \\
+  & g_{n}^{t + 1} = \left\{\right. \begin{matrix}1 , i_{n}^{t + 1} = G_{n} , y_{n}^{t + 1} = 0 \\ 0 , \left(i_{n}^{t + 1} < G_{n} , y_{n}^{t + 1} = 0\right) o \cdot r \left(y_{n}^{t + 1} = 1\right)\end{matrix} , n \in N_{p}^{t} , \tag{eq\_0014} \\
+  & s_{n}^{t + 1} = s_{n}^{t} , n \in N \backslash N_{p}^{t} . \tag{eq\_0015} \\
+  & \left|d_{n^{'}}^{i} - d_{n}^{i}\right| \geq \mathit{kappa}_{1 ,} \forall n , n^{'} \in N , n \neq n^{'} \forall i \in I , \tag{eq\_0016} \\
+  & \left|x_{n^{'}}^{i + 1} - x_{n}^{i + 1}\right| \geq \mathit{kappa}_{2} , \forall n , n^{'} \in N , n \neq n^{'} \forall i + 1 \in I , \tag{eq\_0017} \\
+  & \left(x_{n}^{i + 1} - x_{n^{'}}^{i + 1}\right) \left(d_{n}^{i} - d_{n^{'}}^{i}\right) > 0 , \forall n , n^{'} \in N , n \neq n^{'} \forall i , i + 1 \in I . \tag{eq\_0018} \\
+  & x_{n}^{i} + \mathit{sigma} \leq H_{w} , \forall n \in N_{p}^{t} , i = i_{n}^{t + 1} , \tag{eq\_0019} \\
+  & d_{n}^{i^{d}} \geq H_{e} , \forall n \in N_{p}^{0} , \tag{eq\_0020} \\
+  & d_{n}^{i} \geq c_{n}^{i} , \forall n \in N_{p}^{t} , i = i_{n}^{t + 1} . \tag{eq\_0021} \\
+  & M_{i} \geq \sum_{n} z_{i}^{n} \left(h\right) , \forall i \in I , \forall h \in H , \tag{eq\_0023} \\
+  & f_{n}^{t + 1} \geq u_{n}^{i} , \forall n \in N_{p}^{t} , i = i_{n}^{t + 1} , \tag{eq\_0024} \\
+  & r_{n}^{t + 1} = \left\{\right. \begin{matrix}- \left(p_{n}^{t + 1} - f_{n}^{t + 1} \cdot t_{d} - w_{n}^{i}\right) + R_{m} - R_{p} \left(f_{n}^{t + 1} - u_{n}^{i}\right) , y_{n}^{t + 1} = 0 , i = i_{n}^{t + 1} , i_{n}^{t + 1} > i_{n}^{t} \\ - \left(p_{n}^{t + 1} - c_{n}^{i}\right) , y_{n}^{t + 1} = 0 , i = i_{n}^{t + 1} , i_{n}^{t + 1} = i_{n}^{t} \\ - R_{v} , y_{n}^{t + 1} = 1\end{matrix} , n \in N_{p}^{t} , i \in I , \tag{eq\_0025} \\
+  & r_{n}^{t + 1} = - R_{d} - \mathit{iota} \left(H_{w} - p_{n}^{t}\right) , n \in N_{p}^{t} , a_{n}^{t} = a_{8} , \tag{eq\_0026} \\
+  & \mathit{beta}^{t + 1} = \left\{\right. \begin{matrix}1 , \left(y_{n}^{t + 1} = 1 , \exists n \in N\right) o \cdot r \left(g_{n}^{t + 1} \neq 0 , \forall n \in N\right) \\ 0 , o \cdot t h e \cdot r \cdot w \cdot i \cdot s \cdot e\end{matrix} . \tag{eq\_0028} \\
+  \min\quad & \sum_{k \in K} \underset{\left(i , i^{^{'}} , t , t^{'}\right) \in E_{k}}{\sum} c_{i , i^{^{'}} , t , t^{'}}^{k} \cdot x_{i , i^{^{'}} , t , t^{'}}^{k} \tag{eq\_0047} \\
+  & c_{i , i^{'} , t , t^{'}}^{k} = \left(t - \mathit{dep}_{k , i}\right) + \left|\left(t^{'} - \mathit{arr}_{k , i^{'}}\right)\right| \tag{eq\_0048} \\
+  & \underset{i , t : \left(i , i^{^{'}} , t , t^{'}\right) \in E_{k}}{\sum} x_{i , i^{^{'}} , t , t^{'}}^{k} - \underset{i , t : \left(i^{^{'}} , i , t^{'} , t\right) \in E_{k}}{\sum} x_{i^{'} , i , t^{'} , t}^{k} = \begin{cases} - 1 , i^{'} = o_{k} , t^{'} = e_{k} \\ 1 , i^{'} = d_{k} , t^{'} = l_{k} \\ 0 , o \cdot t h e \cdot r \cdot w \cdot i \cdot s \cdot e \end{cases} , \forall k \in K \tag{eq\_0049} \\
+  & \underset{\left(j , j^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{xi} \left(i , i^{^{'}} , t , t^{'}\right)}{\sum} x_{j , j^{'} , \mathit{tau} , \mathit{tau}^{'}}^{k} + \sum_{k^{'} \in K} x_{i , i^{'} , t , t^{'}}^{k^{'}} \leq 1 , \forall \left(i , i^{^{'}} , t , t^{'}\right) \in E_{k} , k \in K \tag{eq\_0050} \\
+  & \sum_{k \in K} \underset{\left(i , i^{^{'}} , t , t^{'}\right) \in \mathit{varrho}_{i , i^{^{'}} , t^{''}}}{\sum} x_{i , i^{^{'}} , t , t^{'}}^{k} \leq C_{i , i^{^{'}}} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{k , d w e l l} , t^{''} \in T \tag{eq\_0051} \\
+  & x_{i , i^{^{'}} , t , t^{'}}^{k} = 0 \forall k \in K \forall \left(i , i^{'} , t , t^{'}\right) \in E_{k , d r i v e} , t < \mathit{dep}_{k , i} \tag{eq\_0052} \\
+  & x_{i , i^{^{'}} , t , t^{'}}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{k} \tag{eq\_0053} \\
+  & \mathit{mu}_{i , i^{'} , t , t^{'}}^{k} \geq 0 , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{k} , k \in K \tag{eq\_0055} \\
+  & \mathit{eta}_{i , i^{'} , t^{''}} \geq 0 , \forall \left(i , i^{'}\right) \in V_{k} , t ^{''} \in T \tag{eq\_0056} \\
+\end{align}

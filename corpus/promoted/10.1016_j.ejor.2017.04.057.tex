@@ -1,0 +1,57 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2017.04.057
+%@ meta id=10.1016_j.ejor.2017.04.057 family=milp schema=0.1.0
+%@ name :: Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling
+%@ desc :: Mined from Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling (European Journal of Operational Research, 2017).
+%@ prov source :: 10.1016/j.ejor.2017.04.057
+%@ prov reference :: Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling
+%@ prov author :: Matteo Fischetti; Michele Monaci
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total tardiness
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ var z shape=N domain=non_negative role=primary drole=- lo=- hi=- :: Tardiness of event j
+%@ var y shape=R,T domain=binary role=primary drole=- lo=- hi=- :: Binary route choice for each train and route
+%@ index R ordered=0 cyclic=0 :: Set of routes for a train
+%@ index N ordered=0 cyclic=0 :: Set of events
+%@ index j ordered=0 cyclic=0 :: Event index
+%@ param p shape=N kind=vector domain=- :: Planned time of event j
+%@ var t shape=N domain=continuous role=primary drole=- lo=- hi=- :: Actual time of event j
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs of a route
+%@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ param d shape=N,N kind=matrix domain=- :: Minimum headway times between events
+%@ index i ordered=0 cyclic=0 :: Event index
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs
+%@ index h ordered=0 cyclic=0 :: Event index
+%@ index k ordered=0 cyclic=0 :: Event index
+%@ var x shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for alternative arcs
+%@ param B shape=N kind=vector domain=- :: Upper bound on tardiness of event j
+%@ param U shape=- kind=scalar domain=- :: Generic upper bound value
+%@ con eq_0004 kind=linear domain=- indicator=- :: Tardiness definition z_j >= t_j - p_j
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upper bound on tardiness z_j <= B_j
+%@ con eq_0006 kind=linear domain=- indicator=- :: Actual time cannot precede planned time t_j >= p_j
+%@ con eq_0007 kind=linear domain=- indicator=- :: Fixed arc timing relation
+%@ con eq_0008 kind=linear domain=- indicator=- :: Alternative arc timing relation with large constant
+%@ con eq_0009 kind=linear domain=- indicator=- :: Headway constraint between event pairs
+%@ con eq_0010 kind=linear domain=- indicator=- :: Ordering constraint for alternative arcs
+%@ con eq_0011 kind=linear domain=- indicator=- :: Single route selected for each train
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Linearization of route choice with fixed arcs
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Linearization of route choice with alternative arcs
+%@ con eq_0013 kind=linear domain=- indicator=- :: Bound on tardiness in objective
+%@ index alpha :: origin node index
+%@ index omega :: station index
+%@ index theta :: train index (renamed from θ)
+%@ index Theta :: set of train indices (renamed from Θ)
+%@ index theta1 :: first train index in ordered pair
+%@ index theta2 :: second train index in ordered pair
+%@ index r1 :: first route index
+%@ index r2 :: second route index
+%@ index Theta2 :: set of ordered pairs (theta1,theta2) with theta1 < theta2
+\begin{align}
+  \min\quad & f \tag{eq\_0003} \\
+  & \sum_{r \in R_{theta}} y_{r,theta} = 1 \qquad \forall theta \in Theta \tag{eq\_0004} \\
+  & z_{j} \ge t_{j} - p_{j} \qquad \forall j \in N \tag{eq\_0005} \\
+  & t_{alpha} = 0 \tag{eq\_0006} \\
+  & z_{omega} \le U \cdot B_{omega} \qquad \forall omega \in Omega \tag{eq\_0010} \\
+  & z_{j} \ge 0 \qquad \forall j \in N \tag{eq\_0011} \\
+\end{align}

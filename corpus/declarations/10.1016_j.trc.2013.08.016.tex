@@ -1,0 +1,175 @@
+% Declaration sidecar for 10.1016_j.trc.2013.08.016
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2013.08.016
+% Optimizing urban rail timetable under time-dependent demand and oversaturated conditions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2013.08.016.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total passenger waiting time plus β-weighted left-behind passengers.
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Time index for discrete time periods.
+
+% u: classified as index during review
+%@ index u ordered=1 cyclic=0 :: Station index along the corridor (1 to 2N).
+
+% j and v added as index families (previously marked bound)
+%@ index j ordered=1 cyclic=0 :: Train index (1..K).
+%@ index v ordered=1 cyclic=0 :: Destination station index (u+1..2N).
+
+% y: classified as variable during review
+%@ var y shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative arrival indicator for train j at station u at time t.
+
+% z: classified as variable during review
+%@ var z shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative departure indicator for train j at station u at time t.
+
+% x: classified as variable during review
+%@ var x shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative boarding indicator for train j at station u at time t.
+
+% D: classified as variable during review
+%@ var D shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Train capacity (maximum passengers on board).
+
+% TA: classified as variable during review
+%@ var TA shape=u,j domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train j at station u.
+
+% TD: classified as index during review
+%@ index TD ordered=1 cyclic=0 :: Departure time of train j at station u, used as a time index.
+
+% r: classified as parameter during review
+%@ param r shape=u kind=vector domain=- :: Section running time between stations u-1 and u.
+
+% s: classified as parameter during review
+%@ param s shape=u kind=vector domain=- :: Dwell time at station u.
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum safety headway between consecutive trains.
+
+% A: classified as variable during review
+%@ var A shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
+
+% P: classified as parameter during review
+%@ param P shape=u,v,t kind=matrix domain=- :: Time-dependent passenger demand from station u to v at time t.
+
+% N: classified as index during review
+%@ index N ordered=1 cyclic=0 :: Number of stations in one direction (total 2N stations).
+
+% R: classified as index during review
+%@ index R ordered=1 cyclic=0 :: Set of discrete time points in the operation horizon.
+
+% V: classified as variable during review
+%@ var V shape=u,j domain=non_negative role=primary drole=- lo=- hi=- :: Number of left-behind passengers for train j at station u.
+
+% unusable as an identifier, rename or drop: β
+%@ param beta shape=- kind=scalar domain=- :: Penalty weight for left-behind passengers in the objective.
+
+% B: classified as parameter during review
+%@ param B shape=u,v,j kind=matrix domain=- :: Number of passengers boarding train j at station u travelling to v.
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Total number of trains.
+
+% L: classified as index during review
+%@ index L ordered=1 cyclic=0 :: Latest arrival time of boarded passengers for train j at station u.
+
+% O: classified as parameter during review
+%@ param O shape=u,j kind=matrix domain=- :: Number of alighted passengers from train j at station u.
+
+% I: classified as parameter during review
+%@ param I shape=u,j kind=matrix domain=- :: Number of boarded passengers on train j at station u.
+
+% W: classified as parameter during review
+%@ param W shape=u,j kind=matrix domain=- :: Number of waiting passengers for train j at station u.
+
+% any: classified as index during review
+%@ index any ordered=0 cyclic=0 :: Generic index used in universally quantified constraints.
+
+% unusable as an identifier, rename or drop: τ
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: End time of the operation horizon.
+
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Fleet size (number of train units).
+
+% J̄: classified as parameter during review
+%@ param J shape=- kind=scalar domain=- :: Set of trains that must meet minimum load rate.
+
+% unusable as an identifier, rename or drop: α
+%@ param alpha shape=- kind=scalar domain=- :: Minimum average passenger load rate for designated trains.
+
+% X: classified as variable during review
+%@ var X shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Cumulative boarding indicator for the last train in the boundary condition.
+
+% unusable as an identifier, rename or drop: ρ
+%@ param rho shape=- kind=scalar domain=- :: Adjustment amount of departure time in local search.
+
+% unusable as an identifier, rename or drop: Ω
+%@ param omega shape=j kind=vector domain=- :: Additional passengers arriving during the pushed-forward departure period.
+
+% G: classified as parameter during review
+%@ param G shape=- kind=scalar domain=- :: Number of oversaturated loading windows following train j.
+
+% g: classified as index during review
+%@ index g ordered=1 cyclic=0 :: Index for oversaturated trains after train j.
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival indicator at least departure indicator (Eq. 1).
+%@ con eq_0005 kind=linear domain=- indicator=- :: Boarding indicator at next time at least departure indicator (Eq. 2).
+%@ con eq_0006 kind=linear domain=- indicator=- :: Previous train boarding indicator bounds current train boarding indicator (Eq. 3).
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cumulative departure increment bounded by capacity times departure indicator change (Eq. 4).
+%@ con eq_0010 kind=linear domain=- indicator=- :: Left-behind period characterized by boarding minus previous departure indicator (Eq. 5).
+%@ con eq_0011 kind=linear domain=- indicator=- :: Effective loading period characterized by previous vs current boarding indicator (Eq. 6).
+%@ con eq_0012 kind=linear domain=- indicator=- :: Arrival time equals previous station departure plus running time (Eq. 7).
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time (Eq. 8).
+%@ con eq_0014 kind=linear domain=- indicator=- :: Minimum departure headway at the start terminal (Eq. 9).
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cumulative arrivals computed from trip demand matrix (Eq. 10).
+%@ con eq_0016 kind=linear domain=- indicator=- :: Cumulative arrivals at least cumulative departures (Eq. 11).
+%@ con eq_0017 kind=linear domain=- indicator=- :: Boarding indicator nondecreasing over time (Eq. 12).
+%@ con eq_0018 kind=linear domain=- indicator=- :: Arrival indicator nondecreasing over time (Eq. 13).
+%@ con eq_0019 kind=linear domain=- indicator=- :: Departure indicator nondecreasing over time (Eq. 14).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Arrival time obtained from cumulative arrival indicator sum (Eq. 15).
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Departure time obtained from cumulative departure indicator sum, part a (Eq. 16).
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Departure time obtained from cumulative departure indicator sum, part b (Eq. 16).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Left-behind passenger count from demand and boarding/departure indicators (Eq. 17).
+%@ con eq_0024 kind=linear domain=- indicator=- :: Onboard passenger flow recurrence across stations (Eq. 18).
+%@ con eq_0025 kind=linear domain=- indicator=- :: Onboard passenger count does not exceed train capacity (Eq. 19).
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger flow balance with boarding and alighting (Eq. 26).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Boarding passengers by destination inside effective loading window (Eq. 21).
+%@ con eq_0028_a kind=linear domain=- indicator=- :: Alighted passenger count from previous station boardings (Eq. 22).
+%@ con eq_0028_b kind=linear domain=- indicator=- :: Boarded passenger count to all downstream destinations (Eq. 23).
+%@ con eq_0029 kind=linear domain=- indicator=- :: Waiting passenger count before departure in loading window (Eq. 24).
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Onboard count after departure as capacity-limited min expression, part a (Eq. 25).
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Onboard count after departure as capacity-limited min expression, part b (Eq. 25).
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Flow conservation of onboard passengers at station, part a (Eq. 26).
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Flow conservation of onboard passengers at station, part b (Eq. 26).
+%@ con eq_0032 kind=linear domain=- indicator=- :: Latest arrival time under oversaturation via max condition (Eq. 27).
+%@ con eq_0033 kind=linear domain=- indicator=- :: Latest arrival time under both saturation cases via min condition (Eq. 28).
+%@ con eq_0034 kind=linear domain=- indicator=- :: Fleet size constraint: matched train must return and be recovered before next dispatch (Eq. 29).
+%@ con eq_0037 kind=linear domain=- indicator=- :: Minimum average passenger load rate for required train set (Eq. 30).
+%@ con eq_0038 kind=linear domain=- indicator=- :: Last train has enough capacity for all waiting passengers (Eq. 31).
+%@ con eq_0039 kind=linear domain=- indicator=- :: Safety headway maintained when moving a train departure forward (Eq. 34).
+%@ con eq_0040 kind=linear domain=- indicator=- :: Capacity constraint after moving a train departure forward (Eq. 35).
+%@ con eq_0041 kind=linear domain=- indicator=- :: Following oversaturated windows provide enough left-behind passengers to fill moved train (Eq. 36).
+%@ con eq_0042 kind=linear domain=- indicator=- :: Safety headway maintained when moving a train departure backward (Eq. 37).
+%@ con eq_0043 kind=linear domain=- indicator=- :: Loading period unchanged when moving a train departure backward (Eq. 38).

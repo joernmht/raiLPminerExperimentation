@@ -1,0 +1,109 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2005.03.032
+%@ meta id=10.1016_j.ejor.2005.03.032 family=milp schema=0.1.0
+%@ name :: A rolling stock circulation model for combining and splitting of passenger trains
+%@ desc :: Mined from A rolling stock circulation model for combining and splitting of passenger trains (European Journal of Operational Research, 2005).
+%@ prov source :: 10.1016/j.ejor.2005.03.032
+%@ prov reference :: A rolling stock circulation model for combining and splitting of passenger trains
+%@ prov author :: Pieter‐Jan Fioole; Leo Kroon; Gábor Maróti; Alexander Schrijver
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Objective function value
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ var N shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m used on trip t
+%@ var X shape=T,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition p is used for trip t
+%@ var Z shape=T,P,P domain=non_negative role=primary drole=- lo=- hi=- :: Binary variable indicating if trip t has composition p and next trip has composition p'
+%@ index T ordered=0 cyclic=0 :: Set of trips
+%@ index P ordered=0 cyclic=0 :: Set of compositions for a trip
+%@ index p ordered=0 cyclic=0 :: Composition index
+%@ index M ordered=0 cyclic=0 :: Set of train unit types
+%@ index m ordered=0 cyclic=0 :: Train unit type index
+%@ param n shape=P,M kind=matrix domain=- :: Number of train units of type m in composition p
+%@ var C shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m coupled at trip t
+%@ param pt shape=T kind=vector domain=- :: Set of compositions for trip t
+%@ var U shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m uncoupled at trip t
+%@ var I shape=T,M domain=integer role=primary drole=- lo=- hi=- :: Inventory of train units of type m at station s at time t
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers
+%@ var CKM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Carriage kilometers
+%@ param c shape=M kind=vector domain=- :: Cost per carriage kilometer for train unit type m
+%@ var SKM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Seat-shortage kilometers
+%@ var SHM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Number of shunting movements
+%@ index B ordered=0 cyclic=0 :: Set of combinations
+%@ var Y shape=T,B domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if combination b is used for trip t
+%@ index b ordered=0 cyclic=0 :: Combination index
+%@ con eq_0002 kind=linear domain=- indicator=- :: Exactly one composition per trip
+%@ con eq_0003 kind=linear domain=- indicator=- :: Link current composition to transition variable (outgoing)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link next composition to transition variable (incoming)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Define number of train units of each type from composition
+%@ con eq_0006 kind=linear domain=- indicator=- :: Define number of coupled train units at composition change
+%@ con eq_0007 kind=linear domain=- indicator=- :: Define number of uncoupled train units at composition change
+%@ con eq_0008_a kind=linear domain=- indicator=- :: Initial trip: coupled units equal total units
+%@ con eq_0008_b kind=linear domain=- indicator=- :: Initial trip: no uncoupled units
+%@ con eq_0009_a kind=linear domain=- indicator=- :: Final trip: uncoupled units equal total units
+%@ con eq_0009_b kind=linear domain=- indicator=- :: Final trip: no coupled units
+%@ con eq_0010 kind=linear domain=- indicator=- :: Initial inventory allocation sums to fleet size per type
+%@ con eq_0011 kind=linear domain=- indicator=- :: Inventory balance at station after departure
+%@ con eq_0012 kind=linear domain=- indicator=- :: Composition variables are binary
+%@ con eq_0013 kind=linear domain=- indicator=- :: Non-negativity of train unit, coupling, and inventory variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Initial inventory variables are integer
+%@ con eq_0015 kind=linear domain=- indicator=- :: Transition variables are non-negative
+%@ con eq_0016 kind=linear domain=- indicator=- :: Define carriage kilometers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Define seat-shortage kilometers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Define shunting movements
+%@ con eq_0020 kind=linear domain=- indicator=- :: Link composition to splitting transition variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Link first successor composition to splitting transition variable
+%@ con eq_0022 kind=linear domain=- indicator=- :: Link second successor composition to splitting transition variable
+%@ con eq_0023 kind=linear domain=- indicator=- :: Define train units used in split configuration
+%@ con eq_0024 kind=linear domain=- indicator=- :: Define coupled units at split
+%@ con eq_0025 kind=linear domain=- indicator=- :: Define uncoupled units at split
+%@ con eq_0026 kind=linear domain=- indicator=- :: Inventory balance for split operations
+%@ con eq_0027 kind=linear domain=- indicator=- :: Non-negativity for split variables
+%@ con eq_0028 kind=linear domain=- indicator=- :: Split transition variable bounds
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Split transition variable integrality (part a)
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Split transition variable integrality (part b)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Integrality of initial inventory in split case
+%@ var I0 shape=matrix domain=integer role=variable drole=- lo=0 hi=inf :: Initial inventory
+%@ param nu shape=vector domain=integer role=index drole=- lo=- hi=- :: Composition type of train t
+%@ param s shape=vector domain=integer role=index drole=- lo=- hi=- :: Station of train t
+%@ index Gammaplus shape=set domain=set role=index drole=- lo=- hi=- :: Positive length difference pairs
+%@ index Gammaminus shape=set domain=set role=index drole=- lo=- hi=- :: Negative length difference pairs
+%@ index Td shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying departure condition
+%@ index Ta shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying arrival condition
+\begin{align}
+  \min\quad & F \tag{eq\_0001} \\
+  & \sum_{p \in P_{t}} X_{t,p} = 1 \qquad \forall t \in T \tag{eq\_0002} \\
+  & X_{t , p} = \sum_{p^{'} \in P_{\mathit{nu} \left(t\right)} : \left(p , p^{'}\right) \in \mathit{Gamma}_{t}} Z_{t , p , p^{'}} \forall t \in T \backslash T_{1} ; p \in P_{t} , \tag{eq\_0003} \\
+  & X_{\mathit{nu} \left(t\right) , p^{'}} = \sum_{p \in P_{t} : \left(p , p^{'}\right) \in \mathit{Gamma}_{t}} Z_{t , p , p^{'}} \forall t \in T \backslash T_{1} ; p^{'} \in P_{\mathit{nu} \left(t\right)} , \tag{eq\_0004} \\
+  & N_{t,m} = \sum_{p \in P_{t}} n_{p,m} \cdot X_{t,p} \qquad \forall t \in T, m \in M \tag{eq\_0005} \\
+  & C_{\mathit{nu}_{t},m} = \sum_{(p,p2) \in \mathit{Gammaplus}_{t,m}} (n_{p2,m} - n_{p,m}) \cdot Z_{t,p,p2} \qquad \forall t \in T \setminus T_{1}, m \in M \tag{eq\_0006} \\
+  & U_{t,m} = \sum_{(p,p2) \in \mathit{Gammaminus}_{t,m}} (n_{p,m} - n_{p2,m}) \cdot Z_{t,p,p2} \qquad \forall t \in T \setminus T_{1}, m \in M \tag{eq\_0007} \\
+  & C_{t,m} = N_{t,m} \qquad \forall t \in T_{0}, m \in M \tag{eq\_0008\_a} \\
+  & U_{t,m} = 0 \qquad \forall t \in T_{0}, m \in M \tag{eq\_0008\_b} \\
+  & U_{t,m} = N_{t,m} \qquad \forall t \in T_{1}, m \in M \tag{eq\_0009\_a} \\
+  & C_{t,m} = 0 \qquad \forall t \in T_{1}, m \in M \tag{eq\_0009\_b} \\
+  & \sum_{s \in S} \mathit{I0}_{s,m} = n_{m} \qquad \forall m \in M \tag{eq\_0010} \\
+  & I_{t,m} = \mathit{I0}_{s_{t},m} - \sum_{t2 \in \mathit{Td}_{t}} C_{t2,m} + \sum_{t2 \in \mathit{Ta}_{t}} U_{t2,m} \qquad \forall t \in T, m \in M \tag{eq\_0011} \\
+  & 0 \le X_{t,p} \qquad \forall t \in T, p \in P_{t} \tag{eq\_0012\_a} \\
+  & X_{t,p} \le 1 \qquad \forall t \in T, p \in P_{t} \tag{eq\_0012\_b} \\
+  & N_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_a} \\
+  & C_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_b} \\
+  & U_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_c} \\
+  & I_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_d} \\
+  & \mathit{I0}_{s,m} \ge 0 \qquad \forall s \in S, m \in M \tag{eq\_0014} \\
+  & Z_{t,p,p2} \ge 0 \qquad \forall t \in T, (p,p2) \in \mathit{Gamma}_{t} \tag{eq\_0015} \\
+  & CKM = \sum_{t \in T} \sum_{m \in M} \mathit{ell}_{t} \cdot c_{m} \cdot N_{t , m} , \tag{eq\_0016} \\
+  & SKM = \sum_{t \in T} \sum_{p \in P_{t}} \mathit{ell}_{t} \cdot s_{t , p} \cdot X_{t , p} . \tag{eq\_0017} \\
+  & SHM = \sum_{t \in T} \underset{\genfrac{}{}{0pt}{}{\left(p , p^{'}\right) \in \mathit{Gamma}_{t} :}{\mathit{beta} \left(p\right) \neq \mathit{beta} \left(p^{'}\right)}}{\sum} Z_{t , p , p^{'}} . \tag{eq\_0018} \\
+  & Y_{t , b} = \sum_{p \in P_{t} : b = \mathit{beta} \left(p\right)} X_{t , p} \forall t \in T ; b \in B_{t} . \tag{eq\_0020} \\
+  & SKM = \sum_{t \in T} \sum_{b \in B_{t}} \mathit{ell}_{t} \cdot s_{t , b} \cdot Y_{t , b} . \tag{eq\_0021} \\
+  & X_{t , p} = \sum_{p_{1} , p_{2} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p \in P_{t} , \tag{eq\_0022} \\
+  & X_{\mathit{nu}^{1} \left(t\right) , p_{1}} = \sum_{p , p_{2} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p_{1} \in P_{\mathit{nu}^{1} \left(t\right)} , \tag{eq\_0023} \\
+  & X_{\mathit{nu}^{2} \left(t\right) , p_{2}} = \sum_{p , p_{1} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p_{2} \in P_{\mathit{nu}^{2} \left(t\right)} . \tag{eq\_0024} \\
+  & I_{s , m}^{\infty} = I_{s , m}^{0} - \underset{\genfrac{}{}{0pt}{}{t \in T :}{s_{d} \left(t\right) = s}}{\sum} C_{t , m} + \underset{\genfrac{}{}{0pt}{}{t \in T :}{s_{a} \left(t\right) = s}}{\sum} U_{t , m} . \tag{eq\_0025} \\
+  & I_{s , m}^{0} = I_{s , m}^{\infty} \forall s \in S ; m \in M . \tag{eq\_0026} \\
+  & \sum_{m \in M} c_{m} \cdot I_{t , m} \leq B , \tag{eq\_0027} \\
+  & \sum_{m \in M} U_{Amf - Dv , m} \leq \sum_{m \in M} N_{Asd - Amf , m} - 1 . \tag{eq\_0028} \\
+  & X_{t_1,p} = \sum_{p_2,\ldots,p_6} Z_{t_1,p,p_2,p_3,p_4,p_5,p_6}^{Ut} \forall p \in P_{t_1} \tag{eq\_0029\_a} \\
+  & X_{t_6,p} = \sum_{p_1,\ldots,p_5} Z_{t_1,p_1,p_2,p_3,p_4,p_5,p}^{Ut} \forall p \in P_{t_6} \tag{eq\_0029\_b} \\
+  & CKM \leq 318 , 000 . \tag{eq\_0030} \\
+\end{align}

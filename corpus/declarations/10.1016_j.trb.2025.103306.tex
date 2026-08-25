@@ -1,0 +1,220 @@
+% Declaration sidecar for 10.1016_j.trb.2025.103306
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2025.103306
+% Integrated optimization of train makeup problem and resource scheduling in railway marshalling yards: A hybrid MILP-CP approach with Logic-based Benders decomposition
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2025.103306.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: minimize the makespan (maximum completion time) over all outbound trains
+
+% u: classified as variable during review
+%@ var u shape=J,A,K,B,L,E domain=integer role=primary drole=- lo=- hi=- :: completion time of inbound-train, block, and outbound-train operations
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: set of blocks
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: index for blocks
+
+% r: classified as variable during review
+%@ var r shape=K,L domain=binary role=primary drole=- lo=- hi=- :: binary assignment of block k to outbound train l
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: set of outbound trains
+
+% w: classified as parameter during review
+%@ param w shape=K,L kind=matrix domain=- :: weight of blocks and outbound-train weight limits
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: index for outbound trains
+
+% g: classified as parameter during review
+%@ param g shape=K,L kind=matrix domain=- :: length of blocks and outbound-train length limits
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: set of line locomotives
+
+% lambda: renamed from λ
+%@ var lambda shape=L,F domain=binary role=primary drole=- lo=- hi=- :: binary assignment of line locomotive f to outbound train l
+
+% T: classified as parameter during review
+%@ param T shape=J,K,L,F kind=matrix domain=- :: arrival, departure, and availability times of trains, blocks, and locomotives
+
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: destination of block, train, or locomotive
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: processing or dwell time
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: set of stages for inbound trains
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: set of inbound trains
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: index for inbound trains
+
+% p: classified as parameter during review
+%@ param p shape=J,A,K,B,L,E kind=matrix domain=- :: processing time of an operation at a stage
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: set of stages for blocks
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: set of stages for outbound trains
+
+% omega: renamed from ω
+%@ var omega shape=J,A,Q,K,B,Q,L,E,Q domain=binary role=primary drole=- lo=- hi=- :: binary assignment of job to resource at a stage
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: set of resources at a stage
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: set of blocks in inbound train j
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: large positive constant for linearization
+
+% s: classified as variable during review
+%@ var s shape=J,J,Q,K,K,Q,L,L,Q domain=binary role=primary drole=- lo=- hi=- :: binary sequencing variable for pairs of jobs on the same resource
+
+% Z: classified as variable during review
+%@ var Z shape=L,E domain=integer role=primary drole=- lo=- hi=- :: integer completion time variable of outbound train stage in CP model
+
+% x: classified as variable during review
+%@ var x shape=J,A domain=continuous role=primary drole=- lo=- hi=- :: interval variable for inbound train operation at a stage
+
+% EndBeforeStart: classified as parameter during review
+%@ param EndBeforeStart shape=- kind=scalar domain=- :: CP constraint ensuring one interval ends before another starts
+
+% y: classified as variable during review
+%@ var y shape=K,B domain=continuous role=primary drole=- lo=- hi=- :: interval variable for block operation at a stage
+
+% z: classified as variable during review
+%@ var z shape=L,E domain=continuous role=primary drole=- lo=- hi=- :: interval variable for outbound train operation at a stage
+
+% Pulse: classified as parameter during review
+%@ param Pulse shape=- kind=scalar domain=- :: CP function counting overlapping intervals at a resource
+
+% EndAtStart: classified as parameter during review
+%@ param EndAtStart shape=- kind=scalar domain=- :: CP constraint forcing one interval to end exactly when another starts
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: set of blocks assigned to outbound train l
+
+% StartOf: classified as parameter during review
+%@ param StartOf shape=- kind=scalar domain=- :: CP function returning start time of an interval
+
+% EndOf: classified as parameter during review
+%@ param EndOf shape=- kind=scalar domain=- :: CP function returning end time of an interval
+
+% eta: renamed from η
+%@ param eta shape=J,L kind=matrix domain=- :: theoretical completion time of inbound or outbound train
+
+% LB: classified as parameter during review
+%@ param LB shape=- kind=scalar domain=- :: lower bound on makespan
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: makespan of master or subproblem
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: set of earliest-ready blocks for minimum train composition
+
+% LSA: classified as parameter during review
+%@ param LSA shape=Q,E kind=matrix domain=- :: left-side availability of resource at a stage
+
+% RSA: classified as parameter during review
+%@ param RSA shape=Q,E kind=matrix domain=- :: right-side availability of resource at a stage
+
+% body: classified as parameter during review
+%@ param body shape=- kind=scalar domain=- :: middle term in lower bound calculation
+
+% head: classified as parameter during review
+%@ param head shape=- kind=scalar domain=- :: first term in lower bound calculation
+
+% tail: classified as parameter during review
+%@ param tail shape=L kind=vector domain=- :: last term in lower bound calculation
+
+% theta: renamed from θ
+%@ param theta shape=L kind=vector domain=- :: tail time for outbound train
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, b, e, f, q, ζ, τ, φ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: each block assigned to at most one outbound train
+%@ con eq_0004 kind=linear domain=- indicator=- :: total weight of outbound train within required limits
+%@ con eq_0005 kind=linear domain=- indicator=- :: total length of outbound train within required limits
+%@ con eq_0006 kind=linear domain=- indicator=- :: each line locomotive assigned to at most one outbound train
+%@ con eq_0007 kind=linear domain=- indicator=- :: each outbound train assigned exactly one line locomotive
+%@ con eq_0008 kind=linear domain=- indicator=- :: line locomotive assigned only if train is scheduled with blocks
+%@ con eq_0009 kind=linear domain=- indicator=- :: block assignment implies outbound train is scheduled with a line locomotive
+%@ con eq_0010 kind=linear domain=- indicator=- :: incompatible block-train pairs forbidden by destination or timing
+%@ con eq_0011 kind=linear domain=- indicator=- :: incompatible locomotive-train pairs forbidden by destination or timing
+%@ con eq_0012 kind=linear domain=- indicator=- :: binary domain for block-to-train assignment variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: binary domain for locomotive-to-train assignment variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: precedence between consecutive inbound train stages
+%@ con eq_0016 kind=linear domain=- indicator=- :: precedence between consecutive block stages
+%@ con eq_0017 kind=linear domain=- indicator=- :: precedence between consecutive outbound train stages
+%@ con eq_0018 kind=linear domain=- indicator=- :: makespan at least the completion time of each outbound train
+%@ con eq_0019 kind=linear domain=- indicator=- :: each inbound train assigned exactly one resource at each stage
+%@ con eq_0021 kind=linear domain=- indicator=- :: each block assigned exactly one resource at each stage
+%@ con eq_0022 kind=linear domain=- indicator=- :: each outbound train assigned exactly one resource at each stage
+%@ con eq_0023 kind=linear domain=- indicator=- :: roll-in sequence of blocks follows formation order
+%@ con eq_0024 kind=linear domain=- indicator=- :: block humping starts only after inbound train push is completed
+%@ con eq_0026 kind=linear domain=- indicator=- :: outbound classification starts only after last block arrives
+%@ con eq_0027 kind=linear domain=- indicator=- :: inbound first operation starts after train arrival
+%@ con eq_0029 kind=linear domain=- indicator=- :: outbound last operation finishes before departure
+%@ con eq_0030 kind=linear domain=- indicator=- :: non-overlap of inbound trains on the same resource
+%@ con eq_0032 kind=linear domain=- indicator=- :: non-overlap of blocks on the same resource
+%@ con eq_0033 kind=linear domain=- indicator=- :: non-overlap of outbound trains on the same resource
+%@ con eq_0034 kind=linear domain=- indicator=- :: reverse non-overlap for inbound trains on the same resource
+%@ con eq_0035 kind=linear domain=- indicator=- :: reverse non-overlap for blocks on the same resource
+%@ con eq_0036 kind=linear domain=- indicator=- :: reverse non-overlap for outbound trains on the same resource
+%@ con eq_0037 kind=linear domain=- indicator=- :: nonnegative integer completion times for operations
+%@ con eq_0039 kind=linear domain=- indicator=- :: binary resource assignment variables
+%@ con eq_0040 kind=linear domain=- indicator=- :: binary sequencing variables
+%@ con eq_0042 kind=linear domain=- indicator=- :: CP objective minimizing maximum end of outbound train operations
+%@ con eq_0044 kind=linear domain=- indicator=- :: CP precedence between inbound train stages
+%@ con eq_0045 kind=linear domain=- indicator=- :: CP precedence between block stages
+%@ con eq_0046 kind=linear domain=- indicator=- :: CP precedence between outbound train stages
+%@ con eq_0048 kind=linear domain=- indicator=- :: CP resource capacity constraint for inbound train stage
+%@ con eq_0049 kind=linear domain=- indicator=- :: CP resource capacity constraint for block stage
+%@ con eq_0050 kind=linear domain=- indicator=- :: CP resource capacity constraint for outbound train stage
+%@ con eq_0051 kind=linear domain=- indicator=- :: CP roll-in sequence of blocks
+%@ con eq_0053 kind=linear domain=- indicator=- :: CP consistency between inbound train and block operations
+%@ con eq_0054 kind=linear domain=- indicator=- :: CP consistency between block and outbound train operations
+%@ con eq_0056 kind=linear domain=- indicator=- :: CP arrival time constraint for inbound trains
+%@ con eq_0057 kind=linear domain=- indicator=- :: CP departure time constraint for outbound trains
+%@ con eq_0062 kind=linear domain=- indicator=- :: theoretical completion time of inbound trains used in lower bounds
+%@ con eq_0065 kind=linear domain=- indicator=- :: lower bound LB1* based on theoretical inbound completion and outbound processing
+%@ con eq_0066 kind=linear domain=- indicator=- :: lower bound LB2* using resource availability and stage workload
+%@ con eq_0067 kind=linear domain=- indicator=- :: lower bound LB3* using stage workload and train tail times
+%@ con eq_0068 kind=linear domain=- indicator=- :: theoretical completion time of outbound trains in lower bounds
+%@ con eq_0069 kind=linear domain=- indicator=- :: lower bound LB4 based on connection plan between inbound and outbound trains
+%@ con eq_0070 kind=linear domain=- indicator=- :: global lower bound LB* as maximum of existing lower bounds
+%@ con eq_0071 kind=linear domain=- indicator=- :: iteration-dependent lower bound LB_s as maximum of available bounds
+%@ con eq_0072 kind=linear domain=- indicator=- :: feasibility no-good cut preventing repetition of infeasible makeup plans
+%@ con eq_0073 kind=linear domain=- indicator=- :: trivial optimality cut forcing master makespan above historical subproblem value
+%@ con eq_0075 kind=linear domain=- indicator=- :: optimality cut excluding suboptimal assignments
+%@ con eq_0076 kind=linear domain=- indicator=- :: analytical optimality cut based on maximum makespan reduction

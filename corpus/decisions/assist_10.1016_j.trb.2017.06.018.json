@@ -1,0 +1,158 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.trb.2017.06.018",
+      "doi": "10.1016/j.trb.2017.06.018",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0002",
+          "status": "corrected",
+          "note": "\\max \\sum_{t \\in T \\cup T_{\\mathrm{new}}, a \\in A^{t}} p \\cdot x_{t,a}",
+          "parts": [
+            "\\max \\sum_{t \\in T \\cup T_{\\mathrm{new}}, a \\in A^{t}} p \\cdot x_{t,a}"
+          ]
+        },
+        {
+          "id": "eq-0003",
+          "status": "corrected",
+          "note": "\\sum_{a \\in \\delta_{t}^{+}(\\sigma)} x_{t,a} \\le 1 \\qquad \\forall t \\in T \\cup T_{new}",
+          "parts": [
+            "\\sum_{a \\in \\delta_{t}^{+}(\\sigma)} x_{t,a} \\le 1 \\qquad \\forall t \\in T \\cup T_{new}"
+          ]
+        },
+        {
+          "id": "eq-0004",
+          "status": "corrected",
+          "note": "\\sum_{a \\in \\delta_{t,v}^{-}} x_{t,a} = \\sum_{a \\in \\delta_{t,v}^{+}} x_{t,a} \\qquad \\forall t \\in T \\cup T_{\\mathit{new}}, v \\in V^{t} \\setminus \\{\\sigma, \\tau\\}",
+          "parts": [
+            "\\sum_{a \\in \\delta_{t,v}^{-}} x_{t,a} = \\sum_{a \\in \\delta_{t,v}^{+}} x_{t,a} \\qquad \\forall t \\in T \\cup T_{\\mathit{new}}, v \\in V^{t} \\setminus \\{\\sigma, \\tau\\}"
+          ]
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "z_{t,v} = \\sum_{a \\in \\delta_{t,v}^{-}} x_{t,a} \\qquad \\forall t \\in T \\cup T_{\\mathit{new}}, v \\in V^{t} \\setminus \\{\\sigma, \\tau\\}",
+          "parts": [
+            "z_{t,v} = \\sum_{a \\in \\delta_{t,v}^{-}} x_{t,a} \\qquad \\forall t \\in T \\cup T_{\\mathit{new}}, v \\in V^{t} \\setminus \\{\\sigma, \\tau\\}"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "corrected",
+          "note": "y_{v} = \\sum_{t \\in T \\cup T_{\\mathit{new}} : v \\in V^{t}} z_{t,v} \\qquad \\forall v \\in V \\setminus \\{\\sigma, \\tau\\}",
+          "parts": [
+            "y_{v} = \\sum_{t \\in T \\cup T_{\\mathit{new}} : v \\in V^{t}} z_{t,v} \\qquad \\forall v \\in V \\setminus \\{\\sigma, \\tau\\}"
+          ]
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "\\sum_{v \\in W(i,r) : v \\succeq w, \\Delta_{v,w} < d_{i}} y_{v} \\le 1 \\qquad \\forall i \\in S, r=(i,h) \\in R, w \\in W(i,r)",
+          "parts": [
+            "\\sum_{v \\in W(i,r) : v \\succeq w, \\Delta_{v,w} < d_{i}} y_{v} \\le 1 \\qquad \\forall i \\in S, r=(i,h) \\in R, w \\in W(i,r)"
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "corrected",
+          "note": "\\sum_{v \\in U(h,r) : v \\succeq u, \\Delta_{v,u} < a_{h}} y_{v} \\le 1 \\qquad \\forall h \\in S, r=(i,h) \\in R, u \\in U(h,r)",
+          "parts": [
+            "\\sum_{v \\in U(h,r) : v \\succeq u, \\Delta_{v,u} < a_{h}} y_{v} \\le 1 \\qquad \\forall h \\in S, r=(i,h) \\in R, u \\in U(h,r)"
+          ]
+        },
+        {
+          "id": "eq-0009",
+          "status": "corrected",
+          "note": "\\sum_{t \\in T \\cup T_{new}, r \\in R, u \\in U(i,r) \\cap V^{t}, v \\in W(i,r) \\cap V^{t}, a \\in A^{t} : a=(u,v), theta_{u} \\le qbar, theta_{v} \\ge qbar} x_{t,a} \\le c_{i} \\qquad \\forall i \\in S, qbar \\in Hbar",
+          "parts": [
+            "\\sum_{t \\in T \\cup T_{new}, r \\in R, u \\in U(i,r) \\cap V^{t}, v \\in W(i,r) \\cap V^{t}, a \\in A^{t} : a=(u,v), theta_{u} \\le qbar, theta_{v} \\ge qbar} x_{t,a} \\le c_{i} \\qquad \\forall i \\in S, qbar \\in Hbar"
+          ]
+        },
+        {
+          "id": "eq-0010",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "\\sum_{r \\in R, i \\in S, u \\in U(i,r) \\cap V^{t}, v \\in W(i,r) \\cap V^{t}, a \\in A^{t} : a=(u,v), \\Delta_{v,u} < dw_{t,i}} x_{t,a} \\le maxcanc_{t} \\qquad \\forall t \\in T \\cup T_{new}",
+          "parts": [
+            "\\sum_{r \\in R, i \\in S, u \\in U(i,r) \\cap V^{t}, v \\in W(i,r) \\cap V^{t}, a \\in A^{t} : a=(u,v), \\Delta_{v,u} < dw_{t,i}} x_{t,a} \\le maxcanc_{t} \\qquad \\forall t \\in T \\cup T_{new}"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "\\sum_{w \\in W(h,r) \\cap V^{t}, v \\in U(i,r) \\cap V^{t}, a \\in A^{t} : a=(w,v), w \\prec w_3, v \\succeq v_1} x_{t,a} + \\sum_{w \\in W(h,r) \\cap V^{p}, v \\in U(i,r) \\cap V^{p}, a \\in A^{p} : a=(w,v), w \\succeq w_2, v \\prec v_4} x_{p,a} \\le 1 \\qquad \\forall t,p \\in T \\cup T_{new}, r=(h,i) \\in R^{t} \\cap R^{p}, w_1,w_3 \\in W(h,r) \\cap V^{t}, w_2 \\in W(h,r) \\cap V^{p}, v_1 \\in U(i,r) \\cap V^{t}, v_2,v_4 \\in U(i,r) \\cap V^{p}, w_1 \\preceq w_2, v_2 \\preceq v_1, (w_1,v_1) \\in A^{t}, (w_2,v_2) \\in A^{p}, \\Delta_{w_3,w_2}=d_{h}, \\Delta_{v_4,v_1}=a_{i}",
+          "parts": [
+            "\\sum_{w \\in W(h,r) \\cap V^{t}, v \\in U(i,r) \\cap V^{t}, a \\in A^{t} : a=(w,v), w \\prec w_3, v \\succeq v_1} x_{t,a} + \\sum_{w \\in W(h,r) \\cap V^{p}, v \\in U(i,r) \\cap V^{p}, a \\in A^{p} : a=(w,v), w \\succeq w_2, v \\prec v_4} x_{p,a} \\le 1 \\qquad \\forall t,p \\in T \\cup T_{new}, r=(h,i) \\in R^{t} \\cap R^{p}, w_1,w_3 \\in W(h,r) \\cap V^{t}, w_2 \\in W(h,r) \\cap V^{p}, v_1 \\in U(i,r) \\cap V^{t}, v_2,v_4 \\in U(i,r) \\cap V^{p}, w_1 \\preceq w_2, v_2 \\preceq v_1, (w_1,v_1) \\in A^{t}, (w_2,v_2) \\in A^{p}, \\Delta_{w_3,w_2}=d_{h}, \\Delta_{v_4,v_1}=a_{i}"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0014",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0015",
+          "status": "corrected",
+          "note": "\\sum_{w \\in W(h,r) \\cap V^{t} : w_1 \\preceq w \\prec w_3} z_{t,w} + \\sum_{w \\in W(h,r) \\cap V^{p} : w_2 \\preceq w \\prec w_4p} z_{p,w} \\le 1 \\qquad \\forall t,p \\in T \\cup T_{new}, r=(h,i) \\in R^{t} \\cap R^{p}, w_1,w_3 \\in W(h,r) \\cap V^{t}, w_2,w_4p \\in W(h,r) \\cap V^{p}, v_1p \\in U(i,r) \\cap V^{t}, v_2p,v_4 \\in U(i,r) \\cap V^{p}, w_1 \\preceq w_2, v_2p \\preceq v_1p, (w_1,v_1p) \\in A^{t}, (w_2,v_2p) \\in A^{p}, \\Delta_{v_1p,w_1}=l_{t}^{h,i}, \\Delta_{v_2p,w_2}=l_{p}^{h,i}+acc_{p}+dec_{p}, \\Delta_{v_4,w_4p}=l_{p}^{h,i}+acc_{p}+dec_{p}, \\Delta_{w_3,w_2}=d_{h}, \\Delta_{v_4,v_1p}=a_{i}",
+          "parts": [
+            "\\sum_{w \\in W(h,r) \\cap V^{t} : w_1 \\preceq w \\prec w_3} z_{t,w} + \\sum_{w \\in W(h,r) \\cap V^{p} : w_2 \\preceq w \\prec w_4p} z_{p,w} \\le 1 \\qquad \\forall t,p \\in T \\cup T_{new}, r=(h,i) \\in R^{t} \\cap R^{p}, w_1,w_3 \\in W(h,r) \\cap V^{t}, w_2,w_4p \\in W(h,r) \\cap V^{p}, v_1p \\in U(i,r) \\cap V^{t}, v_2p,v_4 \\in U(i,r) \\cap V^{p}, w_1 \\preceq w_2, v_2p \\preceq v_1p, (w_1,v_1p) \\in A^{t}, (w_2,v_2p) \\in A^{p}, \\Delta_{v_1p,w_1}=l_{t}^{h,i}, \\Delta_{v_2p,w_2}=l_{p}^{h,i}+acc_{p}+dec_{p}, \\Delta_{v_4,w_4p}=l_{p}^{h,i}+acc_{p}+dec_{p}, \\Delta_{w_3,w_2}=d_{h}, \\Delta_{v_4,v_1p}=a_{i}"
+          ]
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.trb.2017.06.018",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.trb.2017.06.018",
+      "symbols": {
+        "A": "index",
+        "H̄": "index",
+        "R": "index",
+        "S": "index",
+        "T": "index",
+        "U": "index",
+        "V": "index",
+        "W": "index",
+        "acc": "parameter",
+        "c": "parameter",
+        "d": "parameter",
+        "dec": "parameter",
+        "h": "index",
+        "i": "index",
+        "l": "parameter",
+        "maxcanc": "parameter",
+        "maxstr": "parameter",
+        "p": "parameter",
+        "q̄": "parameter",
+        "v": "index",
+        "w": "index",
+        "x": "variable",
+        "y": "variable",
+        "z": "variable",
+        "Δ": "parameter",
+        "δ": "index",
+        "σ": "index",
+        "τ": "index"
+      }
+    }
+  ]
+}

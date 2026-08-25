@@ -1,0 +1,83 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2018.12.008
+%@ meta id=10.1016_j.trb.2018.12.008 family=milp schema=0.1.0
+%@ name :: Efficient train re-routing and rescheduling: Valid inequalities and reformulation of RECIFE-MILP
+%@ desc :: Mined from Efficient train re-routing and rescheduling: Valid inequalities and reformulation of RECIFE-MILP (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2018.12.008
+%@ prov reference :: Efficient train re-routing and rescheduling: Valid inequalities and reformulation of RECIFE-MILP
+%@ prov author :: Paola Pellegrini; Raffaele Pesenti; Joaquín Rodríguez
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total delay suffered by trains at their exit from the infrastructure.
+%@ var x shape=T,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train t uses route r.
+%@ index R ordered=0 cyclic=0 :: Set of routes available for a train.
+%@ param M shape=- kind=big_m domain=- :: Big-M coefficient in disjunctive headway constraints.
+%@ var eU shape=T,tc domain=non_negative role=primary drole=- lo=- hi=- :: End time of utilization of track-circuit tc by train t.
+%@ var sU shape=T,tc domain=non_negative role=primary drole=- lo=- hi=- :: Start time of utilization of track-circuit tc by train t.
+%@ var y shape=T,T,tc domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t precedes train t' on track-circuit tc.
+%@ index tc ordered=0 cyclic=0 :: Track-circuit index.
+%@ index tc_hat ordered=0 cyclic=0 :: Representative track-circuit of tc in a section.
+%@ index C ordered=0 cyclic=0 :: Set of track-circuits.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index Q ordered=0 cyclic=0 :: Subset of common track-circuits used in valid inequalities.
+%@ param gamma shape=R,R kind=matrix domain=- :: Number of times Lemma 1 holds for route pair (r,r').
+%@ index k ordered=0 cyclic=0 :: Integer parameter for the k-double partition.
+%@ index Psi ordered=0 cyclic=0 :: Route set in a k-double partition.
+%@ param TC shape=R kind=vector domain=- :: Set of track-circuits in route r.
+%@ var z shape=tc domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether track-circuit tc belongs to the minimal representative set.
+%@ index S ordered=0 cyclic=0 :: Section, an equivalence class of track-circuits.
+%@ param a shape=tc,tc_hat,S kind=matrix domain=- :: Indicator equal to 1 if track-circuit tc_hat is a representative of tc in section S.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Each train t must use exactly one of its available routes r.
+%@ con eq_0002 kind=headway domain=- indicator=- :: If train t precedes t' on tc, t's end time on tc is no later than t' start time on tc.
+%@ con eq_0003 kind=headway domain=- indicator=- :: If train t' precedes t on tc, t' end time on tc is no later than t start time on tc.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Valid inequality y_{t,t',tc1} - y_{t,t',tc2} ≤ 0 linking precedence on two track-circuits of the same section.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Assumption 1: if train t chooses a route that does not contain tc, then y_{t,t',tc}=1.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Corollary 1 valid inequality for fixed routes: sum_{Q+} y - sum_{Q-} y ≤ |Q+| - γ_{r,r'}.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Example valid inequality (9): y_{t,t',tc10} - y_{t,t',tc15} ≤ 1 - x_{t',r3} - x_{t',r4}.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Example valid inequality (10): y_{t,t',tc10} - y_{t,t',tc15} ≤ 1 - x_{t,r1}.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Chain of inequalities (11) used to construct the affine under-estimator of the bilinear gamma-term.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Strengthened inequality (12) adding the k-1 level of the k-double partition.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Theorem 1 valid inequality (13) based on a k-double partition of route sets.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Valid inequality (14) expressing y on tc through representative tc_hat and route-choice corrections.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Valid inequality (15) expressing y on representative tc_hat through y on tc and route-choice corrections.
+%@ con eq_0016 kind=headway domain=- indicator=- :: Reformulated headway constraint (16) using representative precedence y_{t,t',tc_hat} with big-M route corrections.
+%@ con eq_0017 kind=headway domain=- indicator=- :: Reformulated headway constraint (17) for the reverse precedence order using y_{t,t',tc_hat}.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Set-covering constraint (18) requiring a representative track-circuit in each section S of a common tc.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint defining start time of occupation of a track-circuit on the chosen route.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint propagating occupation times along consecutive track-circuits of the chosen route.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint defining end time of occupation as start time plus running time on the track-circuit.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint linking track-circuit occupation times to route-choice variables with big-M.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint ensuring consistency between start and end times on successive track-circuits.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Headway constraint imposing minimum separation between trains on shared track-circuits.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint enforcing that a train clears a track-circuit before the next train enters it.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Constraint linking binary precedence variables to route choices on common track-circuits.
+%@ con eq_0029_b kind=headway domain=- indicator=- :: Reformulated headway constraint (29b) in the reduced binary-variable model.
+%@ con eq_0029_c kind=headway domain=- indicator=- :: Reformulated headway constraint (29c) in the reduced binary-variable model.
+\begin{align}
+  & \begin{matrix}\sum_{r \in R_{t}} x_{t , r} = 1 .\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix}\mathit{eU}_{t , \mathit{tc}} - M \left(1 - y_{t , t^{'} , \mathit{tc}}\right) \leq \mathit{sU}_{t^{'} , \mathit{tc}}\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}\mathit{eU}_{t^{'} , \mathit{tc}} - M \cdot y_{t , t^{'} , \mathit{tc}} \leq \mathit{sU}_{t , \mathit{tc}} .\end{matrix} \tag{eq\_0003} \\
+  & y_{t , t^{'} , \mathit{tc}_{1}} - y_{t , t^{'} , \mathit{tc}_{2}} \leq 0 \tag{eq\_0004} \\
+  & \mathit{tc} \sim_{r , r^{'}} \hat{\mathit{tc}} \Leftrightarrow y_{t , t^{'} , \mathit{tc}} = y_{t , t^{'} , \hat{\mathit{tc}}} \tag{eq\_0005} \\
+  & \sum_{r \in R_{t} : \mathit{tc} \notin T C^{r}} x_{t , r} = 1 \Rightarrow y_{t , t^{'} , \mathit{tc}} = 1 . \tag{eq\_0006} \\
+  & \begin{matrix}\sum_{\mathit{tc} \in Q^{+}} y_{t , t^{'} , \mathit{tc}} - \sum_{\mathit{tc} \in Q^{-}} y_{t , t^{'} , \mathit{tc}} \leq \left|Q^{+}\right| - \mathit{gamma}_{r , r^{'}}\end{matrix} \tag{eq\_0009} \\
+  & y_{t , t^{'} , \mathit{tc} 10} - y_{t , t^{'} , \mathit{tc} 5} \leq - 1 \tag{eq\_0010} \\
+  & \begin{matrix}\sum_{\mathit{tc} \in Q^{+}} y_{t , t^{'} , \mathit{tc}} - \sum_{\mathit{tc} \in Q^{-}} y_{t , t^{'} , \mathit{tc}} \leq \left|Q^{+}\right| - \sum_{r \in R_{t}} \underset{r^{'} \in R_{t^{'}}}{\sum} \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} .\end{matrix} \tag{eq\_0011} \\
+  & y_{t , t^{'} , \text{tc10}} - y_{t , t^{'} , \text{tc15}} \leq 1 - x_{t , \text{r1}} \cdot x_{t^{'} , \text{r3}} - x_{t , \text{r1}} \cdot x_{t^{'} , \text{r4}} - x_{t , \text{r1}} \cdot x_{t^{'} , \text{r5}} - x_{t , \text{r2}} \cdot x_{t^{'} , \text{r3}} - x_{t , \text{r2}} \cdot x_{t^{'} , \text{r4}} . \tag{eq\_0012} \\
+  & \sum_{\mathit{tc} \in Q^{+}} y_{t , t^{'} , \mathit{tc}} - \sum_{\mathit{tc} \in Q^{-}} y_{t , t^{'} , \mathit{tc}} \leq \left|Q^{+}\right| - \left(\sum_{r \in R_{t}} l_{r}^{1} x_{t , r} + \underset{r^{'} \in R_{t^{'}}}{\sum} l_{r^{'}}^{2} x_{t^{'} , r^{'}} - k\right) , \tag{eq\_0013} \\
+  & \begin{matrix} & y_{t , t^{'} , \text{tc10}} - y_{t , t^{'} , \text{tc15}} \leq 1 - x_{t^{'} , \text{r3}} - x_{t^{'} , \text{r4}}\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & y_{t , t^{'} , \text{tc10}} - y_{t , t^{'} , \text{tc15}} \leq 1 - x_{t , \text{r1}} .\end{matrix} \tag{eq\_0015} \\
+  & \sum_{r \in R_{t}} \underset{r^{'} \in R_{t^{'}}}{\sum} \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \geq \sum_{r \in R_{t}} l_{r}^{1} x_{t , r} + \underset{r^{'} \in R_{t^{'}}}{\sum} l_{r^{'}}^{2} x_{t^{'} , r^{'}} - k \tag{eq\_0016} \\
+  & \begin{aligned}\sum_{r \in R_{t}} \underset{r^{'} \in R_{t^{'}}}{\sum} & \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \geq \sum_{r \in \mathit{Psi}_{t}^{k}} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \\ & \geq \sum_{r \in \mathit{Psi}_{t}^{k}} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \geq \sum_{r \in \mathit{Psi}_{t}^{k}} k \cdot x_{t , r} + \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t^{'} , r^{'}} - k ,\end{aligned} \tag{eq\_0017} \\
+  & \sum_{r \in \mathit{Psi}_{t}^{k}} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} = k = \sum_{r \in \mathit{Psi}_{t}^{k}} k \cdot x_{t , r} + \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t^{'} , r^{'}} - k . \tag{eq\_0018} \\
+  & \sum_{r \in \mathit{Psi}_{t}^{k}} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} = 0 \geq \sum_{r \in \mathit{Psi}_{t}^{k}} k \cdot x_{t , r} + \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t^{'} , r^{'}} - k . \tag{eq\_0019} \\
+  & \begin{matrix} & & \sum_{r \in R_{t}} \underset{r^{'} \in R_{t^{'}}}{\sum} \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \\ & & \geq \sum_{r \in \mathit{Psi}_{t}^{k}} k \cdot x_{t , r} + \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k}}{\sum} k \cdot x_{t^{'} , r^{'}} + \sum_{r \in \mathit{Psi}_{t}^{k - 1}} \left(k - 1\right) x_{t , r} + \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{k - 1}}{\sum} \left(k - 1\right) x_{t^{'} , r^{'}} - k .\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix}\sum_{r \in R_{t}} \underset{r^{'} \in R_{t^{'}}}{\sum} \mathit{gamma}_{r , r^{'}} \cdot x_{t , r} \cdot x_{t^{'} , r^{'}} \geq \sum_{l_{1} = 0}^{k} l_{1} \underset{r \in \mathit{Psi}_{t}^{l_{1}}}{\sum} x_{t , r} + \sum_{l_{2} = 0}^{k} l_{2} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{l_{2}}}{\sum} x_{t^{'} , r^{'}} - k .\end{matrix} \tag{eq\_0021} \\
+  & \sum_{\mathit{tc} \in Q^{+}} y_{t , t^{'} , \mathit{tc}} - \sum_{\mathit{tc} \in Q^{-}} y_{t , t^{'} , \mathit{tc}} \leq \left|Q^{+}\right| - \left(\sum_{l_{1} = 0}^{k} l_{1} \underset{r \in \mathit{Psi}_{t}^{l_{1}}}{\sum} x_{t , r} + \sum_{l_{2} = 0}^{k} l_{2} \underset{r^{'} \in \mathit{Psi}_{t^{'}}^{l_{2}}}{\sum} x_{t^{'} , r^{'}} - k\right) . \tag{eq\_0022} \\
+  & \begin{matrix} & y_{t , t^{'} , \mathit{tc}} \leq y_{t , t^{'} , \hat{\mathit{tc}}} + \underset{r \in R_{t} : \mathit{tc} \notin \mathit{TC}^{r} \land \hat{\mathit{tc}} \in \mathit{TC}^{r}}{\sum} x_{t , r} + \underset{r^{'} \in R_{t^{'}} : \mathit{tc} \in \mathit{TC}^{r^{'}} \land \hat{\mathit{tc}} \notin \mathit{TC}^{r^{'}}}{\sum} x_{t^{'} , r^{'}}\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & y_{t , t^{'} , \hat{\mathit{tc}}} \leq y_{t , t^{'} , \mathit{tc}} + \underset{r \in R_{t} : \mathit{tc} \in \mathit{TC}^{r} \land \hat{\mathit{tc}} \notin \mathit{TC}^{r}}{\sum} x_{t , r} + \underset{r^{'} \in R_{t^{'}} : \mathit{tc} \notin \mathit{TC}^{r^{'}} \land \hat{\mathit{tc}} \in \mathit{TC}^{r^{'}}}{\sum} x_{t^{'} , r^{'}} .\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix}\mathit{eU}_{t , \mathit{tc}} - M \begin{pmatrix} 1 - y_{t , t^{'} , \hat{\mathit{tc}}} + \underset{\begin{matrix}r \in R_{t} : \\ \mathit{tc} \in \mathit{TC}^{r} \\ \land \hat{\mathit{tc}} \notin \mathit{TC}^{r}\end{matrix}}{\sum} x_{t , r} + \underset{\begin{matrix}r^{'} \in R_{t^{'}} : \\ \mathit{tc} \notin \mathit{TC}^{r^{'}} \\ \land \hat{\mathit{tc}} \in \mathit{TC}^{r^{'}}\end{matrix}}{\sum} x_{t^{'} , r^{'}} \end{pmatrix} \leq \mathit{sU}_{t^{'} , \mathit{tc}} .\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix} & \mathit{eU}_{t^{'} , \mathit{tc}} - M \begin{pmatrix} y_{t , t^{'} , \hat{\mathit{tc}}} + \underset{\begin{matrix}r \in R_{t} : \\ \mathit{tc} \notin \mathit{TC}^{r} \\ \land \hat{\mathit{tc}} \in \mathit{TC}^{r}\end{matrix}}{\sum} x_{t , r} + \underset{\begin{matrix}r^{'} \in R_{t^{'}} : \\ \mathit{tc} \in \mathit{TC}^{r^{'}} \\ \land \hat{\mathit{tc}} \notin \mathit{TC}^{r^{'}}\end{matrix}}{\sum} x_{t^{'} , r^{'}} \end{pmatrix} \leq \mathit{sU}_{t , \mathit{tc}} .\end{matrix} \tag{eq\_0026} \\
+  \min\quad & \underset{\hat{\mathit{tc}} \in \cup_{r \in R_{t} , r^{'} \in R_{t '}} \left(\mathit{TC}^{r} \cap \mathit{TC}^{r^{'}}\right)}{\sum} z_{\hat{\mathit{tc}}} \tag{eq\_0029\_a} \\
+  & \underset{\hat{\mathit{tc}} \in S}{\sum} a_{t c , \hat{\mathit{tc}} , S} \cdot z_{\hat{\mathit{tc}}} \geq 1 , \forall S \in S_{t , t^{'} , \mathit{tc}} , \mathit{tc} \in \underset{r \in R_{t} , r^{'} \in R_{t '}}{\cup} \left(\mathit{TC}^{r} \cap \mathit{TC}^{r^{'}}\right) \tag{eq\_0029\_b} \\
+  & z_{\hat{\mathit{tc}}} \in \left\{0 , 1\right\} \forall \hat{\mathit{tc}} \in \underset{r \in R_{t} , r^{'} \in R_{t '}}{\cup} \left(\mathit{TC}^{r} \cap \mathit{TC}^{r^{'}}\right) . \tag{eq\_0029\_c} \\
+\end{align}

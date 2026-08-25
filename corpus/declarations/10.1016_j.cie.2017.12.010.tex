@@ -1,0 +1,154 @@
+% Declaration sidecar for 10.1016_j.cie.2017.12.010
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2017.12.010
+% Integrated stochastic optimization approaches for tactical scheduling of trains and railway infrastructure maintenance
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2017.12.010.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total train arrival deviation and negative paired maintenance works
+
+% PCT: classified as parameter during review
+%@ param PCT shape=F kind=vector :: Planned arrival time at destination for train f
+
+% Pr: classified as parameter during review
+%@ param Pr shape=S kind=vector :: Probability of scenario s
+
+% d: classified as variable during review
+%@ var d shape=F,E,S domain=non_negative role=primary :: Departure time of train f from cell (i,j) in scenario s
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Train index
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Node index
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Scenario index
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of arcs in the time-space network
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of trains
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of scenarios
+
+% O: classified as index during review
+%@ index O ordered=0 cyclic=0 :: Origin node of train f
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Node index
+
+% x: classified as variable during review
+%@ var x shape=F,E,S domain=binary role=primary :: Binary routing variable: 1 if train f uses arc (i,j) in scenario s
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the physical network
+
+% EST: classified as parameter during review
+%@ param EST shape=F kind=vector :: Earliest start time of train f
+
+% a: classified as variable during review
+%@ var a shape=F,E,S domain=non_negative role=primary :: Arrival time of train f at node j in scenario s
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant
+
+% t: classified as variable during review
+%@ var t shape=F,E,S domain=non_negative role=primary :: Travel and dwell time of train f on arc (i,j) in scenario s
+
+% FT: classified as parameter during review
+%@ param FT shape=F,E,S kind=matrix :: Free flow travel time of train f on arc (i,j) in scenario s
+
+% w: classified as parameter during review
+%@ param w shape=F,E,S kind=matrix :: Minimum or maximum dwell time of train f on arc (i,j) in scenario s
+
+% o: classified as variable during review
+%@ var o shape=F,F,E,S domain=binary role=primary :: Binary ordering variable: 1 if train f precedes f' on arc (i,j) in scenario s
+
+% unusable as an identifier, rename or drop: δ
+% g: classified as parameter during review
+%@ param g shape=F,E kind=matrix :: Safety time interval required by train f to start occupying a cell
+
+% h: classified as parameter during review
+%@ param h shape=F,E kind=matrix :: Safety time interval required by train f to release a cell
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of maintenance areas
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of maintenance works on an arc
+
+% l: classified as variable during review
+%@ var l shape=P,F,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p precedes train f on arc (i,j) in scenario s
+
+% mh: classified as parameter during review
+%@ param mh shape=P,E kind=matrix :: Safety time interval required after/before maintenance work p on arc (i,j)
+
+% MT: classified as variable during review
+%@ var MT shape=P,E,S domain=non_negative role=primary :: Duration of maintenance work p on arc (i,j) in scenario s
+
+% y: classified as variable during review
+%@ var y shape=P,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p is paired with previous work on arc (i,j) in scenario s
+
+% My: classified as parameter during review
+%@ param My shape=- kind=big_m :: Large positive constant used in pairing constraints
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Time horizon
+
+% Bound by a quantifier or big operator, so no declaration of their own: D, b, k, p
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=flow_balance :: Flow balance at origin: each train leaves its origin exactly once in each scenario
+%@ con eq_0004 kind=flow_balance :: Flow balance at intermediate nodes: for every train, inflow equals outflow at each intermediate node
+%@ con eq_0005 kind=flow_balance :: Flow balance at destination: each train reaches its destination exactly once in each scenario
+%@ con eq_0006 kind=linear :: Entrance time at origin is at least the earliest start time when the first arc is selected
+%@ con eq_0007 kind=linear :: Cell-to-cell transition: exit time from an incoming arc equals entrance time to the next arc at each intermediate node
+%@ con eq_0008 kind=big_m :: Mapping constraint: arrival time on an arc is zero unless the arc is selected, and is bounded by M if selected
+%@ con eq_0009 kind=big_m :: Mapping constraint: departure time on an arc is zero unless the arc is selected, and is bounded by M if selected
+%@ con eq_0010 kind=linear :: Travel and dwell time on an arc equals departure time minus arrival time
+%@ con eq_0011 kind=linear :: Minimum dwell and travel time: at least free-flow plus minimum dwell when the arc is used
+%@ con eq_0012 kind=linear :: Maximum dwell and travel time: at most free-flow plus maximum dwell when the arc is used
+%@ con eq_0013 kind=ordering :: Ordering mapping for same-direction trains: an ordering decision is forced when both trains use the same arc
+%@ con eq_0014 kind=ordering :: Ordering mapping for opposite-direction trains: an ordering decision is forced when both trains use the same physical segment in opposite directions
+%@ con eq_0015 kind=ordering :: Ordering variable is bounded above by the routing variable of train f (same direction)
+%@ con eq_0016 kind=ordering :: Ordering variable is bounded above by the routing variable of train f' (same direction)
+%@ con eq_0017 kind=ordering :: Ordering variable is bounded above by the routing variable of train f (opposite direction)
+%@ con eq_0018 kind=ordering :: Ordering variable is bounded above by the routing variable of train f' (opposite direction)
+%@ con eq_0019 kind=headway :: Headway for same direction, f before f': f' enters the arc only after f exits plus safety intervals
+%@ con eq_0020 kind=headway :: Headway for same direction, f' before f: f enters the arc only after f' exits plus safety intervals
+%@ con eq_0021 kind=headway :: Headway for opposite directions, f before f' on reverse arc: f' enters only after f exits plus safety intervals
+%@ con eq_0022 kind=headway :: Headway for opposite directions, f' before f on reverse arc: f enters only after f' exits plus safety intervals
+%@ con eq_0023 kind=capacity :: Capacity: if maintenance work p precedes train f on an arc, train f enters after p ends plus safety intervals
+%@ con eq_0024 kind=capacity :: Capacity: if train f precedes maintenance work p, p starts after f exits plus safety intervals
+%@ con eq_0025 kind=capacity :: Capacity for opposite directions: train f on the reverse arc enters after p ends plus safety intervals
+%@ con eq_0026 kind=capacity :: Capacity for opposite directions: maintenance p starts after train f exits the reverse arc plus safety intervals
+%@ con eq_0027 kind=linear :: Consecutive maintenance works: start time of a maintenance work is after the end time of the previous work on the same arc
+%@ con eq_0028 kind=linear :: Duration of a maintenance work equals its end time minus its start time
+%@ con eq_0029 kind=big_m :: Pairing constraint: if paired (y=1), start of p equals end of previous work; if not paired, the gap is only bounded by M
+%@ con eq_0030 kind=big_m :: Pairing constraint: when not paired, the start of a work is at least one time unit after the previous end; when paired, the gap can be zero
+%@ con eq_0031 kind=linear :: Deadline: each maintenance work ends within the time horizon
+%@ con eq_0032 kind=linear :: Deadline: each train exits the network within the time horizon
+%@ con eq_0033 kind=linear :: Routing stability: route chosen in the nominal scenario is kept in every scenario

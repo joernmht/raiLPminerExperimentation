@@ -1,0 +1,127 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.01.010
+%@ meta id=10.1016_j.trb.2017.01.010 family=lp schema=0.1.0
+%@ name :: Joint optimal train regulation and passenger flow control strategy for high-frequency metro lines
+%@ desc :: Mined from Joint optimal train regulation and passenger flow control strategy for high-frequency metro lines (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.01.010
+%@ prov reference :: Joint optimal train regulation and passenger flow control strategy for high-frequency metro lines
+%@ prov author :: Shukai Li; Maged Dessouky; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize sum of weighted squared timetable, headway and load errors plus control effort
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train i from station j
+%@ var r shape=- domain=continuous role=primary drole=- lo=- hi=- :: Running time of train i from station j to j+1
+%@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train i at station j
+%@ param R shape=- kind=matrix domain=- :: Nominal running time of train i between stations j and j+1
+%@ var u shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control input for train regulation (running time and dwell time adjustments)
+%@ param w shape=- kind=matrix domain=- :: Disturbance term affecting running and dwell times
+%@ param D shape=- kind=vector domain=- :: Minimum required dwell time at station j
+%@ var m shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers entering train i at station j
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers exiting train i at station j
+%@ var l shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger load of train i between stations j and j+1
+%@ var p shape=- domain=continuous role=primary drole=- lo=- hi=- :: Passenger flow control input (non-positive)
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: State vector combining departure time and passenger load
+%@ param A shape=- kind=matrix domain=- :: System matrix for joint departure-time and passenger-load dynamics
+%@ param B shape=- kind=matrix domain=- :: Coupling matrix for preceding train state
+%@ param C shape=- kind=matrix domain=- :: Control input matrix
+%@ param G shape=- kind=matrix domain=- :: Disturbance input matrix
+%@ var u_bar shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control vector combining train regulation and passenger flow control
+%@ param T shape=- kind=matrix domain=- :: Nominal departure time of train i from station j
+%@ param L shape=- kind=matrix domain=- :: Nominal passenger load of train i between stations j and j+1
+%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Error vector of departure time and passenger load deviations from nominal
+%@ var X shape=- domain=continuous role=primary drole=- lo=- hi=- :: State vector of joint dynamic model in matrix form
+%@ param A_bar shape=- kind=matrix domain=- :: System matrix in matrix form
+%@ param B_bar shape=- kind=matrix domain=- :: Control matrix in matrix form
+%@ param G_bar shape=- kind=matrix domain=- :: Disturbance matrix in matrix form
+%@ var E shape=- domain=continuous role=primary drole=- lo=- hi=- :: Error state vector in matrix form
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Cost function value
+%@ param P shape=- kind=matrix domain=- :: Weighting matrix for state errors
+%@ param Q shape=- kind=matrix domain=- :: Weighting matrix for headway deviations
+%@ index j ordered=0 cyclic=0 :: Station index
+%@ param H shape=- kind=scalar domain=- :: Scheduled headway between successive trains
+%@ param I shape=- kind=matrix domain=- :: Identity matrix or vector of ones
+%@ param F shape=- kind=matrix domain=- :: Matrix for state prediction in MPC
+%@ var V shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lyapunov function value
+%@ param P_bar shape=- kind=matrix domain=- :: Weighting matrix for state errors in QP
+%@ param Q_bar shape=- kind=matrix domain=- :: Weighting matrix for headway deviations in QP
+%@ param R_bar shape=- kind=matrix domain=- :: Weighting matrix for control inputs in QP
+%@ con eq_0001 kind=linear domain=- indicator=- :: Train departure time propagation: departure from station j+1 equals departure from j plus running and dwell times
+%@ con eq_0002 kind=linear domain=- indicator=- :: Running time equals nominal running time plus regulation control and disturbance
+%@ con eq_0003 kind=linear domain=- indicator=- :: Dwell time as affine function of boarding/alighting passengers plus minimum dwell, control and disturbance
+%@ con eq_0004 kind=linear domain=- indicator=- :: Combined train traffic dynamics for departure time with passenger-dependent dwell time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Passenger load update: load at next station equals load plus boardings minus alightings plus flow control
+%@ con eq_0006 kind=linear domain=- indicator=- :: Number of entering passengers proportional to headway between successive trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell time with passenger flow control added to boarding/alighting passenger count
+%@ con eq_0008 kind=linear domain=- indicator=- :: Number of exiting passengers proportional to current passenger load
+%@ con eq_0009 kind=linear domain=- indicator=- :: Combined passenger load dynamics with train traffic coupling
+%@ con eq_0010_a kind=linear domain=- indicator=- :: Joint dynamics: departure time evolution including passenger flow control
+%@ con eq_0010_b kind=linear domain=- indicator=- :: Joint dynamics: passenger load evolution including passenger flow control
+%@ con eq_0011 kind=linear domain=- indicator=- :: State-space joint dynamic model of departure time and passenger load
+%@ con eq_0012 kind=linear domain=- indicator=- :: Nominal departure time evolution under scheduled timetable
+%@ con eq_0013 kind=linear domain=- indicator=- :: Nominal passenger load evolution under scheduled timetable
+%@ con eq_0014 kind=linear domain=- indicator=- :: Error dynamics for deviations of departure time and passenger load from nominal
+%@ con eq_0015 kind=linear domain=- indicator=- :: Matrix-form joint dynamic model over stage k
+%@ con eq_0016 kind=linear domain=- indicator=- :: Matrix-form joint error dynamic model over stage k
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cost function summing weighted timetable errors, headway deviations and control effort
+%@ con eq_0018 kind=linear domain=- indicator=- :: Matrix-form cost function over prediction horizon
+%@ con eq_0019 kind=linear domain=- indicator=- :: Safety headway state constraint expressed as error constraint
+%@ con eq_0020 kind=linear domain=- indicator=- :: Train capacity state constraint expressed as load error constraint
+%@ con eq_0021 kind=linear domain=- indicator=- :: Control input bounds for running-time/dwell-time regulation and passenger flow control
+%@ con eq_0022 kind=linear domain=- indicator=- :: Matrix-form safety headway constraint H1(E_{k-1}-E_k) <= (H-t_min) ones
+%@ con eq_0023 kind=linear domain=- indicator=- :: Matrix-form passenger load capacity constraint H2 E_k <= L_k
+%@ con eq_0024 kind=linear domain=- indicator=- :: Matrix-form control upper and lower bound constraints
+%@ con eq_0027 kind=linear domain=- indicator=- :: State prediction over MPC horizon: stacked future states E = F E_k + Phi U
+%@ con eq_0030 kind=linear domain=- indicator=- :: Lyapunov function defined as the optimal value function V(k)=J(U*(k),E_k)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Lyapunov decrease inequality proving closed-loop stability
+%@ con eq_0032 kind=linear domain=- indicator=- :: Definition of matrices H3-H6 used in QP constraint reformulation
+%@ con eq_0033 kind=linear domain=- indicator=- :: Stacked passenger load capacity vector for the QP
+%@ con eq_0034 kind=linear domain=- indicator=- :: Stacked control upper/lower bounds for the QP
+%@ con eq_0035 kind=linear domain=- indicator=- :: Stacked objective weighting matrices for the QP
+%@ con eq_0036 kind=linear domain=- indicator=- :: Definition of prediction matrix F in the M-step state prediction
+%@ con eq_0037 kind=linear domain=- indicator=- :: Definition of prediction matrix Phi in the M-step state prediction
+%@ con eq_0038 kind=linear domain=- indicator=- :: QP objective matrix assembled from P_bar, Q_bar and R_bar
+%@ con eq_0039 kind=linear domain=- indicator=- :: QP cross-term matrix assembled from P_bar and Q_bar
+%@ con eq_0040 kind=linear domain=- indicator=- :: Stacked capacity vector L for the QP constraints
+%@ con eq_0041 kind=linear domain=- indicator=- :: Stacked control upper bound U_max_bar for the QP constraints
+%@ con eq_0042 kind=linear domain=- indicator=- :: Stacked control lower bound U_min_bar for the QP constraints
+\begin{align}
+  & \begin{matrix}t_{j + 1}^{i} = t_{j}^{i} + r_{j}^{i} + s_{j + 1}^{i} ,\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix}r_{j}^{i} = R_{j}^{i} + u_{1}_{j}^{i} + w_{1}_{j}^{i} ,\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}s_{j + 1}^{i} = \mathit{alpha} \left(m_{j + 1}^{i} + n_{j + 1}^{i}\right) + D_{j + 1} + u_{2}_{j + 1}^{i} + w_{2}_{j + 1}^{i} ,\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}t_{j + 1}^{i} = t_{j}^{i} + R_{j}^{i} + \mathit{alpha} \left(m_{j + 1}^{i} + n_{j + 1}^{i}\right) + D_{j + 1} + u_{j}^{i} + w_{j}^{i} ,\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}l_{j + 1}^{i} = l_{j}^{i} + m_{j + 1}^{i} - n_{j + 1}^{i} + p_{j + 1}^{i} .\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}m_{j + 1}^{i} = \mathit{gamma}_{j + 1}^{i} \left(t_{j + 1}^{i} - t_{j + 1}^{i - 1}\right) ,\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}s_{j + 1}^{i} = \mathit{alpha} \left(m_{j + 1}^{i} + n_{j + 1}^{i} + p_{j + 1}^{i}\right) + D_{j + 1} + u_{2}_{j + 1}^{i} + w_{2}_{j + 1}^{i} ,\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix}n_{j + 1}^{i} = \mathit{beta}_{j + 1}^{i} l_{j}^{i}\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}l_{j + 1}^{i} = l_{j}^{i} + \mathit{gamma}_{j + 1}^{i} \left(t_{j + 1}^{i} - t_{j + 1}^{i - 1}\right) - \mathit{beta}_{j + 1}^{i} l_{j}^{i} + p_{j + 1}^{i} ,\end{matrix} \tag{eq\_0009} \\
+  & t_{j + 1}^{i} = t_{j}^{i} + R_{j}^{i} + \mathit{alpha} \left(\mathit{gamma}_{j + 1}^{i} \left(t_{j + 1}^{i} - t_{j + 1}^{i - 1}\right) + \mathit{beta}_{j + 1}^{i} l_{j}^{i} + p_{j + 1}^{i}\right) + D_{j + 1} + u_{j}^{i} + w_{j}^{i} \tag{eq\_0010\_a} \\
+  & l_{j + 1}^{i} = l_{j}^{i} + \mathit{gamma}_{j + 1}^{i} \left(t_{j + 1}^{i} - t_{j + 1}^{i - 1}\right) - \mathit{beta}_{j + 1}^{i} l_{j}^{i} + p_{j + 1}^{i} \tag{eq\_0010\_b} \\
+  & \begin{matrix}x_{j + 1}^{i} = A_{j}^{i} \cdot x_{j}^{i} + B_{j}^{i} \cdot x_{j + 1}^{i - 1} + C_{j}^{i} \left(\bar{u}\right)_{j}^{i} + G_{j}^{i} \left(D_{j + 1} + R_{j}^{i} + w_{j}^{i}\right) .\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}T_{j + 1}^{i} = T_{j}^{i} + R_{j}^{i} + \mathit{alpha} \left(\mathit{gamma}_{j + 1}^{i} \left(T_{j + 1}^{i} - T_{j + 1}^{i - 1}\right) + \mathit{beta}_{j + 1}^{i} L_{j}^{i}\right) + D_{j + 1}\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix}L_{j + 1}^{i} = L_{j}^{i} + \mathit{gamma}_{j + 1}^{i} \left(T_{j + 1}^{i} - T_{j + 1}^{i - 1}\right) - \mathit{beta}_{j + 1}^{i} L_{j}^{i} .\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix}e_{j + 1}^{i} = A_{j}^{i} \cdot e_{j}^{i} + B_{j}^{i} \cdot e_{j + 1}^{i - 1} + C_{j}^{i} \left(\bar{u}\right)_{j}^{i} + G_{j}^{i} \cdot w_{j}^{i} .\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix}X_{k + 1} = \left(\bar{A}\right)_{k} X_{k} + \left(\bar{B}\right)_{k} U_{k} + \left(\bar{G}\right)_{k} \left(w_{k} + R_{k} + D\right) ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}E_{k + 1} = \left(\bar{A}\right)_{k} E_{k} + \left(\bar{B}\right)_{k} U_{k} + \left(\bar{G}\right)_{k} w_{k} ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix}J = \sum_{i , j} \left\{e_{j}^{i}^{T} \cdot P_{j}^{i} \cdot e_{j}^{i} + \left(e_{j}^{i} - e_{j}^{i - 1}\right)^{T} Q_{j}^{i} \left(e_{j}^{i} - e_{j}^{i - 1}\right) + \left(\left(\bar{u}\right)_{j}^{i}\right)^{T} R_{j}^{i} \left(\bar{u}\right)_{j}^{i}\right\} ,\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}J = \sum_{k = j_{0}}^{j_{f}} \left\{E_{k}^{T} \cdot P \cdot E_{k} + \left(E_{k + 1} - E_{k}\right)^{T} Q \left(E_{k + 1} - E_{k}\right) + U_{k}^{T} R U_{k}\right\} ,\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix}\left(t_{j}^{i} - T_{j}^{i}\right) - \left(t_{j}^{i - 1} - T_{j}^{i - 1}\right) \geq t_{min} - H ,\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix}\left(l_{j}^{i} - L_{j}^{i}\right) \leq l_{max} - L_{j}^{i} ,\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix}\left[u_{min} , p_{min}\right]^{T} \leq \left(\bar{u}\right)_{j}^{i} \leq \left[u_{max} , p_{max}\right]^{T}\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix}H_{1} \left(E_{k - 1} - E_{k}\right) \leq \left(H - t_{min}\right) I_{N \cdot 1} ,\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix}H_{2} \cdot E_{k} \leq L_{k} ,\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix}U_{k} \leq U_{max} , - U_{k} \leq - U_{min} ,\end{matrix} \tag{eq\_0024} \\
+  \begin{matrix}\quad & & & \underset{U_{k}}{\text{min}} \sum_{k = j_{0}}^{j_{f}} \left\{E_{k}^{T} \cdot P \cdot E_{k} + \left(E_{k} - E_{k - 1}\right)^{T} Q \left(E_{k} - E_{k - 1}\right) + U_{k}^{T} R U_{k}\right\} \\ & & \text{s}.\text{t}. E_{k + 1} = \left(\bar{A}\right)_{k} E_{k} + \left(\bar{B}\right)_{k} U_{k} + \left(\bar{G}\right)_{k} w_{k} , \\ & & H_{1} \left(E_{k - 1} - E_{k}\right) \leq \left(H - t_{min}\right) I_{N \cdot 1} , \\ & & H_{2} \cdot E_{k} \leq L_{k} , \\ & & U_{k} \leq U_{max} , \\ & & - U_{k} \leq - U_{min} .\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix}E = F \cdot E_{k} + \mathit{Phi} U ,\end{matrix} \tag{eq\_0027} \\
+  & \begin{matrix}V \left(k\right) = J \left(U^{\star} \left(k\right) , E_{k}\right) ,\end{matrix} \tag{eq\_0030} \\
+  & \begin{aligned}V \left(k + 1\right) & = & J \left(U^{\star} \left(k + 1\right) , E_{k + 1}\right) \\ & \leq & J \left(U \left(k + 1\right) , E_{k + 1}\right) \\ & = & V \left(k\right) - E_{k + 1}^{T} \cdot P \cdot E_{k + 1} - \left(E_{k + 1} - E_{k}\right)^{T} Q \left(E_{k + 1} - E_{k}\right) - U_{k}^{T} R U_{k} ,\end{aligned} \tag{eq\_0031} \\
+  & \begin{aligned}t_{j + 1}^{i} & = & \frac{1}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} - \frac{\mathit{alpha} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j + 1}^{i - 1} + \frac{\mathit{alpha} \mathit{beta}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} l_{j}^{i} + \frac{\mathit{alpha}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} p_{j + 1}^{i} + \frac{1}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} D_{j + 1} \\ & & + \frac{1}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} R_{j}^{i} + \frac{1}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} u_{j}^{i} + \frac{1}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} \cdot w_{j}^{i} .\end{aligned} \tag{eq\_0032} \\
+  & \begin{aligned}l_{j + 1}^{i} & = & \left(1 - \mathit{beta}_{j + 1}^{i}\right) l_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} - \left(\frac{\mathit{alpha} \mathit{gamma}_{j + 1}^{i}^{2}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} + \mathit{gamma}_{j + 1}^{i}\right) t_{j + 1}^{i - 1} + \frac{\mathit{alpha} \mathit{beta}_{j + 1}^{i} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} l_{j}^{i} + \frac{\mathit{alpha} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} p_{j + 1}^{i} \\ & & + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} D_{j + 1} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} R_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} u_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} \cdot w_{j}^{i} + p_{j + 1}^{i} ,\end{aligned} \tag{eq\_0033} \\
+  & \begin{aligned}l_{j + 1}^{i} & = & \left(1 - \mathit{beta}_{j + 1}^{i}\right) l_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} - \left(\frac{\mathit{alpha} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}}\right) t_{j + 1}^{i - 1} + \frac{\mathit{alpha} \mathit{beta}_{j + 1}^{i} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} l_{j}^{i} + \frac{\mathit{alpha} \mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} p_{j + 1}^{i} \\ & & + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} D_{j + 1} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} R_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} u_{j}^{i} + \frac{\mathit{gamma}_{j + 1}^{i}}{1 - \mathit{alpha} \mathit{gamma}_{j + 1}^{i}} t_{j}^{i} \cdot w_{j}^{i} + p_{j + 1}^{i} .\end{aligned} \tag{eq\_0034} \\
+  & \begin{matrix}x_{j + 1}^{i} = A_{j}^{i} \cdot x_{j}^{i} + B_{j}^{i} \cdot x_{j + 1}^{i - 1} + C_{j}^{i} \left(\bar{u}\right)_{j}^{i} + G_{j}^{i} \left(D_{j + 1} + R_{j}^{i} + w_{j}^{i}\right) .\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix}\left(t_{j + 1}^{i} - T_{j + 1}^{i}\right) = \left(t_{j}^{i} - T_{j + 1}^{i}\right) + \mathit{alpha} \left(\mathit{gamma}_{j + 1}^{i} \left(\left(t_{j + 1}^{i} - T_{j + 1}^{i}\right) - \left(t_{j + 1}^{i - 1} - T_{j + 1}^{i - 1}\right)\right) + \mathit{beta}_{j + 1}^{i} \left(l_{j}^{i} - L_{j}^{i}\right) + p_{j + 1}^{i}\right) + u_{j}^{i} + w_{j}^{i} .\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix}\left(l_{j + 1}^{i} - L_{j + 1}^{i}\right) = \left(l_{j}^{i} - L_{j}^{i}\right) + \mathit{gamma}_{j + 1}^{i} \left(\left(t_{j + 1}^{i} - T_{j + 1}^{i}\right) - \left(t_{j + 1}^{i - 1} - T_{j + 1}^{i - 1}\right)\right) - \mathit{beta}_{j + 1}^{i} \left(l_{j}^{i} - L_{j}^{i}\right) + p_{j + 1}^{i} .\end{matrix} \tag{eq\_0037} \\
+  & \begin{matrix}e_{j + 1}^{i} = A_{j}^{i} \cdot e_{j}^{i} + B_{j}^{i} \cdot e_{j + 1}^{i - 1} + C_{j}^{i} \left(\bar{u}\right)_{j}^{i} + G_{j}^{i} \cdot w_{j}^{i} .\end{matrix} \tag{eq\_0038} \\
+  & \begin{matrix}E^{T} \bar{P} E + E^{T} \bar{Q} E + U^{T} \bar{R} U\end{matrix} \tag{eq\_0039} \\
+  & \begin{matrix} & & E^{T} \bar{P} E + E^{T} \bar{Q} E + U^{T} \bar{R} U \\ & & = \left(F \cdot E_{k} + \mathit{Phi} U\right)^{T} \bar{P} \left(F \cdot E_{k} + \mathit{Phi} U\right) + \left(F \cdot E_{k} + \mathit{Phi} U\right)^{T} \bar{Q} \left(F \cdot E_{k} + \mathit{Phi} U\right) + U^{T} \bar{R} U \\ & & = U^{T} \left(\mathit{Phi}^{T} \bar{P} \mathit{Phi} + \mathit{Phi}^{T} \bar{Q} \mathit{Phi} + \bar{R}\right) U + 2 U^{T} \left(\mathit{Phi}^{T} \bar{P} F \cdot E_{k} + \mathit{Phi}^{T} \bar{Q} F \cdot E_{k}\right) + F^{T} \bar{P} F \cdot E_{k}^{2} + F^{T} \bar{Q} F \cdot E_{k}^{2} ,\end{matrix} \tag{eq\_0040} \\
+  & \begin{matrix}H_{3} \cdot H_{4} \cdot E + H_{3} \cdot H_{5} \cdot E_{k} \leq \left(H - t_{min}\right) I_{M N \cdot 1} ,\end{matrix} \tag{eq\_0041} \\
+  & \begin{matrix}H_{3} \cdot H_{4} \mathit{Phi} U \leq \left(H - t_{min}\right) I_{M N \cdot 1} - H_{3} \cdot H_{4} \cdot F \cdot E_{k} - H_{3} \cdot H_{5} \cdot E_{k} ,\end{matrix} \tag{eq\_0042} \\
+\end{align}

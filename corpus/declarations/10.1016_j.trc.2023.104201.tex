@@ -1,0 +1,106 @@
+% Declaration sidecar for 10.1016_j.trc.2023.104201
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2023.104201
+% Network periodic train timetabling with integrated stop planning and passenger routing: A periodic time–space network construct and ADMM algorithm
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2023.104201.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total train operation cost and passenger travel cost
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Time-space vertex in the network
+
+% x: classified as variable during review
+%@ var x shape=I,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train i uses arc g
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of trains
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of time-space vertices
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Dummy source node
+
+% v: classified as parameter during review
+%@ param v shape=- kind=scalar domain=- :: Dummy sink node
+
+% unusable as an identifier, rename or drop: δ
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Station index
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of stations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+
+% unusable as an identifier, rename or drop: Ψ
+% unusable as an identifier, rename or drop: ϖ
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Frequency of train line
+
+% k: classified as parameter during review
+%@ param k shape=- kind=scalar domain=- :: Index of train in a line
+
+% unusable as an identifier, rename or drop: ξ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs
+
+% y: classified as variable during review
+%@ var y shape=R,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger group r uses arc g
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of passenger groups
+
+% h: classified as parameter during review
+%@ param h shape=I kind=vector domain=- :: Capacity of train i
+
+% z: classified as parameter during review
+%@ param z shape=R kind=vector domain=- :: Number of passengers in group r
+
+% c: classified as parameter during review
+%@ param c shape=I,A kind=matrix domain=- :: Cost of using arc g for train i or passenger group r
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Objective function value
+
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: π
+% unusable as an identifier, rename or drop: ρ
+% Bound by a quantifier or big operator, so no declaration of their own: g, i, r, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0012 kind=linear domain=- indicator=- :: Train flow conservation constraint
+%@ con eq_0013 kind=linear domain=- indicator=- :: Track capacity constraint
+%@ con eq_0014 kind=linear domain=- indicator=- :: Train flexible regularity constraint
+%@ con eq_0017 kind=linear domain=- indicator=- :: Passenger flow conservation constraint
+%@ con eq_0018 kind=linear domain=- indicator=- :: Train capacity constraint
+%@ con eq_0020 kind=linear domain=- indicator=- :: Variable domain constraint
+%@ con eq_0022 kind=linear domain=- indicator=- :: Objective function definition
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Train subproblem flow balance constraint
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Train subproblem track capacity constraint
+%@ con eq_0037_a kind=linear domain=- indicator=- :: Passenger subproblem flow balance constraint
+%@ con eq_0037_b kind=linear domain=- indicator=- :: Passenger subproblem train capacity constraint
+%@ con eq_0049 kind=linear domain=- indicator=- :: ADMM multiplier update for track capacity constraint
+%@ con eq_0051 kind=linear domain=- indicator=- :: ADMM multiplier update for train capacity constraint

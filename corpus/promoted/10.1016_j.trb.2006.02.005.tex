@@ -1,0 +1,26 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2006.02.005
+%@ meta id=10.1016_j.trb.2006.02.005 family=lp schema=0.1.0
+%@ name :: A traffic management system for real-time traffic optimisation in railways
+%@ desc :: Mined from A traffic management system for real-time traffic optimisation in railways (Transportation Research Part B Methodological, 2006).
+%@ prov source :: 10.1016/j.trb.2006.02.005
+%@ prov reference :: A traffic management system for real-time traffic optimisation in railways
+%@ prov author :: Maura Mazzarello; Ennio Ottaviani
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: minimise total journey time loss
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: time of event
+%@ index F ordered=0 cyclic=0 :: set of precedence constraints
+%@ param f shape=i,j kind=matrix domain=- :: minimum time difference for precedence
+%@ index i ordered=0 cyclic=0 :: index for event
+%@ index j ordered=0 cyclic=0 :: index for event
+%@ param a shape=i,j kind=matrix domain=- :: minimum time difference for alternative
+%@ index A ordered=0 cyclic=0 :: set of alternative constraints
+%@ index h ordered=0 cyclic=0 :: index for event
+%@ index k ordered=0 cyclic=0 :: index for event
+%@ con eq_0001_b kind=linear domain=- indicator=- :: precedence constraint
+%@ con eq_0001_c kind=linear domain=- indicator=- :: alternative constraint
+\begin{align}
+  \min\quad & t_{n} - t_{0} \tag{eq\_0001\_a} \\
+  & t_{j} - t_{i} > f_{\mathit{ij}} \left(i , j\right) \in F \tag{eq\_0001\_b} \\
+  & \left(t_{j} - t_{i} > a_{\mathit{ij}}\right) \vee \left(t_{h} - t_{k} > a_{\mathit{hk}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0001\_c} \\
+\end{align}

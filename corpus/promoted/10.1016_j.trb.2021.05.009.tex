@@ -1,0 +1,134 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2021.05.009
+%@ meta id=10.1016_j.trb.2021.05.009 family=milp schema=0.1.0
+%@ name :: An exact method for the integrated optimization of subway lines operation strategies with asymmetric passenger demand and operating costs
+%@ desc :: Mined from An exact method for the integrated optimization of subway lines operation strategies with asymmetric passenger demand and operating costs (Transportation Research Part B Methodological, 2021).
+%@ prov source :: 10.1016/j.trb.2021.05.009
+%@ prov reference :: An exact method for the integrated optimization of subway lines operation strategies with asymmetric passenger demand and operating costs
+%@ prov author :: Pengli Mo; Andrea D’Ariano; Lixing Yang; Lucas P. Veelenturf; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of normalized passenger service quality and operating costs
+%@ index N ordered=0 cyclic=0 :: Set of effective services in a direction
+%@ index k ordered=0 cyclic=0 :: Index for services
+%@ index T ordered=0 cyclic=0 :: Set of discrete times
+%@ index d ordered=0 cyclic=0 :: Departure time variable
+%@ param Nbar shape=- kind=scalar domain=- :: Maximum difference between the number of effective services in the two directions
+%@ param H shape=- kind=scalar domain=- :: Headway between services
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var a shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of a service at a station
+%@ index o ordered=0 cyclic=0 :: Off-peak period indicator
+%@ index r ordered=0 cyclic=0 :: Index for speed profile
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for speed profile selection on a segment
+%@ index L ordered=0 cyclic=0 :: Set of speed profiles for a segment
+%@ param Tbar shape=- kind=scalar domain=- :: Upper bound for turn-back time
+%@ index j ordered=0 cyclic=0 :: Index for destination station
+%@ param P shape=S,j,T kind=matrix domain=- :: Passenger demand matrix
+%@ param pt shape=- kind=scalar domain=- :: Passenger travel time
+%@ param W shape=- kind=scalar domain=- :: Weight for waiting time
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers traversing a segment
+%@ param C shape=- kind=scalar domain=- :: Cost coefficient
+%@ param U shape=- kind=scalar domain=- :: Utilization cost
+%@ param D shape=- kind=scalar domain=- :: Maximum number of available rolling stock units
+%@ param M shape=- kind=scalar domain=- :: Maintenance cost
+%@ param E shape=- kind=scalar domain=- :: Energy consumption
+%@ var e shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption over a segment at a time
+%@ var obj shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ param w shape=- kind=scalar domain=- :: Weight for objective components
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Contribution function in dynamic programming
+%@ con eq_0001 kind=linear domain=- indicator=- :: Upstream service is effective only if it departs in time to meet the planning horizon
+%@ con eq_0002 kind=linear domain=- indicator=- :: Downstream service is effective only if it departs in time to meet the planning horizon
+%@ con eq_0003 kind=linear domain=- indicator=- :: Limits the absolute difference in the number of effective upstream and downstream services
+%@ con eq_0004 kind=linear domain=- indicator=- :: Peak and off-peak upstream services together form the upstream service set
+%@ con eq_0005 kind=linear domain=- indicator=- :: Peak and off-peak upstream services are disjoint
+%@ con eq_0006 kind=linear domain=- indicator=- :: Peak and off-peak downstream services together form the downstream service set
+%@ con eq_0007 kind=linear domain=- indicator=- :: Peak and off-peak downstream services are disjoint
+%@ con eq_0008 kind=linear domain=- indicator=- :: Defines departure times of upstream services with peak/off-peak headways
+%@ con eq_0009 kind=linear domain=- indicator=- :: Defines departure times of downstream services with peak/off-peak headways
+%@ con eq_0010 kind=linear domain=- indicator=- :: Dwell time relationship between arrival and departure at a station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Running time relationship linking arrival to previous departure and speed profile
+%@ con eq_0012 kind=linear domain=- indicator=- :: Exactly one speed profile is selected per segment
+%@ con eq_0013 kind=linear domain=- indicator=- :: Turn-back connection at depot 1: alpha relation for upstream service
+%@ con eq_0014 kind=linear domain=- indicator=- :: Turn-back connection at depot 1: beta relation for downstream service
+%@ con eq_0015 kind=linear domain=- indicator=- :: Lower bound on the turn-back time at depot 1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Upper bound on the turn-back time at depot 1
+%@ con eq_0017 kind=linear domain=- indicator=- :: Depot-1 connection is allowed only when the upstream service starts from the depot
+%@ con eq_0018 kind=linear domain=- indicator=- :: Depot-1 connection is allowed only when the downstream service ends at the depot
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum connection time through depot 1
+%@ con eq_0020 kind=linear domain=- indicator=- :: Number of rolling stock units dispatched from depot 1
+%@ con eq_0021 kind=linear domain=- indicator=- :: Total passenger waiting time
+%@ con eq_0022 kind=linear domain=- indicator=- :: Last upstream service must be no earlier than the last passenger arrival
+%@ con eq_0023 kind=linear domain=- indicator=- :: Last downstream service must be no earlier than the last passenger arrival
+%@ con eq_0024 kind=linear domain=- indicator=- :: Total passenger travel time
+%@ con eq_0025 kind=linear domain=- indicator=- :: Rolling stock utilization cost
+%@ con eq_0026 kind=linear domain=- indicator=- :: Fleet size availability constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Maintenance cost
+%@ con eq_0028 kind=linear domain=- indicator=- :: Energy cost
+%@ con eq_0029 kind=linear domain=- indicator=- :: Energy consumption over a segment pair with regenerative braking
+%@ con eq_0030 kind=linear domain=- indicator=- :: Mapping from upstream operation strategy to electric power profiles
+%@ con eq_0031 kind=linear domain=- indicator=- :: Mapping from downstream operation strategy to electric power profiles
+%@ con eq_0038 kind=linear domain=- indicator=- :: Depot 2 counterpart of the alpha definition in Eq. (13)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Depot 2 counterpart of the beta definition in Eq. (14)
+%@ con eq_0040 kind=linear domain=- indicator=- :: Depot 2 counterpart of the turn-back lower-bound constraint in Eq. (15)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Depot 2 counterpart of the turn-back upper-bound constraint in Eq. (16)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Depot 2 counterpart of the depot-connection alpha constraint in Eq. (17)
+%@ con eq_0043 kind=linear domain=- indicator=- :: Depot 2 counterpart of the depot-connection beta constraint in Eq. (18)
+%@ con eq_0044 kind=linear domain=- indicator=- :: Depot 2 counterpart of the minimum depot-connection time constraint in Eq. (19)
+%@ con eq_0045 kind=linear domain=- indicator=- :: Depot 2 counterpart of the dispatched rolling stock count in Eq. (20)
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint (51) in the forward dynamic programming formulation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint (52) in the forward dynamic programming formulation
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint (53) in the forward dynamic programming formulation
+%@ con eq_0054 kind=linear domain=- indicator=- :: Constraint (54) in the forward dynamic programming formulation
+%@ con eq_0055 kind=linear domain=- indicator=- :: Constraint (55) in the forward dynamic programming formulation
+%@ con eq_0056 kind=linear domain=- indicator=- :: Constraint (56) in the forward dynamic programming formulation
+%@ con eq_0057 kind=linear domain=- indicator=- :: Constraint (57) in the forward dynamic programming formulation
+%@ con eq_0058 kind=linear domain=- indicator=- :: Constraint (58) in the forward dynamic programming formulation
+\begin{align}
+  & k \in {\mathcal{N}} \Leftrightarrow d_{k , S} \leq T , \forall k \in \left({\mathcal{N}}\right)_{m a x} \tag{eq\_0001} \\
+  & k \in {\mathcal{N}} \Leftrightarrow d_{k , 2 S} \leq T , \forall k \in \left({\mathcal{N}}\right)_{m a x} \tag{eq\_0002} \\
+  & \left|\right. {N} - {N} \left|\right. \leq \left(\bar{N}\right)^{\left(e\right)} \tag{eq\_0003} \\
+  & \left({\mathcal{N}}\right)^{\left(p\right)} \cup \left({\mathcal{N}}\right)^{\left(o\right)} = {\mathcal{N}} \tag{eq\_0004} \\
+  & \left({\mathcal{N}}\right)^{\left(p\right)} \cap \left({\mathcal{N}}\right)^{\left(o\right)} = \emptyset \tag{eq\_0005} \\
+  & \left({\mathcal{N}}\right)^{\left(p\right)} \cup \left({\mathcal{N}}\right)^{\left(o\right)} = {\mathcal{N}} \tag{eq\_0006} \\
+  & \left({\mathcal{N}}\right)^{\left(p\right)} \cap \left({\mathcal{N}}\right)^{\left(o\right)} = \emptyset \tag{eq\_0007} \\
+  & d_{k , 1} = \left\{\right. \begin{matrix}d_{k - 1 , 1} + H^{\left(p\right)} , k \in \left({\mathcal{N}}\right)^{\left(p\right)} , & \\ d_{k - 1 , 1} + H^{\left(o\right)} , k \in \left({\mathcal{N}}\right)^{\left(o\right)} , & \end{matrix} \forall k \in {\mathcal{N}} \backslash \left\{1\right\} \tag{eq\_0008} \\
+  & d_{k , 2 S} = \left\{\right. \begin{matrix}d_{k - 1 , 2 S} + H^{\left(p\right)} , \forall k \in \left({\mathcal{N}}\right)^{\left(p\right)} , & \\ d_{k - 1 , 2 S} + H^{\left(o\right)} , \forall k \in \left({\mathcal{N}}\right)^{\left(o\right)} , & \end{matrix} \forall k \in {\mathcal{N}} \backslash \left\{1\right\} \tag{eq\_0009} \\
+  & d_{k , i} = a_{k , i} + T_{i}^{\left(d\right)} , \forall k \in {\mathcal{N}} , i \in {\mathcal{S}} o \cdot r \forall k \in {\mathcal{N}} , i \in {\mathcal{S}} , \tag{eq\_0010} \\
+  & a_{k , i} = d_{k , i - 1} + \sum_{l \in \mathcal{L}_{i}} x_{i , l} \cdot T_{i - 1 , l}^{\left(t\right)} , \forall k \in {\mathcal{N}} , i \in {\mathcal{S}} \backslash \left\{1\right\} o \cdot r \forall k \in {\mathcal{N}} , i \in {\mathcal{S}} \backslash \left\{S + 1\right\} . \tag{eq\_0011} \\
+  & \sum_{l \in \mathcal{L}_{i}} x_{i , l} = 1 , \forall i \in \mathcal{S} \backslash \left\{S , 2 \cdot S\right\} . \tag{eq\_0012} \\
+  & \mathit{alpha}_{k^{'}}^{\left(1\right)} = 1 - \underset{k \in {\mathcal{N}}}{\sum} \mathit{gamma}_{k , k^{'}}^{\left(1\right)} , \forall k^{'} \in {\mathcal{N}} , \tag{eq\_0013} \\
+  & \mathit{beta}_{k}^{\left(1\right)} = 1 - \underset{k^{'} \in {\mathcal{N}}}{\sum} \mathit{gamma}_{k , k^{'}}^{\left(1\right)} , \forall k \in {\mathcal{N}} , \tag{eq\_0014} \\
+  & a_{k^{'} , 1} - d_{k , 2 S} \geq \left(\underset{̲}{T}\right)^{\left(l\right)} - T \left(1 - \mathit{gamma}_{k , k^{'}}^{\left(1\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} , \tag{eq\_0015} \\
+  & a_{k^{'} , 1} - d_{k , 2 S} \leq \left(\bar{T}\right)^{\left(l\right)} + T \left(1 - \mathit{gamma}_{k , k^{'}}^{\left(1\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} . \tag{eq\_0016} \\
+  & \underset{k \in {\mathcal{N}}}{\sum} \mathit{chi}_{k , k^{'}}^{\left(1\right)} \leq \mathit{alpha}_{k^{'}}^{\left(1\right)} , \forall k^{'} \in {\mathcal{N}} , \tag{eq\_0017} \\
+  & \underset{k^{'} \in {\mathcal{N}}}{\sum} \mathit{chi}_{k , k^{'}}^{\left(1\right)} \leq \mathit{beta}_{k}^{\left(1\right)} , \forall k \in {\mathcal{N}} , \tag{eq\_0018} \\
+  & a_{k^{'} , 1} - d_{k , 2 S} \geq \left(\underset{̲}{T}\right)^{\left(1\right)} - T \left(1 - \mathit{chi}_{k , k^{'}}^{\left(1\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} , \tag{eq\_0019} \\
+  & \mathit{phi}^{\left(1\right)} = \underset{k^{'} \in {\mathcal{N}}}{\sum} \left[1 - \underset{k \in {\mathcal{N}}}{\sum} \left(\mathit{chi}_{k , k^{'}}^{\left(1\right)} + \mathit{gamma}_{k , k^{'}}^{\left(1\right)}\right)\right] . \tag{eq\_0020} \\
+  & P \cdot W = \underset{k \in {\mathcal{N}}}{\sum} \underset{i \in {\mathcal{S}}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i}}{\sum} \sum_{t = d_{k - 1 , i}}^{d_{k , i} - 1} \left(d_{k , i} - t\right) P_{i , j , t} + \underset{k \in {\mathcal{N}}}{\sum} \underset{i \in {\mathcal{S}}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i}}{\sum} \sum_{t = d_{k - 1 , i}}^{d_{k , i} - 1} \left(d_{k , i} - t\right) P_{i , j , t} . \tag{eq\_0021} \\
+  & d_{{N} , i} \geq T_{i}^{\left(p\right)} \forall i \in {\mathcal{S}} \tag{eq\_0022} \\
+  & d_{{N} , i} \geq T_{i}^{\left(p\right)} \forall i \in {\mathcal{S}} . \tag{eq\_0023} \\
+  & \begin{matrix}P \cdot T = \sum_{i \in \mathcal{S} \backslash \left\{S , 2 S\right\}} n_{i} \left(\sum_{l \in \mathcal{L}_{i}} T_{i , l}^{\left(t\right)} \cdot x_{i , l}\right) ,\end{matrix} \tag{eq\_0024} \\
+  & n_{i} = \underset{\genfrac{}{}{0pt}{}{i^{'} \in {\mathcal{S}} ;}{i^{'} \leq i}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i}}{\sum} \sum_{t \in \mathcal{T}} P_{i^{'} , j , t} , \forall i \in {\mathcal{S}} \backslash \left\{S\right\} , \tag{eq\_0025} \\
+  & n_{i} = \underset{\genfrac{}{}{0pt}{}{i^{'} \in {\mathcal{S}} ;}{i^{'} \leq i}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i}}{\sum} \sum_{t \in \mathcal{T}} P_{i^{'} , j , t} , \forall i \in {\mathcal{S}} \backslash \left\{2 \cdot S\right\} . \tag{eq\_0026} \\
+  & C \cdot U = C^{\left(u\right)} \cdot \left(\mathit{phi}^{\left(1\right)} + \mathit{phi}^{\left(2\right)}\right) . \tag{eq\_0027} \\
+  & \mathit{phi}^{\left(1\right)} + \mathit{phi}^{\left(2\right)} \leq D . \tag{eq\_0028} \\
+  & C \cdot M = C^{\left(s\right)} \cdot \left({N} + {N}\right) + C_{1}^{\left(m\right)} \cdot \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(1\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(1\right)}\right) + C_{2}^{\left(m\right)} \cdot \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(2\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(2\right)}\right) . \tag{eq\_0029} \\
+  & C \cdot E = C^{\left(e\right)} \cdot \left[E_{1} \cdot \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(1\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(1\right)}\right) + E_{2} \cdot \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(2\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(2\right)}\right) + \underset{i \in {\mathcal{S}} \backslash \left\{S\right\}}{\sum} \sum_{\mathit{tau} \in \mathfrak{T}} e_{i} \left(\mathit{tau}\right)\right] . \tag{eq\_0030} \\
+  & e_{i} \left(\mathit{tau}\right) = max \left\{\left[r_{i}^{\left(a\right)} \left(\mathit{tau}\right) + r_{2 S - i}^{\left(a\right)} \left(\mathit{tau}\right) - \left(r_{i}^{\left(b\right)} \left(\mathit{tau}\right) + r_{2 S - i}^{\left(b\right)} \left(\mathit{tau}\right)\right) \cdot \mathit{eta}\right] \cdot \mathit{sigma} , 0\right\} \forall i \in {\mathcal{S}} \backslash \left\{S\right\} , \mathit{tau} \in \mathfrak{T} \tag{eq\_0031} \\
+  \mathit{obj}\quad & = min w_{p} \cdot \frac{w_{w} \cdot P \cdot W + P \cdot T}{\mathit{obj}_{p , n o m}} + w_{c} \cdot \frac{C \cdot U + C \cdot M + C \cdot E}{\mathit{obj}_{c , n o m}} . \tag{eq\_0034} \\
+  & d_{1 , i} = \left\{\right. \begin{matrix}d_{1 , 1} , & i = 1 \\ d_{1 , i - 1} + T_{i}^{\left(d\right)} + \sum_{l \in \mathcal{L}_{i - 1}} x_{i - 1 , l} \cdot T_{i - 1 , l}^{\left(t\right)} , & i \in {\mathcal{S}} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0038} \\
+  & d_{1 , 2 S - i + 1} = \left\{\right. \begin{matrix}d_{1 , 2 S} , & i = 1 \\ d_{1 , i^{'} + 1} - T_{i^{'} + 1}^{\left(d\right)} - \underset{l \in \mathcal{L}_{i^{'}}}{\sum} x_{i^{'} , l} \cdot T_{i^{'} , l}^{\left(t\right)} , & i \in {\mathcal{S}} \backslash \left\{1\right\} , i^{'} = 2 \cdot S - i + 1\end{matrix} \tag{eq\_0039} \\
+  & F_{i} \left(s_{i} , u_{i} , s_{i + 1}\right) = \left\{\right. \begin{matrix}w_{p} \cdot \frac{w_{w} \cdot P \cdot W_{i + 1} + P \cdot T_{i}}{\mathit{obj}_{p , n o m}} + w_{c} \cdot \frac{C \cdot E_{i}}{\mathit{obj}_{c , n o m}} , & i \in {\mathcal{S}} \backslash \left\{S\right\} \\ w_{c} \cdot \frac{C \cdot U + C \cdot M + C \cdot E_{S}}{\mathit{obj}_{c , n o m}} , & i = S\end{matrix} , \tag{eq\_0040} \\
+  & P \cdot W_{i} = \underset{k \in {\mathcal{N}}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i}}{\sum} \sum_{t = d_{k - 1 , i}}^{d_{k , i} - 1} \left(d_{k , i} - t\right) \cdot P_{i , j , t} + \underset{k \in {\mathcal{N}}}{\sum} \underset{\genfrac{}{}{0pt}{}{j \in {\mathcal{S}} ;}{j > i^{'}}}{\sum} \sum_{t = d_{k - 1 , i^{'}}}^{d_{k , i^{'}} - 1} \left(d_{k , i^{'}} - t\right) \cdot P_{i^{'} , j , t} , \tag{eq\_0041} \\
+  & \begin{matrix}P \cdot T_{i} = \left(\sum_{l \in \mathcal{L}_{i}} T_{i , l}^{\left(t\right)} \cdot x_{i , l}\right) \cdot n_{i} + \left(\underset{l \in \mathcal{L}_{i^{'}}}{\sum} T_{i^{'} , l}^{\left(t\right)} \cdot x_{i^{'} , l}\right) \cdot n_{i^{'}} , \end{matrix} \tag{eq\_0042} \\
+  & C \cdot E_{i} = \left\{\right. \begin{matrix}\sum_{\mathit{tau} \in \mathfrak{T}} e_{i} \left(\mathit{tau}\right) , & i \in {\mathcal{S}} \backslash \left\{S\right\} \\ C^{\left(1\right)} \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(1\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(1\right)}\right) + C^{\left(2\right)} \left(\underset{k \in {\mathcal{N}}}{\sum} \mathit{alpha}_{k}^{\left(2\right)} + \underset{k \in {\mathcal{N}}}{\sum} \mathit{beta}_{k}^{\left(2\right)}\right) , & i = S\end{matrix} \tag{eq\_0043} \\
+  & \mathit{Psi}_{i + 1}^{\star} \left(s_{i + 1}\right) = \underset{s_{i}}{min} \left\{\mathit{Psi}_{i}^{\star} \left(s_{i}\right) + \underset{u_{i}}{min} F_{i} \left(s_{i} , u_{i} , s_{i + 1}\right)\right\} , \forall i \in {\mathcal{S}} , \tag{eq\_0044} \\
+  & \mathit{Psi}_{1}^{\star} \left(s_{1}\right) = w_{p} \cdot \frac{w_{w} \cdot P \cdot W_{1}}{\mathit{obj}_{p , n o m}} . \tag{eq\_0045} \\
+  & \mathit{alpha}_{k^{'}}^{\left(2\right)} = 1 - \underset{k \in {\mathcal{N}}}{\sum} \mathit{gamma}_{k , k^{'}}^{\left(2\right)} , \forall k^{'} \in {\mathcal{N}} , \tag{eq\_0051} \\
+  & \mathit{beta}_{k}^{\left(2\right)} = 1 - \underset{k^{'} \in {\mathcal{N}}}{\sum} \mathit{gamma}_{k , k^{'}}^{\left(2\right)} , \forall k \in {\mathcal{N}} , \tag{eq\_0052} \\
+  & a_{k^{'} , S + 1} - d_{k , S} \geq \left(\underset{̲}{T}\right)^{\left(l\right)} - T \left(1 - \mathit{gamma}_{k , k^{'}}^{\left(2\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} , \tag{eq\_0053} \\
+  & a_{k^{'} , S + 1} - d_{k , S} \leq \left(\bar{T}\right)^{\left(l\right)} + T \left(1 - \mathit{gamma}_{k , k^{'}}^{\left(2\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} \tag{eq\_0054} \\
+  & \underset{k \in {\mathcal{N}}}{\sum} \mathit{chi}_{k , k^{'}}^{\left(2\right)} \leq \mathit{alpha}_{k^{'}}^{\left(2\right)} , \forall k^{'} \in {\mathcal{N}} , \tag{eq\_0055} \\
+  & \underset{k^{'} \in {\mathcal{N}}}{\sum} \mathit{chi}_{k , k^{'}}^{\left(2\right)} \leq \mathit{beta}_{k}^{\left(2\right)} , \forall k \in {\mathcal{N}} , \tag{eq\_0056} \\
+  & a_{k^{'} , S + 1} - d_{k , S} \geq \left(\underset{̲}{T}\right)^{\left(2\right)} - T \left(1 - \mathit{chi}_{k , k^{'}}^{\left(2\right)}\right) , \forall k \in {\mathcal{N}} , k^{'} \in {\mathcal{N}} , \tag{eq\_0057} \\
+  & \mathit{phi}^{\left(2\right)} = \underset{k^{'} \in {\mathcal{N}}}{\sum} \left[1 - \underset{k \in {\mathcal{N}}}{\sum} \left(\mathit{chi}_{k , k^{'}}^{\left(2\right)} + \mathit{gamma}_{k , k^{'}}^{\left(2\right)}\right)\right] , \tag{eq\_0058} \\
+\end{align}

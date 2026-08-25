@@ -1,0 +1,68 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2021.11.009
+%@ meta id=10.1016_j.trb.2021.11.009 family=milp schema=0.1.0
+%@ name :: Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism
+%@ desc :: Mined from Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism (Transportation Research Part B Methodological, 2021).
+%@ prov source :: 10.1016/j.trb.2021.11.009
+%@ prov reference :: Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism
+%@ prov author :: Yongxiang Zhang; Qiyuan Peng; Gongyuan Lu; Qingwei Zhong; Xu Yan; Xuesong Zhou
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted sum of the three objective items in Eq. (1)
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ var x shape=L,F,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for line frequency and pattern selection
+%@ index F ordered=0 cyclic=0 :: Set of frequencies for a line
+%@ index S ordered=0 cyclic=0 :: Set of patterns for a line
+%@ index j ordered=0 cyclic=0 :: Index for stations or sections
+%@ index D ordered=0 cyclic=0 :: Set of destination stations
+%@ index O ordered=0 cyclic=0 :: Set of origin stations
+%@ param p shape=O,D kind=matrix domain=- :: Minimum number of trains required for each OD pair
+%@ index E ordered=0 cyclic=0 :: Set of space-time arcs in master network
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for master train schedule arc selection
+%@ index T ordered=0 cyclic=0 :: Cycle length
+%@ param d shape=- kind=scalar domain=- :: Destination station of a train
+%@ param dep shape=- kind=scalar domain=- :: Departure time of a train
+%@ param o shape=- kind=scalar domain=- :: Origin station of a train
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ param b shape=- kind=scalar domain=- :: First train of a line-frequency combination
+%@ index Q ordered=0 cyclic=0 :: Number of cycles in extended schedule
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for extended train schedule arc selection
+%@ index G ordered=0 cyclic=0 :: Set of sections
+%@ var w shape=- domain=continuous role=primary drole=- lo=- hi=- :: Auxiliary variable for capacity constraint
+%@ index R ordered=0 cyclic=0 :: Set of real numbers
+%@ param c shape=- kind=vector domain=- :: Modified arc usage cost in the extended train space-time network
+%@ con eq_0005 kind=linear domain=- indicator=- :: Each line selects at most one frequency and pattern (Eq. 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Number of train stops serving each OD pair meets the minimum required number of trains (Eq. 6)
+%@ con eq_0007 kind=flow_balance domain=- indicator=- :: Flow balance for each line-frequency-pattern combination in the master train space-time network (Eq. 7)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Couples space-time paths of consecutive trains in the same combination by a cyclic shift (Eq. 8)
+%@ con eq_0010 kind=capacity domain=- indicator=- :: At most one train can occupy each set of incompatible space-time arcs on a section (Eq. 10)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary domain for line frequency/pattern selection variables x (Eq. 12)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary domain for master train schedule arc variables y (Eq. 13)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary domain for extended train schedule arc variables z (Eq. 14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Augmented Lagrangian objective after dualizing cross-resolution consistency and track capacity constraints (Eq. 15)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Bounds 0 ≤ w ≤ 1 for auxiliary capacity variable w (Eq. 16)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Dual update formula for track capacity multipliers μ (Eq. 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Dual update formula for cross-resolution consistency multipliers λ (Eq. 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Linearization constraint for the quadratic penalty term in the train-specific subproblem (Eq. 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Auxiliary constraint in the linearization of the ADMM penalty terms (Eq. 22)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Domain/auxiliary variable constraint in the linearized train-specific subproblem (Eq. 23)
+%@ con eq_0046 kind=linear domain=- indicator=- :: Equation (46) from the algorithmic/numerical analysis section
+\begin{align}
+  \min\quad & \mathit{alpha}_{1} Z_{1} + \mathit{alpha}_{2} Z_{2} + \mathit{alpha}_{3} Z_{3} \tag{eq\_0001} \\
+  & \sum_{f \in F_{l}} \sum_{s \in S_{l}} x_{l , f , s} \leq 1 , \forall l \in L \tag{eq\_0005} \\
+  & \sum_{l \in L} \sum_{f \in F_{l}} \sum_{s \in S_{l}} x_{l , f , s} f \mathit{vartheta}_{i}^{s} \mathit{vartheta}_{j}^{s} \geq p_{i , j} , \forall \left(i , j\right) \in O \cdot D , i < j \tag{eq\_0006} \\
+  & \underset{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(i , i^{'} , t , t^{'} , f , s\right) - \underset{i , t : \left(i^{'} , i , t^{'} , t\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(i^{'} , i , t^{'} , t , f , s\right) = \left\{\begin{matrix} - 1 & & i^{'} = o_{b_{l , f}} , t^{'} = \left(\mathit{dep}\right)_{b_{l , f}}^{s} \\ 1 & & i^{'} = d_{b_{l , f}} , t^{'} = T^{'} \\ 0 & & o t h e r w i s e \end{matrix}\right , \forall l \in L , f \in F_{l} , s \in S_{l} \tag{eq\_0007} \\
+  & y_{k + 1} \left(i , i^{'} , t + min \left\{\left⌊T / f\right⌋ , T - 1\right\} , t^{'} + min \left\{\left⌊T / f\right⌋ , T - 1\right\} , f , s\right) = y_{k} \left(i , i^{'} , t , t^{'} , f , s\right) , \forall l \in L , f \in F_{l} , k \in K_{l , f} \backslash \left\{b_{l , f}^{'}\right\} , s \in S_{l} , \left(i , i^{'} , t , t^{'}\right) \in E_{k} , f > 1 \tag{eq\_0008} \\
+  & z_{r_{k , \mathit{vartheta}}} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{r_{k , \mathit{vartheta}}} , s\right) = y_{k} \left(i , i^{'} , t + \mathit{vartheta} T , t^{'} + \mathit{vartheta} T , f_{k} , s\right) , \forall k \in K , \left(i , i^{'} , t , t^{'}\right) \in E_{k} , \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{r_{k , \mathit{vartheta}}}^{'} , \mathit{vartheta} \in \left\{0 , \ldots , Q\right\} , \mathit{tau} = t + \mathit{vartheta} T , \mathit{tau}^{'} = t^{'} + \mathit{vartheta} T \tag{eq\_0010} \\
+  & \sum_{k \in K^{'}} \underset{s \in S_{l_{k}}}{\sum} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{phi} \left(j , j^{'} , \mathit{tau}^{''}\right)} z_{k} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{k} , s\right) \leq 1 , \forall \left(j , j^{'}\right) \in G^{''} , \mathit{tau}^{''} \in T^{''} \tag{eq\_0012} \\
+  & \sum_{\mathit{tau} , \mathit{tau}^{'} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{k}^{'}} z_{k} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{k} , s\right) = x_{l_{k} , f_{k} , s} , \forall k \in K^{'} , s \in S_{l_{k}} , \left(i , i^{'}\right) \in G_{k}^{''} \tag{eq\_0013} \\
+  & x_{l , f , s} \in \left\{0 , 1\right\} , \forall l \in L , f \in F_{l} , s \in S_{l} \tag{eq\_0014} \\
+  & y_{k} \left(i , i^{'} , t , t^{'} , f_{k} , s\right) \in \left\{0 , 1\right\} , \forall l \in L , f \in F_{l} , k \in K_{l , f} , s \in S_{l} , \left(i , i^{'} , t , t^{'}\right) \in E_{k} \tag{eq\_0015} \\
+  & z_{k} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{k} , s\right) \in \left\{0 , 1\right\} , \forall l \in L , f \in F_{l} , k \in K_{l , f}^{'} , s \in S_{l} , \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{k}^{'} \tag{eq\_0016} \\
+  & 0 \leq w_{j , j^{'} , \mathit{tau}^{''}} \leq 1 , \forall \left(j , j^{'}\right) \in G^{''} , \mathit{tau}^{''} \in T^{''} \tag{eq\_0019} \\
+  & \mathit{mu}_{j , j^{'} , \mathit{tau}^{''}} \geq 0 , \forall \left(j , j^{'}\right) \in G^{''} , \mathit{tau}^{''} \in T^{''} \tag{eq\_0020} \\
+  & \mathit{lambda}_{i , i^{'} , k , s} \in R , \forall k \in K^{'} , s \in S_{l_{k}} , \left(i , i^{'}\right) \in G^{''} \tag{eq\_0021} \\
+  & \mathit{mu}_{j , j^{'} , \mathit{tau}^{''}}^{n + 1} = max \left\{0 , \mathit{mu}_{j , j^{'} , \mathit{tau}^{''}}^{n} + \mathit{gamma} \left[\sum_{k \in K^{'}} \underset{s \in S_{l_{k}}}{\sum} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{phi} \left(j , j^{'} , \mathit{tau}^{''}\right)} z_{k} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{k} , s\right) - 1\right]\right\} , \forall \left(j , j^{'}\right) \in G^{''} , \mathit{tau}^{''} \in T^{''} \tag{eq\_0022} \\
+  & \mathit{lambda}_{i , i^{'} , k , s}^{n + 1} = \mathit{lambda}_{i , i^{'} , k , s}^{n} + \mathit{rho} \left[\sum_{\mathit{tau} , \mathit{tau}^{'} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{k}^{'}} z_{k} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'} , f_{k} , s\right) - x_{l_{k} , f_{k} , s}\right] , \forall k \in K^{'} , s \in S_{l_{k}} , \left(i , i^{'}\right) \in G_{k}^{''} \tag{eq\_0023} \\
+  & \hat{c}_{k}^{'} \left(i , i^{'} , t , t^{'}\right) = \sum_{\mathit{vartheta} = 0}^{Q} \hat{c}_{r_{k , \mathit{vartheta}}} \left(i , i^{'} , t + \mathit{vartheta} T , t^{'} + \mathit{vartheta} T\right) , \forall k \in K , \left(i , i^{'} , t , t^{'}\right) \in E_{k} \tag{eq\_0046} \\
+\end{align}

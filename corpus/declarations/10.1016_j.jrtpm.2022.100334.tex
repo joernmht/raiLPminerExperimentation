@@ -1,0 +1,112 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2022.100334
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2022.100334
+% A genetic algorithm for heterogeneous high-speed railway timetabling with dense traffic: The train-sequence matrix encoding scheme
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2022.100334.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of all trains plus weighted headway violations (Eqs. 1 and 11)
+
+% a: classified as variable during review
+%@ var a shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station m
+
+% d: classified as variable during review
+%@ var d shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station m
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of trains
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Time-related parameters (running, additional times)
+
+% p: classified as variable during review
+%@ var p shape=I,S domain=binary role=primary drole=- lo=- hi=- :: Binary stop plan: 1 if train i stops at station m, 0 otherwise
+
+% s: classified as parameter during review
+%@ param s shape=S kind=vector domain=- :: Number of platform tracks at station m
+
+% r: classified as parameter during review
+%@ param r shape=I,S kind=matrix domain=- :: Pure running time of train i in section (m,m+1)
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Train index
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Station index
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Dwell time bounds and weight in objective
+
+% A: classified as parameter during review
+%@ param A shape=- kind=scalar domain=- :: Arrival headway times between train types
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Headway times (arrival/departure) between train types
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive number for big-M constraints
+
+% O: classified as index during review
+%@ index O ordered=0 cyclic=0 :: Train sequence matrix: order of trains in sections
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Train index (secondary)
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Departure headway times between train types
+
+% W: classified as parameter during review
+%@ param W shape=- kind=scalar domain=- :: Operation time window bounds (lower and upper)
+
+% y: classified as variable during review
+%@ var y shape=I,I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Headway violation variables for adjacent trains
+
+% Bound by a quantifier or big operator, so no declaration of their own: k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Section running time constraint: pure running plus starting/stopping additional times if stop (Eq. 2)
+
+%@ con eq_0003 kind=linear domain=- indicator=- :: Station dwell time constraint: dwell time within bounds if stop, zero otherwise (Eq. 3)
+
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival headway constraint with stop-pattern-dependent headways and train order (Eq. 4)
+
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure headway constraint with stop-pattern-dependent headways and train order (Eq. 5)
+
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Operation time window constraint for departure at origin station (Eq. 6)
+
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Operation time window constraint for arrival at terminal station (Eq. 6)
+
+%@ con eq_0007 kind=linear domain=- indicator=- :: Overtaking pattern constraint: at most two successive overtakes/overtaken trains per station, limited by platform tracks (Eq. 7)
+
+%@ con eq_0008 kind=linear domain=- indicator=- :: Overtaking qualification constraint: lower-speed trains cannot overtake higher-speed trains (Eq. 8)
+
+%@ con eq_0009 kind=linear domain=- indicator=- :: Overtaking qualification constraint: stopping trains cannot overtake others (Eq. 9)
+
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum dwell time constraint considering overtaking: extra dwell time allowed when overtaken (Eq. 10)
+
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Relaxed arrival headway constraint using y violation variables for adjacent trains (Eq. 12)
+
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Relaxed departure headway constraint using y violation variables for adjacent trains (Eq. 12)

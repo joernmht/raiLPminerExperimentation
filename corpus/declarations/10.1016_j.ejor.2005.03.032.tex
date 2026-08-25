@@ -1,0 +1,137 @@
+% Declaration sidecar for 10.1016_j.ejor.2005.03.032
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2005.03.032
+% A rolling stock circulation model for combining and splitting of passenger trains
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2005.03.032.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+%@ obj sense=min name=objective combination=sum :: Objective function value
+%
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%
+% N: classified as variable during review
+%@ var N shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m used on trip t
+%
+% X: classified as variable during review
+%@ var X shape=T,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition p is used for trip t
+%
+% Z: classified as variable during review
+%@ var Z shape=T,P,P domain=non_negative role=primary drole=- lo=- hi=- :: Binary variable indicating if trip t has composition p and next trip has composition p'
+%
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trips
+%
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of compositions for a trip
+%
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Composition index
+%
+% unusable as an identifier, rename or drop: Γ
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of train unit types
+%
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Train unit type index
+%
+% n: classified as parameter during review
+%@ param n shape=P,M kind=matrix domain=- :: Number of train units of type m in composition p
+%
+% C: classified as variable during review
+%@ var C shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m coupled at trip t
+%
+% pt: classified as parameter during review
+%@ param pt shape=T kind=vector domain=- :: Set of compositions for trip t
+%
+% U: classified as variable during review
+%@ var U shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units of type m uncoupled at trip t
+%
+% I: classified as variable during review
+%@ var I shape=T,M domain=integer role=primary drole=- lo=- hi=- :: Inventory of train units of type m at station s at time t
+%
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%
+% unusable as an identifier, rename or drop: τ
+% unusable as an identifier, rename or drop: ρ
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers
+%
+% CKM: classified as variable during review
+%@ var CKM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Carriage kilometers
+%
+% c: classified as parameter during review
+%@ param c shape=M kind=vector domain=- :: Cost per carriage kilometer for train unit type m
+%
+% unusable as an identifier, rename or drop: ℓ
+% SKM: classified as variable during review
+%@ var SKM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Seat-shortage kilometers
+%
+% unusable as an identifier, rename or drop: β
+% SHM: classified as variable during review
+%@ var SHM shape=- domain=continuous role=primary drole=- lo=- hi=- :: Number of shunting movements
+%
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of combinations
+%
+% Y: classified as variable during review
+%@ var Y shape=T,B domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if combination b is used for trip t
+%
+% b: classified as index during review
+%@ index b ordered=0 cyclic=0 :: Combination index
+%
+% Bound by a quantifier or big operator, so no declaration of their own: s, t
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Exactly one composition per trip
+%@ con eq_0003 kind=linear domain=- indicator=- :: Link current composition to transition variable (outgoing)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link next composition to transition variable (incoming)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Define number of train units of each type from composition
+%@ con eq_0006 kind=linear domain=- indicator=- :: Define number of coupled train units at composition change
+%@ con eq_0007 kind=linear domain=- indicator=- :: Define number of uncoupled train units at composition change
+%@ con eq_0008_a kind=linear domain=- indicator=- :: Initial trip: coupled units equal total units
+%@ con eq_0008_b kind=linear domain=- indicator=- :: Initial trip: no uncoupled units
+%@ con eq_0009_a kind=linear domain=- indicator=- :: Final trip: uncoupled units equal total units
+%@ con eq_0009_b kind=linear domain=- indicator=- :: Final trip: no coupled units
+%@ con eq_0010 kind=linear domain=- indicator=- :: Initial inventory allocation sums to fleet size per type
+%@ con eq_0011 kind=linear domain=- indicator=- :: Inventory balance at station after departure
+%@ con eq_0012 kind=linear domain=- indicator=- :: Composition variables are binary
+%@ con eq_0013 kind=linear domain=- indicator=- :: Non-negativity of train unit, coupling, and inventory variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Initial inventory variables are integer
+%@ con eq_0015 kind=linear domain=- indicator=- :: Transition variables are non-negative
+%@ con eq_0016 kind=linear domain=- indicator=- :: Define carriage kilometers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Define seat-shortage kilometers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Define shunting movements
+%@ con eq_0020 kind=linear domain=- indicator=- :: Link composition to splitting transition variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Link first successor composition to splitting transition variable
+%@ con eq_0022 kind=linear domain=- indicator=- :: Link second successor composition to splitting transition variable
+%@ con eq_0023 kind=linear domain=- indicator=- :: Define train units used in split configuration
+%@ con eq_0024 kind=linear domain=- indicator=- :: Define coupled units at split
+%@ con eq_0025 kind=linear domain=- indicator=- :: Define uncoupled units at split
+%@ con eq_0026 kind=linear domain=- indicator=- :: Inventory balance for split operations
+%@ con eq_0027 kind=linear domain=- indicator=- :: Non-negativity for split variables
+%@ con eq_0028 kind=linear domain=- indicator=- :: Split transition variable bounds
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Split transition variable integrality (part a)
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Split transition variable integrality (part b)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Integrality of initial inventory in split case
+%@ var I0 shape=matrix domain=integer role=variable drole=- lo=0 hi=inf :: Initial inventory
+%@ param nu shape=vector domain=integer role=index drole=- lo=- hi=- :: Composition type of train t
+%@ param s shape=vector domain=integer role=index drole=- lo=- hi=- :: Station of train t
+%@ index Gammaplus shape=set domain=set role=index drole=- lo=- hi=- :: Positive length difference pairs
+%@ index Gammaminus shape=set domain=set role=index drole=- lo=- hi=- :: Negative length difference pairs
+%@ index Td shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying departure condition
+%@ index Ta shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying arrival condition

@@ -1,0 +1,745 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2023.104278",
+  "name": "Train schedule optimization for commuter-metro networks",
+  "family": "milp",
+  "description": "Mined from Train schedule optimization for commuter-metro networks (Transportation Research Part C Emerging Technologies, 2023).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2023.104278",
+    "reference": "Train schedule optimization for commuter-metro networks",
+    "author": "Simin Chai; Jiateng Yin; Andrea D’Ariano; Marcella Samà; Tao Tang",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "K",
+      "description": "Set of trains.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Section index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of consecutive section pairs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of sections.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Train index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Train index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "Set of moving block sections.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "sp",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "jp",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "n",
+      "description": "Running time of train on section.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Sufficiently large positive number.",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum or maximum departure time interval between successive trains.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "N",
+      "description": "Number of common or through trains departing from a section.",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "a",
+      "description": "Acceleration rate of train on section.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "b",
+      "description": "Deceleration rate of train on section.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "L",
+      "description": "Length of block section.",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "sb",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "NC",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "NT",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_max",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "t",
+      "description": "Time when train enters a section.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating immediate precedence of trains departing from the same origin station.",
+      "shape": [
+        "K",
+        "K"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "v",
+      "description": "Train speed at section phases.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "l",
+      "description": "Distance traveled in a phase on a section.",
+      "shape": [
+        "K",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0002_b",
+      "description": "",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "omega",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s_{k}^{e}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0003",
+      "description": "Entrance time relation between consecutive sections.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "sp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "n",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017",
+      "description": "Each train has at most one immediate successor at its origin section.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019",
+      "description": "Each train has at most one immediate predecessor at its origin section.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0020",
+      "description": "Number of immediate precedence links equals the number of trains minus one per origin section.",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "K"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "N",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "C",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "N",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "T",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0022",
+      "description": "Initial speed of each train at its first departure section is zero.",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "v",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s_k^b",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0024",
+      "description": "Final speed of each train at its last arrival section is zero.",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "v",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s_{k}^{e}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0032",
+      "description": "Block section length equals the sum of distances of the three phases.",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "L",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "l",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "l",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "l",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total arrival times of all trains at the last arrival sections in their destination stations.",
+    "terms": [
+      {
+        "ref": "omega",
+        "ref_kind": "literal",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

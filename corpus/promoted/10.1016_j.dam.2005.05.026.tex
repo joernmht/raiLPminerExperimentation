@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.dam.2005.05.026
+%@ meta id=10.1016_j.dam.2005.05.026 family=milp schema=0.1.0
+%@ name :: A Lagrangian heuristic algorithm for a real-world train timetabling problem
+%@ desc :: Mined from A Lagrangian heuristic algorithm for a real-world train timetabling problem (Discrete Applied Mathematics, 2005).
+%@ prov source :: 10.1016/j.dam.2005.05.026
+%@ prov reference :: A Lagrangian heuristic algorithm for a real-world train timetabling problem
+%@ prov author :: Alberto Caprara; Michele Monaci; Paolo Toth; Pier Luigi Guida
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total profit of selected arcs
+%@ var x shape=A domain=non_negative role=primary drole=- lo=- hi=- :: Binary variable indicating if arc a is selected for a train path
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the network
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index s ordered=0 cyclic=0 :: Last station index
+%@ index t ordered=0 cyclic=0 :: Time index for station capacity constraints
+%@ index V ordered=0 cyclic=0 :: Set of all nodes
+%@ index v ordered=0 cyclic=0 :: Node index
+%@ var z shape=T,V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j visits node v
+%@ var y shape=V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if any train visits node v
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes at a station
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ index u ordered=0 cyclic=0 :: Arrival node index
+%@ index w ordered=0 cyclic=0 :: Node index in sets W or U
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes at a station
+%@ param k shape=- kind=scalar domain=- :: Station capacity or train index
+%@ param integer shape=- kind=scalar domain=- :: Keyword indicating integrality constraint
+%@ param b shape=- kind=scalar domain=- :: Minimum time interval between departures
+%@ param d shape=- kind=scalar domain=- :: Minimum time between consecutive departures
+%@ param c shape=- kind=scalar domain=- :: Travel time constant
+%@ param q shape=- kind=scalar domain=- :: Number of time instants
+%@ con eq_0003 kind=linear domain=- indicator=- :: At most one selected arc leaving the source node for each train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation at intermediate nodes for each train
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of z_jv via incoming arcs for each train and node
+%@ con eq_0006 kind=linear domain=- indicator=- :: Definition of y_v via z_jv for each node
+%@ con eq_0007 kind=linear domain=- indicator=- :: Arrival headway constraints at stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure headway constraints at stations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Overtaking constraints between consecutive stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Nonnegativity of arc variables
+%@ con eq_0011 kind=linear domain=- indicator=- :: Integrality of arc variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Auxiliary inequality for overtaking constraints
+%@ con eq_0015 kind=linear domain=- indicator=- :: Station capacity constraints
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0017 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0018 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0020 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0021 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0024 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0025 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+\begin{align}
+  \max\quad & \sum_{j \in T} \sum_{a \in A^{j}} p_{a} x_{a} \tag{eq\_0002} \\
+  & \text{s}.\text{t}. \sum_{a \in \mathit{delta}_{j}^{+} \left(\mathit{sigma}\right)} x_{a} \leq 1 , j \in T , \tag{eq\_0003} \\
+  & \sum_{a \in \mathit{delta}_{j}^{-} \left(v\right)} x_{a} = \sum_{a \in \mathit{delta}_{j}^{+} \left(v\right)} x_{a} , j \in T , v \in V^{j} \backslash \left\{\mathit{sigma} , \mathit{tau}\right\} , \tag{eq\_0004} \\
+  & z_{\mathit{jv}} = \sum_{a \in \mathit{delta}_{j}^{-} \left(v\right)} x_{a} , j \in T , v \in V^{j} , \tag{eq\_0005} \\
+  & y_{v} = \sum_{j \in T : v \in V^{j}} z_{\mathit{jv}} , v \in V , \tag{eq\_0006} \\
+  & \sum_{w \in U^{i} : w \succeq u , \mathit{Delta} \left(u , w\right) < a_{i}} y_{w} \leq 1 , i \in S \backslash \left\{1\right\} , u \in U^{i} , \tag{eq\_0007} \\
+  & \sum_{w \in W^{i} : w \succeq v , \mathit{Delta} \left(v , w\right) < d_{i}} y_{w} \leq 1 , i \in S \backslash \left\{s\right\} , v \in W^{i} , \tag{eq\_0008} \\
+  & \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{k} : w \succeq v} z_{\mathit{kw}} + \sum_{w \in U^{i + 1} \cap V^{k} : w \preceq u} z_{\mathit{kw}} \leq 3 , i \in S \backslash \left\{s\right\} , j , k \in T , j \neq k , i , i + 1 \in S^{j} \cup S^{k} , v \in W^{i} , u \in U^{i + 1} , \tag{eq\_0009} \\
+  & x_{a} \geq 0 , a \in A , \tag{eq\_0010} \\
+  & x_{a} \cdot integer , a \in A . \tag{eq\_0011} \\
+  & b_{i}^{\mathit{jk}} := max \left\{d_{i} , a_{i + 1} + t_{j} - t_{k}\right\} \tag{eq\_0014} \\
+  & \sum_{w \in W^{i} \cap V^{j} : v_{1} \preceq w \prec v_{2}} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{j} : w \succeq v_{2} , \mathit{Delta} \left(v_{2} , w\right) < b_{i}^{\mathit{kj}}}{\sum} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{k} : w \succeq v_{2} , \mathit{Delta} \left(v_{1} , w\right) < b_{i}^{\mathit{jk}}}{\sum} z_{\mathit{kw}} \leq 1 , i \in S \backslash \left\{s\right\} , j , k \in T , j \neq k , i , i + 1 \in S^{j} \cap S^{k} , v_{1} , v_{2} \in W^{i} , v_{1} \preceq v_{2} , \mathit{Delta} \left(v_{1} , v_{2}\right) < b_{i}^{\mathit{jk}} . \tag{eq\_0015} \\
+  & \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} = \sum_{w \in W^{i} \cap V^{j} : w \succeq u - t_{j}} z_{\mathit{jw}} . \tag{eq\_0016} \\
+  & \sum_{w \in W^{i} \cap V^{j}} \sum_{a \in \mathit{delta}_{j}^{-} \left(w\right)} x_{a} \leq 1 \tag{eq\_0017} \\
+  & \sum_{w \in W^{i} \cap V^{j}} z_{\mathit{jw}} \leq 1 . \tag{eq\_0018} \\
+  & \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} = \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{j} : w \succeq u - t_{j}} z_{\mathit{jw}} \leq \sum_{w \in W^{i} \cap V^{j}} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} \leq 1 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} . \tag{eq\_0019} \\
+  & \sum_{w \in W^{i} \cap V^{k} : w \succeq v} z_{\mathit{kw}} + \sum_{w \in W^{i} \cap V^{k} : w \preceq u} z_{\mathit{kw}} \leq 1 + \sum_{w \in W^{i} \cap V^{k} : v \preceq w \preceq u - t_{k}} z_{\mathit{kw}} , \tag{eq\_0020} \\
+  & 2 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{k} : v \preceq w \preceq u - t_{k}} z_{\mathit{kw}} \leq 2 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \prec v} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{j} : w \succeq v , \mathit{Delta} \left(v , w\right) < b_{i}^{\mathit{kj}}}{\sum} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{k} : w \succeq v , \mathit{Delta} \left(u - t_{j} , w\right) < b_{i}^{\mathit{jk}}}{\sum} z_{\mathit{kw}} \tag{eq\_0021} \\
+  & b_{i}^{\mathit{jk}} := t_{j} + c_{i} . \tag{eq\_0023} \\
+  & \sum_{j \in T \left(i , t\right)} \sum_{a \in A^{j} \left(i , t\right)} x_{a} \leq k_{i} , i \in S , t = 1 , \ldots , q . \tag{eq\_0024} \\
+  & \mathit{alpha}_{a} = \sum_{t = \mathit{theta} \left(u\right)}^{\mathit{theta} \left(v\right)} \mathit{lambda}_{\mathit{it}} , \tag{eq\_0025} \\
+  & \mathit{beta}_{i , t} := \sum_{p = 1}^{t} \mathit{lambda}_{\mathit{ip}} \tag{eq\_0026} \\
+\end{align}

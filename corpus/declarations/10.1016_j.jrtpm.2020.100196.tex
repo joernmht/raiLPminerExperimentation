@@ -1,0 +1,66 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2020.100196
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2020.100196
+% Dynamic and robust timetable rescheduling for uncertain railway disruptions
+%
+%@ obj sense=min name=objective combination=sum :: Minimize expected train cancellations and arrival delays over control and look-ahead horizons
+%
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar :: Cost function for first-stage decisions X
+%
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of arrival and departure events
+%
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: First-stage decisions, scenario-independent disruption management decisions
+%
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Second-stage decisions for scenario w
+%
+% w: classified as index during review
+%@ index w ordered=0 cyclic=0 :: Scenario index
+%
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar :: Constraint set for decisions
+%
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar :: Station index for short-turning
+%
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar :: Time variable
+%
+% W: classified as parameter during review
+%@ param W shape=- kind=scalar :: Number of scenarios
+%
+% c: classified as index during review
+%@ index c ordered=0 cyclic=0 :: Decision to cancel event e
+%
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: Delay of event e
+%
+% unusable as an identifier, renamed to beta_c: β
+%@ param beta_c shape=- kind=scalar :: Cost of cancelling a train run between two adjacent stations
+%
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Scenario index at a stage
+%
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Scenario index for nonanticipativity constraints
+%
+% Bound by a quantifier or big operator, so no declaration of their own: e
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear :: Constraint set Z_I for first-stage decisions X
+%@ con eq_0004 kind=linear :: Constraint set Z_II(X,w) for second-stage decisions Y(w)
+%@ con eq_0007 kind=linear :: Nonanticipativity constraint X_1(w_1,n)=X_1(w_1,m) for first-stage decisions
+%@ con eq_0009 kind=linear :: Constraint set Z_1^I(w_1,n) for first-stage decisions at stage 1
+%@ con eq_0012 kind=linear :: Constraint set Z_1^II(X_1(w_1,n),w_1,n) for second-stage decisions at stage 1
+%@ con eq_0013 kind=linear :: Nonanticipativity constraint for stage 1 first-stage decisions
+%@ con eq_0014 kind=linear :: Scenario consistency constraint for stage 1 scenarios
+%@ con eq_0019 kind=linear :: Constraint set Z_k^I(w_k,n) for first-stage decisions at stage k
+%@ con eq_0020 kind=linear :: Constraint set Z_k^II(X_k(w_k,n),w_k,n) for second-stage decisions at stage k
+%@ con eq_0021 kind=linear :: Nonanticipativity constraint X_k(w_k,n)=X_k(w_k,m) at stage k

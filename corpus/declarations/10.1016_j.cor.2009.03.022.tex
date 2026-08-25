@@ -1,0 +1,156 @@
+% Declaration sidecar for 10.1016_j.cor.2009.03.022
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2009.03.022
+% Computing delay resistant railway timetables
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cor.2009.03.022.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize combined passenger delay and missed-transfer penalties.
+
+% unusable as an identifier, rename or drop: π
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in event-activity network.
+
+% u: classified as parameter during review
+%@ param u shape=A kind=vector :: Upper bounds on activity durations.
+
+% unusable as an identifier, rename or drop: ℓ
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar :: Directed graph (V,A) representing event-activity network.
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of events (nodes) in event-activity network.
+
+% Tk: classified as parameter during review
+%@ param Tk shape=A kind=vector :: Periodic time offset for activity a (T times integer k).
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of integers.
+
+% k: classified as variable during review
+%@ var k shape=A domain=integer role=primary :: Integer variable for periodic activity time offset.
+
+% IP: classified as parameter during review
+%@ param IP shape=- kind=scalar :: Integer programming formulation identifier.
+
+% PESP: classified as parameter during review
+%@ param PESP shape=- kind=scalar :: Periodic Event Scheduling Problem.
+
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar :: Objective function.
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar :: Vector of parameters in objective function.
+
+% w: classified as parameter during review
+%@ param w shape=V,A kind=matrix :: Weights for events or activities.
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Period time.
+
+% kT: classified as parameter during review
+%@ param kT shape=- kind=scalar :: Multiple of period time.
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar :: Time variable in first/last occurrence formulas.
+
+% activity: classified as parameter during review
+%@ param activity shape=- kind=scalar :: Generic term for an arc in the network.
+
+% maintained: classified as parameter during review
+%@ param maintained shape=- kind=scalar :: Indicator for transfer activity being maintained.
+
+% transfer: classified as parameter during review
+%@ param transfer shape=- kind=scalar :: Type of activity for passenger transfers.
+
+% z: classified as variable during review
+%@ var z shape=A domain=binary role=primary :: Binary variable indicating if a transfer activity is dropped.
+
+% before: classified as parameter during review
+%@ param before shape=- kind=scalar :: Indicator for event ordering.
+
+% g: classified as variable during review
+%@ var g shape=A domain=binary role=primary :: Binary variable for headway ordering.
+
+% starts: classified as parameter during review
+%@ param starts shape=- kind=scalar :: Indicator for event start.
+
+% Tz: classified as parameter during review
+%@ param Tz shape=A kind=vector :: Weighted penalty for dropped transfer (T times z).
+
+% d: classified as parameter during review
+%@ param d shape=A kind=vector :: Source delay for activity.
+
+% Mz: classified as parameter during review
+%@ param Mz shape=- kind=big_m :: Big-M constant for transfer constraints.
+
+% Mg: classified as parameter during review
+%@ param Mg shape=- kind=big_m :: Big-M constant for headway constraints.
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar :: Set of natural numbers.
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Cost function.
+
+% ID: classified as parameter during review
+%@ param ID shape=- kind=scalar :: Identifier for a timetable variant.
+
+% DEF: classified as parameter during review
+%@ param DEF shape=- kind=scalar :: Default timetable variant.
+
+% PoR: classified as parameter during review
+%@ param PoR shape=- kind=scalar :: Price of robustness ratio.
+
+% RoD: classified as parameter during review
+%@ param RoD shape=- kind=scalar :: Robustness of delay ratio.
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, i, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear :: Feasible differential problem bounds ℓ_a ≤ π_j − π_i ≤ u_a.
+%@ con eq_0002 kind=linear :: Periodic event scheduling constraint with integer offsets.
+%@ con eq_0003 kind=linear :: Upper bound on periodic activity duration.
+%@ con eq_0004 kind=linear :: Lower bound on periodic activity duration.
+%@ con eq_0005 kind=linear :: Nonnegativity of periodic event times.
+%@ con eq_0006 kind=linear :: Periodic event times bounded above by period T.
+%@ con eq_0007 kind=linear :: Integrality of periodic offset variables.
+%@ con eq_0009 kind=linear :: Disposition event times not earlier than scheduled.
+%@ con eq_0010 kind=linear :: Delay propagation along stop, drive and turn activities.
+%@ con eq_0011 kind=big_m :: Transfer maintenance constraint with big-M.
+%@ con eq_0012 kind=big_m :: Headway constraint with big-M ordering variable.
+%@ con eq_0013 kind=ordering :: Headway pair ordering complementarity.
+%@ con eq_0014 kind=linear :: Definition of periodic tension x_a for activities.
+%@ con eq_0016 kind=linear :: Rolling-out relation for first/last occurrence of events.
+%@ con eq_0017_a kind=linear :: Headway ordering alternative A.
+%@ con eq_0017_b kind=linear :: Headway ordering alternative B.
+%@ con eq_0020 kind=linear :: Constraint for expanded non-periodic network.
+%@ con eq_0021 kind=linear :: Constraint linking periodic and rolled-out event times.
+%@ con eq_0023 kind=linear :: Lower/upper bound for rolled-out activities.
+%@ con eq_0024 kind=linear :: Source delay constraint for delay scenario.
+%@ con eq_0025 kind=linear :: Maintained transfer indicator constraint.
+%@ con eq_0026 kind=linear :: Event ordering constraint.
+%@ con eq_0027 kind=linear :: Start-order relation for events.
+%@ con eq_0028 kind=linear :: Light robustness nominal optimality constraint.
+%@ con eq_0030 kind=linear :: Definition of price of robustness ratio PoR.
+%@ con eq_0031 kind=linear :: Definition of robustness of delay ratio RoD.

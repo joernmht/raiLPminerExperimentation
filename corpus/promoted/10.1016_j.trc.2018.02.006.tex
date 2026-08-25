@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2018.02.006
+%@ meta id=10.1016_j.trc.2018.02.006 family=milp schema=0.1.0
+%@ name :: Macroscopic multiple-station short-turning model in case of complete railway blockages
+%@ desc :: Mined from Macroscopic multiple-station short-turning model in case of complete railway blockages (Transportation Research Part C Emerging Technologies, 2018).
+%@ prov source :: 10.1016/j.trc.2018.02.006
+%@ prov reference :: Macroscopic multiple-station short-turning model in case of complete railway blockages
+%@ prov author :: Nadjla Ghaemi; Oded Cats; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Objective minimizes the weighted sum of cancellation penalties and arrival delays over all train services.
+%@ index V ordered=0 cyclic=0 :: Set of all train services.
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service is cancelled.
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival delay of a service.
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival or departure time of a service.
+%@ param M shape=- kind=scalar domain=- :: Large positive constant for big-M constraints.
+%@ param d shape=- kind=scalar domain=- :: Scheduled departure time of a service.
+%@ param a shape=- kind=scalar domain=- :: Scheduled arrival time of a service.
+%@ index L ordered=0 cyclic=0 :: Set of lines.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index s ordered=0 cyclic=0 :: Station index.
+%@ index Out ordered=0 cyclic=0 :: Set of possible short-turning pairs from a service.
+%@ index In ordered=0 cyclic=0 :: Set of possible short-turning pairs to a service.
+%@ index j ordered=0 cyclic=0 :: Index for service number.
+%@ index k ordered=0 cyclic=0 :: Index for service number.
+%@ index sht ordered=0 cyclic=0 :: Set of short-turning pairs in first phase.
+%@ index P ordered=0 cyclic=0 :: Set of platform tracks at a station.
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a service uses a platform track.
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Definition of L^Dist, the set of lines planned to operate in the disrupted area during the disruption.
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Definition of the set of approaching services that have to be short-turned at a station before the blockage.
+%@ con eq_0001_c kind=linear domain=- indicator=- :: Definition of the set of services scheduled to depart from the final station toward the blocked station within the disruption.
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Definition of the set of services running away from the disruption.
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Definition of the possible short-turning pairs from an approaching service to an opposite-direction departure.
+%@ con eq_0002_c kind=linear domain=- indicator=- :: Definition of the possible short-turning pairs to a departing service from an approaching service.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Running time equality between arrival and departure times of each service.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Dwell time constraint ensuring minimum headway between consecutive services unless one is cancelled.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Departure times must not be earlier than scheduled departure times.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Departure times of cancelled services must equal scheduled departure times (upper bound with big-M).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Arrival delay is the difference between actual and scheduled arrival times.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Recovery services may depart only after the disruption ends.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Short-turning balance: every approaching service two steps from the blockage must be matched by a short-turn or cancellation.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Short-turning balance for opposite-direction departures: each departure must be covered by a short-turn or cancelled.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Early short-turning cancels the immediately following service.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Short-turning cancels the immediately preceding opposite-direction service.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Exclusivity: avoid selecting both early and last-station short-turning pairs for the same service.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Minimum short-turning time between arrival of the turning train and departure of the turned service.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Cancellation propagation: if a departure is cancelled, later departures on the same line are cancelled.
+%@ con eq_0030 kind=linear domain=- indicator=- :: First-phase short-turning pairs are forced.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Each arriving service is assigned exactly one platform track or is cancelled.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Platform headway when a short-turning service uses a track: next service on that track waits until minimum headway after departure.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Platform headway for non-short-turning services using the same track: next service waits until minimum headway after departure.
+\begin{align}
+  & V_{a , k}^{'} = \left\{v_{k , n}^{z} , v_{k , n + 1}^{z}\right\} , V_{b , k}^{'} = \left\{v_{k , n}^{z + 1} , v_{k , n + 1}^{z + 1}\right\} , V_{c , k}^{''} = \left\{v_{k , n}^{z + 2} , v_{k , n + 1}^{z + 2}\right\} \tag{eq\_0001\_a} \\
+  & V_{a , l}^{'} = \left\{v_{l , n}^{i} , v_{l , n + 1}^{i}\right\} , V_{b , l}^{'} = \left\{v_{l , n}^{i + 1} , v_{l , n + 1}^{i + 1}\right\} , V_{c , l}^{''} = \left\{v_{l , n}^{i + 2} , v_{l , n + 1}^{i + 2}\right\} \tag{eq\_0001\_b} \\
+  & V_{a , m}^{'} = \left\{v_{m , n}^{p} , v_{m , n + 1}^{p}\right\} . V_{b , m}^{'} = \left\{v_{m , n}^{p + 1} , v_{m , n + 1}^{p + 1}\right\} . V_{c , m}^{''} = \left\{v_{m , n}^{p + 2} , v_{m , n + 1}^{p + 2}\right\} . \tag{eq\_0001\_c} \\
+  & V_{d , k}^{'''} = \left\{v_{k , n}^{z + 4} , v_{k , n + 1}^{z + 4}\right\} , V_{e , k}^{'''} = \left\{v_{k , n}^{z + 5} , v_{k , n + 1}^{z + 5}\right\} \tag{eq\_0002\_a} \\
+  & V_{d , l}^{'''} = \left\{v_{l , n}^{i + 4} , v_{l , n + 1}^{i + 4}\right\} , V_{e , l}^{'''} = \left\{v_{l , n}^{i + 5} , v_{l , n + 1}^{i + 5}\right\} \tag{eq\_0002\_b} \\
+  & V_{d , m}^{'''} = \left\{v_{m , n}^{p + 4} , v_{m , n + 1}^{p + 4}\right\} . V_{e , m}^{'''} = \left\{v_{m , n}^{p + 5} , v_{m , n + 1}^{p + 5}\right\} . \tag{eq\_0002\_c} \\
+  \min\quad & \sum_{v_{l , n}^{i} \in V} \left(\mathit{omega}_{v_{l , n}^{i}}^{c} \cdot c_{l , n}^{i} + \mathit{omega}_{v_{l , n}^{i}}^{z} \cdot z_{v_{l , n}^{i}}\right) , \tag{eq\_0016} \\
+  & t_{v_{l , n}^{i}}^{a} - t_{v_{l , n}^{i}}^{d} = \mathit{tau}_{v_{l , n}^{i}}^{\mathit{run}} , \forall v_{l , n}^{i} \in V , \tag{eq\_0017} \\
+  & t_{v_{l , n}^{i + 1}}^{d} - t_{v_{l , n}^{i}}^{a} + M \cdot \left(c_{l , n}^{i} + c_{l , n}^{i + 1}\right) \geq \mathit{tau}_{v_{l , n}^{i} , v_{l , n}^{i + 1}}^{\mathit{dwell}} , \forall v_{l , n}^{i} , v_{l , n}^{i + 1} \in V , \tag{eq\_0018} \\
+  & t_{v_{l , n}^{i}}^{d} - d_{l , n}^{i} \geq 0 , \forall v_{l , n}^{i} \in V , \tag{eq\_0019} \\
+  & t_{v_{l , n}^{i}}^{d} - d_{l , n}^{i} \leq \left(1 - c_{l , n}^{i}\right) \cdot M , \forall v_{l , n}^{i} \in V , \tag{eq\_0020} \\
+  & z_{v_{l , n}^{i}} = t_{v_{l , n}^{i}}^{a} - a_{l , n}^{i} \forall v_{l , n}^{i} \in V , \tag{eq\_0021} \\
+  & t_{v_{l , n}^{i}}^{d} \geq t^{e} \forall v_{l , n}^{i} \in V_{s , l , \mathit{rec}}^{''} , s \in S_{1} , l \in L_{\mathit{Dist}} \tag{eq\_0022} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i}} \cup \mathit{Out}_{v_{l , n}^{i + 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} = c_{l , n}^{i + 2} , \forall v_{l , n}^{i} \in V_{s , l}^{'} , s \in S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0023} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{In}_{v_{l , m}^{j}} \cup \mathit{In}_{v_{l , m}^{j - 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , m}^{j} = c_{l , m}^{j - 2} , \forall v_{l , m}^{j} \in V_{s , l}^{'''} , s \in S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0024} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} = c_{l , n}^{i + 1} , \forall v_{l , n}^{i} \in V_{s , l}^{'} , s \in S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0025} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{In}_{v_{l , m}^{j}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , m}^{j} = c_{l , m}^{j - 1} , \forall v_{l , m}^{j} \in V_{s , l}^{'''} , s \in S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0026} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i + 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , n}^{i + 1} \leq 1 , \forall v_{l , n}^{i} \in V_{s , l}^{'} , s \in S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0027} \\
+  & \left(1 - \mathit{lambda}_{v^{'} , v^{'''}}\right) \cdot M + t_{v^{'''}}^{d} \geq t_{v^{'}}^{a} + \mathit{theta}_{v^{'}}^{\mathit{min}} , \forall \left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v^{'}} , \tag{eq\_0028} \\
+  & c_{l , m}^{j} \leq c_{l , m}^{k + 1} , \forall v_{l , m}^{j} \in V_{s , l}^{'''} , s \in S_{2} , l \in L_{\mathit{Dist}} , k \in \left[j , \left|S\right| - 1\right] , \tag{eq\_0029} \\
+  & \mathit{lambda}_{v^{'} , v^{'''}} = 1 , \forall \left(v^{'} , v^{'''}\right) \in \mathit{sht}_{\mathit{red}} . \tag{eq\_0030} \\
+  & \underset{q \in P_{s , v_{l , n}^{i}}}{\sum} p_{v_{l , n}^{i} , q} + c_{l , n}^{i} = 1 \forall v_{l , n}^{i} \in V_{s , l}^{'} \cup V_{s , l}^{'''} , s \in S_{1} \cup S_{2} , l \in L_{\mathit{Dist}} , \tag{eq\_0031} \\
+  & \begin{aligned} & \left(3 - \left(p_{v^{'} , q} + p_{v_{w , z}^{u} , q}\right) - \mathit{lambda}_{v^{'} , v^{'''}}\right) \cdot M + t_{v_{w , z}^{u}}^{a} \geq t_{v^{'''}}^{d} + \mathit{tau}_{v_{l , n}^{i} , v_{w , z}^{u}}^{h} , \\ & \forall \left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v^{'}} , v^{'} \in V_{s , l}^{'} , s \in S_{1} \cup S_{2} , l \in L_{\mathit{Dist}} , \forall v_{w , z}^{u} \in V : s_{v_{w , z}^{u}}^{a} = s , a_{w , z}^{u} \geq a^{v '} , \forall q \in P_{s , v^{'}} \cap P_{s , v_{w , z}^{u}} ,\end{aligned} \tag{eq\_0032} \\
+  & \begin{aligned} & \left(c_{l , n}^{i + 1} + 2 - \left(p_{v_{l , n}^{i} , q} + p_{v_{w , z}^{u} , q}\right)\right) \cdot M + t_{v_{w , z}^{u}}^{a} \geq t_{v_{l , n}^{i + 1}}^{d} + \mathit{tau}_{v_{l , n}^{i} , v_{w , z}^{u}}^{h} , \\ & \forall v_{l , n}^{i} \in V_{s , l}^{'} , s \in S_{2} , l \in L_{\mathit{Dist}} , \forall v_{w , z}^{u} \in V : s_{v_{w , z}^{u}}^{a} = s , a_{w , z}^{u} \geq a_{l , n}^{i} \forall q \in P_{s , v_{l , n}^{i}} \cap P_{s , v_{w , z}^{u}} .\end{aligned} \tag{eq\_0033} \\
+\end{align}

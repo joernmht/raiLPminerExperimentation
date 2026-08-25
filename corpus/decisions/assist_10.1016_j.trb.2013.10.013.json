@@ -1,0 +1,256 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.trb.2013.10.013",
+      "doi": "10.1016/j.trb.2013.10.013",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0002",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0003",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0004",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "\\mathit{sU}_{t,\\mathit{tc}} \\ge 0 \\qquad \\forall t \\in T, \\mathit{tc} \\in \\mathit{TC}",
+          "parts": [
+            "\\mathit{sU}_{t,\\mathit{tc}} \\ge 0 \\qquad \\forall t \\in T, \\mathit{tc} \\in \\mathit{TC}",
+            "\\mathit{eU}_{t,\\mathit{tc}} \\ge 0 \\qquad \\forall t \\in T, \\mathit{tc} \\in \\mathit{TC}"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0007",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0008",
+          "status": "corrected",
+          "note": "\\min D",
+          "parts": [
+            "\\min D"
+          ]
+        },
+        {
+          "id": "eq-0009",
+          "status": "duplicate",
+          "duplicate_of": "eq-0008"
+        },
+        {
+          "id": "eq-0010",
+          "status": "corrected",
+          "note": "o_{t,r,tc} \\geq \\mathit{init}_{t} \\cdot x_{t,r} \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}",
+          "parts": [
+            "o_{t,r,tc} \\geq \\mathit{init}_{t} \\cdot x_{t,r} \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}"
+          ]
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "o_{t,r,tc} \\le Mx_{t,r} \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in TC^{r}",
+          "parts": [
+            "o_{t,r,tc} \\le Mx_{t,r} \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in TC^{r}"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "o_{t,r,tc} \\geq \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{alpha}_{r,tc,k} \\cdot \\left( o_{t,r,k} + \\mathit{rt}_{r,\\mathit{ty}_{t},k} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}",
+          "parts": [
+            "o_{t,r,tc} \\geq \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{alpha}_{r,tc,k} \\cdot \\left( o_{t,r,k} + \\mathit{rt}_{r,\\mathit{ty}_{t},k} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "corrected",
+          "note": "\\sum_{r \\in R_{t}} x_{t,r} = 1 \\qquad \\forall t \\in T",
+          "parts": [
+            "\\sum_{r \\in R_{t}} x_{t,r} = 1 \\qquad \\forall t \\in T"
+          ]
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "\\mathit{conn}_{t,tp} \\cdot \\left( \\sum_{r \\in R_{tp}, tc \\in \\mathit{TC}^{r}} \\mathit{piStart}_{r,tc} \\cdot o_{tp,r,tc} \\right) \\geq \\mathit{conn}_{t,tp} \\cdot \\left( \\sum_{r \\in R_{t}, tc \\in \\mathit{TC}^{r}} \\mathit{sigEnd}_{r,tc} \\cdot \\left( o_{t,r,tc} + \\left( \\mathit{ms}_{t,tp,c} + \\mathit{rt}_{r,\\mathit{ty}_{t},tc} \\right) \\cdot x_{t,r} \\right) \\right) \\qquad \\forall t, tp \\in T",
+          "parts": [
+            "\\mathit{conn}_{t,tp} \\cdot \\left( \\sum_{r \\in R_{tp}, tc \\in \\mathit{TC}^{r}} \\mathit{piStart}_{r,tc} \\cdot o_{tp,r,tc} \\right) \\geq \\mathit{conn}_{t,tp} \\cdot \\left( \\sum_{r \\in R_{t}, tc \\in \\mathit{TC}^{r}} \\mathit{sigEnd}_{r,tc} \\cdot \\left( o_{t,r,tc} + \\left( \\mathit{ms}_{t,tp,c} + \\mathit{rt}_{r,\\mathit{ty}_{t},tc} \\right) \\cdot x_{t,r} \\right) \\right) \\qquad \\forall t, tp \\in T"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "corrected",
+          "note": "D_{t} \\geq \\sum_{r \\in R_{t}} o_{t,r,tcEnd} - \\mathit{sched}_{t} \\qquad \\forall t \\in T",
+          "parts": [
+            "D_{t} \\geq \\sum_{r \\in R_{t}} o_{t,r,tcEnd} - \\mathit{sched}_{t} \\qquad \\forall t \\in T"
+          ]
+        },
+        {
+          "id": "eq-0016",
+          "status": "corrected",
+          "note": "D \\geq D_{t} \\qquad \\forall t \\in T",
+          "parts": [
+            "D \\geq D_{t} \\qquad \\forall t \\in T"
+          ]
+        },
+        {
+          "id": "eq-0017",
+          "status": "corrected",
+          "note": "\\mathit{theta}_{r,tc} \\cdot d_{t,r,tc} = \\mathit{theta}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{sigma}_{r,tc,k} \\cdot o_{t,r,k} - o_{t,r,tc} - \\mathit{rt}_{r,\\mathit{ty}_{t},tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}",
+          "parts": [
+            "\\mathit{theta}_{r,tc} \\cdot d_{t,r,tc} = \\mathit{theta}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{sigma}_{r,tc,k} \\cdot o_{t,r,k} - o_{t,r,tc} - \\mathit{rt}_{r,\\mathit{ty}_{t},tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, r \\in R_{t}, tc \\in \\mathit{TC}^{r}"
+          ]
+        },
+        {
+          "id": "eq-0018",
+          "status": "corrected",
+          "note": "\\mathit{inc}_{tp,t} \\cdot \\left( \\sum_{r \\in R_{t}, tc \\in \\mathit{TC}^{r}} \\mathit{piStart}_{r,tc} \\cdot o_{t,r,tc} \\right) \\geq \\mathit{inc}_{tp,t} \\cdot \\left( \\sum_{r \\in R_{tp}, tc \\in \\mathit{TC}^{r}} \\mathit{sigEnd}_{r,tc} \\cdot \\left( o_{tp,r,tc} + \\left( \\mathit{ms}_{t,tp} + \\mathit{rt}_{r,\\mathit{ty}_{tp},tc} \\right) \\cdot x_{tp,r} \\right) \\right) \\qquad \\forall t, tp \\in T",
+          "parts": [
+            "\\mathit{inc}_{tp,t} \\cdot \\left( \\sum_{r \\in R_{t}, tc \\in \\mathit{TC}^{r}} \\mathit{piStart}_{r,tc} \\cdot o_{t,r,tc} \\right) \\geq \\mathit{inc}_{tp,t} \\cdot \\left( \\sum_{r \\in R_{tp}, tc \\in \\mathit{TC}^{r}} \\mathit{sigEnd}_{r,tc} \\cdot \\left( o_{tp,r,tc} + \\left( \\mathit{ms}_{t,tp} + \\mathit{rt}_{r,\\mathit{ty}_{tp},tc} \\right) \\cdot x_{tp,r} \\right) \\right) \\qquad \\forall t, tp \\in T"
+          ]
+        },
+        {
+          "id": "eq-0019",
+          "status": "corrected",
+          "note": "\\sum_{r \\in R_{t}, tc \\in TC^{r} : p_{r,tc} = tc0} sU_{t,tc} \\le \\sum_{r \\in R_{tp}, tc \\in TC^{r} : s_{r,tc} = tcinf} eU_{tp,tc} \\qquad \\forall t, tp \\in T : i(tp,t) = 1",
+          "parts": [
+            "\\sum_{r \\in R_{t}, tc \\in TC^{r} : p_{r,tc} = tc0} sU_{t,tc} \\le \\sum_{r \\in R_{tp}, tc \\in TC^{r} : s_{r,tc} = tcinf} eU_{tp,tc} \\qquad \\forall t, tp \\in T : i(tp,t) = 1"
+          ]
+        },
+        {
+          "id": "eq-0020",
+          "status": "corrected",
+          "note": "\\sum_{r \\in R_{t} : \\mathit{tc} \\in \\mathit{TC}^{r}} x_{t,r} = \\sum_{r \\in R_{tp} : \\mathit{tc} \\in \\mathit{TC}^{r}} x_{tp,r} \\qquad \\forall t, tp \\in T : \\mathit{incomp}_{tp,t}=1, \\mathit{tc} \\in \\mathit{PL}",
+          "parts": [
+            "\\sum_{r \\in R_{t} : \\mathit{tc} \\in \\mathit{TC}^{r}} x_{t,r} = \\sum_{r \\in R_{tp} : \\mathit{tc} \\in \\mathit{TC}^{r}} x_{tp,r} \\qquad \\forall t, tp \\in T : \\mathit{incomp}_{tp,t}=1, \\mathit{tc} \\in \\mathit{PL}"
+          ]
+        },
+        {
+          "id": "eq-0021",
+          "status": "corrected",
+          "note": "\\mathit{phi}_{t,tc} \\cdot \\mathit{sU}_{t,tc} = \\mathit{phi}_{t,tc} \\cdot \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} - \\mathit{fo}_{r,tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}",
+          "parts": [
+            "\\mathit{phi}_{t,tc} \\cdot \\mathit{sU}_{t,tc} = \\mathit{phi}_{t,tc} \\cdot \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} - \\mathit{fo}_{r,tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}"
+          ]
+        },
+        {
+          "id": "eq-0022",
+          "status": "corrected",
+          "note": "\\mathit{psi}_{t,tc} \\cdot \\mathit{sU}_{t,tc} \\leq \\mathit{psi}_{t,tc} \\cdot \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} - \\mathit{fo}_{r,tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}",
+          "parts": [
+            "\\mathit{psi}_{t,tc} \\cdot \\mathit{sU}_{t,tc} \\leq \\mathit{psi}_{t,tc} \\cdot \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} - \\mathit{fo}_{r,tc} \\cdot x_{t,r} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}"
+          ]
+        },
+        {
+          "id": "eq-0023",
+          "status": "corrected",
+          "note": "\\mathit{eU}_{t,tc} = \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} + \\mathit{ul}_{t,r,tc} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}",
+          "parts": [
+            "\\mathit{eU}_{t,tc} = \\sum_{r \\in R_{t}} \\mathit{mu}_{r,tc} \\cdot \\left( \\sum_{k \\in \\mathit{TC}^{r}} \\mathit{rho}_{r,tc,k} \\cdot o_{t,r,k} + \\mathit{ul}_{t,r,tc} \\right) \\qquad \\forall t \\in T, tc \\in \\mathit{TC}_{t}"
+          ]
+        },
+        {
+          "id": "eq-0024",
+          "status": "corrected",
+          "note": "y_{t,tp,tc} + y_{tp,t,tc} = 1 \\qquad \\forall t, tp \\in T, tc \\in TC_t \\cap TC_{tp}",
+          "parts": [
+            "y_{t,tp,tc} + y_{tp,t,tc} = 1 \\qquad \\forall t, tp \\in T, tc \\in TC_t \\cap TC_{tp}"
+          ]
+        },
+        {
+          "id": "eq-0025",
+          "status": "corrected",
+          "note": "\\mathit{cond}_{t,tp,tc} \\cdot \\left( \\mathit{eU}_{t,tc} - M \\cdot \\left( 1 - y_{t,tp,tc} \\right) \\right) \\leq \\mathit{cond}_{t,tp,tc} \\cdot \\mathit{sU}_{tp,tc} \\qquad \\forall t, tp \\in T, tc \\in \\mathit{TC}_{t} \\cap \\mathit{TC}_{tp}",
+          "parts": [
+            "\\mathit{cond}_{t,tp,tc} \\cdot \\left( \\mathit{eU}_{t,tc} - M \\cdot \\left( 1 - y_{t,tp,tc} \\right) \\right) \\leq \\mathit{cond}_{t,tp,tc} \\cdot \\mathit{sU}_{tp,tc} \\qquad \\forall t, tp \\in T, tc \\in \\mathit{TC}_{t} \\cap \\mathit{TC}_{tp}"
+          ]
+        },
+        {
+          "id": "eq-0026",
+          "status": "corrected",
+          "note": "\\mathit{cond}_{t,tp,tc} \\cdot \\left( \\mathit{eU}_{tp,tc} - \\mathit{My}_{t,tp,tc} \\right) \\leq \\mathit{cond}_{t,tp,tc} \\cdot \\mathit{sU}_{t,tc} \\qquad \\forall t, tp \\in T, tc \\in \\mathit{TC}_{t} \\cap \\mathit{TC}_{tp}",
+          "parts": [
+            "\\mathit{cond}_{t,tp,tc} \\cdot \\left( \\mathit{eU}_{tp,tc} - \\mathit{My}_{t,tp,tc} \\right) \\leq \\mathit{cond}_{t,tp,tc} \\cdot \\mathit{sU}_{t,tc} \\qquad \\forall t, tp \\in T, tc \\in \\mathit{TC}_{t} \\cap \\mathit{TC}_{tp}"
+          ]
+        },
+        {
+          "id": "eq-0027",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0028",
+          "status": "accepted"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.trb.2013.10.013",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.trb.2013.10.013",
+      "symbols": {
+        "D": "variable",
+        "M": "parameter",
+        "Mx": "parameter",
+        "My": "parameter",
+        "PL": "parameter",
+        "R": "index",
+        "T": "index",
+        "TC": "index",
+        "U": "variable",
+        "being": "parameter",
+        "bs": "parameter",
+        "by": "parameter",
+        "c": "index",
+        "ct": "parameter",
+        "d": "variable",
+        "e": "parameter",
+        "eU": "variable",
+        "ends": "parameter",
+        "i": "index",
+        "in": "parameter",
+        "init": "parameter",
+        "ms": "parameter",
+        "o": "variable",
+        "p": "parameter",
+        "pt": "parameter",
+        "ref": "parameter",
+        "rel": "parameter",
+        "rt": "parameter",
+        "s": "parameter",
+        "sU": "variable",
+        "sched": "parameter",
+        "starts": "parameter",
+        "t": "index",
+        "tc": "index",
+        "time": "parameter",
+        "ul": "variable",
+        "utilized": "parameter",
+        "which": "parameter",
+        "x": "variable",
+        "y": "variable"
+      }
+    }
+  ]
+}

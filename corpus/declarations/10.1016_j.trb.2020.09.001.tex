@@ -1,0 +1,197 @@
+% Declaration sidecar for 10.1016_j.trb.2020.09.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2020.09.001
+% Integrated timetable rescheduling and passenger reassignment during railway disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2020.09.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total generalized travel time over all passenger groups
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Event index in the event-activity network
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events in the network
+
+% c: classified as variable during review
+%@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary cancellation decision for an event
+
+% unusable as an identifier, rename or drop: λ
+% x: classified as variable during review
+%@ var x shape=E domain=continuous role=primary drole=- lo=- hi=- :: Rescheduled time of an event
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities in the network
+
+% y: classified as variable during review
+%@ var y shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if activity is effective
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of activity types
+
+% board: classified as index during review
+%@ index board ordered=0 cyclic=0 :: Activity type: boarding
+
+% dwell: classified as index during review
+%@ index dwell ordered=0 cyclic=0 :: Activity type: dwelling
+
+% entry: classified as index during review
+%@ index entry ordered=0 cyclic=0 :: Activity type: entry
+
+% exit: classified as index during review
+%@ index exit ordered=0 cyclic=0 :: Activity type: exit
+
+% pass: classified as index during review
+%@ index pass ordered=0 cyclic=0 :: Activity type: pass-through
+
+% run: classified as index during review
+%@ index run ordered=0 cyclic=0 :: Activity type: running
+
+% trans: classified as index during review
+%@ index trans ordered=0 cyclic=0 :: Activity type: transfer
+
+% wait: classified as index during review
+%@ index wait ordered=0 cyclic=0 :: Activity type: waiting
+
+% r: classified as parameter during review
+%@ param r shape=E kind=vector domain=- :: Binary parameter indicating train origin departure
+
+% s: classified as variable during review
+%@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for skip stop decision
+
+% f: classified as parameter during review
+%@ param f shape=E kind=vector domain=- :: Binary parameter indicating train destination arrival
+
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar domain=- :: Passenger type or path parameter
+
+% tail: classified as parameter during review
+%@ param tail shape=A kind=vector domain=- :: Function returning tail event of an activity
+
+% head: classified as parameter during review
+%@ param head shape=A kind=vector domain=- :: Function returning head event of an activity
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large number (set to 2880) for big-M constraints
+
+% unusable as an identifier, rename or drop: ℓ
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of passenger groups
+
+% u: classified as variable during review
+%@ var u shape=A,G domain=binary role=primary drole=- lo=- hi=- :: Binary decision if activity chosen by passenger group
+
+% O: classified as parameter during review
+%@ param O shape=G kind=vector domain=- :: Origin station of passenger group
+
+% t: classified as parameter during review
+%@ param t shape=G kind=vector domain=- :: Arrival time of passenger group at origin station
+
+% D: classified as parameter during review
+%@ param D shape=G kind=vector domain=- :: Destination station of passenger group
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of activities going into an event
+
+% Out: classified as index during review
+%@ index Out ordered=0 cyclic=0 :: Set of activities going out of an event
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number of passengers in group
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Activity type index
+
+% w: classified as variable during review
+%@ var w shape=A,G domain=non_negative role=primary drole=- lo=- hi=- :: Weight of activity perceived by passenger group
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: μ
+% T: classified as parameter during review
+%@ param T shape=G kind=vector domain=- :: Expected generalized travel time in planned timetable
+
+% z: classified as variable during review
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value: total generalized travel time
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, g
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Duplicate departure and corresponding departure events cancelled together
+%@ con eq_0002 kind=linear domain=- indicator=- :: Duplicate departure and corresponding departure events share rescheduled time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Entry/exit penalty activities always effective
+%@ con eq_0004 kind=linear domain=- indicator=- :: Undisrupted activities always effective
+%@ con eq_0005 kind=linear domain=- indicator=- :: Disrupted running activity effective iff tail departure not cancelled
+%@ con eq_0006 kind=linear domain=- indicator=- :: Disrupted running activity effective iff head arrival not cancelled
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell/pass activity not effective if tail event cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: Dwell/pass activity not effective if head event cancelled
+%@ con eq_0009 kind=linear domain=- indicator=- :: Dwell/pass activity effective if neither event cancelled
+%@ con eq_0010 kind=linear domain=- indicator=- :: Entry activity at origin departure effective iff duplicate departure not cancelled
+%@ con eq_0011 kind=linear domain=- indicator=- :: Entry activity at non-origin not effective if duplicate departure cancelled
+%@ con eq_0012 kind=linear domain=- indicator=- :: Entry activity effective only if associated real stop kept and not skipped
+%@ con eq_0013 kind=linear domain=- indicator=- :: Entry activity effective if real stop kept and not skipped
+%@ con eq_0014 kind=linear domain=- indicator=- :: Boarding activity at origin departure effective iff duplicate departure not cancelled
+%@ con eq_0015 kind=linear domain=- indicator=- :: Boarding activity at non-origin not effective if duplicate departure cancelled
+%@ con eq_0016 kind=linear domain=- indicator=- :: Boarding activity effective only if associated real stop kept and not skipped
+%@ con eq_0017 kind=linear domain=- indicator=- :: Boarding activity effective if real stop kept and not skipped
+%@ con eq_0018 kind=linear domain=- indicator=- :: Exit activity at destination arrival effective iff arrival not cancelled
+%@ con eq_0019 kind=linear domain=- indicator=- :: Exit activity at non-destination not effective if arrival cancelled
+%@ con eq_0020 kind=linear domain=- indicator=- :: Exit activity effective only if associated real stop kept and not skipped
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exit activity effective if real stop kept and not skipped
+%@ con eq_0022 kind=linear domain=- indicator=- :: Wait activity not effective if tail duplicate departure cancelled
+%@ con eq_0023 kind=linear domain=- indicator=- :: Wait activity not effective if head duplicate departure cancelled
+%@ con eq_0024 kind=linear domain=- indicator=- :: Wait activity ineffective if tail duplicate departure not associated with real stop
+%@ con eq_0025 kind=linear domain=- indicator=- :: Wait activity ineffective if head duplicate departure not associated with real stop
+%@ con eq_0026 kind=linear domain=- indicator=- :: At most one of two opposite wait activities can be effective
+%@ con eq_0027 kind=linear domain=- indicator=- :: At most one effective wait activity out of a duplicate departure event
+%@ con eq_0028 kind=linear domain=- indicator=- :: At most one effective wait activity into a duplicate departure event
+%@ con eq_0029 kind=linear domain=- indicator=- :: Effective wait activity must connect to next time-closest duplicate departure (upper bound)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Effective wait activity must connect to next time-closest duplicate departure (reverse upper bound)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Effective wait activity has nonnegative waiting time
+%@ con eq_0032 kind=linear domain=- indicator=- :: Transfer activity not effective if tail arrival cancelled
+%@ con eq_0033 kind=linear domain=- indicator=- :: Transfer activity not effective if head duplicate departure cancelled
+%@ con eq_0034 kind=linear domain=- indicator=- :: Transfer activity ineffective if tail arrival not associated with real stop
+%@ con eq_0035 kind=linear domain=- indicator=- :: Transfer activity ineffective if head duplicate departure not associated with real stop
+%@ con eq_0036 kind=linear domain=- indicator=- :: At most one effective transfer activity out of an arrival event
+%@ con eq_0037 kind=linear domain=- indicator=- :: Effective transfer must go to next time-closest duplicate departure (upper bound)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Effective transfer must go to next time-closest duplicate departure (reverse upper bound)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Effective transfer respects minimum transfer time
+%@ con eq_0040 kind=linear domain=- indicator=- :: Passenger group can only choose effective activities
+%@ con eq_0041 kind=linear domain=- indicator=- :: Exactly one entry activity chosen at passenger origin
+%@ con eq_0042 kind=linear domain=- indicator=- :: No entry activity chosen at non-origin stations
+%@ con eq_0043 kind=linear domain=- indicator=- :: Exactly one exit activity chosen at passenger destination
+%@ con eq_0044 kind=linear domain=- indicator=- :: No exit activity chosen at non-destination stations
+%@ con eq_0045 kind=linear domain=- indicator=- :: Flow balance at intermediate events for each passenger group
+%@ con eq_0046 kind=linear domain=- indicator=- :: Entry activity can be chosen only if rescheduled departure not before group arrival at origin
+%@ con eq_0047 kind=linear domain=- indicator=- :: Weight zero if activity not chosen by passenger group
+%@ con eq_0048 kind=linear domain=- indicator=- :: Weights are nonnegative
+%@ con eq_0049 kind=linear domain=- indicator=- :: Upper bound on entry activity weight as waiting time
+%@ con eq_0050 kind=linear domain=- indicator=- :: Lower bound on entry activity weight as waiting time
+%@ con eq_0051 kind=linear domain=- indicator=- :: Upper bound on wait activity weight
+%@ con eq_0052 kind=linear domain=- indicator=- :: Lower bound on wait activity weight
+%@ con eq_0053 kind=linear domain=- indicator=- :: Upper bound on run/dwell/pass activity weight
+%@ con eq_0054 kind=linear domain=- indicator=- :: Lower bound on run/dwell/pass activity weight
+%@ con eq_0055 kind=linear domain=- indicator=- :: Upper bound on transfer activity weight
+%@ con eq_0056 kind=linear domain=- indicator=- :: Lower bound on transfer activity weight
+%@ con eq_0057 kind=linear domain=- indicator=- :: Entry penalty weight equals acceptable travel time penalty
+%@ con eq_0058 kind=linear domain=- indicator=- :: Zero weight for exit penalty, boarding and exit activities
+%@ con eq_0059 kind=linear domain=- indicator=- :: Objective: total generalized travel time over all passenger groups

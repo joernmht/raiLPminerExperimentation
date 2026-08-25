@@ -1,0 +1,25 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2013.07.023
+%@ meta id=10.1016_j.apm.2013.07.023 family=lp schema=0.1.0
+%@ name :: Balanced train timetabling on a single-line railway with optimized velocity
+%@ desc :: Mined from Balanced train timetabling on a single-line railway with optimized velocity (Applied Mathematical Modelling, 2013).
+%@ prov source :: 10.1016/j.apm.2013.07.023
+%@ prov reference :: Balanced train timetabling on a single-line railway with optimized velocity
+%@ prov author :: Xiaoming Xu; Keping Li; Lixing Yang; Jingjing Ye
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the delay-ratio F(V), defined as the ratio of total delay time to total free-run time.
+%@ var v shape=N domain=continuous role=primary drole=- lo=- hi=- :: Velocity of train i, decision variable in the model.
+%@ param delta_v shape=- kind=scalar :: Pre-specified degree of velocity relaxation.
+%@ var V shape=N domain=continuous role=primary drole=- lo=- hi=- :: Velocity vector for all trains (components v_i).
+%@ var T shape=N domain=continuous role=primary drole=- lo=- hi=- :: Time functions T_i^ob(v_i,V) and T_i^f(v_i,V): arrival time and free-run time of train i.
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Delay-ratio objective function F(V).
+%@ index N ordered=0 cyclic=0 :: Number of trains under consideration.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Lower bound of velocity relaxation: v_i >= v_i^c - delta_v.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Upper bound of velocity relaxation: v_i <= v_i^c + delta_v.
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Definition of the delay-ratio objective F(V) as the ratio of total delay time to total free-run time.
+\begin{align}
+  & v_{i}^{c} - \mathit{Delta} v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} v , \tag{eq\_0001} \\
+  & F \left(V\right) = \frac{\sum_{i = 1}^{N} \left(T_{i}^{\mathit{ob}} \left(v_{i} , V\right) - T_{i}^{f} \left(v_{i} , V\right)\right)}{\sum_{i = 1}^{N} T_{i}^{f} \left(v_{i} , V\right)} \tag{eq\_0002} \\
+  \min\quad & F \left(V\right) \tag{eq\_0005\_a} \\
+  & v_{i}^{c} - \mathit{Delta} v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} v . \tag{eq\_0005\_b} \\
+\end{align}

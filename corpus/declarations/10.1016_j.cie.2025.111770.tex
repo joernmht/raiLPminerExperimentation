@@ -1,0 +1,152 @@
+% Declaration sidecar for 10.1016_j.cie.2025.111770
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2025.111770
+% Multi-line coordinated schedule adjustment optimization for metro short-term disruption recovery
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2025.111770.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total cost (passenger waiting + operational cost)
+
+% z: classified as variable during review
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Cost coefficients
+
+% P: classified as variable during review
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (boarding, alighting, waiting)
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
+
+% t: classified as variable during review
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time
+
+% unusable as an identifier, rename or drop: Δ
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time slots
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of lines
+
+% A: classified as variable during review
+%@ var A shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Alighting passengers
+
+% V: classified as parameter during review
+%@ param V shape=- kind=scalar domain=- :: Train capacity
+
+% c: classified as variable during review
+%@ var c shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Schedule adjustment amount
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary train schedule indicator
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of trains
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% unusable as an identifier, rename or drop: α
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway
+
+% I: classified as variable during review
+%@ var I shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Boarding passengers
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Big-M constant
+
+% B: classified as variable during review
+%@ var B shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
+
+% O: classified as variable during review
+%@ var O shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Minimum boarding threshold
+
+% q: classified as variable during review
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
+
+% unusable as an identifier, rename or drop: η
+% PTA: classified as variable during review
+%@ var PTA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Transfer passenger flow
+
+% a: classified as variable during review
+%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
+
+% b: classified as variable during review
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
+
+% w: classified as variable during review
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for transfer flow
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: ε
+% Bound by a quantifier or big operator, so no declaration of their own: l, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting time cost term (z1)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Operational cost term (z2) for train insertion and schedule adjustment
+%@ con eq_0004 kind=linear domain=- indicator=- :: Coupling of train departure from station s in slot t with starting time t0 via spatio-temporal connection
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time of stranded/resumed train at station (fixed input)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure time of fine-tuning/standby train at station
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum headway between consecutive trains at origin station
+%@ con eq_0008 kind=linear domain=- indicator=- :: Each train has at most one scheduled departure from its starting station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of schedule adjustment amount for fine-tuning train at origin
+%@ con eq_0010 kind=linear domain=- indicator=- :: Non-negativity of schedule adjustment amount
+%@ con eq_0011 kind=linear domain=- indicator=- :: Zero adjustment for final fine-tuning train in recovery period
+%@ con eq_0012 kind=linear domain=- indicator=- :: Big-M coupling of boarding passengers to binary stop decision (fine-tuning/standby)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Big-M coupling of boarding passengers to fixed stranded-train schedule
+%@ con eq_0014 kind=linear domain=- indicator=- :: Aggregation of boarding passengers over time slots per train and station
+%@ con eq_0015 kind=linear domain=- indicator=- :: Boarding passengers limited by remaining train capacity at station
+%@ con eq_0017 kind=linear domain=- indicator=- :: Onboard passenger count update after boarding and alighting
+%@ con eq_0018 kind=linear domain=- indicator=- :: Skip-stop: boarding must meet minimum threshold D when standby train stops
+%@ con eq_0019 kind=linear domain=- indicator=- :: Skip-stop: boarding prohibited when standby train skips station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Skip-stop: alighting prohibited when standby train skips station
+%@ con eq_0021 kind=linear domain=- indicator=- :: Platform waiting passenger balance: cumulative arrivals minus cumulative boardings
+%@ con eq_0022 kind=linear domain=- indicator=- :: Non-negativity of platform waiting passengers
+%@ con eq_0023 kind=linear domain=- indicator=- :: Updated passenger arrivals on connecting lines due to transfers from disrupted lines
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linearized minimum headway between consecutive fine-tuning trains
+%@ con eq_0033 kind=linear domain=- indicator=- :: Minimum headway between fine-tuning and standby train when standby departs first
+%@ con eq_0034 kind=linear domain=- indicator=- :: Sequencing variable h_w applies only when standby train is inserted
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized upper bound for alighting passengers at origin station when stopping
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized lower bound for alighting passengers at origin station when stopping
+%@ con eq_0037 kind=linear domain=- indicator=- :: Linearized upper bound for alighting passengers at downstream station when stopping
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearized lower bound for alighting passengers at downstream station when stopping
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearized arrival update on disrupted lines using auxiliary transfer-flow variable w
+%@ con eq_0040 kind=linear domain=- indicator=- :: Auxiliary transfer flow w forced to zero when train does not stop (x=0)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Auxiliary transfer flow w set to transfer flow PTA when train stops (x=1)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Auxiliary transfer flow w capped by transfer passenger quantity PTA
+%@ con eq_0043 kind=linear domain=- indicator=- :: Non-negativity of auxiliary transfer flow w
+%@ con eq_0044 kind=linear domain=- indicator=- :: Additional linearization constraint for transfer-flow floor calculation
+%@ con eq_0045 kind=linear domain=- indicator=- :: Additional linearization constraint for transfer-flow floor calculation (lower bound)
+%@ con eq_0046 kind=linear domain=- indicator=- :: Consistency constraint for stranded-train fixed schedule in recovery period
+%@ con eq_0047 kind=linear domain=- indicator=- :: Consistency constraint for stranded-train fixed schedule in recovery period (continued)
+%@ con eq_0048 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains
+%@ con eq_0049 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains (continued)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Residual linear constraint ensuring feasible multi-line coordinated adjustment

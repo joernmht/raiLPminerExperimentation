@@ -1,0 +1,140 @@
+% Declaration sidecar for 10.1016_j.trc.2023.104278
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2023.104278
+% Train schedule optimization for commuter-metro networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2023.104278.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total arrival times of all trains at the last arrival sections in their destination stations.
+
+% t: classified as variable during review
+%@ var t shape=K,S domain=continuous role=primary drole=- lo=- hi=- :: Time when train enters a section.
+
+% unusable as an identifier, rename or drop: ω
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains.
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Section index.
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of consecutive section pairs.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of sections.
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Train index.
+
+% n: classified as parameter during review
+%@ param n shape=K,S kind=matrix domain=- :: Running time of train on section.
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Train index.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive number.
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of moving block sections.
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: λ
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum or maximum departure time interval between successive trains.
+
+% x: classified as variable during review
+%@ var x shape=K,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating immediate precedence of trains departing from the same origin station.
+
+% unusable as an identifier, rename or drop: ξ
+% N: classified as parameter during review
+%@ param N shape=S kind=vector domain=- :: Number of common or through trains departing from a section.
+
+% v: classified as variable during review
+%@ var v shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Train speed at section phases.
+
+% a: classified as parameter during review
+%@ param a shape=K,S kind=matrix domain=- :: Acceleration rate of train on section.
+
+% b: classified as parameter during review
+%@ param b shape=K,S kind=matrix domain=- :: Deceleration rate of train on section.
+
+% l: classified as variable during review
+%@ var l shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Distance traveled in a phase on a section.
+
+% L: classified as parameter during review
+%@ param L shape=S kind=vector domain=- :: Length of block section.
+
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: ε
+% unusable as an identifier, rename or drop: θ̂
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: ι
+% unusable as an identifier, rename or drop: σ
+% Bound by a quantifier or big operator, so no declaration of their own: Q, k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Entrance time relation between consecutive sections.
+%@ con eq_0004 kind=big_m domain=- indicator=- :: Alternative sequencing constraint for fixed block sections ensuring train i enters after train j's occupation.
+%@ con eq_0006 kind=big_m domain=- indicator=- :: Alternative sequencing constraint for fixed block sections ensuring train j enters after train i's occupation.
+%@ con eq_0007 kind=headway domain=- indicator=- :: Minimum departure headway constraint when train j departs before train i.
+%@ con eq_0009 kind=headway domain=- indicator=- :: Minimum departure headway constraint when train i departs before train j.
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Precedence constraint for common trains: among the two following trains, one is common and one is through.
+%@ con eq_0013 kind=ordering domain=- indicator=- :: Precedence constraint for through trains: next two trains are common/common or common/through.
+%@ con eq_0014 kind=headway domain=- indicator=- :: Maximum departure interval constraint when train j immediately precedes train i.
+%@ con eq_0016 kind=headway domain=- indicator=- :: Maximum departure interval constraint when train i immediately precedes train j.
+%@ con eq_0017 kind=ordering domain=- indicator=- :: Each train has at most one immediate successor at its origin section.
+%@ con eq_0019 kind=ordering domain=- indicator=- :: Each train has at most one immediate predecessor at its origin section.
+%@ con eq_0020 kind=ordering domain=- indicator=- :: Number of immediate precedence links equals the number of trains minus one per origin section.
+%@ con eq_0021 kind=ordering domain=- indicator=- :: Immediate precedence implies the predecessor enters the section first.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Initial speed of each train at its first departure section is zero.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Final speed of each train at its last arrival section is zero.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Incoming speed on each section does not exceed the speed limit.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Cruising speed on each section does not exceed the speed limit.
+%@ con eq_0028 kind=ordering domain=- indicator=- :: Event sequence on a section: enter, start cruising, end cruising, leave.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Acceleration phase speed update from entry to cruising.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Braking phase speed update from cruising to next section entry.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Block section length equals the sum of distances of the three phases.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Incoming phase distance computed from entry and cruising speeds and time.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Cruising phase distance computed from cruising speed and time.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Outgoing phase distance computed from cruising and next entry speeds and time.
+%@ con eq_0039 kind=big_m domain=- indicator=- :: Linearization upper bound for auxiliary variable θˇ indicating t_{i,s'} ≥ t_{j,s}.
+%@ con eq_0041 kind=big_m domain=- indicator=- :: Linearization lower bound for auxiliary variable θˇ.
+%@ con eq_0042 kind=big_m domain=- indicator=- :: Linearization upper bound for auxiliary variable θ̂ indicating t_{i,s'} ≤ t_{j,ŝ}.
+%@ con eq_0043 kind=big_m domain=- indicator=- :: Linearization lower bound for auxiliary variable θ̂.
+%@ con eq_0044 kind=big_m domain=- indicator=- :: Activation constraint for simultaneous occupation indicator ζ.
+%@ con eq_0045 kind=big_m domain=- indicator=- :: Upper bound linking ζ to θˇ.
+%@ con eq_0046 kind=big_m domain=- indicator=- :: Upper bound linking ζ to θ̂.
+%@ con eq_0047 kind=big_m domain=- indicator=- :: Upper bound linking ζ to λ.
+%@ con eq_0048 kind=big_m domain=- indicator=- :: Safety distance constraint for following trains in fixed and moving block sections.
+%@ con eq_0058 kind=big_m domain=- indicator=- :: Adjusted alternative sequencing constraint with increased time margin σ_{ij} (train i after j).
+%@ con eq_0060 kind=big_m domain=- indicator=- :: Adjusted alternative sequencing constraint with increased time margin σ_{ij} (train j after i).
+%@ con eq_0061 kind=big_m domain=- indicator=- :: Linear constraint defining speed indicator variables ι for train control strategies (Appendix C).
+%@ con eq_0062 kind=big_m domain=- indicator=- :: Linear constraint defining speed indicator variables ι for train control strategies (Appendix C).
+%@ index sp
+%@ index jp
+%@ param sb
+%@ param NC
+%@ param NT
+%@ param h_min
+%@ param h_max

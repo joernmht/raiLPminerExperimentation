@@ -1,0 +1,30 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2013.04.002
+%@ meta id=10.1016_j.cor.2013.04.002 family=milp schema=0.1.0
+%@ name :: An experimental comparison of periodic timetabling models
+%@ desc :: Mined from An experimental comparison of periodic timetabling models (Computers & Operations Research, 2013).
+%@ prov source :: 10.1016/j.cor.2013.04.002
+%@ prov reference :: An experimental comparison of periodic timetabling models
+%@ prov author :: Michael Siebert; Marc Goerigk
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger traveling time
+%@ var pi shape=E domain=integer role=primary drole=- lo=- hi=- :: Event time variable π_i for each event i in the EAN
+%@ var Tz shape=A domain=integer role=primary drole=- lo=- hi=- :: Product of period T and modulo parameter z_ij for activity (i,j) in A
+%@ param w shape=A kind=vector domain=- :: Passenger weight for activity a (number of passengers using that activity)
+%@ index A ordered=0 cyclic=0 :: Set of activities (driving, waiting, changing, headway) in the event activity network
+%@ param l shape=A kind=vector domain=- :: Minimal allowed activity duration for activity a
+%@ param u shape=A kind=vector domain=- :: Maximal allowed activity duration for activity a
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures) in the event activity network
+%@ index N ordered=0 cyclic=0 :: Set of natural numbers (domain of event time variables π)
+%@ index Z ordered=0 cyclic=0 :: Set of integers (domain of modulo parameters z)
+%@ var z shape=A domain=integer role=primary drole=- lo=- hi=- :: Modulo parameter for activity (i,j) in A, number of periods added to the duration
+%@ con eq_0004 kind=linear domain=- indicator=- :: Activity duration bounds: l_ij ≤ π_j − π_i + T z_ij ≤ u_ij for all (i,j) in A
+%@ con eq_0005 kind=linear domain=- indicator=- :: Event times are natural numbers: π_i ∈ N for all i in E
+%@ con eq_0006 kind=linear domain=- indicator=- :: Modulo parameters are integers: z_ij ∈ Z for all (i,j) in A
+%@ var piInt shape=- domain=integer role=auxiliary drole=- lo=0 hi=- :: auxiliary integer copy of pi
+%@ var zInt shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: auxiliary integer copy of z
+%@ var z_int shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: integer period offset
+\begin{align}
+  \min\quad & \sum_{\left(i , j\right) \in \mathcal{A}} w_{\mathit{ij}} \left(\mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tz}_{\mathit{ij}}\right) \tag{eq\_0003} \\
+  & pi_i \ge 0 \qquad \forall i \in \mathcal{E} \tag{eq\_0005} \\
+\end{align}

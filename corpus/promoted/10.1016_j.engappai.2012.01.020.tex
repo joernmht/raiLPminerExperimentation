@@ -1,0 +1,37 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.engappai.2012.01.020
+%@ meta id=10.1016_j.engappai.2012.01.020 family=milp schema=0.1.0
+%@ name :: Solving a periodic single-track train timetabling problem by an efficient hybrid algorithm
+%@ desc :: Mined from Solving a periodic single-track train timetabling problem by an efficient hybrid algorithm (Engineering Applications of Artificial Intelligence, 2012).
+%@ prov source :: 10.1016/j.engappai.2012.01.020
+%@ prov reference :: Solving a periodic single-track train timetabling problem by an efficient hybrid algorithm
+%@ prov author :: Amin Jamili; Mohammad Ali Shafia; Seyed Jafar Sadjadi; Reza Tavakkoli‐Moghaddam
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: minimize total weighted traveling time of trains
+%@ param l shape=R kind=vector domain=- :: lower bound for departure time of train i from origin
+%@ index A ordered=0 cyclic=0 :: set of constraints (arcs) in event-activity graph
+%@ param modT shape=- kind=scalar domain=- :: modulo operation with period T
+%@ param u shape=R kind=vector domain=- :: upper bound for departure time of train i from origin
+%@ param T shape=- kind=scalar domain=- :: time period
+%@ var z shape=R,R,B domain=integer role=primary drole=- lo=- hi=- :: integer variable for periodic constraints
+%@ var arr shape=R,B domain=continuous role=primary drole=- lo=- hi=- :: arrival time of train i to the end of block section b
+%@ param w shape=R kind=vector domain=- :: importance weight of train i
+%@ index R ordered=0 cyclic=0 :: set of trains
+%@ index B ordered=0 cyclic=0 :: set of block sections
+%@ param d shape=R kind=vector domain=- :: last block section that should be passed by train i
+%@ index o ordered=0 cyclic=0 :: first block section that should be passed by train i
+%@ param s shape=R,B kind=vector domain=- :: idle time of train i at beginning of block section b
+%@ param t shape=R,B kind=vector domain=- :: required time for train i to pass block section b
+%@ con eq_0001 kind=linear domain=- indicator=- :: periodic interval constraint for each activity arc a=(i,j) in event-activity graph
+%@ con eq_0002 kind=linear domain=- indicator=- :: integer reformulation of periodic constraint using integer variables z_a
+%@ con eq_0004 kind=linear domain=- indicator=- :: constraint ensuring trains pass block sections one after another
+%@ con eq_0005 kind=linear domain=- indicator=- :: precedence constraint ensuring at most one train occupies a block section concurrently
+%@ con eq_0006 kind=linear domain=- indicator=- :: departure time of train i from origin is within [l_i,u_i]
+\begin{align}
+  & \left(\mathit{pi}_{j} - \mathit{pi}_{i} - l_{a}\right) \mathit{modT} \leq u_{a} - l_{a} , \forall a = \left(i , j\right) \in A , \tag{eq\_0001} \\
+  & l_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} - T \cdot z_{a} \leq u_{a} \tag{eq\_0002} \\
+  \min\quad & \sum_{i \in R} w_{i} \left(\mathit{arr}_{i d_{i}} - \mathit{arr}_{i o_{i}}\right) \tag{eq\_0003} \\
+  & t_{i b '} + s_{i b '} \leq \mathit{arr}_{i b '} - \mathit{arr}_{i b} \leq T - 1 , \forall i \in R , \forall b , b ' \in \left[o_{i} , d_{i}\right] \tag{eq\_0004} \\
+  & t_{i b} \leq \mathit{arr}_{i b} - \mathit{arr}_{j b} - z_{i j b} \cdot T \leq T - t_{j b} , \forall i , j \in R , \forall b \in \left[o_{i} , d_{i}\right] \cap \left[o_{j} , d_{j}\right] \tag{eq\_0005} \\
+  & l_{i} \leq \mathit{arr}_{i o_{i}} - t_{i o_{i}} \leq u_{i} , \forall i \in R , \tag{eq\_0006} \\
+\end{align}

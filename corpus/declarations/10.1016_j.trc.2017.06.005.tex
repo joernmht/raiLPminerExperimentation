@@ -1,0 +1,99 @@
+% Declaration sidecar for 10.1016_j.trc.2017.06.005
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2017.06.005
+% Real-time automatic rescheduling strategy for an urban rail line by integrating the information of fault handling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2017.06.005.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize total deviation between rescheduled and planned arrival/departure times
+%
+% a: classified as variable during review
+%@ var a shape=N,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time for train i at station k
+%
+% d: classified as variable during review
+%@ var d shape=N,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time for train i from station k
+%
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total deviation from planned timetable)
+%
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of stations
+%
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of trains
+%
+% Rt: classified as parameter during review
+%@ param Rt shape=N,K kind=matrix domain=- :: Minimum running time for train i on section k
+%
+% Dt: classified as parameter during review
+%@ param Dt shape=N,K kind=matrix domain=- :: Minimum dwelling time for train i at station k
+%
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway time between consecutive trains
+%
+% unusable as an identifier, rename or drop: δ
+%@ param delta shape=- kind=scalar domain=- :: Actual primary delay caused by fault
+%
+% d̂: classified as parameter during review
+%@ param d_hat shape=N,K kind=matrix domain=- :: Upper bound for departure time from prior-RS
+%
+% â: classified as parameter during review
+%@ param a_hat shape=N,K kind=matrix domain=- :: Upper bound for arrival time from prior-RS
+%
+% d̃: classified as parameter during review
+%@ param d_tilde shape=N,K kind=matrix domain=- :: Planned departure time
+%
+% ã: classified as parameter during review
+%@ param a_tilde shape=N,K kind=matrix domain=- :: Planned arrival time
+%
+% buf: classified as parameter during review
+%@ param buf shape=N,K kind=matrix domain=- :: Buffer time between consecutive trains
+%
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Minimum running time constraint: a_{i,k} - d_{i,k-1} >= Rt_{i,k}
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum dwelling time constraint: d_{i,k} - a_{i,k} >= Dt_{i,k}
+%@ con eq_0005 kind=linear domain=- indicator=- :: Rescheduled arrival time not earlier than planned arrival time: a_{i,k} >= a_tilde_{i,k}
+%@ con eq_0006 kind=linear domain=- indicator=- :: Rescheduled departure time not earlier than planned departure time: d_{i,k} >= d_tilde_{i,k}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum headway between arrivals of consecutive trains: a_{i+1,k} - a_{i,k} >= h
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum headway between departures of consecutive trains: d_{i+1,k} - d_{i,k} >= h
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum headway between departure of preceding train and arrival of following train: a_{i+1,k} - d_{i,k} >= h
+%@ con eq_0010 kind=linear domain=- indicator=- :: Fault during dwelling: d_{i,k} = d_tilde_{i,k} + delta
+%@ con eq_0011 kind=linear domain=- indicator=- :: Fault during running: a_{i,k} = a_tilde_{i,k} + delta
+%@ con eq_0012 kind=linear domain=- indicator=- :: Upper bound from prior-RS on departure time: d_{i+1,k} <= d_hat_{i+1,k}
+%@ con eq_0013_a kind=linear domain=- indicator=- :: Prior-RS equality for departure of next train when fault occurs at station (Case A, if d_tilde_{i,k+1}+delta >= d_hat_{i+1,k}): d_{i+1,k} = d_hat_{i+1,k}
+%@ con eq_0013_b kind=linear domain=- indicator=- :: Prior-RS equality for arrival of next train in Case A: a_{i+1,k+1} = a_hat_{i+1,k+1}
+%@ con eq_0014 kind=linear domain=- indicator=- :: Post-RS inequality for departure of next train in Case A (if d_tilde_{i,k+1}+delta < d_hat_{i+1,k}): d_{i+1,k} >= d_tilde_{i,k+1}+delta
+%@ con eq_0015 kind=linear domain=- indicator=- :: Prior-RS equality for departure of next train when fault occurs on a section (Case B, if a_tilde_{i,k+1}+delta >= d_hat_{i+1,k}): d_{i+1,k} = d_hat_{i+1,k}
+%@ con eq_0016 kind=linear domain=- indicator=- :: Post-RS inequality for departure of next train in Case B (if a_tilde_{i,k+1}+delta < d_hat_{i+1,k}): d_{i+1,k} >= a_tilde_{i,k+1}+delta
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Prior-RS equality for departure of train i+2 in Case B1 (if d_tilde_{i,k+1}+delta >= d_hat_{i+2,k}): d_{i+2,k} = d_hat_{i+2,k}
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Prior-RS equality for arrival of train i+2 in Case B1: a_{i+2,k+1} = a_hat_{i+2,k+1}
+%@ con eq_0018 kind=linear domain=- indicator=- :: Post-RS inequality for departure of train i+2 in Case B1 (if d_tilde_{i,k+1}+delta < d_hat_{i+2,k}): d_{i+2,k} >= d_tilde_{i,k+1}+delta
+%@ con eq_0019 kind=linear domain=- indicator=- :: Prior-RS equality for departure of train i+2 in Case B2 (if a_tilde_{i,k+1}+delta >= d_hat_{i+2,k}): d_{i+2,k} = d_hat_{i+2,k}
+%@ con eq_0020 kind=linear domain=- indicator=- :: Post-RS inequality for departure of train i+2 in Case B2 (if a_tilde_{i,k+1}+delta < d_hat_{i+2,k}): d_{i+2,k} >= a_tilde_{i,k+1}+delta
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Appendix constraint defining the set of trains to be rescheduled (T subset of N)
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Appendix constraint defining the remaining station set S_i for each rescheduled train
+%@ con eq_0036 kind=linear domain=- indicator=- :: Appendix constraint for constructing the rescheduled train set T
+%@ con eq_0037 kind=linear domain=- indicator=- :: Appendix constraint for constructing the remaining station set S_i
+%@ con eq_0039 kind=linear domain=- indicator=- :: Appendix auxiliary constraint for the automatic rescheduling strategy

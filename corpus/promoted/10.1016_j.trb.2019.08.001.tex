@@ -1,0 +1,135 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.08.001
+%@ meta id=10.1016_j.trb.2019.08.001 family=milp schema=0.1.0
+%@ name :: Solving cyclic train timetabling problem through model reformulation: Extended time-space network construct and Alternating Direction Method of Multipliers methods
+%@ desc :: Mined from Solving cyclic train timetabling problem through model reformulation: Extended time-space network construct and Alternating Direction Method of Multipliers methods (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.08.001
+%@ prov reference :: Solving cyclic train timetabling problem through model reformulation: Extended time-space network construct and Alternating Direction Method of Multipliers methods
+%@ prov author :: Yongxiang Zhang; Qiyuan Peng; Yu Yao; Xin Zhang; Xuesong Zhou
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total journey time of all trains over the master time-space schedule.
+%@ index i ordered=0 cyclic=0 :: Index for stations or time-space nodes.
+%@ param Z shape=- kind=scalar domain=- :: Objective value (total travel cost).
+%@ param c shape=A,i,i,T,T kind=vector domain=- :: Cost of using time-space arc (i,i',t,t') by train a.
+%@ var x shape=A,i,i,T,T domain=binary role=primary drole=- lo=- hi=- :: Binary selection of master-schedule time-space arc (i,i',t,t') for train a.
+%@ index A ordered=0 cyclic=0 :: Set of trains.
+%@ index E ordered=0 cyclic=0 :: Set of track segments.
+%@ param D shape=A kind=vector domain=- :: Destination station of train a.
+%@ param O shape=A kind=vector domain=- :: Origin station of train a.
+%@ index T ordered=1 cyclic=1 :: Set of time periods in the periodic cycle.
+%@ param start shape=A kind=vector domain=- :: Planned start/departure time of train a.
+%@ index j ordered=0 cyclic=0 :: Index for track segments or stations in capacity constraints.
+%@ index U ordered=0 cyclic=0 :: Set of time-space arcs forming a capacity clique.
+%@ index L ordered=0 cyclic=0 :: Set of train lines.
+%@ index f ordered=0 cyclic=0 :: Frequency of a train line.
+%@ index H ordered=1 cyclic=0 :: Number of periods in the extended horizon.
+%@ var y shape=A,i,i,T,T domain=binary role=primary drole=- lo=- hi=- :: Binary selection of extended-schedule time-space arc (i,i',tau,tau') for train a.
+%@ index k ordered=1 cyclic=0 :: Iteration counter in dual updates.
+%@ var s shape=j,j,T domain=continuous role=slack drole=- lo=- hi=- :: Slack variable for capacity constraints in ADMM.
+%@ param n shape=A,j,j,T kind=vector domain=- :: Number of other trains occupying capacity resource (j,j',tau'') when current train is fixed.
+%@ param Q shape=- kind=scalar domain=- :: Constant term in the quadratic expression independent of slack variable.
+%@ param r shape=L,i,i,T,T kind=vector domain=- :: Arc usage cost in dynamic programming for the first train of line l.
+%@ var z shape=i,j domain=binary role=primary drole=- lo=- hi=- :: Binary periodicity/ordering variable in PESP.
+%@ param u shape=i,j kind=matrix domain=- :: Upper bound on arc duration in PESP.
+%@ param h shape=i,j kind=matrix domain=- :: Minimum headway time between trains on resource (i,j).
+%@ param K shape=- kind=scalar domain=- :: Tolerance parameter for regularity in PESP.
+%@ var v shape=i,i,j,j domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for trains on shared resources.
+%@ var w shape=i,i,j,j domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for trains on shared resources.
+%@ param B shape=- kind=scalar domain=- :: Linear operator in the ADMM formulation.
+%@ param g shape=- kind=scalar domain=- :: Linear/objective term in the ADMM formulation.
+%@ param arg shape=- kind=scalar domain=- :: Argument of the minimization in the ADMM derivation.
+%@ con eq_0002 kind=flow_balance domain=- indicator=- :: Flow balance in master schedule: each train selects one path from origin to destination.
+%@ con eq_0003 kind=capacity domain=- indicator=- :: Track capacity: at most one train occupies any capacity clique at a time.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Binary domain of master-schedule arc variables x.
+%@ con eq_0006 kind=flow_balance domain=- indicator=- :: Flow balance for the first train of each line in the master schedule.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Coupling constraint linking line-frequency shifted master schedule arcs to the line's first-train path.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Duplication constraint mapping master schedule arcs to extended schedule arcs.
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Track capacity in the extended time-space network.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain of extended-schedule arc variables y.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Non-negativity of Lagrangian multipliers for capacity constraints.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Train-specific Lagrangian subproblem objective.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Definition of modified extended arc cost from Lagrangian penalties.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Master schedule arc cost obtained by summing duplicated extended arcs.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Subgradient update of Lagrangian multipliers.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Subgradient step size rule.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Bounds on ADMM slack variables.
+%@ con eq_0021 kind=linear domain=- indicator=- :: ADMM multiplier update with penalty parameter.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Definition of n_a: number of other trains occupying a capacity resource.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linearization of the quadratic penalty term.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Function of slack variable in the linearized penalty.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Closed-form optimal slack value.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Case-wise linearized quadratic penalty.
+%@ con eq_0027 kind=linear domain=- indicator=- :: ADMM train-specific subproblem objective after linearization.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Unified modified arc cost gamma' for ADMM.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Improved arc usage cost for ADMM heuristic.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Master schedule arc usage cost in ADMM objective.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Label cost update condition in forward dynamic programming.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint/definition equation (33) from the paper.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint/definition equation (34) from the paper.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint/definition equation (35) from the paper.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint/definition equation (36) from the paper.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Constraint/definition equation (37) from the paper.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Constraint/definition equation (38) from the paper.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Constraint/definition equation (39) from the paper.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint/definition equation (40) from the paper.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint/definition equation (41) from the paper.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint/definition equation (42) from the paper.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Constraint/definition equation (43) from the paper.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Constraint/definition equation (44) from the paper.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Constraint/definition equation (45) from the paper.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Constraint/definition equation (46) from the paper.
+%@ con eq_0048 kind=linear domain=- indicator=- :: Constraint/definition equation (48) from the paper.
+%@ con eq_0049 kind=linear domain=- indicator=- :: Constraint/definition equation (49) from the paper.
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint/definition equation (50) from the paper.
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint/definition equation (51) from the paper.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint/definition equation (52) from the paper.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint/definition equation (53) from the paper.
+\begin{align}
+  \min\quad & \sum_{a \in A} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}^{'}} c_{a} \left(i , i^{'} , t , t^{'}\right) \cdot x_{a} \left(i , i^{'} , t , t^{'}\right) \tag{eq\_0001} \\
+  & \sum_{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{a}^{'}} x_{a} \left(i , i^{'} , t , t^{'}\right) - \sum_{i , t : \left(i^{'} , i , t^{'} , t\right) \in E_{a}^{'}} x_{a} \left(i^{'} , i , t^{'} , t\right) = \begin{cases} - 1 \\ 1 \\ 0 \end{cases} \begin{matrix}i^{'} = O_{a} , t^{'} = \mathit{start}_{a} \\ i^{'} = D_{a} , t^{'} = T \\ o t h e r \cdot w \cdot i \cdot s e\end{matrix} , \forall a \in A \tag{eq\_0002} \\
+  & \sum_{a \in A} \sum_{\left(i , i^{'} , t , t^{'}\right) \in U \left(j , j^{'} , t^{''}\right)} x_{a} \left(i , i^{'} , t , t^{'}\right) \leq 1 , \forall \left(j , j^{'}\right) \in E , t^{''} \in T \tag{eq\_0003} \\
+  & x_{a} \left(i , i^{'} , t , t^{'}\right) \in \left\{0 , 1\right\} , \forall a \in A , \left(i , i^{'} , t , t^{'}\right) \in E^{'} \tag{eq\_0004} \\
+  & \underset{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{w_{l}}^{'}}{\sum} x_{w_{l}} \left(i , i^{'} , t , t^{'}\right) - \underset{i , t : \left(i^{'} , i , t^{'} , t\right) \in E_{w_{l}}^{'}}{\sum} x_{w_{l}} \left(i^{'} , i , t^{'} , t\right) = \begin{cases} - 1 \\ 1 \\ 0 \end{cases} \begin{matrix}i^{'} = O_{w_{l}} , t^{'} = \mathit{start}_{a} \\ i^{'} = D_{w_{l}} , t^{'} = T_{m} \\ o t h e r \cdot w \cdot i \cdot s e\end{matrix} , \forall l \in L \tag{eq\_0006} \\
+  & \begin{matrix}x_{a} \left(i , i^{'} , t + q_{l , a} \cdot \text{min} \left\{\lfloor T / f_{l} \rfloor , T - 1\right\} , t^{'} + q_{l , a} \cdot \text{min} \left\{\lfloor T / f_{l} \rfloor , T - 1\right\}\right) = x_{w_{l}} \left(i , i^{'} , t , t^{'}\right) , \\ \forall l \in L , a \in A_{l} , \left(i , i^{'} , t , t^{'}\right) \in E^{'} , f_{l} > 1 , q_{l , a} \in \left\{1 , \hdots , f_{l} - 1\right\}\end{matrix} \tag{eq\_0007} \\
+  & \begin{aligned}y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) & = & x_{a} \left(i , i^{'} , t + \mathit{beta} T , t^{'} + \mathit{beta} T\right) , \\ & & \forall a \in A , \left(i , i^{'} , t , t^{'}\right) \in E^{'} , \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E^{''} , \mathit{beta} \in \left\{0 , \hdots , H\right\} , \mathit{tau} = t + \mathit{beta} T , \mathit{tau}^{'} = t^{'} + \mathit{beta} T\end{aligned} \tag{eq\_0008} \\
+  & \sum_{a \in A} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \leq 1 , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0009} \\
+  & y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \left\{0 , 1\right\} , \forall a \in A , \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E^{''} \tag{eq\_0011} \\
+  & \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} > 0 , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0013} \\
+  & Z_{3}^{a} = \underset{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}}{\sum} c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \cdot y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} \left[\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - 1\right] = \underset{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}}{\sum} \mathit{gamma}_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \cdot y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} \tag{eq\_0014} \\
+  & \mathit{gamma}_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) = c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} , \forall \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}} \tag{eq\_0015} \\
+  & \mathit{gamma}_{a}^{m} \left(i , i^{'} , t , t^{'}\right) = \sum_{\mathit{beta} = 0}^{H} \mathit{gamma}_{a} \left(i , i^{'} , t + \mathit{beta} \cdot T , t^{'} + \mathit{beta} \cdot T\right) , \forall a \in A , \left(i , i^{'} , t , t^{'}\right) \in E_{w_{l}}^{'} \tag{eq\_0016} \\
+  & \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}}^{k + 1} = \text{max} \left\{0 , \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}}^{k} + \mathit{alpha}^{k} \left[\sum_{a \in A} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - 1\right]\right\} , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0017} \\
+  & \mathit{alpha}^{k} = 1 / \left(k + 1\right) \tag{eq\_0018} \\
+  & 0 \leq s_{j , j^{'} , \mathit{tau}^{''}} \leq 1 , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0020} \\
+  & \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}}^{k + 1} = \text{max} \left\{0 , \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}}^{k} + \mathit{rho} \left[\sum_{a \in A} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - 1\right]\right\} , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0021} \\
+  & n_{a} = \sum_{a^{'} \in A^{'}} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a^{'}} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) , \forall \left(j , j^{'}\right) \in E , \mathit{tau}^{''} \in T_{e} \tag{eq\_0022} \\
+  & \begin{matrix} & & \left\|\sum_{a \in A} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right\|_{2}^{2} \\ & & = \left\|\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right\|_{2}^{2} \\ & & = \left[\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right)\right]^{2} + 2 \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left(n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right) + \left(n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right)^{2} \\ & & = \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + 2 \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left(n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right) + \left(n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right)^{2} \\ & & = \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left(2 \cdot n_{a} + 2 \cdot s_{j , j^{'} , \mathit{tau}^{''}} - 1\right) + \left(n_{a} + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right)^{2}\end{matrix} \tag{eq\_0023} \\
+  & L_{s_{j , j^{'} , \mathit{tau}^{''}}} = s_{j , j^{'} , \mathit{tau}^{''}}^{2} + 2 \cdot s_{j , j^{'} , \mathit{tau}^{''}} \left[\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + n_{a} - 1\right] + Q \tag{eq\_0024} \\
+  & s_{j , j^{'} , \mathit{tau}^{''}}^{\star} = 1 - \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - n_{a} \tag{eq\_0025} \\
+  & \left\|\sum_{a \in A} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + s_{j , j^{'} , \mathit{tau}^{''}} - 1\right\|_{2}^{2} = \begin{cases} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left(2 \cdot n_{a} - 1\right) + \left(n_{a} - 1\right)^{2} & n_{a} \geq 1 \\ 0 & n_{a} = 0 \end{cases} \tag{eq\_0026} \\
+  & \begin{aligned}Z_{4}^{a} & = & \underset{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}}{\sum} c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \cdot y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} \left[\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) - 1\right] \\ & & + \frac{\mathit{rho}}{2} \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \left[\sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left(2 \cdot n_{a} - 1\right) + \left(n_{a} - 1\right)^{2}\right] \\ & = & \underset{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}}{\sum} c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \cdot y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \sum_{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \left[\mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} + \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right] \\ & & + \frac{\mathit{rho}}{2} \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \left(n_{a} - 1\right)^{2} - \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} \\ & = & \underset{\left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}}{\sum} \mathit{gamma}_{a}^{'} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \cdot y_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \frac{\mathit{rho}}{2} \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \left(n_{a} - 1\right)^{2} - \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e}} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}}\end{aligned} \tag{eq\_0027} \\
+  & \begin{aligned}\mathit{gamma}_{a}^{'} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) & = & \begin{cases} c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} \left[\mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} + \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right] & n_{a} \geq 1 \\ c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} & n_{a} = 0 \end{cases} , \forall \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}} \\ & = & c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} \left\{\mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} + \text{max} \left\{0 , \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right\}\right\} , \forall \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}}\end{aligned} \tag{eq\_0028} \\
+  & \mathit{gamma}_{a}^{'} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) = c_{a} \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) + \sum_{\left(j , j^{'}\right) \in E} \sum_{\mathit{tau}^{''} \in T_{e} : \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in U^{'} \left(j , j^{'} , \mathit{tau}^{''}\right)} \text{max} \left\{0 , \mathit{lambda}_{j , j^{'} , \mathit{tau}^{''}} + \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right\} , \forall \left(i , i^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in E_{a}^{^{''}} \tag{eq\_0029} \\
+  & \mathit{gamma}_{a}^{m^{'}} \left(i , i^{'} , t , t^{'}\right) = \sum_{\mathit{beta} = 0}^{H} \mathit{gamma}_{a}^{'} \left(i , i^{'} , t + \mathit{beta} \cdot T , t^{'} + \mathit{beta} \cdot T\right) , \forall a \in A , \left(i , i^{'} , t , t^{'}\right) \in E_{w_{l}}^{'} \tag{eq\_0030} \\
+  & \mathit{sigma}_{w_{l}} \left(i , t\right) + \sum_{ q_{l , a} = 0}^{f_{l} - 1} \sum_{\mathit{beta} = 0}^{H} r_{w_{l}}^{'} \left(i , i^{'} , t + q_{l , a} \cdot \lfloor T / f_{l} \rfloor + \mathit{beta} \cdot T , t^{'} + q_{l , a} \cdot \lfloor T / f_{l} \rfloor + \mathit{beta} \cdot T\right) < \mathit{sigma}_{w_{l}} \left(i^{'} , t^{'}\right) , \forall l \in L , \left(i , i^{'} , t , t^{'}\right) \in E_{w_{l}}^{'} \tag{eq\_0031} \\
+  & x_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{run}} \cup \mathbf{\mathcal{A}}_{\text{dwell}} \cup \mathbf{\mathcal{A}}_{\text{pass}} \cup \mathbf{\mathcal{A}}_{\text{safe}} \cup \mathbf{\mathcal{A}}_{\text{regular}} \tag{eq\_0033} \\
+  & x_{i j} = 0 , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{pass}} \tag{eq\_0034} \\
+  & l_{i j} \leq x_{i j} \leq u_{i j} , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{run}} \cup \mathbf{\mathcal{A}}_{\text{dwell}} \tag{eq\_0035} \\
+  & h_{i j} \leq x_{i j} \leq T - h_{i j} , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{safe}} \tag{eq\_0036} \\
+  & \frac{T}{f_{i j}} - \frac{K}{f_{i j}} \leq x_{i j} \leq \frac{T}{f_{i j}} + \frac{K}{f_{i j}} , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{regular}} \tag{eq\_0037} \\
+  & z_{i j} = 0 , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{regula} r^{\star}} \tag{eq\_0038} \\
+  & z_{i j} \in \left\{0 , 1\right\} , \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{\text{run}} \cup \mathbf{\mathcal{A}}_{\text{dwell}} \cup \mathbf{\mathcal{A}}_{\text{safe}} \cup \mathbf{\mathcal{A}}_{\text{regular}} \tag{eq\_0039} \\
+  & 0 \leq \mathit{pi}_{i} \leq T - 1 , \forall i \in \mathit{epsilon} \tag{eq\_0040} \\
+  & 0 \leq x_{i j} \leq T - 1 , \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0041} \\
+  & z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}} + z_{j j^{'}} = 2 \cdot \left(w_{i i^{'} j j^{'}} + v_{i i^{'} j j^{'}}\right) , \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{run}} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{safe}} \cup \mathbf{\mathcal{A}}_{\text{regular}} \tag{eq\_0042} \\
+  & - x_{i i^{'}} + \left[\left(h_{i j} + h_{i^{'} j^{'}}\right) - l_{i i^{'}}^{w i t h o u t}\right] \cdot s_{i i^{'}} \leq - l_{i i^{'}}^{w i t h o u t} , \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{\text{dwel} l^{\star}} , \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{safe}} \tag{eq\_0043} \\
+  & x_{i i^{'}} + \left(u_{i i^{'}}^{w i t h o u t} - u_{i i^{'}}\right) \cdot s_{i i^{'}} \leq u_{i i^{'}}^{w i t h o u t} , \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{\text{dwel} l^{\star}} \tag{eq\_0044} \\
+  & \left(z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}}\right) - 2 \cdot q_{i i^{'} j j^{'}} - s_{i i^{'} j j^{'}} = 0 , \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{safe}} , \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{\text{dwel} l^{\star}} , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{pass}} \tag{eq\_0045} \\
+  & s_{i i^{'}} = \underset{\left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{pass}}}{\sum} s_{i i^{'} j j^{'}} , \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{\text{safe}} , \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{\text{dwel} l^{\star}} \tag{eq\_0046} \\
+  & A \cdot x + B \cdot y + D \cdot z = c \tag{eq\_0048} \\
+  & L_{\mathit{rho}} \left(x , y , z , \mathit{lambda}\right) = f \left(x\right) + g \left(y\right) + h \left(z\right) + \mathit{lambda}^{T} \left(A \cdot x + B \cdot y + D \cdot z - c\right) + \left(\mathit{rho} / 2 \right) \left\|A \cdot x + B \cdot y + D \cdot z - c\right\|_{2}^{2} \tag{eq\_0049} \\
+  & x^{k + 1} : = arg min_{x} L_{\mathit{rho}} \left(x , y^{k} , z^{k} , \mathit{lambda}^{k}\right) \tag{eq\_0050} \\
+  & y^{k + 1} : = arg min_{y} L_{\mathit{rho}} \left(x^{k + 1} , y , z^{k} , \mathit{lambda}^{k}\right) \tag{eq\_0051} \\
+  & z^{k + 1} : = arg min_{z} L_{\mathit{rho}} \left(x^{k + 1} , y^{k + 1} , z , \mathit{lambda}^{k}\right) \tag{eq\_0052} \\
+  & \mathit{lambda}^{k + 1} : = \mathit{lambda}^{k} + \mathit{rho} \left(A \cdot x^{k + 1} + B \cdot y^{k + 1} + D \cdot z^{k + 1} - c\right) \tag{eq\_0053} \\
+\end{align}

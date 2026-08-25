@@ -1,0 +1,126 @@
+% Declaration sidecar for 10.1016_j.trb.2018.01.012
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2018.01.012
+% A matheuristic for transfer synchronization through integrated timetabling and vehicle scheduling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2018.01.012.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of operational costs and transfer costs
+
+% c: classified as parameter during review
+%@ param c shape=- kind=matrix domain=continuous :: Cost coefficients for vehicle movements and dwell time
+
+% f: classified as parameter during review
+%@ param f shape=- kind=vector domain=continuous :: Transfer frequency weight for transfer opportunity r
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if vehicle k serves trip i then j
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: δ
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of feasible vehicle movements (i,j,k)
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of transfer opportunities
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of timetabled trips
+
+% t: classified as parameter during review
+%@ param t shape=- kind=vector domain=continuous :: Minimum travel time of trip i
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of vehicles
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of trips that can be served by vehicle k
+
+% v: classified as parameter during review
+%@ param v shape=- kind=vector domain=integer :: Number of available vehicles of type k
+
+% d: classified as parameter during review
+%@ param d shape=- kind=matrix domain=continuous :: Earliest and latest departure times for trip i at stop s
+
+% unusable as an identifier, rename or drop: τ
+% w: classified as parameter during review
+%@ param w shape=- kind=matrix domain=continuous :: Minimum and maximum dwell time at stop s for trip i
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of stops with transfer opportunities for trip i
+
+% h: classified as parameter during review
+%@ param h shape=- kind=matrix domain=continuous :: Minimum and maximum headway between consecutive trips on line l at stop s
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Line index
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constant
+
+% b: classified as parameter during review
+%@ param b shape=- kind=matrix domain=continuous :: Travel time from end of trip i to start of trip j
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=continuous :: Minimum connection time between trips
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Transfer opportunity index
+
+% unusable as an identifier, rename or drop: α
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Set of all possible transfer triplets (i,j,s)
+
+% e: classified as parameter during review
+%@ param e shape=- kind=vector domain=continuous :: Minimum transfer time for transfer opportunity r
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of non-negative integers
+
+% unusable as an identifier, rename or drop: Δ
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Each trip is served by exactly one vehicle
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Vehicle flow conservation for each vehicle at each node
+%@ con eq_0004 kind=capacity domain=- indicator=- :: Limit on the number of vehicles of each type used
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time of each trip within its time window
+%@ con eq_0006 kind=linear domain=- indicator=- :: Dwell time at transfer stops within allowed bounds
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum added dwell time for each trip
+%@ con eq_0008 kind=linear domain=- indicator=- :: Definition of added dwell time for each trip
+%@ con eq_0009 kind=headway domain=- indicator=- :: Headway constraints between consecutive trips on a line
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Connection time between consecutive trips assigned to the same vehicle
+%@ con eq_0011 kind=linear domain=- indicator=- :: Exactly one transfer is selected for each transfer opportunity
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Selected transfer satisfies minimum transfer time
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Ensure transfer time not below minimum when no earlier transfer is used
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Definition of transfer time violation for each transfer
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary domain for vehicle movement variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure times are non-negative integers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Arrival times are non-negative integers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Added dwell times are non-negative integers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Transfer time violations are non-negative reals
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain for transfer selection variables
+%@ con eq_0027 kind=linear domain=- indicator=- :: Additional constraint from the integrated timetabling and vehicle scheduling model

@@ -1,0 +1,107 @@
+% Declaration sidecar for 10.1016_j.trb.2016.12.019
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2016.12.019
+% Designing alternative railway timetables under infrastructure maintenance possessions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2016.12.019.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted passenger delay and cancellations
+
+% pi: classified as variable during review
+%@ var pi shape=E domain=integer role=primary drole=- lo=- hi=- :: Event time in original timetable
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activity arcs
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Period length
+
+% l: classified as parameter during review
+%@ param l shape=A kind=vector domain=- :: Lower bound on activity duration
+
+% p: classified as variable during review
+%@ var p shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events in original timetable
+
+% u: classified as parameter during review
+%@ param u shape=A kind=vector domain=- :: Upper bound on activity duration
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of train lines
+
+% S: set of stations
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% v: classified as variable during review
+%@ var v shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Event time in alternative timetable
+
+% x: classified as variable during review
+%@ var x shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train line
+
+% q: classified as variable during review
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events in alternative timetable
+
+% dwell: classified as parameter during review
+%@ param dwell shape=M,S kind=matrix domain=- :: Dwell time of train line m at station s
+
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event j compared to original timetable
+
+% alpha: classified as variable during review
+%@ var alpha shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for period shift in delay calculation
+
+% c: classified as variable during review
+%@ var c shape=X,Y domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train i is present when train j arrives
+
+% delta: classified as parameter during review
+%@ param delta shape=E kind=vector domain=- :: Duration of platform occupation after event i
+
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: Set of connected or loose arrivals
+
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of connected or loose departures
+
+% N: classified as parameter during review
+%@ param N shape=S kind=vector domain=- :: Number of tracks at station s
+
+% w: classified as parameter during review
+%@ param w shape=E,M kind=matrix domain=- :: Weight for delay/cancellation in objective
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, m, n
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=modulo domain=- indicator=- :: Periodic event scheduling constraints for original timetable
+%@ con eq_0003 kind=linear domain=- indicator=- :: Original event time bounds
+%@ con eq_0004 kind=linear domain=- indicator=- :: Binary variable for original event order
+%@ con eq_0005 kind=linear domain=- indicator=- :: Alternative event time bounds with cancellation
+%@ con eq_0006 kind=modulo domain=- indicator=- :: Running time constraints in alternative timetable with cancellation
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell time constraints in alternative timetable with cancellation
+%@ con eq_0008 kind=modulo domain=- indicator=- :: Other activity constraints with cancellation
+%@ con eq_0009 kind=linear domain=- indicator=- :: Delay definition relative to original timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Delay bounds
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary period shift variable
+%@ con eq_0012 kind=capacity domain=- indicator=- :: Station capacity constraints identifying present trains
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Station capacity constraints ensuring platform availability

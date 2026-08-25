@@ -1,0 +1,77 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2017.06.005
+%@ meta id=10.1016_j.trc.2017.06.005 family=lp schema=0.1.0
+%@ name :: Real-time automatic rescheduling strategy for an urban rail line by integrating the information of fault handling
+%@ desc :: Mined from Real-time automatic rescheduling strategy for an urban rail line by integrating the information of fault handling (Transportation Research Part C Emerging Technologies, 2017).
+%@ prov source :: 10.1016/j.trc.2017.06.005
+%@ prov reference :: Real-time automatic rescheduling strategy for an urban rail line by integrating the information of fault handling
+%@ prov author :: Yuan Gao; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total deviation between rescheduled and planned arrival/departure times
+%@ var a shape=N,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time for train i at station k
+%@ var d shape=N,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time for train i from station k
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total deviation from planned timetable)
+%@ index K ordered=0 cyclic=0 :: Set of stations
+%@ index N ordered=0 cyclic=0 :: Set of trains
+%@ param Rt shape=N,K kind=matrix domain=- :: Minimum running time for train i on section k
+%@ param Dt shape=N,K kind=matrix domain=- :: Minimum dwelling time for train i at station k
+%@ param h shape=- kind=scalar domain=- :: Minimum headway time between consecutive trains
+%@ param delta shape=- kind=scalar domain=- :: Actual primary delay caused by fault
+%@ param d_hat shape=N,K kind=matrix domain=- :: Upper bound for departure time from prior-RS
+%@ param a_hat shape=N,K kind=matrix domain=- :: Upper bound for arrival time from prior-RS
+%@ param d_tilde shape=N,K kind=matrix domain=- :: Planned departure time
+%@ param a_tilde shape=N,K kind=matrix domain=- :: Planned arrival time
+%@ param buf shape=N,K kind=matrix domain=- :: Buffer time between consecutive trains
+%@ con eq_0003 kind=linear domain=- indicator=- :: Minimum running time constraint: a_{i,k} - d_{i,k-1} >= Rt_{i,k}
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum dwelling time constraint: d_{i,k} - a_{i,k} >= Dt_{i,k}
+%@ con eq_0005 kind=linear domain=- indicator=- :: Rescheduled arrival time not earlier than planned arrival time: a_{i,k} >= a_tilde_{i,k}
+%@ con eq_0006 kind=linear domain=- indicator=- :: Rescheduled departure time not earlier than planned departure time: d_{i,k} >= d_tilde_{i,k}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum headway between arrivals of consecutive trains: a_{i+1,k} - a_{i,k} >= h
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum headway between departures of consecutive trains: d_{i+1,k} - d_{i,k} >= h
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum headway between departure of preceding train and arrival of following train: a_{i+1,k} - d_{i,k} >= h
+%@ con eq_0010 kind=linear domain=- indicator=- :: Fault during dwelling: d_{i,k} = d_tilde_{i,k} + delta
+%@ con eq_0011 kind=linear domain=- indicator=- :: Fault during running: a_{i,k} = a_tilde_{i,k} + delta
+%@ con eq_0012 kind=linear domain=- indicator=- :: Upper bound from prior-RS on departure time: d_{i+1,k} <= d_hat_{i+1,k}
+%@ con eq_0013_a kind=linear domain=- indicator=- :: Prior-RS equality for departure of next train when fault occurs at station (Case A, if d_tilde_{i,k+1}+delta >= d_hat_{i+1,k}): d_{i+1,k} = d_hat_{i+1,k}
+%@ con eq_0013_b kind=linear domain=- indicator=- :: Prior-RS equality for arrival of next train in Case A: a_{i+1,k+1} = a_hat_{i+1,k+1}
+%@ con eq_0014 kind=linear domain=- indicator=- :: Post-RS inequality for departure of next train in Case A (if d_tilde_{i,k+1}+delta < d_hat_{i+1,k}): d_{i+1,k} >= d_tilde_{i,k+1}+delta
+%@ con eq_0015 kind=linear domain=- indicator=- :: Prior-RS equality for departure of next train when fault occurs on a section (Case B, if a_tilde_{i,k+1}+delta >= d_hat_{i+1,k}): d_{i+1,k} = d_hat_{i+1,k}
+%@ con eq_0016 kind=linear domain=- indicator=- :: Post-RS inequality for departure of next train in Case B (if a_tilde_{i,k+1}+delta < d_hat_{i+1,k}): d_{i+1,k} >= a_tilde_{i,k+1}+delta
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Prior-RS equality for departure of train i+2 in Case B1 (if d_tilde_{i,k+1}+delta >= d_hat_{i+2,k}): d_{i+2,k} = d_hat_{i+2,k}
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Prior-RS equality for arrival of train i+2 in Case B1: a_{i+2,k+1} = a_hat_{i+2,k+1}
+%@ con eq_0018 kind=linear domain=- indicator=- :: Post-RS inequality for departure of train i+2 in Case B1 (if d_tilde_{i,k+1}+delta < d_hat_{i+2,k}): d_{i+2,k} >= d_tilde_{i,k+1}+delta
+%@ con eq_0019 kind=linear domain=- indicator=- :: Prior-RS equality for departure of train i+2 in Case B2 (if a_tilde_{i,k+1}+delta >= d_hat_{i+2,k}): d_{i+2,k} = d_hat_{i+2,k}
+%@ con eq_0020 kind=linear domain=- indicator=- :: Post-RS inequality for departure of train i+2 in Case B2 (if a_tilde_{i,k+1}+delta < d_hat_{i+2,k}): d_{i+2,k} >= a_tilde_{i,k+1}+delta
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Appendix constraint defining the set of trains to be rescheduled (T subset of N)
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Appendix constraint defining the remaining station set S_i for each rescheduled train
+%@ con eq_0036 kind=linear domain=- indicator=- :: Appendix constraint for constructing the rescheduled train set T
+%@ con eq_0037 kind=linear domain=- indicator=- :: Appendix constraint for constructing the remaining station set S_i
+%@ con eq_0039 kind=linear domain=- indicator=- :: Appendix auxiliary constraint for the automatic rescheduling strategy
+\begin{align}
+  f^{\quad & \cdot } = min f = min \sum_{i \in \mathbf{N} , k \in \mathbf{K}} \left|a_{i , k} - {a}_{i , k}\right| + \left|d_{i , k} - {d}_{i , k}\right| . \tag{eq\_0001} \\
+  & a_{i , k} - d_{i , k - 1} \geq \mathit{Rt}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0003} \\
+  & d_{i , k} - a_{i , k} \geq \mathit{Dt}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0004} \\
+  & a_{i , k} \geq {a}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0005} \\
+  & d_{i , k} \geq {d}_{i , k} , i = 1 , 2 , \ldots , N , k = 0 , 1 , \ldots , K - 1 \tag{eq\_0006} \\
+  & a_{i + 1 , k} - a_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 1 , 2 , \ldots , K \tag{eq\_0007} \\
+  & d_{i + 1 , k} - d_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 0 , 1 , 2 , \ldots , K - 1 \tag{eq\_0008} \\
+  & a_{i + 1 , k} - d_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 1 , 2 , \ldots , K - 1 \tag{eq\_0009} \\
+  & d_{i , k} = {d}_{i , k} + \mathit{delta} . \tag{eq\_0010} \\
+  & a_{i , k} = {a}_{i , k} + \mathit{delta} . \tag{eq\_0011} \\
+  & d_{i + 1 , k} \leq {d}_{i + 1 , k} . \tag{eq\_0012} \\
+  & d_{i+1,k} = \hat{d}_{i+1,k} \tag{eq\_0013\_a} \\
+  & a_{i+1,k+1} = \hat{a}_{i+1,k+1} , if \tilde{d}_{i,k+1} + \mathit{delta} \geq \hat{d}_{i+1,k} \tag{eq\_0013\_b} \\
+  & d_{i + 1 , k} \geq {d}_{i , k + 1} + \mathit{delta} , if {d}_{i , k + 1} + \mathit{delta} < {d}_{i + 1 , k} . \tag{eq\_0014} \\
+  & d_{i + 1 , k} = {d}_{i + 1 , k} , if {a}_{i , k + 1} + \mathit{delta} \geq {d}_{i + 1 , k} , \tag{eq\_0015} \\
+  & d_{i + 1 , k} \geq {a}_{i , k + 1} + \mathit{delta} , if {a}_{i , k + 1} + \mathit{delta} < {d}_{i + 1 , k} , \tag{eq\_0016} \\
+  & d_{i+2,k} = \hat{d}_{i+2,k} \tag{eq\_0017\_a} \\
+  & a_{i+2,k+1} = \hat{a}_{i+2,k+1} , if \tilde{d}_{i,k+1} + \mathit{delta} \geq \hat{d}_{i+2,k} \tag{eq\_0017\_b} \\
+  & d_{i + 2 , k} \geq {d}_{i , k + 1} + \mathit{delta} , if {d}_{i , k + 1} + \mathit{delta} < {d}_{i + 2 , k} , \tag{eq\_0018} \\
+  & d_{i + 2 , k} = {d}_{i + 2 , k} , if {a}_{i , k + 1} + \mathit{delta} \geq {d}_{i + 2 , k} , \tag{eq\_0019} \\
+  & d_{i + 2 , k} \geq {a}_{i , k + 1} + \mathit{delta} , if {a}_{i , k + 1} + \mathit{delta} < {d}_{i + 2 , k} . \tag{eq\_0020} \\
+  & d_{4,3} = \hat{d}_{4,3} , a_{4,4} = \hat{a}_{4,4} \tag{eq\_0023\_a} \\
+  & d_{5,2} = \hat{d}_{5,2} , a_{5,3} = \hat{a}_{5,3} \tag{eq\_0023\_b} \\
+  & \mathit{buf}_{i , k} = {a}_{i + 1 , k} - {d}_{i , k} - h_{s} , \tag{eq\_0036} \\
+  & \mathit{delta}_{m} \leq \sum_{i \leq i^{'} \leq j} \mathit{buf}_{i^{'} , k} , \tag{eq\_0037} \\
+  & \mathit{delta}_{m} \leq \mathit{buf}_{i , k + 1} + \mathit{buf}_{i + 1 , k + 1} + \mathit{buf}_{i + 2 , k + 1} . \tag{eq\_0039} \\
+\end{align}

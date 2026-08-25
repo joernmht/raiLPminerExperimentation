@@ -1,0 +1,47 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2020.100196
+%@ meta id=10.1016_j.jrtpm.2020.100196 family=lp schema=0.1.0
+%@ name :: Dynamic and robust timetable rescheduling for uncertain railway disruptions
+%@ desc :: Mined from Dynamic and robust timetable rescheduling for uncertain railway disruptions (Journal of Rail Transport Planning & Management, 2020).
+%@ prov source :: 10.1016/j.jrtpm.2020.100196
+%@ prov reference :: Dynamic and robust timetable rescheduling for uncertain railway disruptions
+%@ prov author :: Yongqiu Zhu; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize expected train cancellations and arrival delays over control and look-ahead horizons
+%@ param Q shape=- kind=scalar :: Cost function for first-stage decisions X
+%@ index E ordered=0 cyclic=0 :: Set of arrival and departure events
+%@ index X ordered=0 cyclic=0 :: First-stage decisions, scenario-independent disruption management decisions
+%@ index Y ordered=0 cyclic=0 :: Second-stage decisions for scenario w
+%@ index w ordered=0 cyclic=0 :: Scenario index
+%@ param Z shape=- kind=scalar :: Constraint set for decisions
+%@ param s shape=- kind=scalar :: Station index for short-turning
+%@ param t shape=- kind=scalar :: Time variable
+%@ param W shape=- kind=scalar :: Number of scenarios
+%@ index c ordered=0 cyclic=0 :: Decision to cancel event e
+%@ index d ordered=0 cyclic=0 :: Delay of event e
+%@ param beta_c shape=- kind=scalar :: Cost of cancelling a train run between two adjacent stations
+%@ index n ordered=0 cyclic=0 :: Scenario index at a stage
+%@ index m ordered=0 cyclic=0 :: Scenario index for nonanticipativity constraints
+%@ con eq_0003 kind=linear :: Constraint set Z_I for first-stage decisions X
+%@ con eq_0004 kind=linear :: Constraint set Z_II(X,w) for second-stage decisions Y(w)
+%@ con eq_0007 kind=linear :: Nonanticipativity constraint X_1(w_1,n)=X_1(w_1,m) for first-stage decisions
+%@ con eq_0009 kind=linear :: Constraint set Z_1^I(w_1,n) for first-stage decisions at stage 1
+%@ con eq_0012 kind=linear :: Constraint set Z_1^II(X_1(w_1,n),w_1,n) for second-stage decisions at stage 1
+%@ con eq_0013 kind=linear :: Nonanticipativity constraint for stage 1 first-stage decisions
+%@ con eq_0014 kind=linear :: Scenario consistency constraint for stage 1 scenarios
+%@ con eq_0019 kind=linear :: Constraint set Z_k^I(w_k,n) for first-stage decisions at stage k
+%@ con eq_0020 kind=linear :: Constraint set Z_k^II(X_k(w_k,n),w_k,n) for second-stage decisions at stage k
+%@ con eq_0021 kind=linear :: Nonanticipativity constraint X_k(w_k,n)=X_k(w_k,m) at stage k
+\begin{align}
+  \min\quad & Q^{I} \left(X\right) + E_{w} \left[min Q^{II} \left(Y \left(w\right)\right)\right] , \tag{eq\_0001} \\
+  & s.t. X \in Z^{I} , \tag{eq\_0003} \\
+  & Y \left(w\right) \in Z^{II} \left(X , w\right) , w \in \left\{1 , \ldots , W\right\} \tag{eq\_0004} \\
+  & Q^{I} \left(X\right) = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e} \in X} c_{e} + \sum_{e \in E_{ar} : d_{e} \in X} d_{e} , \tag{eq\_0007} \\
+  & Q^{II} \left(Y \left(w\right)\right) = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e}^{w} \in Y \left(w\right)} c_{e}^{w} + \sum_{e \in E_{ar} : d_{e}^{w} \in Y \left(w\right)} d_{e}^{w} , w \in \left\{1 , \ldots , W\right\} , \tag{eq\_0009} \\
+  & s.t. X_{1} \left(w_{1 , n}\right) \in Z_{1}^{I} \left(w_{1 , n}\right) , n \in \left\{1 , \ldots , W_{1}\right\} , \tag{eq\_0012} \\
+  & Y_{1} \left(w_{1 , n}\right) \in Z_{1}^{II} \left(X_{1} \left(w_{1 , n}\right) , w_{1 , n}\right) , n \in \left\{1 , \ldots , W_{1}\right\} , \tag{eq\_0013} \\
+  & X_{1} \left(w_{1 , n}\right) = X_{1} \left(w_{1 , m}\right) , n , m \in \left\{1 , \ldots , W_{1}\right\} : n \neq m , \tag{eq\_0014} \\
+  & s.t. X_{k} \left(w_{k , n}\right) \in Z_{k}^{I} \left(w_{k , n}\right) , n \in \left\{1 , \ldots , W_{k}\right\} , \tag{eq\_0019} \\
+  & Y_{k} \left(w_{k , n}\right) \in Z_{k}^{II} \left(X_{k} \left(w_{k , n}\right) , w_{k , n}\right) , n \in \left\{1 , \ldots , W_{k}\right\} , \tag{eq\_0020} \\
+  & X_{k} \left(w_{k , n}\right) = X_{k} \left(w_{k , m}\right) , n , m \in \left\{1 , \ldots , W_{k}\right\} : n \neq m , \tag{eq\_0021} \\
+\end{align}

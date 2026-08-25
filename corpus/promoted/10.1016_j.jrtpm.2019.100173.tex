@@ -1,0 +1,70 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2019.100173
+%@ meta id=10.1016_j.jrtpm.2019.100173 family=lp schema=0.1.0
+%@ name :: Coordinated railway traffic rescheduling with the Resource Conflict Graph model
+%@ desc :: Mined from Coordinated railway traffic rescheduling with the Resource Conflict Graph model (Journal of Rail Transport Planning & Management, 2019).
+%@ prov source :: 10.1016/j.jrtpm.2019.100173
+%@ prov reference :: Coordinated railway traffic rescheduling with the Resource Conflict Graph model
+%@ prov author :: Ambra Toletti; Marco Laumanns; Ulrich Weidmann
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimise sum of arrival delays, cancellation penalties and deferred-run penalties
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index n ordered=0 cyclic=0 :: Number of runs for a train
+%@ index B ordered=0 cyclic=0 :: Set of blocking time stairways
+%@ index C ordered=0 cyclic=0 :: Set of maximal cliques of the conflict graph
+%@ index P ordered=0 cyclic=0 :: Set of tracks at operation points
+%@ index R ordered=0 cyclic=0 :: Set of resources
+%@ index S ordered=0 cyclic=0 :: Set of operation points
+%@ index s ordered=0 cyclic=0 :: Operation point index
+%@ index b ordered=0 cyclic=0 :: Blocking time stairway index
+%@ index A ordered=0 cyclic=0 :: Set of arrival events
+%@ index alpha ordered=0 cyclic=0 :: Arrival time of blocking time stairway
+%@ index pt ordered=0 cyclic=0 :: Track prescribed by operational rules
+%@ index D ordered=0 cyclic=0 :: Set of departure events
+%@ index delta ordered=0 cyclic=0 :: Departure time of blocking time stairway
+%@ index U ordered=0 cyclic=0 :: Blocking time stairways in self-connection constraint (first set)
+%@ index V ordered=0 cyclic=0 :: Blocking time stairways in self-connection constraint (second set)
+%@ index v ordered=0 cyclic=0 :: Speed consistency indicator
+%@ index Omega ordered=0 cyclic=0 :: Set of pairs of blocking time stairways for self-connection
+%@ param f shape=- kind=scalar domain=- :: Objective function
+%@ param Delta shape=- kind=scalar domain=- :: Size of rescheduling horizon
+%@ param alpha_hat shape=- kind=vector domain=- :: Scheduled arrival time of train at station
+%@ param gamma shape=- kind=vector domain=- :: Terminal cost for cancelled train movements
+%@ param Phi shape=- kind=scalar domain=- :: Optimal value of rescheduling problem
+%@ index X ordered=0 cyclic=0 :: Set of feasible decisions
+%@ var lambda shape=- domain=non_negative role=primary :: Lagrangian multiplier for complicating portal constraints
+%@ con eq_0005 kind=linear domain=- indicator=- :: Constraint (4): at most one blocking time stairway per successive section; run scheduled only if previous run is scheduled
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint (5): passenger train run is either scheduled or cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint (6): cancellation consistency, cancelled runs are contiguous from the end
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint (7): run indicator equals sum of selected blocking time stairways for the section
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (8): at most one blocking time stairway per maximal clique for non-operation-point resources
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (9): ordering of arrival/departure blocking time stairways at operation points to avoid conflicts
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (10): at most one blocking time stairway with a given arrival time at an operation point
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (11): trains depart from the same track they arrived on
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (12): self-connection, minimum dwell time before departure
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (13): speed consistency between consecutive runs
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (14): objective function definition (delays, cancellation penalties, deferred-run penalties)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint (20): portal run consistency r_{t,→s} = r_{t,s→}
+%@ con eq_0027 kind=linear domain=- indicator=- :: Constraint (21): portal cancellation consistency h_{t,→s} = h_{t,s→}
+%@ con eq_0029 kind=linear domain=- indicator=- :: Constraint (22): portal temporal consistency of blocking time stairways
+%@ con eq_0030 kind=linear domain=- indicator=- :: Constraint (23): portal speed consistency
+%@ con eq_0031 kind=linear domain=- indicator=- :: Constraint (24): Lagrangian relaxation of complicating portal constraints
+\begin{align}
+  & r_{t , i} \leq r_{t , i - 1} \forall t \in \mathcal{T} , i = 2 , \ldots , n_{t} \tag{eq\_0005} \\
+  & r_{t , i} + h_{t , i} \leq 1 \forall t \in \mathcal{T}_{p} , i = 1 , \ldots , n_{t} \tag{eq\_0007} \\
+  & h_{t , i} \geq h_{t , i - 1} \forall t \in \mathcal{T}_{p} , i = 2 , \ldots , n_{t} \tag{eq\_0008} \\
+  & r_{t , i} = \sum_{b \in \mathcal{B}_{t , i}} x_{b} \forall t \in \mathcal{T} , i = 1 , \ldots , n_{t} \tag{eq\_0009} \\
+  & \sum_{b \in C} x_{b} \leq 1 \forall C \in \mathcal{C}^{r} , r \in \mathcal{R} \backslash \underset{s \in \mathcal{S}}{\cup} P_{s} \tag{eq\_0010} \\
+  & 0 \leq \underset{\genfrac{}{}{0pt}{}{b \in A_{. , p}}{\mathit{alpha} \left(b\right) \leq \mathit{alpha}}}{\sum} x_{b} - \underset{\genfrac{}{}{0pt}{}{b \in D_{. , p}}{\mathit{delta} \left(b\right) < \mathit{alpha}}}{\sum} x_{b} \leq 1 \begin{matrix}\forall \mathit{alpha} \in \left\{\mathit{alpha} \left(b\right) , b \in A_{. , p}\right\} , p \in P_{s} , \\ s \in \mathcal{S}\end{matrix} \tag{eq\_0011} \\
+  & \underset{\genfrac{}{}{0pt}{}{b \in A_{. , p}}{\mathit{alpha} \left(b\right) = \mathit{alpha}}}{\sum} x_{b} \leq 1 \begin{matrix}\forall \mathit{alpha} \in \left\{\mathit{alpha} \left(b\right) , b \in A_{t , p}\right\} , p \in P_{s} , \\ s \in \mathcal{S}\end{matrix} \tag{eq\_0012} \\
+  & \sum_{b \in A_{t , p}} x_{b} - \sum_{b \in D_{t , p}} x_{b} \leq 0 \forall p \in P_{\cdot , t} , t \in \mathcal{T} \tag{eq\_0013} \\
+  & \sum_{b \in U} x_{b} + \sum_{b \in V} x_{b} \leq 1 \forall \left(U , V\right) \in \mathit{Omega}_{i}^{t} , t \in \mathcal{T} , i = 2 , \ldots , n_{t} - 1 \tag{eq\_0014} \\
+  & \sum_{b \in U} x_{b} + \sum_{b \in V} x_{b} \leq 1 \forall \left(U , V\right) \in \mathit{Omega} \cdot v_{i}^{t} , t \in \mathcal{T} , i = 2 , \ldots , n_{t} - 1 \tag{eq\_0015} \\
+  & f \left(x , r , h\right) = \sum_{t \in \mathcal{T}} \sum_{i = 1}^{n_{t}} \left(1 - r_{t , i} - h_{t , i}\right) \cdot \mathit{Delta} + \sum_{t \in \mathcal{T}_{p}} \sum_{i = 1}^{n_{t}} \mathit{gamma}_{t , i} \cdot h_{t , i} + \sum_{t \in \mathcal{T}} \sum_{i = 1}^{n_{t}} \sum_{b \in \mathcal{B}_{t , i}} x_{b} \left(\mathit{alpha} \left(b\right) - \hat{\mathit{alpha}}_{t , i}\right)_{\geq 0} \tag{eq\_0016} \\
+  \mathit{Phi}\quad & = \underset{\left(x , r , h\right) \in X}{min} f \left(x , r , h\right) \tag{eq\_0018} \\
+  & \mathit{lambda} \geq 0 \tag{eq\_0022} \\
+  & (\text{4}) \rightarrow r_{t , \rightarrow s} = r_{t , s \rightarrow} \forall t \in \mathcal{T} \tag{eq\_0027} \\
+  & (\text{6}) \rightarrow h_{t , \rightarrow s} = h_{t , s \rightarrow} \forall t \in \mathcal{T} \tag{eq\_0029} \\
+  & (\text{12}) \rightarrow \sum_{b \in A_{t , p}} \mathit{alpha} \left(b\right) x_{b} = \sum_{b \in D_{t , p}} \mathit{delta} \left(b\right) x_{b} \forall t \in \mathcal{T} \tag{eq\_0030} \\
+  & (\text{13}) \rightarrow \sum_{b \in A_{t , p}} v \cdot \mathit{alpha} \left(b\right) x_{b} = \sum_{b \in D_{t , p}} v \cdot \mathit{delta} \left(b\right) x_{b} \forall t \in \mathcal{T} \tag{eq\_0031} \\
+\end{align}

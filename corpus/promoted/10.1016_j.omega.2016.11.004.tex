@@ -1,0 +1,45 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2016.11.004
+%@ meta id=10.1016_j.omega.2016.11.004 family=milp schema=0.1.0
+%@ name :: An exact micro–macro approach to cyclic and non-cyclic train timetabling
+%@ desc :: Mined from An exact micro–macro approach to cyclic and non-cyclic train timetabling (Omega, 2016).
+%@ prov source :: 10.1016/j.omega.2016.11.004
+%@ prov reference :: An exact micro–macro approach to cyclic and non-cyclic train timetabling
+%@ prov author :: Leonardo Lamorgese; Carlo Mannino; Erik Natvig
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize sum of deviations from desired times
+%@ var a shape=i,s domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station s
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Time of atomic movement
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ var d shape=i,s domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i at station s
+%@ index j ordered=0 cyclic=0 :: Train index
+%@ param S shape=- kind=scalar domain=- :: Set of stations
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param J shape=- kind=scalar domain=- :: Set of trains
+%@ param F shape=- kind=scalar domain=- :: Set of disjunctive pairs
+%@ index u ordered=0 cyclic=0 :: Atomic movement index
+%@ index v ordered=0 cyclic=0 :: Atomic movement index
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for route choice
+%@ param Q shape=i,j,s kind=scalar domain=- :: Minimum dwell time between trains
+%@ param b shape=i,s kind=scalar domain=- :: Lower bound for departure time
+%@ index w ordered=0 cyclic=0 :: Atomic movement index
+%@ index z ordered=0 cyclic=0 :: Atomic movement index
+%@ param M shape=- kind=scalar domain=- :: Large constant
+%@ var p shape=i,j,s domain=continuous role=primary drole=- lo=- hi=- :: Deviation from desired departure time
+%@ param c shape=- kind=scalar domain=- :: Objective function
+%@ var o shape=i,j,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of arrivals
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for disjunctive choice
+%@ param D shape=i,j,s kind=scalar domain=- :: Minimum headway between arrivals
+%@ param L shape=i,s kind=scalar domain=- :: Lower bound for arrival time
+%@ param U shape=i,s kind=scalar domain=- :: Upper bound for arrival time
+%@ index R ordered=0 cyclic=0 :: Set of routes
+%@ param binary shape=- kind=scalar domain=- :: Indicates binary variables
+%@ param e shape=- kind=scalar domain=- :: Base of natural logarithm
+%@ param real shape=- kind=scalar domain=- :: Indicates real variables
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Arrival time at station s is at least the time of atomic movement u
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Arrival time at station s is at least the time of atomic movement u
+\begin{align}
+  & a_{s}^{i} \geq t_{u_{1}} \tag{eq\_0014\_a} \\
+  & a_{s}^{i} \geq t_{u_{2}} \tag{eq\_0014\_b} \\
+  \min\quad & c \left(t\right) s.t . \left(1\right) a_{l_{i}}^{i} - d_{f_{i}}^{i} \leq F_{i} \cdot i \in J \left(2 \cdot a\right) L_{s}^{i} \leq a_{s}^{i} \leq U_{s}^{i} \cdot i \in J , s \in S \left(i\right) \left(2 \cdot b\right) L_{s}^{i} \leq d_{s}^{i} \leq U_{s}^{i} \cdot i \in J , s \in S \left(i\right) \left(3 \cdot a\right) a_{s}^{j} - a_{s}^{i} \geq D_{s}^{\mathit{ij}} + \left(o_{s}^{\mathit{ij}} - 1\right) M \left\{i , j\right\} \subseteq J , s \in S \left(i\right) \cap S \left(j\right) \left(3 \cdot b\right) a_{s}^{i} - a_{s}^{j} \geq D_{s}^{\mathit{ji}} - M \cdot o_{s}^{\mathit{ij}} \left\{i , j\right\} \subseteq J , s \in S \left(i\right) \cap S \left(j\right) \left(4 \cdot a\right) d_{s}^{j} - d_{s}^{i} \leq Q_{s}^{\mathit{ij}} + p_{s}^{\mathit{ij}} \left\{i , j\right\} \in \mathcal{Q}_{s} , s \in S \left(i\right) \cap S \left(j\right) \left(4 \cdot b\right) d_{s}^{j} - d_{s}^{i} \geq Q_{s}^{\mathit{ij}} - p_{s}^{\mathit{ij}} \left\{i , j\right\} \in \mathcal{Q}_{s} , s \in S \left(i\right) \cap S \left(j\right) \left(4 \cdot c\right) p_{s}^{\mathit{ij}} \leq \mathit{epsilon}_{s}^{\mathit{ij}} \left\{i , j\right\} \in \mathcal{Q}_{s} , s \in S \left(i\right) \cap S \left(j\right) \left(5\right) \sum_{r \in R \left(i , s\right)} x_{r} = 1 \cdot i \in J , s \in S \left(i\right) \left(6\right) t_{v} - t_{u} \geq l_{\mathit{uv}} x_{r} i \in J , s \in S \left(i\right) , r \in R \left(i , s\right) , \left\{\left(u , v\right)\right\} \in r \left(7 \cdot a\right) t_{v} - t_{u} \geq \left(y_{d} - r_{d} - 1\right) M \cdot d = \left\{\left(u , v\right) , \left(w , z\right)\right\} \in F \left(7 \cdot b\right) t_{z} - t_{w} \geq \left(- r_{d} - y_{d}\right) M \cdot d = \left\{\left(u , v\right) , \left(w , z\right)\right\} \in F \left(7 \cdot c\right) r_{d} \leq 2 - \sum_{l \in R \left(i , u , z\right) \cup R \left(j , v , w\right)} x_{l} \cdot d = \left\{\left(u , v\right) , \left(w , z\right)\right\} \in F , J \left(d\right) = \left\{i , j\right\} \left(7 \cdot d\right) r_{d} \geq 1 - \sum_{l \in R \left(j , v , w\right)} x_{l} \cdot d = \left\{\left(u , v\right) , \left(w , z\right)\right\} \in F , J \left(d\right) = \left\{i , j\right\} \left(7 \cdot e\right) r_{d} \geq 1 - \sum_{l \in R \left(i , u , z\right)} x_{l} \cdot d = \left\{\left(u , v\right) , \left(w , z\right)\right\} \in F , J \left(d\right) = \left\{i , j\right\} \left(8 \cdot a\right) a_{s}^{j} = t_{a \left(j , s\right)} \cdot j \in J , s \in S \left(j\right) \left(8 \cdot b\right) d_{s}^{j} = t_{d \left(j , s\right)} \cdot j \in J , s \in S \left(j\right) t , a , d , p \cdot real \cdot o , x , y , r binary \tag{eq\_0019} \\
+\end{align}

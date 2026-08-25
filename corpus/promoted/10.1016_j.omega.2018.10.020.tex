@@ -1,0 +1,129 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2018.10.020
+%@ meta id=10.1016_j.omega.2018.10.020 family=lp schema=0.1.0
+%@ name :: Collaborative optimization for metro train scheduling and train connections combined with passenger flow control strategy
+%@ desc :: Mined from Collaborative optimization for metro train scheduling and train connections combined with passenger flow control strategy (Omega, 2018).
+%@ prov source :: 10.1016/j.omega.2018.10.020
+%@ prov reference :: Collaborative optimization for metro train scheduling and train connections combined with passenger flow control strategy
+%@ prov author :: Renming Liu; Shukai Li; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted normalized sum of negative train connections (T1), passenger flow control (T2), and waiting passengers (T3).
+%@ var s shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train service i at station k.
+%@ var p shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on board of train service i when it leaves station k.
+%@ var w shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at platform k for train service i.
+%@ param b shape=I,K kind=matrix domain=- :: Arrival rate of passengers entering station k for train service i.
+%@ var c shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers restricted to enter station k for train service i.
+%@ var e shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers entering train service i at station k.
+%@ index I ordered=0 cyclic=0 :: Set of train services.
+%@ index i ordered=0 cyclic=0 :: Index for train services.
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive constant for big-M reformulations.
+%@ var r shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train service i at station k.
+%@ index K ordered=0 cyclic=0 :: Set of stations.
+%@ param N shape=- kind=scalar domain=- :: Number of available trains (N_train).
+%@ var T shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective term value (T1, T2, or T3) before normalization.
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+%@ param Constraints shape=- kind=scalar domain=- :: Set of constraints in the collaborative optimization model.
+%@ param t shape=- kind=scalar domain=- :: Entering/exiting depot time parameters (t_enter + t_exit).
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Auxiliary variable for linearization, f = b - a.
+%@ param iff shape=- kind=scalar domain=- :: Logical equivalence operator used in linear inequality transformation P.1.
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Auxiliary variable for product of logical and continuous variables, z = f δ.
+%@ var a shape=- domain=continuous role=primary drole=- lo=- hi=- :: Auxiliary variable for linearization, a = pw_{i-1}(k) + x_i(k)b_i(k) - c_i(k).
+%@ con eq_0001 kind=linear domain=- indicator=- :: Headway dynamic equation: x_i(k+1)=x_i(k)+s_i(k)-s_{i-1}(k).
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting dynamics: pw_i(k)=pw_{i-1}(k)+x_i(k)b_i(k)-c_i(k)-pe_i(k).
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passenger load dynamics: p_i(k)=p_i(k-1)+pe_i(k)-ps_i(k).
+%@ con eq_0004 kind=linear domain=- indicator=- :: Alighting passenger relation: ps_i(k)=γ_i(k)p_i(k-1).
+%@ con eq_0011 kind=linear domain=- indicator=- :: Train-source consistency: α_i'=Σ_{i<i'} θ_{i,i'}.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Train-destination consistency: β_i=Σ_{i'>i} θ_{i,i'}.
+%@ con eq_0013_a kind=linear domain=- indicator=- :: Big-M upper bound: α_i'+β_i ≤ 2+M(1-θ_{i,i'}).
+%@ con eq_0013_b kind=linear domain=- indicator=- :: Big-M lower bound: α_i'+β_i ≥ 2-M(1-θ_{i,i'}).
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Turnaround time upper-bound constraint for connecting services i and i'.
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Turnaround time lower-bound constraint for connecting services i and i'.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Available train fleet constraint: Σ_{m≤i}(1-α_m)-Σ_{m<i}(1-β_m)λ_{m,i} ≤ N_train.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Objective term T1 = -Σ_{i'}\Σ_{i<i'} θ_{i,i'} (maximize direct train connections).
+%@ con eq_0018 kind=linear domain=- indicator=- :: Objective term T2 = Σ_i Σ_k c_i(k) (minimize passenger flow control actions).
+%@ con eq_0019 kind=linear domain=- indicator=- :: Objective term T3 = Σ_i Σ_k pw_i(k) (minimize waiting passengers at platforms).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Weighted-sum objective: J = Σ_l ω_l (T_l-T_{l,min})/(T_{l,max}-T_{l,min}).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Full collaborative optimization model: minimize J with headway, passenger, connection, turnaround and fleet constraints.
+%@ con eq_0023_a kind=linear domain=- indicator=- :: P.1 upper inequality: f(x) ≤ fmax(1-δ).
+%@ con eq_0023_b kind=linear domain=- indicator=- :: P.1 lower inequality: f(x) ≥ ε+(fmin-ε)δ.
+%@ con eq_0024 kind=linear domain=- indicator=- :: P.2 linearization of z=δf(x): bounds using fmax and fmin.
+%@ con eq_0025_a kind=linear domain=- indicator=- :: P.3 inequality: -δ1+δ3 ≤ 0.
+%@ con eq_0025_b kind=linear domain=- indicator=- :: P.3 inequality: -δ2+δ3 ≤ 0.
+%@ con eq_0025_c kind=linear domain=- indicator=- :: P.3 inequality: δ1+δ2-δ3 ≤ 1.
+%@ con eq_0025_d kind=linear domain=- indicator=- :: P.3 auxiliary binary variable δ3 is defined by the product δ1δ2.
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Definition of auxiliary variable a = pw_{i-1}(k)+x_i(k)b_i(k)-c_i(k).
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Definition of auxiliary variable b = pmax-[1-γ_i(k)]p_i(k-1).
+%@ con eq_0026_c kind=linear domain=- indicator=- :: Definition of auxiliary variable f = b-a.
+%@ con eq_0027_a kind=linear domain=- indicator=- :: Original waiting-passenger equation: pw_i(k)=a-min(a,b).
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Original passenger-load equation: p_i(k)=pmax-b+min(a,b).
+%@ con eq_0030 kind=linear domain=- indicator=- :: Logical variable definition: δ=1 if f≤0, otherwise 0.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearized waiting equation: pw_i(k)=-z.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearized load equation: p_i(k)=pmax-f+z.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Six mixed-integer linear inequalities enforcing δ and z=fδ.
+%@ con eq_0036_a kind=linear domain=- indicator=- :: First inequality of Eq. (36) for train stock availability λ_{m,i}.
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Second inequality of Eq. (36) for train stock availability λ_{m,i}.
+%@ con eq_0036_c kind=linear domain=- indicator=- :: Inequality of Eq. (36) bounding λ_{m,i} with M̃.
+%@ con eq_0036_d kind=linear domain=- indicator=- :: Inequality of Eq. (36) bounding λ_{m,i} with m̃.
+%@ con eq_0036_e kind=linear domain=- indicator=- :: Inequality of Eq. (36) for λ_{m,i} and depot time parameters.
+%@ con eq_0036_f kind=linear domain=- indicator=- :: Inequality of Eq. (36) for λ_{m,i} and depot time parameters.
+%@ con eq_0037_a kind=linear domain=- indicator=- :: Definition of maximal bound M̃ = t_enter+t_exit.
+%@ con eq_0037_b kind=linear domain=- indicator=- :: Definition of minimal bound m̃ = t_enter+t_exit-Σ_i x_i^{max}(k).
+%@ con eq_0038_a kind=linear domain=- indicator=- :: Linearization of φ_{m,i}=β_m λ_{m,i}: -β_m+φ_{m,i} ≤ 0.
+%@ con eq_0038_b kind=linear domain=- indicator=- :: Linearization of φ_{m,i}=β_m λ_{m,i}: -λ_{m,i}+φ_{m,i} ≤ 0.
+%@ con eq_0039_a kind=linear domain=- indicator=- :: Linearized fleet constraint: Σ_{m≤i}(1-α_m)-Σ_{m<i}(λ_{m,i}-φ_{m,i}) ≤ N_train.
+%@ con eq_0039_b kind=linear domain=- indicator=- :: Auxiliary inequality completing the linearization of φ_{m,i}.
+%@ con eq_0039_c kind=linear domain=- indicator=- :: Auxiliary inequality completing the linearization of φ_{m,i}.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Lagrangian relaxation objective Δ(ρ,μ) dualizing turnaround constraints.
+%@ con eq_0042_a kind=linear domain=- indicator=- :: Constraint from Eq. (42) of the Lagrangian-relaxation based solution procedure.
+%@ con eq_0042_b kind=linear domain=- indicator=- :: Constraint from Eq. (42) of the Lagrangian-relaxation based solution procedure.
+\begin{align}
+  & x_{i} \left(k + 1\right) = x_{i} \left(k\right) + s_{i} \left(k\right) - s_{i - 1} \left(k\right) , \tag{eq\_0001} \\
+  & p \cdot w_{i} \left(k\right) = p \cdot w_{i - 1} \left(k\right) + x_{i} \left(k\right) b_{i} \left(k\right) - c_{i} \left(k\right) - p \cdot e_{i} \left(k\right) , \tag{eq\_0002} \\
+  & p_{i} \left(k\right) = p_{i} \left(k - 1\right) + p \cdot e_{i} \left(k\right) - p \cdot s_{i} \left(k\right) , \tag{eq\_0003} \\
+  & p \cdot s_{i} \left(k\right) = \mathit{gamma}_{i} \left(k\right) p_{i} \left(k - 1\right) , \tag{eq\_0004} \\
+  & \begin{matrix} & & \mathit{alpha}_{i^{'}} = \sum_{i \in I \text{and} i < i^{'}} \mathit{theta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & & \mathit{beta}_{i} = \sum_{i^{'} \in I \text{and} i^{'} > i} \mathit{theta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0012} \\
+  & \mathit{alpha}_{i^{'}} + \mathit{beta}_{i} \leq 2 + M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0013\_a} \\
+  & \mathit{alpha}_{i^{'}} + \mathit{beta}_{i} \geq 2 - M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0013\_b} \\
+  & \sum_{i^{'}} x_{i^{'}} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \leq r_{1 , max}^{\text{turn}} + M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0014\_a} \\
+  & \sum_{i^{'}} x_{i^{'}} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \geq r_{1 , min}^{\text{turn}} - M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0014\_b} \\
+  & \sum_{m = 1}^{i} \left(1 - \mathit{alpha}_{m}\right) - \sum_{m = 1}^{i - 1} \left(1 - \mathit{beta}_{m}\right) \mathit{lambda}_{m , i} \leq N_{\text{train}} , \tag{eq\_0016} \\
+  & T_{1}^{'} = \sum_{i^{'}} \sum_{i < i^{'}} \mathit{theta}_{i , i^{'}} , \tag{eq\_0017} \\
+  & T_{1} = - \sum_{i^{'}} \sum_{i < i^{'}} \mathit{theta}_{i , i^{'}} . \tag{eq\_0018} \\
+  & T_{2} = \sum_{i = 1}^{I} \sum_{k < 1}^{2 K} c_{i} \left(k\right) , \tag{eq\_0019} \\
+  & T_{3} = \sum_{i = 1}^{I} \sum_{k < 1}^{2 K} p \cdot w_{i} \left(k\right) . \tag{eq\_0020} \\
+  & J = \mathit{omega}_{1} \frac{T_{1} - T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \mathit{omega}_{2} \frac{T_{2} - T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \mathit{omega}_{3} \frac{T_{3} - T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} , \tag{eq\_0021} \\
+  \begin{matrix}\quad & & & min J = \mathit{omega}_{1} \frac{T_{1} - T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \mathit{omega}_{2} \frac{T_{2} - T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \mathit{omega}_{3} \frac{T_{3} - T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \\ & & \text{s}.\text{t}. \begin{cases} & \text{Constraints} \left(1\right) , \left(6\right) - \left(16\right) , \\ & x_{i}^{min} \left(k\right) \leq x_{i} \left(k\right) \leq x_{i}^{max} \left(k\right) , k = 1 , 2 , \ldots , K , i = 1 , 2 , \ldots , I , \\ & s_{i}^{min} \left(k\right) \leq s_{i} \left(k\right) \leq s_{i}^{max} \left(k\right) , k = 1 , 2 , \ldots , K , i = 1 , 2 , \ldots , I , \\ & 0 \leq c_{i} \left(k\right) \leq c_{i}^{max} \left(k\right) , k = 1 , 2 , \ldots , K , i = 1 , 2 , \ldots , I , \\ & 0 \leq p \cdot w_{i} \left(k\right) \leq p \cdot w_{i}^{max} \left(k\right) , k = 1 , 2 , \ldots , K , i = 1 , 2 , \ldots , I , \\ & x_{i} \left(k\right) , s_{i} \left(k\right) \in \mathcal{N}^{+} , k = 1 , 2 , \ldots , K , i = 1 , 2 , \ldots , I . \end{cases}\end{matrix} \tag{eq\_0022} \\
+  & f_{max} = \underset{x \in \mathit{chi}}{max} f \left(x\right) \tag{eq\_0023\_a} \\
+  & f_{min} = \underset{x \in \mathit{chi}}{min} f \left(x\right) \tag{eq\_0023\_b} \\
+  & \begin{matrix}\left[f \left(x\right) \leq 0\right] \Leftrightarrow \left[\mathit{delta} = 1\right] , \text{iff} \begin{cases} f \left(x\right) \leq f_{max} \left(1 - \mathit{delta}\right) , \\ f \left(x\right) \geq \mathit{epsilon} + \left(f_{min} - \mathit{epsilon}\right) \mathit{delta} , \end{cases}\end{matrix} \tag{eq\_0024} \\
+  & z \leq f_{max} \mathit{delta} \tag{eq\_0025\_a} \\
+  & z \geq f_{min} \mathit{delta} \tag{eq\_0025\_b} \\
+  & z \leq f \left(x\right) - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0025\_c} \\
+  & z \geq f \left(x\right) - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0025\_d} \\
+  & - \mathit{delta}_{1} + \mathit{delta}_{3} \leq 0 \tag{eq\_0026\_a} \\
+  & - \mathit{delta}_{2} + \mathit{delta}_{3} \leq 0 \tag{eq\_0026\_b} \\
+  & \mathit{delta}_{1} + \mathit{delta}_{2} - \mathit{delta}_{3} \leq 1 \tag{eq\_0026\_c} \\
+  & a = p \cdot w_{i - 1} \left(k\right) + x_{i} \left(k\right) b_{i} \left(k\right) - c_{i} \left(k\right) \tag{eq\_0027\_a} \\
+  & b = p_{max} - \left[1 - \mathit{gamma}_{i} \left(k\right)\right] p_{i} \left(k - 1\right) \tag{eq\_0027\_b} \\
+  & f = b - a , \tag{eq\_0030} \\
+  & z = f \mathit{delta} , \tag{eq\_0033} \\
+  & \begin{matrix} & & p \cdot w_{i} \left(k\right) = - z ,\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix} & & p_{i} \left(k\right) = p_{max} - f + z .\end{matrix} \tag{eq\_0035} \\
+  & f \leq f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_a} \\
+  & f \geq \mathit{epsilon} + \left(f_{min} - \mathit{epsilon}\right) \mathit{delta} \tag{eq\_0036\_b} \\
+  & z \leq f_{max} \mathit{delta} \tag{eq\_0036\_c} \\
+  & z \geq f_{min} \mathit{delta} \tag{eq\_0036\_d} \\
+  & z \leq f - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_e} \\
+  & z \geq f - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_f} \\
+  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \leq {M} \left(1 - \mathit{lambda}_{m , i}\right) \tag{eq\_0037\_a} \\
+  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \geq \mathit{epsilon} + \left({m} - \mathit{epsilon}\right) \mathit{lambda}_{m , i} \tag{eq\_0037\_b} \\
+  & {M} = t_{\text{enter}} + t_{\text{exit}} \tag{eq\_0038\_a} \\
+  & {m} = t_{\text{enter}} + t_{\text{exit}} - \sum_{i} x_{i}^{max} \left(k\right) \tag{eq\_0038\_b} \\
+  & - \mathit{beta}_{m} + \mathit{phi}_{m , i} \leq 0 \tag{eq\_0039\_a} \\
+  & - \mathit{lambda}_{m , i} + \mathit{phi}_{m , i} \leq 0 \tag{eq\_0039\_b} \\
+  & \mathit{beta}_{m} + \mathit{lambda}_{m , i} - \mathit{phi}_{m , i} \leq 1 \tag{eq\_0039\_c} \\
+  & \sum_{m = 1}^{i} \left(1 - \mathit{alpha}_{m}\right) - \sum_{m = 1}^{i - 1} \left(\mathit{lambda}_{m , i} - \mathit{phi}_{m , i}\right) \leq N_{\text{train}} . \tag{eq\_0040} \\
+  & \mathit{omega}_{1}^{'} = \frac{\mathit{omega}_{1}}{T_{1 , \text{max}} - T_{1 , \text{min}}} , \mathit{omega}_{2}^{'} = \frac{\mathit{omega}_{2}}{T_{2 , \text{max}} - T_{2 , \text{min}}} , \mathit{omega}_{3}^{'} = \frac{\mathit{omega}_{3}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \tag{eq\_0042\_a} \\
+  & N = \frac{- \mathit{omega}_{1} T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \frac{- \mathit{omega}_{2} T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \frac{- \mathit{omega}_{3} T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \tag{eq\_0042\_b} \\
+\end{align}

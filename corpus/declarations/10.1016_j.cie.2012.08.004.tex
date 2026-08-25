@@ -1,0 +1,157 @@
+% Declaration sidecar for 10.1016_j.cie.2012.08.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2012.08.004
+% Modelling disruptions and resolving conflicts optimally in a railway schedule
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2012.08.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of delays of all trains at destinations
+
+% X: classified as parameter during review
+%@ param X shape=- kind=scalar domain=binary :: Binary indicator for train direction (UP=1, DN=0)
+
+% a: classified as parameter during review
+%@ param a shape=I,K kind=matrix domain=continuous :: Scheduled arrival time of train at station
+
+% ā: classified as variable during review
+%@ var a_bar shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time of train at station
+
+% w: classified as parameter during review
+%@ param w shape=I kind=vector domain=continuous :: Weight for train delay in objective
+
+% TD: classified as index during review
+%@ index TD ordered=0 cyclic=0 :: Set of down trains
+
+% TU: classified as index during review
+%@ index TU ordered=0 cyclic=0 :: Set of up trains
+
+% I: declared for shapes
+%@ index I ordered=1 cyclic=0 :: Set of all trains (first train index)
+
+% J: declared for shapes
+%@ index J ordered=1 cyclic=0 :: Set of all trains (second train index)
+
+% K: declared for shapes
+%@ index K ordered=1 cyclic=0 :: Set of stations
+
+% Tut: classified as parameter during review
+%@ param Tut shape=I,K kind=matrix domain=continuous :: Minimum travel time for up train i to station k
+
+% d̄: classified as variable during review
+%@ var d_bar shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time of train at station
+
+% Tdt: classified as parameter during review
+%@ param Tdt shape=J,K kind=matrix domain=continuous :: Minimum travel time for down train j to station k
+
+% Th: classified as parameter during review
+%@ param Th shape=I,K kind=matrix domain=continuous :: Minimum halt time of train i at station k
+
+% Ax: classified as variable during review
+%@ var Ax shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for up train arrivals
+
+% D: classified as parameter during review
+%@ param D shape=- kind=big_m domain=continuous :: Large positive constant for big-M constraints
+
+% HA: classified as parameter during review
+%@ param HA shape=I,J,K kind=matrix domain=continuous :: Minimum arrival headway between trains i and j at station k
+
+% Dx: classified as variable during review
+%@ var Dx shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for up train departures
+
+% HD: classified as parameter during review
+%@ param HD shape=I,J,K kind=matrix domain=continuous :: Minimum departure headway between trains i and j at station k
+
+% Az: classified as variable during review
+%@ var Az shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for down train arrivals
+
+% Dz: classified as variable during review
+%@ var Dz shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for down train departures
+
+% Ay: classified as variable during review
+%@ var Ay shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for meet precedence
+
+% HM: classified as parameter during review
+%@ param HM shape=I,J,K kind=matrix domain=continuous :: Minimum meet headway between up and down trains
+
+% Dy: classified as variable during review
+%@ var Dy shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary order variable for meet precedence
+
+% d: classified as parameter during review
+%@ param d shape=I,K kind=matrix domain=continuous :: Scheduled departure time of train at station
+
+% AU: classified as variable during review
+%@ var AU shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary conflict detection for up trains
+
+% fromTime: classified as parameter during review
+%@ param fromTime shape=- kind=scalar domain=continuous :: Start time of disruption
+
+% toTime: classified as parameter during review
+%@ param toTime shape=- kind=scalar domain=continuous :: End time of disruption
+
+% conf: classified as variable during review
+%@ var conf shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary conflict indicator for train
+
+% AD: classified as variable during review
+%@ var AD shape=J domain=binary role=primary drole=- lo=- hi=- :: Binary conflict detection for down trains
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0005 kind=linear domain=- indicator=- :: Objective function: minimize weighted delay of all trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimum travel time constraint for up train
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum travel time constraint for down train
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum halt time constraint
+%@ con eq_0009 kind=linear domain=- indicator=- :: Up arrival headway ordering (i before j)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Up departure headway ordering (i before j)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Up arrival headway ordering (j before i)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Up departure headway ordering (j before i)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary order variables for up trains (Ax, Dx)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Down arrival headway ordering (i before j)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Down departure headway ordering (i before j)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Down arrival headway ordering (j before i)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Down departure headway ordering (j before i)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary order variables for down trains (Az, Dz)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Meet headway constraint: up arrival before down departure
+%@ con eq_0020 kind=linear domain=- indicator=- :: Meet headway constraint: down arrival before up departure
+%@ con eq_0021 kind=linear domain=- indicator=- :: Meet headway constraint: up departure before down arrival
+%@ con eq_0022 kind=linear domain=- indicator=- :: Meet headway constraint: down departure before up arrival
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary meet order variables (Ay, Dy)
+%@ con eq_0024 kind=linear domain=- indicator=- :: UP consistency: departure order at k-1 equals arrival order at k
+%@ con eq_0025 kind=linear domain=- indicator=- :: DOWN consistency: departure order at k equals arrival order at k-1
+%@ con eq_0026 kind=linear domain=- indicator=- :: Meet consistency: arrival-departure order at k equals departure-arrival order at k+1
+%@ con eq_0027 kind=linear domain=- indicator=- :: Rescheduling: actual arrival >= scheduled arrival (up/down)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Rescheduling: actual arrival >= scheduled arrival (continued)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Rescheduling: actual departure >= scheduled departure (up/down)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Rescheduling: actual departure >= scheduled departure (continued)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Disruption conflict detection for up trains (arrival)
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Disruption conflict detection for up trains (departure)
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Binary conflict detection variables for up trains (AU1, AU2)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Conflict indicator for up trains (conf <= AU1 and AU2)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Conflict indicator for up trains (conf + 1 >= AU1 + AU2)
+%@ con eq_0035 kind=linear domain=- indicator=- :: Modify actual departure of up conflicting train after disruption end
+%@ con eq_0036 kind=linear domain=- indicator=- :: Disruption conflict detection for down trains (arrival)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Disruption conflict detection for down trains (departure)
+%@ con eq_0038_a kind=linear domain=- indicator=- :: Binary conflict detection variables for down trains (AD1, AD2)
+%@ con eq_0038_b kind=linear domain=- indicator=- :: Conflict indicator for down trains (conf <= AD1 and AD2)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Conflict indicator for down trains (conf + 1 >= AD1 + AD2)
+%@ con eq_0040 kind=linear domain=- indicator=- :: Modify actual departure of down conflicting train after disruption end

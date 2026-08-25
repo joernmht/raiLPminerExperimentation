@@ -1,0 +1,94 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2023.102968
+%@ meta id=10.1016_j.omega.2023.102968 family=milp schema=0.1.0
+%@ name :: Integrated optimization of train timetable and train unit circulation for a Y-type urban rail transit system with flexible train composition mode
+%@ desc :: Mined from Integrated optimization of train timetable and train unit circulation for a Y-type urban rail transit system with flexible train composition mode (Omega, 2023).
+%@ prov source :: 10.1016/j.omega.2023.102968
+%@ prov reference :: Integrated optimization of train timetable and train unit circulation for a Y-type urban rail transit system with flexible train composition mode
+%@ prov author :: Lin Yang; Yuan Gao; Andrea D’Ariano; Suxiu Xu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize alpha-weighted passenger waiting time plus beta-weighted number of train units used
+%@ var t shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of service i at station s
+%@ index I ordered=0 cyclic=0 :: Set of all services
+%@ index S ordered=0 cyclic=0 :: Set of all stations
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between consecutive services
+%@ index i ordered=0 cyclic=0 :: Index for services
+%@ index s ordered=0 cyclic=0 :: Index for stations
+%@ index L ordered=0 cyclic=0 :: Set of lines (including trunk and branches)
+%@ index l ordered=0 cyclic=0 :: Index for lines
+%@ var x shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service i is converted
+%@ var y shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Total number of train units used by service i
+%@ var c shape=I,I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units transferred from service i to service i' at station s
+%@ var o shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units leaving depot at station s for service i
+%@ index R ordered=0 cyclic=0 :: Set of routes (major and minor)
+%@ var e shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units entering depot at station s after service i
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+%@ index P ordered=0 cyclic=0 :: Set of all passengers
+%@ var z shape=P,I,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger p boards service i on route r
+%@ index r ordered=0 cyclic=0 :: Index for routes
+%@ param Cap shape=- kind=scalar domain=- :: Capacity of a train unit
+%@ con eq_0001 kind=linear domain=- indicator=- :: Headway: departure headway between consecutive services at each station
+%@ con eq_0002 kind=linear domain=- indicator=- :: Arrival time at next station equals departure time plus running time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time at non-joint station equals arrival time plus dwell time
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure time at joint stations includes coupling/decoupling time for converted services
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure times of a service are equal at all joint stations
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minor-route train units of converted services follow the minor-route incidence
+%@ con eq_0007 kind=linear domain=- indicator=- :: Major-route train units equal total train units minus minor-route train units
+%@ con eq_0008 kind=linear domain=- indicator=- :: Converted services must be performed by at least a double composition
+%@ con eq_0009 kind=linear domain=- indicator=- :: Balance of train units at starting station for downstream services
+%@ con eq_0010 kind=linear domain=- indicator=- :: Balance of train units at starting station for upstream services
+%@ con eq_0011 kind=linear domain=- indicator=- :: Balance of train units at ending station for downstream services
+%@ con eq_0012 kind=linear domain=- indicator=- :: Balance of train units at ending station for upstream services
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum turnaround time before train units can be inherited
+%@ con eq_0014 kind=linear domain=- indicator=- :: Turnaround inheritance is bounded by the binary inheritance indicator
+%@ con eq_0015 kind=linear domain=- indicator=- :: Boarding time upper bound: passenger cannot board before departure
+%@ con eq_0016 kind=linear domain=- indicator=- :: Boarding time lower bound for the boarding-time indicator
+%@ con eq_0017 kind=linear domain=- indicator=- :: A passenger can board a service only if the boarding time condition is satisfied
+%@ con eq_0018 kind=linear domain=- indicator=- :: Unique boarding: each passenger boards exactly one train unit
+%@ con eq_0019 kind=linear domain=- indicator=- :: Route-specific unique boarding: each passenger on a route boards exactly one service
+%@ con eq_0020 kind=linear domain=- indicator=- :: Absolute temporal FIFO for trunk passengers
+%@ con eq_0021 kind=linear domain=- indicator=- :: Relative temporal FIFO for major and minor route passengers
+%@ con eq_0022 kind=linear domain=- indicator=- :: Absolute spatial FIFO for trunk passengers
+%@ con eq_0025 kind=linear domain=- indicator=- :: Turnaround directions: invalid train unit transfers are forced to zero
+%@ con eq_0028 kind=linear domain=- indicator=- :: Objective component: minimize total number of train units leaving depots
+%@ con eq_0029 kind=linear domain=- indicator=- :: Linear weighted objective combining passenger waiting time and train units used
+%@ con eq_0030 kind=linear domain=- indicator=- :: Linearization of passenger waiting time product in the objective
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization of passenger waiting time product in the objective
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearization of train unit usage objective
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearization of train unit usage objective
+%@ con eq_0059 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model
+%@ con eq_0060 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model
+\begin{align}
+  & t_{i + 1 , s}^{d e p} - t_{i , s}^{d e p} \geq h^{m i n} , \forall i \in I , s \in S . \tag{eq\_0001} \\
+  & t_{i , s + 1}^{a r r} = t_{i , s}^{d e p} + t_{s}^{r t} , \forall i \in {I} , s \in S \backslash \underset{l \in L}{\cup} \left\{s_{l , \left|s_{l}\right|}\right\} . \tag{eq\_0002} \\
+  & t_{i , s}^{d e p} = t_{i , s}^{a r r} + t_{s}^{d t} , \forall i \in {I} , s \in S \backslash S^{j s} . \tag{eq\_0003} \\
+  & t_{i , s_{0 , \left|S_{0}\right|}}^{d e p} = t_{i , s_{0 , \left|S_{0}\right|}}^{a r r} + t_{s_{0 , \left|S_{0}\right|}}^{d t} , \forall i \in {I} . \tag{eq\_0004} \\
+  & t_{i , s_{0 , \left|S_{0}\right|}}^{d e p} = t_{i , s_{0 , \left|S_{0}\right|}}^{a r r} + t_{s_{0 , \left|S_{0}\right|}}^{d t} + \mathit{tau}^{c d} , \forall i \in {I} . \tag{eq\_0005} \\
+  & t_{i , s_{0 , \left|S_{0}\right|}}^{d e p} = t_{i , s_{0 , \left|S_{0}\right|}}^{a r r} + t_{s_{0 , \left|S_{0}\right|}}^{d t} + \mathit{tau}^{c d} \cdot x_{i} , \forall i \in {I} . \tag{eq\_0006} \\
+  & t_{i , s}^{d e p} = t_{i , s^{'}}^{d e p} , \forall i \in I , s , s^{'} \in S^{j s} . \tag{eq\_0007} \\
+  & \mathit{mu}_{i , s , 2} = \mathit{eta}_{s , 2} \cdot x_{i} , \forall i \in I , s \in S , \tag{eq\_0008} \\
+  & \mathit{mu}_{i , s , 1} = \mathit{eta}_{s , 1} \cdot \left(y_{i} + 1 - x_{i}\right) , \forall i \in I , s \in S . \tag{eq\_0009} \\
+  & x_{i} \leq y_{i} , \forall i \in I . \tag{eq\_0010} \\
+  & \mathit{xi}_{s_{0 , 1}} \cdot o_{i , s_{0 , 1}} + \sum_{i^{'} \in {I}} c_{i^{'} , i , s_{0 , 1}} = \sum_{r \in R} \mathit{mu}_{i , s_{0 , 1} , r} , \forall i \in {I} , \tag{eq\_0011} \\
+  & \mathit{xi}_{s} \cdot o_{i , s} + \sum_{i^{'} \in {I}} c_{i^{'} , i , s} = \sum_{r \in R} \mathit{mu}_{i , s , r} , \forall i \in {I} , s \in S^{t s} \backslash \left\{s_{0 , 1}\right\} . \tag{eq\_0012} \\
+  & \mathit{xi}_{s} \cdot e_{i , s} + \sum_{i^{'} \in {I}} c_{i , i^{'} , s} = \sum_{r \in R} \mathit{mu}_{i , s , r} , \forall i \in {I} , s \in S^{t s} \backslash \left\{s_{0 , 1}\right\} , \tag{eq\_0013} \\
+  & \mathit{xi}_{s_{0 , 1}} \cdot e_{i , s_{0 , 1}} + \sum_{i^{'} \in {I}} c_{i , i^{'} , s_{0 , 1}} = \sum_{r \in R} \mathit{mu}_{i , s_{0 , 1} , r} , \forall i \in {I} . \tag{eq\_0014} \\
+  & M \cdot \left(\mathit{rho}_{i , i^{'} , s} - 1\right) \leq t_{i^{'} , s}^{d e p} - t_{i , s}^{a r r} - \mathit{tau}^{t u r n} , \forall i , i^{'} \in I , s \in S^{t s} . \tag{eq\_0015} \\
+  & c_{i , i^{'} , s} \leq M \cdot \mathit{rho}_{i , i^{'} , s} , \forall i , i^{'} \in I , s \in S^{t s} . \tag{eq\_0016} \\
+  & M \cdot \mathit{upsilon}_{p , i} \geq t_{i , s}^{d e p} - t_{p} , \forall i \in I , s \in S , p \in P_{s}^{o r i} , \tag{eq\_0017} \\
+  & M \cdot \left(\mathit{upsilon}_{p , i} - 1\right) \leq t_{i , s}^{d e p} - t_{p} , \forall i \in I , s \in S , p \in P_{s}^{o r i} . \tag{eq\_0018} \\
+  & \sum_{r \in R} z_{p , i , r} \leq \mathit{upsilon}_{p , i} , \forall p \in P , i \in I . \tag{eq\_0019} \\
+  & \sum_{i \in I} \sum_{r \in R} z_{p , i , r} = 1 , \forall p \in P . \tag{eq\_0020} \\
+  & \sum_{i \in I} z_{p , i , r} = 1 , \forall r \in R , p \in P_{r} . \tag{eq\_0021} \\
+  & \sum_{r^{'} \in R} \sum_{i^{'} = 1}^{i} z_{p^{'} , i^{'} , r^{'}} \geq \sum_{r^{'} \in R} z_{p , i , r^{'}} , \forall i \in {I} , p \in {P} , \tag{eq\_0022} \\
+  & \sum_{i^{'} = 1}^{i} z_{p^{'} , i^{'} , r} \geq z_{p , i , r} , \forall i \in {I} , r \in R , p \in {P} \cap P_{r} , \tag{eq\_0025} \\
+  & M \cdot \sum_{i^{'} = 1}^{i} \sum_{r \in R} z_{p , i^{'} , r} \geq \sum_{r \in R} \mathit{Cap} \cdot \mathit{mu}_{i , f_{p} , r} - \underset{p^{'} \in {P} \cap P_{f_{p}}^{s e g}}{\sum} \sum_{r \in R} z_{p^{'} , i , r} + M \cdot \left(\mathit{upsilon}_{p , i} - 1\right) , \forall i \in {I} , p \in {P} \backslash \underset{r \in R}{\cup} P_{r} . \tag{eq\_0028} \\
+  & M \cdot \sum_{i^{'} = 1}^{i} z_{p , i^{'} , r} \geq \mathit{Cap} \cdot \mathit{mu}_{i , f_{p} , r} - \underset{p^{'} \in {P} \cap P_{f_{p}}^{s e g}}{\sum} z_{p^{'} , i , r} + M \cdot \left(\mathit{upsilon}_{p , i} - 1\right) , \forall i \in {I} , r \in R , p \in {P} \cap P_{r} . \tag{eq\_0029} \\
+  & \sum_{p \in P_{s}^{s e g}} z_{p , i , r} \leq \mathit{Cap} \cdot \mathit{mu}_{i , s , r} , \forall i \in I , r \in R , s \in S \backslash \underset{l \in L}{\cup} \left\{s_{l , \left|S_{l}\right|}\right\} . \tag{eq\_0030} \\
+  & \sum_{i^{'} \in {I}} \sum_{i \in I} c_{i^{'} , i , s_{0 , 1}} + \sum_{i \in I} \sum_{i^{'} \in {I}} \sum_{l \in L \backslash \left\{0\right\}} c_{i , i^{'} , s_{l , \left|S_{l}\right|}} + \sum_{i \in I} \sum_{i^{''} \in {I}} c_{i , i^{''} , s_{0 , 1}} \tag{eq\_0031} \\
+  & + \sum_{i^{''} \in {I}} \sum_{i \in I} \sum_{l \in L \backslash \left\{0\right\}} c_{i^{''} , i , s_{l , \left|S_{l}\right|}} = 0 . \tag{eq\_0033} \\
+  & \sum_{p \in {P}} \sum_{i \in {I}} \sum_{r \in R} z_{p , i , r} + \sum_{p^{'} \in {P}} \sum_{i^{'} \in {I}} \sum_{r \in R} z_{p^{'} , i^{'} , r} = 0 . \tag{eq\_0034} \\
+  \min\quad & \mathit{alpha} \cdot \sum_{p \in P} \sum_{i \in I} \sum_{r \in R} z_{p , i , r} \cdot \left(t_{i , o_{p}}^{d e p} - t_{p}\right) + \mathit{beta} \cdot \sum_{i \in I} \sum_{s \in S^{t s}} o_{i , s} , \tag{eq\_0037} \\
+  & \mathit{omega}_{p} \geq 0 , \forall p \in P \tag{eq\_0059} \\
+  & \mathit{omega}_{p} \geq M \cdot \left(z_{p , i , r} - 1\right) + t_{i , o_{p}}^{d e p} - t_{p} , \forall p \in P , i \in I , r \in R \tag{eq\_0060} \\
+\end{align}

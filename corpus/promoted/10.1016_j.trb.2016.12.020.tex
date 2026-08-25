@@ -1,0 +1,94 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.12.020
+%@ meta id=10.1016_j.trb.2016.12.020 family=milp schema=0.1.0
+%@ name :: A cycle time optimization model for generating stable periodic railway timetables
+%@ desc :: Mined from A cycle time optimization model for generating stable periodic railway timetables (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2016.12.020
+%@ prov reference :: A cycle time optimization model for generating stable periodic railway timetables
+%@ prov author :: Daniel Sparing; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ var tau shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Periodic scheduled time of event i
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize cycle time, with secondary weighted sum of running and dwell times
+%@ param L shape=A kind=vector domain=- :: Lower bound on activity duration
+%@ param U shape=A kind=vector domain=- :: Upper bound on activity duration
+%@ param mod shape=- kind=scalar domain=- :: Modulo operator
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Cycle time to be minimized
+%@ param n shape=- kind=scalar domain=- :: Number of dummy nodes inserted
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ param T shape=- kind=scalar domain=- :: Given cycle time
+%@ var z shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of events
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ var y shape=A domain=non_negative role=primary drole=- lo=- hi=- :: Product of z and t
+%@ index F ordered=0 cyclic=0 :: Set of events for frequency constraints
+%@ index Lines ordered=0 cyclic=0 :: Set of train lines
+%@ con eq_0005 kind=linear domain=- indicator=- :: Inequality preventing illegal overtaking by a stopping train at a station where overtaking is not possible
+%@ con eq_0006 kind=linear domain=- indicator=- :: Dwell activity split by n dummy nodes into segments with bounds L/(n+1) and U/(n+1)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Periodic event scheduling constraint for given cycle time T: L_ij ≤ τ_j - τ_i + z_ij T ≤ U_ij
+%@ con eq_0011 kind=linear domain=- indicator=- :: Variable-cycle timing constraint: L_ij ≤ τ_j - τ_i + z_ij t ≤ U_ij
+%@ con eq_0012 kind=linear domain=- indicator=- :: Event times within cycle: 0 ≤ τ_i < t
+%@ con eq_0014 kind=linear domain=- indicator=- :: Lower bound on cycle time: L ≤ t
+%@ con eq_0015 kind=linear domain=- indicator=- :: Linearization of product z t (upper part): 0 ≤ y ≤ U z
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linearization of product z t (lower part): t - U(1-z) ≤ y ≤ t
+%@ con eq_0018 kind=linear domain=- indicator=- :: MILP timing constraint with y: L_ij ≤ τ_j - τ_i + y_ij ≤ U_ij
+%@ con eq_0019 kind=linear domain=- indicator=- :: Event times strictly less than cycle time: τ_i < t
+%@ con eq_0020 kind=linear domain=- indicator=- :: Linearization upper bound for all activities: y_ij ≤ t
+%@ con eq_0021 kind=linear domain=- indicator=- :: Linearization linking y and z: y_ij - U z_ij ≤ 0
+%@ con eq_0022 kind=linear domain=- indicator=- :: Linearization linking y, t and z: y_ij - t + U(1-z_ij) ≥ 0
+%@ con eq_0023 kind=linear domain=- indicator=- :: Cycle time bounds: L ≤ t ≤ U
+%@ con eq_0025 kind=linear domain=- indicator=- :: Nonnegativity of y_ij
+%@ con eq_0026 kind=linear domain=- indicator=- :: Binary z_ij
+%@ con eq_0027 kind=modulo domain=- indicator=- :: Regularity constraint for frequency F_Line_i: τ_j - τ_i + z_ij t = t/F_Line_i
+%@ con eq_0028 kind=linear domain=- indicator=- :: MILP form of regularity constraint: τ_j - τ_i + y_ij - (1/F_Line_i) t = 0
+%@ con eq_0029 kind=linear domain=- indicator=- :: Regularity linearization: y_ij ≤ t
+%@ con eq_0030 kind=linear domain=- indicator=- :: Regularity linearization: y_ij - U z_ij ≤ 0
+%@ con eq_0031 kind=linear domain=- indicator=- :: Regularity linearization: y_ij - t + U(1-z_ij) ≥ 0
+%@ con eq_0032 kind=linear domain=- indicator=- :: Regularity nonnegativity: y_ij ≥ 0
+%@ con eq_0033 kind=linear domain=- indicator=- :: Definition of A_l: run and dwell activities of the first run of line l
+%@ con eq_0036 kind=linear domain=- indicator=- :: Feasibility condition for line travel time upper bound: U_l ≥ ∑ L_ij over A_l
+%@ con eq_0037 kind=linear domain=- indicator=- :: Canonical event time bound for higher frequency lines: τ_i < t/F_i
+%@ con eq_0038 kind=linear domain=- indicator=- :: Fixing the initial event time: τ_init = 0
+%@ con eq_0039 kind=linear domain=- indicator=- :: Preprocessing constraint for frequency lines (non-strict variant with t-δ)
+%@ con eq_0040 kind=linear domain=- indicator=- :: Valid inequality for sum of markings, lower bound: ∑ z_ij ≥ floor(∑ L_ij / U)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Valid inequality for sum of markings, upper bound: ∑ z_ij ≤ ceil(∑ U_ij / L)
+%@ con eq_0043 kind=linear domain=- indicator=- :: Dimension-reduction constraint for cycle time / event orders
+%@ con eq_0044 kind=linear domain=- indicator=- :: Dimension-reduction constraint for cycle time / event orders
+%@ con eq_0045 kind=linear domain=- indicator=- :: Dimension-reduction constraint for cycle time / event orders
+%@ con eq_0046 kind=linear domain=- indicator=- :: Dimension-reduction constraint for cycle time / event orders
+%@ con eq_0047 kind=linear domain=- indicator=- :: Dimension-reduction constraint for cycle time / event orders
+\begin{align}
+  & L_{i j} \leq \left(\mathit{tau}_{j} - \mathit{tau}_{i} \cdot mod \cdot t\right) \leq U_{i j} . \tag{eq\_0005} \\
+  & L_{\left(i , a r r\right) , \left(k , t h r\right)} + L_{\left(k , t h r\right) , \left(i , d e p\right)} \leq U_{\left(i , a r r\right) , \left(i , d e p\right)} . \tag{eq\_0006} \\
+  & L_{\left(i , a r r\right) , \left(j , a r r\right)} + L_{\left(j , a r r\right) , \left(j , d e p\right)} + L_{\left(j , d e p\right) , \left(i , d e p\right)} \leq U_{\left(i , a r r\right) , \left(i , d e p\right)} . \tag{eq\_0007} \\
+  & \begin{matrix} & L_{\left(i , d u m m y_{x}\right) , \left(k , t h r\right)} + L_{\left(k , t h r\right) , \left(i , d u m m y_{x + 1}\right)} \leq U_{\left(i , d u m m y_{x}\right) , \left(i , d u m m y_{x + 1}\right)} .\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & L_{\left(i , a r r\right) , \left(k , t h r\right)} + L_{\left(k , t h r\right) , \left(i , d e p\right)} \leq U_{\left(i , a r r\right) , \left(i , d e p\right)} / \left(n + 1\right) .\end{matrix} \tag{eq\_0012} \\
+  & L_{i j} \leq \mathit{tau}_{j} - \mathit{tau}_{i} + z_{i j} \cdot T \leq U_{i j} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0014} \\
+  & 0 \leq \mathit{tau}_{i} < T \text{for} \text{all} i \in \mathcal{E} \tag{eq\_0015} \\
+  & z_{i j} \in \left\{0 , 1\right\} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} , \tag{eq\_0016} \\
+  \min\quad & t \tag{eq\_0017} \\
+  & L_{i j} \leq \mathit{tau}_{j} - \mathit{tau}_{i} + z_{i j} \cdot t \leq U_{i j} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0018} \\
+  & 0 \leq \mathit{tau}_{i} < t \text{for} \text{all} i \in \mathcal{E} \tag{eq\_0019} \\
+  & \begin{matrix} & L \leq t\end{matrix} \tag{eq\_0020} \\
+  & z_{i j} \in \left\{0 , 1\right\} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} , \tag{eq\_0021} \\
+  & \begin{matrix} & 0 \leq y \leq U \cdot z\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix} & t - U \left(1 - z\right) \leq y \leq t .\end{matrix} \tag{eq\_0023} \\
+  & L_{i j} \leq \mathit{tau}_{j} - \mathit{tau}_{i} + y_{i j} \leq U_{i j} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0025} \\
+  & \mathit{tau}_{i} < t \text{for} \text{all} i \in \mathcal{E} \tag{eq\_0026} \\
+  & y_{i j} \leq t \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0027} \\
+  & y_{i j} - U \cdot z_{i j} \leq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0028} \\
+  & y_{i j} - t + U \left(1 - z_{i j}\right) \geq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0029} \\
+  & L \leq t \leq U \tag{eq\_0030} \\
+  & \mathit{tau}_{i} \geq 0 \text{for} \text{all} i \in \mathcal{E} \tag{eq\_0031} \\
+  & y_{i j} \geq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A} \tag{eq\_0032} \\
+  & z_{i j} \in \left\{0 , 1\right\} \text{for} \text{all} \left(i , j\right) \in \mathcal{A} . \tag{eq\_0033} \\
+  & \mathit{tau}_{j} - \mathit{tau}_{i} + z_{i j} \cdot t = t / F_{L i n e_{i}} \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0036} \\
+  & \mathit{tau}_{j} - \mathit{tau}_{i} + y_{i j} - \left(1 / F_{L i n e_{i}}\right) t = 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0037} \\
+  & y_{i j} \leq t \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0038} \\
+  & y_{i j} - U \cdot z_{i j} \leq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0039} \\
+  & y_{i j} - t + U \left(1 - z_{i j}\right) \geq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0040} \\
+  & y_{i j} \geq 0 \text{for} \text{all} \left(i , j\right) \in \mathcal{A}_{r e g} \tag{eq\_0041} \\
+  & \sum_{\left(i , j\right) \in \mathcal{A}_{l}} \left(\mathit{tau}_{j} - \mathit{tau}_{i} + y_{i j}\right) \leq U_{l} \text{for} \text{all} l \in \mathit{Lines} . \tag{eq\_0043} \\
+  & \sum_{\left(i , j\right) \in \mathcal{A}_{l}} L_{i j} \leq U_{l} \forall l \in \mathit{Lines} \tag{eq\_0044} \\
+  & U_{l} \leq \sum_{\left(i , j\right) \in \mathcal{A}_{l}} L_{i j} . \tag{eq\_0045} \\
+  & \begin{matrix}\mathit{tau}_{i} < \frac{t}{F_{i}} & \forall i \in \mathcal{F} .\end{matrix} \tag{eq\_0046} \\
+  & \lfloor \sum_{\left(i , j\right) \in \mathcal{A}_{l}} L_{i j} / U \rfloor \leq \sum_{\left(i , j\right) \in \mathcal{A}_{l}} z_{i j} \leq \lceil \sum_{\left(i , j\right) \in \mathcal{A}_{l}} U_{i j} / L \rceil \forall l \in \mathit{Lines} \tag{eq\_0047} \\
+\end{align}

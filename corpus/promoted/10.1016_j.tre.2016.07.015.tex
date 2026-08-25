@@ -1,0 +1,96 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2016.07.015
+%@ meta id=10.1016_j.tre.2016.07.015 family=milp schema=0.1.0
+%@ name :: A rolling horizon approach to the high speed train rescheduling problem in case of a partial segment blockage
+%@ desc :: Mined from A rolling horizon approach to the high speed train rescheduling problem in case of a partial segment blockage (Transportation Research Part E Logistics and Transportation Review, 2016).
+%@ prov source :: 10.1016/j.tre.2016.07.015
+%@ prov reference :: A rolling horizon approach to the high speed train rescheduling problem in case of a partial segment blockage
+%@ prov author :: Shuguang Zhan; Leo Kroon; Jun Zhao; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted sum of train service cancelations and deviations
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Deviation variable for earliness or tardiness of event e
+%@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures)
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train service t
+%@ index T ordered=0 cyclic=0 :: Set of train services
+%@ param D shape=E kind=vector domain=continuous :: Maximum allowed deviation for event e
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constants (M1, M2)
+%@ index q ordered=0 cyclic=0 :: Scheduled time of event e
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Actual time of event e
+%@ index H ordered=0 cyclic=0 :: Disruption start and end times
+%@ index A ordered=0 cyclic=0 :: Set of activities (train, headway, etc.)
+%@ param L shape=A kind=vector domain=continuous :: Minimum duration of activity a
+%@ index B ordered=0 cyclic=0 :: Set of order activity pairs
+%@ param C shape=S kind=vector domain=integer :: Station capacity (down/up)
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index p ordered=0 cyclic=0 :: Subset of train services for balance constraints
+%@ index PP ordered=0 cyclic=0 :: Set of train service subset pairs
+%@ index Seg ordered=0 cyclic=0 :: Set of segments
+%@ con eq_0002 kind=big_m domain=- indicator=- :: Bounds for events of canceled train services moved beyond horizon
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure events cannot occur before scheduled time
+%@ con eq_0004 kind=big_m domain=- indicator=- :: Tardiness is at least actual minus scheduled delay
+%@ con eq_0005 kind=linear domain=- indicator=- :: Earliness is at least scheduled minus actual arrival time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum allowed tardiness
+%@ con eq_0007 kind=linear domain=- indicator=- :: Maximum allowed earliness for arrivals
+%@ con eq_0008 kind=linear domain=- indicator=- :: Events before disruption keep scheduled times
+%@ con eq_0009 kind=linear domain=- indicator=- :: No cancelation for trains already departed before disruption
+%@ con eq_0010 kind=linear domain=- indicator=- :: Binary integrality of cancelation variables
+%@ con eq_0011 kind=linear domain=- indicator=- :: Non-negativity of time, tardiness, earliness variables
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum running and dwell times for train activities
+%@ con eq_0014 kind=ordering domain=- indicator=- :: One of two opposite segment headway orders is selected
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Minimum headway between same-direction trains in segment
+%@ con eq_0017 kind=big_m domain=- indicator=- :: Binary decision whether a train departs before disruption ends
+%@ con eq_0018 kind=ordering domain=- indicator=- :: One of two opposite-direction headway orders is selected
+%@ con eq_0019 kind=big_m domain=- indicator=- :: Minimum headway for opposite-direction trains on shared track
+%@ con eq_0020 kind=ordering domain=- indicator=- :: Overtaking forbidden within a segment
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Downside station capacity constraint
+%@ con eq_0023 kind=capacity domain=- indicator=- :: Upside station capacity constraint
+%@ con eq_0024 kind=big_m domain=- indicator=- :: Minimum station headway when a train departs before another arrives
+%@ con eq_0025 kind=linear domain=- indicator=- :: Balance constraint for cancelations in one direction
+%@ con eq_0026 kind=linear domain=- indicator=- :: Balance constraint for cancelations in the other direction
+%@ con eq_0027 kind=ordering domain=- indicator=- :: Order consistency between segment and station headway
+%@ con eq_0028 kind=linear domain=- indicator=- :: Blocked-track strategy: downside trains wait until disruption end
+%@ con eq_0029 kind=linear domain=- indicator=- :: Blocked-track strategy: upside trains wait until disruption end
+%@ con eq_0030 kind=linear domain=- indicator=- :: Maximum running time for disrupted downside trains before blocked segment
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maximum running time for disrupted upside trains before blocked segment
+%@ con eq_0033 kind=big_m domain=- indicator=- :: Headway constraint for BTWFS disrupted trains on reverse track
+%@ con eq_0034 kind=ordering domain=- indicator=- :: Ordering of departures for BTWFS strategy
+%@ con eq_0035 kind=ordering domain=- indicator=- :: Ordering of departures for BTWFS downside strategy
+%@ con eq_0036 kind=linear domain=- indicator=- :: Definition of trains dwelling at station at stage start
+%@ con eq_0039 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for downside trains
+%@ con eq_0040 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for upside trains
+\begin{align}
+  \begin{aligned}\quad & & min \\ & \sum_{t \in T} \mathit{gamma}_{t} y_{t} + \sum_{e \in E} \mathit{mu}_{e}^{+} d_{e}^{+} + \underset{e \in E^{\mathit{arr}}}{\sum} \mathit{mu}_{e}^{-} d_{e}^{-}\end{aligned} \tag{eq\_0001} \\
+  & \begin{aligned} & \text{subject to} \\ & y_{t_{e}} \left(M_{1} + D_{e}\right) - D_{e} \leq x_{e} - q_{e} \leq M_{1} \forall e \in E\end{aligned} \tag{eq\_0002} \\
+  & x_{e} \geq q_{e} \forall e \in E^{\mathit{dep}} \tag{eq\_0003} \\
+  & d_{e}^{+} \geq x_{e} - q_{e} - M_{1} \cdot y_{t_{e}} \forall e \in E \tag{eq\_0004} \\
+  & d_{e}^{-} \geq q_{e} - x_{e} \forall e \in E^{\mathit{arr}} \tag{eq\_0005} \\
+  & d_{e}^{+} \leq D_{e} \forall e \in E \tag{eq\_0006} \\
+  & d_{e}^{-} \leq D_{e} \forall e \in E^{\mathit{arr}} \tag{eq\_0007} \\
+  & x_{e} = q_{e} \forall e \in E : q_{e} < H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0008} \\
+  & y_{t_{e}} = 0 \forall t_{e} \in T , e \in E_{s_{t_{e}}^{o}}^{\mathit{dep}} : q_{e} < H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0009} \\
+  & y_{t} \in \left\{0 , 1\right\} \forall t \in T \tag{eq\_0010} \\
+  & x_{e} , d_{e}^{+} , d_{e}^{-} \geq 0 \forall e \in E \tag{eq\_0011} \\
+  & x_{f} - x_{e} \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{train}} \tag{eq\_0012} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land a^{'} = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0014} \\
+  & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{lambda}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0015} \\
+  & H_{\mathit{dis}}^{\mathit{end}} \cdot \left(1 - \mathit{chi}_{e}^{d}\right) < x_{e} \leq H_{\mathit{dis}}^{\mathit{end}} + \left(1 - \mathit{chi}_{e}^{d}\right) \cdot M_{2} \tag{eq\_0017} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 2} \land a^{'} = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track} , 2} \tag{eq\_0018} \\
+  & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{lambda}_{a}\right) + M_{2} \cdot \left(1 - \mathit{chi}_{e_{1}}^{d}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 2} , e_{1} \in E^{\mathit{dep}} \tag{eq\_0019} \\
+  & \mathit{lambda}_{a} - \mathit{lambda}_{a^{'}} = 0 \forall \left(a , a^{'}\right) \in B \tag{eq\_0020} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} \leq C_{s}^{\mathit{down}} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{down}} \tag{eq\_0022} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} \leq C_{s}^{\mathit{up}} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{up}} \tag{eq\_0023} \\
+  & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{varphi}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{station}} \tag{eq\_0024} \\
+  & \sum_{t \in p} y_{t} - \sum_{t \in p^{'}} y_{t} \leq \mathit{delta} \forall \left(p , p^{'}\right) \in \mathit{PP} \tag{eq\_0025} \\
+  & \sum_{t \in p^{'}} y_{t} - \sum_{t \in p} y_{t} \leq \mathit{delta} \forall \left(p , p^{'}\right) \in \mathit{PP} \tag{eq\_0026} \\
+  & \begin{aligned} & \mathit{lambda}_{a} \geq \mathit{varphi}_{a^{'}} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , a^{'} = \left(e^{'} , f\right) \in A_{\mathit{head}}^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , e^{'} \in E_{s}^{\mathit{dep}} , t_{e} = t_{e^{'}} , f \in E_{s}^{\mathit{arr}} , s \in {S}\end{aligned} \tag{eq\_0027} \\
+  & x_{e} \geq H_{\mathit{dis}}^{\mathit{end}} \forall e \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{e} \leq H_{\mathit{dis}}^{\mathit{end}} , t_{e} \in T^{\mathit{down}} \tag{eq\_0028} \\
+  & x_{e} \geq H_{\mathit{dis}}^{\mathit{end}} \forall e \in E_{s_{l}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{e} \leq H_{\mathit{dis}}^{\mathit{end}} , t_{e} \in T^{\mathit{up}} \tag{eq\_0029} \\
+  & x_{f} - x_{e} \leq L_{a}^{\mathit{max}} \forall a = \left(e , f\right) \in A_{\mathit{train}}^{\mathit{run}} , s_{f} \leq s_{k} , t_{e} \in T_{\mathit{dis}}^{\mathit{down}} \tag{eq\_0030} \\
+  & x_{f} - x_{e} \leq L_{a}^{\mathit{max}} \forall a = \left(e , f\right) \in A_{\mathit{train}}^{\mathit{run}} , s_{f} \geq s_{l} , t_{e} \in T_{\mathit{dis}}^{\mathit{up}} \tag{eq\_0031} \\
+  & \begin{aligned} & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{k}}^{\mathit{arr}} , f \in E_{s_{l}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & e^{'} \in E_{s_{l}}^{\mathit{dep}} , a = \left(e^{'} , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{e^{'}} , t_{e} , t_{f} \in T^{\mathit{up}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}\end{aligned} \tag{eq\_0033} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e^{'} , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land a^{'} = \left(f , e^{'}\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0034} \\
+  & \begin{aligned} & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{l}}^{\mathit{arr}} , f \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & e^{'} \in E_{s_{k}}^{\mathit{dep}} , a = \left(e^{'} , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{e^{'}} , t_{e} , t_{f} \in T^{\mathit{down}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}\end{aligned} \tag{eq\_0035} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e^{'} , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land a^{'} = \left(f , e^{'}\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0036} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} + \left|\mathit{omega}_{s , h_{0}}^{\mathit{down}}\right| \leq C_{s}^{\mathit{down}} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{down}} \tag{eq\_0039} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} + \left|\mathit{omega}_{s , h_{0}}^{\mathit{up}}\right| \leq C_{s}^{\mathit{up}} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{up}} \tag{eq\_0040} \\
+\end{align}

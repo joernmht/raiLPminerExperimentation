@@ -1,0 +1,96 @@
+% Declaration sidecar for 10.1016_j.trb.2018.09.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2018.09.001
+% Automatic train regulation of complex metro networks with transfer coordination constraints: A distributed optimal control framework
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2018.09.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted squared timetable deviation, headway deviation and control effort
+
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i at station j on line k
+%@ var r shape=- domain=continuous role=primary drole=- lo=- hi=- :: Running time of train i from station j to j+1 on line k
+%@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train i at station j+1 on line k
+%@ index E ordered=0 cyclic=0 :: Set of directed edges representing transfer connections between metro lines
+%@ param l shape=- kind=matrix domain=- :: Coordinated transfer time for passengers from line m to n at a transfer station
+%@ param lbar shape=- kind=matrix domain=- :: Constant scheduled transfer time
+%@ index m ordered=1 cyclic=0 :: Index of metro lines in transfer constraints
+%@ param delta shape=- kind=scalar domain=- :: Small adjustment to scheduled transfer time
+%@ param R shape=- kind=matrix domain=- :: Scheduled running time of train i between stations j and j+1 on line k
+%@ param w shape=- kind=matrix domain=- :: Disturbance variable in running time and dwell time
+%@ param D shape=- kind=matrix domain=- :: Scheduled dwell time at station j+1 on line k
+%@ param alpha shape=- kind=matrix domain=- :: Delay rate affecting dwell time based on passenger flow
+%@ param T shape=- kind=matrix domain=- :: Scheduled departure time of train i at station j on line k
+%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Deviation of actual departure time from scheduled departure time
+%@ param H shape=- kind=vector domain=- :: Scheduled headway between adjacent trains on line k
+%@ param p shape=- kind=vector domain=- :: Weight for squared timetable deviation in objective
+%@ param q shape=- kind=vector domain=- :: Weight for squared headway deviation in objective
+%@ param y shape=- kind=vector domain=- :: Weight for squared control input in objective
+%@ param B shape=- kind=matrix domain=- :: System matrix in state-space model
+%@ param A shape=- kind=matrix domain=- :: System matrix in state-space model
+%@ index Z ordered=1 cyclic=0 :: Number of metro lines in the network
+%@ param Y shape=- kind=matrix domain=- :: Weight matrix for control inputs in objective
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value for line k at stage j
+%@ param P shape=- kind=matrix domain=- :: Weight matrix for state error in objective
+%@ param Q shape=- kind=matrix domain=- :: Weight matrix for headway deviation in objective
+%@ index M ordered=1 cyclic=0 :: Prediction horizon length
+%@ var L shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian function of the overall optimization problem
+%@ param Ebar shape=- kind=matrix domain=- :: Matrix in transfer coordination constraint
+%@ var lambda shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian multiplier for transfer coordination constraints
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control input vector over prediction horizon
+%@ param F shape=- kind=matrix domain=- :: Matrix in state prediction equation
+%@ param Phi shape=- kind=matrix domain=- :: Matrix in state prediction equation
+%@ param G shape=- kind=matrix domain=- :: Matrix in objective transformation
+%@ param Pbar shape=- kind=matrix domain=- :: Block diagonal matrix of P over horizon
+%@ param Qbar shape=- kind=matrix domain=- :: Block diagonal matrix of Q over horizon
+%@ var Lambda shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Vector of Lagrangian multipliers over horizon
+%@ param Theta shape=- kind=scalar domain=- :: Constant term in objective expansion
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, n, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Train dynamic equation: departure time at next station equals departure time plus running and dwell times
+%@ con eq_0002 kind=linear domain=- indicator=- :: Transfer coordination constraint: departure time difference equals coordinated transfer time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running time definition: scheduled running time plus control and disturbance
+%@ con eq_0004 kind=linear domain=- indicator=- :: Dwell time model with passenger-flow effect, control and disturbance
+%@ con eq_0005 kind=linear domain=- indicator=- :: Combined train dynamic after substituting running and dwell time expressions
+%@ con eq_0006 kind=headway domain=- indicator=- :: Safety constraint: minimum headway between adjacent trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Control bound on running time adjustment u1
+%@ con eq_0008 kind=linear domain=- indicator=- :: Control bound on dwell time adjustment u2
+%@ con eq_0009 kind=linear domain=- indicator=- :: Scheduled train dynamics defining the nominal timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Error dynamics: evolution of deviation from scheduled departure time
+%@ con eq_0011 kind=linear domain=- indicator=- :: Transfer coordination constraint in error-variable form
+%@ con eq_0012 kind=headway domain=- indicator=- :: Safety constraint in error-variable form
+%@ con eq_0014_b kind=linear domain=- indicator=- :: State transition constraint of optimal control problem (14)
+%@ con eq_0014_c kind=linear domain=- indicator=- :: Transfer coordination coupling constraint in (14)
+%@ con eq_0014_d kind=headway domain=- indicator=- :: Safety headway constraint in (14)
+%@ con eq_0014_e kind=linear domain=- indicator=- :: Running time control bound u1 in (14)
+%@ con eq_0014_f kind=linear domain=- indicator=- :: Dwell time control bound u2 in (14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Real-time vector state-space model for line k
+%@ con eq_0017 kind=linear domain=- indicator=- :: Line-k objective over prediction horizon
+%@ con eq_0019 kind=linear domain=- indicator=- :: Lagrangian function with transfer coordination multipliers
+%@ con eq_0022 kind=linear domain=- indicator=- :: State prediction equation over finite horizon
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24) in the paper
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25) in the paper
+%@ con eq_0026 kind=linear domain=- indicator=- :: Equation (26) in the paper
+%@ con eq_0027 kind=linear domain=- indicator=- :: Equation (27) in the paper
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28) in the paper

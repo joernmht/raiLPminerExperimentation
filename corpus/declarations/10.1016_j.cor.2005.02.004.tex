@@ -1,0 +1,137 @@
+% Declaration sidecar for 10.1016_j.cor.2005.02.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2005.02.004
+% Generation of classes of robust periodic railway timetables
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cor.2005.02.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Formal objective placeholder; model is a feasibility/sampling problem
+% unusable as an identifier, rename or drop: τ
+%@ var tau shape=N domain=continuous role=primary drole=- lo=- hi=- :: Event times vector (arrival/departure times)
+% Tp: classified as variable during review
+%@ var Tp shape=M domain=integer role=primary drole=- lo=- hi=- :: Periodic event scheduling variable (integrality of event-time differences)
+% u: classified as parameter during review
+%@ param u shape=M kind=vector domain=- :: Upper bounds for interval constraints
+% unusable as an identifier, rename or drop: ℓ
+%@ param ell shape=M kind=vector domain=- :: Lower bounds for interval constraints
+% p: classified as variable during review
+%@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integral phase shift vector
+% B: classified as parameter during review
+%@ param B shape=N,M kind=matrix domain=- :: Incidence matrix of the graph
+% TEx: classified as parameter during review
+%@ param TEx shape=- kind=matrix domain=- :: Matrix product T times E times relaxed phase shift x
+% TI: classified as parameter during review
+%@ param TI shape=- kind=matrix domain=- :: Identity matrix scaled by T on the M-N subspace
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Relaxed phase shift vector
+% I: classified as parameter during review
+%@ param I shape=- kind=matrix domain=- :: Identity matrix on the M-N subspace
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Cycle length of the periodic timetable
+% unusable as an identifier, rename or drop: Λ̄
+%@ param Lambda_bar shape=- kind=scalar domain=- :: Set of feasible relaxed phase shifts
+% Ex: classified as parameter during review
+%@ param Ex shape=- kind=matrix domain=- :: Matrix E times relaxed phase shift x
+% c: classified as parameter during review
+%@ param c shape=M kind=vector domain=- :: Circuit vector
+% U: classified as parameter during review
+%@ param U shape=- kind=scalar domain=- :: Operator mapping circuits to U(c)=(1/T)(u^T c^+ - l^T c^-)
+% l: classified as parameter during review
+%@ param l shape=M kind=vector domain=- :: Lower bounds (alternative notation)
+% e: classified as parameter during review
+%@ param e shape=M kind=vector domain=- :: Unit vector selecting an arc
+% TU: classified as parameter during review
+%@ param TU shape=- kind=scalar domain=- :: T times operator U
+% Tc: classified as parameter during review
+%@ param Tc shape=M kind=vector domain=- :: T times circuit vector c
+% y: classified as variable during review
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for implicit equalities
+% z: classified as variable during review
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for circuit rays
+% F: classified as parameter during review
+%@ param F shape=- kind=matrix domain=- :: Matrix F = I - (B2^{-1}B1)^T
+% Tx: classified as parameter during review
+%@ param Tx shape=- kind=vector domain=- :: T times relaxed phase shift x
+% Q: classified as parameter during review
+%@ param Q shape=- kind=matrix domain=- :: Projection matrix Q = I - B^T(B B^T)^{-1}B
+% QE: classified as parameter during review
+%@ param QE shape=- kind=matrix domain=- :: Q times E matrix
+% unusable as an identifier, rename or drop: ρ
+%@ param rho shape=- kind=scalar domain=- :: Distance measure rho(x,x~)=||QE(x-x~)||_2
+% unusable as an identifier, rename or drop: Λ
+%@ param Lambda shape=- kind=scalar domain=- :: Set of feasible integral phase shifts
+% f: classified as parameter during review
+%@ param f shape=- kind=vector domain=- :: Columns of F
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Number of arcs in the graph
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of events in the timetable
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for arcs or events
+% û: classified as parameter during review
+%@ param u_hat shape=- kind=vector domain=- :: Upper bounds for phase shifts
+% unusable as an identifier, rename or drop: ℓ̂
+%@ param ell_hat shape=- kind=vector domain=- :: Lower bounds for phase shifts
+% TEp: classified as parameter during review
+%@ param TEp shape=M kind=vector domain=- :: T times E times integral phase shift p
+% p̄: classified as parameter during review
+%@ param p_bar shape=- kind=vector domain=- :: Upper bound for phase shift vector p
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Set of integers
+% unusable as an identifier, rename or drop: ε
+%@ param epsilon shape=- kind=scalar domain=- :: Tolerance
+% Bound by a quantifier or big operator, so no declaration of their own: m, n
+% (If one of these is really an index family, add a %@ index line for it.)
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Interval constraints: l <= tau_i - tau_j + T p_ij <= u
+%@ con eq_0002 kind=linear domain=- indicator=- :: Relaxed timetable constraints in matrix form: l <= B^T tau + TEx <= u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Constraints defining K(x): l - TEx <= B^T tau <= u - TEx
+%@ con eq_0004 kind=linear domain=- indicator=- :: Upper-bound constraints for forward arcs of a circuit
+%@ con eq_0014 kind=linear domain=- indicator=- :: Equation (14) constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Equation (15) constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Equation (16) constraint
+%@ con eq_0017 kind=linear domain=- indicator=- :: Equation (17) constraint
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equation (18) constraint
+%@ con eq_0019 kind=linear domain=- indicator=- :: Equation (19) constraint
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21) constraint
+%@ con eq_0022 kind=linear domain=- indicator=- :: Equation (22) constraint
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23) constraint
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24) constraint
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25) constraint
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Equation (26a) constraint
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Equation (26b) constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28) constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Equation (29) constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: Equation (30) constraint
+%@ con eq_0042 kind=linear domain=- indicator=- :: Equation (42) constraint
+%@ con eq_0044 kind=linear domain=- indicator=- :: Equation (44) constraint
+%@ con eq_0045 kind=linear domain=- indicator=- :: Equation (45) constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Equation (46) constraint
+%@ con eq_0047 kind=linear domain=- indicator=- :: Equation (47) constraint
+%@ con eq_0050 kind=linear domain=- indicator=- :: Equation (50) constraint
+%@ con eq_0051_b kind=linear domain=- indicator=- :: Equation (51b) constraint
+%@ con eq_0052 kind=linear domain=- indicator=- :: Equation (52) constraint
+%@ con eq_0053 kind=linear domain=- indicator=- :: Equation (53) constraint
+%@ con eq_0056_a kind=linear domain=- indicator=- :: Equation (56a) constraint
+%@ con eq_0056_b kind=linear domain=- indicator=- :: Equation (56b) constraint
+%@ con eq_0056_c kind=linear domain=- indicator=- :: Equation (56c) constraint
+%@ con eq_0056_d kind=linear domain=- indicator=- :: Equation (56d) constraint

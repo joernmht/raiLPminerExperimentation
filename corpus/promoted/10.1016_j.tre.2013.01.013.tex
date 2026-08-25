@@ -1,0 +1,78 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2013.01.013
+%@ meta id=10.1016_j.tre.2013.01.013 family=milp schema=0.1.0
+%@ name :: Recovery of disruptions in rapid transit networks
+%@ desc :: Mined from Recovery of disruptions in rapid transit networks (Transportation Research Part E Logistics and Transportation Review, 2013).
+%@ prov source :: 10.1016/j.tre.2013.01.013
+%@ prov reference :: Recovery of disruptions in rapid transit networks
+%@ prov author :: Luís Cadarso; Ángel Marı́n; Gábor Maróti
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost including operating, cancellation, denied passengers, and deviation penalties
+%@ var em shape=SC,SC,T,C domain=non_negative role=primary drole=- lo=- hi=- :: Empty movement of composition c from s to s' at time t
+%@ param km shape=- kind=scalar domain=- :: Distance in kilometers for service or between stations
+%@ param oc shape=C kind=vector domain=- :: Operating cost per kilometer for composition c
+%@ var x shape=L,C domain=binary role=primary drole=- lo=- hi=- :: Binary assignment of composition c to service ℓ
+%@ param canc shape=L kind=vector domain=- :: Cancellation cost for service ℓ
+%@ var cc shape=SC,T,C,C domain=non_negative role=primary drole=- lo=- hi=- :: Number of composition changes from c to c' at station s and time t
+%@ var dp shape=A,Tau domain=non_negative role=primary drole=- lo=- hi=- :: Number of denied passengers on arc a during time interval τ
+%@ param dpc shape=A,Tau kind=matrix domain=- :: Cost per denied passenger on arc a during time interval τ
+%@ param e shape=SC kind=vector domain=- :: Shunting time for aggregation at station s
+%@ param m shape=SC,SC,T,C kind=matrix domain=- :: Normal-day empty movement assignment
+%@ param x_hat shape=L,C kind=matrix domain=- :: Normal-day rolling stock assignment for service ℓ
+%@ var y shape=L domain=binary role=primary drole=- lo=- hi=- :: Binary cancellation indicator for planned service ℓ
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the network
+%@ index C ordered=0 cyclic=0 :: Set of compositions
+%@ index L ordered=0 cyclic=0 :: Set of train services
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index SC ordered=0 cyclic=0 :: Set of stations with depot
+%@ index Sc ordered=0 cyclic=0 :: Set of stations with depot (alternative notation)
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ param LCS shape=L,S kind=matrix domain=- :: Set of services on line ℓ at station s within headway
+%@ param h shape=- kind=scalar domain=- :: Headway time
+%@ param pt shape=- kind=scalar domain=- :: Passenger demand (possibly)
+%@ param INO shape=- kind=scalar domain=- :: Set of arcs open in one direction
+%@ param IT shape=- kind=scalar domain=- :: Set of time periods with infrastructure limitation
+%@ param at shape=L,S kind=matrix domain=- :: Arrival time of service to station
+%@ param dt shape=L,S kind=matrix domain=- :: Departure time of service from station
+%@ param ISO shape=- kind=scalar domain=- :: Set of arcs open in opposite direction
+%@ param ain shape=T kind=vector domain=- :: Infrastructure limitation indicator (0,1,2)
+%@ param TD shape=A kind=vector domain=- :: Set of time intervals for passenger demand on arc
+%@ param cap shape=C,SC,T kind=matrix domain=- :: Capacity of composition c or station s at time t
+%@ param pf shape=A,Tau kind=matrix domain=- :: Passenger demand on arc a during time interval τ
+%@ param cn shape=C,C kind=matrix domain=- :: Number of compositions c needed to obtain c'
+%@ var yt shape=SC,T,C domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of composition c at station s at time t
+%@ param tu shape=C kind=vector domain=- :: Number of train units in composition c
+%@ index M ordered=0 cyclic=0 :: Set of fleet types
+%@ index Tau ordered=0 cyclic=0 :: Time intervals for passenger demand on arcs
+%@ con eq_0006 kind=headway domain=- indicator=- :: Headway constraints: at most one service per arc in any interval of length h
+%@ con eq_0007 kind=linear domain=- indicator=- :: Direction availability constraint for arcs open in one direction
+%@ con eq_0008 kind=linear domain=- indicator=- :: Direction availability constraint for arcs open in opposite direction
+%@ con eq_0009 kind=linear domain=- indicator=- :: Infrastructure limitation: at most one direction open at a time
+%@ con eq_0010 kind=capacity domain=- indicator=- :: Passenger capacity: allocated capacity plus denied passengers covers demand
+%@ con eq_0011 kind=assignment domain=- indicator=- :: Planned service either cancelled or assigned one composition
+%@ con eq_0012 kind=assignment domain=- indicator=- :: Emergency service gets at most one composition
+%@ con eq_0013 kind=flow_balance domain=- indicator=- :: Composition conservation: flow balance of train units
+%@ con eq_0014 kind=rotation domain=- indicator=- :: Rotation and departure: rotation before each departure
+%@ con eq_0015 kind=fleet_capacity domain=- indicator=- :: Fleet capacity: number of train units limited by fleet size
+%@ con eq_0016 kind=depot_capacity domain=- indicator=- :: Depot capacity: parked and shunting units below capacity
+%@ con eq_0017 kind=composition_count domain=- indicator=- :: Count composition changes as aggregation plus disaggregation
+%@ con eq_0018 kind=initial_inventory domain=- indicator=- :: Initial inventory equals scheduled inventory
+%@ con eq_0019 kind=final_inventory domain=- indicator=- :: Final inventory equals scheduled inventory
+\begin{align}
+  \min\quad & \sum_{\mathit{ell} \in L} \sum_{c \in C} \mathit{oc}_{c} \cdot \mathit{km}_{\mathit{ell}} \cdot x_{\mathit{ell} , c} + \sum_{s , s^{'} \in \mathit{SC}} \sum_{t \in T} \sum_{c \in C} \mathit{oc}_{c} \cdot \mathit{km}_{s , s^{'}} \cdot \mathit{em}_{s , s^{'} , t}^{c} + \sum_{s \in \mathit{Sc}} \sum_{t \in T} \sum_{c , c^{'} \in C} \mathit{vartheta}_{s , t} \cdot \mathit{cc}_{s , t}^{c , c^{'}} + \sum_{\mathit{ell} \in L^{p}} \mathit{canc}_{\mathit{ell}} \cdot y_{\mathit{ell}} + \sum_{a \in A} \sum_{\mathit{tau} \in T} \mathit{dpc}_{a , \mathit{tau}} \cdot \mathit{dp}_{a , \mathit{tau}} + \sum_{\mathit{ell} \in L^{p}} \sum_{c \in C} \mathit{kappa}_{\mathit{ell}} \left|x_{\mathit{ell} , c} - \hat{x}_{\mathit{ell} , c}\right| + \sum_{s , s^{'} , t \in S , T} \sum_{c \in C} \mathit{lambda}_{t} \left|\mathit{em}_{s , s^{'} , t}^{c} - e \hat{m}_{s , s^{'} , t}^{c}\right| \tag{eq\_0005} \\
+  & \sum_{\mathit{ell} \in L} \underset{\genfrac{}{}{0pt}{}{t 1 \in \mathit{LCS}_{\mathit{ell} , s} :}{t 1 \geq t , t 1 \leq t + h}}{\sum} \sum_{c \in C} x_{\mathit{ell} , c} \leq 1 \forall s \in S , t \in T \tag{eq\_0006} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{alpha}_{t} \forall a \in \mathit{INO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \leq t \leq \mathit{at}_{\mathit{as}_{a}} \left(\mathit{ell}\right) \tag{eq\_0007} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{beta}_{t} \forall a \in \mathit{ISO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \leq t \leq \mathit{at}_{\mathit{as}_{a}} \left(\mathit{ell}\right) \tag{eq\_0008} \\
+  & \mathit{alpha}_{t} + \mathit{beta}_{t} \leq \mathit{ain}_{t} \forall t \in \mathit{IT} \tag{eq\_0009} \\
+  & \sum_{\mathit{ell} \in L_{a}} \underset{\genfrac{}{}{0pt}{}{t \in T :}{\mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \subset \mathit{tau}}}{\sum} \sum_{c \in C} \mathit{cap}_{c} \cdot x_{\mathit{ell} , c} \geq \mathit{pf}_{a , \mathit{tau}} - \mathit{dp}_{a , \mathit{tau}} \forall a \in A , \mathit{tau} \in \mathit{TD}_{a} \tag{eq\_0010} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} + y_{\mathit{ell}} = 1 \forall \mathit{ell} \in L^{p} \tag{eq\_0011} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} \leq 1 \forall \mathit{ell} \in L^{e} \tag{eq\_0012} \\
+  & \mathit{yt}_{s , t - 1}^{c} + \underset{\genfrac{}{}{0pt}{}{\mathit{ell} \in L}{\mathit{alpha}_{\mathit{ell} , s , t} = 1}}{\sum} x_{\mathit{ell} , c} + \sum_{c^{'} \in C} \mathit{epsilon}_{s , t - e_{s}}^{c^{'} , c} + \sum_{c^{'} \in C} \mathit{cn}_{c^{'} , c} \cdot \mathit{delta} \mathit{epsilon}_{s , t - d_{s}}^{c^{'} , c} + \mathit{rho}_{s , t}^{c} + \sum_{s^{'} \in \mathit{SC}} \mathit{em}_{s^{'} , s , t - \mathit{et}_{s^{'} , s}}^{c} = \mathit{yt}_{s , t}^{c} + \underset{\genfrac{}{}{0pt}{}{\mathit{ell} \in L}{\mathit{alpha}_{\mathit{ell} , s , t} = - 1}}{\sum} x_{\mathit{ell} , c} + \sum_{c^{'} \in C} \mathit{cn}_{c , c^{'}} \cdot \mathit{epsilon}_{s , t}^{c , c^{'}} + \sum_{c^{'} \in C} \mathit{delta} \mathit{epsilon}_{s , t}^{c , c^{'}} + \mathit{rho}_{s , t + r_{s}}^{c} + \sum_{s^{'} \in \mathit{SC}} \mathit{em}_{s , s^{'} , t}^{c} \forall s \in \mathit{SC} , t \in T , c \in C \tag{eq\_0013} \\
+  & \underset{\genfrac{}{}{0pt}{}{\mathit{ell} \in L}{\mathit{alpha}_{\mathit{ell} , s , t} = - 1}}{\sum} x_{\mathit{ell} , c} = \mathit{rho}_{s , t}^{c} + \sum_{c^{'} \in C} \mathit{epsilon}_{s , t - e_{s}}^{c^{'} , c} + \sum_{c^{'} \in C} \mathit{delta} \mathit{epsilon}_{s , t - d_{s}}^{c^{'} , c} \forall s \in \mathit{SC} , t \in T , c \in C \tag{eq\_0014} \\
+  & \sum_{s \in \mathit{SC}} \sum_{c \in C_{m}} \mathit{tu}_{c} \cdot \mathit{yt}_{s , t}^{c} + \sum_{\mathit{ell} \in L} \sum_{c \in C_{m}} \mathit{tu}_{c} \mathit{beta}_{\mathit{ell} , t} x_{\mathit{ell} , c} + \sum_{s \in \mathit{SC}} \sum_{t^{'} \in T} \sum_{c \in C_{m}} \mathit{tu}_{c} \mathit{gamma}_{s , t^{'} , t} \mathit{rho}_{s , t^{'}}^{c} + \sum_{s , s^{'} \in \mathit{SC}} \sum_{t^{'} \in T} \sum_{c \in C_{m}} \mathit{tu}_{c} \mathit{xi}_{s , s^{'} , t^{'} , t} \mathit{em}_{s , s^{'} , t^{'}}^{c} \sum_{s \in \mathit{SC}} \sum_{t^{'} \in T} \sum_{c , c^{'} \in C_{m}} \mathit{mu}_{s , t^{'} , t} \left(\mathit{tu}_{c^{'}} \mathit{epsilon}_{s , t^{'}}^{c , c^{'}} + \mathit{tu}_{c} \mathit{delta} \mathit{epsilon}_{s , t^{'}}^{c , c^{'}}\right) \leq \mathit{chi}_{m} \forall m \in M , t \in T \tag{eq\_0015} \\
+  & \sum_{c \in C} \mathit{tu}_{c} \cdot \mathit{yt}_{s , t}^{c} + \sum_{t^{'} \in T} \sum_{c \in C} \mathit{mu}_{s , t^{'} , t} \left(\mathit{tu}_{c^{'}} \mathit{epsilon}_{s , t^{'}}^{c , c^{'}} + \mathit{tu}_{c} \mathit{delta} \mathit{epsilon}_{s , t^{'}}^{c , c^{'}}\right) + \sum_{t^{'} \in T} \sum_{c \in C} \mathit{tu}_{c} \cdot \mathit{gamma}_{s , t^{'} , t} \mathit{rho}_{s , t^{'}}^{c} \leq \mathit{cap}_{s , t} \forall s \in \mathit{SC} , t \in T \tag{eq\_0016} \\
+  & \mathit{cc}_{s , t}^{c , c^{'}} = \mathit{epsilon}_{s , t}^{c , c^{'}} + \mathit{delta} \mathit{epsilon}_{s , t}^{c , c^{'}} \forall s \in \mathit{SC} , t \in T , c , c^{'} \in C \tag{eq\_0017} \\
+  & \mathit{yt}_{s , t_{i}}^{c} = \mathit{yt}_{s , 0}^{c} \forall s \in \mathit{SC} , c \in C \tag{eq\_0018} \\
+  & \mathit{yt}_{s , t_{f}}^{c} = \mathit{yt}_{s , \infty}^{c} \forall s \in \mathit{SC} , c \in C \tag{eq\_0019} \\
+\end{align}

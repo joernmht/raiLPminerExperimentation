@@ -1,0 +1,63 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.11.006
+%@ meta id=10.1016_j.trb.2020.11.006 family=milp schema=0.1.0
+%@ name :: Integrated railway timetable rescheduling and dynamic passenger routing during a complete blockage
+%@ desc :: Mined from Integrated railway timetable rescheduling and dynamic passenger routing during a complete blockage (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.11.006
+%@ prov reference :: Integrated railway timetable rescheduling and dynamic passenger routing during a complete blockage
+%@ prov author :: Shuguang Zhan; S.C. Wong; Pan Shang; Qiyuan Peng; Jiemin Xie; Siuming Lo
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total passenger general travel cost plus weighted train operation cost.
+%@ param c shape=a,P kind=matrix domain=- :: Cost of using a time-expanded arc for a passenger group or train.
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value representing total cost.
+%@ param n shape=P kind=vector domain=- :: Number of passengers in passenger group p.
+%@ var v shape=a,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating passenger group p uses time-expanded arc a.
+%@ var x shape=a,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train k uses time-expanded arc a.
+%@ param omega shape=- kind=scalar domain=- :: Relative weight between passenger and train costs (symbol ω).
+%@ index A ordered=0 cyclic=0 :: Set of time-expanded arcs.
+%@ index K ordered=0 cyclic=0 :: Set of trains.
+%@ index P ordered=0 cyclic=0 :: Set of passenger groups.
+%@ param Train shape=- kind=scalar domain=- :: Label for train operational constraints.
+%@ param constraints shape=- kind=scalar domain=- :: Label for constraints section.
+%@ index i ordered=0 cyclic=0 :: Index for stations or nodes.
+%@ param operational shape=- kind=scalar domain=- :: Label for operational constraints.
+%@ index N ordered=0 cyclic=0 :: Set of nodes in network.
+%@ index d ordered=0 cyclic=0 :: Destination node.
+%@ index o ordered=0 cyclic=0 :: Origin node.
+%@ index Phi ordered=0 cyclic=0 :: Set of conflicting arcs (symbol Φ).
+%@ param Passenger shape=- kind=scalar domain=- :: Label for passenger route choice constraints.
+%@ param choice shape=- kind=scalar domain=- :: Label for route choice constraints.
+%@ param route shape=- kind=scalar domain=- :: Label for route constraints.
+%@ param q shape=K kind=vector domain=- :: Capacity of train k.
+%@ var r shape=a domain=continuous role=slack drole=- lo=- hi=- :: Slack variable for headway/station capacity constraint.
+%@ index a ordered=0 cyclic=0 :: Arc index.
+%@ var s shape=a domain=continuous role=slack drole=- lo=- hi=- :: Slack variable for coupling capacity constraint.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Train destination flow conservation constraint.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Train headway and station capacity constraint.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Binary domain constraint for train arc variables.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Passenger origin flow conservation constraint.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger destination flow conservation constraint.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Passenger intermediate flow conservation constraint.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Coupling capacity constraint linking passenger and train arc usage.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Coupling constraint preventing passengers from transferring away from their booked train.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Binary domain constraint for passenger arc variables.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Equality reformulation of headway/capacity constraint with slack variable.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equality reformulation of coupling capacity constraint with slack variable.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Relaxed Lagrangian objective with penalty terms.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Remaining constraint in the relaxed integrated model.
+\begin{align}
+  \min\quad & \sum_{p \in P} \sum_{\left(i , j , t , t^{'}\right) \in A_{p a}^{p}} c_{i , j , t , t^{'}}^{p} \cdot n_{p} \cdot v_{i , j , t , t^{'}}^{p} + \mathit{omega} \cdot \sum_{k \in K} \sum_{\left(i , j , t , t^{'}\right) \in A_{t r}^{k}} c_{i , j , t , t^{'}}^{k} \cdot x_{i , j , t , t^{'}}^{k} \tag{eq\_0007} \\
+  & \begin{aligned}\textbf{subject} \textbf{to}: & & \\ & & \text{Train} \text{operational} \text{constraints}: \\ & & \underset{\left(i , j , t , t^{'}\right) \in A_{t r , o_{k}}^{k , +}}{\sum} x_{i , j , t , t^{'}}^{k} = 1 \forall k \in K\end{aligned} \tag{eq\_0008} \\
+  & \sum_{\left(i , j , t , t^{'}\right) \in A_{t r , i}^{k , -}} x_{i , j , t , t^{'}}^{k} = \sum_{\left(j , i , t , t^{'}\right) \in A_{t r , i}^{k , +}} x_{j , i , t , t^{'}}^{k} \forall k \in K , \forall i \in N^{k} : i \neq o_{k} \cap i \neq d_{k} , \tag{eq\_0009} \\
+  & \underset{\left(i , j , t , t^{'}\right) \in A_{t r , d_{k}}^{k , -}}{\sum} x_{i , j , t , t^{'}}^{k} = 1 \forall k \in K \tag{eq\_0010} \\
+  & \sum_{k \in K} \sum_{\left(i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{Phi} \left(i , j , t , t^{'}\right)} x_{i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'}}^{k} \leq 1 \forall \left(i , j , t , t^{'}\right) \in A_{t r}^{d r i v e} \text{or} \left(i , j , t , t^{'}\right) \in A_{t r}^{S t r a c k} \tag{eq\_0011} \\
+  & x_{i , j , t , t^{'}}^{k} \in \left\{0 , 1\right\} \forall \left(i , j , t , t^{'}\right) \in A_{t r} , \forall k \in K \tag{eq\_0012} \\
+  & \begin{matrix} & & \text{Passenger} \text{route} \text{choice} \text{constraints}: \\ & & \underset{\left(i , j , t , t^{'}\right) \in A_{p a , o_{p}^{'}}^{p , +}}{\sum} v_{i , j , t , t^{'}}^{p} = 1 \forall p \in P\end{matrix} \tag{eq\_0013} \\
+  & \underset{\left(i , j , t , t^{'}\right) \in A_{p a , d_{p}^{'}}^{p , -}}{\sum} v_{i , j , t , t^{'}}^{p} = 1 \forall p \in P \tag{eq\_0014} \\
+  & \sum_{\left(i , j , t , t^{'}\right) \in A_{p a , i}^{p , -}} v_{i , j , t , t^{'}}^{p} = \sum_{\left(j , i , t , t^{'}\right) \in A_{p a , i}^{p , +}} v_{j , i , t , t^{'}}^{p} \forall p \in P , \forall i \in N^{p} : i \neq o_{p}^{'} \cap i \neq d_{p}^{'} \tag{eq\_0015} \\
+  & \sum_{p \in P} n_{p} \cdot v_{i , j , t , t^{'}}^{p} \leq \sum_{k \in K} q_{k} \cdot x_{i , j , t , t^{'}}^{k} \forall \left(i , j , t , t^{'}\right) \in A_{t r} \cap A_{p a} \tag{eq\_0016} \\
+  & v_{i , j , t , t^{'}}^{p} \geq x_{i , j , t , t^{'}}^{k} \forall k \in K , \forall p \in P^{k} , \forall \left(i , j , t , t^{'}\right) \in A_{t r}^{k} \cap A_{p a}^{p} \tag{eq\_0017} \\
+  & v_{i , j , t , t^{'}}^{p} \in \left\{0 , 1\right\} \forall p \in P , \forall \left(i , j , t , t^{'}\right) \in A_{p a}^{p} \tag{eq\_0018} \\
+  & \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right) \left.\right)} x_{a^{'}}^{k} + r_{a} = 1 \tag{eq\_0019} \\
+  & \sum_{p \in P} n_{p} \cdot v_{a}^{p} + s_{a} = \sum_{k \in K} q_{k} \cdot x_{a}^{k} \tag{eq\_0020} \\
+\end{align}

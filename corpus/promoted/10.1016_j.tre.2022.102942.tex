@@ -1,0 +1,120 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2022.102942
+%@ meta id=10.1016_j.tre.2022.102942 family=milp schema=0.1.0
+%@ name :: Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances
+%@ desc :: Mined from Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances (Transportation Research Part E Logistics and Transportation Review, 2022).
+%@ prov source :: 10.1016/j.tre.2022.102942
+%@ prov reference :: Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances
+%@ prov author :: Yin Yuan; Shukai Li; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total objective F = F1 + F2 + F3 + F4 (train deviations, passenger waiting, accumulation risk, control effort)
+%@ param A shape=L,I,J kind=matrix domain=- :: Scheduled arrival time of train j at station i on line l
+%@ param D shape=L,I,J kind=matrix domain=- :: Scheduled departure time of train j at station i on line l
+%@ index I ordered=0 cyclic=0 :: Set of stations on a line
+%@ index J ordered=0 cyclic=0 :: Set of trains on a line
+%@ index L ordered=0 cyclic=0 :: Set of lines in the network
+%@ param S shape=L,I,J kind=matrix domain=- :: Nominal dwell time of train j at station i on line l
+%@ param R shape=L,I,J kind=matrix domain=- :: Nominal running time between stations i-1 and i for train j on line l
+%@ param H shape=L,I,J kind=matrix domain=- :: Nominal headway between trains j-1 and j at station i on line l
+%@ var a shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival time of train j at station i on line l
+%@ var d shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train j at station i on line l
+%@ var s shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual dwell time of train j at station i on line l
+%@ var r shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual running time between stations i-1 and i for train j on line l
+%@ var u shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Control action for dwell or running time
+%@ param w shape=L,I,J kind=matrix domain=- :: Disturbance in dwell or running time
+%@ var h shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual departure headway between trains j-1 and j at station i on line l
+%@ var p shape=L,I,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers in various states (waiting, boarding, etc.)
+%@ param T shape=- kind=scalar domain=- :: Start time of operations
+%@ param c shape=L,I kind=matrix domain=- :: Platform capacity at station i on line l
+%@ var g shape=L,I,J,L,J domain=continuous role=primary drole=- lo=- hi=- :: Number of transfer passengers from train j' of line l' to platform i of line l for train j
+%@ index X ordered=0 cyclic=0 :: Set of lines connecting to a given line at a transfer station
+%@ param M shape=- kind=scalar domain=- :: Large positive number
+%@ index U ordered=0 cyclic=0 :: Set of transfer stations on a line
+%@ param o shape=L,I,L kind=matrix domain=- :: Transfer walking time from line l' to line l at station i
+%@ var y shape=L,I,J,L,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating possible connection between trains
+%@ var z shape=L,I,J,L,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating effective connection between trains
+%@ param t shape=L,J kind=matrix domain=- :: Train capacity of train j on line l
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ con eq_0001 kind=linear domain=- indicator=- :: Scheduled departure time equals scheduled arrival time plus nominal dwell time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Nominal headway between consecutive trains
+%@ con eq_0004 kind=linear domain=- indicator=- :: Actual departure time equals actual arrival time plus actual dwell time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Actual arrival time satisfies train dynamics at first and subsequent stations
+%@ con eq_0007 kind=linear domain=- indicator=- :: Actual dwell time equals nominal dwell time plus control and disturbance
+%@ con eq_0008 kind=linear domain=- indicator=- :: Actual running time equals nominal running time plus control and disturbance
+%@ con eq_0009 kind=linear domain=- indicator=- :: Bounds on dwell time control action
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bounds on running time control action
+%@ con eq_0012 kind=linear domain=- indicator=- :: Actual departure headway definition
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum headway safety constraint
+%@ con eq_0014 kind=linear domain=- indicator=- :: Waiting passengers entering platform formulation
+%@ con eq_0015 kind=linear domain=- indicator=- :: Stranded passengers outside platform
+%@ con eq_0016 kind=linear domain=- indicator=- :: Nonnegativity of passengers allowed to enter platform
+%@ con eq_0017 kind=linear domain=- indicator=- :: Limit on passengers allowed to enter platform
+%@ con eq_0019 kind=linear domain=- indicator=- :: Platform capacity constraint
+%@ con eq_0020 kind=linear domain=- indicator=- :: Waiting passengers on platform include entered, transfer, and previously left
+%@ con eq_0021 kind=linear domain=- indicator=- :: Possible connection condition (lower bound)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Possible connection condition (upper bound)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Effective connection definition
+%@ con eq_0025 kind=linear domain=- indicator=- :: Number of transfer passengers
+%@ con eq_0026 kind=linear domain=- indicator=- :: Stranded passengers on platform
+%@ con eq_0027 kind=linear domain=- indicator=- :: Boarding passengers limited by capacity
+%@ con eq_0029 kind=linear domain=- indicator=- :: Onboard passenger dynamic transition
+%@ con eq_0030 kind=linear domain=- indicator=- :: Alighting passengers proportion
+%@ con eq_0031 kind=linear domain=- indicator=- :: Objective function definition
+%@ con eq_0033 kind=linear domain=- indicator=- :: Objective term for punctuality and headway regularity
+%@ con eq_0034 kind=linear domain=- indicator=- :: Objective term for passenger waiting time
+%@ con eq_0035 kind=linear domain=- indicator=- :: Objective term for accumulation risk
+%@ con eq_0037 kind=linear domain=- indicator=- :: Piecewise accumulation risk value definition
+%@ con eq_0041 kind=linear domain=- indicator=- :: Objective term for control effort
+%@ con eq_0042 kind=linear domain=- indicator=- :: Binary constraint on connection variables
+%@ con eq_0043 kind=linear domain=- indicator=- :: Bounds on running time control actions (overall)
+%@ con eq_0044 kind=linear domain=- indicator=- :: Bounds on dwell time control actions (overall)
+%@ var F1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ param us shape=- domain=continuous :: Bounds for u^s
+%@ param ur shape=- domain=continuous :: Bounds for u^r
+%@ param cp shape=- domain=continuous :: Capacity
+%@ param hmin shape=- domain=continuous :: Minimum headway
+%@ param N shape=- domain=continuous :: Cardinality of J_l
+\begin{align}
+  & D_{l , i , j} = A_{l , i , j} + S_{l , i , j} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0001} \\
+  & A_{l,i,j} = D_{l,i-1,j} + R_{l,i-1,j} \qquad \forall l \in L, i \in I_{l} \setminus \{1\}, j \in J_{l} \tag{eq\_0003} \\
+  & H_{l,i,j} = D_{l,i,j} - D_{l,i,j-1} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{1\} \tag{eq\_0004} \\
+  & d_{l , i , j} = a_{l , i , j} + s_{l , i , j} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0005} \\
+  & a_{l,i,j} = A_{l,i,j} \qquad \forall l \in L, i \in \{1\}, j \in J_{l} \tag{eq\_0007\_a} \\
+  & a_{l,i,j} = d_{l,i-1,j} + r_{l,i-1,j} \qquad \forall l \in L, i \in I_{l} \setminus \{1\}, j \in J_{l} \tag{eq\_0007\_b} \\
+  & s_{l , i , j} = S_{l , i , j} + u_{l , i , j}^{s} + w_{l , i , j}^{s} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0008} \\
+  & r_{l,i,j} = R_{l,i,j} + u_{l,i,j}^{r} + w_{l,i,j}^{r} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{N_{l}\} \tag{eq\_0009} \\
+  & us_{l}^{min} \le u_{l,i,j}^{s} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \tag{eq\_0010\_a} \\
+  & u_{l,i,j}^{s} \le us_{l}^{max} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \tag{eq\_0010\_b} \\
+  & ur_{l}^{min} \le u_{l,i,j}^{r} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{N_{l}\} \tag{eq\_0012\_a} \\
+  & u_{l,i,j}^{r} \le ur_{l}^{max} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{N_{l}\} \tag{eq\_0012\_b} \\
+  & h_{l,i,j} = d_{l,i,j} - d_{l,i,j-1} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{1\} \tag{eq\_0013} \\
+  & h_{l,i,j} \ge hmin_{l} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{1\} \tag{eq\_0014} \\
+  & p_{l,i,j}^{wp} = \mathit{lambda}_{l,i,j} \cdot (d_{l,i,j} - T_{0}) \qquad \forall l \in L, i \in I_{l}, j \in \{1\} \tag{eq\_0015\_a} \\
+  & p_{l,i,j}^{wp} = \mathit{lambda}_{l,i,j} \cdot h_{l,i,j} + p_{l,i,j-1}^{sp} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \setminus \{1\} \tag{eq\_0015\_b} \\
+  & p_{l , i , j}^{s p} = p_{l , i , j}^{w p} - p_{l , i , j}^{e p} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0016} \\
+  & p_{l,i,j}^{ep} \ge 0 \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \tag{eq\_0017} \\
+  & p_{l,i,j}^{ep} \le p_{l,i,j}^{wp} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \tag{eq\_0019} \\
+  & p_{l,i,j}^{wt} \le cp_{l,i} \qquad \forall l \in L, i \in I_{l}, j \in J_{l} \tag{eq\_0020} \\
+  & p_{l , i , j}^{w t} = \left\{\begin{matrix} p_{l , i , j}^{e p} + \mathit{delta}_{l , i} \sum_{l^{'} \in X_{l , i}} \underset{j^{'} \in J_{l^{'}}}{\sum} g_{l , i , j}^{l^{'} , j^{'}} , \forall l \in L , i \in I_{l} , j = 1 \\ p_{l , i , j}^{e p} + \mathit{delta}_{l , i} \sum_{l^{'} \in X_{l , i}} \underset{j^{'} \in J_{l^{'}}}{\sum} g_{l , i , j}^{l^{'} , j^{'}} + p_{l , i , j - 1}^{s t} , \forall l \in L , i \in I_{l} , j \in J_{l} \backslash \left\{1\right\} \end{matrix}\right \tag{eq\_0021} \\
+  & d_{l , i , j} - \left(a_{l^{'} , i , j^{'}} + o_{l , i}^{l^{'}}\right) \geq M \left(y_{l , i , j}^{l^{'} , j^{'}} - 1\right) , \forall l \in L , i \in U_{l} , l^{'} \in X_{l , i} , j \in J_{l} , j^{'} \in J_{l^{'}} \tag{eq\_0022} \\
+  & d_{l , i , j} - \left(a_{l^{'} , i , j^{'}} + o_{l , i}^{l^{'}}\right) \leq M \cdot y_{l , i , j}^{l^{'} , j^{'}} , \forall l \in L , i \in U_{l} , l^{'} \in X_{l , i} , j \in J_{l} , j^{'} \in J_{l^{'}} \tag{eq\_0024} \\
+  & z_{l , i , j}^{l^{'} , j^{'}} = \left\{\begin{matrix} y_{l , i , j}^{l^{'} , j^{'}} , \forall l \in L , i \in U_{l} , j = 1 , l^{'} \in X_{l , i} , j^{'} \in J_{l^{'}} \\ y_{l , i , j}^{l^{'} , j^{'}} - y_{l , i , j - 1}^{l^{'} , j^{'}} , \forall l \in L , i \in U_{l} , j \in J_{l} \backslash \left\{1\right\} , l^{'} \in X_{l , i} , j^{'} \in J_{l^{'}} \end{matrix}\right \tag{eq\_0025} \\
+  & g_{l , i , j}^{l^{'} , j^{'}} = \mathit{alpha}_{l , i}^{l^{'} , j^{'}} z_{l , i , j}^{l^{'} , j^{'}} p_{l^{'} , i , j^{'}}^{a l} , \forall l \in L , i \in U_{l} , l^{'} \in X_{l , i} , j \in J_{l} , j^{'} \in J_{l^{'}} \tag{eq\_0026} \\
+  & p_{l , i , j}^{s t} = p_{l , i , j}^{w t} - p_{l , i , j}^{b t} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0027} \\
+  & p_{l , i , j}^{b t} = \left\{\begin{matrix} min \left\{p_{l , i , j}^{w t} , c \cdot t_{l , j}\right\} , \forall l \in L , i = 1 , j \in J_{l} \\ min \left\{p_{l , i , j}^{w t} , c \cdot t_{l , j} - p_{l , i - 1 , j}^{o n} + p_{l , i , j}^{a l}\right\} , \forall l \in L , i \in I_{l} \backslash \left\{1\right\} , j \in J_{l} \end{matrix}\right \tag{eq\_0029} \\
+  & p_{l , i , j}^{o n} = \left\{\begin{matrix} p_{l , i , j}^{b t} , \forall l \in L , i = 1 , j \in J_{l} \\ p_{l , i - 1 , j}^{o n} + p_{l , i , j}^{b t} - p_{l , i , j}^{a l} , \forall l \in L , i \in I_{l} \backslash \left\{1\right\} , j \in J_{l} \end{matrix}\right \tag{eq\_0030} \\
+  & p_{l , i , j}^{a l} = \left\{\begin{matrix} 0 , \forall l \in L , i = 1 , j \in J_{l} \\ \mathit{beta}_{l , i , j} p_{l , i - 1 , j}^{o n} , \forall l \in L , i \in I_{l} \backslash \left\{1\right\} , j \in J_{l} \end{matrix}\right \tag{eq\_0031} \\
+  \min\quad & F \tag{eq\_0032\_a} \\
+  & F = F1 + F2 + F3 + F4 \tag{eq\_0032\_b} \\
+  & F_{1} = \sum_{l \in L} \sum_{i \in I_{l}} \sum_{j \in J_{l}} \left[\mathit{xi}_{1} \left(d_{l , i , j} - D_{l , i , j}\right)^{2} + \mathit{xi}_{2} \left(h_{l , i , j} - H_{l , i , j}\right)^{2}\right] \tag{eq\_0033} \\
+  & F_{2} = \sum_{l \in L} \sum_{i \in I_{l}} \sum_{j \in J_{l}} \begin{bmatrix} \mathit{xi}_{3} \frac{1}{2} \mathit{lambda}_{l , i , j} h_{l , i , j}^{2} + \mathit{xi}_{4} p_{l , i , j - 1}^{s t} h_{l , i , j} + \mathit{xi}_{5} p_{l , i , j - 1}^{s p} h_{l , i , j} \\ + \mathit{xi}_{6} \mathit{delta}_{l , i} \sum_{l^{'} \in X_{l , i}} \underset{j^{'} \in J_{l^{'}}}{\sum} g_{l , i , j}^{l^{'} , j^{'}} \left(d_{l , i , j} - a_{l^{'} , i , j^{'}} - o_{l , i}^{l^{'}}\right) \end{bmatrix} \tag{eq\_0034} \\
+  & F_{3} = \sum_{l \in L} \sum_{i \in I_{l}} \sum_{j \in J_{l}} \mathit{xi}_{7} p_{l , i , j}^{a r} \tag{eq\_0035} \\
+  & F_{4} = \sum_{l \in L} \sum_{i \in I_{l}} \sum_{j \in J_{l}} \left[\mathit{xi}_{8} \left(u_{l , i , j}^{r}\right)^{2} + \mathit{xi}_{9} \left(u_{l , i , j}^{s}\right)^{2}\right] \tag{eq\_0037} \\
+  & y_{l , i , j}^{l^{'} , j^{'}} = \left\{0 , 1\right\} , \forall l \in L , i \in U_{l} , l^{'} \in X_{l , i} , j \in J_{l} , j^{'} \in J_{l^{'}} \tag{eq\_0041} \\
+  & \mathit{ur}_{l}^{min} \leq u_{l , i , j}^{r} \leq \mathit{ur}_{l}^{max} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0042} \\
+  & \mathit{us}_{l}^{min} \leq u_{l , i , j}^{s} \leq \mathit{us}_{l}^{max} , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0043} \\
+  & p_{l , i , j}^{e p} \geq 0 , \forall l \in L , i \in I_{l} , j \in J_{l} \tag{eq\_0044} \\
+\end{align}

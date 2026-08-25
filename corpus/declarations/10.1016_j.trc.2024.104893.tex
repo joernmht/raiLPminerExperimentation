@@ -1,0 +1,197 @@
+% Declaration sidecar for 10.1016_j.trc.2024.104893
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2024.104893
+% A data-driven mixed-integer linear programming approach for real-time rescheduling of urban rail transit under rolling stock faults
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2024.104893.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of timetable deviation, service cancellation, headway variation, and backup rolling stock usage.
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of train services (planned and emergency, upstream and downstream).
+
+% a: classified as variable during review
+%@ var a shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled arrival time of train service n at station s.
+
+% n: classified as variable during review
+%@ var n shape=- domain=integer role=primary drole=- lo=- hi=- :: Train service index used in variable subscripts.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations on the urban rail transit line.
+
+% d: classified as variable during review
+%@ var d shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled departure time of train service n at station s.
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Duration of the primary delay caused by the rolling stock fault.
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: ξ
+% y: classified as variable during review
+%@ var y shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator of whether station s is in the operation zone of train service n.
+
+% unusable as an identifier, rename or drop: β
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant used in big-M reformulations.
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: Minimum and maximum dwell time bounds at stations.
+
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Minimum and maximum running time bounds in segments.
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway time between consecutive train services at the same station.
+
+% unusable as an identifier, rename or drop: φ
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=- :: Minimum turnaround time for rolling stock at turnaround stations.
+
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar domain=- :: Minimum time for backup rolling stock to reach the main track from the depot.
+
+% c: classified as parameter during review
+%@ param c shape=S kind=vector domain=- :: Number of backup rolling stocks allocated to the depot connected with station s.
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: π
+% unusable as an identifier, rename or drop: σ
+% r: classified as parameter during review
+%@ param r shape=S kind=vector domain=- :: Number of initially available turnaround tracks connected with station s.
+
+% p: classified as variable during review
+%@ var p shape=N,N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator of consecutive train services at a turnaround station.
+
+% unusable as an identifier, rename or drop: ε
+% x: classified as variable during review
+%@ var x shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator of stop-skipping at station s by train service n.
+
+% unusable as an identifier, rename or drop: τ
+% Z: classified as variable during review
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value for the weighted sum of performance indicators.
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: ψ
+% unusable as an identifier, rename or drop: ρ
+% v: classified as variable during review
+%@ var v shape=N,N,N,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for headway variation at turnaround stations.
+
+% Bound by a quantifier or big operator, so no declaration of their own: s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Fix arrival times of already served train services to the planned timetable.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Initialize primary delay for the faulty train service at the fault station.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Assign a depot rolling stock to each ongoing upstream train service.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Assign a depot rolling stock to each ongoing downstream train service.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Define the operation-zone indicator for downstream train services from turnaround and depot connections.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Enforce minimum dwell time at stations where the train stops.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Enforce minimum running time in upstream segments.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Enforce maximum running time in upstream segments.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Enforce maximum running time in downstream segments.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Enforce minimum headway between train services in the same planned/emergency subset.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Enforce headway when the emergency train service is not the predecessor of the planned train service.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Enforce minimum turnaround time for rolling stock connections.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Prevent turnaround connections for emergency upstream train services.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Prevent turnaround connections for emergency downstream train services.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Limit the number of dispatched backup rolling stocks to the depot capacity.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Enforce one-to-one rolling stock assignment for downstream train services.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Balance rolling stock flow for upstream train services.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Balance rolling stock flow for downstream train services.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Ensure an upstream train starts before any station at which it ends.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Count rolling stock departures from turnaround tracks before an upstream train departs.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Count rolling stock departures from turnaround tracks before a downstream train departs.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Count rolling stock arrivals to turnaround tracks before a planned upstream train departs.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Count rolling stock arrivals to turnaround tracks before a planned downstream train departs.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Count rolling stock arrivals to turnaround tracks before an emergency downstream train departs.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Enforce turnaround track capacity for downstream train services.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Define the consecutive-order indicator p at turnaround stations.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Return the faulty rolling stock to the depot in the out-of-service scenario when the depot lies along its direction.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Insert an emergency return train and send it to the depot when the depot is opposite the faulty train direction.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Enforce minimum dwell time for non-withdrawn trains in the out-of-service scenario.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Enforce minimum running time for non-withdrawn upstream trains in the out-of-service scenario.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Enforce minimum running time for non-withdrawn downstream trains in the out-of-service scenario.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Prevent turnaround connections for non-withdrawn emergency downstream trains in the out-of-service scenario.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Initialize the stop-skipping indicator for withdrawn trains.
+%@ con eq_0047 kind=linear domain=- indicator=- :: Enforce zero dwell time for skipped stops on withdrawn trains (lower bound).
+%@ con eq_0048 kind=linear domain=- indicator=- :: Enforce zero dwell time for skipped stops on withdrawn trains (upper bound).
+%@ con eq_0049 kind=linear domain=- indicator=- :: Enforce minimum running time for upstream withdrawn trains with acceleration/deceleration time savings.
+%@ con eq_0050 kind=linear domain=- indicator=- :: Enforce minimum running time for downstream withdrawn trains with acceleration/deceleration time savings.
+%@ con eq_0051 kind=linear domain=- indicator=- :: Send faulty and rescue rolling stocks to the depot in the rescue scenario when the depot lies along the direction.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Insert two emergency return trains for faulty and rescue rolling stocks when the depot is opposite the direction.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Enforce minimum dwell time for non-special trains in the rescue scenario.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Enforce minimum running time for non-special upstream trains in the rescue scenario.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Enforce maximum running time for non-special upstream trains in the rescue scenario.
+%@ con eq_0057 kind=linear domain=- indicator=- :: Enforce minimum running time for non-special downstream trains in the rescue scenario.
+%@ con eq_0058 kind=linear domain=- indicator=- :: Enforce maximum running time for non-special downstream trains in the rescue scenario.
+%@ con eq_0059 kind=linear domain=- indicator=- :: Enforce headway among non-special trains in the rescue scenario.
+%@ con eq_0060 kind=linear domain=- indicator=- :: Prevent turnaround connections for non-special emergency upstream trains in the rescue scenario.
+%@ con eq_0061 kind=linear domain=- indicator=- :: Prevent turnaround connections for non-special emergency downstream trains in the rescue scenario.
+%@ con eq_0063 kind=linear domain=- indicator=- :: Enforce dwell time with stop-skipping for rescue-special upstream trains (lower bound).
+%@ con eq_0064 kind=linear domain=- indicator=- :: Enforce dwell time with stop-skipping for rescue-special downstream trains (upper bound).
+%@ con eq_0066 kind=linear domain=- indicator=- :: Enforce maximum running time for upstream rescue-coupled trains after coupling.
+%@ con eq_0067 kind=linear domain=- indicator=- :: Enforce minimum running time for downstream rescue-coupled trains after coupling.
+%@ con eq_0068 kind=linear domain=- indicator=- :: Enforce maximum running time for downstream rescue-coupled trains after coupling.
+%@ con eq_0069 kind=linear domain=- indicator=- :: Equalize arrival and departure times of faulty and rescue trains at the coupling station.
+%@ con eq_0071 kind=linear domain=- indicator=- :: Equalize arrival and departure times of the two emergency return trains in the rescue scenario.
+%@ con eq_0072 kind=linear domain=- indicator=- :: Compute timetable deviation objective component.
+%@ con eq_0073 kind=linear domain=- indicator=- :: Compute service cancellation objective component.
+%@ con eq_0074 kind=linear domain=- indicator=- :: Compute headway variation objective component at turnaround stations.
+%@ con eq_0075 kind=linear domain=- indicator=- :: Compute dispatched backup rolling stock objective component.
+%@ con eq_0076 kind=linear domain=- indicator=- :: Define the weighted-sum objective function Z.
+%@ con eq_0079 kind=linear domain=- indicator=- :: Summary constraint set for the rescue scenario model.
+%@ con eq_0081 kind=linear domain=- indicator=- :: Define the end indicator of train service n at station s.
+%@ con eq_0082 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track departure count.
+%@ con eq_0083 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track departure count.
+%@ con eq_0085 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track arrival count.
+%@ con eq_0086 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track arrival count.
+%@ con eq_0088 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track departure count for opposite direction.
+%@ con eq_0090 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track departure count for opposite direction.
+%@ con eq_0092 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track arrival count for opposite direction.
+%@ con eq_0094 kind=linear domain=- indicator=- :: Linearization of the product term in the turnaround-track arrival count for opposite direction.
+%@ con eq_0096_a kind=linear domain=- indicator=- :: Linearization of the product term in the train service order definition.
+%@ con eq_0096_b kind=linear domain=- indicator=- :: Linearization of the product term in the train service order definition.
+%@ con eq_0097 kind=linear domain=- indicator=- :: Linearization of the order-definition product y_n,s y_n',s.
+%@ con eq_0098 kind=linear domain=- indicator=- :: Linearization of the order-definition product with the sum term.
+%@ con eq_0099 kind=linear domain=- indicator=- :: Linearization of the order-definition product with the sum term.
+%@ con eq_0100 kind=linear domain=- indicator=- :: Linearization of the order-definition product with the sum term.
+%@ con eq_0102 kind=linear domain=- indicator=- :: Linearization of the order-definition product with the sum term.
+%@ con eq_0108 kind=linear domain=- indicator=- :: Linearization of the absolute-value term in the timetable deviation objective.
+%@ con eq_0109 kind=linear domain=- indicator=- :: Linearization of the absolute-value term in the timetable deviation objective.
+%@ con eq_0114_a kind=linear domain=- indicator=- :: Linearization of the product in the headway-variation objective.
+%@ con eq_0114_b kind=linear domain=- indicator=- :: Linearization of the product in the headway-variation objective.
+%@ con eq_0115_a kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term.
+%@ con eq_0115_b kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term.
+%@ con eq_0115_c kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term.
+%@ con eq_0115_d kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term.
+%@ con eq_0116_a kind=linear domain=- indicator=- :: Linearization of the downstream headway-variation objective product.
+%@ con eq_0116_b kind=linear domain=- indicator=- :: Linearization of the downstream headway-variation objective product.
+%@ con eq_0116_c kind=linear domain=- indicator=- :: Linearization of the downstream headway-variation objective product.
+%@ con eq_0116_d kind=linear domain=- indicator=- :: Linearization of the downstream headway-variation objective product.
+%@ con eq_0116_e kind=linear domain=- indicator=- :: Linearization of the downstream headway-variation objective product.
+%@ con eq_0117_a kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+%@ con eq_0117_b kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+%@ con eq_0117_c kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+%@ con eq_0118_a kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+%@ con eq_0118_b kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+%@ con eq_0118_c kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.

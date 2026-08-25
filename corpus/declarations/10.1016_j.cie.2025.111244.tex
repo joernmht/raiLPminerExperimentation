@@ -1,0 +1,154 @@
+% Declaration sidecar for 10.1016_j.cie.2025.111244
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2025.111244
+% Inter-area coordination approach for metro train regulation under localized bi-directional power supply shortage during peak periods
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2025.111244.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize maintained line capacity across the three regulation stages
+% v: classified as variable during review
+%@ var v shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Train speed at a time point
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time point index
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Train mass
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: Train resistance function
+% u: classified as variable during review
+%@ var u shape=B domain=continuous role=primary drole=- lo=- hi=- :: Applied traction or braking force
+% x: classified as variable during review
+%@ var x shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Train location at a time point
+% X: classified as variable during review
+%@ var X shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Running distance in a time unit
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Line capacity in the up and down directions
+% h̄: classified as parameter during review
+%@ param h_avg shape=- kind=scalar domain=- :: Average headway in the under-supplied area
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of a regulation stage
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of trains
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Maximum traction force function
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Maximum braking force function
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of time points
+% P: classified as variable during review
+%@ var P shape=B,Y,I domain=non_negative role=primary drole=- lo=- hi=- :: Electrical power supplied by a substation to a train in a time unit
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of substations
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway time
+% a: classified as variable during review
+%@ var a shape=B,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of a train at a station
+% unusable as an identifier, rename or drop: Δ
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of train services
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: ρ
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large number for big-M linearization
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: σ
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: α
+% c: classified as parameter during review
+%@ param c shape=S kind=vector domain=- :: Number of available backup trains at the depot connected to each station
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: ψ
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of alternative departure times
+% X̂: classified as variable during review
+%@ var X_hat shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Re-adjusted running distance in the feedback adjustment stage
+% P̂: classified as variable during review
+%@ var P_hat shape=B,Y,I domain=non_negative role=primary drole=- lo=- hi=- :: Updated substation power supply in the feedback adjustment stage
+% Bound by a quantifier or big operator, so no declaration of their own: b, d, i, k, y, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Train speed and location update equations with a switching driving regime
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Piecewise applied traction force during a time unit
+%@ con eq_0007 kind=linear domain=- indicator=- :: Speed limit constraint preventing trains from exceeding the location-dependent speed limit
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maximum train power consumption in each time unit
+%@ con eq_0013 kind=linear domain=- indicator=- :: Dwell time bounds at stations in the under-supplied area
+%@ con eq_0014 kind=linear domain=- indicator=- :: Inter-station running time bounds in the under-supplied area
+%@ con eq_0015 kind=linear domain=- indicator=- :: Well-supplied-area objective: maximize train stops minus weighted synchronization deviation
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linearized absolute deviation between initial and re-adjusted entry/exit times
+%@ con eq_0017 kind=linear domain=- indicator=- :: Logical relation linking the train-stop indicator to cancellation and arrival-before-fault indicators
+%@ con eq_0018 kind=linear domain=- indicator=- :: Big-M linearization of the arrival-before-fault-end indicator
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Each upstream train must be assigned to exactly one upstream service
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Each downstream train must be assigned to exactly one downstream service
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Non-canceled upstream service must be covered by a train
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Non-canceled downstream service must be covered by a train
+%@ con eq_0021_c kind=linear domain=- indicator=- :: Non-canceled terminal service must be covered by a train
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Big-M upper bound for arrival-before-fault-end indicator in synchronization constraints
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Big-M lower bound for arrival-before-fault-end indicator in synchronization constraints
+%@ con eq_0024_a kind=linear domain=- indicator=- :: Minimum turn-back time at the short-turn station for downstream-to-upstream connection
+%@ con eq_0024_b kind=linear domain=- indicator=- :: Minimum turn-back time at the short-turn station for upstream-to-downstream connection
+%@ con eq_0026 kind=linear domain=- indicator=- :: A train on a short-turn service cannot enter the depot or reverse at the terminal
+%@ con eq_0027_a kind=linear domain=- indicator=- :: Depot return/backup departure constraints for upstream trains before the fault
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Additional depot-related constraints for upstream trains before the fault
+%@ con eq_0028 kind=linear domain=- indicator=- :: Depot return/backup departure constraints for downstream trains before the fault
+%@ con eq_0029 kind=linear domain=- indicator=- :: Limit on the number of backup trains used from each depot
+%@ con eq_0031 kind=linear domain=- indicator=- :: Dwell time bounds adjusted by stop-cancellation indicators
+%@ con eq_0032 kind=linear domain=- indicator=- :: Inter-station running time bounds adjusted by stop-cancellation indicators
+%@ con eq_0036 kind=linear domain=- indicator=- :: Minimum turn-back time at terminal stations for connecting services
+%@ con eq_0039 kind=linear domain=- indicator=- :: A train that does not return to the depot must turn around and perform another service
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Holding constraint: held train departs after the over-zone power supply mode starts
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Holding constraint for the ahead station of a held train
+%@ con eq_0041 kind=linear domain=- indicator=- :: Feedback objective: maximize the re-adjusted total running distance in the under-supplied area
+%@ con eq_0043 kind=linear domain=- indicator=- :: Re-adjusted departure times at successive stations must be chosen from the feasible alternative subsets
+%@ con eq_0044_a kind=linear domain=- indicator=- :: Lower-bound relation between re-adjusted running distance and selected departure times
+%@ con eq_0044_b kind=linear domain=- indicator=- :: Upper-bound relation between re-adjusted running distance and selected departure times
+%@ con eq_0044_c kind=linear domain=- indicator=- :: Running distance assignment when an additional time unit is inserted between departures
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Lower-bound relation between updated substation power and selected departure times
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Upper-bound relation between updated substation power and selected departure times
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Logical coupling of departure-time selection with train-service assignment (variant a)
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Logical coupling of departure-time selection with train-service assignment (variant b)
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant a)
+%@ con eq_0048_b kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant b)
+%@ con eq_0049_a kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant c)
+%@ con eq_0049_b kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant d)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Logical constraint linking departure-time selection to stop cancellation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Big-M constraint for updated departure times in the feedback adjustment
+%@ con eq_0053 kind=linear domain=- indicator=- :: Exactly one alternative departure time can be selected for each train at each station
+%@ con eq_0054_a kind=linear domain=- indicator=- :: Minimum departure headway in the re-adjusted timetable
+%@ con eq_0054_b kind=linear domain=- indicator=- :: Minimum headway between a departure and the next arrival in the re-adjusted timetable
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Backup-train availability constraint in the feedback adjustment (variant a)
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Backup-train availability constraint in the feedback adjustment (variant b)
+%@ con eq_0060 kind=linear domain=- indicator=- :: Substation power capacity constraint in the feedback-adjusted timetable
+%@ var maxZ_undersupply :: Maximum undersupply capacity
+%@ param C_up :: Up capacity
+%@ param C_dn :: Down capacity
+%@ param barh_up :: Barred headway up
+%@ param barh_dn :: Barred headway down
+%@ var Z_undersupply shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: undersupply capacity
+%@ param hbar_up shape=- domain=- role=- drole=- lo=- hi=- :: average headway up
+%@ param hbar_dn shape=- domain=- role=- drole=- lo=- hi=- :: average headway down
+%@ param h_bar shape=- domain=- role=- drole=- lo=- hi=- :: average headway parameter

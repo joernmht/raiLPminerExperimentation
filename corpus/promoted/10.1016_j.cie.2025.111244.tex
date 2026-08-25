@@ -1,0 +1,141 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2025.111244
+%@ meta id=10.1016_j.cie.2025.111244 family=lp schema=0.1.0
+%@ name :: Inter-area coordination approach for metro train regulation under localized bi-directional power supply shortage during peak periods
+%@ desc :: Mined from Inter-area coordination approach for metro train regulation under localized bi-directional power supply shortage during peak periods (Computers & Industrial Engineering, 2025).
+%@ prov source :: 10.1016/j.cie.2025.111244
+%@ prov reference :: Inter-area coordination approach for metro train regulation under localized bi-directional power supply shortage during peak periods
+%@ prov author :: Xuekai Wang; Andrea D’Ariano; Shuai Su; Tao Tang; Boyi Su; Maode Yan
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize maintained line capacity across the three regulation stages
+%@ var v shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Train speed at a time point
+%@ index t ordered=0 cyclic=0 :: Time point index
+%@ param m shape=- kind=scalar domain=- :: Train mass
+%@ param q shape=- kind=scalar domain=- :: Train resistance function
+%@ var u shape=B domain=continuous role=primary drole=- lo=- hi=- :: Applied traction or braking force
+%@ var x shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Train location at a time point
+%@ var X shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Running distance in a time unit
+%@ param C shape=- kind=scalar domain=- :: Line capacity in the up and down directions
+%@ param h_avg shape=- kind=scalar domain=- :: Average headway in the under-supplied area
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of a regulation stage
+%@ index B ordered=0 cyclic=0 :: Set of trains
+%@ param F shape=- kind=scalar domain=- :: Maximum traction force function
+%@ param f shape=- kind=scalar domain=- :: Maximum braking force function
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ index I ordered=0 cyclic=0 :: Set of time points
+%@ var P shape=B,Y,I domain=non_negative role=primary drole=- lo=- hi=- :: Electrical power supplied by a substation to a train in a time unit
+%@ index Y ordered=0 cyclic=0 :: Set of substations
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param h shape=- kind=scalar domain=- :: Headway time
+%@ var a shape=B,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of a train at a station
+%@ index K ordered=0 cyclic=0 :: Set of train services
+%@ param M shape=- kind=scalar domain=- :: Large number for big-M linearization
+%@ param c shape=S kind=vector domain=- :: Number of available backup trains at the depot connected to each station
+%@ index D ordered=0 cyclic=0 :: Set of alternative departure times
+%@ var X_hat shape=B,I domain=non_negative role=primary drole=- lo=- hi=- :: Re-adjusted running distance in the feedback adjustment stage
+%@ var P_hat shape=B,Y,I domain=non_negative role=primary drole=- lo=- hi=- :: Updated substation power supply in the feedback adjustment stage
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Train speed and location update equations with a switching driving regime
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Piecewise applied traction force during a time unit
+%@ con eq_0007 kind=linear domain=- indicator=- :: Speed limit constraint preventing trains from exceeding the location-dependent speed limit
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maximum train power consumption in each time unit
+%@ con eq_0013 kind=linear domain=- indicator=- :: Dwell time bounds at stations in the under-supplied area
+%@ con eq_0014 kind=linear domain=- indicator=- :: Inter-station running time bounds in the under-supplied area
+%@ con eq_0015 kind=linear domain=- indicator=- :: Well-supplied-area objective: maximize train stops minus weighted synchronization deviation
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linearized absolute deviation between initial and re-adjusted entry/exit times
+%@ con eq_0017 kind=linear domain=- indicator=- :: Logical relation linking the train-stop indicator to cancellation and arrival-before-fault indicators
+%@ con eq_0018 kind=linear domain=- indicator=- :: Big-M linearization of the arrival-before-fault-end indicator
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Each upstream train must be assigned to exactly one upstream service
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Each downstream train must be assigned to exactly one downstream service
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Non-canceled upstream service must be covered by a train
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Non-canceled downstream service must be covered by a train
+%@ con eq_0021_c kind=linear domain=- indicator=- :: Non-canceled terminal service must be covered by a train
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Big-M upper bound for arrival-before-fault-end indicator in synchronization constraints
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Big-M lower bound for arrival-before-fault-end indicator in synchronization constraints
+%@ con eq_0024_a kind=linear domain=- indicator=- :: Minimum turn-back time at the short-turn station for downstream-to-upstream connection
+%@ con eq_0024_b kind=linear domain=- indicator=- :: Minimum turn-back time at the short-turn station for upstream-to-downstream connection
+%@ con eq_0026 kind=linear domain=- indicator=- :: A train on a short-turn service cannot enter the depot or reverse at the terminal
+%@ con eq_0027_a kind=linear domain=- indicator=- :: Depot return/backup departure constraints for upstream trains before the fault
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Additional depot-related constraints for upstream trains before the fault
+%@ con eq_0028 kind=linear domain=- indicator=- :: Depot return/backup departure constraints for downstream trains before the fault
+%@ con eq_0029 kind=linear domain=- indicator=- :: Limit on the number of backup trains used from each depot
+%@ con eq_0031 kind=linear domain=- indicator=- :: Dwell time bounds adjusted by stop-cancellation indicators
+%@ con eq_0032 kind=linear domain=- indicator=- :: Inter-station running time bounds adjusted by stop-cancellation indicators
+%@ con eq_0036 kind=linear domain=- indicator=- :: Minimum turn-back time at terminal stations for connecting services
+%@ con eq_0039 kind=linear domain=- indicator=- :: A train that does not return to the depot must turn around and perform another service
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Holding constraint: held train departs after the over-zone power supply mode starts
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Holding constraint for the ahead station of a held train
+%@ con eq_0041 kind=linear domain=- indicator=- :: Feedback objective: maximize the re-adjusted total running distance in the under-supplied area
+%@ con eq_0043 kind=linear domain=- indicator=- :: Re-adjusted departure times at successive stations must be chosen from the feasible alternative subsets
+%@ con eq_0044_a kind=linear domain=- indicator=- :: Lower-bound relation between re-adjusted running distance and selected departure times
+%@ con eq_0044_b kind=linear domain=- indicator=- :: Upper-bound relation between re-adjusted running distance and selected departure times
+%@ con eq_0044_c kind=linear domain=- indicator=- :: Running distance assignment when an additional time unit is inserted between departures
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Lower-bound relation between updated substation power and selected departure times
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Upper-bound relation between updated substation power and selected departure times
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Logical coupling of departure-time selection with train-service assignment (variant a)
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Logical coupling of departure-time selection with train-service assignment (variant b)
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant a)
+%@ con eq_0048_b kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant b)
+%@ con eq_0049_a kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant c)
+%@ con eq_0049_b kind=linear domain=- indicator=- :: Linearization of binary products in the departure-time selection (variant d)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Logical constraint linking departure-time selection to stop cancellation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Big-M constraint for updated departure times in the feedback adjustment
+%@ con eq_0053 kind=linear domain=- indicator=- :: Exactly one alternative departure time can be selected for each train at each station
+%@ con eq_0054_a kind=linear domain=- indicator=- :: Minimum departure headway in the re-adjusted timetable
+%@ con eq_0054_b kind=linear domain=- indicator=- :: Minimum headway between a departure and the next arrival in the re-adjusted timetable
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Backup-train availability constraint in the feedback adjustment (variant a)
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Backup-train availability constraint in the feedback adjustment (variant b)
+%@ con eq_0060 kind=linear domain=- indicator=- :: Substation power capacity constraint in the feedback-adjusted timetable
+\begin{align}
+  & v_{b , i + 1} = v_{b , i} + \frac{u^{\text{PA}} - q \left(v_{b , i} , x_{b , i}\right)}{m} \left(t^{\text{switch}} - t_{i}\right) \tag{eq\_0001\_a} \\
+  & X_{b , \left(i , i + 1\right)} = v_{b , i} \left(t^{\text{switch}} - t_{i}\right) + \frac{u^{\text{PA}} - q \left(v_{b , i} , x_{b , i}\right)}{2 \cdot m} \left(t^{\text{switch}} - t_{i}\right)^{2} + v_{b , i + 1} \left(t_{i + 1} - t^{\text{switch}}\right) + \frac{u^{\text{CR}} - q \left(v_{b , i} , x_{b , i}\right)}{2 \cdot m} \left(t_{i + 1} - t^{\text{switch}}\right)^{2} \tag{eq\_0001\_b} \\
+  \max\quad & \left(C^{up} + C^{dn}\right) / 2 = \left(3600 / \bar{h^{up}} + 3600 / \bar{h^{dn}}\right) / 2 \tag{eq\_0004} \\
+  & s.t. - f^{max} \left(v_{b} \left(\mathit{tau}\right)\right) \leq u_{b} \left(\mathit{tau}\right) \leq F^{max} \left(v_{b} \left(\mathit{tau}\right)\right) , \forall b \in \mathcal{B} , \mathit{tau} \in \left[t^{overzone} , t^{end}\right] \tag{eq\_0007} \\
+  & 0 \leq v_{b} \left(\mathit{tau}\right) \leq v^{max} \left(x_{b} \left(\mathit{tau}\right)\right) , \forall b \in \mathcal{B} , \mathit{tau} \in \left[t^{overzone} , t^{end}\right] \tag{eq\_0008} \\
+  & \sum_{b \in \mathcal{B}} P_{b , y , \left(i , i + 1\right)}^{supply} \leq P^{subs , max} , \forall y \in \mathcal{Y} , i \in \mathcal{I} / I . \tag{eq\_0013} \\
+  & d_{b + 1 , s} - d_{b , s} \geq h^{dep , min} , \forall s \in \mathcal{S}_{u} , b \in \mathcal{B} . \tag{eq\_0014} \\
+  & a_{b + 1 , s} - d_{b , s} \geq h^{arr , min} , \forall s \in \mathcal{S}_{u} , b \in \mathcal{B} . \tag{eq\_0015} \\
+  & t_{s}^{dwell , min} \leq d_{b , s} - a_{b , s} \leq t_{s}^{dwell , max} , \forall s \in \mathcal{S}_{u} , b \in \mathcal{B} . \tag{eq\_0016} \\
+  & t_{s , s + 1}^{run , min} \leq a_{b , s + 1} - d_{b , s} \leq t_{s , s + 1}^{run , max} , \forall s \in \mathcal{S}_{u} / s^{end} , b \in \mathcal{B}_{u} . \tag{eq\_0017} \\
+  & t_{s , s + 1}^{run , min} \leq a_{b , s} - d_{b , s + 1} \leq t_{s , s + 1}^{run , max} , \forall s \in \mathcal{S}_{u} / s^{end} , b \in \mathcal{B}_{d} . \tag{eq\_0018} \\
+  & \mathit{Delta} d_{b , s} \geq d_{b , s} - {d}_{b , s} , \forall b \in \mathcal{B} , s \in \left\{s^{start} , s^{end}\right\} \tag{eq\_0020\_a} \\
+  & \mathit{Delta} d_{b , s} \geq {d}_{b , s} - d_{b , s} . , \forall b \in \mathcal{B} , s \in \left\{s^{start} , s^{end}\right\} \tag{eq\_0020\_b} \\
+  & \mathit{eta}_{k , s} \leq 1 - \mathit{zeta}_{k , s} , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0021\_a} \\
+  & \mathit{eta}_{k , s} \leq \mathit{rho}_{k , s} , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0021\_b} \\
+  & \mathit{eta}_{k , s} \geq - \mathit{zeta}_{k , s} + \mathit{rho}_{k , s} , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0021\_c} \\
+  & a_{k , s} \leq t^{end} + \left(1 - \mathit{rho}_{k , s}\right) M , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0022\_a} \\
+  & a_{k , s} \geq t^{end} - \mathit{rho}_{k , s} M + \partial , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0022\_b} \\
+  & \sum_{k \in \mathcal{K}_{u}} \mathit{theta}_{k , b} = 1 , \forall b \in \mathcal{B}_{u} \tag{eq\_0024\_a} \\
+  & \sum_{k \in \mathcal{K}_{d}} \mathit{theta}_{k , b} = 1 , \forall b \in \mathcal{B}_{d} . \tag{eq\_0024\_b} \\
+  & 1 - \sum_{b \in \mathcal{B}} \mathit{theta}_{k , b} \leq \mathit{sigma}_{k , s} + \mathit{zeta}_{k , s} , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} . \tag{eq\_0026} \\
+  & d_{k , s} \leq t^{end} + \mathit{sigma}_{k , s} M , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0027\_a} \\
+  & d_{k , s} \geq t^{end} - \left(1 - \mathit{sigma}_{k , s}\right) M + \partial , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0027\_b} \\
+  & \sum_{b \in B} \mathit{theta}_{k , b} \leq 1 , \forall k \in \mathcal{K} . \tag{eq\_0028} \\
+  & d_{k , s^{turn}} - a_{k^{'} , s^{turn}} \geq t^{turn,min} - M \left(1 - \mathit{lambda}_{k^{'} , k}\right) , \forall k \in \mathcal{K}_{u} , k^{'} \in \mathcal{K}_{d} . \tag{eq\_0029} \\
+  & \mathit{beta}_{k , S} + \sum_{k \in \mathcal{K}_{u}} \mathit{delta}_{k , k^{'}} \geq \sum_{k \in \mathcal{K}_{u}} \mathit{lambda}_{k^{'} , k} , \forall k \in \mathcal{K}_{d} . \tag{eq\_0031} \\
+  & \mathit{alpha}_{k , 1} + \sum_{k \in \mathcal{K}_{u}} \mathit{delta}_{k^{'} , k} \leq 1 - \sum_{k \in \mathcal{K}_{u}} \mathit{lambda}_{k^{'} , k} , \forall k \in \mathcal{K}_{d} . \tag{eq\_0032} \\
+  & \sum_{k \in \mathcal{K}} \mathit{beta}_{k , s} \leq c_{s} , \forall s \in \mathcal{K}_{d} , \tag{eq\_0036} \\
+  & - \mathit{zeta}_{k , s} M + t_{s}^{dwell,min} \leq d_{k , s} - a_{k , s} \leq t_{s}^{dwell,max} + \mathit{zeta}_{k , s} M , \forall k \in \mathcal{K} , s \in \mathcal{S} \backslash \mathcal{S}_{u} . \tag{eq\_0039} \\
+  & - M \left(\mathit{zeta}_{k , s} + \mathit{zeta}_{k , s + 1}\right) + t_{s , s + 1}^{run,min} \leq a_{k , s + 1} - d_{k , s} \leq t_{s , s + 1}^{run , max} + M \left(_{k , s} + \mathit{zeta}_{k , s + 1}\right) , \forall k \in \mathcal{K}_{u} , s \in \mathcal{S} \backslash \mathcal{S}_{u} \tag{eq\_0040\_a} \\
+  & - M \left(\mathit{zeta}_{k , s} + \mathit{zeta}_{k , s + 1}\right) + t_{s , s + 1}^{run,min} \leq a_{k , s} - d_{k , s + 1} \leq t_{s , s + 1}^{run , max} + M \left(_{k , s} + \mathit{zeta}_{k , s + 1}\right) , \forall k \in \mathcal{K}_{d} , s \in \mathcal{S} \backslash \mathcal{S}_{u} . \tag{eq\_0040\_b} \\
+  & d_{k , s} - d_{k^{'} , s} \geq h^{dep , min} \mathit{gamma}_{k , k^{'} , s} , \forall s \in \mathcal{S} \backslash \mathcal{S}_{u} , k \in \mathcal{K} , k^{'} \in \left[1 , k - 1\right] . \tag{eq\_0041} \\
+  & a_{k , s} - d_{k^{'} , s} \geq h^{arr , min} \mathit{gamma}_{k , k^{'} , s} , \forall s \in \mathcal{S} \backslash \mathcal{S}_{u} , k \in \mathcal{K} , k^{'} \in \left[1 , k - 1\right] . \tag{eq\_0043} \\
+  & 1 - \mathit{gamma}_{k , k^{'} , s} \geq \mathit{zeta}_{k , s} \tag{eq\_0044\_a} \\
+  & 1 - \mathit{gamma}_{k , k^{'} , s} \geq \mathit{zeta}_{k^{'} , s} \tag{eq\_0044\_b} \\
+  & 1 - \mathit{gamma}_{k , k^{'} , s} \leq \mathit{zeta}_{k , s} + \mathit{zeta}_{k^{'} , s} \forall s \in \mathcal{S} \backslash \mathcal{S}_{u} , k , k^{'} \in \mathcal{K} \tag{eq\_0044\_c} \\
+  & d_{k^{'} , S} - a_{k , S} \geq t^{turn,min} - M \left(1 - \mathit{delta}_{k , k^{'}}\right) , \forall k \in \mathcal{K}_{u} , k^{'} \in \mathcal{K}_{d} \tag{eq\_0045\_a} \\
+  & d_{k , 1} - a_{k^{'} , 1} \geq t^{turn,min} - M \left(1 - \mathit{delta}_{k^{'} , k}\right) , \forall k \in \mathcal{K}_{u} , k^{'} \in \mathcal{K}_{d} \tag{eq\_0045\_b} \\
+  & \sum_{k^{'} \in \mathcal{K}_{d}} \mathit{delta}_{k^{'} , k} + \mathit{beta}_{k , 1} \leq 1 , \forall k \in \mathcal{K}_{u} \tag{eq\_0047\_a} \\
+  & \sum_{k \in \mathcal{K}_{u}} \mathit{delta}_{k , k^{'}} + \mathit{beta}_{k^{'} , S} \leq 1 , \forall k^{'} \in \mathcal{K}_{d} . \tag{eq\_0047\_b} \\
+  & \sum_{k^{'} \in \mathcal{K}_{d}} \mathit{delta}_{k , k^{'}} + \mathit{alpha}_{k , S} \leq 1 , \forall k \in \mathcal{K}_{u} \tag{eq\_0048\_a} \\
+  & \sum_{k \in \mathcal{K}_{u}} \mathit{delta}_{k^{'} , k} + \mathit{alpha}_{k^{'} , 1} \leq 1 , \forall k^{'} \in \mathcal{K}_{d} . \tag{eq\_0048\_b} \\
+  & \sum_{k^{'} \in \mathcal{K}_{d}} \mathit{delta}_{k , k^{'}} \geq 1 - \mathit{zeta}_{k , S} - \mathit{alpha}_{k , S} , \forall k \in \mathcal{K}_{u} \tag{eq\_0049\_a} \\
+  & \sum_{k \in \mathcal{K}_{u}} \mathit{delta}_{k^{'} , k} \geq 1 - \mathit{zeta}_{k , 1} - \mathit{alpha}_{k , 1} , \forall k \in \mathcal{K}_{d} . \tag{eq\_0049\_b} \\
+  & d_{k , s_{k}^{hold}} \geq t^{overzone} , \forall k \in \mathcal{K}_{h} . \tag{eq\_0050} \\
+  & \sum_{d \in \mathcal{D}_{b , s}^{alter}} \mathit{psi}_{b , s , d} = 1 , \forall s \in \mathcal{S}_{u} , b \in \mathcal{B} , \tag{eq\_0052} \\
+  & \underset{d_{2} \in \mathcal{D}_{b , s + 1}^{alter} \backslash \mathcal{D}_{b , s + 1 , d_{1}}^{option}}{\sum} \mathit{psi}_{b , s + 1 , d_{2}} \leq 1 - \mathit{psi}_{b , s , d_{1}} , \forall s \in \mathcal{S}_{u} , d_{1} \in \mathcal{D}_{b , s}^{alter} , b \in \mathcal{B} . \tag{eq\_0053} \\
+  & \hat{X}_{b , \left(i , i + 1\right)} - X_{b , s , d_{1} , d_{2} , \left(i , i + 1\right)}^{train} \geq M \left(\mathit{psi}_{b , s , d_{1}} + \mathit{psi}_{b , s + 1 , d_{2}} - 2\right) \tag{eq\_0054\_a} \\
+  & \hat{X}_{b , \left(i , i + 1\right)} - X_{b , s , d_{1} , d_{2} , \left(i , i + 1\right)}^{train} \leq M \left(2 - \mathit{psi}_{b , s , d_{1}} - \mathit{psi}_{b , s + 1 , d_{2}}\right) \tag{eq\_0054\_b} \\
+  & \hat{P}_{b , y , \left(i , i + 1\right)}^{supply} - P_{b , y , s , d_{1} , d_{2} , \left(i , i + 1\right)}^{subs} \geq M \left(\mathit{psi}_{b , s , d_{1}} + \mathit{psi}_{b , s + 1 , d_{2}} - 2\right) \tag{eq\_0057\_a} \\
+  & \hat{P}_{b , y , \left(i , i + 1\right)}^{supply} - P_{b , y , s , d_{1} , d_{2} , \left(i , i + 1\right)}^{subs} \leq M \left(2 - \mathit{psi}_{b , s , d_{1}} - \mathit{psi}_{b , s + 1 , d_{2}}\right) \tag{eq\_0057\_b} \\
+  & \sum_{b \in \mathcal{B}} \hat{P}_{b , y , \left(i , i + 1\right)}^{supply} \leq P^{subs,max} , \forall i \in \mathcal{I} \backslash I , y \in \mathcal{Y} . \tag{eq\_0060} \\
+\end{align}

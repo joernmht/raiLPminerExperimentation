@@ -1,0 +1,132 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.08.011
+%@ meta id=10.1016_j.trb.2016.08.011 family=milp schema=0.1.0
+%@ name :: Rescheduling a metro line in an over-crowded situation after disruptions
+%@ desc :: Mined from Rescheduling a metro line in an over-crowded situation after disruptions (Transportation Research Part B Methodological, 2016).
+%@ prov source :: 10.1016/j.trb.2016.08.011
+%@ prov reference :: Rescheduling a metro line in an over-crowded situation after disruptions
+%@ prov author :: Yuan Gao; Leo Kroon; Marie Schmidt; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize sum of total travel time and passenger waiting in the recovery period
+%@ index S ordered=0 cyclic=0 :: Set of services (trains) in the metro line
+%@ index N ordered=0 cyclic=0 :: Set of stations in the metro line
+%@ param R shape=- kind=scalar domain=- :: Pure running time between stations
+%@ param t shape=- kind=scalar domain=- :: Running time component
+%@ param D shape=- kind=scalar domain=- :: Minimum dwell time at a station
+%@ param M shape=- kind=scalar domain=- :: Sufficiently large positive constant
+%@ param B shape=- kind=scalar domain=- :: Minimum back-turning time
+%@ param s shape=- kind=scalar domain=- :: Maximum number of skipped stations per service
+%@ var w shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station i for service k
+%@ var n shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on service k at station i
+%@ param pt shape=- kind=scalar domain=- :: Passenger flow parameter (possibly OD matrix)
+%@ param Q shape=S,N kind=matrix domain=- :: Number of passengers already on train at disruption time
+%@ var z shape=S,N,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passengers get off early
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (travel time or passenger flow)
+%@ param H shape=- kind=scalar domain=- :: Disruption end time
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ param Std shape=- kind=scalar domain=- :: Standard stop pattern passenger counts
+%@ con eq_0005 kind=linear domain=- indicator=- :: Back-turning time constraint for downstream services
+%@ con eq_0007 kind=linear domain=- indicator=- :: Nonlinear skip-stop constraint ensuring at least one suitable service in every three consecutive services
+%@ con eq_0008 kind=linear domain=- indicator=- :: Proof equation (8): counterexample assumption for Theorem 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Proof equation (9): product of skip indicators equals zero
+%@ con eq_0010 kind=linear domain=- indicator=- :: Proof equation (10): product of skip indicators equals zero
+%@ con eq_0011 kind=linear domain=- indicator=- :: Proof equation (11): product of skip indicators equals zero
+%@ con eq_0012 kind=linear domain=- indicator=- :: Proof equation (12): sum of skip indicators at station i' at least 2
+%@ con eq_0013 kind=linear domain=- indicator=- :: Proof equation (13): sum of skip indicators at station j' at least 2
+%@ con eq_0014 kind=linear domain=- indicator=- :: Proof equation (14): contradiction implication in Theorem 1
+%@ con eq_0015 kind=linear domain=- indicator=- :: Definition of total waiting passengers at station i for service k
+%@ con eq_0016 kind=linear domain=- indicator=- :: Decomposition of boarding passengers by destination
+%@ con eq_0017 kind=linear domain=- indicator=- :: Piecewise constant approximation of waiting passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Boarding passengers only if service stops at both origin and destination
+%@ con eq_0019 kind=linear domain=- indicator=- :: Passenger flow balance on train k at station i
+%@ con eq_0020 kind=linear domain=- indicator=- :: Capacity constraint on boarding passengers
+%@ con eq_0021 kind=linear domain=- indicator=- :: Total alighting passengers at station i
+%@ con eq_0022 kind=linear domain=- indicator=- :: Well-mixed boarding proportion constraint
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Remaining waiting passengers after boarding (Eq. 22) - part a
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Remaining waiting passengers after boarding (Eq. 22) - part b
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger waiting count for existing services
+%@ con eq_0027 kind=linear domain=- indicator=- :: Remaining waiting passengers for existing services with early alighting
+%@ con eq_0029 kind=linear domain=- indicator=- :: Total travel time objective
+%@ con eq_0030 kind=linear domain=- indicator=- :: Travel time of service k
+%@ con eq_0031 kind=linear domain=- indicator=- :: Total passenger flow objective
+%@ con eq_0032 kind=linear domain=- indicator=- :: Passenger flow objective per service
+%@ con eq_0033 kind=linear domain=- indicator=- :: Upper bound on boarding passengers
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized well-mixed boarding constraints
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization constraint for boarding passenger variables
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization constraint for boarding passenger variables
+%@ con eq_0040 kind=linear domain=- indicator=- :: Well-mixed boarding relation (Eq. 39)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Auxiliary constraint for early-alighting indicator z
+%@ con eq_0043 kind=linear domain=- indicator=- :: Auxiliary constraint for early-alighting indicator z
+%@ con eq_0044_a kind=linear domain=- indicator=- :: Linearization of w^b upper bound by origin stop
+%@ con eq_0044_b kind=linear domain=- indicator=- :: Linearization of w^b upper bound by destination stop
+%@ con eq_0044_c kind=linear domain=- indicator=- :: Linearization of w^b lower bound with big-M
+%@ con eq_0044_d kind=linear domain=- indicator=- :: Nonnegativity of w^b
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Linearization of n^b upper bound by waiting passengers
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Linearization of n^b upper bound by remaining capacity
+%@ con eq_0045_c kind=linear domain=- indicator=- :: Linearization of n^b lower bound with big-M and mu
+%@ con eq_0045_d kind=linear domain=- indicator=- :: Linearization of n^b lower bound with big-M and mu complement
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Linearization of z lower bound
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Linearization of z upper bound
+%@ con eq_0047_c kind=linear domain=- indicator=- :: Binary integrality of z
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Linearization of z relation part a
+%@ con eq_0048_b kind=linear domain=- indicator=- :: Linearization of z relation part b
+%@ con eq_0048_c kind=linear domain=- indicator=- :: Linearization of z relation part c
+%@ con eq_0049 kind=linear domain=- indicator=- :: Constraint linking z and x (early alighting)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint defining z via skip pattern
+%@ con eq_0052 kind=linear domain=- indicator=- :: Objective function transformation (weighted sum)
+%@ con eq_0058_a kind=linear domain=- indicator=- :: Iterative algorithm constraint part a
+%@ con eq_0058_b kind=linear domain=- indicator=- :: Iterative algorithm constraint part b
+\begin{align}
+  & a_{k , i + 1} - d_{k , i} = R \cdot t_{i} + x_{k , i} \cdot \mathit{tau}_{a} + x_{k , i + 1} \cdot \mathit{tau}_{d} , \text{for} k \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i , i + 1 \in \mathbf{N}_{k} . \tag{eq\_0005} \\
+  & x_{k , i} \cdot M \geq d_{k , i} - a_{k , i} \geq x_{k , i} \cdot D \cdot t_{i} , \text{for} k \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0007} \\
+  & a_{k + 1 , i} - d_{k , i} \geq h_{s} , \text{for} k , k + 1 \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0008} \\
+  & a_{k , 1} - d_{\mathit{sigma} \left(k\right) , 2 N} \geq B \cdot t , \text{for} k \in \mathbf{S}_{F}^{\left(u\right)} . \tag{eq\_0009} \\
+  & a_{k , N + 1} - d_{\mathit{sigma} \left(k\right) , N} \geq B \cdot t , \text{for} k \in \mathbf{S}_{F}^{\left(d\right)} . \tag{eq\_0010} \\
+  & \sum_{i \in \mathbf{N}_{k}} x_{k , i} \geq \left|\mathbf{N}_{k}\right| - s_{k} , \text{for} k \in \mathbf{S}_{E} \cup \mathbf{S}_{F} . \tag{eq\_0011} \\
+  & x_{k , i} \cdot x_{k , j} + x_{k + 1 , i} \cdot x_{k + 1 , j} + x_{k + 2 , i} \cdot x_{k + 2 , j} \geq 1 , \text{for} k , k + 1 , k + 2 \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i , j \in \mathbf{N}_{k} . \tag{eq\_0012} \\
+  & x_{k , i} + x_{k + 1 , i} + x_{k + 2 , i} \geq 2 , \text{for} k , k + 1 , k + 2 \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0013} \\
+  & x_{k , i^{'}} \cdot x_{k , j^{'}} + x_{k + 1 , i^{'}} \cdot x_{k + 1 , j^{'}} + x_{k + 2 , i^{'}} \cdot x_{k + 2 , j^{'}} = 0 . \tag{eq\_0014} \\
+  & \begin{matrix}x_{k , i^{'}} \cdot x_{k , j^{'}} = 0 ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}x_{k + 1 , i^{'}} \cdot x_{k + 1 , j^{'}} = 0 ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix}x_{k + 2 , i^{'}} \cdot x_{k + 2 , j^{'}} = 0 .\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}x_{k , i^{'}} + x_{k + 1 , i^{'}} + x_{k + 2 , i^{'}} \geq 2 ,\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix}x_{k , j^{'}} + x_{k + 1 , j^{'}} + x_{k + 2 , j^{'}} \geq 2 .\end{matrix} \tag{eq\_0019} \\
+  & x_{k , i^{'}} + x_{k + 1 , i^{'}} + x_{k + 2 , i^{'}} \leq 1 . \tag{eq\_0020} \\
+  & x_{k , i^{'}} \cdot x_{k , j} + x_{k + 1 , i^{'}} \cdot x_{k + 1 , j} + x_{k + 2 , i^{'}} \cdot x_{k + 2 , j} \geq 1 , \text{for} j \neq i^{'} . \tag{eq\_0021} \\
+  & w_{k , i} = \sum_{j \in \mathbf{N}_{k} , j > i} w_{k , i , j} , \text{for} k \in \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0022} \\
+  & w_{k , i}^{b} = \sum_{j \in \mathbf{N}_{k} , j > i} w_{k , i , j}^{b} \tag{eq\_0023\_a} \\
+  & n_{k , i}^{b} = \sum_{j \in \mathbf{N}_{k} , j > i} n_{k , i , j}^{b} , \text{for} k \in \mathbf{S}_{F} , i \in \mathbf{N}_{k} . \tag{eq\_0023\_b} \\
+  & w_{k , i , j}^{b} = x_{k , i} \cdot x_{k , j} \cdot w_{k , i , j} , \text{for} k \in \mathbf{S}_{F} , \text{and} i , j \in \mathbf{N}_{k} , i < j , \tag{eq\_0026} \\
+  & n_{k , i} = n_{k , i - 1} - n_{k , i}^{a} + n_{k , i}^{b} , \text{for} k \in \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0027} \\
+  & n_{k , i}^{a} = \underset{\genfrac{}{}{0pt}{}{j \in \mathbf{N}_{k} ,}{j < i}}{\sum} n_{k , j , i}^{b} , \text{for} k \in \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0029} \\
+  & \frac{n_{k , i , j}^{b}}{n_{k , i}^{b}} = \frac{w_{k , i , j}^{b}}{w_{k , i}^{b}} , \tag{eq\_0030} \\
+  & n_{k , i , j}^{b} = \frac{w_{k , i , j}^{b}}{w_{k , i}^{b}} \cdot n_{k , i}^{b} , \text{for} k \in \mathbf{S}_{F} , \text{and} i , j \in \mathbf{N}_{k} , i < j . \tag{eq\_0031} \\
+  & w_{k , i , j}^{r} = w_{k , i , j} - n_{k , i , j}^{b} , \text{for} k \in \mathbf{S}_{F} , \text{and} i , j \in \mathbf{N}_{k} , i < j . \tag{eq\_0032} \\
+  & n_{k , i}^{a} = \underset{\genfrac{}{}{0pt}{}{j < i}{j \in \mathbf{N}_{k}}}{\sum} n_{k , j , i}^{b} + x_{k , i} \cdot Q_{k , i} + \underset{\genfrac{}{}{0pt}{}{i < j \leq i + s_{k}}{j \in \mathbf{N}_{k}}}{\sum} z_{k , i , j} \cdot Q_{k , j} , \text{for} k \in \mathbf{S}_{E} , \text{and} i \in \mathbf{N}_{k} , \tag{eq\_0033} \\
+  & w_{k , i , j}^{r} = w_{k , i , j} - n_{k , i , j}^{b} + z_{k , i , j} \cdot Q_{k , j} , \text{for} k \in \mathbf{S}_{E} , \text{and} i , j \in \mathbf{N}_{k} , i < j . \tag{eq\_0036} \\
+  \min_{\mathbf{x}\quad & , \mathbf{a} , \mathbf{d}} \left(f_{T} , f_{P}\right) \tag{eq\_0037} \\
+  & f_{T} = \sum_{k \in \mathbf{S}^{E} \cup \mathbf{S}^{F}} f_{T}^{\left(k\right)} , \tag{eq\_0038} \\
+  & f_{T}^{\left(k\right)} = d_{k , N} - \mathbf{H} . \tag{eq\_0039} \\
+  & f_{T}^{\left(k\right)} = d_{k , N} - d_{\mathit{sigma} \left(k\right) , 2 N} . \tag{eq\_0040} \\
+  & f_{P} = \sum_{k \in \mathbf{S}_{E} \cup \mathbf{S}_{F}} f_{P}^{\left(k\right)} , \tag{eq\_0042} \\
+  & f_{P}^{\left(k\right)} = \sum_{i \in \mathbf{N}_{k}} \underset{\genfrac{}{}{0pt}{}{j \in \mathbf{N}_{k} ,}{j > i}}{\sum} w_{k , i , j}^{r} , \tag{eq\_0043} \\
+  & 0 \leq w_{k , i , j}^{b} \leq w_{k , i , j} \tag{eq\_0044\_a} \\
+  & w_{k , i , j}^{b} \leq M \cdot x_{k , i} \tag{eq\_0044\_b} \\
+  & w_{k , i , j}^{b} \leq M \cdot x_{k , j} \tag{eq\_0044\_c} \\
+  & w_{k , i , j}^{b} \geq w_{k , i , j} - M \cdot \left(2 - x_{k , i} - x_{k , j}\right) \tag{eq\_0044\_d} \\
+  & n_{k , i}^{b} \leq w_{k , i}^{b} \tag{eq\_0045\_a} \\
+  & n_{k , i}^{b} \leq C - n_{k , i - 1} + n_{k , i}^{a} \tag{eq\_0045\_b} \\
+  & n_{k , i}^{b} \geq w_{k , i}^{b} - M \cdot \left(1 - \mathit{mu}_{k , i}\right) \tag{eq\_0045\_c} \\
+  & n_{k , i}^{b} \geq C - n_{k , i - 1} + n_{k , i}^{a} - M \cdot \mathit{mu}_{k , i} \tag{eq\_0045\_d} \\
+  & \mathit{mu}_{k , i} > \frac{\left(C - n_{k , i - 1} + n_{k , i}^{a}\right) - w_{k , i}^{b}}{M} \tag{eq\_0047\_a} \\
+  & \mathit{mu}_{k , i} \leq 1 + \frac{\left(C - n_{k , i - 1} + n_{k , i}^{a}\right) - w_{k , i}^{b}}{M} \tag{eq\_0047\_b} \\
+  & \mathit{mu}_{k , i} \in \left\{0 , 1\right\} . \tag{eq\_0047\_c} \\
+  & z_{k , i , j} \geq \frac{x_{k , i} - \sum_{i < h \leq j} x_{k , h} - 0.5}{j - i + 1} \tag{eq\_0048\_a} \\
+  & z_{k , i , j} \leq 1 + \frac{x_{k , i} - \sum_{i < h \leq j} x_{k , h} - 0.5}{j - i + 1} \tag{eq\_0048\_b} \\
+  & z_{k , i , j} \in \left\{0 , 1\right\} . \tag{eq\_0048\_c} \\
+  & n_{k , i , j}^{b} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} \cdot w_{k , i , j}^{b} = \frac{w_{k , i , j}^{b}}{w_{k , i}^{b}} \cdot n_{k , i}^{b} , \tag{eq\_0049} \\
+  & \begin{matrix}n_{k , i , j}^{b} \leq w_{k , i , j}^{b} ,\end{matrix} \tag{eq\_0050} \\
+  & \mathit{beta}_{k , i , j} = \frac{\mathit{Std} \underline w_{k , i , j}}{\mathit{Std} \underline w_{k , i}} . \tag{eq\_0052} \\
+  & \frac{n_{k , i , j}^{b}}{w_{k , i , j}^{b}} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} , \text{or} \tag{eq\_0058\_a} \\
+  & n_{k , i , j}^{b} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} \cdot w_{k , i , j}^{b} \tag{eq\_0058\_b} \\
+\end{align}

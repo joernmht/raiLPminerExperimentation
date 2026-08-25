@@ -1,0 +1,91 @@
+% Declaration sidecar for 10.1016_j.trc.2014.06.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2014.06.003
+% Demand-driven timetable design for metro services
+%
+% STUB - written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2014.06.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier - do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time
+
+% w: classified as variable during review
+%@ var w shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time for passengers entering at interval u (or at station s in interval u)
+
+% y: classified as variable during review
+%@ var y shape=T,P domain=continuous role=primary drole=- lo=- hi=- :: Proportion of passengers entering at interval u choosing waiting profile p (or at station s)
+
+% P: classified as index during review
+%@ index P ordered=1 cyclic=0 :: Set of possible waiting profiles
+
+% B: classified as parameter during review
+%@ param B shape=T kind=vector domain=- :: Passenger demand: total demand in interval u (B^u), or disaggregated origin-destination demand B_{o,d}^u
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=0 :: Set of equivalent time intervals
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Index for equivalent time intervals
+
+% x: classified as variable during review
+%@ var x shape=t domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train departs at the end of interval t
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Total number of train services to be operated
+
+% s: classified as index during review
+%@ index s ordered=1 cyclic=0 :: Index for stations
+
+% q: classified as variable during review
+%@ var q shape=t,s domain=non_negative role=primary drole=- lo=- hi=- :: Occupancy of train services departing at the end of interval t at station s
+
+% S: classified as index during review
+%@ index S ordered=1 cyclic=0 :: Set of stations
+
+% CAP: classified as parameter during review
+%@ param CAP shape=- kind=scalar domain=- :: Train capacity
+
+% Bound by a quantifier or big operator, so no declaration of their own: N, d, o, p, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional - they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of average waiting time for interval u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Binary train departure variable x_t
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total number of train services equals K
+%@ con eq_0005 kind=headway domain=- indicator=- :: Maximum headway: at most one departure in any window of N_min intervals
+%@ con eq_0006 kind=headway domain=- indicator=- :: Minimum headway: at least one departure in any window of N_max intervals
+%@ con eq_0007 kind=linear domain=- indicator=- :: Final interval T_n must have a train departure (x_{T_n}=1)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Waiting profile proportions bounded between 0 and 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Sum of waiting profile proportions equals 1 for each interval
+%@ con eq_0010 kind=linear domain=- indicator=- :: Consistency: a train departs if passengers are assigned to board at that interval
+%@ con eq_0011 kind=linear domain=- indicator=- :: Definition of station-specific average waiting time w_s^u
+%@ con eq_0021 kind=flow_balance domain=- indicator=- :: Occupancy balance along the line after alighting and boarding
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Occupancy cannot exceed train capacity CAP
+%@ con eq_0024 kind=headway domain=- indicator=- :: Peak/off-peak headway selection: x_t forces either N_Peak or N_Off headway
+%@ con eq_0025 kind=headway domain=- indicator=- :: Peak headway: at most one departure in any peak window of N_Peak intervals
+%@ con eq_0026 kind=ordering domain=- indicator=- :: Peak and off-peak headways are not selected simultaneously when N_Off != 2*N_Peak
+%@ index u shape=- domain=- role=- drole=- lo=- hi=- :: Time index
+%@ param a shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Nmin-1]
+%@ param b shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Nmax-1]
+%@ param c shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Npeak-1]
+%@ index Tmin shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Nmin-1 in T
+%@ index Tmax shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Nmax-1 in T
+%@ index Tpeak shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Npeak-1 in T
+%@ index Tpo shape=- domain=- role=index drole=- lo=- hi=- :: t in T with t+Npeak and t+Noff in T

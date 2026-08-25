@@ -1,0 +1,88 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2020.106374
+%@ meta id=10.1016_j.cie.2020.106374 family=milp schema=0.1.0
+%@ name :: Integrated timetable synchronization optimization with capacity constraint under time-dependent demand for a rail transit network
+%@ desc :: Mined from Integrated timetable synchronization optimization with capacity constraint under time-dependent demand for a rail transit network (Computers & Industrial Engineering, 2020).
+%@ prov source :: 10.1016/j.cie.2020.106374
+%@ prov reference :: Integrated timetable synchronization optimization with capacity constraint under time-dependent demand for a rail transit network
+%@ prov author :: Yizhen Wang; Dewei Li; Zhichao Cao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize passenger total waiting time and penalty for failed transfers
+%@ index T ordered=0 cyclic=0 :: Time horizon index
+%@ param Objective shape=- kind=scalar domain=- :: Objective function value
+%@ param function shape=- kind=scalar domain=- :: Objective function consisting of waiting and penalty terms
+%@ index t ordered=0 cyclic=0 :: Time interval index
+%@ index L ordered=0 cyclic=0 :: Line index
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at original station
+%@ var d shape=- domain=integer role=primary drole=- lo=- hi=- :: Departure time of train i at station m on line l
+%@ param p shape=- kind=scalar domain=- :: Passenger demand rate between origin and destination
+%@ index N ordered=0 cyclic=0 :: Number of trains on a line
+%@ index S ordered=0 cyclic=0 :: Number of stations on a line
+%@ index r ordered=0 cyclic=0 :: Running time index
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Penalty value for failed transfer
+%@ var Y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating successful transfer
+%@ param alpha shape=- kind=scalar domain=- :: Penalty factor for failed transfer
+%@ var a shape=- domain=integer role=primary drole=- lo=- hi=- :: Arrival time of train i at station m on line l
+%@ index m ordered=0 cyclic=0 :: Station index
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time at station
+%@ param h shape=- kind=scalar domain=- :: Headway bounds
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger can board train i at time t
+%@ param M shape=- kind=scalar domain=- :: Large constant for linearization
+%@ var X shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train i' is the first connection after train i
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ var Nu shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train i after station m
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting time at original station
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passenger transfer waiting time
+%@ con eq_0004 kind=linear domain=- indicator=- :: Penalty for failed transfers
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure minus arrival equals dwell time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival at next station equals departure plus running time
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint
+%@ con eq_0008 kind=headway domain=- indicator=- :: Departure headway constraint
+%@ con eq_0009 kind=ordering domain=- indicator=- :: Non-increasing boarding indicator z
+%@ con eq_0010 kind=linear domain=- indicator=- :: Relationship between departure time and boarding indicator
+%@ con eq_0011 kind=linear domain=- indicator=- :: Relationship between boarding variable and z difference
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger train choice sum to one
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Transfer connection timing lower bound
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Transfer connection timing upper bound
+%@ con eq_0015 kind=linear domain=- indicator=- :: Successful transfer indicator from X difference
+%@ con eq_0018 kind=linear domain=- indicator=- :: Transfer waiting time lower bound linearization
+%@ con eq_0019 kind=linear domain=- indicator=- :: Transfer waiting time upper bound linearization
+%@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegative transfer waiting time
+%@ con eq_0021 kind=capacity domain=- indicator=- :: Train capacity constraint
+%@ con eq_0022 kind=flow_balance domain=- indicator=- :: Passenger load before transfer station
+%@ con eq_0023 kind=flow_balance domain=- indicator=- :: Passenger load after transfer station
+%@ con eq_0024 kind=linear domain=- indicator=- :: Linearized load constraint for after transfer
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Linearization product variable upper bound by L
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Linearization product variable upper bound by Y
+%@ con eq_0025_c kind=linear domain=- indicator=- :: Linearization product variable lower bound
+%@ con eq_0026 kind=linear domain=- indicator=- :: Study horizon bounds for departure time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Study horizon bounds for arrival time
+\begin{align}
+  \text{Objective\quad & \cdot function} : min T = min \left(T_{1} + T_{2} + T_{3}\right) \tag{eq\_0001} \\
+  & T_{1} = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{S_{l} - 1} \sum_{m^{'} = 1}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{t = 1}^{T} T \cdot W_{l , m , i}^{l^{'} , m^{'}} \left(t\right) = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{S_{l} - 1} \sum_{m^{'} = 1}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{t = 1}^{T} L_{l , m , i}^{l^{'} , m^{'}} \left(t\right) \star p_{l , m}^{l^{'} , m^{'}} \left(t\right) \star \left(d_{l , i}^{m} - t\right) \tag{eq\_0002} \\
+  & T_{2} = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{t r_{l l^{'}} - 1} \sum_{m^{'} = t r_{l l^{'}}}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{i^{'} = 1}^{N_{l^{'}}} \sum_{t = 1}^{T} T \cdot T_{l , m , i}^{l^{'} , m^{'} , i^{'}} \left(t\right) = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{t r_{l l^{'}} - 1} \sum_{m^{'} = t r_{l l^{'}}}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{i^{'} = 1}^{N_{l^{'}}} \sum_{t = 1}^{T} p_{l , m}^{l^{'} , m^{'}} \left(t\right) \cdot t \cdot t_{l , m , i}^{l^{'} , m^{'} , i^{'}} \left(t\right) \tag{eq\_0003} \\
+  & T_{3} = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{t r_{l l^{'}} - 1} \sum_{m^{'} = t r_{l l^{'}}}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{i^{'} = 1}^{N_{l^{'}}} \sum_{t = 1}^{T} T \cdot P_{l , m , i}^{l^{'} , m^{'}} \left(t\right) = \sum_{l = 1}^{L} \sum_{l^{'} = 1}^{L} \sum_{m = 1}^{t r_{l l^{'}} - 1} \sum_{m^{'} = t r_{l l^{'}}}^{S_{l^{'}}} \sum_{i = 1}^{N_{l}} \sum_{t = 1}^{T} L_{l , m , i}^{l^{'} , m^{'}} \left(t\right) \star p_{l , m}^{l^{'} , m^{'}} \left(t\right) \star (\text{1 }- \sum_{i^{'} = 1}^{N_{l^{'}}} Y_{l , i}^{l^{'} , i^{'}} \left.\right) \cdot \mathit{alpha} \tag{eq\_0004} \\
+  & d_{l , i}^{m} - a_{l , i}^{m} = w_{l , i}^{m} \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 2 . . . S_{l} - 1\right) \tag{eq\_0005} \\
+  & a_{l , i}^{m + 1} - d_{l , i}^{m} = r_{l , i}^{m} \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 1 . . . S_{l} - 1\right) \tag{eq\_0006} \\
+  & h \cdot a_{min}^{l , m} \leq a_{l , i + 1}^{m} - a_{l , i}^{m} \leq h \cdot a_{max}^{l , m} \left(l = 1 . . . L , i = 1 . . . N_{l} - 1 , m = 2 . . . S_{l}\right) \tag{eq\_0007} \\
+  & h \cdot d_{min}^{l , m} \leq d_{l , i + 1}^{m} - d_{l , i}^{m} \leq h \cdot d_{max}^{l , m} \left(l = 1 . . . L , i = 1 . . . N_{l} - 1 , m = 1 . . . S_{l} - 1\right) \tag{eq\_0008} \\
+  & z_{l , i}^{m} \left(t - 1\right) \geq z_{l , i}^{m} \left(t\right) \left(l = 1 . . . L , t = 1 . . . T - 1 , i = 1 . . . N_{l} , m = 1 . . . S_{l} - 1\right) \tag{eq\_0009} \\
+  & d_{l , i}^{m} = \sum_{t = 1}^{T - 1} t \cdot \left(z_{l , i}^{m} \left(t\right) - z_{l , i}^{m} \left(t + 1\right)\right) \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 1 . . . S_{l} - 1\right) \tag{eq\_0010} \\
+  & L_{l , m , i}^{l^{'} , m^{'}} \left(t\right) = z_{l , i}^{m} \left(t\right) - z_{l , i - 1}^{m} \left(t\right) \left(l , l^{'} = 1 . . . L , m = 1 . . . S_{l} - 1 , m^{'} = 1 . . . S_{l^{'}} , i = 1 . . . N_{l} , t = 1 . . . T\right) \tag{eq\_0011} \\
+  & \sum_{i = 1}^{N_{l}} L_{l , m , i}^{l^{'} , m^{'}} \left(t\right) = 1 \left(l , l^{'} = 1 . . . L , m = 1 . . . S_{l} - 1 , m^{'} = 1 . . . S_{l^{'}} , t = 1 . . . T\right) \tag{eq\_0012} \\
+  & d_{l^{'} , i^{'}}^{\mathit{tr}} - a_{l , i}^{\mathit{tr}} - t_{\mathit{walking}} \geq M \cdot \left(X_{l , i}^{l^{'} , i^{'}} - 1\right) \left(l , l^{'} = 1 . . . L , i = 1 . . . N_{l} , i^{'} = 1 . . . N_{l^{'}} , t \cdot r_{l l^{'}} = 1 . . . T \cdot r_{l l^{'}}\right) \tag{eq\_0013} \\
+  & d_{l^{'} , i^{'}}^{\mathit{tr}} - a_{l , i}^{\mathit{tr}} - t_{\mathit{walking}} < M \cdot X_{l , i}^{l^{'} , i^{'}} \left(l , l^{'} = 1 . . . L , i = 1 . . . N_{l} , i^{'} = 1 . . . N_{l^{'}} , t \cdot r_{l l^{'}} = 1 . . . T \cdot r_{l l^{'}}\right) \tag{eq\_0014} \\
+  & Y_{l , i}^{l^{'} , i^{'}} = X_{l , i}^{l^{'} , i^{'}} - X_{l , i}^{l^{'} , i^{'} - 1} \left(l , l^{'} = 1 . . . L , i = 1 . . . N_{l} , i^{'} = 1 . . . N_{l^{'}}\right) \tag{eq\_0015} \\
+  & t \cdot t_{l , m , i}^{l^{'} , m^{'} , i^{'}} \left(t\right) \geq \left(d_{l^{'} , i^{'}}^{t r_{l l^{'}}} - a_{l , i}^{t r_{l l^{'}}} - t_{\mathit{walking}}\right) - M \cdot \left(1 - L_{l , m , i}^{l^{'} , m^{'}} \left(t\right)\right) - M \cdot \left(1 - Y_{l , i}^{l^{'} , i^{'}}\right) \tag{eq\_0018} \\
+  & t \cdot t_{l , m , i}^{l^{'} , m^{'} , i^{'}} \left(t\right) \leq \left(d_{l^{'} , i^{'}}^{t r_{l l^{'}}} - a_{l , i}^{t r_{l l^{'}}} - t_{\mathit{walking}}\right) + M \cdot \left(1 - L_{l , m , i}^{l^{'} , m^{'}} \left(t\right)\right) + M \cdot \left(1 - Y_{l , i}^{l^{'} , i^{'}}\right) \tag{eq\_0019} \\
+  & t \cdot t_{l , m , i}^{l^{'} , m^{'} , i^{'}} \left(t\right) \geq 0 \tag{eq\_0020} \\
+  & \mathit{Nu} \cdot m_{l , i}^{m} \leq C_{l , i} \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 1 . . . S_{l} - 1\right) \tag{eq\_0021} \\
+  & \mathit{Nu} \cdot m_{l , i}^{m} = \sum_{l^{'} = 1}^{L} \sum_{n = 1}^{m} \sum_{n^{'} = m + 1}^{S_{l}} \sum_{m^{'} = t r_{l l^{'} + 1}}^{S_{l^{'}}} \sum_{t = 1}^{T} p_{l , n}^{l , n^{'}} \left(t\right) \cdot L_{l , n , i}^{l , n^{'}} \left(t\right) + p_{l , n}^{l^{'} , m^{'}} \left(t\right) \cdot L_{l , n , i}^{l^{'} , m^{'}} \left(t\right) \left(m < t \cdot r_{l l^{'}}\right) \tag{eq\_0022} \\
+  & \mathit{Nu} \cdot m_{l , i}^{m} = \sum_{l^{'} = 1}^{L} \sum_{n = 1}^{m} \sum_{n^{'} = m + 1}^{S_{l}} \sum_{m^{'} = 1}^{t r_{l l^{'}}} \sum_{t = 1}^{T} \sum_{i^{'} = 1}^{N_{l^{'}}} p_{l , n}^{l , n^{'}} \left(t\right) \cdot L_{l , n , i}^{l , n^{'}} \left(t\right) + p_{l^{'} , m^{'}}^{l , n^{'}} \left(t\right) \cdot L_{l^{'} , m^{'} , i^{'}}^{l , n^{'}} \left(t\right) \cdot Y_{l^{'} , i^{'}}^{l , i} \left(m \geq t \cdot r_{l l^{'}}\right) \tag{eq\_0023} \\
+  & \mathit{Nu} \cdot m_{l , i}^{m} = \sum_{l^{'} = 1}^{L} \sum_{n = 1}^{m} \sum_{n^{'} = m + 1}^{S_{l}} \sum_{m^{'} = 1}^{t r_{l l^{'}}} \sum_{t = 1}^{T} \sum_{i^{'} = 1}^{N_{l^{'}}} p_{l , n}^{l , n^{'}} \left(t\right) \cdot L_{l , n , i}^{l , n^{'}} \left(t\right) + p_{l^{'} , m^{'}}^{l , n^{'}} \left(t\right) \cdot L \cdot Y_{l^{'} , m^{'} , i^{'}}^{l , n^{'} , i} \left(t\right) \tag{eq\_0024} \\
+  & L \cdot Y_{l^{'} , m^{'} , i^{'}}^{l , n^{'} , i} \left(t\right) \leq L_{l^{'} , m^{'} , i^{'}}^{l , n^{'}} \left(t\right) \tag{eq\_0025\_a} \\
+  & L \cdot Y_{l^{'} , m^{'} , i^{'}}^{l , n^{'} , i} \left(t\right) \leq Y_{l^{'} , i^{'}}^{l , i} \tag{eq\_0025\_b} \\
+  & L \cdot Y_{l^{'} , m^{'} , i^{'}}^{l , n^{'} , i} \left(t\right) \geq L_{l^{'} , m^{'} , i^{'}}^{l , n^{'}} \left(t\right) + Y_{l^{'} , i^{'}}^{l , i} - 1 \tag{eq\_0025\_c} \\
+  & 1 \leq d_{l , i}^{m} \leq T \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 1 . . . S_{l} - 1\right) \tag{eq\_0026} \\
+  & 1 \leq a_{l , i}^{m} \leq T \left(l = 1 . . . L , i = 1 . . . N_{l} , m = 2 . . . S_{l}\right) \tag{eq\_0027} \\
+\end{align}

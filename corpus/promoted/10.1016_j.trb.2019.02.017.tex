@@ -1,0 +1,101 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.02.017
+%@ meta id=10.1016_j.trb.2019.02.017 family=milp schema=0.1.0
+%@ name :: An integrated train service plan optimization model with variable demand: A team-based scheduling approach with dual cost information in a layered network
+%@ desc :: Mined from An integrated train service plan optimization model with variable demand: A team-based scheduling approach with dual cost information in a layered network (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.02.017
+%@ prov reference :: An integrated train service plan optimization model with variable demand: A team-based scheduling approach with dual cost information in a layered network
+%@ prov author :: Lingyun Meng; Xuesong Zhou
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total transporting profit (total revenue minus total travel cost).
+%@ var I shape=- domain=integer role=primary drole=- lo=- hi=- :: Service interval time between stations m and m' at time t.
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constant (big-M) used in linking and linearization constraints.
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of the optimization model (total transporting profit).
+%@ index F ordered=0 cyclic=0 :: Set of all trains.
+%@ var a shape=- domain=integer role=primary drole=- lo=- hi=- :: Arrival time of train f at cell (i,j) at time t.
+%@ var r shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f stops at station m for OD pair (m,m').
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f selects stopping pattern s.
+%@ index S ordered=0 cyclic=0 :: Set of stopping patterns for train f.
+%@ var u shape=- domain=binary role=primary drole=- lo=- hi=- :: Actual usage of cell (i,j) by train f at time t.
+%@ index p ordered=0 cyclic=0 :: Passenger OD pair index.
+%@ param q shape=- kind=scalar domain=continuous :: Demand function for OD pair p as a function of service interval time.
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the state-space-time network for train f.
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f uses arc (i,j,t,t',w,w') in the state-space-time network.
+%@ index P ordered=0 cyclic=0 :: Set of all passenger OD pairs.
+%@ param c shape=- kind=scalar domain=continuous :: Cost of train f using arc (i,j,t,t',w,w').
+%@ var L shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian subproblem objective for team g.
+%@ con eq_0001 kind=big_m domain=- indicator=- :: Service interval time upper bound with big-M linking train stopping indicators.
+%@ con eq_0002 kind=big_m domain=- indicator=- :: Service interval time lower bound with big-M linking train stopping indicators.
+%@ con eq_0003 kind=big_m domain=- indicator=- :: Reset service interval time to 1 when a train stops (upper bound).
+%@ con eq_0004 kind=big_m domain=- indicator=- :: Reset service interval time to 1 when a train stops (lower bound).
+%@ con eq_0005 kind=big_m domain=- indicator=- :: Link stopping time indicator z to arrival time difference and stopping decision r (upper bound).
+%@ con eq_0006 kind=big_m domain=- indicator=- :: Link stopping time indicator z to arrival time difference and stopping decision r (lower bound).
+%@ con eq_0007 kind=linear domain=- indicator=- :: Compute stopping decision r f,m,m' from selected stopping pattern x f,s and compatibility matrix Θ.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Stopping time indicator z f,m,m',t is bounded by stopping decision r f,m,m'.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Each train f selects exactly one stopping pattern.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Compute actual cell usage u f,i,j,t from shifted arrival and departure times (blocking time).
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Passenger carrying capacity of train f: sum of demand volumes does not exceed capacity ζ_f.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger OD pair p can be assigned to train f only if train f stops at both origin and destination.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Passenger OD pair p can be assigned to train f only if departure/arrival time windows overlap.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Compatibility between two passenger OD pairs p and p' for assignment to the same train.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Infer arrival time indicator a_f,i,j,t from selected arcs y in the state-space-time network.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Infer departure time indicator d_f,i,j,t from selected arcs y in the state-space-time network.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Objective function definition: z equals total transport revenue minus total travel cost.
+%@ con eq_0018 kind=flow_balance domain=- indicator=- :: Flow balance at train f's origin vertex (one outgoing arc).
+%@ con eq_0019 kind=flow_balance domain=- indicator=- :: Flow balance at train f's intermediate vertices.
+%@ con eq_0020 kind=flow_balance domain=- indicator=- :: Flow balance at train f's destination vertex (one incoming arc).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Passenger pick-up service uniqueness: each passenger p is picked up exactly once.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Passenger delivery service uniqueness: each passenger p is dropped off exactly once.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Mapping constraint linking passenger assignment variable δ_p,f to pick-up arc selection y.
+%@ con eq_0024 kind=big_m domain=- indicator=- :: Lower bound on passenger volume variable ∂_p using big-M and assigned volume Λ.
+%@ con eq_0025 kind=big_m domain=- indicator=- :: Upper bound on passenger volume variable ∂_p using big-M and assigned volume Λ.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Define passenger volume Λ_f,w',p as the demand q_p(I) for OD pair p at time t.
+%@ con eq_0027 kind=capacity domain=- indicator=- :: Infrastructure cell capacity: total usage of cell (i,j) at time t does not exceed π_i,j,t.
+%@ con eq_0028 kind=ordering domain=- indicator=- :: Arrival time indicator a_f,i,j,t is nondecreasing over time.
+%@ con eq_0029 kind=ordering domain=- indicator=- :: Departure time indicator d_f,i,j,t is nondecreasing over time.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Lagrangian relaxed objective z' includes dualized passenger assignment and cell capacity constraints.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Team-based Lagrangian subproblem objective L_g for team g.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Additional consistency constraint in the integrated train service plan model.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Additional passenger demand assignment constraint in the integrated train service plan model.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Additional infrastructure capacity coordination constraint in the integrated train service plan model.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Additional train timing and ordering constraint in the integrated train service plan model.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Additional stopping pattern compatibility constraint in the integrated train service plan model.
+\begin{align}
+  & I_{m , m^{'} , t} \leq I_{m , m^{'} , t - 1} + 1 + \sum_{f \in F_{g}} z_{f}^{m , m^{'} , t} \cdot {M} , \forall t , m , m^{'} , g \tag{eq\_0001} \\
+  & \begin{matrix}I_{m , m^{'} , t} \geq I_{m , m^{'} , t - 1} + 1 - \sum_{f \in F_{g}} z_{f}^{m , m^{'} , t} \cdot {M} , \forall t , m , m^{'} , g\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}I_{m , m^{'} , t} \leq \left(1 - \sum_{f \in F_{g}} z_{f}^{m , m^{'} , t}\right) {M} + 1 , \forall t , m , m^{'} , g\end{matrix} \tag{eq\_0003} \\
+  & I_{m , m^{'} , t} \geq \left(\sum_{f \in F_{g}} z_{f}^{m , m^{'} , t} - 1\right) {M} + 1 , \forall t , m , m^{'} , g \tag{eq\_0004} \\
+  & z_{f}^{m , m^{'} , t} \leq \sum_{t} \left(a_{f}^{i , j , t} - a_{f}^{i , j , t - 1}\right) + \left(1 - r_{f}^{m , m^{'}}\right) {M} , \forall f , m , m^{'} , t \tag{eq\_0005} \\
+  & z_{f}^{m , m^{'} , t} \geq \sum_{t} \left(a_{f}^{i , j , t} - a_{f}^{i , j , t - 1}\right) + \left(r_{f}^{m , m^{'}} - 1\right) {M} , \forall f , m , m^{'} , t \tag{eq\_0006} \\
+  & r_{f}^{m , m^{'}} = \sum_{s \in S_{f}} x_{f}^{s} \cdot \mathit{Theta} _{m , s}^{'} \cdot \mathit{Theta} _{m^{'} , s}^{'} , \forall f , m , m^{'} \tag{eq\_0007} \\
+  & z_{f}^{m , m^{'} , t} \leq r_{f}^{m , m^{'}} , \forall f , m , m^{'} , t \tag{eq\_0008} \\
+  & \sum_{s \in S_{f}} x_{f}^{s} = 1 , \forall f \tag{eq\_0009} \\
+  & u_{f}^{i , j , t} = a_{f}^{i , j , t + h_{f}^{i , j}} - d_{f}^{i , j , t - h^{'} _{f}^{i , j}} \tag{eq\_0010} \\
+  & \underset{p : f \in F_{g_{p}}}{\sum} \mathit{omega}_{p} \cdot q_{p} \left(I_{o s_{p} , d s_{p} , t}\right) \leq \mathit{zeta}_{f} , \forall t \tag{eq\_0011} \\
+  & \mathit{omega}_{p} \leq r_{f}^{o s_{p} , d s_{p}} , \forall p , f \in F_{g_{p}} \tag{eq\_0012} \\
+  & \mathit{omega}_{p} \leq \mathit{Theta}^{'} _{p , f}^{'} , \forall p , f \in F_{g_{p}} \tag{eq\_0013} \\
+  & \mathit{omega}_{p} + \mathit{omega}_{p^{'}} \leq \mathit{Theta}_{p , p^{'}} + 1 , \forall p , p^{'} , f \in F_{g_{p}} , f \in F_{g_{p^{'}}} \tag{eq\_0014} \\
+  & a_{f}^{i , j , t} = a_{f}^{i , j , t - 1} + \sum_{t^{'} , w , w^{'}} y_{f}^{i , j , t , t^{'} , w , w^{'}} , \forall f , t , \left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f} \tag{eq\_0015} \\
+  & d_{f}^{i , j , t} = d_{f}^{i , j , t - 1} + \sum_{t^{'} , w , w^{'}} y_{f}^{i , j , t , t^{'} , w , w^{'}} , \forall f , t , \left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f} \tag{eq\_0016} \\
+  & (\text{P2}) \text{max} \text{z} = \sum_{g} \sum_{f \in F_{g}} \sum_{p} \sum_{\hat{p} \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{\hat{p} , f} - \sum_{g} \sum_{f \in F_{g}} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} c_{f}^{i , j , t , t^{'} , w , w^{'}} \cdot y_{f}^{i , j , t , t^{'} , w , w^{'}} \tag{eq\_0017} \\
+  & \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} = 1 , \forall f , i = o n _{f}^{'} , t = \mathit{tau} _{b , f}^{'} , w = w^{'} = w_{0} \tag{eq\_0018} \\
+  & \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} = \sum_{\left(j , k , t^{'} , t ^{''} , w^{'} , w ^{''}\right) \in A_{f}} y_{f}^{j , k , t^{'} , t ^{''} , w^{'} , w ^{''}} , \forall f , \left(j , t^{'} , w^{'}\right) \notin \left\{\left(o n _{f}^{'} , \mathit{tau} _{b , f}^{'} , w_{0}\right) , \left(d n _{f}^{'} , \mathit{sigma} _{l , f}^{'} , w_{0}\right)\right\} \tag{eq\_0019} \\
+  & \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} = 1 , \forall f , j = d n _{f}^{'} , t = \mathit{sigma} _{l , f}^{'} , w = w^{'} = w_{0} \tag{eq\_0020} \\
+  & \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{Psi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} = 1 , \forall p \tag{eq\_0021} \\
+  & \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{Phi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} = 1 , \forall p \tag{eq\_0022} \\
+  & \mathit{delta}_{p , f} = \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{Psi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} , \forall p , f \in F_{g_{p}} \tag{eq\_0023} \\
+  & \partial_{p} \geq \left(\underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{Psi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} - 1\right) \cdot {M} + \mathit{Lambda}_{f}^{w^{'} , p} , \forall p \tag{eq\_0024} \\
+  & \partial_{p} \leq \left(1 - \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{Psi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}}\right) \cdot {M} + \mathit{Lambda}_{f}^{w^{'} , p} , \forall p \tag{eq\_0025} \\
+  & \mathit{Lambda}_{f}^{w^{'} , p} = q_{p} \left(I_{o s_{p} , d s_{p} , t}\right) , \forall p , f , w^{'} , t \tag{eq\_0026} \\
+  & \sum_{f \in F} u_{f}^{i , j , t} \leq \mathit{pi}_{i , j , t} , \forall i , j , t \tag{eq\_0027} \\
+  & a_{f}^{i , j , t - 1} \leq a_{f}^{i , j , t} , \forall f , i , j , t \tag{eq\_0028} \\
+  & d_{f}^{i , j , t - 1} \leq d_{f}^{i , j , t} , \forall f , i , j , t \tag{eq\_0029} \\
+  & \begin{aligned}(\text{P3}) \text{max} \text{z} & = & \sum_{g} \sum_{f \in F_{g}} \sum_{p} \sum_{\hat{p} \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{\hat{p} , f} - \sum_{g} \sum_{f \in F_{g}} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} c_{f}^{i , j , t , t^{'} , w , w^{'}} \cdot y_{f}^{i , j , t , t^{'} , w , w^{'}} \\ & & + \sum_{p} \mathit{alpha}_{p} \cdot \left(\underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{psi}_{p , f}} y_{f}^{i , j , t , t^{'} , w , w^{'}} - 1\right) + \sum_{i , j , t} \mathit{beta}_{i , j , t} \cdot \left(\sum_{f \in F} u_{f}^{i , j , t} - \mathit{pi}_{i , j , t}\right)\end{aligned} \tag{eq\_0030} \\
+  & \begin{aligned}L_{g} & = & \sum_{f \in F_{g}} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in A_{f}} c_{f}^{i , j , t , t^{'} , w , w^{'}} \cdot y_{f}^{i , j , t , t^{'} , w , w^{'}} - \sum_{f \in F_{g}} \sum_{p} \sum_{\hat{p} \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{\hat{p} , f} \\ & & - \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , t^{'} , w , w^{'}\right) \in \mathit{psi}_{p , f}} \mathit{alpha}_{p} \cdot y_{f}^{i , j , t , t^{'} , w , w^{'}} - \sum_{f \in F_{g}} \sum_{i , j , t} \mathit{beta}_{i , j , t} \cdot u_{f}^{i , j , t}\end{aligned} \tag{eq\_0032} \\
+  \max\quad & \sum_{g} \sum_{f \in F_{g}} \sum_{\hat{p}} \mathit{delta} _{\hat{p} , f}^{'} \cdot \mathit{theta}_{\hat{p} , f} - \sum_{g} \sum_{f \in F_{g}} \sum_{\mathit{iota}} c_{f}^{\mathit{iota}} \cdot \mathit{nu}_{f}^{\mathit{iota}} \tag{eq\_0039} \\
+  & \sum_{\mathit{iota}} \mathit{nu}_{f}^{\mathit{iota}} = 1 , \forall f \tag{eq\_0040} \\
+  & r_{\hat{p} , f , f^{'} , \mathit{iota} , \mathit{iota}^{'}} \leq \sum_{f , f^{'}} \sum_{\mathit{iota} , \mathit{iota}^{'}} \mathit{nu}_{f}^{\mathit{iota}} \cdot \mathit{nu}_{f^{'}}^{\mathit{iota}^{'}} \cdot \mathit{sigma}_{\hat{p} , \mathit{iota}^{'}} , \forall \hat{p} \tag{eq\_0041} \\
+  & \mathit{delta} _{\hat{p} , f^{'}}^{'} = \sum_{f , \mathit{iota} , \mathit{iota}^{'}} \mathit{nu}_{f^{'}}^{\mathit{iota}^{'}} \cdot \mathit{sigma}_{\hat{p} , \mathit{iota}^{'}} \cdot r_{\hat{p} , f , f^{'} , \mathit{iota} , \mathit{iota}^{'}} , \forall \hat{p} , f^{'} \tag{eq\_0042} \\
+  & \sum_{\hat{p}} \mathit{delta} _{\hat{p} , f}^{'} \leq \mathit{zeta}_{f} , \forall f \tag{eq\_0043} \\
+  & \begin{matrix}\mathit{nu}_{f}^{\mathit{iota}} + \mathit{nu}_{f^{'}}^{\mathit{iota}^{'}} \leq 1 ,^{'} f , f^{'} , \left(\mathit{iota} , \mathit{iota}^{'}\right) \in \mathit{gamma}\end{matrix} \tag{eq\_0044} \\
+\end{align}

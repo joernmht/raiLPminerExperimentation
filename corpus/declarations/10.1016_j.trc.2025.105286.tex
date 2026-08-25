@@ -1,0 +1,261 @@
+% Declaration sidecar for 10.1016_j.trc.2025.105286
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2025.105286
+% Adaptive and flexible rail transit network service dispatching as a partially observable Markov decision process
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2025.105286.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize total discounted reward combining passenger waiting cost and operator cost
+
+% Ĉ: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Carrying capacity of each train unit
+
+% u: classified as variable during review
+%@ var u shape=n domain=integer role=primary drole=- lo=- hi=- :: Fleet size assigned to a service run
+
+% unusable as an identifier, rename or drop: Λ
+% unusable as an identifier, rename or drop: σ
+% h: classified as variable during review
+%@ var h shape=n domain=integer role=primary drole=- lo=- hi=- :: Dispatching headway between service runs
+
+% z: classified as parameter during review
+%@ param z shape=- kind=scalar domain=- :: Nominal running time between adjacent stations
+
+% unusable as an identifier, rename or drop: τ
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Nominal dwell time at a station
+
+% unusable as an identifier, rename or drop: σ̂
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Index for service runs
+
+% unusable as an identifier, rename or drop: π
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of service runs satisfying transfer conditions
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for station or service run
+
+% l: classified as variable during review
+%@ var l shape=- domain=continuous role=primary drole=- lo=- hi=- :: Number of remaining passengers at a station
+
+% unusable as an identifier, rename or drop: Ω
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: Δ
+% unusable as an identifier, rename or drop: λ̂
+% unusable as an identifier, rename or drop: ν
+% unusable as an identifier, rename or drop: ρ
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Passenger waiting time
+
+% unusable as an identifier, rename or drop: β
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations
+
+% unusable as an identifier, rename or drop: ζ
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Total number of departure times in a set
+
+% r: classified as variable during review
+%@ var r shape=n domain=continuous role=primary drole=- lo=- hi=- :: Reward signal
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Index for train service passing a station
+
+% v: classified as parameter during review
+%@ param v shape=- kind=scalar domain=- :: Speed between stations
+
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Traction force of a train service
+
+% O: classified as index during review
+%@ index O ordered=0 cyclic=0 :: Operating cost
+
+% unusable as an identifier, rename or drop: α
+% R: classified as variable during review
+%@ var R shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total discounted reward
+
+% lim: classified as parameter during review
+%@ param lim shape=- kind=scalar domain=- :: Limit operator
+
+% x: classified as variable during review
+%@ var x shape=n domain=continuous role=primary drole=- lo=- hi=- :: Decision variable (headway, route, fleet size)
+
+% unusable as an identifier, rename or drop: γ
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Replay buffer size
+
+% unusable as an identifier, rename or drop: Π
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Number of dispatching times on a route
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Index for service run offset
+
+% Ĝ: classified as parameter during review
+%@ param G_hat shape=- kind=scalar domain=- :: Number of driving modules
+
+% Û: classified as variable during review
+%@ var U_hat shape=- domain=continuous role=primary drole=- lo=- hi=- :: Number of available trailers at time t
+
+% E: classified as parameter during review
+%@ param E shape=- kind=scalar domain=- :: Expectation operator
+
+% V: classified as variable during review
+%@ var V shape=- domain=continuous role=primary drole=- lo=- hi=- :: State-value function
+
+% arg: classified as parameter during review
+%@ param arg shape=- kind=scalar domain=- :: Argument of the maximum
+
+% s: classified as variable during review
+%@ var s shape=n domain=continuous role=primary drole=- lo=- hi=- :: State of the system
+
+% Q: classified as variable during review
+%@ var Q shape=- domain=continuous role=primary drole=- lo=- hi=- :: Action-value function
+
+% unusable as an identifier, rename or drop: ω
+% o: classified as variable during review
+%@ var o shape=n domain=continuous role=primary drole=- lo=- hi=- :: Observation
+
+% G: classified as parameter during review
+%@ param G shape=- kind=scalar domain=- :: Gate in LSTM
+
+% Sigm: classified as parameter during review
+%@ param Sigm shape=- kind=scalar domain=- :: Sigmoid function
+
+% U: classified as parameter during review
+%@ param U shape=- kind=scalar domain=- :: Weight matrix in LSTM
+
+% forget: classified as parameter during review
+%@ param forget shape=- kind=scalar domain=- :: Forget gate
+
+% gate: classified as parameter during review
+%@ param gate shape=- kind=scalar domain=- :: Gate
+
+% input: classified as parameter during review
+%@ param input shape=- kind=scalar domain=- :: Input gate
+
+% output: classified as parameter during review
+%@ param output shape=- kind=scalar domain=- :: Output gate
+
+% Tanh: classified as parameter during review
+%@ param Tanh shape=- kind=scalar domain=- :: Hyperbolic tangent function
+
+% c: classified as variable during review
+%@ var c shape=n domain=continuous role=primary drole=- lo=- hi=- :: Memory vector in LSTM
+
+% memory: classified as parameter during review
+%@ param memory shape=- kind=scalar domain=- :: Memory vector
+
+% vector: classified as parameter during review
+%@ param vector shape=- kind=scalar domain=- :: Vector
+
+% constraints: classified as parameter during review
+%@ param constraints shape=- kind=scalar domain=- :: Constraints
+
+% meets: classified as parameter during review
+%@ param meets shape=- kind=scalar domain=- :: Meets constraints
+
+% unusable as an identifier, rename or drop: ε
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Training epoch
+
+% exp: classified as parameter during review
+%@ param exp shape=- kind=scalar domain=- :: Exponential function
+
+% Y: classified as variable during review
+%@ var Y shape=- domain=continuous role=primary drole=- lo=- hi=- :: Target value
+
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: θ
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Batch size
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar domain=- :: Length of transition sequences
+
+% unusable as an identifier, rename or drop: ξ
+% Bound by a quantifier or big operator, so no declaration of their own: Ô, b, d, i, j, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0004 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0006 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0008 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0010 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0012 kind=linear domain=- indicator=- :: Service run dynamics equation from the model
+%@ con eq_0014 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0016 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0018 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0020 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0022 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0024 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger flow equation from the model
+%@ con eq_0028 kind=linear domain=- indicator=- :: Passenger waiting cost equation from the model
+%@ con eq_0030 kind=linear domain=- indicator=- :: Passenger waiting cost equation from the model
+%@ con eq_0032 kind=linear domain=- indicator=- :: Passenger waiting cost equation from the model
+%@ con eq_0034 kind=linear domain=- indicator=- :: Reward equation from the model
+%@ con eq_0036 kind=linear domain=- indicator=- :: Operating cost equation from the model
+%@ con eq_0038 kind=linear domain=- indicator=- :: Operating cost equation from the model
+%@ con eq_0040 kind=linear domain=- indicator=- :: Operating cost equation from the model
+%@ con eq_0042 kind=linear domain=- indicator=- :: Reward equation from the model
+%@ con eq_0044 kind=linear domain=- indicator=- :: Reward equation from the model
+%@ con eq_0046 kind=linear domain=- indicator=- :: Objective equation from the model
+%@ con eq_0048 kind=linear domain=- indicator=- :: Operational constraint equation from the model
+%@ con eq_0049 kind=linear domain=- indicator=- :: Operational constraint equation from the model
+%@ con eq_0050 kind=linear domain=- indicator=- :: Operational constraint equation from the model
+%@ con eq_0052 kind=linear domain=- indicator=- :: Operational constraint equation from the model
+%@ con eq_0054 kind=linear domain=- indicator=- :: Feasibility condition from the model
+%@ con eq_0055 kind=linear domain=- indicator=- :: Feasibility condition from the model
+%@ con eq_0056 kind=linear domain=- indicator=- :: Feasibility condition from the model
+%@ con eq_0058 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0059 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0060 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0062 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0063 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0064 kind=linear domain=- indicator=- :: Rolling stock constraint equation from the model
+%@ con eq_0065 kind=linear domain=- indicator=- :: Fleet size constraint equation from the model
+%@ con eq_0067 kind=linear domain=- indicator=- :: Fleet size constraint equation from the model
+%@ con eq_0069 kind=linear domain=- indicator=- :: Safety constraint equation from the model
+%@ con eq_0071 kind=linear domain=- indicator=- :: Deep reinforcement learning equation from the model
+%@ con eq_0073 kind=linear domain=- indicator=- :: Deep reinforcement learning equation from the model
+%@ con eq_0075 kind=linear domain=- indicator=- :: Deep reinforcement learning equation from the model
+%@ con eq_0076 kind=linear domain=- indicator=- :: Deep reinforcement learning equation from the model
+%@ con eq_0078 kind=linear domain=- indicator=- :: Deep reinforcement learning equation from the model
+%@ con eq_0080 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0082 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0084 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0086 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0088 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0090 kind=linear domain=- indicator=- :: LSTM equation from the model
+%@ con eq_0091 kind=linear domain=- indicator=- :: Invalid action masking equation from the model
+%@ con eq_0092 kind=linear domain=- indicator=- :: Action selection equation from the model
+%@ con eq_0093 kind=linear domain=- indicator=- :: Exploration rate equation from the model
+%@ con eq_0095 kind=linear domain=- indicator=- :: Target value equation from the model
+%@ con eq_0097 kind=linear domain=- indicator=- :: Loss function equation from the model
+%@ con eq_0099 kind=linear domain=- indicator=- :: Target network update equation from the model
+%@ con eq_0101 kind=linear domain=- indicator=- :: Auxiliary equation from the model
+%@ con eq_0103 kind=linear domain=- indicator=- :: Auxiliary equation from the model
+%@ con eq_0105 kind=linear domain=- indicator=- :: Auxiliary equation from the model
+%@ con eq_0107 kind=linear domain=- indicator=- :: Auxiliary equation from the model
+%@ con eq_0109 kind=linear domain=- indicator=- :: Auxiliary equation from the model

@@ -1,0 +1,80 @@
+% Declaration sidecar for 10.1016_j.trb.2017.05.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.05.001
+% Two-phase decomposition method for the last train departure time choice in subway networks
+%
+%@ obj sense=min name=objective combination=sum :: Minimize total transfer connection time for last train passengers, weighted by passenger demand p_{ll'k}.
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Subway line index, l ∈ L.
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time argument in Arr/Dep functions; also subscript in last-train departure time t_l^R.
+
+% Arr: classified as parameter during review
+%@ param Arr shape=- kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of subway lines, L = {1,...,ϒ}.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of station positions on a line, S(l).
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Station index, k ∈ S(l) ∩ S(l').
+
+% t̂: classified as parameter during review
+%@ param t_hat shape=- kind=scalar :: Dwell time of the last train at station s on line l (constant t̂_s^l).
+
+% t̄: classified as parameter during review
+%@ param t_bar shape=- kind=scalar :: Running time of the last train between consecutive stations s-1 and s on line l (constant t̄_{s-1,s}^l).
+
+% Dep: classified as parameter during review
+%@ param Dep shape=- kind=scalar :: Departure time of the last train from station k on line l, Dep_k^l(t_l^R), Eq. (2).
+
+% Tra: classified as parameter during review
+%@ param Tra shape=- kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Passenger demand coefficient p_{ll'k} (number of transferring passengers).
+
+% w: classified as index during review
+%@ index w ordered=0 cyclic=0 :: Minimum connection time w_{ll'k} for last-train transfer passengers.
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar :: Headway of trains on line l' during last-train service period.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Big positive penalty for unsuccessful connection.
+
+% x: classified as variable during review
+%@ var x shape=l,l,k domain=binary role=primary :: Binary variable indicating whether passengers can successfully transfer from line l to line l' at station k (1 if yes, 0 otherwise).
+
+% y: classified as variable during review
+%@ var y shape=l,l,k domain=integer role=primary :: Non-negative integer variable for number of trains running to station k before the last train on the target line that the last train passengers can transfer.
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar :: Set of non-negative integers (Z+) used for y domain.
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Bounds T_l^min, T_l^max on last-train depot departure time.
+
+% Bound by a quantifier or big operator, so no declaration of their own: s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+%@ con eq_0001 kind=linear :: Definition of arrival time at station k on line l (Eq. 1).
+%@ con eq_0002 kind=linear :: Definition of departure time from station k on line l (Eq. 2).
+%@ con eq_0003 kind=linear :: Definition of maximum connection time between last trains of lines l and l' at transfer station k (Eq. 3).
+%@ con eq_0007 kind=big_m :: Linear expression of minimum connection time w using x and y with big-M penalty (Eq. 7).
+%@ con eq_0008 kind=big_m :: Logical link: x=1 iff maximum connection time >=0 (Eq. 8).
+%@ con eq_0009 kind=linear :: Linear reformulation of floor(t/H) using integer y (Eq. 9).
+%@ con eq_0010 kind=linear :: Binary domain of transfer-success variable x (Eq. 10).
+%@ con eq_0011 kind=linear :: Integer (non-negative) domain of train-count variable y (Eq. 11).
+%@ con eq_0012 kind=linear :: Bounds on last-train departure time at every station (Eq. 12).
+%@ con eq_0013 kind=linear :: Bounds on last-train arrival time at every station (Eq. 13).
+%@ con eq_0014 kind=linear :: Bounds on last-train depot departure time t_l^R (Eq. 14).
+%@ con eq_0015 kind=linear :: Bounds on maximum connection time derived from constraints (12)-(14) (Eq. 15).
+%@ con eq_0016 kind=linear :: Upper bound on maximum connection time by M0 (Eq. 16).

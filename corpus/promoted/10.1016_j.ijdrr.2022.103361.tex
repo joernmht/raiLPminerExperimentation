@@ -1,0 +1,65 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ijdrr.2022.103361
+%@ meta id=10.1016_j.ijdrr.2022.103361 family=milp schema=0.1.0
+%@ name :: Earthquake resilience assessment and improving method of high-speed railway based on train timetable rescheduling
+%@ desc :: Mined from Earthquake resilience assessment and improving method of high-speed railway based on train timetable rescheduling (International Journal of Disaster Risk Reduction, 2022).
+%@ prov source :: 10.1016/j.ijdrr.2022.103361
+%@ prov reference :: Earthquake resilience assessment and improving method of high-speed railway based on train timetable rescheduling
+%@ prov author :: Shuang Li; Yumeng Tang; Changhai Zhai
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total penalty for cancellations and deviations, minus excitation reward for special trains
+%@ var y shape=T domain=binary role=primary :: Binary variable indicating whether train t is canceled (1) or not (0)
+%@ param P shape=- kind=scalar :: Penalty cost for train cancellation or deviation
+%@ var d shape=E domain=non_negative role=primary :: Positive deviation from original timetable for event e
+%@ index E ordered=0 cyclic=0 :: Set of events in the event-activity network
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ param M shape=- kind=big_m :: Large positive constant (M1, M2) for linearization
+%@ index t ordered=0 cyclic=0 :: Train index
+%@ index time ordered=0 cyclic=0 :: Function returning original time of event
+%@ var x shape=E domain=non_negative role=primary :: Rescheduled time of event e
+%@ index D ordered=0 cyclic=0 :: Allowable maximum delay time
+%@ index H ordered=0 cyclic=0 :: Time when target station returns to service
+%@ index e ordered=0 cyclic=0 :: Event index
+%@ index f ordered=0 cyclic=0 :: Event index
+%@ index A ordered=0 cyclic=0 :: Set of activities in the event-activity network
+%@ param L shape=- kind=scalar :: Minimum duration or interval time
+%@ index a ordered=0 cyclic=0 :: Activity index
+%@ param ifeventeisarrangedbeforeeventf shape=- kind=scalar :: Indicator for event ordering (1 if e before f, 0 otherwise)
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param ifdepartureeventeisarrangedbeforearrivaleventfatthesamestations shape=- kind=scalar :: Indicator for departure-arrival ordering at same station
+%@ param C shape=S kind=vector :: Capacity of station s (number of tracks)
+%@ con eq_0006 kind=linear :: Events of a non-canceled train cannot be earlier than original timetable (Eq. 4)
+%@ con eq_0007 kind=linear :: Maximum deviation from original timetable is bounded by D unless train canceled (Eq. 5)
+%@ con eq_0008 kind=linear :: Binary cancellation decision for trains whose departure plus D is at or after recovery time (Eq. 6)
+%@ con eq_0009 kind=linear :: Mandatory cancellation when original departure plus D is before recovery time (Eq. 7)
+%@ con eq_0010 kind=linear :: Events can only happen after target station returns to service (Eq. 8)
+%@ con eq_0011 kind=linear :: Non-negativity of event times and deviation variables (Eq. 9)
+%@ con eq_0012 kind=linear :: Minimum running time in each section (Eq. 10)
+%@ con eq_0013 kind=linear :: Minimum dwell time at stations (Eq. 11)
+%@ con eq_0014 kind=linear :: Definition of event ordering variable lambda_a (Eq. 12)
+%@ con eq_0015 kind=linear :: One of two ordering directions must hold for every activity pair (Eq. 13)
+%@ con eq_0016 kind=linear :: Departure order equals arrival order, preventing overtaking on segments (Eq. 14)
+%@ con eq_0017 kind=linear :: Definition of station headway sequence variable phi_a (Eq. 15)
+%@ con eq_0018 kind=linear :: Minimum interval between an arriving and a departing train at the same station (Eq. 16)
+%@ con eq_0019 kind=linear :: Minimum departure interval between two trains at the same station (Eq. 17)
+%@ con eq_0020 kind=linear :: Minimum arrival interval between two trains at the same station (Eq. 18)
+%@ con eq_0021 kind=linear :: Station capacity: at least one free arrival-departure track must be available on entry (Eq. 19)
+\begin{align}
+  \min\quad & \begin{Bmatrix} \sum_{t_{o} \in T} y_{t_{o}} \cdot P_{o}^{c a n c e l} + \sum_{e_{o} \in E} d_{o}^{+} \cdot P_{o}^{+} + \sum_{e_{o} \in E} d_{o}^{-} \cdot P_{o}^{-} - \\ \left[\sum_{t_{w o u} \in T} \left(1 - y_{t_{w o u}}\right) \mathit{eta}_{w o u} + \sum_{t_{d o c} \in T} \left(1 - y_{t_{d o c}}\right) \mathit{eta}_{d o c} + \sum_{t_{s u p p} \in T} \left(1 - y_{s u p p}\right) \mathit{eta}_{s u p p}\right] \end{Bmatrix} \tag{eq\_0005} \\
+  & M_{1} \cdot y_{t_{o}} \leq x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right) \leq M_{1} \tag{eq\_0006} \\
+  & \left|x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right)\right| - M_{1} \cdot y_{t_{o}} \leq D \tag{eq\_0007} \\
+  & y_{t} \in \left\{0,1\right\} \forall t \in T , e \in \mathbf{E}_{s_{t_{o}}^{o}}^{d e p} : \mathit{time} \left(t_{e}^{o}\right) + D \geq H \tag{eq\_0008} \\
+  & y_{t_{o}} = 1 \forall e \in \mathbf{E}_{s_{t_{o}}^{o}}^{d e p} : \mathit{time} \left(t_{e}^{o}\right) + D < H \tag{eq\_0009} \\
+  & x_{e} + M_{1} \cdot y_{t} \geq H \forall t \in T , e \in \mathbf{E}_{s_{t_{o}}^{o}}^{d e p} \tag{eq\_0010} \\
+  & x_{e} , d_{o}^{+} , d_{o}^{-} \geq 0 \forall e \in E \tag{eq\_0011} \\
+  & x_{f} - x_{e} \geq L_{a}^{S e g} \forall a = \left(e , f\right) \in A_{t}^{s e g} , e \in E^{d e p} , f \in E^{a r r} \tag{eq\_0012} \\
+  & x_{f} - x_{e} \geq L_{a}^{D w e l l} \forall a = \left(e , f\right) \in A_{t}^{s} , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0013} \\
+  & \mathit{lambda}_{a} = \begin{cases} 1 \\ 0 \end{cases} \begin{matrix} \mathit{ifeventeisarrangedbeforeeventf} \\ o t h e r w i s e\end{matrix} \forall a = \left(e , f\right) \in A \tag{eq\_0014} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A \land a^{'} = \left(f , e\right) \in A \tag{eq\_0015} \\
+  & \begin{matrix}\mathit{lambda}_{a} = \mathit{lambda}_{a^{'}} \forall a = \left(e , f\right) \in A^{s} \land a^{'} = \left(e^{'} , f '\right) \in A^{s} \land e , f \in E_{s}^{d e p} \land e^{'} , f ' \in E_{s + 1}^{a r r} \land t_{e} = t_{e^{'}} \land t_{f} = t_{f^{'}} \\ \end{matrix} \tag{eq\_0016} \\
+  & \mathit{varphi}_{a} = \begin{cases} 1 \\ 0 \end{cases} \begin{matrix} \mathit{ifdepartureeventeisarrangedbeforearrivaleventfatthesamestations} \in S \\ o t h e r w i s e\end{matrix} \tag{eq\_0017} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{varphi}_{a}\right) \geq L^{i n t e r v a l} \forall a = \left(e , f\right) \in A , e \in E^{a r r} , f \in E^{d e p} \tag{eq\_0018} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{d e p \underline i n t e r v a l} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{d e p} \tag{eq\_0019} \\
+  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) \geq L_{s}^{a r r \underline i n t e r v a l} \forall a = \left(e , f\right) \in A \land e , f \in E_{s}^{a r r} \tag{eq\_0020} \\
+  & \sum_{a = \left(e_{1} , f\right) \in A^{s}} \mathit{lambda}_{a} - \sum_{a = \left(e_{2} , f\right) \in A^{s}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in S^{m} , f \in E_{s}^{a r r} , e_{1} \in E_{s}^{a r r} , e_{2} \in E_{s}^{d e p} \tag{eq\_0021} \\
+\end{align}

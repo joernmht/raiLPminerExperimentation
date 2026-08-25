@@ -1,0 +1,114 @@
+% Declaration sidecar for 10.1016_j.tre.2020.101882
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2020.101882
+% Train schedule optimization based on schedule-based stochastic passenger assignment
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2020.101882.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total itinerary cost over all OD pairs and itineraries
+
+% t: classified as variable during review
+%@ var t shape=n,s domain=continuous role=primary :: Scheduled time of train at station (arrival/departure)
+
+% Δ: unusable as an identifier, renamed to Delta
+%@ var Delta shape=n,R domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
+
+% D: classified as parameter during review
+%@ param D shape=R kind=vector :: Demand for OD pair R
+
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary :: Objective function value (total itinerary cost)
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of itineraries for OD pair R
+
+% Prob: classified as parameter during review
+%@ param Prob shape=R,I kind=matrix :: Probability of choosing itinerary I for OD pair R
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of OD pairs
+
+% u: classified as variable during review
+%@ var u shape=R,I domain=continuous role=primary :: Itinerary cost for itinerary I of OD pair R
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant for big-M constraints
+
+% b: classified as variable during review
+%@ var b shape=n,n,s domain=binary role=primary :: Binary variable for train ordering or platform assignment
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar :: Minimum headway between trains
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Train index
+
+% s: added as station index for shapes n,s
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% stopping: classified as parameter during review
+%@ param stopping shape=n,s kind=matrix :: Indicator if train stops at station
+
+% train: classified as index during review
+%@ index train ordered=0 cyclic=0 :: Train index (same as n)
+
+% non: classified as parameter during review
+%@ param non shape=n,s kind=matrix :: Indicator for non-stopping train
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of platforms
+
+% x: classified as variable during review
+%@ var x shape=R,I domain=continuous role=primary :: Itinerary time components (wait, walk, etc.)
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, p, r, z
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0018 kind=linear :: Connects schedule differences with scheduled and ideal times for OD pair and train
+%@ con eq_0019 kind=linear :: Positive schedule difference must be non-negative
+%@ con eq_0020 kind=linear :: Negative schedule difference must be non-negative
+%@ con eq_0023 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0024 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0025 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0026 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0027 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0028 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0029 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0031 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0032 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0033 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0034 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0035 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0036 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0037 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0038 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0039 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0040 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0041 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0042 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_a kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_b kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_c kind=linear :: Train scheduling constraint (Appendix A.1)

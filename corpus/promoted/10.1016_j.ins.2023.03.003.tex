@@ -1,0 +1,113 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ins.2023.03.003
+%@ meta id=10.1016_j.ins.2023.03.003 family=milp schema=0.1.0
+%@ name :: A dynamic rescheduling and speed management approach for high-speed trains with uncertain time-delay
+%@ desc :: Mined from A dynamic rescheduling and speed management approach for high-speed trains with uncertain time-delay (Information Sciences, 2023).
+%@ prov source :: 10.1016/j.ins.2023.03.003
+%@ prov reference :: A dynamic rescheduling and speed management approach for high-speed trains with uncertain time-delay
+%@ prov author :: Sairong Peng; Xin Yang; Shuxin Ding; Jianjun Wu; Huijun Sun
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total train traveling time and speed grade changes
+%@ var a shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at block section k
+%@ index B ordered=0 cyclic=0 :: Set of block sections
+%@ param M shape=- kind=big_m domain=- :: Large positive constant used in big-M linearizations
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i has passed block section k by time t(delta)
+%@ param t shape=- kind=scalar domain=- :: Function giving the start time of time horizon delta
+%@ index E ordered=0 cyclic=0 :: Set of speed grades
+%@ index N ordered=0 cyclic=0 :: Set of stations
+%@ index n ordered=0 cyclic=0 :: Station index
+%@ param A shape=- kind=scalar domain=- :: Planned arrival time of train i at block section k from previous time horizon
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i occupies block section k at time t(delta)
+%@ param G shape=- kind=scalar domain=- :: Planned speed grade of train i at block section k from previous time horizon
+%@ var g shape=- domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
+%@ var D shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i stops at station n
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i uses track c at block section k
+%@ index Tr ordered=0 cyclic=0 :: Set of tracks at a station
+%@ param y shape=- kind=scalar domain=- :: Planned departure time of train i from station n
+%@ index fori ordered=0 cyclic=0 :: Loop index over trains
+%@ var x shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for temporary speed restriction constraints
+%@ param H shape=- kind=scalar domain=- :: Length of each rolling time horizon
+%@ param h shape=- kind=scalar domain=- :: Minimum headway times (departure, arrival, departure-arrival)
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (F1 total travel time, F2 speed grade changes)
+%@ param Q shape=- kind=scalar domain=- :: Weights for the two objective terms
+%@ param imize shape=- kind=scalar domain=- :: Parsed fragment of the keyword 'minimize' (not a real model parameter)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Lower bound on block-section running time depending on speed grade and pass status
+%@ con eq_0007 kind=linear domain=- indicator=- :: Upper bound on open-track running time for speed grades greater than grade 1
+%@ con eq_0008 kind=linear domain=- indicator=- :: Upper bound on open-track running time for speed grade 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Continuity of arrival times with the previous rolling time horizon
+%@ con eq_0011_a kind=linear domain=- indicator=- :: Lower bound on speed grade change from previous time horizon when train occupies section
+%@ con eq_0011_b kind=linear domain=- indicator=- :: Upper bound on speed grade change from previous time horizon when train occupies section
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower bound of dwelling time at a station for stopping trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Upper bound of platform-section running time for non-stopping trains
+%@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound of dwelling time at a station for stopping trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Forces track 0 to be used by trains passing through without dwelling
+%@ con eq_0016 kind=linear domain=- indicator=- :: Forces dwelling trains to use a track other than track 0
+%@ con eq_0018_a kind=linear domain=- indicator=- :: At least one station track must be selected for a train not yet passed
+%@ con eq_0018_b kind=linear domain=- indicator=- :: At most one station track is selected for a train not yet passed
+%@ con eq_0019 kind=linear domain=- indicator=- :: Planned stops in the timetable cannot be skipped
+%@ con eq_0020 kind=linear domain=- indicator=- :: Trains cannot depart from a station earlier than the planned departure time
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Speed grade forced to grade 1 in inbound/outbound sections when stopping (lower side)
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Speed grade forced to grade 1 in inbound/outbound sections when stopping (upper side)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Exactly one speed grade is selected for each train at each block section
+%@ con eq_0024 kind=linear domain=- indicator=- :: Integer speed grade defined as the weighted sum of binary speed-grade indicators
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Speed grade can change by at most one level between consecutive block sections
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Speed grade change between consecutive block sections bounded above by one
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Lower bound on speed grade difference between consecutive sections with big-M
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Upper bound on speed grade difference between consecutive sections with big-M
+%@ con eq_0027 kind=linear domain=- indicator=- :: Defines x_{i,k,1} for a train arriving in a TSR section during the current horizon
+%@ con eq_0028 kind=linear domain=- indicator=- :: Defines x_{i,k,2} for a train traveling in a TSR section during the current horizon
+%@ con eq_0029 kind=linear domain=- indicator=- :: Limits speed grade in temporary-speed-restriction sections during the active horizon
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Minimum departure headway between consecutive train departures (alternative 1)
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Minimum departure headway between consecutive train departures (alternative 2)
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Minimum arrival headway between consecutive train arrivals (alternative 1)
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Minimum arrival headway between consecutive train arrivals (alternative 2)
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Minimum departure-arrival headway for trains using the same station track (alternative 1)
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Minimum departure-arrival headway for trains using the same station track (alternative 2)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Safety distance constraint keeping enough free block sections between consecutive trains
+%@ con eq_0036 kind=linear domain=- indicator=- :: Objective term F2: total number of speed grade changes
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearized constraints defining the speed-grade-change indicator μ
+%@ con eq_0039 kind=linear domain=- indicator=- :: Weighted-sum objective Q1*F1 + Q2*F2 to be minimized
+%@ con eq_0041_a kind=linear domain=- indicator=- :: Update planned arrival times from the current horizon solution for use in the next horizon
+%@ con eq_0041_b kind=linear domain=- indicator=- :: Update planned speed grades from the current horizon solution for use in the next horizon
+\begin{align}
+  & a_{i , k + 1} - a_{i , k} \geq \mathit{eta}_{s} + \sum_{\mathit{xi} = 1}^{E} \mathit{beta}_{i , k , \mathit{xi}} \mathit{Delta} t_{\mathit{xi}} - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{\mathit{set}} \tag{eq\_0006} \\
+  & a_{i , k + 1} - a_{i , k} \leq \mathit{eta}_{s} + \sum_{\mathit{xi} = 2}^{E} \mathit{beta}_{i , k , \mathit{xi}} \mathit{Delta} t_{\mathit{xi} - 1} + M \mathit{beta}_{i , k , 1} + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B_{< n , n + 1 >} , n \in N^{\mathit{set}} , n \neq N \tag{eq\_0007} \\
+  & a_{i , k + 1} - a_{i , k} \leq \mathit{eta}_{s} + 2 \cdot \mathit{Delta} t_{1} + M \left(1 - \mathit{beta}_{i , k , 1}\right) + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B_{< n , n + 1 >} , n \in N^{\mathit{set}} , n \neq N \tag{eq\_0008} \\
+  & a_{i , k + 1} \geq \sum_{k = 1}^{N - 1} p_{i , k , t \left(\mathit{delta}\right)} \cdot A_{i , k + 1 , t \left(\mathit{delta} - 1\right)} , k \in B^{\mathit{set}} , i \in T^{\mathit{set}} \tag{eq\_0009} \\
+  & g_{i , k + 1} - G_{i , k , t \left(\mathit{delta} - 1\right)} \geq - 1 - \left(1 - p_{i , k , t \left(\mathit{delta}\right)}\right) M , k \in B^{\mathit{set}} , i \in T^{\mathit{set}} \tag{eq\_0011\_a} \\
+  & g_{i , k + 1} - G_{i , k , t \left(\mathit{delta} - 1\right)} \leq 1 + \left(1 - p_{i , k , t \left(\mathit{delta}\right)}\right) M , k \in B^{\mathit{set}} , i \in T^{\mathit{set}} \tag{eq\_0011\_b} \\
+  & a_{i , k + 1} - a_{i , k} \geq D^{\mathit{min}} + \left(D_{i , n} - 1\right) M - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , k \in B^{n , p} , i \in T^{\mathit{set}} , n \in N^{\mathit{set}} \tag{eq\_0012} \\
+  & a_{i , k + 1} - a_{i , k} \leq D^{\mathit{min}} + D_{i , n} \cdot M + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , k \in B^{n , p} , i \in T^{\mathit{set}} , n \in N^{\mathit{set}} \tag{eq\_0013} \\
+  & a_{i , k + 1} - a_{i , k} \leq D^{\mathit{max}} + \left(1 - D_{i , n}\right) M + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{n , p} , n \in N^{\mathit{set}} \tag{eq\_0014} \\
+  & 0.5 - d_{i , k , 0} - M \cdot q_{i , k , t \left(\mathit{delta}\right)} \leq D_{i , n} \leq 1.5 - d_{i , k , 0} + M \cdot q_{i , k , t \left(\mathit{delta}\right)} , i \in T^{\mathit{set}} , k \in B^{n , p} , n \in N^{\mathit{set}} \tag{eq\_0015} \\
+  & - 0.5 + \left(1 - d_{i , k , c}\right) - M \cdot q_{i , k , t \left(\mathit{delta}\right)} \leq D_{i , n} \leq 0.5 + \left(1 - d_{i , k , c}\right) + M \cdot q_{i , k , t \left(\mathit{delta}\right)} , i \in T^{\mathit{set}} , k \in B^{n , p} , c = 0 , n \in N^{\mathit{set}} \tag{eq\_0016} \\
+  & \sum_{c \in \mathit{Tr}^{n , s e t}} \left(d_{i , k , c}\right) \geq 1 - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{n , p} , n \in N^{\mathit{set}} \tag{eq\_0018\_a} \\
+  & \sum_{c \in \mathit{Tr}^{n , s e t}} \left(d_{i , k , c}\right) \leq 1 + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{n , p} , n \in N^{\mathit{set}} \tag{eq\_0018\_b} \\
+  & D_{i , n} = 1 , i \in T^{\mathit{set}} , n \in N_{i , d} \tag{eq\_0019} \\
+  & a_{i , k + 1} \geq y_{i , n} - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{n , p} , n \in N_{i , d} \tag{eq\_0020} \\
+  & \mathit{beta}_{i , k , 1} \geq \left(1 - ( 1 - D\right)_{i , n} ) M - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , k \in \left\{B^{n , i n} \cup B^{n , o u t}\right\} , i \in T^{\mathit{set}} , n \in N^{\mathit{set}} \tag{eq\_0022\_a} \\
+  & \mathit{beta}_{i , k , 1} \leq \left(1 + ( 1 - D\right)_{i , n} ) M + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , k \in \left\{B^{n , i n} \cup B^{n , o u t}\right\} , i \in T^{\mathit{set}} , n \in N^{\mathit{set}} \tag{eq\_0022\_b} \\
+  & \sum_{\mathit{xi} = 1}^{E} \mathit{beta}_{i , k , \mathit{xi}} = 1 , i \in T^{\mathit{set}} , k \in B^{\mathit{set}} \tag{eq\_0023} \\
+  & g_{i , k} = \sum_{\mathit{xi} = 1}^{E} \mathit{beta}_{i , k , \mathit{xi}} \mathit{xi} , i \in T^{\mathit{set}} , k \in B^{\mathit{set}} \tag{eq\_0024} \\
+  & \left|g_{i , k + 1} - g_{i , k}\right| \leq 1 \tag{eq\_0025\_a} \\
+  & \mathit{fori} \in T^{\mathit{set}} , k \in B^{\mathit{set}} , k \neq B \tag{eq\_0025\_b} \\
+  & g_{i , k + 1} - g_{i , k} \geq - 1 - q_{i , k , t \left(\mathit{delta}\right)} \cdot M \tag{eq\_0026\_a} \\
+  & g_{i , k + 1} - g_{i , k} \leq 1 + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B^{\mathit{set}} , k \neq B \tag{eq\_0026\_b} \\
+  & \frac{a_{i , k} - t \left(\mathit{delta}\right)}{M} - q_{i , k , t \left(\mathit{delta}\right)} \cdot M \leq x_{i , k , 1} \leq \frac{a_{i , k} - t \left(\mathit{delta}\right)}{M} + 1 + q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B_{\mathit{TSR}} \tag{eq\_0027} \\
+  & \frac{t \left(\mathit{delta}\right) + H - a_{i , k}}{M} - q_{i , k , t \left(\mathit{delta}\right)} \cdot M \leq x_{i , k , 2} \leq \frac{t \left(\mathit{delta}\right) + H - a_{i , k}}{M} +\text{1}+ q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B_{\mathit{TSR}} \tag{eq\_0028} \\
+  & \sum_{\mathit{xi} = 1}^{E_{\mathit{delta}}} \mathit{beta}_{i , k , \mathit{xi}} \geq x_{i , k , 1} + x_{i , k , 2} - 1 - q_{i , k , t \left(\mathit{delta}\right)} \cdot M , i \in T^{\mathit{set}} , k \in B_{\mathit{TSR}} \tag{eq\_0029} \\
+  & a_{j , k} - a_{i , k} \geq h_{d} - M \left(1 - \mathit{lambda}_{i , j , n} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) , \forall i , j \in T^{\mathit{set}} , i \neq j , k \in B^{n , o u t} , n \in \left\{N_{i , d} \cup N_{j , d}\right\} \tag{eq\_0030\_a} \\
+  & a_{i , k} - a_{j , k} \geq h_{d} - M \left(\mathit{lambda}_{i , j , n} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) , \forall i , j \in T^{\mathit{set}} , i \neq j , k \in B^{n , o u t} , n \in \left\{N_{i , d} \cup N_{j , d}\right\} \tag{eq\_0030\_b} \\
+  & a_{j , k} - a_{i , k} \geq h_{a} - M \left(1 - \mathit{lambda}_{i , j , n - 1} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) \tag{eq\_0031\_a} \\
+  & a_{i , k} - a_{j , k} \geq h_{a} - M \left(\mathit{lambda}_{i , j , n - 1} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) , \forall i , j \in T^{\mathit{set}} , i \neq j , k \in B^{n , i n} , n \in \left\{N_{i , d} \cup N_{j , d}\right\} \tag{eq\_0031\_b} \\
+  & a_{j , k} - a_{i , k + 1} \geq h_{d a} - M \left(3 - d_{i , k , c} - d_{j , k , c} - \mathit{lambda}_{i , j , n - 1} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) \tag{eq\_0032\_a} \\
+  & a_{i , k + 1} - a_{j , k} \geq h_{d a} - M \left(2 - d_{i , k , c} - d_{j , k , c} + \mathit{lambda}_{i , j , n - 1} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) \tag{eq\_0032\_b} \\
+  & a_{j , k} - a_{i , v} \geq - \left(2 - \mathit{lambda}_{i , j , n} - \mathit{beta}_{j , k , \mathit{xi}} + q_{i , v , t \left(\mathit{delta}\right)} + q_{j , k , t \left(\mathit{delta}\right)}\right) M \tag{eq\_0034} \\
+  & a_{i , k} - a_{j , v} \geq - \left(1 + \mathit{lambda}_{i , j , n} - \mathit{beta}_{i , k , \mathit{xi}} + q_{i , k , t \left(\mathit{delta}\right)} + q_{j , v , t \left(\mathit{delta}\right)}\right) M \tag{eq\_0036} \\
+  & F_{1} = \sum_{i \in T} a_{i , B} \tag{eq\_0038} \\
+  & F_{2} = \sum_{k = 1}^{B - 1} \mathit{mu}_{i , k} \tag{eq\_0039} \\
+  & \mathit{mu}_{i , k} \geq g_{i , k + 1} - g_{i , k} - M \cdot q_{i , k , t \left(\mathit{delta}\right)} \tag{eq\_0041\_a} \\
+  & \mathit{mu}_{i , k} \geq g_{i , k} - g_{i , k + 1} - M \cdot q_{i , k , t \left(\mathit{delta}\right)} \tag{eq\_0041\_b} \\
+  \min\quad & \left(Q_{1} \cdot F_{1} + Q_{2} \cdot F_{2}\right) \tag{eq\_0042} \\
+\end{align}

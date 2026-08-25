@@ -1,0 +1,80 @@
+% Declaration sidecar for 10.1016_j.trb.2021.06.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2021.06.001
+% Train timetabling with stop-skipping, passenger flow, and platform choice considerations
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2021.06.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total train operating cost plus passenger travel, waiting, and walking costs and penalty for unsatisfied passengers
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Problem instance or model name
+
+% x: classified as variable during review
+%@ var x shape=K,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k traverses arc u->v
+
+% y: classified as variable during review
+%@ var y shape=R,A domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers in group r traversing arc u->v
+
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: ξ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the time-space network
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of passenger groups
+
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar domain=- :: Origin vertex (o-bar) in the time-space network
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Destination vertex (d-bar) in the time-space network
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of vertices in the time-space network
+
+% z: classified as parameter during review
+%@ param z shape=R kind=vector domain=- :: Number of passengers in group r (z_r)
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of headway/overtaking/platform constraints
+
+% unusable as an identifier, rename or drop: Γ
+% unusable as an identifier, rename or drop: μ
+% Bound by a quantifier or big operator, so no declaration of their own: k, r, u, v, w
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0009 kind=linear domain=- indicator=- :: Objective function of problem P (minimize total train operating cost plus passenger cost)
+%@ con eq_0011 kind=flow_balance domain=- indicator=- :: Train inflow at origin o-bar equals 1 for every train k
+%@ con eq_0012 kind=flow_balance domain=- indicator=- :: Train outflow at destination d-bar equals 1 for every train k
+%@ con eq_0013 kind=flow_balance domain=- indicator=- :: Train flow conservation at intermediate vertices v
+%@ con eq_0014 kind=flow_balance domain=- indicator=- :: Passenger inflow at origin o-bar equals demand z_r for every passenger group r
+%@ con eq_0015 kind=flow_balance domain=- indicator=- :: Passenger outflow at destination d-bar equals demand z_r for every passenger group r
+%@ con eq_0016 kind=flow_balance domain=- indicator=- :: Passenger flow conservation at intermediate vertices v
+%@ con eq_0017 kind=headway domain=- indicator=- :: Headway, overtaking, and platform choice constraints: at most one train uses each conflicting arc set C
+%@ con eq_0018 kind=capacity domain=- indicator=- :: Train capacity constraints on departure and travel arcs
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary integrality of train arc variables x^k_uv
+%@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegativity of passenger flow variables y^r_uv

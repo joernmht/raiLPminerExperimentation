@@ -1,0 +1,160 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2025.103233
+%@ meta id=10.1016_j.trb.2025.103233 family=milp schema=0.1.0
+%@ name :: A risk-averse two-stage stochastic programming approach for backup rolling stock allocation and metro train rescheduling under uncertain disturbances
+%@ desc :: Mined from A risk-averse two-stage stochastic programming approach for backup rolling stock allocation and metro train rescheduling under uncertain disturbances (Transportation Research Part B Methodological, 2025).
+%@ prov source :: 10.1016/j.trb.2025.103233
+%@ prov reference :: A risk-averse two-stage stochastic programming approach for backup rolling stock allocation and metro train rescheduling under uncertain disturbances
+%@ prov author :: Boyi Su; Andrea D’Ariano; Shuai Su; Zhikai Wang; Marta Leonina Tessitore; Tao Tang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize backup rolling stock allocation cost plus mean-CVaR of negative disturbance impact.
+%@ index B ordered=0 cyclic=0 :: Set of potential backup train units.
+%@ index z ordered=0 cyclic=0 :: Index for backup train units.
+%@ index I ordered=0 cyclic=0 :: Set of station nodes.
+%@ index K ordered=0 cyclic=0 :: Set of train services.
+%@ index k ordered=0 cyclic=0 :: Index for train services.
+%@ param e shape=I kind=vector :: Initial number of available storage lines at each station node.
+%@ param pt shape=I,I,F kind=matrix :: Passenger demand in segment (i,j) during time period f.
+%@ var y shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service k serves station node i.
+%@ var a shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train service k at station node i.
+%@ var d shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train service k from station node i.
+%@ param M shape=- kind=big_m :: Large positive constant used in big-M reformulations.
+%@ param q shape=- kind=scalar :: Bounds on dwell time at stations.
+%@ index V ordered=0 cyclic=0 :: Set of segments.
+%@ param g shape=I,I kind=matrix :: Lower and upper bounds on running time in segment (i,j).
+%@ var x shape=K,I,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service k operates segment (i,j).
+%@ param h shape=- kind=scalar :: Minimum headway time between train services.
+%@ param l shape=- kind=scalar :: Minimum time for a backup train to travel from depot to station.
+%@ param t shape=F kind=vector :: Time instants used for passenger demand evaluation.
+%@ param u shape=- kind=scalar :: Bounds on turnaround time for train units.
+%@ var s shape=I,I,F domain=continuous role=primary drole=- lo=- hi=- :: Passenger flow variable in segment (i,j) during time period f.
+%@ index F ordered=0 cyclic=0 :: Set of time periods.
+%@ var Q shape=- domain=continuous role=primary drole=- lo=- hi=- :: Negative disturbance impact for a given first-stage allocation and scenario.
+%@ param MCVaR shape=- kind=scalar :: Mean conditional value-at-risk of second-stage negative disturbance impact.
+%@ param c shape=B kind=vector :: Allocation cost of backup train unit b.
+%@ param L shape=- kind=scalar :: Lower bound of MCVaR used in integer optimality cuts.
+%@ index P ordered=0 cyclic=0 :: Set of allocated backup train units.
+%@ param C shape=- kind=scalar :: Passenger capacity of a train service.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Each backup train unit can be allocated to at most one depot.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Pre-disturbance rolling-stock connection fixed for planned services.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Pre-disturbance return-to-depot indicator fixed for planned services.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Planned service is performed by a connecting train, a backup train, or is canceled.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Emergency service is performed by at most one backup train.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Planned services cannot originate at infeasible station nodes.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Emergency services cannot originate at infeasible station nodes.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Rolling-stock flow conservation after completing a planned service.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Emergency service train returns to depot after completion.
+%@ con eq_0016 kind=linear domain=- indicator=- :: IF-THEN definition of precedence indicator at intermediate stations.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Definition of storage-line usage indicator.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Definition of station-service indicator y for planned services.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Definition of station-service indicator y for emergency services.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Definition of segment-operation indicator x.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Arrival times of unaffected planned services fixed to planned values.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Initial primary delay insertion for the disturbed service.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Arrival times cannot be earlier than planned times.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Minimum dwell time at served station nodes.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maximum running time in operated segments.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Minimum headway among emergency train services.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Headway between planned and emergency service when the emergency service precedes.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Arrival time of a backup train respects earliest dispatching time from depot.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Minimum turnaround time for connected train services.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Definition of departure-time indicator relative to time instants.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Definition of segment-entry indicator.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Passenger load equals the minimum of train capacity and accumulated demand.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Unsatisfied passenger demand update.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Service cancellation penalty based on skipped stations.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Unsatisfied passenger demand penalty.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Weighted-sum negative disturbance impact for a scenario.
+%@ con eq_0048 kind=linear domain=- indicator=- :: Master problem objective relaxation with auxiliary theta.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Valid inequality for arrival-time lower bound after turnaround.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Valid inequality for departure-time lower bound after turnaround.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Dominating valid inequality for arrival-time lower bound.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Dominating valid inequality for departure-time lower bound.
+%@ con eq_0064 kind=linear domain=- indicator=- :: Linearization of the precedence-indicator if-then condition.
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization of the precedence-indicator if-then condition complement.
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization of the storage-line usage product.
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization of the segment-operation product.
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization of the service-cancellation disjunction.
+%@ con eq_0076 kind=linear domain=- indicator=- :: Linearization of the segment-entry indicator product.
+%@ con eq_0078 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (capacity bound).
+%@ con eq_0079 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (demand bound).
+%@ con eq_0080 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (nonnegativity).
+%@ con eq_0082_a kind=linear domain=- indicator=- :: Linearization of unsatisfied passenger demand definition (a).
+%@ con eq_0082_b kind=linear domain=- indicator=- :: Linearization of unsatisfied passenger demand definition (b).
+%@ con eq_0084_a kind=linear domain=- indicator=- :: Linearization of cancellation penalty definition (a).
+%@ con eq_0084_b kind=linear domain=- indicator=- :: Linearization of cancellation penalty definition (b).
+%@ con eq_0085_a kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (a).
+%@ con eq_0085_b kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (b).
+%@ con eq_0085_c kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (c).
+%@ con eq_0087_a kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (a).
+%@ con eq_0087_b kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (b).
+%@ con eq_0087_c kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (c).
+%@ con eq_0088_a kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (d).
+%@ con eq_0088_b kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (e).
+%@ con eq_0090_a kind=linear domain=- indicator=- :: Integer optimality cut linearization (a).
+%@ con eq_0090_b kind=linear domain=- indicator=- :: Integer optimality cut linearization (b).
+%@ con eq_0090_c kind=linear domain=- indicator=- :: Integer optimality cut linearization (c).
+%@ con eq_0090_d kind=linear domain=- indicator=- :: Integer optimality cut linearization (d).
+\begin{align}
+  & \sum_{i \in \mathcal{I}_{d}} z_{b , i} \leq 1 , \forall b \in \mathcal{B} . \tag{eq\_0004} \\
+  & \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) = {\mathit{xi}}_{k , m , i} , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) \cap \mathcal{I}_{t} , \tag{eq\_0006} \\
+  & \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) = {\mathit{vartheta}}_{k , i} , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) \cap \mathcal{I}_{d} , \tag{eq\_0008} \\
+  & \mathit{beta}_{k , i} \left(\mathit{omega}\right) = {\mathit{beta}}_{k , i} , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) \cap \mathcal{I}_{d} . \tag{eq\_0009} \\
+  & \sum_{m \in \mathcal{K}_{e}} \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}} \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right) + \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) \leq 1 , \forall k \in \mathcal{K}_{e} . \tag{eq\_0010} \\
+  & \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) \leq 1 , \forall k \in \mathcal{K}_{a} . \tag{eq\_0011} \\
+  & \sum_{m \in \mathcal{K}_{e}} \sum_{i \in \mathcal{I} \backslash \left(\mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}\right)} \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right) + \sum_{i \in \mathcal{I} \backslash \left(\mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}\right)} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) = 0 , \forall k \in \mathcal{K}_{e} , \tag{eq\_0012} \\
+  & \sum_{i \in \mathcal{I} \backslash \left(\mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}\right)} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) = 0 , \forall k \in \mathcal{K}_{a} . \tag{eq\_0014} \\
+  & \sum_{k \in \mathcal{K}} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) - \sum_{k \in \mathcal{K}_{e}} {\mathit{vartheta}}_{k , i} \leq \sum_{b \in \mathcal{B}} z_{b , i} , \forall i \in \mathcal{I}_{d} . \tag{eq\_0015} \\
+  & \sum_{m \in \mathcal{K}_{e}} \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}} \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) + \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{beta}_{k , i} \left(\mathit{omega}\right) = \sum_{m \in \mathcal{K}_{e}} \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}} \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right) + \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{e} . \tag{eq\_0016} \\
+  & \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{beta}_{k , i} \left(\mathit{omega}\right) = \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}} \mathit{vartheta}_{k , i} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{a} . \tag{eq\_0017} \\
+  & \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) = \mathit{mu}_{m , k , i} \left(\mathit{omega}\right) \sum_{k^{'} \in \mathcal{K}_{e}} \mathit{xi}_{k^{'} , m , i} \left(\mathit{omega}\right) , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t} \backslash \left\{I , 2 \cdot I\right\} . \tag{eq\_0019} \\
+  & \sum_{m \in \mathcal{K}_{e}} \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) \leq e_{i} - \underset{\genfrac{}{}{0pt}{}{m \in \mathcal{K}_{e}}{m < k}}{\sum} \sum_{k^{'} \in \mathcal{K}_{e}} \mathit{xi}_{m , k^{'} , i} \left(\mathit{omega}\right) + \sum_{m \in \mathcal{K}_{e}} \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{t} \backslash \left\{I , 2 \cdot I\right\} , \tag{eq\_0020} \\
+  & \begin{matrix}y_{k , i} \left(\mathit{omega}\right) = \sum_{m \in \mathcal{K}_{e}} \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}}{j \leq i}}{\sum} \mathit{xi}_{m , k , 2 I + 1 - j} \left(\mathit{omega}\right) - \sum_{m \in \mathcal{K}_{e}} \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t}}{j < i}}{\sum} \mathit{xi}_{k , m , j} \left(\mathit{omega}\right) + \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}}{j \leq i}}{\sum} \mathit{vartheta}_{k , j} \left(\mathit{omega}\right) - & \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}}{j < i}}{\sum} \mathit{beta}_{k , j} \left(\mathit{omega}\right) , \\ & \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} ,\end{matrix} \tag{eq\_0021} \\
+  & y_{k , i} \left(\mathit{omega}\right) = \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}}{j \leq i}}{\sum} \mathit{vartheta}_{k , j} \left(\mathit{omega}\right) - \underset{\genfrac{}{}{0pt}{}{j \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d}}{j < i}}{\sum} \mathit{beta}_{k , j} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{a} , i \in \mathcal{I}_{k}^{p} , \tag{eq\_0023} \\
+  & \left(\sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) = 0\right) \lor \left(\sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \geq 2\right) , \forall k \in \mathcal{K} . \tag{eq\_0025} \\
+  & a_{k , i} \left(\mathit{omega}\right) = {a}_{k , i} , \forall k \in \mathcal{K}_{e} \backslash \left\{k^{ \cdot } \left(\mathit{omega}\right)\right\} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) , \tag{eq\_0026} \\
+  & d_{k , i} \left(\mathit{omega}\right) = {d}_{k , i} , \forall k \in \mathcal{K}_{e} \backslash \left\{k^{ \cdot } \left(\mathit{omega}\right)\right\} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) . \tag{eq\_0028} \\
+  & a_{k , i} \left(\mathit{omega}\right) \geq {a}_{k , i} , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} , \tag{eq\_0031} \\
+  & d_{k , i} \left(\mathit{omega}\right) \geq {d}_{k , i} , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} . \tag{eq\_0033} \\
+  & d_{k , i} \left(\mathit{omega}\right) - a_{k , i} \left(\mathit{omega}\right) \geq q_{min} - M \left(1 - y_{k , i} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K} , i \in \mathcal{I}_{k}^{p} \backslash \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) , \tag{eq\_0034} \\
+  & d_{k , i} \left(\mathit{omega}\right) - a_{k , i} \left(\mathit{omega}\right) \leq q_{max} + M \left(1 - y_{k , i} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K} , i \in \mathcal{I}_{k}^{p} \backslash \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) . \tag{eq\_0036} \\
+  & a_{k , i} \left(\mathit{omega}\right) - d_{k , j} \left(\mathit{omega}\right) \geq g_{i , j}^{min} - M \left(1 - x_{k , i , j} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K} , j \in \mathcal{I}_{k}^{p} \backslash \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) , \left(i , j\right) \in \mathcal{V} , \tag{eq\_0037} \\
+  & a_{k , j} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \leq g_{i , j}^{max} + M \left(1 - x_{k , i , j} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K} , j \in \mathcal{I}_{k}^{p} \backslash \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) , \left(i , j\right) \in \mathcal{V} . \tag{eq\_0039} \\
+  & a_{k , i} \left(\mathit{omega}\right) - d_{m , i} \left(\mathit{omega}\right) \geq h_{min} - M \left(2 - y_{k , i} \left(\mathit{omega}\right) - y_{m , i} \left(\mathit{omega}\right)\right) , \forall k , m \in \mathcal{K}_{e} , m < k , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{m}^{p} , \tag{eq\_0040} \\
+  & a_{k , i} \left(\mathit{omega}\right) - d_{m , i} \left(\mathit{omega}\right) \geq h_{min} - M \left(2 - y_{k , i} \left(\mathit{omega}\right) - y_{m , i} \left(\mathit{omega}\right)\right) , \forall k , m \in \mathcal{K}_{a} , m < k , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{m}^{p} . \tag{eq\_0041} \\
+  & a_{k , i} \left(\mathit{omega}\right) - d_{m , i} \left(\mathit{omega}\right) \geq h_{min} - M \left(3 - y_{k , i} \left(\mathit{omega}\right) - y_{m , i} \left(\mathit{omega}\right) - \mathit{varphi}_{m , k} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K}_{e} , m \in \mathcal{K}_{a} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{m}^{p} , \tag{eq\_0042} \\
+  & a_{m , i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \geq h_{min} - M \left(2 - y_{k , i} \left(\mathit{omega}\right) - y_{m , i} \left(\mathit{omega}\right) + \mathit{varphi}_{m , k} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K}_{e} , m \in \mathcal{K}_{a} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{m}^{p} . \tag{eq\_0044} \\
+  & a_{k , i} \left(\mathit{omega}\right) - t_{\text{start}} \left(\mathit{omega}\right) \geq l_{\text{min}} - M \left(1 - \mathit{vartheta}_{k , i} \left(\mathit{omega}\right)\right) , \forall k \in \mathcal{K} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{d} , \mathit{omega} \in \mathit{Omega} . \tag{eq\_0045} \\
+  & a_{k , i} \left(\mathit{omega}\right) - d_{m , 2 I + 1 - i} \left(\mathit{omega}\right) \geq u_{min} - M \left(1 - \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right)\right) , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t} , \tag{eq\_0046} \\
+  & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \leq u_{max} + M \left(1 - \mathit{xi}_{k , m , i} \left(\mathit{omega}\right)\right) , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \left\{I , 2 \cdot I\right\} . \tag{eq\_0048} \\
+  & s_{i , j , f}^{r} \left(\mathit{omega}\right) = s_{i , j , f - 1}^{r} \left(\mathit{omega}\right) + s_{i , j , f} - s_{i , j , f}^{b} \left(\mathit{omega}\right) , \forall \left(i , j\right) \in \mathcal{V} , f \in \mathcal{F} . \tag{eq\_0052} \\
+  & Q_{d} \left(\mathit{omega}\right) = \sum_{k \in \mathcal{K}_{e}} \sum_{i \in \mathcal{I}_{k}^{p}} \left(a_{k , i} \left(\mathit{omega}\right) - {a}_{k , i} + d_{k , i} \left(\mathit{omega}\right) - {d}_{k , i}\right) . \tag{eq\_0053} \\
+  & Q_{c} \left(\mathit{omega}\right) = \sum_{k \in \mathcal{K}_{e}} \left(\left|\mathcal{I}_{k}^{p}\right| - \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right)\right) . \tag{eq\_0054} \\
+  & Q_{p} \left(\mathit{omega}\right) = \sum_{\left(i , j\right) \in \mathcal{V}} \sum_{f \in \mathcal{F}} s_{i , j , f}^{r} \left(\mathit{omega}\right) \tag{eq\_0055} \\
+  \min\quad & \sum_{b \in \mathcal{B}} \sum_{i \in \mathcal{I}_{d}} c_{b} \cdot z_{b , i} + \text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z} , \mathit{omega}\right)\right] \tag{eq\_0057} \\
+  & \mathit{theta} \geq \text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z} , \mathit{omega}\right)\right] . \tag{eq\_0064} \\
+  & \mathit{theta} \geq \left(\text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z}^{n} , \mathit{omega}\right)\right] - L\right) \left(\sum_{\left(b , i\right) \in \mathcal{P} \left(\mathbf{z}^{n}\right)} z_{b , i} - \sum_{\left(b , i\right) \notin \mathcal{P} \left(\mathbf{z}^{n}\right)} z_{b , i} - \left|\mathcal{P} \left(\mathbf{z}^{n}\right)\right|\right) + \text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z}^{n} , \mathit{omega}\right)\right] , \tag{eq\_0065} \\
+  & \mathit{theta} \geq \left(\text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z}^{n} , \mathit{omega}\right)\right] - L\right) \left(\sum_{\left(b , i\right) \in \mathcal{P} \left(\mathbf{z}^{n}\right)} z_{b , i} - \sum_{\left(b , i\right) \notin \mathcal{P} \left(\mathbf{z}^{n}\right)} z_{b , i} - \left|\mathcal{P} \left(\mathbf{z}^{n}\right)\right|\right) + \text{MCVaR}_{\mathit{alpha}} \left[Q \left(\mathbf{z}^{n} , \mathit{omega}\right)\right] , \forall n = 1 , 2 , \ldots , N , \tag{eq\_0069} \\
+  & a_{k , i} \left(\mathit{omega}\right) \geq {a}_{k , i} + \left({d}_{m , 2 I + 1 - i} + u_{min} - {a}_{k , i}\right) \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right) , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t} , \tag{eq\_0073} \\
+  & d_{k , i} \left(\mathit{omega}\right) \geq {d}_{k , i} + \left({a}_{m , 2 I + 1 - i} - u_{max} - {d}_{k , i}\right) \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \left\{I , 2 \cdot I\right\} . \tag{eq\_0075} \\
+  & a_{k , i} \left(\mathit{omega}\right) \geq {a}_{k , i} + \sum_{m \in \mathcal{K}_{e}} \left({d}_{m , 2 I + 1 - i} + u_{min} - {a}_{k , i}\right) \mathit{xi}_{m , k , 2 I + 1 - i} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{t} , \tag{eq\_0076} \\
+  & d_{k , i} \left(\mathit{omega}\right) \geq {d}_{k , i} + \sum_{m \in \mathcal{K}_{e}} \left({a}_{m , 2 I + 1 - i} - u_{max} - {d}_{k , i}\right) \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) , \forall k \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{p} \cap \left\{I , 2 \cdot I\right\} . \tag{eq\_0078} \\
+  & {a}_{k , i^{ \cdot } \left(\mathit{omega}\right)} \geq d_{k^{ \cdot } \left(\mathit{omega}\right) , i^{ \cdot } \left(\mathit{omega}\right)} + \left(k - k^{ \cdot } \left(\mathit{omega}\right) - 1\right) q_{min} + \left(k - k^{ \cdot } \left(\mathit{omega}\right)\right) h_{min} , \tag{eq\_0079} \\
+  & {a}_{m , 2 I + 1 - i} \geq d_{k^{ \cdot } \left(\mathit{omega}\right) , i^{ \cdot } \left(\mathit{omega}\right)} + \left(i - i^{ \cdot } \left(\mathit{omega}\right)\right) q_{min} + \underset{\genfrac{}{}{0pt}{}{\left(i^{'} , j\right) \in V}{i^{'} \geq i^{ \cdot } \left(\mathit{omega}\right) , j \leq i}}{\sum} g_{i^{'} , j}^{min} + \left(k - k^{ \cdot } \left(\mathit{omega}\right)\right) \left(q_{min} + h_{min}\right) + u_{min} , \tag{eq\_0080} \\
+  & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \leq - \mathit{kappa} + \left(M + \mathit{kappa}\right) \left(1 - \mathit{mu}_{k , m , i} \left(\mathit{omega}\right)\right) \tag{eq\_0082\_a} \\
+  & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \geq - M \mathit{mu}_{k , m , i} \left(\mathit{omega}\right) \tag{eq\_0082\_b} \\
+  & d_{k , i} \left(\mathit{omega}\right) - t_{f} \leq M \left(1 - \mathit{phi}_{k , i , f} \left(\mathit{omega}\right)\right) \tag{eq\_0084\_a} \\
+  & d_{k , i} \left(\mathit{omega}\right) - t_{f} \geq \mathit{kappa} - \left(M + \mathit{kappa}\right) \mathit{phi}_{k , i , f} \left(\mathit{omega}\right) \tag{eq\_0084\_b} \\
+  & \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) \leq \mathit{mu}_{m , k , i} \left(\mathit{omega}\right) \tag{eq\_0085\_a} \\
+  & \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) \leq \sum_{k^{'} \in \mathcal{K}_{e}} \mathit{xi}_{k^{'} , m , i} \left(\mathit{omega}\right) \tag{eq\_0085\_b} \\
+  & \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) \geq \mathit{mu}_{m , k , i} \left(\mathit{omega}\right) + \sum_{k^{'} \in \mathcal{K}_{e}} \mathit{xi}_{k^{'} , m , i} \left(\mathit{omega}\right) - 1 \tag{eq\_0085\_c} \\
+  & \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \leq \mathit{phi}_{k , i , f + 1} \left(\mathit{omega}\right) - \mathit{phi}_{k , i , f} \left(\mathit{omega}\right) \tag{eq\_0087\_a} \\
+  & \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \leq x_{k , i , j} \left(\mathit{omega}\right) \tag{eq\_0087\_b} \\
+  & \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \geq \mathit{phi}_{k , i , f + 1} \left(\mathit{omega}\right) - \mathit{phi}_{k , i , f} \left(\mathit{omega}\right) + x_{k , i , j} \left(\mathit{omega}\right) - 1 \tag{eq\_0087\_c} \\
+  & \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \geq 2 - M \left(1 - \mathit{zeta}_{k} \left(\mathit{omega}\right)\right) \tag{eq\_0088\_a} \\
+  & \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \leq M \mathit{zeta}_{k} \left(\mathit{omega}\right) \tag{eq\_0088\_b} \\
+  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \leq C \sum_{k \in \mathcal{K}} \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \tag{eq\_0090\_a} \\
+  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \leq s_{i , j , f - 1}^{r} \left(\mathit{omega}\right) + s_{i , j , f} \tag{eq\_0090\_b} \\
+  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \geq C \sum_{k \in \mathcal{K}} \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) - M \mathit{rho}_{i , j , f} \left(\mathit{omega}\right) \tag{eq\_0090\_c} \\
+  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \geq s_{i , j , f - 1}^{r} \left(\mathit{omega}\right) + s_{i , j , f} - M \left(1 - \mathit{rho}_{i , j , f} \left(\mathit{omega}\right)\right) \tag{eq\_0090\_d} \\
+\end{align}

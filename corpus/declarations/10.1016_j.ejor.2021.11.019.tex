@@ -1,0 +1,176 @@
+% Declaration sidecar for 10.1016_j.ejor.2021.11.019
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2021.11.019
+% Integrated optimization of train timetable, rolling stock assignment and short-turning strategy for a metro line
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2021.11.019.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time over all services.
+
+% K: classified as index during review
+%@ index K ordered=1 cyclic=0 :: Set of potential services in a direction
+
+% z: classified as variable during review
+%@ var z shape=K,S,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service k serves operation zone from m to n
+
+% unusable as an identifier, rename or drop: τ
+% S: classified as index during review
+%@ index S ordered=1 cyclic=0 :: Set of stations in a direction
+
+% i: classified as index during review
+%@ index i ordered=1 cyclic=0 :: Station index
+
+% unusable as an identifier, rename or drop: λ
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+
+% a: classified as variable during review
+%@ var a shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
+
+% d: classified as variable during review
+%@ var d shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of service k at station i
+
+% s: classified as parameter during review
+%@ param s shape=S kind=vector domain=- :: Running time on segment between stations i-1 and i
+
+% e: classified as parameter during review
+%@ param e shape=S kind=vector domain=- :: Dwelling time at station i
+
+% h: classified as variable during review
+%@ var h shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Headway between service k-1 and k
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% R: classified as index during review
+%@ index R ordered=1 cyclic=0 :: Number of time intervals for passenger arrival rates
+
+% w: classified as variable during review
+%@ var w shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting for service k at station i with destination j
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of stations in one direction
+
+% c: classified as variable during review
+%@ var c shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers in service k after station i
+
+% v: classified as variable during review
+%@ var v shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers left behind by service k at station i with destination j
+
+% f: classified as variable during review
+%@ var f shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting time for service k
+
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar domain=- :: Passenger arrival rate function
+
+% F: classified as variable during review
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting time objective
+
+% unusable as an identifier, rename or drop: θ
+% T: classified as parameter during review
+%@ param T shape=R kind=vector domain=- :: Time point for interval r
+
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: ε
+% unusable as an identifier, rename or drop: ρ
+% P: classified as parameter during review
+%@ param P shape=S,S,R kind=matrix domain=- :: Passenger arrival rate matrix
+
+% r: classified as index during review
+%@ index r ordered=1 cyclic=0 :: Time interval index
+
+% Q: classified as variable during review
+%@ var Q shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting for service k at station i with destination j
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% unusable as an identifier, rename or drop: ψ
+% unusable as an identifier, rename or drop: φ
+% Bound by a quantifier or big operator, so no declaration of their own: j, k, l, m, n
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Operation zone selection for upstream services
+%@ con eq_0002 kind=linear domain=- indicator=- :: Operation zone selection for downstream services
+%@ con eq_0003 kind=linear domain=- indicator=- :: Selected upstream service serves no unserved station
+%@ con eq_0004 kind=linear domain=- indicator=- :: Upstream service cannot serve stations before its start station
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upstream service cannot serve stations after its end station
+%@ con eq_0006 kind=linear domain=- indicator=- :: Upstream service must serve every station in its operation zone
+%@ con eq_0007 kind=linear domain=- indicator=- :: Downstream served-station bound
+%@ con eq_0008 kind=linear domain=- indicator=- :: Downstream service cannot serve stations before its start station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Downstream service cannot serve stations after its end station
+%@ con eq_0010 kind=linear domain=- indicator=- :: Downstream service must serve every station in its operation zone
+%@ con eq_0011 kind=linear domain=- indicator=- :: At least one of two consecutive upstream services serves each station
+%@ con eq_0012 kind=linear domain=- indicator=- :: At least one of two consecutive downstream services serves each station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Running time relation for upstream services
+%@ con eq_0014 kind=linear domain=- indicator=- :: Running time relation for downstream services
+%@ con eq_0015 kind=linear domain=- indicator=- :: Dwelling time relation for upstream services
+%@ con eq_0016 kind=linear domain=- indicator=- :: Dwelling time relation for downstream services
+%@ con eq_0018 kind=linear domain=- indicator=- :: Headway bounds for downstream services
+%@ con eq_0019 kind=linear domain=- indicator=- :: Departure time headway relation for upstream services
+%@ con eq_0020 kind=linear domain=- indicator=- :: Departure time headway relation for downstream services
+%@ con eq_0021 kind=linear domain=- indicator=- :: Turnaround consistency from upstream service k to downstream service l at station m
+%@ con eq_0022 kind=linear domain=- indicator=- :: Minimum turnaround time from upstream to downstream service
+%@ con eq_0024 kind=linear domain=- indicator=- :: Turnaround consistency from downstream service k to upstream service l at station m
+%@ con eq_0025 kind=linear domain=- indicator=- :: Minimum turnaround time from downstream to upstream service
+%@ con eq_0026 kind=linear domain=- indicator=- :: Maximum turnaround time from downstream to upstream service
+%@ con eq_0027 kind=linear domain=- indicator=- :: Origin of train for upstream service from depot or turnaround
+%@ con eq_0028 kind=linear domain=- indicator=- :: Origin of train for downstream service from depot or turnaround
+%@ con eq_0029 kind=linear domain=- indicator=- :: Destination of train after upstream service to depot or turnaround
+%@ con eq_0030 kind=linear domain=- indicator=- :: Destination of train after downstream service to depot or turnaround
+%@ con eq_0031 kind=linear domain=- indicator=- :: Depot 1 allocated trains capacity
+%@ con eq_0032 kind=linear domain=- indicator=- :: Depot 2 allocated trains capacity
+%@ con eq_0033 kind=linear domain=- indicator=- :: Total available train fleet constraint
+%@ con eq_0034 kind=linear domain=- indicator=- :: Upstream service from depot 1 starts at terminal station 1
+%@ con eq_0035 kind=linear domain=- indicator=- :: Upstream service returning to depot 2 ends at terminal station N
+%@ con eq_0036 kind=linear domain=- indicator=- :: Downstream service from depot 2 starts at terminal station N+1
+%@ con eq_0037 kind=linear domain=- indicator=- :: Downstream service returning to depot 1 ends at terminal station 2N
+%@ con eq_0038 kind=linear domain=- indicator=- :: Total boarding passengers at station i split by destination
+%@ con eq_0039 kind=linear domain=- indicator=- :: Waiting passenger accumulation with time-dependent arrival rate
+%@ con eq_0040 kind=linear domain=- indicator=- :: Boarding only when service serves both origin and destination stations
+%@ con eq_0042 kind=linear domain=- indicator=- :: Boarding passengers limited by remaining train capacity
+%@ con eq_0043 kind=linear domain=- indicator=- :: Total alighting passengers at station i from previous stations
+%@ con eq_0045 kind=linear domain=- indicator=- :: Remaining passengers after boarding
+%@ con eq_0047 kind=linear domain=- indicator=- :: Total waiting time of passengers for an upstream service
+%@ con eq_0049 kind=linear domain=- indicator=- :: Objective sum of total waiting time over all services
+%@ con eq_0050 kind=linear domain=- indicator=- :: Integrated optimization model with objective F
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linearization constraint (51)
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linearization constraint (57)
+%@ con eq_0058 kind=linear domain=- indicator=- :: Linearization constraint (58)
+%@ con eq_0059 kind=linear domain=- indicator=- :: Linearization constraint (59)
+%@ con eq_0060 kind=linear domain=- indicator=- :: Linearization constraint (60)
+%@ con eq_0062 kind=linear domain=- indicator=- :: Linearization constraint (62)
+%@ con eq_0063 kind=linear domain=- indicator=- :: Linearization constraint (63)
+%@ con eq_0064 kind=linear domain=- indicator=- :: Linearization constraint (64)
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization constraint (65)
+%@ con eq_0066 kind=linear domain=- indicator=- :: Linearization constraint (66)
+%@ con eq_0067 kind=linear domain=- indicator=- :: Linearization constraint (67)
+%@ con eq_0068 kind=linear domain=- indicator=- :: Linearization constraint (68)
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization constraint (69)
+%@ con eq_0071 kind=linear domain=- indicator=- :: Linearization constraint (71)
+%@ con eq_0072 kind=linear domain=- indicator=- :: Linearization constraint (72)
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint (73)
+%@ con eq_0074 kind=linear domain=- indicator=- :: Linearization constraint (74)
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint (75)
+%@ var tau shape=- domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau

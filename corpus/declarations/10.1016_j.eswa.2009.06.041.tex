@@ -1,0 +1,52 @@
+% Declaration sidecar for 10.1016_j.eswa.2009.06.041
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.eswa.2009.06.041
+% A multi-objective PSO for job-shop scheduling problems
+%
+%@ obj sense=min name=objective combination=sum :: Minimize job-shop scheduling objectives (makespan, total tardiness, etc.)
+
+% π renamed to pi
+%@ index pi ordered=0 cyclic=0 :: Job permutation sequence in job-shop scheduling
+
+% i and j are index families
+%@ index i ordered=0 cyclic=0 :: Job position index
+%@ index j ordered=0 cyclic=0 :: Machine index
+
+% C: classified as variable during review
+%@ var C shape=i,j domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of job at position i on machine j
+
+% t: classified as parameter during review
+%@ param t shape=i,j kind=matrix domain=- :: Processing time of job at position i on machine j
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number of jobs
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Number of machines
+
+% Makespan: classified as variable during review
+%@ var Makespan shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Makespan objective function value
+
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function (e.g., makespan, total tardiness, total idle time)
+
+% L: classified as variable during review
+%@ var L shape=i domain=continuous role=primary drole=- lo=- hi=- :: Lateness of job i
+
+% Total: classified as parameter during review
+%@ param Total shape=- kind=scalar domain=- :: Part of objective function name 'total tardiness'
+
+% tardiness: classified as parameter during review
+%@ param tardiness shape=- kind=scalar domain=- :: Part of objective function name 'total tardiness'
+
+%@ con eq_0001 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0002 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0003 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0006 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0007 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ index I shape=set domain=integer role=- drole=- lo=2 hi=n :: index set for i = 2..n

@@ -1,0 +1,75 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2004.07.019
+%@ meta id=10.1016_j.ejor.2004.07.019 family=milp schema=0.1.0
+%@ name :: Bicriteria train scheduling for high-speed passenger railroad planning applications
+%@ desc :: Mined from Bicriteria train scheduling for high-speed passenger railroad planning applications (European Journal of Operational Research, 2004).
+%@ prov source :: 10.1016/j.ejor.2004.07.019
+%@ prov reference :: Bicriteria train scheduling for high-speed passenger railroad planning applications
+%@ prov author :: Xuesong Zhou; Zhong Ming
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the sum of the two criteria: expected waiting time variation and total travel time
+%@ var d shape=I domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train i
+%@ param g shape=I kind=vector domain=- :: Maximum allowable adjustment for departure time of train i
+%@ index I ordered=0 cyclic=0 :: Set of all trains
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index N ordered=0 cyclic=0 :: Number of trains
+%@ var y shape=I domain=continuous role=primary drole=- lo=- hi=- :: Interdeparture time between train i and i+1
+%@ var x shape=I,K domain=continuous role=primary drole=- lo=- hi=- :: Event time of train i at section k (entry/exit)
+%@ var C shape=I domain=continuous role=primary drole=- lo=- hi=- :: Total travel time of train i
+%@ index k ordered=0 cyclic=0 :: Section index
+%@ index V ordered=0 cyclic=0 :: Set of sections
+%@ param s shape=I,K kind=matrix domain=- :: Minimum stop time of train i at station k
+%@ var t shape=I,K domain=continuous role=primary drole=- lo=- hi=- :: Acceleration or deceleration time of train i at section k
+%@ param p shape=I,K kind=matrix domain=- :: Pure running time of train type q(i) on section k
+%@ var B shape=I,K domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for acceleration/deceleration or headway order
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+%@ index K ordered=0 cyclic=0 :: Number of sections
+%@ param h shape=I,J,K kind=matrix domain=- :: Minimum headway between train types at section k
+%@ param either shape=- kind=scalar domain=- :: Logical operator for either-or constraints
+%@ param Var shape=- kind=scalar domain=- :: Variance operator
+%@ param Y shape=- kind=scalar domain=- :: Random variable of interdeparture time
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ index J ordered=0 cyclic=0 :: Train index (second train in headway constraints)
+%@ con eq_0001 kind=linear domain=- indicator=- :: Allowable adjustment for departure time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Interdeparture time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time equality
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total travel time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwell time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Travel time on sections
+%@ con eq_0007 kind=linear domain=- indicator=- :: Acceleration time binary implication
+%@ con eq_0008 kind=linear domain=- indicator=- :: Acceleration time calculation
+%@ con eq_0009 kind=linear domain=- indicator=- :: Deceleration time binary implication
+%@ con eq_0010 kind=linear domain=- indicator=- :: Deceleration time calculation
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum headway either-or (entry times)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum headway either-or (exit times)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Headway linearization entry direction 1
+%@ con eq_0014 kind=linear domain=- indicator=- :: Headway linearization entry direction 2
+%@ con eq_0015 kind=linear domain=- indicator=- :: Headway linearization exit direction 1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Headway linearization exit direction 2
+%@ con eq_0021 kind=linear domain=- indicator=- :: Additional linear constraint 21
+%@ con eq_0022 kind=linear domain=- indicator=- :: Additional linear constraint 22
+%@ con eq_0027 kind=linear domain=- indicator=- :: Lower bound for total travel time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Additional linear constraint 28
+\begin{align}
+  & {d}_{i} - g_{i} \leq d_{i} \leq {d}_{i} + g_{i} \forall i \in I . \tag{eq\_0001} \\
+  & y_{i} = d_{i + 1} - d_{i} \forall i \in I_{h} \backslash \left\{N_{h}\right\} . \tag{eq\_0002} \\
+  & x_{i , 1}^{e} = d_{i} \forall i \in I . \tag{eq\_0003} \\
+  & C_{i} = x_{i , K}^{l} - x_{i , 1}^{e} \forall i \in I . \tag{eq\_0004} \\
+  & x_{i , k}^{e} - x_{i , k - 1}^{l} \geq s_{i , k} \forall i \in I , \forall k \in V \backslash \left\{k = 1\right\} . \tag{eq\_0005} \\
+  & x_{i , k}^{l} - x_{i , k}^{e} = p_{q \left(i\right) , k} + t_{i , k}^{a} + t_{i , k}^{d} \forall i \in I , \forall k \in V . \tag{eq\_0006} \\
+  & B_{i , k}^{a} \cdot M \geq x_{i , k}^{e} - x_{i , k - 1}^{l} \forall i \in I , \forall k \in V \backslash \left\{k = 1\right\} , B_{i , 1}^{a} = 1 , \tag{eq\_0007} \\
+  & t_{i , k}^{a} = B_{i , k}^{a} \cdot \mathit{tau}_{q \left(i\right) , k}^{a} \forall i \in I , \forall k \in V . \tag{eq\_0008} \\
+  & B_{i , k}^{d} \cdot M \geq x_{i , k + 1}^{e} - x_{i , k}^{l} \forall i \in I , \forall k \in V \backslash \left\{k = K\right\} , B_{i , K}^{d} = 1 , \tag{eq\_0009} \\
+  & t_{i , k}^{d} = B_{i , k}^{d} \cdot \mathit{tau}_{q \left(i\right) , k}^{d} \forall i \in I , \forall k \in V . \tag{eq\_0010} \\
+  & either \cdot x_{i , k}^{e} - x_{j , k}^{e} \geq h_{q \left(j\right) , q \left(i\right) , k}^{e} or x_{j , k}^{e} - x_{i , k}^{e} \geq h_{q \left(i\right) , q \left(j\right) , k}^{e} \forall i \neq j , i , j \in I , \forall k \in V , \tag{eq\_0011} \\
+  & either \cdot x_{i , k}^{l} - x_{j , k}^{l} \geq h_{q \left(j\right) , q \left(i\right) , k}^{l} or x_{j , k}^{l} - x_{i , k}^{l} \geq h_{q \left(i\right) , q \left(j\right) , k}^{l} \forall i \neq j , i , j \in I , \forall k \in V . \tag{eq\_0012} \\
+  & x_{i , k}^{e} - x_{j , k}^{e} \geq h_{q \left(j\right) q \left(i\right)}^{e} - \left(1 - B_{i , j , k}\right) \cdot M \forall i \neq j , i , j \in I , \forall k \in V , \tag{eq\_0013} \\
+  & x_{j , k}^{e} - x_{i , k}^{e} \geq h_{q \left(i\right) , q \left(j\right)}^{e} - B_{i , j , k} \cdot M \forall i \neq j , i , j \in I , \forall k \in V , \tag{eq\_0014} \\
+  & x_{i , k}^{l} - x_{j , k}^{l} \geq h_{q \left(j\right) , q \left(i\right)}^{l} - \left(1 - B_{i , j , k}\right) \cdot M \forall i \neq j , i , j \in I , \forall k \in V , \tag{eq\_0015} \\
+  & x_{j , k}^{l} - x_{i , k}^{l} \geq h_{q \left(i\right) , q \left(j\right)}^{l} - B_{i , j , k} \cdot M \forall i \neq j , i , j \in I , \forall k \in V . \tag{eq\_0016} \\
+  \min\quad & Var \left(Y\right) = \frac{1}{N_{h} - 2} \sum_{i = 1}^{N_{h} - 1} \left(\right. y_{i} - {y}_{i} \left.\right)^{2} , \tag{eq\_0017} \\
+  & Subject to : {d}_{i} - g_{i} \leq d_{i} \leq {d}_{i} + g_{i} \forall i \in I_{h} , \tag{eq\_0021} \\
+  & y_{i} = d_{i + 1} - d_{i} \forall i \in I_{h} \backslash \left\{i = N_{h}\right\} . \tag{eq\_0022} \\
+  & C_{j} \geq x_{j , k^{\star}}^{e} - x_{j , 1}^{e} + \sum_{k = k^{\star}}^{K} p_{q \left(j\right) , k} . \tag{eq\_0027} \\
+  & x_{j , k + 1}^{e} = x_{j , k}^{l} + s_{j , k + 1} . \tag{eq\_0028} \\
+\end{align}

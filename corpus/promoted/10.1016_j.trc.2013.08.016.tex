@@ -1,0 +1,127 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2013.08.016
+%@ meta id=10.1016_j.trc.2013.08.016 family=milp schema=0.1.0
+%@ name :: Optimizing urban rail timetable under time-dependent demand and oversaturated conditions
+%@ desc :: Mined from Optimizing urban rail timetable under time-dependent demand and oversaturated conditions (Transportation Research Part C Emerging Technologies, 2013).
+%@ prov source :: 10.1016/j.trc.2013.08.016
+%@ prov reference :: Optimizing urban rail timetable under time-dependent demand and oversaturated conditions
+%@ prov author :: Huimin Niu; Xuesong Zhou
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total passenger waiting time plus β-weighted left-behind passengers.
+%@ index t ordered=1 cyclic=0 :: Time index for discrete time periods.
+%@ index u ordered=1 cyclic=0 :: Station index along the corridor (1 to 2N).
+%@ index j ordered=1 cyclic=0 :: Train index (1..K).
+%@ index v ordered=1 cyclic=0 :: Destination station index (u+1..2N).
+%@ var y shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative arrival indicator for train j at station u at time t.
+%@ var z shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative departure indicator for train j at station u at time t.
+%@ var x shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative boarding indicator for train j at station u at time t.
+%@ var D shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
+%@ param c shape=- kind=scalar domain=- :: Train capacity (maximum passengers on board).
+%@ var TA shape=u,j domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train j at station u.
+%@ index TD ordered=1 cyclic=0 :: Departure time of train j at station u, used as a time index.
+%@ param r shape=u kind=vector domain=- :: Section running time between stations u-1 and u.
+%@ param s shape=u kind=vector domain=- :: Dwell time at station u.
+%@ param h shape=- kind=scalar domain=- :: Minimum safety headway between consecutive trains.
+%@ var A shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
+%@ param P shape=u,v,t kind=matrix domain=- :: Time-dependent passenger demand from station u to v at time t.
+%@ index N ordered=1 cyclic=0 :: Number of stations in one direction (total 2N stations).
+%@ index R ordered=1 cyclic=0 :: Set of discrete time points in the operation horizon.
+%@ var V shape=u,j domain=non_negative role=primary drole=- lo=- hi=- :: Number of left-behind passengers for train j at station u.
+%@ param beta shape=- kind=scalar domain=- :: Penalty weight for left-behind passengers in the objective.
+%@ param B shape=u,v,j kind=matrix domain=- :: Number of passengers boarding train j at station u travelling to v.
+%@ param K shape=- kind=scalar domain=- :: Total number of trains.
+%@ index L ordered=1 cyclic=0 :: Latest arrival time of boarded passengers for train j at station u.
+%@ param O shape=u,j kind=matrix domain=- :: Number of alighted passengers from train j at station u.
+%@ param I shape=u,j kind=matrix domain=- :: Number of boarded passengers on train j at station u.
+%@ param W shape=u,j kind=matrix domain=- :: Number of waiting passengers for train j at station u.
+%@ index any ordered=0 cyclic=0 :: Generic index used in universally quantified constraints.
+%@ param T shape=- kind=scalar domain=- :: End time of the operation horizon.
+%@ param m shape=- kind=scalar domain=- :: Fleet size (number of train units).
+%@ param J shape=- kind=scalar domain=- :: Set of trains that must meet minimum load rate.
+%@ param alpha shape=- kind=scalar domain=- :: Minimum average passenger load rate for designated trains.
+%@ var X shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Cumulative boarding indicator for the last train in the boundary condition.
+%@ param rho shape=- kind=scalar domain=- :: Adjustment amount of departure time in local search.
+%@ param omega shape=j kind=vector domain=- :: Additional passengers arriving during the pushed-forward departure period.
+%@ param G shape=- kind=scalar domain=- :: Number of oversaturated loading windows following train j.
+%@ index g ordered=1 cyclic=0 :: Index for oversaturated trains after train j.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival indicator at least departure indicator (Eq. 1).
+%@ con eq_0005 kind=linear domain=- indicator=- :: Boarding indicator at next time at least departure indicator (Eq. 2).
+%@ con eq_0006 kind=linear domain=- indicator=- :: Previous train boarding indicator bounds current train boarding indicator (Eq. 3).
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cumulative departure increment bounded by capacity times departure indicator change (Eq. 4).
+%@ con eq_0010 kind=linear domain=- indicator=- :: Left-behind period characterized by boarding minus previous departure indicator (Eq. 5).
+%@ con eq_0011 kind=linear domain=- indicator=- :: Effective loading period characterized by previous vs current boarding indicator (Eq. 6).
+%@ con eq_0012 kind=linear domain=- indicator=- :: Arrival time equals previous station departure plus running time (Eq. 7).
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time (Eq. 8).
+%@ con eq_0014 kind=linear domain=- indicator=- :: Minimum departure headway at the start terminal (Eq. 9).
+%@ con eq_0015 kind=linear domain=- indicator=- :: Cumulative arrivals computed from trip demand matrix (Eq. 10).
+%@ con eq_0016 kind=linear domain=- indicator=- :: Cumulative arrivals at least cumulative departures (Eq. 11).
+%@ con eq_0017 kind=linear domain=- indicator=- :: Boarding indicator nondecreasing over time (Eq. 12).
+%@ con eq_0018 kind=linear domain=- indicator=- :: Arrival indicator nondecreasing over time (Eq. 13).
+%@ con eq_0019 kind=linear domain=- indicator=- :: Departure indicator nondecreasing over time (Eq. 14).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Arrival time obtained from cumulative arrival indicator sum (Eq. 15).
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Departure time obtained from cumulative departure indicator sum, part a (Eq. 16).
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Departure time obtained from cumulative departure indicator sum, part b (Eq. 16).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Left-behind passenger count from demand and boarding/departure indicators (Eq. 17).
+%@ con eq_0024 kind=linear domain=- indicator=- :: Onboard passenger flow recurrence across stations (Eq. 18).
+%@ con eq_0025 kind=linear domain=- indicator=- :: Onboard passenger count does not exceed train capacity (Eq. 19).
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger flow balance with boarding and alighting (Eq. 26).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Boarding passengers by destination inside effective loading window (Eq. 21).
+%@ con eq_0028_a kind=linear domain=- indicator=- :: Alighted passenger count from previous station boardings (Eq. 22).
+%@ con eq_0028_b kind=linear domain=- indicator=- :: Boarded passenger count to all downstream destinations (Eq. 23).
+%@ con eq_0029 kind=linear domain=- indicator=- :: Waiting passenger count before departure in loading window (Eq. 24).
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Onboard count after departure as capacity-limited min expression, part a (Eq. 25).
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Onboard count after departure as capacity-limited min expression, part b (Eq. 25).
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Flow conservation of onboard passengers at station, part a (Eq. 26).
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Flow conservation of onboard passengers at station, part b (Eq. 26).
+%@ con eq_0032 kind=linear domain=- indicator=- :: Latest arrival time under oversaturation via max condition (Eq. 27).
+%@ con eq_0033 kind=linear domain=- indicator=- :: Latest arrival time under both saturation cases via min condition (Eq. 28).
+%@ con eq_0034 kind=linear domain=- indicator=- :: Fleet size constraint: matched train must return and be recovered before next dispatch (Eq. 29).
+%@ con eq_0037 kind=linear domain=- indicator=- :: Minimum average passenger load rate for required train set (Eq. 30).
+%@ con eq_0038 kind=linear domain=- indicator=- :: Last train has enough capacity for all waiting passengers (Eq. 31).
+%@ con eq_0039 kind=linear domain=- indicator=- :: Safety headway maintained when moving a train departure forward (Eq. 34).
+%@ con eq_0040 kind=linear domain=- indicator=- :: Capacity constraint after moving a train departure forward (Eq. 35).
+%@ con eq_0041 kind=linear domain=- indicator=- :: Following oversaturated windows provide enough left-behind passengers to fill moved train (Eq. 36).
+%@ con eq_0042 kind=linear domain=- indicator=- :: Safety headway maintained when moving a train departure backward (Eq. 37).
+%@ con eq_0043 kind=linear domain=- indicator=- :: Loading period unchanged when moving a train departure backward (Eq. 38).
+\begin{align}
+  & y_{j}^{u} \left(t\right) \geq z_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0004} \\
+  & x_{j}^{u} \left(t + 1\right) \geq z_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0005} \\
+  & x_{j - 1}^{u} \left(t\right) \geq x_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0006} \\
+  & D^{u} \left(t\right) - D^{u} \left(t - 1\right) \leq c \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j , t \tag{eq\_0007} \\
+  & \mathit{TA}_{j}^{u} = \mathit{TD}_{j}^{u - 1} + r^{u - 1} \forall u \geq 2 , j \tag{eq\_0010} \\
+  & \mathit{TD}_{j}^{u} = \mathit{TA}_{j}^{u} + s^{u} \forall u , j \tag{eq\_0011} \\
+  & \mathit{TD}_{j}^{1} - \mathit{TD}_{j - 1}^{1} \geq h \forall j \geq 2 \tag{eq\_0012} \\
+  & A^{u} \left(t\right) = \sum_{v = u + 1}^{2 N} \sum_{t^{'} = 0}^{t} P^{u , v} \left(t^{'}\right) \forall u , t \tag{eq\_0013} \\
+  & A^{u} \left(t\right) \geq D^{u} \left(t\right) \forall u , t \tag{eq\_0014} \\
+  & x_{j}^{u} \left(t\right) \geq x_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0015} \\
+  & y_{j}^{u} \left(t\right) \geq y_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0016} \\
+  & z_{j}^{u} \left(t\right) \geq z_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0017} \\
+  & \mathit{TA}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[y_{j}^{u} \left(t\right) - y_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0018} \\
+  & \mathit{TD}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0019} \\
+  & V_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \left(t\right) \cdot \left[x_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0020} \\
+  & R_{j}^{u} = R_{j}^{u - 1} + \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \left(t\right) \cdot \left[x_{j - 1}^{u} \left(t\right) - x_{j}^{u} \left(t\right)\right] - \sum_{u^{'} = 1}^{u - 1} \sum_{t \in \mathfrak{R}} P^{u^{'} , u} \left(t\right) \cdot \left[x_{j - 1}^{u^{'}} \left(t\right) - x_{j}^{u^{'}} \left(t\right)\right] \forall u \geq 1 , j \geq 1 \tag{eq\_0021\_a} \\
+  & R_{j}^{0} = 0 \tag{eq\_0021\_b} \\
+  & R_{j}^{u} \leq c \forall u , j \tag{eq\_0022} \\
+  \min\quad & \sum_{u} \sum_{t \in \mathfrak{R}} \left[A^{u} \left(t\right) - D^{u} \left(t\right)\right] + \mathit{beta} \cdot \sum_{u} \sum_{j} V_{j}^{u} \tag{eq\_0023} \\
+  & B_{j}^{u , v} = \sum_{t \in \left(L_{j - 1}^{u} , L_{j}^{u}\right]} P^{u , v} \left(t\right) for u = 1 , 2 , \ldots , 2 \cdot N - 1 ; v = u + 1 , u + 2 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0024} \\
+  & O_{j}^{u} = \sum_{u^{'} = 1}^{u - 1} B_{j}^{u^{'} , u} for u = 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K . \tag{eq\_0025} \\
+  & I_{j}^{u} = \sum_{v = u + 1}^{2 N} B_{j}^{u . v} for u = 1 , 2 , \ldots , 2 \cdot N - 1 ; j = 1 , 2 , \ldots , K . \tag{eq\_0026} \\
+  & W_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \left(L_{j - 1}^{u} , \mathit{TD}_{j}^{u}\right]} P^{u , v} \left(t\right) for u = 1 , 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0027} \\
+  & R_{j}^{u} = min \left\{c , R_{j}^{u - 1} - O_{j}^{u} + W_{j}^{u}\right\} for u = 1 , 2 , \ldots , 2 \cdot N - 1 , j = 1 , 2 , \ldots , K \tag{eq\_0028\_a} \\
+  & R_{j}^{0} = 0 . \tag{eq\_0028\_b} \\
+  & R_{j}^{u} = R_{j}^{u - 1} + I_{j}^{u} - O_{j}^{u} for u = 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K . \tag{eq\_0029} \\
+  & L_{j}^{u} = max \left\{\mathit{tau} \left|\sum_{t \in \left(L_{j - 1}^{u} , \mathit{tau}\right]}\right) \sum_{v = u + 1}^{2 N} P^{u , v} \left(t\right) \leq c - R_{j}^{u - 1} + O_{j}^{u}\right\} for any u , j = 1 , 2 , \ldots , K \tag{eq\_0030\_a} \\
+  & L_{j = 0}^{u} = 0 . \tag{eq\_0030\_b} \\
+  & L_{j}^{u} = min \left\{\mathit{TD}_{j}^{u} , max \{ \mathit{tau} \left|\right. \sum_{t \in \left(L_{j - 1}^{u} , \mathit{tau}\right]} \sum_{v = u + 1}^{2 N} P^{u , v} \left(t\right) \leq c - R_{j}^{u - 1} + O_{j}^{u} \} \right\} for any u , j = 1 , 2 , \ldots , K \tag{eq\_0031\_a} \\
+  & L_{j = 0}^{u} = 0 . \tag{eq\_0031\_b} \\
+  & \mathit{TD}_{j + m}^{1} - \mathit{TA}_{j}^{2 N} \geq T_{0} for j = 1 , 2 , \ldots , K - m . \tag{eq\_0032} \\
+  & \frac{1}{\left(2 \cdot N - 2\right) \cdot c} \cdot \sum_{u = 1}^{2 N} R_{j}^{u} \geq \mathit{alpha} for j \in \bar{J} . \tag{eq\_0033} \\
+  & W_{K}^{u} \leq c - X_{K}^{u - 1} + O_{K}^{u} for u = 1 , 2 , \ldots , 2 \cdot N - 1 . \tag{eq\_0034} \\
+  & \mathit{TD}_{j + 1} - \left(\mathit{TD}_{j} + \mathit{rho}\right) \geq h \tag{eq\_0037} \\
+  & R_{j} + \mathit{Omega} \left(j , \mathit{rho}\right) \leq c \tag{eq\_0038} \\
+  & \sum_{t \in \left(L_{j + g} , \mathit{TD}_{j + g}\right]} P \left(t\right) \geq \mathit{Omega} \left(j , \mathit{rho}\right) for g = 1 , 2 , \hdots , G - 1 \tag{eq\_0039} \\
+  & \left(\mathit{TD}_{j} - \mathit{rho}\right) - \mathit{TD}_{j - 1} \geq h \tag{eq\_0040} \\
+  & \mathit{TD}_{j} - \mathit{rho} \geq L_{j} \tag{eq\_0041} \\
+  & \mathit{rho}_{\mathit{opt}} = min \left\{\right. \mathit{TD}_{j + 1} - \mathit{TD}_{j} - h , max \left\{\right. \mathit{rho} \left|\right. R_{j} + \sum_{t \in \left(\mathit{TD}_{j} , \mathit{TD}_{j} + \mathit{rho}\right]} P \left(t\right) \leq c \left.\right\} \left.\right\} \tag{eq\_0042} \\
+  & \mathit{rho}_{\mathit{opt}} = min \left\{\mathit{TD}_{j} - \mathit{TD}_{j - 1} - h , \mathit{TD}_{j} - L_{j}\right\} \tag{eq\_0043} \\
+\end{align}

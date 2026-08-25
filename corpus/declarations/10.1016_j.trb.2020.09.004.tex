@@ -1,0 +1,144 @@
+% Declaration sidecar for 10.1016_j.trb.2020.09.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2020.09.004
+% Decomposition and distributed optimization of real-time traffic management for large-scale railway networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2020.09.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted delay of all trains
+
+% A: classified as parameter during review
+%@ param A shape=- kind=matrix :: Constraint matrix in the general MILP formulation
+
+% b: classified as parameter during review
+%@ param b shape=- kind=vector :: Right-hand side vector in the general MILP formulation
+
+% s: classified as parameter during review
+%@ param s shape=- kind=vector :: Slack variable added in the ADMM reformulation to handle inequality constraints
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time interval index for the time-interval-based decomposition
+
+% unusable as an identifier, rename or drop: λ
+% B: classified as parameter during review
+%@ param B shape=- kind=matrix :: Matrix in the ADMM linear equality constraint A*z1 + B*z2 = b
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of block sections in the railway network
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of trains
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of regions in the geography-based decomposition
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: α
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of subproblems coupled with a given subproblem
+
+% z: classified as variable during review
+%@ var z shape=- domain=continuous role=primary :: Primal variable in the ADMM reformulation
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Function measuring violation of the coupling constraints in ADMM
+
+% unusable as an identifier, rename or drop: λ̄
+% T: classified as parameter during review
+%@ param T shape=- kind=matrix :: Matrix parameterizing allowable changes of communicated solutions in CDRSBK
+
+% unusable as an identifier, rename or drop: ξ
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar :: Desired departure time used in the objective function
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary :: Objective function value
+
+% d: classified as variable during review
+%@ var d shape=F,E domain=continuous role=primary :: Departure time of train f from block section e
+
+% w: classified as variable during review
+%@ var w shape=F,E domain=continuous role=primary :: Waiting time of train f on block section e
+
+% x: classified as variable during review
+%@ var x shape=F,E domain=binary role=primary :: Binary variable indicating whether train f uses block section e
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the railway network
+
+% unusable as an identifier, rename or drop: ψ
+% unusable as an identifier, rename or drop: φ
+% a: classified as variable during review
+%@ var a shape=F,E domain=continuous role=primary :: Arrival time of train f at block section e
+
+% unusable as an identifier, rename or drop: τ
+% unusable as an identifier, rename or drop: θ
+% u: classified as parameter during review
+%@ param u shape=F kind=vector :: Direction of train f
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large constant used in big-M constraints
+
+% g: classified as parameter during review
+%@ param g shape=F,E kind=matrix :: Minimum headway time for train f on block section e
+
+% h: classified as parameter during review
+%@ param h shape=F,E kind=matrix :: Additional headway time for train f on block section e
+
+% Bound by a quantifier or big operator, so no declaration of their own: f, i, j, k, o, q, r, σ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear :: Objective function definition minimizing total delay
+%@ con eq_0004 kind=linear :: Objective of the geography-based decomposition
+%@ con eq_0005 kind=linear :: Definition of region-change variables in the GEO decomposition
+%@ con eq_0006 kind=big_m :: Force beta to 1 when consecutive block sections belong to different regions
+%@ con eq_0007 kind=linear :: Bound region assignment variable mu to the predefined regions
+%@ con eq_0008 kind=big_m :: Link binary alpha to region assignment variable mu
+%@ con eq_0009 kind=linear :: Ensure each region contains at least one block section
+%@ con eq_0011 kind=linear :: Local constraints A_loc * lambda <= b_loc
+%@ con eq_0012 kind=linear :: Complicating constraints A_cpl * lambda <= b_cpl
+%@ con eq_0014 kind=linear :: Local constraints of subproblem p
+%@ con eq_0019 kind=linear :: ADMM update of primal variable z1
+%@ con eq_0024 kind=linear :: ADMM update of railway subproblem variables
+%@ con eq_0026 kind=linear :: ADMM update of dual variables / residual evaluation
+%@ con eq_0027 kind=linear :: Priority-rule algorithm coupling constraint using current iteration solutions
+%@ con eq_0028 kind=linear :: CDRSBK objective including actively coupled neighbor objectives
+%@ con eq_0029 kind=linear :: CDRSBK local constraints of subproblem p
+%@ con eq_0030 kind=linear :: CDRSBK local constraints of actively coupled subproblems
+%@ con eq_0031 kind=linear :: CDRSBK coupling constraints for non-active neighbors
+%@ con eq_0032 kind=linear :: CDRSBK coupling constraints for active neighbors
+%@ con eq_0034 kind=linear :: CDRSBK coupling constraints between active neighbors and their other neighbors
+%@ con eq_0035 kind=linear :: CDRSBK coupling constraints between two actively coupled neighbors
+%@ con eq_0036 kind=linear :: Parameterized update of communicated solution lambda_q = lambda_bar_q + T_q * xi_q
+%@ con eq_0037 kind=flow_balance :: Flow conservation for train routes in the network
+%@ con eq_0038 kind=flow_balance :: Route selection and node balance constraints for trains
+%@ con eq_0039 kind=big_m :: Minimum running time constraint on a block section
+%@ con eq_0040 kind=big_m :: Waiting time definition at a block section
+%@ con eq_0041 kind=ordering :: Train ordering variable constraints on shared block sections
+%@ con eq_0042 kind=headway :: Minimum headway between consecutive train departures
+%@ con eq_0043 kind=capacity :: Block section capacity constraint
+%@ con eq_0044 kind=big_m :: Earliest departure time constraint from train origin
+%@ con eq_0045 kind=linear :: Time transition constraint across decomposition boundaries
+%@ con eq_0046_a kind=capacity :: Capacity constraint (A.1l): minimum headway between departures on a block section
+%@ con eq_0046_b kind=capacity :: Capacity constraint (A.1m): minimum headway between arrivals on a block section

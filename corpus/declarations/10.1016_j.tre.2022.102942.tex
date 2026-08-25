@@ -1,0 +1,160 @@
+% Declaration sidecar for 10.1016_j.tre.2022.102942
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2022.102942
+% Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2022.102942.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total objective F = F1 + F2 + F3 + F4 (train deviations, passenger waiting, accumulation risk, control effort)
+
+% A: classified as parameter during review
+%@ param A shape=L,I,J kind=matrix domain=- :: Scheduled arrival time of train j at station i on line l
+
+% D: classified as parameter during review
+%@ param D shape=L,I,J kind=matrix domain=- :: Scheduled departure time of train j at station i on line l
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations on a line
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of trains on a line
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines in the network
+
+% S: classified as parameter during review
+%@ param S shape=L,I,J kind=matrix domain=- :: Nominal dwell time of train j at station i on line l
+
+% R: classified as parameter during review
+%@ param R shape=L,I,J kind=matrix domain=- :: Nominal running time between stations i-1 and i for train j on line l
+
+% H: classified as parameter during review
+%@ param H shape=L,I,J kind=matrix domain=- :: Nominal headway between trains j-1 and j at station i on line l
+
+% a: classified as variable during review
+%@ var a shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival time of train j at station i on line l
+
+% d: classified as variable during review
+%@ var d shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train j at station i on line l
+
+% s: classified as variable during review
+%@ var s shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual dwell time of train j at station i on line l
+
+% r: classified as variable during review
+%@ var r shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual running time between stations i-1 and i for train j on line l
+
+% u: classified as variable during review
+%@ var u shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Control action for dwell or running time
+
+% w: classified as parameter during review
+%@ param w shape=L,I,J kind=matrix domain=- :: Disturbance in dwell or running time
+
+% h: classified as variable during review
+%@ var h shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: Actual departure headway between trains j-1 and j at station i on line l
+
+% p: classified as variable during review
+%@ var p shape=L,I,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers in various states (waiting, boarding, etc.)
+
+% unusable as an identifier, rename or drop: λ
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Start time of operations
+
+% c: classified as parameter during review
+%@ param c shape=L,I kind=matrix domain=- :: Platform capacity at station i on line l
+
+% g: classified as variable during review
+%@ var g shape=L,I,J,L,J domain=continuous role=primary drole=- lo=- hi=- :: Number of transfer passengers from train j' of line l' to platform i of line l for train j
+
+% unusable as an identifier, rename or drop: δ
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: Set of lines connecting to a given line at a transfer station
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large positive number
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of transfer stations on a line
+
+% o: classified as parameter during review
+%@ param o shape=L,I,L kind=matrix domain=- :: Transfer walking time from line l' to line l at station i
+
+% y: classified as variable during review
+%@ var y shape=L,I,J,L,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating possible connection between trains
+
+% z: classified as variable during review
+%@ var z shape=L,I,J,L,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating effective connection between trains
+
+% unusable as an identifier, rename or drop: α
+% t: classified as parameter during review
+%@ param t shape=L,J kind=matrix domain=- :: Train capacity of train j on line l
+
+% unusable as an identifier, rename or drop: β
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+
+% unusable as an identifier, rename or drop: ξ
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, l
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Scheduled departure time equals scheduled arrival time plus nominal dwell time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Nominal headway between consecutive trains
+%@ con eq_0004 kind=linear domain=- indicator=- :: Actual departure time equals actual arrival time plus actual dwell time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Actual arrival time satisfies train dynamics at first and subsequent stations
+%@ con eq_0007 kind=linear domain=- indicator=- :: Actual dwell time equals nominal dwell time plus control and disturbance
+%@ con eq_0008 kind=linear domain=- indicator=- :: Actual running time equals nominal running time plus control and disturbance
+%@ con eq_0009 kind=linear domain=- indicator=- :: Bounds on dwell time control action
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bounds on running time control action
+%@ con eq_0012 kind=linear domain=- indicator=- :: Actual departure headway definition
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum headway safety constraint
+%@ con eq_0014 kind=linear domain=- indicator=- :: Waiting passengers entering platform formulation
+%@ con eq_0015 kind=linear domain=- indicator=- :: Stranded passengers outside platform
+%@ con eq_0016 kind=linear domain=- indicator=- :: Nonnegativity of passengers allowed to enter platform
+%@ con eq_0017 kind=linear domain=- indicator=- :: Limit on passengers allowed to enter platform
+%@ con eq_0019 kind=linear domain=- indicator=- :: Platform capacity constraint
+%@ con eq_0020 kind=linear domain=- indicator=- :: Waiting passengers on platform include entered, transfer, and previously left
+%@ con eq_0021 kind=linear domain=- indicator=- :: Possible connection condition (lower bound)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Possible connection condition (upper bound)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Effective connection definition
+%@ con eq_0025 kind=linear domain=- indicator=- :: Number of transfer passengers
+%@ con eq_0026 kind=linear domain=- indicator=- :: Stranded passengers on platform
+%@ con eq_0027 kind=linear domain=- indicator=- :: Boarding passengers limited by capacity
+%@ con eq_0029 kind=linear domain=- indicator=- :: Onboard passenger dynamic transition
+%@ con eq_0030 kind=linear domain=- indicator=- :: Alighting passengers proportion
+%@ con eq_0031 kind=linear domain=- indicator=- :: Objective function definition
+%@ con eq_0033 kind=linear domain=- indicator=- :: Objective term for punctuality and headway regularity
+%@ con eq_0034 kind=linear domain=- indicator=- :: Objective term for passenger waiting time
+%@ con eq_0035 kind=linear domain=- indicator=- :: Objective term for accumulation risk
+%@ con eq_0037 kind=linear domain=- indicator=- :: Piecewise accumulation risk value definition
+%@ con eq_0041 kind=linear domain=- indicator=- :: Objective term for control effort
+%@ con eq_0042 kind=linear domain=- indicator=- :: Binary constraint on connection variables
+%@ con eq_0043 kind=linear domain=- indicator=- :: Bounds on running time control actions (overall)
+%@ con eq_0044 kind=linear domain=- indicator=- :: Bounds on dwell time control actions (overall)
+%@ var F1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ var F4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: objective component
+%@ param us shape=- domain=continuous :: Bounds for u^s
+%@ param ur shape=- domain=continuous :: Bounds for u^r
+%@ param cp shape=- domain=continuous :: Capacity
+%@ param hmin shape=- domain=continuous :: Minimum headway
+%@ param N shape=- domain=continuous :: Cardinality of J_l

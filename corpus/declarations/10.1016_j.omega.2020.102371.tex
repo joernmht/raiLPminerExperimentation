@@ -1,0 +1,138 @@
+% Declaration sidecar for 10.1016_j.omega.2020.102371
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2020.102371
+% Collaborative real-time optimization strategy for train rescheduling and track emergency maintenance of high-speed railway: A Lagrangian relaxation-based decomposition algorithm
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2020.102371.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total delay (T1), train cancellation cost (T2), dwelling plan change cost (T3), and track maintenance cost (T4).
+%
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Weight coefficient for T1 (total delay) in the objective function.
+%
+% t: classified as variable during review
+%@ var t shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival/departure time of train at station.
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive number used for linearizing big-M constraints.
+%
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%
+% Y: classified as variable during review
+%@ var Y shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for scheduled dwelling or virtual station.
+%
+% u: classified as variable during review
+%@ var u shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or headway order.
+%
+% y: classified as variable during review
+%@ var y shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train cancellation.
+%
+% unusable as an identifier, rename or drop: τ
+% unusable as an identifier, rename or drop: ω
+% Z: classified as variable during review
+%@ var Z shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train type or auxiliary variable.
+%
+% x: classified as variable during review
+%@ var x shape=N,N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival/departure order of two trains at a station.
+%
+% T: classified as parameter during review
+%@ param T shape=N,S kind=matrix domain=- :: Planned time of train at station or start time of maintenance task.
+%
+% C: classified as parameter during review
+%@ param C shape=S kind=vector domain=- :: Station capacity or cost coefficient.
+%
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of trains.
+%
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: ε
+% m: classified as variable during review
+%@ var m shape=S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance intervention type selection.
+%
+% z: classified as variable during review
+%@ var z shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for first or second train after maintenance.
+%
+% w: classified as variable during review
+%@ var w shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Predictive running time disturbance for first/second train after maintenance.
+%
+% J: classified as variable during review
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+%
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar domain=- :: Weight coefficient for T2 (train cancellation cost) in the objective function.
+%
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Weight coefficient for T3 (dwelling plan change cost) in the objective function.
+%
+% Bound by a quantifier or big operator, so no declaration of their own: a, e, i, j, s
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Minimum dwelling time constraint at station.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dwelling plan change allowed only for non-scheduled dwell and not virtual station.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Virtual station dwelling time bound.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time in section.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Arrival headway between consecutive trains.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure headway between consecutive trains.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure-arrival headway when train i enters before train j leaves.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure-arrival headway for the reverse order.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure order at station equals arrival order at next station for the same pair.
+%@ con eq_0010 kind=linear domain=- indicator=- :: No overtaking at virtual stations.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival order antisymmetry.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure order antisymmetry.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure time not earlier than planned departure unless canceled.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Station capacity constraint when a train enters.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Canceled train arrival time set to zero.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Canceled train departure time set to zero.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Trains already underway cannot be canceled.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maintenance section entrance before maintenance start.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Maintenance section entrance after maintenance end.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Maintenance task duration equality with intervention time and disturbance.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exactly one maintenance intervention type selected per section.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Speed limitation in opposite-direction section during maintenance period.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Speed limitation in maintenance section after maintenance.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Speed limitation in opposite-direction section after maintenance.
+%@ con eq_0027 kind=linear domain=- indicator=- :: First train after maintenance must enter after maintenance end.
+%@ con eq_0028_a kind=linear domain=- indicator=- :: First train after maintenance is the earliest of post-maintenance entering trains.
+%@ con eq_0028_b kind=linear domain=- indicator=- :: First train after maintenance ordering condition.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Second train after maintenance must enter after maintenance end.
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Second train after maintenance ordering condition excluding first train.
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Second train after maintenance ordering condition.
+%@ con eq_0031 kind=linear domain=- indicator=- :: First and second train indicators are mutually exclusive.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Existence of a first train after maintenance.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Existence of a second train after maintenance.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Speed limitation constraints for first and second trains after maintenance.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Definition of total delay T1.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Positive arrival delay lower bound.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Positive arrival delay penalty for canceled trains.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Negative arrival delay lower bound.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Negative arrival delay penalty for canceled trains.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Positive departure delay lower bound.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Positive departure delay penalty for canceled trains.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Train cancellation cost T2 definition.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Dwelling plan change cost T3 definition.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Maintenance intervention cost T4 definition.
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint (a).
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint (b).
+%@ con eq_0059 kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint.
+%@ con eq_0061 kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint.

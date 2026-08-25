@@ -1,0 +1,146 @@
+% Declaration sidecar for 10.1016_j.trb.2017.01.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.01.001
+% Dynamic passenger demand oriented metro train scheduling with energy-efficiency and waiting time minimization: Mixed-integer linear programming approaches
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2017.01.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted total passenger waiting time and train energy consumption (with utilized regenerative energy in RTS model)
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of timestamps in the planning horizon
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time index
+
+% W: classified as parameter during review
+%@ param W shape=- kind=scalar domain=- :: Weight factor for passenger waiting time
+
+% n: classified as variable during review
+%@ var n shape=I,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers at station i and time t
+
+% unusable as an identifier, rename or drop: δ
+%@ param delta shape=- kind=scalar domain=- :: Time interval length
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of involved metro stations
+
+% b: classified as variable during review
+%@ var b shape=I,T domain=integer role=primary drole=- lo=- hi=- :: Number of boarding passengers at station i in time interval (t−δ,t]
+
+% p: classified as parameter during review
+%@ param p shape=I,I,T kind=matrix domain=- :: Time-variant passenger demand ratio from station i to j
+
+% x: classified as variable during review
+%@ var x shape=I,I,T,T,K domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train k using space-time arc (i,j,t,t′)
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of in-service trains to be scheduled
+
+% d: classified as parameter during review
+%@ param d shape=I,T kind=matrix domain=- :: Number of arriving passengers at station i at timestamp t
+
+% E: classified as parameter during review
+%@ param E shape=I,I,T,T,K kind=matrix domain=- :: Energy consumption of train k on space-time arc (i,j,t,t′)
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of involved links
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Dummy destination station
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Weight factor for energy consumption
+
+% ETS: classified as parameter during review
+%@ param ETS shape=- kind=scalar domain=- :: Model name for energy-efficient train scheduling
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Objective function value
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Number of time intervals in planning horizon
+
+% O: classified as parameter during review
+%@ param O shape=- kind=scalar domain=- :: Dummy origin station
+
+% s: classified as parameter during review
+%@ param s shape=I,I kind=matrix domain=- :: Length of link (i,j)
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Regenerative braking energy
+
+% h: classified as parameter during review
+%@ param h shape=I,I kind=matrix domain=- :: Minimum headway between successive trains on link (i,j)
+
+% d̄: classified as parameter during review
+%@ param d_bar shape=I kind=vector domain=- :: Maximum dwelling time at station i
+
+% C: classified as parameter during review
+%@ param C shape=K kind=vector domain=- :: Loading capacity of train k
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Set of nonnegative integer variables (N+)
+
+% G: classified as parameter during review
+%@ param G shape=U,T kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
+
+% constraints: classified as parameter during review
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of power supply substations
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, t̄, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Nonnegativity of waiting and boarding passenger counts
+%@ con eq_0005 kind=linear domain=- indicator=- :: Equivalent cumulative-form passenger waiting time expression
+%@ con eq_0006 kind=linear domain=- indicator=- :: Passenger flow balance at first time step after t0
+%@ con eq_0007 kind=linear domain=- indicator=- :: Passenger flow balance at second time step after t0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Ellipsis of intermediate passenger flow balance equations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger flow balance at time t
+%@ con eq_0013 kind=linear domain=- indicator=- :: Definition of train arrival time at station j on link (i,j)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Selection of operation level l* for a space-time arc
+%@ con eq_0015 kind=linear domain=- indicator=- :: Traction force (per unit mass) of train k on a space-time arc
+%@ con eq_0016 kind=linear domain=- indicator=- :: Braking force (per unit mass) of train k on a space-time arc
+%@ con eq_0017 kind=linear domain=- indicator=- :: Energy consumption of train k on a travelling space-time arc
+%@ con eq_0022 kind=linear domain=- indicator=- :: Minimum departure headway constraint between successive trains
+%@ con eq_0023 kind=linear domain=- indicator=- :: Minimum arrival headway constraint between successive trains
+%@ con eq_0024 kind=linear domain=- indicator=- :: Minimum dwelling time constraint at station i
+%@ con eq_0025 kind=linear domain=- indicator=- :: Maximum dwelling time constraint at station i
+%@ con eq_0026 kind=linear domain=- indicator=- :: Definition of train entering time via selected space-time arcs
+%@ con eq_0027 kind=linear domain=- indicator=- :: Definition of train leaving time via selected space-time arcs
+%@ con eq_0028 kind=linear domain=- indicator=- :: Boarding passenger limit determined by dwelling trains and boarding speed
+%@ con eq_0029 kind=linear domain=- indicator=- :: Cumulative boarding passengers cannot exceed cumulative arrivals plus initial waiting
+%@ con eq_0030 kind=linear domain=- indicator=- :: Train loading capacity constraint
+%@ con eq_0031 kind=linear domain=- indicator=- :: Binary restriction on space-time arc selection variables
+%@ con eq_0032 kind=linear domain=- indicator=- :: Integer restriction on boarding passenger variables
+%@ con eq_0033 kind=linear domain=- indicator=- :: Utilized regenerative energy equals minimum of available traction energy and recovered braking energy
+%@ con eq_0034 kind=linear domain=- indicator=- :: Objective function of RTS model with regenerative energy utilization
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized mixed-integer programming formulation of RTS model
+%@ con eq_0036 kind=linear domain=- indicator=- :: Upper bound on utilized regenerative energy from traction energy (r_t^u ≤ F_a(u,t))
+%@ con eq_0046 kind=linear domain=- indicator=- :: Allowable passenger boarding speed cap at each station and time interval (b_t^i ≤ b_max^i)

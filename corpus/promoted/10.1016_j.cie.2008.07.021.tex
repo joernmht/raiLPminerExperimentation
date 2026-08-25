@@ -1,0 +1,40 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2008.07.021
+%@ meta id=10.1016_j.cie.2008.07.021 family=milp schema=0.1.0
+%@ name :: An effective hybrid particle swarm optimization algorithm for multi-objective flexible job-shop scheduling problem
+%@ desc :: Mined from An effective hybrid particle swarm optimization algorithm for multi-objective flexible job-shop scheduling problem (Computers & Industrial Engineering, 2008).
+%@ prov source :: 10.1016/j.cie.2008.07.021
+%@ prov reference :: An effective hybrid particle swarm optimization algorithm for multi-objective flexible job-shop scheduling problem
+%@ prov author :: Guohui Zhang; Xinyu Shao; Peigen Li; Liang Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted sum of the three objectives f1, f2, f3
+%@ index i ordered=0 cyclic=0 :: Index of jobs, i = 1, ..., n
+%@ index j ordered=0 cyclic=0 :: Index of operation sequence, j = 1, ..., n_i
+%@ index k ordered=0 cyclic=0 :: Index of machines, k = 1, ..., m
+%@ var C shape=i,j domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of operation O_ij
+%@ param P shape=i,j,k kind=scalar domain=- :: Processing time of operation O_ij on machine k
+%@ param n shape=- kind=scalar domain=- :: Total number of jobs
+%@ param s shape=i,j,k kind=scalar domain=- :: Start time of operation O_ij on machine k (alternative notation)
+%@ param t shape=i,j,k kind=scalar domain=- :: Start time of operation O_ij on machine k
+%@ var x shape=i,j,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if machine k is selected for operation O_ij, 0 otherwise
+%@ index M ordered=0 cyclic=0 :: Set of available machines for operation O_ij
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective functions f1 (makespan), f2 (maximum workload), f3 (total workload)
+%@ param w shape=- kind=scalar domain=- :: Weights for the objectives
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Weighted sum objective F = w1*f1 + w2*f2 + w3*f3
+%@ con eq_0006 kind=linear domain=- indicator=- :: Operation precedence constraint: C_ij - C_i(j-1) >= P_ijk x_ijk
+%@ con eq_0007 kind=linear domain=- indicator=- :: Disjunctive machine capacity constraint: no two operations overlap on a machine
+%@ con eq_0008 kind=linear domain=- indicator=- :: Machine selection constraint: sum_{k in M_ij} x_ijk = 1
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Makespan objective constraint: f1 >= C_k for all machines k
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Maximum workload objective constraint: f2 >= W_k for all machines k
+%@ con eq_0012_c kind=linear domain=- indicator=- :: Total workload objective constraint: f3 = sum_k W_k
+%@ con eq_0012_d kind=linear domain=- indicator=- :: Weighted-sum objective constraint: F = sum_l w_l f_l
+\begin{align}
+  & \text{s}.\text{t}. C_{\mathit{ij}} - C_{i \left(j - 1\right)} \geq P_{\mathit{ijk}} \cdot x_{\mathit{ijk}} , j = 2 , \ldots , n_{i} ; \forall i , j \tag{eq\_0006} \\
+  & \left[\left(C_{\mathit{hg}} - C_{\mathit{ij}} - t_{\mathit{hgk}}\right) x_{\mathit{hgk}} \cdot x_{\mathit{ijk}} \geq 0\right] \vee \left[\left(C_{\mathit{ij}} - C_{\mathit{hg}} - t_{\mathit{ijk}}\right) x_{\mathit{hgj}} \cdot x_{\mathit{ijk}} \geq 0\right] , \forall \left(i , j\right) , \left(h , g\right) , k \tag{eq\_0007} \\
+  & \sum_{k \in M_{i , j}} x_{\mathit{ijk}} = 1 , \forall i , j \tag{eq\_0008} \\
+  \min\quad & w_{1} \cdot f_{1} + w_{2} \cdot f_{2} + w_{3} \cdot f_{3} \tag{eq\_0011} \\
+  & w_{1} \in \left(0 , 1\right) \tag{eq\_0012\_a} \\
+  & w_{2} \in \left(0 , 1\right) \tag{eq\_0012\_b} \\
+  & w_{3} \in \left(0 , 1\right) \tag{eq\_0012\_c} \\
+  & w_{1} + w_{2} + w_{3} = 1 \tag{eq\_0012\_d} \\
+\end{align}

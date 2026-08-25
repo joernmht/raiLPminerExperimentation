@@ -1,0 +1,139 @@
+% Declaration sidecar for 10.1016_j.trb.2019.12.005
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2019.12.005
+% Coupling time-indexed and big-M formulations for real-time train scheduling during metro service disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2019.12.005.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting and headway deviation
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar :: Set of passenger arrival sample matrices
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of platforms
+
+% a: classified as variable during review
+%@ var a shape=K,U domain=non_negative role=primary :: Arrival time of train at platform
+
+% d: classified as variable during review
+%@ var d shape=K,U domain=non_negative role=primary :: Departure time of train from platform
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Train index
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Platform index
+
+% s: classified as variable during review
+%@ var s shape=K,U domain=non_negative role=primary :: Dwell time of train at platform
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar :: Minimum headway between trains
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar :: Large constant for big-M constraints
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Train index (used in constraints)
+
+% y: classified as variable during review
+%@ var y shape=K,K domain=binary role=primary :: Binary variable indicating train precedence
+
+% unusable as an identifier, rename or drop: Θ
+% p: classified as parameter during review
+%@ param p shape=Q,U kind=matrix :: Passenger arrival rate at platform u in time interval i
+
+% b: classified as variable during review
+%@ var b shape=Q,K,U domain=binary role=primary :: Auxiliary binary variable for passenger accumulation
+
+% c: classified as variable during review
+%@ var c shape=K,U domain=non_negative role=primary :: Residual capacity of train
+
+% w: classified as variable during review
+%@ var w shape=K,U domain=non_negative role=primary :: Number of waiting passengers
+
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary :: Objective function value
+
+% unusable as an identifier, rename or drop: λ
+% T: classified as parameter during review
+%@ param T shape=Q kind=vector :: Discretized time points
+
+% x: classified as variable during review
+%@ var x shape=Q,K,U domain=non_negative role=primary :: Slack variable for departure time offset
+
+% z: classified as variable during review
+%@ var z shape=Q,K,U domain=binary role=primary :: Binary variable indicating departure time interval
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of time intervals
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Time interval index
+
+% unusable as an identifier, rename or drop: ε
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Passenger arrival sample index
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar :: Set of inner loop trains
+
+% Bound by a quantifier or big operator, so no declaration of their own: j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear :: Running time constraint
+%@ con eq_0002 kind=linear :: Dwell time constraint
+%@ con eq_0003 kind=headway :: Headway constraint
+%@ con eq_0004_a kind=capacity :: Bidirectional section occupancy constraint (outbound)
+%@ con eq_0004_b kind=capacity :: Bidirectional section occupancy constraint (inbound)
+%@ con eq_0005_a kind=big_m :: Alternate strategy shared-section sequencing constraint (train k before l)
+%@ con eq_0005_b kind=big_m :: Alternate strategy shared-section sequencing constraint (train l before k)
+%@ con eq_0006_a kind=big_m :: ShortTurn right-left shared-region sequencing constraint (left-loop train l before right-loop train k)
+%@ con eq_0006_b kind=big_m :: ShortTurn right-left shared-region sequencing constraint (right-loop train k before left-loop train l)
+%@ con eq_0007_a kind=big_m :: ShortTurn left-bidirectional shared-section headway constraint (bidirectional train j before left-loop train l)
+%@ con eq_0007_b kind=big_m :: ShortTurn left-bidirectional shared-region sequencing constraint (left-loop train l before bidirectional train j)
+%@ con eq_0007_c kind=big_m :: ShortTurn left-bidirectional shared-region sequencing constraint (bidirectional train j before left-loop train l)
+%@ con eq_0012 kind=flow_balance :: Onboard passenger balance constraint
+%@ con eq_0014 kind=linear :: Headway deviation objective term
+%@ con eq_0017 kind=linear :: Departure interval selection (exactly one interval) constraint
+%@ con eq_0018 kind=linear :: Departure offset bounds within selected interval
+%@ con eq_0019_a kind=linear :: Full time-indexed departure time expression
+%@ con eq_0019_b kind=linear :: Full time-indexed departure interval selection constraint
+%@ con eq_0020 kind=linear :: Definition of cumulative departure interval indicator b
+%@ con eq_0022 kind=flow_balance :: Total waiting passenger accumulation constraint
+%@ con eq_0033 kind=linear :: Equation 33 constraint of the hybrid MILP model
+%@ con eq_0034 kind=linear :: Equation 34 constraint of the hybrid MILP model
+%@ con eq_0035 kind=linear :: Equation 35 constraint of the hybrid MILP model
+%@ con eq_0036 kind=linear :: Equation 36 constraint of the hybrid MILP model
+%@ con eq_0037 kind=linear :: Equation 37 constraint of the hybrid MILP model
+%@ con eq_0038 kind=linear :: Equation 38 constraint of the hybrid MILP model
+%@ con eq_0039 kind=linear :: Equation 39 constraint of the hybrid MILP model
+%@ con eq_0041 kind=linear :: Equation 41 constraint of the hybrid MILP model
+%@ con eq_0043_a kind=linear :: Equation 43a constraint of the hybrid MILP model
+%@ con eq_0043_b kind=linear :: Equation 43b constraint of the hybrid MILP model
+%@ con eq_0047 kind=linear :: Equation 47 constraint of the hybrid MILP model
+%@ con eq_0048 kind=linear :: Equation 48 constraint of the hybrid MILP model

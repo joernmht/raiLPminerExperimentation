@@ -1,0 +1,37 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2015.05.008
+%@ meta id=10.1016_j.apm.2015.05.008 family=milp schema=0.1.0
+%@ name :: A simulated annealing algorithm for first train transfer problem in urban railway networks
+%@ desc :: Mined from A simulated annealing algorithm for first train transfer problem in urban railway networks (Applied Mathematical Modelling, 2015).
+%@ prov source :: 10.1016/j.apm.2015.05.008
+%@ prov reference :: A simulated annealing algorithm for first train transfer problem in urban railway networks
+%@ prov author :: Liujiang Kang; Xiaoning Zhu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger transfer waiting time
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Generic time variable for arrival, departure, running, dwell, and waiting times
+%@ index q ordered=0 cyclic=0 :: Index for station sequence number in a line
+%@ param T shape=- kind=scalar domain=continuous :: Generic parameter for time bounds (earliest, latest, min, max)
+%@ var h shape=- domain=integer role=primary drole=- lo=- hi=- :: Number of trains passed before transfer, used in waiting time calculation
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger transfer waiting time (objective)
+%@ index L ordered=0 cyclic=0 :: Set of all lines in the network
+%@ index S ordered=0 cyclic=0 :: Set of stations on a line
+%@ index l ordered=0 cyclic=0 :: Index for a line, also used for feeder line
+%@ con eq_0003 kind=linear domain=- indicator=- :: Arrival time tracking of first train at station s of line l
+%@ con eq_0005 kind=linear domain=- indicator=- :: Transfer waiting time computation between lines l and l' at station s
+%@ con eq_0006 kind=linear domain=- indicator=- :: First-train dispatch time limits for line l
+%@ con eq_0007 kind=linear domain=- indicator=- :: First-train dispatch time limits for line l'
+%@ con eq_0008 kind=linear domain=- indicator=- :: Running time limits between stations of line l
+%@ con eq_0009 kind=linear domain=- indicator=- :: Running time limits between stations of line l'
+%@ con eq_0010 kind=linear domain=- indicator=- :: Dwell time limits at stations of line l
+%@ con eq_0011 kind=linear domain=- indicator=- :: Dwell time limits at stations of line l'
+\begin{align}
+  & t_{\mathit{sl}}^{A} = t_{l}^{o} + \sum_{k = 2}^{q} t_{\mathit{lk} \left(k - 1\right)}^{R} + \sum_{k = 1}^{q - 1} t_{\mathit{lk}}^{\mathit{Dw}} , \tag{eq\_0003} \\
+  & t_{\mathit{sll}^{'}}^{w} = h \cdot T_{l^{'}}^{H} + t_{\mathit{sl}^{'}}^{D} - \left(t_{\mathit{sl}}^{A} + T_{\mathit{sll}^{'}}^{\mathit{Tra}}\right) . \tag{eq\_0005} \\
+  & T_{\mathit{earliest}} \leq t_{l}^{o} \leq T_{\mathit{latest}} , \tag{eq\_0006} \\
+  & T_{\mathit{earliest}} \leq t_{l^{'}}^{o} \leq T_{\mathit{latest}} . \tag{eq\_0007} \\
+  & T_{\text{min} \mathit{lk} \left(k - 1\right)}^{R} \leq t_{\mathit{lk} \left(k - 1\right)}^{R} \leq T_{\text{max} \mathit{lk} \left(k - 1\right)}^{R} , \tag{eq\_0008} \\
+  & T_{\text{min} l^{'} k \left(k - 1\right)}^{R} \leq t_{l^{'} k \left(k - 1\right)}^{R} \leq T_{\text{max} l^{'} k \left(k - 1\right)}^{R} . \tag{eq\_0009} \\
+  & T_{min}^{\mathit{Dw}} \leq t_{\mathit{ls}}^{\mathit{Dw}} \leq T_{max}^{\mathit{Dw}} , \tag{eq\_0010} \\
+  & T_{min}^{\mathit{Dw}} \leq t_{l^{'} s}^{\mathit{Dw}} \leq T_{max}^{\mathit{Dw}} . \tag{eq\_0011} \\
+  \min\quad & \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} t_{\mathit{sll}^{'}}^{w} . \tag{eq\_0012} \\
+\end{align}

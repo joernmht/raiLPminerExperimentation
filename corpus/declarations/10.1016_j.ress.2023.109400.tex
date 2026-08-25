@@ -1,0 +1,134 @@
+% Declaration sidecar for 10.1016_j.ress.2023.109400
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ress.2023.109400
+% Railway operation recovery method of regional high-speed railway based on optimal resilience after earthquakes
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ress.2023.109400.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted train delay, cancellation and passenger deviation penalties while maximizing special train arrangement benefits.
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of train services.
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Train service index.
+
+% y: classified as variable during review
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train service is canceled (1) or not (0).
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passengers.
+
+% unusable as an identifier, rename or drop: η
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of train events (arrivals and departures).
+
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay variable for train events.
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Train event index.
+
+% in: classified as index during review
+%@ index in ordered=0 cyclic=0 :: Subset of events in the in-area.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant (big-M).
+
+% time: classified as parameter during review
+%@ param time shape=- kind=scalar domain=- :: Function returning the planned time of a train event.
+
+% x: classified as variable during review
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled time of a train event.
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Maximum allowed deviation from original timetable.
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Train event index (destination of an activity).
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (train running and dwelling).
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar domain=- :: Minimum time for an activity (running or dwelling).
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Activity index.
+
+% unusable as an identifier, rename or drop: λ
+% line: classified as parameter during review
+%@ param line shape=- kind=scalar domain=- :: Function returning the line of a train service.
+
+% unusable as an identifier, rename or drop: φ
+% C: classified as parameter during review
+%@ param C shape=S kind=vector domain=- :: Capacity of a station (number of arrival-departure tracks).
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Passenger index.
+
+% z: classified as variable during review
+%@ var z shape=P,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger p is assigned to train t.
+
+% out: classified as index during review
+%@ index out ordered=0 cyclic=0 :: Subset of events in the out-area.
+
+% O: classified as parameter during review
+%@ param O shape=P kind=vector domain=- :: Origin station of a passenger.
+
+% V: classified as parameter during review
+%@ param V shape=T kind=vector domain=- :: Rated capacity of a train.
+
+% v: classified as parameter during review
+%@ param v shape=T,S kind=matrix domain=- :: Number of occupied seats on a train at a station.
+
+% Bound by a quantifier or big operator, so no declaration of their own: s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Rescheduled departure time of an original train cannot be earlier than the originally planned time.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Deviation of original train events from the original timetable is not more than maximum allowed deviation D.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Train running time at a segment is at least the minimum running time.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Train stopping time at a station is at least the minimum stopping time.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Ordering constraint ensuring any two events occur sequentially.
+%@ con eq_0008 kind=linear domain=- indicator=- :: No overtaking on segments: departure order at the previous station equals arrival order at the next station.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Receiving trains at stations must satisfy minimum headway intervals.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Departure interval constraint for two trains on the same main track and direction.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival interval constraint for two trains on the same main track and direction.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station capacity constraint: a train arrival requires at least one spare arrival-departure track.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Each passenger is either assigned to a matching train or not assigned at all.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Each passenger can be rearranged to at most one train.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Train capacity constraint: passengers on a train at any station do not exceed rated capacity.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Scheduled time of additional passenger trains must be within the timetable cycle, otherwise the train is canceled.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Rescheduled time of original trains must be within the timetable cycle and cannot be canceled.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Deviation of rescheduled original train time from the original timetable is at most D.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train running time at a segment is at least the minimum running time (out-area).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train stopping time at a station is at least the minimum stopping time (out-area).
+%@ con eq_0023 kind=linear domain=- indicator=- :: Ordering constraint ensuring any two events occur sequentially (out-area).
+%@ con eq_0024 kind=linear domain=- indicator=- :: No overtaking on segments (out-area).
+%@ con eq_0025 kind=linear domain=- indicator=- :: Receiving trains at stations must satisfy minimum headway intervals (out-area).
+%@ con eq_0026 kind=linear domain=- indicator=- :: Departure interval constraint for trains on the same main track and direction (out-area).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Arrival interval constraint for trains on the same main track and direction (out-area).
+%@ con eq_0028 kind=linear domain=- indicator=- :: Station capacity constraint (out-area).

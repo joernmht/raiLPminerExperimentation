@@ -1,0 +1,129 @@
+% Declaration sidecar for 10.1016_j.omega.2023.102968
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2023.102968
+% Integrated optimization of train timetable and train unit circulation for a Y-type urban rail transit system with flexible train composition mode
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2023.102968.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize alpha-weighted passenger waiting time plus beta-weighted number of train units used
+
+% t: classified as variable during review
+%@ var t shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of service i at station s
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of all services
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of all stations
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between consecutive services
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for services
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for stations
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines (including trunk and branches)
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for lines
+
+% unusable as an identifier, rename or drop: τ
+% x: classified as variable during review
+%@ var x shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service i is converted
+
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: μ
+% y: classified as variable during review
+%@ var y shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Total number of train units used by service i
+
+% c: classified as variable during review
+%@ var c shape=I,I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units transferred from service i to service i' at station s
+
+% o: classified as variable during review
+%@ var o shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units leaving depot at station s for service i
+
+% unusable as an identifier, rename or drop: ξ
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of routes (major and minor)
+
+% e: classified as variable during review
+%@ var e shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of train units entering depot at station s after service i
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+
+% unusable as an identifier, rename or drop: ρ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of all passengers
+
+% unusable as an identifier, rename or drop: υ
+% z: classified as variable during review
+%@ var z shape=P,I,R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger p boards service i on route r
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Index for routes
+
+% Cap: classified as parameter during review
+%@ param Cap shape=- kind=scalar domain=- :: Capacity of a train unit
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: ω
+% Bound by a quantifier or big operator, so no declaration of their own: p
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Headway: departure headway between consecutive services at each station
+%@ con eq_0002 kind=linear domain=- indicator=- :: Arrival time at next station equals departure time plus running time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time at non-joint station equals arrival time plus dwell time
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure time at joint stations includes coupling/decoupling time for converted services
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure times of a service are equal at all joint stations
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minor-route train units of converted services follow the minor-route incidence
+%@ con eq_0007 kind=linear domain=- indicator=- :: Major-route train units equal total train units minus minor-route train units
+%@ con eq_0008 kind=linear domain=- indicator=- :: Converted services must be performed by at least a double composition
+%@ con eq_0009 kind=linear domain=- indicator=- :: Balance of train units at starting station for downstream services
+%@ con eq_0010 kind=linear domain=- indicator=- :: Balance of train units at starting station for upstream services
+%@ con eq_0011 kind=linear domain=- indicator=- :: Balance of train units at ending station for downstream services
+%@ con eq_0012 kind=linear domain=- indicator=- :: Balance of train units at ending station for upstream services
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum turnaround time before train units can be inherited
+%@ con eq_0014 kind=linear domain=- indicator=- :: Turnaround inheritance is bounded by the binary inheritance indicator
+%@ con eq_0015 kind=linear domain=- indicator=- :: Boarding time upper bound: passenger cannot board before departure
+%@ con eq_0016 kind=linear domain=- indicator=- :: Boarding time lower bound for the boarding-time indicator
+%@ con eq_0017 kind=linear domain=- indicator=- :: A passenger can board a service only if the boarding time condition is satisfied
+%@ con eq_0018 kind=linear domain=- indicator=- :: Unique boarding: each passenger boards exactly one train unit
+%@ con eq_0019 kind=linear domain=- indicator=- :: Route-specific unique boarding: each passenger on a route boards exactly one service
+%@ con eq_0020 kind=linear domain=- indicator=- :: Absolute temporal FIFO for trunk passengers
+%@ con eq_0021 kind=linear domain=- indicator=- :: Relative temporal FIFO for major and minor route passengers
+%@ con eq_0022 kind=linear domain=- indicator=- :: Absolute spatial FIFO for trunk passengers
+%@ con eq_0025 kind=linear domain=- indicator=- :: Turnaround directions: invalid train unit transfers are forced to zero
+%@ con eq_0028 kind=linear domain=- indicator=- :: Objective component: minimize total number of train units leaving depots
+%@ con eq_0029 kind=linear domain=- indicator=- :: Linear weighted objective combining passenger waiting time and train units used
+%@ con eq_0030 kind=linear domain=- indicator=- :: Linearization of passenger waiting time product in the objective
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization of passenger waiting time product in the objective
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearization of train unit usage objective
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearization of train unit usage objective
+%@ con eq_0059 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model
+%@ con eq_0060 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model

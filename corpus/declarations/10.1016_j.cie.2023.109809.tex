@@ -1,0 +1,246 @@
+% Declaration sidecar for 10.1016_j.cie.2023.109809
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2023.109809
+% Demand-driven flexible-periodicity train timetabling model and algorithm for a rail transit network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2023.109809.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time, train operation cost, and timetable periodicity deviation
+
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Range of acceptable periodicity frequency vacancy
+
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Set of lines in the rail transit network
+
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of lines in the rail transit network
+
+% w: classified as variable during review
+%@ var w shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k in period n is dispatched on line l
+
+% unusable as an identifier, rename or drop: Λ
+% unusable as an identifier, rename or drop: Φ
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of integers
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Index for cyclic period
+
+% td: classified as variable during review
+%@ var td shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train departs at specific time interval
+
+% TDC: classified as parameter during review
+%@ param TDC shape=- kind=scalar domain=- :: Range of acceptable periodicity time location deviation
+
+% tdc: classified as variable during review
+%@ var tdc shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable for departure time periodicity deviation
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time intervals in the total time horizon
+
+% unusable as an identifier, rename or drop: δ
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Index for destination station
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Station index
+
+% unusable as an identifier, rename or drop: Ω
+% unusable as an identifier, rename or drop: α
+% pwt: classified as variable during review
+%@ var pwt shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
+
+% toc: classified as variable during review
+%@ var toc shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Train operation cost
+
+% tpd: classified as variable during review
+%@ var tpd shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Timetable periodicity deviation
+
+% z: classified as variable during review
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+
+% unusable as an identifier, rename or drop: β
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Prefix for passenger-related variables
+
+% b: classified as variable during review
+%@ var b shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers at station i and time δ
+
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers on platform at station i and time δ
+
+% pw: classified as variable during review
+%@ var pw shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time component
+
+% tr: classified as variable during review
+%@ var tr shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Train operation time for train k in period n
+
+% tp: classified as variable during review
+%@ var tp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Timetable periodicity deviation component
+
+% NTC: classified as parameter during review
+%@ param NTC shape=- kind=scalar domain=- :: Number of cyclic periods
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Headway index
+
+% TC: classified as parameter during review
+%@ param TC shape=- kind=scalar domain=- :: Length of a cyclic period time
+
+% unusable as an identifier, rename or drop: Π
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Rolling stock related parameter
+
+% unusable as an identifier, rename or drop: Θ
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large positive constant
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Number of trains
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Number of periods
+
+% TTR: classified as parameter during review
+%@ param TTR shape=- kind=scalar domain=- :: Transfer time at station
+
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: Passenger arrival rate
+
+% PAS: classified as parameter during review
+%@ param PAS shape=- kind=scalar domain=- :: Passenger arrival rate at station i and time δ
+
+% PA: classified as parameter during review
+%@ param PA shape=- kind=scalar domain=- :: Passenger arrival rate
+
+% a: classified as variable during review
+%@ var a shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of alighting passengers at station i and time δ
+
+% PRA: classified as parameter during review
+%@ param PRA shape=- kind=scalar domain=- :: Probability of alighting at station i
+
+% PRT: classified as parameter during review
+%@ param PRT shape=- kind=scalar domain=- :: Probability of transferring from station i' to i
+
+% Cap: classified as parameter during review
+%@ param Cap shape=- kind=scalar domain=- :: Train capacity
+
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar domain=- :: Origin station index
+
+% r: classified as parameter during review
+%@ param r shape=- kind=scalar domain=- :: Rolling stock index
+
+% PW: classified as variable during review
+%@ var PW shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time component
+
+% TI: classified as parameter during review
+%@ param TI shape=- kind=scalar domain=- :: Length of a time interval
+
+% Bound by a quantifier or big operator, so no declaration of their own: C, NKT, j, k, l, n, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Train dispatch variable frequency lower bound
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure time periodicity deviation integer domain
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time periodicity deviation bound
+%@ con eq_0007 kind=linear domain=- indicator=- :: Train departure time relation to standard departure time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger waiting time decomposition
+%@ con eq_0010 kind=linear domain=- indicator=- :: Waiting time at intermediate stations
+%@ con eq_0011 kind=linear domain=- indicator=- :: Waiting time at transfer stations
+%@ con eq_0012 kind=linear domain=- indicator=- :: Train operation cost calculation
+%@ con eq_0013 kind=linear domain=- indicator=- :: Train operation time calculation
+%@ con eq_0014 kind=linear domain=- indicator=- :: Timetable periodicity deviation decomposition
+%@ con eq_0015 kind=linear domain=- indicator=- :: Time location deviation calculation
+%@ con eq_0016 kind=linear domain=- indicator=- :: Frequency vacancy calculation
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimum headway between successive standard trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maximum headway between successive standard trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum headway across cyclic periods
+%@ con eq_0020 kind=linear domain=- indicator=- :: Maximum headway across cyclic periods
+%@ con eq_0021 kind=linear domain=- indicator=- :: Unique departure time cutting plane
+%@ con eq_0023 kind=linear domain=- indicator=- :: Running and dwell time propagation between stations
+%@ con eq_0024 kind=linear domain=- indicator=- :: Minimum station headway constraint
+%@ con eq_0025 kind=linear domain=- indicator=- :: Maximum station headway constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Train ordering big-M constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: Maximum dispatched trains per line
+%@ con eq_0029 kind=linear domain=- indicator=- :: Rolling stock availability at depot
+%@ con eq_0030 kind=linear domain=- indicator=- :: Initial platform waiting passengers balance
+%@ con eq_0031 kind=linear domain=- indicator=- :: Platform waiting passenger flow balance
+%@ con eq_0032 kind=linear domain=- indicator=- :: Boarding passengers limit at first interval
+%@ con eq_0033 kind=linear domain=- indicator=- :: Boarding passengers limit at later intervals
+%@ con eq_0034 kind=linear domain=- indicator=- :: Alighting passengers zero at origin and initial interval
+%@ con eq_0035 kind=linear domain=- indicator=- :: Alighting passengers calculation
+%@ con eq_0036 kind=linear domain=- indicator=- :: Transfer passengers zero at non-transfer stations
+%@ con eq_0037 kind=linear domain=- indicator=- :: Transfer passengers calculation
+%@ con eq_0038 kind=linear domain=- indicator=- :: Initial train load at origin
+%@ con eq_0039 kind=linear domain=- indicator=- :: Train load balance at origin stations
+%@ con eq_0040 kind=linear domain=- indicator=- :: Train load balance at intermediate stations
+%@ con eq_0041 kind=linear domain=- indicator=- :: Train capacity constraint
+%@ con eq_0045 kind=linear domain=- indicator=- :: Intermediate passenger variables nonnegative integer domains
+%@ con eq_0046 kind=linear domain=- indicator=- :: Train departure time binary domain
+%@ con eq_0047 kind=linear domain=- indicator=- :: Standard train departure time binary domain
+%@ con eq_0048 kind=linear domain=- indicator=- :: Train dispatch variable binary domain
+%@ con eq_0049 kind=linear domain=- indicator=- :: Departure time periodicity deviation integer domain
+%@ con eq_0057 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0058 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0059 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0060 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0061 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0063 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0064 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0065 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0066 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0068 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0069 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0070 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0071 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0072 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0073 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0074 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0075 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0076 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0077 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0078 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0079 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0080 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0081 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0082 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0083 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0084 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0085 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0086 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0087 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0088 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ con eq_0089 kind=linear domain=- indicator=- :: DDFPT auxiliary constraint
+%@ param alpha1 shape=- domain=- role=- drole=- lo=- hi=- :: objective weight for passenger waiting time
+%@ param alpha2 shape=- domain=- role=- drole=- lo=- hi=- :: objective weight for operating cost
+%@ param alpha3 shape=- domain=- role=- drole=- lo=- hi=- :: objective weight for passenger delay
+%@ param WF shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Parameter WF
+%@ param pb shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Passenger boarding parameter
+%@ param pf shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Passenger flow parameter
+%@ param TW shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Transfer waiting time parameter
+%@ var ztdc shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Integer auxiliary for tdc
+%@ var trt shape=- domain=continuous role=variable drole=- lo=- hi=- :: Train running time variable

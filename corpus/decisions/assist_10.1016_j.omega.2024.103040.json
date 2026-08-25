@@ -1,0 +1,258 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.omega.2024.103040",
+      "doi": "10.1016/j.omega.2024.103040",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0002",
+          "status": "corrected",
+          "note": "\\sum_{(i,j,t,\\mathit{tp}) \\in A_{k}^{i,+}} x_{i,j,t,\\mathit{tp}}^{k} - \\sum_{(j,i,\\mathit{tp},t) \\in A_{k}^{i,-}} x_{j,i,\\mathit{tp},t}^{k} = b_{i,t}^{k} \\qquad \\forall k \\in K, i \\in \\mathcal{N}, t \\in \\mathcal{T}",
+          "parts": [
+            "\\sum_{(i,j,t,\\mathit{tp}) \\in A_{k}^{i,+}} x_{i,j,t,\\mathit{tp}}^{k} - \\sum_{(j,i,\\mathit{tp},t) \\in A_{k}^{i,-}} x_{j,i,\\mathit{tp},t}^{k} = b_{i,t}^{k} \\qquad \\forall k \\in K, i \\in \\mathcal{N}, t \\in \\mathcal{T}"
+          ]
+        },
+        {
+          "id": "eq-0003",
+          "status": "corrected",
+          "note": "\\underset{\\genfrac{}{}{0pt}{}{(i,j,t,\\mathit{tp}) \\in A_{\\mathit{drive}},}{t < T_{k,s}^{\\mathit{dep}}}}{\\sum} x_{i,j,t,\\mathit{tp}}^{k} = 0 \\qquad \\forall k \\in K, s \\in I_{\\mathit{stop}}^{k}, i \\in \\mathcal{N}(s)",
+          "parts": [
+            "\\underset{\\genfrac{}{}{0pt}{}{(i,j,t,\\mathit{tp}) \\in A_{\\mathit{drive}},}{t < T_{k,s}^{\\mathit{dep}}}}{\\sum} x_{i,j,t,\\mathit{tp}}^{k} = 0 \\qquad \\forall k \\in K, s \\in I_{\\mathit{stop}}^{k}, i \\in \\mathcal{N}(s)"
+          ]
+        },
+        {
+          "id": "eq-0004",
+          "status": "corrected",
+          "note": "\\underset{\\genfrac{}{}{0pt}{}{(i,j,t,\\mathit{tp}) \\in A_{\\mathit{drive}},}{t = T_{k,s}^{\\mathit{dep}}}}{\\sum} x_{i,j,t,\\mathit{tp}}^{k} = 1 \\qquad \\forall k \\in K_{0}, s \\in I_{\\mathit{stop}}^{k}, i \\in \\mathcal{N}(s)",
+          "parts": [
+            "\\underset{\\genfrac{}{}{0pt}{}{(i,j,t,\\mathit{tp}) \\in A_{\\mathit{drive}},}{t = T_{k,s}^{\\mathit{dep}}}}{\\sum} x_{i,j,t,\\mathit{tp}}^{k} = 1 \\qquad \\forall k \\in K_{0}, s \\in I_{\\mathit{stop}}^{k}, i \\in \\mathcal{N}(s)"
+          ]
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "\\sum_{k \\in K} x_{i,j,t,\\mathit{tp}}^{k} = 0 \\qquad \\forall (i,j,t,\\mathit{tp}) \\in A_{\\mathit{disruption}}",
+          "parts": [
+            "\\sum_{k \\in K} x_{i,j,t,\\mathit{tp}}^{k} = 0 \\qquad \\forall (i,j,t,\\mathit{tp}) \\in A_{\\mathit{disruption}}"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{\\mathit{headway},a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{drive}}",
+          "parts": [
+            "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{\\mathit{headway},a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{drive}}"
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0009",
+          "status": "corrected",
+          "note": "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{\\mathit{safety},a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{track}}",
+          "parts": [
+            "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{\\mathit{safety},a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{track}}"
+          ]
+        },
+        {
+          "id": "eq-0010",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}",
+          "parts": [
+            "\\sum_{k \\in K, (\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}) \\in \\Phi_{a}} x_{\\mathit{ip},\\mathit{jp},\\mathit{tau},\\mathit{taup}}^{k} \\le 1 \\qquad \\forall a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "F = \\sum_{k \\in K, (i,j,t,\\mathit{tp}) \\in A_{k}} c_{i,j,t,\\mathit{tp}}^{k} \\cdot x_{i,j,t,\\mathit{tp}}^{k}",
+          "parts": [
+            "F = \\sum_{k \\in K, (i,j,t,\\mathit{tp}) \\in A_{k}} c_{i,j,t,\\mathit{tp}}^{k} \\cdot x_{i,j,t,\\mathit{tp}}^{k}"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "\\min F",
+          "parts": [
+            "\\min F"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "corrected",
+          "note": "L = \\sum_{k \\in K, a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\lambda_{a} \\cdot \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 \\right)",
+          "parts": [
+            "L = \\sum_{k \\in K, a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\lambda_{a} \\cdot \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 \\right)"
+          ]
+        },
+        {
+          "id": "eq-0016",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0017",
+          "status": "corrected",
+          "note": "L_{k} = \\sum_{a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}, \\mathit{ap} \\in \\Phi_{a}} \\lambda_{\\mathit{ap}} \\cdot x_{a}^{k} \\qquad \\forall k \\in K",
+          "parts": [
+            "L_{k} = \\sum_{a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}, \\mathit{ap} \\in \\Phi_{a}} \\lambda_{\\mathit{ap}} \\cdot x_{a}^{k} \\qquad \\forall k \\in K",
+            "\\sum_{a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}, \\mathit{ap} \\in \\Phi_{a}} \\lambda_{\\mathit{ap}} \\cdot x_{a}^{k} = \\sum_{a \\in A} \\left( c_{a}^{k} + \\sum_{\\mathit{ap} \\in \\Phi_{a}} \\lambda_{\\mathit{ap}} \\right) \\cdot x_{a}^{k} \\qquad \\forall k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0018",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0019",
+          "status": "corrected",
+          "note": "L_{\\rho} = \\sum_{k \\in K, a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\lambda_{a} \\cdot \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 \\right) + \\frac{\\rho}{2} \\left( \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 + \\delta_{a} \\right) \\right)^{2}",
+          "parts": [
+            "L_{\\rho} = \\sum_{k \\in K, a \\in A} c_{a}^{k} \\cdot x_{a}^{k} + \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\lambda_{a} \\cdot \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 \\right) + \\frac{\\rho}{2} \\left( \\sum_{a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}} \\left( \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} - 1 + \\delta_{a} \\right) \\right)^{2}"
+          ]
+        },
+        {
+          "id": "eq-0020",
+          "status": "corrected",
+          "note": "\\delta_{a} + \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} = 1 \\qquad \\forall a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}",
+          "parts": [
+            "\\delta_{a} + \\sum_{k \\in K, \\mathit{ap} \\in \\Phi_{a}} x_{\\mathit{ap}}^{k} = 1 \\qquad \\forall a \\in A_{\\mathit{drive}} \\cup A_{\\mathit{track}}"
+          ]
+        },
+        {
+          "id": "eq-0021",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0022",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0023",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0024",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0025",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0026",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0027",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0028",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0029",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0030",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0031",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0032",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0033",
+          "status": "duplicate",
+          "duplicate_of": "eq-0016"
+        },
+        {
+          "id": "eq-0034",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0035",
+          "status": "duplicate",
+          "duplicate_of": "eq-0024"
+        },
+        {
+          "id": "eq-0036",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0037",
+          "status": "accepted"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.omega.2024.103040",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.omega.2024.103040",
+      "symbols": {
+        "A": "index",
+        "F": "variable",
+        "I": "index",
+        "K": "index",
+        "L": "variable",
+        "N": "index",
+        "Q": "variable",
+        "T": "parameter",
+        "a": "index",
+        "c": "parameter",
+        "ĉ": "parameter",
+        "d": "parameter",
+        "e": "parameter",
+        "i": "index",
+        "k": "index",
+        "l": "parameter",
+        "o": "parameter",
+        "p": "variable",
+        "pt": "parameter",
+        "q": "variable",
+        "res": "variable",
+        "s": "index",
+        "x": "variable",
+        "x̂": "variable",
+        "Φ": "index",
+        "δ": "variable",
+        "λ": "variable",
+        "μ": "variable",
+        "ρ": "parameter"
+      }
+    }
+  ]
+}

@@ -1,0 +1,196 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.02.015
+%@ meta id=10.1016_j.trb.2019.02.015 family=milp schema=0.1.0
+%@ name :: Railway timetable rescheduling with flexible stopping and flexible short-turning during disruptions
+%@ desc :: Mined from Railway timetable rescheduling with flexible stopping and flexible short-turning during disruptions (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.02.015
+%@ prov reference :: Railway timetable rescheduling with flexible stopping and flexible short-turning during disruptions
+%@ prov author :: Yongqiu Zhu; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger-weighted delays (delay, cancellation and skipped-stop penalties, minus added-stop savings)
+%@ index E ordered=0 cyclic=0 :: Set of events (arrival and departure events)
+%@ param M shape=- kind=scalar domain=- :: Large constant (M1=1440, M2=2880)
+%@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary cancellation decision for event e
+%@ param o shape=E kind=vector domain=- :: Original scheduled time of event e
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled time of event e
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e
+%@ param D shape=- kind=scalar domain=- :: Maximum allowed delay per event
+%@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary skip indicator for activity a (1=skip scheduled stop, 0=add stop to pass)
+%@ param R shape=- kind=scalar domain=- :: Recovery time after disruption end for resuming original timetable
+%@ index A ordered=0 cyclic=0 :: Set of activities (running, dwelling, passing, turning, etc.)
+%@ param lambda shape=- kind=scalar domain=- :: Maximum percentage allowed for running time extension
+%@ param L shape=A kind=vector domain=- :: Minimum duration of activity a
+%@ var q shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary order indicator: 1 if event e occurs before event e'
+%@ param N shape=- kind=scalar domain=- :: Total number of tracks at a station
+%@ var m shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary selection of short-turn or OD-turn activity a
+%@ param Delta shape=A kind=vector domain=- :: Acceleration/deceleration time adjustment for run activity a
+%@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary short-turn station selection for event e
+%@ index TR ordered=0 cyclic=0 :: Set of trains
+%@ param tail shape=A kind=vector domain=- :: Tail event of activity a
+%@ param head shape=A kind=vector domain=- :: Head event of activity a
+%@ var n shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary occupancy indicator between arrival events e and e'
+%@ var p shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary platform-track requirement for arrival event e
+%@ param w shape=E kind=vector domain=- :: Passenger-dependent weight for delay/cancellation/skip/add decisions
+%@ param z shape=E kind=vector domain=- :: Number of passengers affected by event e
+%@ param alpha shape=- kind=scalar domain=- :: Assumed delay per passenger affected by cancellation
+%@ param beta shape=- kind=scalar domain=- :: Assumed delay per passenger affected by a skipped stop
+%@ param gamma shape=- kind=scalar domain=- :: Assumed saved time per passenger benefiting from an added stop
+%@ con eq_0001 kind=linear domain=- indicator=- :: Rescheduled time within [o_e, o_e+M1], fixed at o_e+M1 if cancelled
+%@ con eq_0002 kind=linear domain=- indicator=- :: Delay definition: x_e - o_e = d_e + M1 c_e
+%@ con eq_0003 kind=linear domain=- indicator=- :: Non-negativity of delay d_e
+%@ con eq_0004 kind=linear domain=- indicator=- :: Upper bound D on delay except for E_NMdelay events
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Entry-station departure events during disruption must be delayed to t_end or cancelled (part a)
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Entry-station departure events during disruption must be delayed to t_end or cancelled (part b)
+%@ con eq_0006 kind=linear domain=- indicator=- :: No cancellation for events originally before t_start
+%@ con eq_0007 kind=linear domain=- indicator=- :: No rescheduling for events originally before t_start
+%@ con eq_0008 kind=linear domain=- indicator=- :: No cancellation for departure events originally at/after t_end+R
+%@ con eq_0009 kind=linear domain=- indicator=- :: No rescheduling for departure events originally at/after t_end+R
+%@ con eq_0010 kind=linear domain=- indicator=- :: No cancellation for arrivals whose running departure is after t_end+R
+%@ con eq_0011 kind=linear domain=- indicator=- :: No rescheduling for arrivals whose running departure is after t_end+R
+%@ con eq_0012 kind=linear domain=- indicator=- :: Run activity endpoints have equal cancellation status
+%@ con eq_0013 kind=linear domain=- indicator=- :: Station activity endpoints have equal cancellation status unless short-turn involved
+%@ con eq_0014 kind=linear domain=- indicator=- :: Running time at least original scheduled running time
+%@ con eq_0015 kind=linear domain=- indicator=- :: Running time extension at most λ times original running time
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum headway between same-direction events with ordering variable
+%@ con eq_0017 kind=linear domain=- indicator=- :: Ordering variables are complementary for same-direction headways
+%@ con eq_0018 kind=linear domain=- indicator=- :: No overtaking on open track
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum arrival-departure headway at single-track stations
+%@ con eq_0020 kind=linear domain=- indicator=- :: Ordering complementarity for single-track arrival-departure headways
+%@ con eq_0021 kind=linear domain=- indicator=- :: Two-track station headway for through station activity (situation 1)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Two-track station headway for turning activity (situation 2)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Dwell stop can be skipped only if tail arrival not cancelled
+%@ con eq_0024 kind=linear domain=- indicator=- :: Dwell stop can be skipped only if head departure not cancelled
+%@ con eq_0025 kind=linear domain=- indicator=- :: Pass activity with cancelled tail forces skip indicator s_a=1
+%@ con eq_0026 kind=linear domain=- indicator=- :: Pass activity with cancelled head forces skip indicator s_a=1
+%@ con eq_0027 kind=linear domain=- indicator=- :: Minimum duration for true stop; zero duration for skipped stop/non-stop with cancellations
+%@ con eq_0028 kind=linear domain=- indicator=- :: Upper bound on station activity duration under skip/cancellation
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Flexible-stopping running time constraint (part a of eq. 29)
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Flexible-stopping running time constraint (part b of eq. 29)
+%@ con eq_0029_c kind=linear domain=- indicator=- :: Flexible-stopping running time constraint (part c of eq. 29)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Flexible-stopping running time constraint for pass before OD turn (case 5 of Fig. 7)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Flexible-stopping running time constraint for dwell before pass (case 6 of Fig. 7)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Flexible-stopping running time constraint for OD turn before pass (case 7 of Fig. 7)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Flexible-stopping running time constraint for pass before pass (case 8 of Fig. 7)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Short-turn arrival side: cancellation of tail implies cancellation of head
+%@ con eq_0035 kind=linear domain=- indicator=- :: Short-turn arrival side: head can be cancelled only if tail cancelled or station selected
+%@ con eq_0036 kind=linear domain=- indicator=- :: Short-turn arrival side: selecting station as short-turn forces head cancellation
+%@ con eq_0037 kind=linear domain=- indicator=- :: Short-turn departure side: cancellation of head implies cancellation of tail
+%@ con eq_0038 kind=linear domain=- indicator=- :: Short-turn departure side: tail can be cancelled only if head cancelled or station selected
+%@ con eq_0039 kind=linear domain=- indicator=- :: Short-turn departure side: selecting station as short-turn forces tail cancellation
+%@ con eq_0040 kind=linear domain=- indicator=- :: One short-turn station per train with cancelled entry-side departure
+%@ con eq_0041 kind=linear domain=- indicator=- :: One short-turn station per train with cancelled exit-side arrival
+%@ con eq_0042 kind=linear domain=- indicator=- :: Select exactly one short-turn activity when arrival kept and station departure cancelled
+%@ con eq_0043 kind=linear domain=- indicator=- :: Select exactly one short-turn activity when departure kept and station arrival cancelled
+%@ con eq_0044 kind=linear domain=- indicator=- :: Respect minimum short-turn duration if short-turn activity selected
+%@ con eq_0045 kind=linear domain=- indicator=- :: Select one OD-turn activity for every uncancelled destination arrival
+%@ con eq_0046 kind=linear domain=- indicator=- :: Select one OD-turn activity for every uncancelled origin departure
+%@ con eq_0047 kind=linear domain=- indicator=- :: Respect minimum OD-turn duration if OD-turn activity selected
+%@ con eq_0048 kind=linear domain=- indicator=- :: Track occupancy n requires the other arrival to occur later
+%@ con eq_0049 kind=linear domain=- indicator=- :: Lower bound forcing n=1 when occupying train's departure is after the other arrival
+%@ con eq_0050 kind=linear domain=- indicator=- :: Upper bound forcing n=0 when occupying train's departure is before the other arrival
+%@ con eq_0051 kind=linear domain=- indicator=- :: No track occupancy by a cancelled arrival
+%@ con eq_0052 kind=linear domain=- indicator=- :: No track occupancy counted for a cancelled other arrival
+%@ con eq_0053 kind=linear domain=- indicator=- :: No occupancy if the corresponding station departure is cancelled (no turn activity)
+%@ con eq_0054 kind=linear domain=- indicator=- :: No occupancy if station departure cancelled and no short-turn activity selected
+%@ con eq_0055 kind=linear domain=- indicator=- :: Track headway lower bound for station activity with cancellation allowances
+%@ con eq_0056 kind=linear domain=- indicator=- :: Track headway upper bound for station activity with cancellation allowances
+%@ con eq_0057 kind=linear domain=- indicator=- :: Track headway lower bound for turn/OD-turn activity cases
+%@ con eq_0058 kind=linear domain=- indicator=- :: Track headway upper bound for turn/OD-turn activity cases
+%@ con eq_0059 kind=linear domain=- indicator=- :: Define ordering between opposite-direction arrival events
+%@ con eq_0060 kind=linear domain=- indicator=- :: Ordering complementarity for opposite-direction arrivals
+%@ con eq_0061 kind=linear domain=- indicator=- :: At least one track free at station for every arrival
+%@ con eq_0062 kind=linear domain=- indicator=- :: Cancelled arrival does not require platform track
+%@ con eq_0063 kind=linear domain=- indicator=- :: True stop requires a platform track
+%@ con eq_0064 kind=linear domain=- indicator=- :: Selected short-turn or OD-turn activity requires platform track
+%@ con eq_0065 kind=linear domain=- indicator=- :: Skipped or non-stop arrival (no turn) does not require platform track
+%@ con eq_0066 kind=linear domain=- indicator=- :: Turn-related arrival needs no platform track if skip and no turn selected
+%@ con eq_0067 kind=linear domain=- indicator=- :: Platform occupancy implies track occupancy
+%@ con eq_0068 kind=linear domain=- indicator=- :: Platform occupancy requires the occupying train to need a platform track
+%@ con eq_0069 kind=linear domain=- indicator=- :: Platform occupancy active when both track occupancy and platform need hold
+%@ con eq_0070 kind=linear domain=- indicator=- :: Platform track capacity for arrivals needing a platform track
+%@ con eq_0071 kind=linear domain=- indicator=- :: Objective expression: minimize weighted passenger delays
+%@ con eq_0073 kind=linear domain=- indicator=- :: Weight of delaying arrival event e equals alighting plus through passengers
+%@ con eq_0074 kind=linear domain=- indicator=- :: Weight of cancelling arrival event e equals α times alighting plus through passengers
+%@ con eq_0075 kind=linear domain=- indicator=- :: Weight of skipping dwell stop a equals β times alighting plus boarding passengers
+%@ con eq_0076 kind=linear domain=- indicator=- :: Weight of adding stop to pass a equals γ times earlier boarding/alighting passengers
+\begin{align}
+  & \begin{matrix} & M_{1} \cdot c_{e} \leq x_{e} - o_{e} \leq M_{1} , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix} & x_{e} - o_{e} = d_{e} + M_{1} \cdot c_{e} , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix} & d_{e} \geq 0 , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix} & d_{e} \leq D , e \in \left(E_{\text{ar}} \cup E_{\text{de}}\right) \backslash E^{\text{NMdelay}} ,\end{matrix} \tag{eq\_0004} \\
+  & x_{e} \geq t_{\text{end}} \left(1 - c_{e}\right) , e \in E_{\text{de}} , s t_{e} = s t_{\text{en}}^{d r_{e}} \tag{eq\_0005\_a} \\
+  & t_{\text{start}} \leq o_{e} < t_{\text{end}} \tag{eq\_0005\_b} \\
+  & \begin{matrix} & c_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} ,\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix} & x_{e} - o_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} .\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix} & c_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R ,\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix} & x_{e} - o_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R .\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix} & c_{e^{'}} = 0 , \left(e , e^{'}\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R ,\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix} & x_{e^{'}} - o_{e^{'}} = 0 , \left(e , e^{'}\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R .\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & c_{e^{'}} - c_{e} = 0 , \left(e , e^{'}\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix} & c_{e^{'}} - c_{e} = 0 , \left(e , e^{'}\right) \in A_{\text{station}} , e \notin E_{\text{ar}}^{\text{turn}} , e^{'} \notin E_{\text{de}}^{\text{turn}} .\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \geq o_{e^{'}} - o_{e} , a = \left(e , e^{'}\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \leq \left(1 + \mathit{lambda}\right) \left(o_{e^{'}} - o_{e}\right) , a = \left(e , e^{'}\right) \in A_{\text{run}} ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \geq L_{a} + M_{2} \left(q_{e , e^{'}} - 1\right) , a = \left(e , e^{'}\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & q_{e , e^{'}} + q_{e^{'} , e} = 1 , \left(e , e^{'}\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & q_{e_{1} , e_{1}^{'}} - q_{e_{2} , e_{2}^{'}} = 0 , \left(e_{1} , e_{1}^{'}\right) \in A_{\text{head}}^{\text{de}} , \left(e_{2} , e_{2}^{'}\right) \in A_{\text{head}}^{\text{ar}} , \left(e_{1} , e_{2}\right) \in A_{\text{run}} , \left(e_{1}^{'} , e_{2}^{'}\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \geq L_{a} + M_{2} \left(q_{e , e^{'}} - 1\right) , a = \left(e , e^{'}\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix} & q_{e , e^{'}} + q_{e^{'} , e} = 1 , \left(e , e^{'}\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e^{''}} \geq L_{a} + M_{2} \left(q_{e , e^{'}} - 1 - c_{e} - c_{e^{'}} - c_{e^{''}}\right) , a = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , \left(e , e^{''}\right) \in A_{\text{station}} , N_{s t_{e}} = 2 ,\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e^{''}} \geq L_{a} + M_{2} \left(q_{e , e^{'}} - 1 - c_{e} - c_{e^{'}} - \left(1 - m_{a^{'}}\right)\right) , a = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , a^{'} = \left(e , e^{''}\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , N_{s t_{e}} = 2 ,\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix} & s_{a} \leq 1 - c_{e} , a = \left(e , e^{'}\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & s_{a} \leq 1 - c_{e^{'}} , a = \left(e , e^{'}\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix} & s_{a} \geq c_{e} , a = \left(e , e^{'}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix} & s_{a} \geq c_{e^{'}} , a = \left(e , e^{'}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0026} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \geq L_{a} \left(1 - s_{a} - c_{e} - c_{e^{'}}\right) - M_{1} \cdot c_{e} , a = \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0027} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e} \leq M_{2} \left(1 - s_{a} + c_{e} + c_{e^{'}}\right) , a = \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0028} \\
+  & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} - \mathit{Delta}_{a^{'}}^{\text{acce}} \cdot s_{a} - \mathit{Delta}_{a^{'}}^{\text{dece}} \cdot s_{a^{''}} , a = \left(e , e^{'}\right) \in A_{\text{dwell}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{dwell}} \tag{eq\_0029\_a} \\
+  & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} - \mathit{Delta}_{a^{'}}^{\text{acce}} \cdot s_{a} , a = \left(e , e^{'}\right) \in A_{\text{dwell}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} \tag{eq\_0029\_b} \\
+  & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} - \mathit{Delta}_{a^{'}}^{\text{dece}} \cdot s_{a^{''}} , a = \left(e , e^{'}\right) \in A_{\text{odturn}}^{\text{plan}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{dwell}} \tag{eq\_0029\_c} \\
+  & \begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} + \mathit{Delta}_{a^{'}}^{\text{acce}} \left(1 - s_{a}\right) - \mathit{Delta}_{a^{'}}^{\text{dece}} \cdot s_{a^{''}} , a = \left(e , e^{'}\right) \in A_{pass} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0030} \\
+  & \begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} + \mathit{Delta}_{a^{'}}^{\text{acce}} \left(1 - s_{a}\right) , a = \left(e , e^{'}\right) \in A_{pass} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} ,\end{matrix} \tag{eq\_0031} \\
+  & \begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} - \mathit{Delta}_{a^{'}}^{\text{acce}} \cdot s_{a} + \mathit{Delta}_{a^{'}}^{\text{dece}} \left(1 - s_{a^{''}}\right) , a = \left(e , e^{'}\right) \in A_{\text{dwell}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0032} \\
+  & \begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} + \mathit{Delta}_{a^{'}}^{\text{dece}} \left(1 - s_{a^{''}}\right) , a = \left(e , e^{'}\right) \in A_{\text{odturn}}^{\text{plan}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0033} \\
+  & \begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} + \mathit{Delta}_{a^{'}}^{\text{acce}} \left(1 - s_{a}\right) + \mathit{Delta}_{a^{'}}^{\text{dece}} \left(1 - s_{a^{''}}\right) , a = \left(e , e^{'}\right) \in A_{pass} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix} & c_{e} \leq c_{e^{'}} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix} & c_{e^{'}} \leq c_{e} + y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix} & c_{e^{'}} \geq y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0037} \\
+  & \begin{matrix} & c_{e^{'}} \leq c_{e} , e^{'} \in E_{\text{de}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0038} \\
+  & \begin{matrix} & c_{e} \leq c_{e^{'}} + y_{e^{'}} , e^{'} \in E_{\text{de}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0039} \\
+  & \begin{matrix} & c_{e} \geq y_{e^{'}} , e^{'} \in E_{\text{de}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0040} \\
+  & \begin{matrix} & \sum_{e : t r_{e} = t r} y_{e} = c_{e^{'}} , t r \in \mathit{TR}_{\text{turn}} , e \in E_{\text{ar}}^{\text{turn}} , e^{'} \in E_{\text{de}} , t r_{e^{'}} = t r , s t_{e^{'}} = s_{\text{en}}^{d r_{e^{'}}} ,\end{matrix} \tag{eq\_0041} \\
+  & \begin{matrix} & \underset{e^{'} : t r_{e^{'}} = t r}{\sum} y_{e^{'}} = c_{e} , t r \in \mathit{TR}_{\text{turn}} , e^{'} \in E_{\text{de}}^{\text{turn}} , e \in E_{\text{ar}} , t r_{e} = t r , s t_{e} = s_{\text{ex}}^{d r_{e}} ,\end{matrix} \tag{eq\_0042} \\
+  & \begin{matrix} & \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = c_{e^{'}} - c_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0043} \\
+  & \begin{matrix} & \underset{a \in A_{\text{turn}} , \mathit{head} \left(a\right) = e^{'}}{\sum} m_{a} = c_{e} - c_{e^{'}} , e^{'} \in E_{\text{de}}^{\text{turn}} , \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0044} \\
+  & \begin{matrix} & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{e^{'}} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , e^{'}\right) \in A_{\text{turn}} .\end{matrix} \tag{eq\_0045} \\
+  & \begin{matrix} & \underset{a \in A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = 1 - c_{e} , e \in E_{\text{ar}}^{\text{odturn}} ,\end{matrix} \tag{eq\_0046} \\
+  & \begin{matrix} & \underset{a \in A_{\text{odturn}} , \mathit{head} \left(a\right) = e^{'}}{\sum} m_{a} = 1 - c_{e^{'}} , e^{'} \in E_{\text{de}}^{\text{odturn}} ,\end{matrix} \tag{eq\_0047} \\
+  & \begin{matrix} & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{e^{'}} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , e^{'}\right) \in A_{\text{odturn}} .\end{matrix} \tag{eq\_0048} \\
+  & \begin{matrix} & n_{e , e^{'}} \leq q_{e , e^{'}} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} ,\end{matrix} \tag{eq\_0049} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e^{''}} \geq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}} - 1\right) , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} , \left(e , e^{''}\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,\end{matrix} \tag{eq\_0050} \\
+  & \begin{matrix} & x_{e^{'}} - x_{e^{''}} \leq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}}\right) , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} , \left(e , e^{''}\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,\end{matrix} \tag{eq\_0051} \\
+  & \begin{matrix} & n_{e , e^{'}} \leq 1 - c_{e} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} ,\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix} & n_{e , e^{'}} \leq 1 - c_{e^{'}} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} .\end{matrix} \tag{eq\_0053} \\
+  & \begin{matrix} & n_{e , e^{'}} \leq 1 - c_{e^{''}} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} , \left(e , e^{''}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0054} \\
+  & \begin{matrix} & n_{e , e^{'}} \leq 1 - \left(c_{e^{''}} - \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a}\right) , e \in E_{\text{ar}}^{\text{turn}} , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} , \left(e , e^{''}\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0055} \\
+  & \begin{matrix} & x_{e^{'}} - \left(x_{e^{''}} + L_{a^{'}}\right) \geq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}} - 1 - c_{e} - c_{e^{'}} - c_{e^{''}}\right) , e , e^{'} \in E_{\text{ar}} , \left(e , e^{''}\right) \in A_{\text{station}} , a^{'} = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,\end{matrix} \tag{eq\_0056} \\
+  & \begin{matrix} & x_{e^{'}} - \left(x_{e^{''}} + L_{a^{'}}\right) \leq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}} + c_{e} + c_{e^{'}} + c_{e^{''}}\right) , e , e^{'} \in E_{\text{ar}} , \left(e , e^{''}\right) \in A_{\text{station}} , a^{'} = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,\end{matrix} \tag{eq\_0057} \\
+  & x_{e^{'}} - \left(x_{e^{''}} + L_{a^{'}}\right) \geq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}} - 1 - c_{e} - c_{e^{'}} - \left(1 - m_{a}\right)\right) , e , e^{'} \in E_{\text{ar}} , a = \left(e , e^{''}\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , a^{'} = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} \tag{eq\_0058} \\
+  & x_{e^{'}} - \left(x_{e^{''}} + L_{a^{'}}\right) \leq M_{2} \left(q_{e , e^{'}} - n_{e , e^{'}} + c_{e} + c_{e^{'}} + 1 - m_{a}\right) , e , e^{'} \in E_{\text{ar}} , a = \left(e , e^{''}\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , a^{'} = \left(e^{''} , e^{'}\right) \in A_{\text{head}}^{\text{de} , \text{ar}} . \tag{eq\_0059} \\
+  & \begin{matrix} & M_{2} \left(q_{e , e^{'}} - 1\right) \leq x_{e^{'}} - x_{e} \leq M_{2} \cdot q_{e , e^{'}} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , d r_{e} \neq d r_{e^{'}} ,\end{matrix} \tag{eq\_0060} \\
+  & \begin{matrix} & q_{e , e^{'}} + q_{e^{'} , e} = 1 , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , d r_{e} \neq d r_{e^{'}} .\end{matrix} \tag{eq\_0061} \\
+  & \begin{matrix}\sum_{e} n_{e , e^{'}} \leq N_{s t} - 1 , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , s t = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} ,\end{matrix} \tag{eq\_0062} \\
+  & \begin{matrix}p_{e} \leq 1 - c_{e} , e \in E_{\text{ar}} .\end{matrix} \tag{eq\_0063} \\
+  & \begin{matrix}p_{e} \geq 1 - s_{a} - c_{e} - c_{e^{'}} , e \in E_{\text{ar}} , a = \left(e , e^{'}\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0064} \\
+  & \begin{matrix} & p_{e} \geq \underset{a \in A_{\text{turn}} \cup A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}} .\end{matrix} \tag{eq\_0065} \\
+  & \begin{matrix} & p_{e} \leq 1 - s_{a} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , a = \left(e , e^{'}\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0066} \\
+  & \begin{matrix} & p_{e} \leq 1 - s_{a} + \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} , a = \left(e , e^{'}\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0067} \\
+  & \begin{matrix} & n_{e , e^{'}}^{p} \leq n_{e , e^{'}} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} ,\end{matrix} \tag{eq\_0068} \\
+  & \begin{matrix} & n_{e , e^{'}}^{p} \leq p_{e} , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} ,\end{matrix} \tag{eq\_0069} \\
+  & \begin{matrix} & n_{e , e^{'}}^{p} \geq n_{e , e^{'}} + p_{e} - 1 , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} .\end{matrix} \tag{eq\_0070} \\
+  & \begin{matrix} & \sum_{e} n_{e , e^{'}}^{p} \leq \left(N_{s t} - 1\right) \left(1 - p_{e^{'}}\right) + p_{e^{'}} \left(N_{s t}^{p} - 1\right) , e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , s t = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} .\end{matrix} \tag{eq\_0071} \\
+  \begin{matrix}\text{min}\quad & \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{delay}} \cdot d_{e} + \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{cancel}} \cdot c_{e} + \underset{a \in A_{\text{dwell}}}{\sum} w_{a}^{\text{skip}} \cdot s_{a} - \sum_{a \in A_{pass}} w_{a}^{\text{add}} \left(1 - s_{a}\right) .\end{matrix} \tag{eq\_0072} \\
+  & w_{e}^{\text{delay}} = z_{e}^{\text{alight}} + z_{e}^{\text{pass}} , e \in E_{\text{ar}} . \tag{eq\_0073} \\
+  & w_{e}^{\text{cancel}} = \mathit{alpha} \left(z_{e}^{\text{alight}} + z_{e}^{\text{pass}}\right) , e \in E_{\text{ar}} , \tag{eq\_0074} \\
+  & w_{a}^{\text{skip}} = \mathit{beta} \left(z_{e}^{\text{alight}} + z_{e^{'}}^{\text{board}}\right) , a = \left(e , e^{'}\right) \in A_{\text{dwell}} , \tag{eq\_0075} \\
+  & w_{a}^{\text{add}} = \mathit{gamma} \left(z_{a}^{\text{Eboard}} + z_{a}^{\text{Eoff}}\right) , a \in A_{pass} , \tag{eq\_0076} \\
+\end{align}

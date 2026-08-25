@@ -1,0 +1,106 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2024.103040
+%@ meta id=10.1016_j.omega.2024.103040 family=milp schema=0.1.0
+%@ name :: Passenger service-oriented timetable rescheduling for large-scale disruptions in a railway network: A heuristic-based alternating direction method of multipliers
+%@ desc :: Mined from Passenger service-oriented timetable rescheduling for large-scale disruptions in a railway network: A heuristic-based alternating direction method of multipliers (Omega, 2024).
+%@ prov source :: 10.1016/j.omega.2024.103040
+%@ prov reference :: Passenger service-oriented timetable rescheduling for large-scale disruptions in a railway network: A heuristic-based alternating direction method of multipliers
+%@ prov author :: Cong Xiu; Jinyi Pan; Andrea D’Ariano; Shuguang Zhan; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger delay and abandonment cost over all trains
+%@ index i ordered=0 cyclic=0 :: Index for nodes in the space-time network
+%@ var x shape=k,a domain=binary role=primary drole=- lo=- hi=- :: Binary path indicator: 1 if train k uses arc a
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ param d shape=k kind=vector domain=- :: Destination node of train k
+%@ param e shape=k kind=vector domain=- :: Earliest departure time of train k
+%@ index k ordered=0 cyclic=0 :: Index for trains
+%@ param l shape=k kind=vector domain=- :: Latest arrival time of train k
+%@ param o shape=k kind=vector domain=- :: Origin node of train k
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the space-time network
+%@ index s ordered=0 cyclic=0 :: Index for stations
+%@ index I ordered=0 cyclic=0 :: Set of stations
+%@ index N ordered=0 cyclic=0 :: Set of nodes associated with a station
+%@ param T shape=k,s kind=matrix domain=- :: Scheduled departure time of train k at station s
+%@ param pt shape=k,a kind=matrix domain=- :: Passenger-related cost coefficient for arc a of train k
+%@ var F shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total objective function value
+%@ param c shape=k,a kind=matrix domain=- :: Cost coefficient for arc a of train k
+%@ var L shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian objective function value
+%@ var lambda shape=a domain=non_negative role=auxiliary drole=- lo=- hi=- :: Lagrangian multiplier for arc a
+%@ index a ordered=0 cyclic=0 :: Index for arcs
+%@ var delta shape=a domain=non_negative role=slack drole=- lo=- hi=- :: Slack variable for arc a
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter in ADMM
+%@ var mu shape=k,a domain=non_negative role=auxiliary drole=- lo=- hi=- :: Total occupancy of incompatible set by other trains
+%@ var Q shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Quadratic penalty term
+%@ param chat shape=k,a kind=matrix domain=- :: Modified arc cost for train k in augmented Lagrangian
+%@ var res shape=- domain=non_negative role=auxiliary drole=- lo=- hi=- :: Primary residual measuring violation of incompatible-arc constraints
+%@ var q shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Train-specific objective function value
+%@ var xhat shape=k,a domain=binary role=auxiliary drole=- lo=- hi=- :: Solution of an outer ADMM iteration
+%@ var p shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Train-specific dual cost value
+%@ con eq_0002 kind=flow_balance domain=- indicator=- :: Flow balance: exactly one space-time path for each train
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time: no running arc before scheduled departure
+%@ con eq_0004 kind=linear domain=- indicator=- :: Schedule unchanged: unaffected trains keep planned departure
+%@ con eq_0005 kind=linear domain=- indicator=- :: Disruption: no train enters disrupted area
+%@ con eq_0007 kind=headway domain=- indicator=- :: Headway: at most one train in headway incompatible set
+%@ con eq_0009 kind=capacity domain=- indicator=- :: Station capacity: at most one train in station incompatible set
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Unified conflict-free headway and station capacity constraints
+%@ con eq_0012 kind=linear domain=- indicator=- :: Objective definition F = sum of arc costs
+%@ con eq_0015 kind=linear domain=- indicator=- :: Lagrangian relaxation of conflict-free constraints
+%@ con eq_0016 kind=linear domain=- indicator=- :: Property 1: exchange summation over incompatible sets
+%@ con eq_0017 kind=linear domain=- indicator=- :: Train-specific Lagrangian objective L_k
+%@ con eq_0019 kind=linear domain=- indicator=- :: Augmented Lagrangian with quadratic penalty and slack
+%@ con eq_0020 kind=linear domain=- indicator=- :: Slack delta(a) = 1 - total occupancy
+%@ con eq_0021 kind=linear domain=- indicator=- :: Occupancy mu_a^k of incompatible set by other trains
+%@ con eq_0022 kind=linear domain=- indicator=- :: Split total occupancy into train-k part and mu
+%@ con eq_0023 kind=linear domain=- indicator=- :: Modified slack delta(a) using mu_a^k
+%@ con eq_0025 kind=linear domain=- indicator=- :: Train-specific augmented Lagrangian subproblem
+%@ con eq_0027 kind=linear domain=- indicator=- :: Lagrangian multiplier update with penalty rho
+%@ con eq_0028 kind=linear domain=- indicator=- :: Primary residual res = max violation
+%@ con eq_0030 kind=linear domain=- indicator=- :: Train-specific objective value q_k
+%@ con eq_0031 kind=linear domain=- indicator=- :: Train-specific dual cost p_k
+%@ con eq_0032 kind=linear domain=- indicator=- :: Decomposition of modified arc cost chat
+%@ con eq_0034 kind=linear domain=- indicator=- :: ADMM-H sorting rule row
+%@ con eq_0036 kind=linear domain=- indicator=- :: ADMM-H dual residual row
+%@ con eq_0037 kind=linear domain=- indicator=- :: ADMM-H stopping criterion row
+%@ index tp shape=- domain=- role=index drole=- lo=- hi=- :: primed time index
+%@ index tau shape=- domain=- role=index drole=- lo=- hi=- :: time index
+%@ index taup shape=- domain=- role=index drole=- lo=- hi=- :: primed time index
+%@ index ip shape=- domain=- role=index drole=- lo=- hi=- :: primed node index
+%@ index jp shape=- domain=- role=index drole=- lo=- hi=- :: primed node index
+%@ index ap shape=- domain=- role=index drole=- lo=- hi=- :: primed arc index
+%@ index headway shape=- domain=- role=index drole=- lo=- hi=- :: headway conflict set label
+%@ index safety shape=- domain=- role=index drole=- lo=- hi=- :: safety conflict set label
+%@ index drive shape=- domain=- role=index drole=- lo=- hi=- :: driving arc set label
+%@ index track shape=- domain=- role=index drole=- lo=- hi=- :: track arc set label
+%@ index disruption shape=- domain=- role=index drole=- lo=- hi=- :: disrupted arc set label
+%@ index stop shape=- domain=- role=index drole=- lo=- hi=- :: stop set label
+%@ index dep shape=- domain=- role=index drole=- lo=- hi=- :: departure label
+%@ param b shape=- domain=integer role=coefficient drole=- lo=-1 hi=1 :: net flow balance
+\begin{align}
+  & \sum_{(i,j,t,\mathit{tp}) \in A_{k}^{i,+}} x_{i,j,t,\mathit{tp}}^{k} - \sum_{(j,i,\mathit{tp},t) \in A_{k}^{i,-}} x_{j,i,\mathit{tp},t}^{k} = b_{i,t}^{k} \qquad \forall k \in K, i \in \mathcal{N}, t \in \mathcal{T} \tag{eq\_0002} \\
+  & \underset{\genfrac{}{}{0pt}{}{(i,j,t,\mathit{tp}) \in A_{\mathit{drive}},}{t < T_{k,s}^{\mathit{dep}}}}{\sum} x_{i,j,t,\mathit{tp}}^{k} = 0 \qquad \forall k \in K, s \in I_{\mathit{stop}}^{k}, i \in \mathcal{N}(s) \tag{eq\_0003} \\
+  & \underset{\genfrac{}{}{0pt}{}{(i,j,t,\mathit{tp}) \in A_{\mathit{drive}},}{t = T_{k,s}^{\mathit{dep}}}}{\sum} x_{i,j,t,\mathit{tp}}^{k} = 1 \qquad \forall k \in K_{0}, s \in I_{\mathit{stop}}^{k}, i \in \mathcal{N}(s) \tag{eq\_0004} \\
+  & \sum_{k \in K} x_{i,j,t,\mathit{tp}}^{k} = 0 \qquad \forall (i,j,t,\mathit{tp}) \in A_{\mathit{disruption}} \tag{eq\_0005} \\
+  & \sum_{k \in K, (\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}) \in \mathit{Phi}_{\mathit{headway},a}} x_{\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}}^{k} \le 1 \qquad \forall a \in A_{\mathit{drive}} \tag{eq\_0007} \\
+  & \sum_{k \in K, (\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}) \in \mathit{Phi}_{\mathit{safety},a}} x_{\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}}^{k} \le 1 \qquad \forall a \in A_{\mathit{track}} \tag{eq\_0009} \\
+  & \sum_{k \in K, (\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}) \in \mathit{Phi}_{a}} x_{\mathit{ip},\mathit{jp},\mathit{tau},\mathit{taup}}^{k} \le 1 \qquad \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0011} \\
+  & F = \sum_{k \in K, (i,j,t,\mathit{tp}) \in A_{k}} c_{i,j,t,\mathit{tp}}^{k} \cdot x_{i,j,t,\mathit{tp}}^{k} \tag{eq\_0012} \\
+  \min\quad & F \tag{eq\_0014} \\
+  & L = \sum_{k \in K, a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{\mathit{drive}} \cup A_{\mathit{track}}} \mathit{lambda}_{a} \cdot \left( \sum_{k \in K, \mathit{ap} \in \mathit{Phi}_{a}} x_{\mathit{ap}}^{k} - 1 \right) \tag{eq\_0015} \\
+  & \sum_{a} \mathit{lambda}_{a} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} \sum_{a} x_{a}^{k} \tag{eq\_0016} \\
+  & L_{k} = \sum_{a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{\mathit{drive}} \cup A_{\mathit{track}}, \mathit{ap} \in \mathit{Phi}_{a}} \mathit{lambda}_{\mathit{ap}} \cdot x_{a}^{k} \qquad \forall k \in K \tag{eq\_0017\_a} \\
+  & \sum_{a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{\mathit{drive}} \cup A_{\mathit{track}}, \mathit{ap} \in \mathit{Phi}_{a}} \mathit{lambda}_{\mathit{ap}} \cdot x_{a}^{k} = \sum_{a \in A} \left( c_{a}^{k} + \sum_{\mathit{ap} \in \mathit{Phi}_{a}} \mathit{lambda}_{\mathit{ap}} \right) \cdot x_{a}^{k} \qquad \forall k \in K \tag{eq\_0017\_b} \\
+  & L_{\mathit{rho}} = \sum_{k \in K, a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{\mathit{drive}} \cup A_{\mathit{track}}} \mathit{lambda}_{a} \cdot \left( \sum_{k \in K, \mathit{ap} \in \mathit{Phi}_{a}} x_{\mathit{ap}}^{k} - 1 \right) + \frac{\mathit{rho}}{2} \left( \sum_{a \in A_{\mathit{drive}} \cup A_{\mathit{track}}} \left( \sum_{k \in K, \mathit{ap} \in \mathit{Phi}_{a}} x_{\mathit{ap}}^{k} - 1 + \mathit{delta}_{a} \right) \right)^{2} \tag{eq\_0019} \\
+  & \mathit{delta}_{a} + \sum_{k \in K, \mathit{ap} \in \mathit{Phi}_{a}} x_{\mathit{ap}}^{k} = 1 \qquad \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0020} \\
+  & \mathit{mu}_{a}^{k} = \sum_{k^{'} \in K : k^{'} \neq k} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k^{'}} , \forall a \in A_{d r i v e} \cup A_{t r a c k} \tag{eq\_0021} \\
+  & \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} + \sum_{k^{'} \in K : k^{'} \neq k} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k^{'}} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} + \mathit{mu}_{a}^{k} \tag{eq\_0022} \\
+  & \mathit{delta} \left(a\right) = 1 - \mathit{mu}_{a}^{k} - \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} \tag{eq\_0023} \\
+  & L_{\mathit{rho} , k} = \sum_{a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \left(\mathit{rho} \cdot \mathit{mu}_{a^{'}}^{k} - \frac{\mathit{rho}}{2}\right) \cdot x_{a}^{k} = \sum_{a \in A} \left(\hat{c}\right)_{a}^{k} \cdot x_{a}^{k} + Q_{0} \tag{eq\_0025} \\
+  & \mathit{lambda}_{a}^{\mathit{theta} + 1} = \mathit{lambda}_{a}^{\mathit{theta}} + \mathit{rho} \cdot \left(\sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} - 1\right) , \forall a \in A^{d r i v e} \cup A^{t r a c k} \tag{eq\_0027} \\
+  & \mathit{res} = max \left\{0 , \sum_{a \in A_{d r i v e} \cup A_{t r a c k}} \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} - 1\right\} \tag{eq\_0028} \\
+  & q_{k} = \sum_{a \in A_{k}} c_{a}^{k} \cdot \left(\hat{x}\right)_{a}^{k} \tag{eq\_0030} \\
+  & p_{k} = \sum_{a \in A_{k}} \left({c}\right)_{a}^{k} \cdot \left(\hat{x}\right)_{a}^{k} \tag{eq\_0031} \\
+  & \left(\hat{c}\right)_{a}^{k} = \left({c}\right)_{a}^{k} + c_{a}^{k} + m a x \left\{0 , \mathit{rho} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{mu}_{a^{'}}^{k} - \frac{\mathit{rho}}{2}\right\} \tag{eq\_0032} \\
+  & \sum_{a} \mathit{lambda}_{a} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} = \sum_{a} \mathit{lambda}_{a} \cdot \left(\right. \sum_{a_{0} \in \mathit{Phi} \left(a\right)} x_{a_{0}}^{k} + 0 \left.\right) = \sum_{a} \mathit{lambda}_{a} \sum_{a_{0} \in \mathit{Phi} \left(a\right)} x_{a_{0}}^{k} = \sum_{a \in \mathit{Phi} \left(a_{0}\right)} \mathit{lambda}_{a} \cdot x_{a_{0}}^{k} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} \sum_{a} x_{a}^{k} \tag{eq\_0034} \\
+  & \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k}\right)^{2} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} \tag{eq\_0036} \\
+  & Q = \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} + \mathit{mu}_{a}^{k} - 1\right)^{2} = \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k}\right)^{2} + 2 \cdot \left(\mathit{mu}_{a}^{k} - 1\right) \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} = \left(2 \cdot \mathit{mu}_{a}^{k} - 1\right) \cdot \sum_{a^{'} \in \mathit{Phi} \left(a\right)} x_{a^{'}}^{k} + Q_{0} \tag{eq\_0037} \\
+\end{align}

@@ -1,0 +1,47 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2009.07.007
+%@ meta id=10.1016_j.trb.2009.07.007 family=milp schema=0.1.0
+%@ name :: Scheduling extra freight trains on railway networks
+%@ desc :: Mined from Scheduling extra freight trains on railway networks (Transportation Research Part B Methodological, 2009).
+%@ prov source :: 10.1016/j.trb.2009.07.007
+%@ prov reference :: Scheduling extra freight trains on railway networks
+%@ prov author :: Valentina Cacchiani; Alberto Caprara; Paolo Toth
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total profit of assigning extra freight trains to routes
+%@ param p shape=T,R kind=matrix :: Profit of assigning train j to route r
+%@ var x shape=T,R domain=binary role=primary :: Binary variable indicating if train j uses route r
+%@ index R ordered=0 cyclic=0 :: Set of routes for train j
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index delta ordered=0 cyclic=0 :: Set of arcs entering or leaving a node for a train
+%@ index sigma ordered=0 cyclic=0 :: Source node (origin) for trains
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the network
+%@ index v ordered=0 cyclic=0 :: Node in the network
+%@ index tau ordered=0 cyclic=0 :: Sink node (destination) for trains
+%@ var z shape=T,V domain=binary role=primary :: Binary variable indicating if train j visits node v
+%@ var y shape=V domain=binary role=primary :: Binary variable indicating if any train visits node v
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes at an endpoint of an edge
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes at an endpoint of an edge
+%@ index i ordered=0 cyclic=0 :: Endpoint of an edge
+%@ index h ordered=0 cyclic=0 :: Endpoint of an edge
+%@ con eq_0007 kind=linear :: At most one path from origin for each extra train j in T2
+%@ con eq_0008 kind=linear :: Exactly one path from origin for each fixed train j in T1
+%@ con eq_0009 kind=flow_balance :: Flow conservation at intermediate nodes v for each train j
+%@ con eq_0010 kind=linear :: Link z_jv to incoming arcs at node v for train j
+%@ con eq_0011 kind=linear :: Link y_v to z_jv over all trains j visiting node v
+%@ con eq_0012 kind=linear :: Binary restriction on x_jr and z_jv variables
+%@ con eq_0013 kind=linear :: Binary restriction on y_v variables
+%@ con eq_0014 kind=capacity :: Clique inequality forbidding arrivals and departures too close in time at station i on edge e
+%@ con eq_0015 kind=headway :: Headway constraint on directed edge e for two trains in the same direction
+%@ con eq_0016 kind=headway :: Headway constraint on bi-directional edge e for two trains in opposite directions
+%@ index Ttwo shape=- domain=- role=set drole=- lo=- hi=- :: Renamed set T_2
+%@ index T_1
+%@ index T_2
+%@ index B :: binary domain {0,1}
+%@ index ST :: terminal nodes {sigma, tau}
+\begin{align}
+  \max\quad & \sum_{j \in \mathcal{T}_{2}, r \in \mathcal{R}^{j}} p \cdot x_{j,r} \tag{eq\_0006} \\
+  & \sum_{r \in \mathit{delta}_{j,\mathit{sigma}}^{+}} x_{j,r} = 1 \qquad \forall j \in T_{\mathit{one}} \tag{eq\_0008} \\
+  & \sum_{r \in \mathit{delta}_{j,v}^{-}} x_{j,r} = \sum_{r \in \mathit{delta}_{j,v}^{+}} x_{j,r} \qquad \forall j \in T, v \in V^{j} \setminus \mathit{ST} \tag{eq\_0009} \\
+  & z_{j,v} = \sum_{r \in \mathit{delta}_{j,v}^{-}} x_{j,r} \qquad \forall j \in T, v \in V^{j} \setminus \mathit{ST} \tag{eq\_0010} \\
+  & y_{v} = \sum_{j \in T : v \in V^{j}} z_{j,v} \qquad \forall v \in V \setminus \mathit{ST} \tag{eq\_0011} \\
+\end{align}

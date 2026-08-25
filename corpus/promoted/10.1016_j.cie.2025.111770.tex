@@ -1,0 +1,118 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2025.111770
+%@ meta id=10.1016_j.cie.2025.111770 family=milp schema=0.1.0
+%@ name :: Multi-line coordinated schedule adjustment optimization for metro short-term disruption recovery
+%@ desc :: Mined from Multi-line coordinated schedule adjustment optimization for metro short-term disruption recovery (Computers & Industrial Engineering, 2025).
+%@ prov source :: 10.1016/j.cie.2025.111770
+%@ prov reference :: Multi-line coordinated schedule adjustment optimization for metro short-term disruption recovery
+%@ prov author :: Lebing Wang; Jian Gang Jin
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost (passenger waiting + operational cost)
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ param C shape=- kind=scalar domain=- :: Cost coefficients
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (boarding, alighting, waiting)
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of time slots
+%@ index U ordered=0 cyclic=0 :: Set of lines
+%@ var A shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Alighting passengers
+%@ param V shape=- kind=scalar domain=- :: Train capacity
+%@ var c shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Schedule adjustment amount
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary train schedule indicator
+%@ index L ordered=0 cyclic=0 :: Set of trains
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param h shape=- kind=scalar domain=- :: Minimum headway
+%@ var I shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Boarding passengers
+%@ param M shape=- kind=big_m domain=- :: Big-M constant
+%@ var B shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
+%@ var O shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
+%@ param D shape=- kind=scalar domain=- :: Minimum boarding threshold
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
+%@ var PTA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Transfer passenger flow
+%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for transfer flow
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting time cost term (z1)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Operational cost term (z2) for train insertion and schedule adjustment
+%@ con eq_0004 kind=linear domain=- indicator=- :: Coupling of train departure from station s in slot t with starting time t0 via spatio-temporal connection
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time of stranded/resumed train at station (fixed input)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure time of fine-tuning/standby train at station
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum headway between consecutive trains at origin station
+%@ con eq_0008 kind=linear domain=- indicator=- :: Each train has at most one scheduled departure from its starting station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of schedule adjustment amount for fine-tuning train at origin
+%@ con eq_0010 kind=linear domain=- indicator=- :: Non-negativity of schedule adjustment amount
+%@ con eq_0011 kind=linear domain=- indicator=- :: Zero adjustment for final fine-tuning train in recovery period
+%@ con eq_0012 kind=linear domain=- indicator=- :: Big-M coupling of boarding passengers to binary stop decision (fine-tuning/standby)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Big-M coupling of boarding passengers to fixed stranded-train schedule
+%@ con eq_0014 kind=linear domain=- indicator=- :: Aggregation of boarding passengers over time slots per train and station
+%@ con eq_0015 kind=linear domain=- indicator=- :: Boarding passengers limited by remaining train capacity at station
+%@ con eq_0017 kind=linear domain=- indicator=- :: Onboard passenger count update after boarding and alighting
+%@ con eq_0018 kind=linear domain=- indicator=- :: Skip-stop: boarding must meet minimum threshold D when standby train stops
+%@ con eq_0019 kind=linear domain=- indicator=- :: Skip-stop: boarding prohibited when standby train skips station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Skip-stop: alighting prohibited when standby train skips station
+%@ con eq_0021 kind=linear domain=- indicator=- :: Platform waiting passenger balance: cumulative arrivals minus cumulative boardings
+%@ con eq_0022 kind=linear domain=- indicator=- :: Non-negativity of platform waiting passengers
+%@ con eq_0023 kind=linear domain=- indicator=- :: Updated passenger arrivals on connecting lines due to transfers from disrupted lines
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linearized minimum headway between consecutive fine-tuning trains
+%@ con eq_0033 kind=linear domain=- indicator=- :: Minimum headway between fine-tuning and standby train when standby departs first
+%@ con eq_0034 kind=linear domain=- indicator=- :: Sequencing variable h_w applies only when standby train is inserted
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized upper bound for alighting passengers at origin station when stopping
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized lower bound for alighting passengers at origin station when stopping
+%@ con eq_0037 kind=linear domain=- indicator=- :: Linearized upper bound for alighting passengers at downstream station when stopping
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearized lower bound for alighting passengers at downstream station when stopping
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearized arrival update on disrupted lines using auxiliary transfer-flow variable w
+%@ con eq_0040 kind=linear domain=- indicator=- :: Auxiliary transfer flow w forced to zero when train does not stop (x=0)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Auxiliary transfer flow w set to transfer flow PTA when train stops (x=1)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Auxiliary transfer flow w capped by transfer passenger quantity PTA
+%@ con eq_0043 kind=linear domain=- indicator=- :: Non-negativity of auxiliary transfer flow w
+%@ con eq_0044 kind=linear domain=- indicator=- :: Additional linearization constraint for transfer-flow floor calculation
+%@ con eq_0045 kind=linear domain=- indicator=- :: Additional linearization constraint for transfer-flow floor calculation (lower bound)
+%@ con eq_0046 kind=linear domain=- indicator=- :: Consistency constraint for stranded-train fixed schedule in recovery period
+%@ con eq_0047 kind=linear domain=- indicator=- :: Consistency constraint for stranded-train fixed schedule in recovery period (continued)
+%@ con eq_0048 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains
+%@ con eq_0049 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains (continued)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Residual linear constraint ensuring feasible multi-line coordinated adjustment
+\begin{align}
+  \min\quad & z_{1} + z_{2} \tag{eq\_0001} \\
+  & z_{1} = C_{1} \sum_{u \in \mathcal{U}} \sum_{s \in \mathcal{S}} \sum_{t \in \mathcal{T} \backslash \left\{0\right\}} \mathit{Delta} t \cdot P \cdot W_{s t}^{u} \tag{eq\_0002} \\
+  & z_{2} = \sum_{u \in \mathcal{U}} C_{2}^{u} \sum_{l \in L_{s}} \sum_{t \in \mathcal{T}} x_{l t}^{u} + C_{3} \sum_{u \in \mathcal{U}} \sum_{l \in \mathcal{L}_{w}} \left(C \cdot V - C \cdot A_{l}^{u}\right) \cdot c \cdot t_{l}^{u} \tag{eq\_0003} \\
+  & x_{l s t}^{u} = \sum_{t_{0} \in \mathcal{T}} x_{l , t_{0}}^{u} \mathit{alpha}_{s , t , t_{0}}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0004} \\
+  & t_{l s}^{u} = \sum_{t \in \mathcal{T}} t \cdot {x}_{l s t}^{u} , \forall u \in \mathcal{U}_{d} , l \in \mathcal{L}_{h} , s \in \mathcal{S} \tag{eq\_0005} \\
+  & t_{l s}^{u} = \sum_{t \in \mathcal{T}} t \cdot x_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0006} \\
+  & \left|t_{l s}^{u} - t_{l^{'} s}^{u}\right| \geq h_{min} , \forall u \in \mathcal{U} , l , l^{'} \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s = s_{0} \tag{eq\_0007} \\
+  & \sum_{t \in \mathcal{T}} x_{l t}^{u} \leq 1 , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} \tag{eq\_0008} \\
+  & c \cdot t_{l}^{u} = t_{l s}^{u} - {t}_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0009} \\
+  & c \cdot t_{l}^{u} \geq 0 , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \tag{eq\_0010} \\
+  & c \cdot t_{l}^{u} = 0 , \forall u \in \mathcal{U} , l = l_{ \cdot } \tag{eq\_0011} \\
+  & P \cdot I_{l s t}^{u} \leq M \cdot x_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0012} \\
+  & P \cdot I_{l s t}^{u} \leq M {x}_{l s t}^{u} , \forall u \in \mathcal{U}_{d} , l \in \mathcal{L}_{h} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0013} \\
+  & P \cdot B_{l s}^{u} = \sum_{t \in \mathcal{T}} P \cdot I_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \tag{eq\_0014} \\
+  & P \cdot B_{l s}^{u} \leq \left\{\begin{matrix} C \cdot A_{l}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ C \cdot V - P \cdot O_{l , s - 1}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \end{matrix}\right \tag{eq\_0015} \\
+  & P \cdot O_{l s}^{u} = \left\{\begin{matrix} C \cdot V - C \cdot A_{l}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ P \cdot O_{l , s - 1}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \end{matrix}\right \tag{eq\_0017} \\
+  & P \cdot B_{l s}^{u} \geq D \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0018} \\
+  & P \cdot B_{l s}^{u} \leq M \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0019} \\
+  & P \cdot A_{l s}^{u} \leq M \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0020} \\
+  & P \cdot W_{s t}^{u} = \sum_{t^{'} = 0}^{t} \mathit{eta}_{s t^{'}}^{u} - \sum_{l \in \mathcal{L}} \sum_{t^{'} = 0}^{t} P \cdot I_{l s t^{'}}^{u} , \forall u \in \mathcal{U} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0021} \\
+  & P \cdot W_{s t}^{u} \geq 0 , \forall u \in \mathcal{U} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0022} \\
+  & \mathit{eta}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} = {\mathit{eta}}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} + \sum_{u \in \mathcal{U}_{d}} \sum_{s \in \mathcal{S}_{d}} \sum_{l \in \mathcal{L}_{h}} \mathit{PTA}_{l s s^{'}}^{u u^{'}} {x}_{l s t}^{u} + \sum_{u \in \mathcal{U}_{d}} \sum_{s \in \mathcal{S}_{d}} \sum_{l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} \mathit{PTA}_{l s s^{'}}^{u u^{'}} \cdot x_{l s t}^{u} , \tag{eq\_0023} \\
+  & \mathit{eta}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} = {\mathit{eta}}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} + \sum_{u \in \mathcal{U}_{c}} \sum_{s \in \mathcal{S}_{c}} \sum_{l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} \mathit{PTA}_{l s s^{'}}^{u u^{'}} \cdot x_{l s t}^{u} , \tag{eq\_0026} \\
+  & t_{l s}^{u} - t_{l - 1 , s}^{u} \geq h_{min} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0033} \\
+  & h \cdot b_{l , l - 1}^{u} \geq h \cdot a_{l}^{u} + h \cdot a_{l - 1}^{u} - 1 , \forall u \in \mathcal{U} , l , l - 1 \in \mathcal{L}_{s} \tag{eq\_0034} \\
+  & h \cdot b_{l , l - 1}^{u} \leq h \cdot a_{l}^{u} , \forall u \in \mathcal{U} , l , l - 1 \in \mathcal{L}_{s} \tag{eq\_0035} \\
+  & h \cdot b_{l , l - 1}^{u} \leq h \cdot a_{l - 1}^{u} , \forall u \in \mathcal{U} , l , l - 1 \in \mathcal{L}_{s} \tag{eq\_0036} \\
+  & t_{l s}^{u} \leq M \cdot h \cdot a_{l}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s = s_{0} \tag{eq\_0037} \\
+  & t_{l s}^{u} - t_{l - 1 , s}^{u} \geq h_{min} - M \cdot \left(1 - h \cdot b_{l , l - 1}^{u}\right) , \forall u \in \mathcal{U} , l , l - 1 \in \mathcal{L}_{s} , s = s_{0} \tag{eq\_0038} \\
+  & t_{l s}^{a} - t_{{l} , s}^{a} \geq h_{min} \cdot h \cdot a_{l}^{u} - M \left(1 - h \cdot w_{l , {l}}^{u}\right) , \forall u \in \mathcal{U} , {l} \in \mathcal{L}_{w} , l \in \mathcal{L}_{s} , s = s_{0} \tag{eq\_0039} \\
+  & t_{{l} , s}^{a} - t_{l s}^{a} \geq h_{min} \cdot h \cdot a_{l}^{u} - M \cdot h \cdot w_{l , {l}}^{u} , \forall u \in \mathcal{U} , {l} \in \mathcal{L}_{w} , l \in \mathcal{L}_{s} , s = s_{0} \tag{eq\_0040} \\
+  & h \cdot w_{l , {l}}^{u} \leq h \cdot a_{l}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , {l} \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0041} \\
+  & P \cdot A_{l s}^{u} - M \left(1 - q_{l s}^{u}\right) \leq \mathit{gamma}_{l s}^{u} \left(C \cdot V - C \cdot A_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \tag{eq\_0042} \\
+  & \mathit{gamma}_{l s}^{u} \left(C \cdot V - C \cdot A_{l s}^{u}\right) \leq P \cdot A_{l s}^{u} + 1 - \mathit{epsilon} + M \left(1 - q_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \tag{eq\_0043} \\
+  & P \cdot A_{l s}^{u} - M \left(1 - q_{l s}^{u}\right) \leq \mathit{gamma}_{l s}^{u} P O_{l , s - 1}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0044} \\
+  & \mathit{gamma}_{l s}^{u} P O_{l , s - 1}^{u} \leq P \cdot A_{l s}^{u} + 1 - \mathit{epsilon} + M \left(1 - q_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0045} \\
+  & \mathit{eta}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} = {\mathit{eta}}_{s^{'} , \left(t + d t_{s s^{'}}^{u u^{'}}\right)}^{u^{'}} + \sum_{u \in \mathcal{U}_{c}} \sum_{s \in \mathcal{S}_{c}} \sum_{l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} w_{l s s^{'} t}^{u u^{'}} , \forall u^{'} \in \mathcal{U}_{d} , s^{'} \in \mathcal{S}_{d} , t \in \mathcal{T} \tag{eq\_0046} \\
+  & w_{l s s^{'} t}^{u u^{'}} \leq M_{l s s^{'} t}^{u u^{'}} \cdot x_{l s t}^{u} , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , u^{'} \in \mathcal{U}_{d} , s^{'} \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0047} \\
+  & w_{l s s^{'} t}^{u u^{'}} \geq \mathit{PTA}_{l s s^{'}}^{u u^{'}} - M_{l s s^{'} t}^{u u^{'}} \cdot \left(1 - x_{l s t}^{u}\right) , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , u^{'} \in \mathcal{U}_{d} , s^{'} \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0048} \\
+  & w_{l s s^{'} t}^{u u^{'}} \leq \mathit{PTA}_{l s s^{'}}^{u u^{'}} , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , u^{'} \in \mathcal{U}_{d} , s^{'} \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0049} \\
+  & w_{l s s^{'} t}^{u u^{'}} \geq 0 , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , u^{'} \in \mathcal{U}_{d} , s^{'} \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0050} \\
+\end{align}

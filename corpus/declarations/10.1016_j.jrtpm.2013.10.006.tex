@@ -1,0 +1,73 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2013.10.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2013.10.006
+% Modeling capacity consumption considering disruption program characteristics and the transition phase to steady operations during disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2013.10.006.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ index i ordered=1 cyclic=0 :: Platform track index
+%@ index j ordered=1 cyclic=0 :: Route index
+
+%@ obj sense=min name=objective combination=sum :: No explicit optimization; feasibility evaluation
+
+% t: classified as parameter during review
+%@ param t shape=i,j kind=matrix domain=- :: Blocking time of platform track i due to a train run on route j
+
+% F: classified as parameter during review
+%@ param F shape=i,j kind=matrix domain=- :: Matrix of blocking times for all routes
+
+% k: classified as variable during review
+%@ var k shape=i domain=continuous role=primary drole=- lo=- hi=- :: Occupancy rate of platform track i in a scenario
+
+% n: classified as variable during review
+%@ var n shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains taking route j in a scenario
+
+% GW: classified as parameter during review
+%@ param GW shape=- kind=scalar domain=- :: UIC guideline figure for capacity consumption
+
+% Bound by a quantifier or big operator, so no declaration of their own: s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Total blocking time definition per platform track and scenario
+%@ con eq_0002 kind=linear domain=- indicator=- :: Occupancy rate definition per platform track and scenario
+%@ con eq_0003 kind=linear domain=- indicator=- :: Feasibility condition for DRP scenarios
+%@ con eq_0004 kind=linear domain=- indicator=- :: Infeasibility condition for DRP scenarios
+%@ con eq_0005 kind=linear domain=- indicator=- :: Transition phase scenario condition (15-minute steady state)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Transition phase scenario condition (30-minute steady state)
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Total blocking time constraint for scenario 0
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Total blocking time constraint for scenario 1
+%@ con eq_0007_c kind=linear domain=- indicator=- :: Total blocking time constraint for scenario 2
+%@ con eq_0007_d kind=linear domain=- indicator=- :: Total blocking time constraint for scenario 3
+%@ con eq_0008 kind=linear domain=- indicator=- :: Occupancy rate constraint per platform track
+%@ con eq_0009_a kind=linear domain=- indicator=- :: Feasibility constraint for scenario 1
+%@ con eq_0009_b kind=linear domain=- indicator=- :: Feasibility constraint for scenario 2
+%@ con eq_0009_c kind=linear domain=- indicator=- :: Feasibility constraint for scenario 3
+%@ con eq_0009_d kind=linear domain=- indicator=- :: Feasibility constraint for regular scenario
+%@ con eq_0010_a kind=linear domain=- indicator=- :: Occupancy rate constraint for scenario 0
+%@ con eq_0010_b kind=linear domain=- indicator=- :: Occupancy rate constraint for scenario 1
+%@ con eq_0010_c kind=linear domain=- indicator=- :: Occupancy rate constraint for scenario 2
+%@ con eq_0010_d kind=linear domain=- indicator=- :: Occupancy rate constraint for scenario 3
+%@ con eq_0011_a kind=linear domain=- indicator=- :: Capacity consumption constraint for scenario 0
+%@ con eq_0011_b kind=linear domain=- indicator=- :: Capacity consumption constraint for scenario 1
+%@ con eq_0011_c kind=linear domain=- indicator=- :: Capacity consumption constraint for scenario 2
+%@ con eq_0011_d kind=linear domain=- indicator=- :: Capacity consumption constraint for scenario 3

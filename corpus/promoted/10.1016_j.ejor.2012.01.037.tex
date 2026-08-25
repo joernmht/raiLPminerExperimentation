@@ -1,0 +1,42 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2012.01.037
+%@ meta id=10.1016_j.ejor.2012.01.037 family=milp schema=0.1.0
+%@ name :: A rolling horizon approach for disruption management of railway rolling stock
+%@ desc :: Mined from A rolling horizon approach for disruption management of railway rolling stock (European Journal of Operational Research, 2012).
+%@ prov source :: 10.1016/j.ejor.2012.01.037
+%@ prov reference :: A rolling horizon approach for disruption management of railway rolling stock
+%@ prov author :: Lars Kjær Nielsen; Leo Kroon; Gábor Maróti
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total costs of composition assignment, transitions and end-of-day deviations
+%@ param F shape=- kind=scalar domain=- :: Objective function value
+%@ var X shape=R,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating assignment of composition c to trip r
+%@ var Z shape=R,R,C,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating transition from composition c on trip r to c' on trip r'
+%@ index R ordered=0 cyclic=0 :: Set of trips
+%@ index C ordered=0 cyclic=0 :: Set of compositions
+%@ index T ordered=0 cyclic=0 :: Set of pairs of consecutive trips
+%@ index M ordered=0 cyclic=0 :: Set of rolling stock types
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param i shape=S,M kind=matrix domain=- :: Inventory of type m at station s at start or end of day
+%@ param n shape=C,M kind=matrix domain=- :: Number of units of type m in composition c
+%@ var D shape=S,M domain=non_negative role=primary drole=- lo=- hi=- :: Deviation from target end-of-day inventory for type m at station s
+%@ var I shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Final inventory of type m at station s
+%@ param w shape=R,C kind=matrix domain=- :: Penalty for assigning composition c to trip r
+%@ con eq_0003 kind=linear domain=- indicator=- :: Each trip is assigned exactly one composition
+%@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation: composition on trip r equals sum of transitions to next trip
+%@ con eq_0005 kind=linear domain=- indicator=- :: Flow conservation: composition on next trip equals sum of transitions from previous trip
+%@ con eq_0006 kind=linear domain=- indicator=- :: Inventory at every station remains non-negative at all times
+%@ con eq_0007 kind=linear domain=- indicator=- :: End-of-day inventory at each station equals prescribed target value
+%@ con eq_0008_a kind=linear domain=- indicator=- :: Deviation variable bounds target minus final inventory
+%@ con eq_0008_b kind=linear domain=- indicator=- :: Deviation variable bounds final inventory minus target
+%@ con eq_0009 kind=linear domain=- indicator=- :: Final inventory computed from initial inventory and assigned compositions
+\begin{align}
+  \min\quad & F(X,Z) \tag{eq\_0002} \\
+  & \text{subject to} \sum_{c \in C} X_{r , c} = 1 \forall r \in R \tag{eq\_0003} \\
+  & X_{r , c} = \sum_{c^{'} \in C} Z_{r , r^{'} , c , c^{'}} \forall \left(r , r^{'}\right) \in T , c \in C \tag{eq\_0004} \\
+  & X_{r^{'} , c^{'}} = \sum_{c \in C} Z_{r , r^{'} , c , c^{'}} \forall \left(r , r^{'}\right) \in T , c^{'} \in C \tag{eq\_0005} \\
+  & 0 \leq i_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} \mathit{alpha}_{r , s , t} \cdot n_{c , m} \cdot X_{r , c} \forall t , s \in S , m \in M \tag{eq\_0006} \\
+  & i_{s , m}^{\infty} = i_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} \mathit{alpha}_{r , s}^{\infty} \cdot n_{c , m} \cdot X_{r , c} \forall s \in S , m \in M \tag{eq\_0007} \\
+  & D_{s , m} \geq i_{s , m}^{\infty} - I_{s , m}^{\infty} \forall s \in S , m \in M \tag{eq\_0008\_a} \\
+  & D_{s , m} \geq I_{s , m}^{\infty} - i_{s , m}^{\infty} \forall s \in S , m \in M \tag{eq\_0008\_b} \\
+  & \sum_{r \in R} \sum_{c \in C} w_{r , c} \cdot X_{r , c} + \sum_{r , r^{'} \in T} \sum_{c , c^{'} \in C \cdot C} \mathit{gamma}_{r , r^{'} , c , c^{'}} Z_{r , r^{'} , c , c^{'}} + \mathit{beta} \cdot \sum_{s \in S} \sum_{m \in M} D_{s , m} \tag{eq\_0009} \\
+\end{align}

@@ -1,0 +1,95 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2019.100175
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2019.100175
+% A concurrent approach to the periodic event scheduling problem
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2019.100175.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize weighted periodic slack
+%
+% w: classified as parameter during review
+%@ param w shape=- kind=vector :: Weight vector for slack variables in objective
+%
+% y: classified as variable during review
+%@ var y shape=- domain=non_negative role=primary :: Periodic slack on activities
+%
+% pi renamed from unusable π
+%@ var pi shape=- domain=continuous role=primary :: Periodic timetable values for events
+%
+% ell renamed from unusable ℓ
+%@ param ell shape=- kind=vector :: Lower bound on activity durations
+%
+% A: classified as parameter during review
+%@ param A shape=- kind=matrix :: Incidence matrix of event-activity network
+%
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Period length
+%
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for events
+%
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for events
+%
+% p: classified as variable during review
+%@ var p shape=- domain=integer role=primary :: Periodic offsets for activities
+%
+% u: classified as parameter during review
+%@ param u shape=- kind=vector :: Upper bound on activity durations
+%
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar :: Set of integers (symbol for integer domain)
+%
+% z: classified as variable during review
+%@ var z shape=- domain=integer role=primary :: Integer variables in cycle formulation
+%
+% Gamma renamed from unusable Γ
+%@ param Gamma shape=- kind=matrix :: Cycle matrix of the network
+%
+% gamma renamed from unusable γ
+%@ param gamma shape=- kind=vector :: Incidence vector of an oriented cycle
+%
+% alpha renamed from unusable α
+%@ param alpha shape=- kind=scalar :: Modulo value used in change-cycle inequalities
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear :: Periodic slack definition y_ij = pi_j - pi_i - ell_ij + p_ij T
+%@ con eq_0005 kind=linear :: Bounds on periodic slack 0 <= y_ij <= u_ij - ell_ij
+%@ con eq_0006 kind=linear :: Timetable bounds 0 <= pi_i < T
+%@ con eq_0007 kind=linear :: Nonnegative integrality of periodic offsets p_ij
+%@ con eq_0010 kind=linear :: Cycle-matrix equation Gamma(y + ell) = z T
+%@ con eq_0011 kind=linear :: Slack bounds in cycle formulation
+%@ con eq_0012 kind=linear :: Integrality of cycle variables z
+%@ con eq_0015 kind=linear :: Lower cycle inequality for integer cycle variable z_gamma
+%@ con eq_0016 kind=linear :: Upper cycle inequality for integer cycle variable z_gamma
+%@ con eq_0019_a kind=linear :: Change-cycle inequality (Nachtigall) — part (a)
+%@ con eq_0019_b kind=linear :: Change-cycle inequality (Nachtigall) — part (b)
+%@ con eq_0019_c kind=linear :: Change-cycle inequality (Nachtigall) — part (c)
+%@ con eq_0019_d kind=linear :: Change-cycle inequality (Nachtigall) — part (d)
+%@ con eq_0019_e kind=linear :: Change-cycle inequality (Nachtigall) — part (e)
+%@ con eq_0019_f kind=linear :: Change-cycle inequality (Nachtigall) — part (f)
+%@ con eq_0025_a kind=linear :: Additional PESP valid inequality — part (a)
+%@ con eq_0025_b kind=linear :: Additional PESP valid inequality — part (b)
+%@ con eq_0025_c kind=linear :: Additional PESP valid inequality — part (c)
+%@ con eq_0025_d kind=linear :: Additional PESP valid inequality — part (d)
+%@ con eq_0025_e kind=linear :: Additional PESP valid inequality — part (e)
+%@ param wt

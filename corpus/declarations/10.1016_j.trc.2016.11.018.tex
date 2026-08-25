@@ -1,0 +1,152 @@
+% Declaration sidecar for 10.1016_j.trc.2016.11.018
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2016.11.018
+% An eigenmodel for iterative line planning, timetabling and vehicle scheduling in public transportation
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2016.11.018.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of cost objective and passenger time objective (α·f_cost + β·f_time)
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines in the line pool
+
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Objective function of the integrated planning problem
+
+% x: classified as variable during review
+%@ var x shape=- domain=non_negative role=primary :: Decision variables for line planning, timetabling and vehicle scheduling
+
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Feasible set for the planning stages
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Index for lines l in L
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Cost per line in the line pool
+
+% f̄: classified as parameter during review
+%@ param f_hat shape=- kind=scalar domain=- :: Approximated cost function for line planning
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Timetabling stage
+
+% LT: classified as parameter during review
+%@ param LT shape=- kind=scalar domain=- :: Combined line planning and timetabling stage
+
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: Vehicle scheduling stage
+
+% number: classified as parameter during review
+%@ param number shape=- kind=scalar domain=- :: Number of transfers in the line plan
+
+% pen: classified as parameter during review
+%@ param pen shape=- kind=scalar domain=- :: Penalty per transfer in the passenger objective
+
+% transfers: classified as parameter during review
+%@ param transfers shape=- kind=scalar domain=- :: Transfers in the line plan
+
+% LTS: classified as parameter during review
+%@ param LTS shape=- kind=scalar domain=- :: Integrated line planning, timetabling and vehicle scheduling problem
+
+% α: classified as parameter during review (renamed to alpha)
+%@ param alpha shape=- kind=scalar domain=- :: Weight for the cost objective in weighted-sum scalarization
+
+% β: classified as parameter during review (renamed to beta)
+%@ param beta shape=- kind=scalar domain=- :: Weight for the passenger time objective in weighted-sum scalarization
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Feasible set of integrated solutions (LTS-plans)
+
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Budget for cost or time in ε-constrained scalarizations
+
+% LS: classified as parameter during review
+%@ param LS shape=- kind=scalar domain=- :: Combined line planning and vehicle scheduling stage
+
+% const: classified as parameter during review
+%@ param const shape=- kind=scalar domain=- :: Constant term in the objective
+
+% TS: classified as parameter during review
+%@ param TS shape=- kind=scalar domain=- :: Combined timetabling and vehicle scheduling stage
+
+% Bound by a quantifier or big operator, so no declaration of their own: e
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001_a kind=linear :: Line planning problem: objective expression
+%@ con eq_0001_b kind=linear :: Line planning problem: feasibility constraint x_L ∈ F_L
+%@ con eq_0002 kind=linear :: Line planning frequency bounds: minimal and maximal service level per edge
+%@ con eq_0004 kind=linear :: Line planning: approximated cost function using line frequencies and line costs
+%@ con eq_0005_a kind=linear :: Frequency bound: lower bound on edge frequency
+%@ con eq_0005_b kind=linear :: Frequency bound: upper bound on edge frequency
+%@ con eq_0006_a kind=linear :: Timetabling problem: objective expression
+%@ con eq_0006_b kind=linear :: Timetabling problem: feasibility constraint x_T ∈ F_T(x_L)
+%@ con eq_0008 kind=linear :: Integrated problem: definition of feasible set of LTS-plans
+%@ con eq_0009_a kind=linear :: Timetabling event-activity constraint: driving activity
+%@ con eq_0009_b kind=linear :: Timetabling event-activity constraint: waiting activity
+%@ con eq_0009_c kind=linear :: Timetabling event-activity constraint: transfer activity
+%@ con eq_0009_d kind=linear :: Timetabling event-activity constraint: time bounds
+%@ con eq_0010_a kind=linear :: Cost approximation: f̄_cost(x_L) = Σ_{l∈L} x_l^L c_l
+%@ con eq_0010_b kind=linear :: Cost approximation: line costs from line lengths
+%@ con eq_0011_a kind=linear :: Timetabling constraint: driving duration between events
+%@ con eq_0011_b kind=linear :: Timetabling constraint: waiting duration between events
+%@ con eq_0011_c kind=linear :: Timetabling constraint: transfer duration between events
+%@ con eq_0012_a kind=linear :: Timetabling feasibility: relation between arrival and departure times
+%@ con eq_0012_b kind=linear :: Timetabling feasibility: periodicity constraints
+%@ con eq_0012_c kind=linear :: Timetabling feasibility: integrality and bounds on event times
+%@ con eq_0013_a kind=linear :: Vehicle scheduling: trip compatibility for direct succession
+%@ con eq_0013_b kind=linear :: Vehicle scheduling: assignment of trips to vehicles
+%@ con eq_0014 kind=linear :: Integrated objective: cost and passenger time components
+%@ con eq_0015_a kind=linear :: Passenger objective: traveling time from timetabling
+%@ con eq_0015_b kind=linear :: Passenger objective: transfer penalty from line planning
+%@ con eq_0016_a kind=linear :: Cost objective: vehicle schedule costs and number of vehicles
+%@ con eq_0016_b kind=linear :: Cost objective: constant operating costs for fixed lines and timetable
+%@ con eq_0017_a kind=linear :: Integrated feasibility: line plan x_L ∈ F_L
+%@ con eq_0017_b kind=linear :: Integrated feasibility: timetable x_T ∈ F_T(x_L)
+%@ con eq_0017_c kind=linear :: Integrated feasibility: vehicle schedule x_S ∈ F_S(x_L,x_T)
+%@ con eq_0018_a kind=linear :: Weighted-sum scalarization: weighted cost and passenger time objective
+%@ con eq_0018_b kind=linear :: Weighted-sum scalarization: nonnegative weights α, β
+%@ con eq_0018_c kind=linear :: Weighted-sum scalarization: integrated feasibility (x_L,x_T,x_S) ∈ I
+%@ con eq_0019_a kind=linear :: ε-constrained scalarization: minimize passenger time subject to cost budget
+%@ con eq_0019_b kind=linear :: ε-constrained scalarization: cost budget constraint f_cost ≤ B_cost
+%@ con eq_0019_c kind=linear :: ε-constrained scalarization: minimize cost subject to time budget
+%@ con eq_0020_a kind=linear :: Line planning problem: objective min f_L(x_L)
+%@ con eq_0020_b kind=linear :: Line planning problem: feasibility x_L ∈ F_L
+%@ con eq_0021_a kind=linear :: Timetabling problem: objective min f_T(x_T)
+%@ con eq_0021_b kind=linear :: Timetabling problem: feasibility x_T ∈ F_T(x_L)
+%@ con eq_0021_c kind=linear :: Timetabling problem: bounds on discrete event times
+%@ con eq_0022_a kind=linear :: Vehicle scheduling problem: objective min f_S(x_S)
+%@ con eq_0022_b kind=linear :: Vehicle scheduling problem: feasibility x_S ∈ F_S(x_L,x_T)
+%@ con eq_0023_a kind=linear :: Integrated line planning and timetabling: objective expression
+%@ con eq_0023_b kind=linear :: Integrated line planning and timetabling: feasibility constraints
+%@ con eq_0025_a kind=linear :: Timetabling problem (L→T): objective min f_T(x_T)
+%@ con eq_0025_b kind=linear :: Timetabling problem (L→T): feasibility x_T ∈ F_T(x_L)
+%@ con eq_0025_c kind=linear :: Timetabling problem (L→T): period and bound constraints
+%@ con eq_0026_a kind=linear :: Vehicle scheduling problem (LT→S): objective min f_S(x_S)
+%@ con eq_0026_b kind=linear :: Vehicle scheduling problem (LT→S): feasibility x_S ∈ F_S(x_L,x_T)
+%@ con eq_0027 kind=linear :: Integrated feasible set I = {(x_L,x_T,x_S): x_L∈F_L, x_T∈F_T(x_L), x_S∈F_S(x_L,x_T)}
+%@ con eq_0028_a kind=linear :: Iterative algorithm: re-optimize timetable for fixed line and vehicle schedule
+%@ con eq_0028_b kind=linear :: Iterative algorithm: re-optimize vehicle schedule for fixed line and timetable
+%@ con eq_0030_a kind=linear :: Vehicle scheduling problem (LT→S): objective min f_S(x_S)
+%@ con eq_0030_b kind=linear :: Vehicle scheduling problem (LT→S): feasibility x_S ∈ F_S(x_L,x_T)
+%@ con eq_0033 kind=linear :: Integrated model: objective and feasibility for line planning, timetabling and vehicle scheduling

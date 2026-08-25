@@ -1,0 +1,46 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2015.12.007
+%@ meta id=10.1016_j.trc.2015.12.007 family=milp schema=0.1.0
+%@ name :: Optimizing train stopping patterns and schedules for high-speed passenger rail corridors
+%@ desc :: Mined from Optimizing train stopping patterns and schedules for high-speed passenger rail corridors (Transportation Research Part C Emerging Technologies, 2015).
+%@ prov source :: 10.1016/j.trc.2015.12.007
+%@ prov reference :: Optimizing train stopping patterns and schedules for high-speed passenger rail corridors
+%@ prov author :: Yixiang Yue; Shifeng Wang; Leishan Zhou; Lu Tong; M. Rapik Saat
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total profit from all train trajectories.
+%@ var x shape=i,j,t,s,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train k uses arc (i,j) at time t,s.
+%@ var y shape=i,j,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train k stops at station i.
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value (total profit).
+%@ index t ordered=1 cyclic=0 :: Time index.
+%@ index i ordered=1 cyclic=0 :: Station index (origin of arc).
+%@ index j ordered=1 cyclic=0 :: Station index (destination of arc).
+%@ index k ordered=0 cyclic=0 :: Train index.
+%@ index s ordered=1 cyclic=0 :: Time index (arrival time).
+%@ param o shape=k kind=vector domain=- :: Origin station of train k.
+%@ param q shape=k kind=vector domain=- :: Destination station of train k.
+%@ param v shape=i,j kind=matrix domain=- :: Minimum number of trains serving passengers from i to j.
+%@ param w shape=i kind=vector domain=- :: Minimum and maximum stopping times at station i.
+%@ param u shape=i kind=vector domain=- :: Number of sidetracks at station i.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Profit of train k as maximum profit minus penalties for stopping time and number of stops.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Flow conservation at each space-time node (i,t): outflow minus inflow equals 1 at source, -1 at sink, 0 otherwise.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Trains can stop only at stations between origin o(k) and destination q(k).
+%@ con eq_0005 kind=linear domain=- indicator=- :: At least v_{i,j} trains must serve passengers traveling from station i to station j.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum stopping time at station i is bounded by w_i^{max} when train k stops there.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum stopping time at station i is enforced by w_i^{min} when train k stops there.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure headway: trains departing from station i must be separated by at least f minutes.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Arrival headway: trains arriving at station j must be separated by at least h minutes.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity: number of waiting trains at station i at time t cannot exceed sidetracks u_i.
+%@ con eq_0011 kind=linear domain=- indicator=- :: No overtaking: two trains cannot use the same single-track section within conflicting time windows.
+\begin{align}
+  & \mathit{pi} \left(k\right) = \mathit{pi}^{max} \left(k\right) - \left[\mathit{alpha} \left(k\right) \cdot \sum_{i} \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right)\right] - \left[\mathit{beta} \left(k\right) \cdot \sum_{i} y_{o \left(k\right) , i} \left(k\right)\right] \forall k \tag{eq\_0001} \\
+  \text{Z}_{1}\quad & = max \sum_{k} \mathit{pi} \left(k\right) \tag{eq\_0002} \\
+  & \sum_{s} \sum_{j} x_{i , j}^{t , s} \left(k\right) - \sum_{s} \sum_{j} x_{j , i}^{s , t} \left(k\right) = \left\{\begin{matrix} 1 & i = o \left(k\right) , t = t_{o} \left(k\right) \\ - 1 & i = q \left(k\right) , t = t_{q} \left(k\right) \\ 0 & \text{otherwise} \end{matrix}\right \forall k , i , t \tag{eq\_0003} \\
+  & y_{o \left(k\right) , i} \left(k\right) = 0 \cdot i \leq o \left(k\right) \text{or} i > q \left(k\right) \forall k \tag{eq\_0004} \\
+  & \sum_{k} y_{i , j} \left(k\right) \geq v_{i , j} \forall i , j , i \neq j \tag{eq\_0005} \\
+  & \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right) \leq w_{i}^{max} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0006} \\
+  & \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right) \geq w_{i}^{min} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0007} \\
+  & \sum_{k} \sum_{j} \sum_{s} \sum_{t \in \left(t^{'} , t^{'} + f\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall i , t^{'} \tag{eq\_0008} \\
+  & \sum_{k} \sum_{i} \sum_{t} \sum_{s \in \left(t^{'} , t^{'} + h\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall j , t^{'} \tag{eq\_0009} \\
+  & \sum_{k} \sum_{s} x_{i , i}^{t , s} \left(k\right) \leq u_{i} \forall i , t \tag{eq\_0010} \\
+  & x_{i , j}^{t^{'} , t^{'} + l_{i , j} \left(k\right)} \left(k\right) + \sum_{s \in \left[t^{'} , t^{'} + l_{i , j} \left(k\right)\right]} \sum_{t \in \left[t^{'} , t^{'} + l_{i , j} \left(k\right)\right]} x_{i , j}^{t , s} \left(k^{'}\right) \leq 1 \forall i , j , k , k^{'} , t^{'} \tag{eq\_0011} \\
+\end{align}

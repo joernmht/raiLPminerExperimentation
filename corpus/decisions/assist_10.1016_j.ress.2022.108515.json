@@ -1,0 +1,281 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.ress.2022.108515",
+      "doi": "10.1016/j.ress.2022.108515",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0002",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0003",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0004",
+          "status": "corrected",
+          "note": "d_{C_n}(t) = \\sum_{k \\in K} d_{k,C_n}(t)",
+          "parts": [
+            "d_{C_n}(t) = \\sum_{k \\in K} d_{k,C_n}(t)"
+          ]
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "d_{C_{n+i}, C_n}(t) = d_{C_n}(t) \\frac{GDP_{C_{n+i}}}{\\sum_{i=1}^{N} GDP_{C_{n+i}}}",
+          "parts": [
+            "d_{C_{n+i}, C_n}(t) = d_{C_n}(t) \\frac{GDP_{C_{n+i}}}{\\sum_{i=1}^{N} GDP_{C_{n+i}}}"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "corrected",
+          "note": "\\Delta_{t, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line, m \\in M, i=1}^{n-1} t_{I_n, I_{n+i}, m}}{L_{n, C_n, C_{n+i}}}",
+          "parts": [
+            "\\Delta_{t, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line, m \\in M, i=1}^{n-1} t_{I_n, I_{n+i}, m}}{L_{n, C_n, C_{n+i}}}",
+            "\\{C_n, C_{n+i}\\} \\supseteq \\{I_n, I_{n+i}\\}",
+            "\\{I_n, I_{n+i}\\} \\in \\{s_n, s_{n+i}\\}",
+            "\\{s_n, s_{n+i}\\} \\in A_1"
+          ]
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "\\Delta_{c, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line, m \\in M, i=1}^{n-1} c_{I_n, I_{n+i}, m}}{L_{n, C_n, C_{n+i}}}",
+          "parts": [
+            "\\Delta_{c, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line, m \\in M, i=1}^{n-1} c_{I_n, I_{n+i}, m}}{L_{n, C_n, C_{n+i}}}",
+            "\\{C_n, C_{n+i}\\} \\supseteq \\{I_n, I_{n+i}\\}",
+            "\\{I_n, I_{n+i}\\} \\in \\{s_n, s_{n+i}\\}",
+            "\\{s_n, s_{n+i}\\} \\in A_1"
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "corrected",
+          "note": "\\Delta_{a, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line} \\{l \\cap A_2\\}}{L_{n, C_n, C_{n+i}}}",
+          "parts": [
+            "\\Delta_{a, C_n, C_{n+i}} = \\frac{\\sum_{l \\in Line} \\{l \\cap A_2\\}}{L_{n, C_n, C_{n+i}}}"
+          ]
+        },
+        {
+          "id": "eq-0009",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0010",
+          "status": "corrected",
+          "note": "q_{C_{n+i}, C_n} = d_{C_{n+i}, C_n} P_{par}(\\Delta)",
+          "parts": [
+            "q_{C_{n+i}, C_n} = d_{C_{n+i}, C_n} P_{par}(\\Delta)"
+          ]
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "q_{C_n} = \\sum_{i=1}^{N} q_{C_{n+i}, C_n}",
+          "parts": [
+            "q_{C_n} = \\sum_{i=1}^{N} q_{C_{n+i}, C_n}"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "q_{ab, C_n} = \\sum_{I_n \\in C_n, m \\in M} q_{ab, m, I_n}",
+          "parts": [
+            "q_{ab, C_n} = \\sum_{I_n \\in C_n, m \\in M} q_{ab, m, I_n}",
+            "q_{ab, C_n} \\leq q_{C_n}"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "t_{Arr, m_n, I_n} = t_{Dep, m_n, I_1} + \\sum_{i=1}^{n} t_{I_i, I_{i+1}, m_n} + \\sum_{i=1}^{n-1} t_{dwell, m_n, I_i}",
+          "parts": [
+            "t_{Arr, m_n, I_n} = t_{Dep, m_n, I_1} + \\sum_{i=1}^{n} t_{I_i, I_{i+1}, m_n} + \\sum_{i=1}^{n-1} t_{dwell, m_n, I_i}"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "corrected",
+          "note": "t_{Dep, m_n, I_n} = t_{Arr, m_n, I_n} + t_{Hold, m_n, I_n}",
+          "parts": [
+            "t_{Dep, m_n, I_n} = t_{Arr, m_n, I_n} + t_{Hold, m_n, I_n}"
+          ]
+        },
+        {
+          "id": "eq-0016",
+          "status": "corrected",
+          "note": "t_{Arr, m_n, I_n} = t_{Dep, m_n, I_{n-1}} + (N_{m_n} - Nbar_A) \\cdot t_{Air} + t_{I_{n-1}, I_n, m_n} \\qquad \\forall m \\in M",
+          "parts": [
+            "t_{Arr, m_n, I_n} = t_{Dep, m_n, I_{n-1}} + (N_{m_n} - Nbar_A) \\cdot t_{Air} + t_{I_{n-1}, I_n, m_n} \\qquad \\forall m \\in M"
+          ]
+        },
+        {
+          "id": "eq-0017",
+          "status": "corrected",
+          "note": "t_{bus, I_n, I_np} = \\frac{\\Delta_{u, I_n, I_np}}{v_{bus} \\left(1 - q_{ab, m_n, I_np} / q_{ab, I_n} \\right)}",
+          "parts": [
+            "t_{bus, I_n, I_np} = \\frac{\\Delta_{u, I_n, I_np}}{v_{bus} \\left(1 - q_{ab, m_n, I_np} / q_{ab, I_n} \\right)}",
+            "\\Delta_{u, I_n, I_np} \\leq Deltabar_u",
+            "t_{bus, I_n, I_np} \\leq t_{Arr, m_n, I_np}",
+            "t_{bus, I_n, I_np} \\leq t_{Arr, m_n, I_np}",
+            "\\{I_n, I_np\\} \\in C_n"
+          ]
+        },
+        {
+          "id": "eq-0018",
+          "status": "corrected",
+          "note": "t_{t r a v e l}^{l_{n}} = t_{A r r}^{m_{n} I_{n}} - t_{D e p}^{m_{n} I_{n + i}}",
+          "parts": [
+            "t_{t r a v e l}^{l_{n}} = t_{A r r}^{m_{n} I_{n}} - t_{D e p}^{m_{n} I_{n + i}}",
+            "l_{n} \\supseteq \\left\\{I_{n} , I_{n + i}\\right\\} \\subseteq \\left\\{s_{n} , s_{n + i}\\right\\} \\subseteq A_{1}"
+          ]
+        },
+        {
+          "id": "eq-0019",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0020",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0021",
+          "status": "corrected",
+          "note": "t_{w a i t}^{l_{n}} = t_{A r r}^{m_{n} ^{'} I_{n}} - t_{A r r}^{m_{n} I_{n}}",
+          "parts": [
+            "t_{w a i t}^{l_{n}} = t_{A r r}^{m_{n} ^{'} I_{n}} - t_{A r r}^{m_{n} I_{n}}",
+            "t_{A r r}^{m_{n} ^{'} I_{n}} > t_{A r r}^{m_{n} I_{n}}"
+          ]
+        },
+        {
+          "id": "eq-0022",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0023",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0024",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0025",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0026",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0027",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0028",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0029",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0030",
+          "status": "corrected",
+          "note": "\\min C",
+          "parts": [
+            "\\min C",
+            "\\min R",
+            "\\min U"
+          ]
+        },
+        {
+          "id": "eq-0031",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0032",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0033",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0034",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0035",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0036",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0037",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0038",
+          "status": "rejected"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.ress.2022.108515",
+      "cell": "P4"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.ress.2022.108515",
+      "symbols": {
+        "A": "index",
+        "C": "index",
+        "D": "index",
+        "GDP": "parameter",
+        "INC": "parameter",
+        "INV": "parameter",
+        "L": "parameter",
+        "M": "index",
+        "N": "parameter",
+        "N̄": "parameter",
+        "P": "parameter",
+        "R": "parameter",
+        "U": "parameter",
+        "V": "parameter",
+        "a": "parameter",
+        "c": "parameter",
+        "d": "parameter",
+        "f": "parameter",
+        "m": "index",
+        "n": "index",
+        "q": "parameter",
+        "s": "index",
+        "t": "parameter",
+        "u": "parameter",
+        "v": "parameter",
+        "Δ": "parameter",
+        "Δ̄": "parameter",
+        "α": "parameter"
+      }
+    }
+  ]
+}

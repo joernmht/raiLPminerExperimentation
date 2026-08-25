@@ -1,0 +1,106 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.04.003
+%@ meta id=10.1016_j.trb.2016.04.003 family=milp schema=0.1.0
+%@ name :: Passenger centric train timetabling problem
+%@ desc :: Mined from Passenger centric train timetabling problem (Transportation Research Part B Methodological, 2016).
+%@ prov source :: 10.1016/j.trb.2016.04.003
+%@ prov reference :: Passenger centric train timetabling problem
+%@ prov author :: Tomáš Robenek; Yousef Maknoon; Shadi Sharif Azadeh; Jianghang Chen; Michel Bierlaire
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize operator profit while maintaining epsilon level of passenger satisfaction
+%@ param k shape=- kind=scalar domain=- :: Length of line ℓ in kilometers
+%@ param e shape=- kind=scalar domain=- :: Ticket price on segment s
+%@ param f shape=- kind=scalar domain=- :: Train driver salary per kilometer
+%@ param o shape=- kind=scalar domain=- :: Rolling stock operating cost per kilometer
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index S ordered=0 cyclic=0 :: Set of segments
+%@ index V ordered=0 cyclic=0 :: Set of trains
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Generalized time for passenger group i and departure time t
+%@ param VOT shape=- kind=scalar domain=- :: Value of time
+%@ param n shape=- kind=scalar domain=- :: Number of passengers in group i at time t
+%@ index I ordered=0 cyclic=0 :: Set of origin-destination pairs
+%@ param M shape=- kind=scalar domain=- :: Big-M constant
+%@ index P ordered=0 cyclic=0 :: Set of paths
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p, line ℓ, train v
+%@ var d shape=- domain=integer role=primary drole=- lo=- hi=- :: Departure time of train v on line ℓ
+%@ index v ordered=0 cyclic=0 :: Train index
+%@ param c shape=- kind=scalar domain=- :: Cycle length in minutes
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable for cyclicity constraints
+%@ param q shape=- kind=scalar domain=- :: Train capacity
+%@ param g shape=- kind=scalar domain=- :: Maximum number of trains per driver
+%@ param N shape=- kind=scalar domain=- :: Set of natural numbers
+%@ param a shape=- kind=scalar domain=- :: Preferred arrival time of passenger group i at time t
+%@ param b shape=- kind=scalar domain=- :: Boarding time for passenger group i, path p, line ℓ
+%@ param r shape=- kind=scalar domain=- :: Riding time for passenger group i, path p, line ℓ
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Waiting time for passenger group i,t on path p (and line ℓ)
+%@ param m shape=- kind=scalar domain=- :: Minimum transfer time
+%@ param u shape=- kind=scalar domain=- :: Number of transfers for passenger group i
+%@ param h shape=- kind=scalar domain=- :: Planning horizon
+%@ con eq_0007 kind=linear domain=- indicator=- :: Ensures total passenger satisfaction is at least epsilon
+%@ con eq_0008 kind=linear domain=- indicator=- :: Selects path with best generalized time for each passenger group
+%@ con eq_0009 kind=linear domain=- indicator=- :: Handles passengers not served within planning horizon
+%@ con eq_0010 kind=linear domain=- indicator=- :: Each passenger group uses at most one path
+%@ con eq_0011 kind=linear domain=- indicator=- :: Passenger takes exactly one train per line on chosen path
+%@ con eq_0012 kind=linear domain=- indicator=- :: Cyclicity constraint: constant time difference between consecutive trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Orders train departures in ascending order
+%@ con eq_0014 kind=linear domain=- indicator=- :: Computes train occupation per segment
+%@ con eq_0015 kind=linear domain=- indicator=- :: Capacity constraint: train capacity not exceeded
+%@ con eq_0016 kind=linear domain=- indicator=- :: Assigns train drivers: if train operated, enough drivers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Nonnegativity of generalized time
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary domain for path choice
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary domain for train choice
+%@ con eq_0020 kind=linear domain=- indicator=- :: Integer domain for departure times
+%@ con eq_0021 kind=linear domain=- indicator=- :: Integer domain for cyclicity variable
+%@ con eq_0022 kind=linear domain=- indicator=- :: Integer domain for train occupation
+%@ con eq_0023 kind=linear domain=- indicator=- :: Integer domain for number of trains needed
+%@ con eq_0024 kind=linear domain=- indicator=- :: Binary domain for train operation
+%@ con eq_0025 kind=linear domain=- indicator=- :: Earliness constraint for schedule delay
+%@ con eq_0026 kind=linear domain=- indicator=- :: Lateness constraint for schedule delay
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of earliness
+%@ con eq_0028 kind=linear domain=- indicator=- :: Nonnegativity of lateness
+%@ con eq_0029 kind=linear domain=- indicator=- :: Computes total waiting time as sum of transfer waiting times
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Lower bound on transfer waiting time at connection (part a)
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Lower bound on transfer waiting time at connection (part b)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Upper bound on transfer waiting time at connection
+%@ con eq_0032 kind=linear domain=- indicator=- :: Nonnegativity of total waiting time
+%@ con eq_0033 kind=linear domain=- indicator=- :: Nonnegativity of transfer waiting time
+%@ con eq_0034 kind=linear domain=- indicator=- :: Computes generalized time of passenger group for a path
+%@ con eq_0035 kind=linear domain=- indicator=- :: Calculates generalized time for passengers not served within horizon
+%@ con eq_0036 kind=linear domain=- indicator=- :: Reformulated cyclicity constraint with 60/120 min differences
+%@ con eq_0037 kind=linear domain=- indicator=- :: Selects one of two possible headways in reformulated cyclicity
+\begin{align}
+  \begin{matrix}\quad & & & max \sum_{\mathit{ell} \in L} \sum_{v \in V^{\mathit{ell}}} \sum_{s \in S^{\mathit{ell}}} \mathit{omega}_{v s}^{\mathit{ell}} \cdot e_{s} - \sum_{\mathit{ell} \in L} \sum_{v \in V^{\mathit{ell}}} \left(\mathit{alpha}_{v}^{\mathit{ell}} \cdot f \cdot k^{\mathit{ell}} + \mathit{mu}_{v}^{\mathit{ell}} \cdot o \cdot k^{\mathit{ell}}\right)\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix} & & - \mathit{VOT} \cdot \sum_{i \in I} \sum_{t \in T_{i}} n_{i}^{t} \cdot \mathcal{T}_{i}^{t} \geq \mathit{varepsilon} ,\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq \mathcal{T}_{i}^{t p} - M \cdot \left(1 - x_{i}^{t p}\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq \mathcal{V}_{i}^{t} \cdot \left(1 - \sum_{p \in P_{i}} x_{i}^{t p}\right) , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix} & & \sum_{p \in P_{i}} x_{i}^{t p} \leq 1 , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix} & & \sum_{v \in V^{\mathit{ell}}} y_{i}^{t p \mathit{ell} v} = x_{i}^{t p} , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell} \in L^{p} ,\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & & \left(d_{v}^{\mathit{ell}} - d_{v - 1}^{\mathit{ell}}\right) = c \cdot z_{v}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v > 1 ,\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix} & & d_{v}^{\mathit{ell}} \leq d_{v + 1}^{\mathit{ell}} - 1 , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v < \left|V^{\mathit{ell}}\right| ,\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & & \mathit{omega}_{v s}^{\mathit{ell}} = \sum_{i \in I} \sum_{t \in T_{i}} \sum_{p \in P_{i}} y_{i}^{t p \mathit{ell} v} \cdot n_{i}^{t} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & & \mathit{mu}_{v}^{\mathit{ell}} \cdot q \geq \mathit{omega}_{v s}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & & \mathit{alpha}_{v}^{\mathit{ell}} \cdot g \geq \mathit{mu}_{v}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq 0 , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & & x_{i}^{t p} \in \left(0 , 1\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & & y_{i}^{t p \mathit{ell} v} \in \left(0 , 1\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell} \in L^{p} , \forall v \in V^{\mathit{ell}} ,\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix} & & d_{v}^{\mathit{ell}} \in \mathcal{N} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}}\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix} & & z_{v}^{\mathit{ell}} \in \mathcal{N} \backslash \left\{0\right\} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}}\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix} & & \mathit{omega}_{v s}^{\mathit{ell}} \in \mathcal{N} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix} & & \mathit{mu}_{v}^{\mathit{ell}} \in \mathcal{N} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}}\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & & \mathit{alpha}_{v}^{\mathit{ell}} \in \left(0 , 1\right) , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} ,\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix} & & \mathit{delta}_{i}^{t p} \geq \left(a_{i}^{t} - \left(d_{v}^{\left|\right. L^{p} \left|\right.} + b_{i}^{p} \left|\right. L^{p} \left|\right. + r_{i}^{p \left|\right. L^{p} \left|\right.}\right)\right) - M \cdot \left(1 - y_{i}^{t p \left|\right. L^{p} \left|\right. v}\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall v \in V^{\left|\right. L^{p} \left|\right.} ,\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix} & & \mathit{gamma}_{i}^{t p} \geq \left(\left(d_{v}^{\left|\right. L^{p} \left|\right.} + b_{i}^{p} \left|\right. L^{p} \left|\right. + r_{i}^{p \left|\right. L^{p} \left|\right.}\right) - a_{i}^{t}\right) - M \cdot \left(1 - y_{i}^{t p \left|\right. L^{p} \left|\right. v}\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall v \in V^{\left|\right. L^{p} \left|\right.} ,\end{matrix} \tag{eq\_0026} \\
+  & \begin{matrix} & & \mathit{delta}_{i}^{t p} \geq 0 , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0027} \\
+  & \begin{matrix} & & \mathit{gamma}_{i}^{t p} \geq 0 , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0028} \\
+  & \begin{matrix} & & w_{i}^{t p} = \sum_{\mathit{ell} \in L^{p} \backslash 1} w_{i}^{t p \mathit{ell}} , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0029} \\
+  & w_{i}^{t p \mathit{ell}_{1}} \geq \left(\left(d_{v_{1}}^{\mathit{ell}_{1}} + b_{i}^{p \mathit{ell}_{1}}\right) - \left(d_{v_{2}}^{\mathit{ell}_{2}} + b_{i}^{p \mathit{ell}_{2}} + r_{i}^{p \mathit{ell}_{2}} + m\right)\right) \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell}_{1} \in L^{p} : \tag{eq\_0030\_a} \\
+  & - M \cdot \left(1 - y_{i}^{t p \mathit{ell}_{2} v_{2}}\right) - M \cdot \left(1 - y_{i}^{t p \mathit{ell}_{1} v_{1}}\right) , \mathit{ell}_{1} > 1 , \mathit{ell}_{2} = \mathit{ell}_{1} - 1 , \forall v_{1} \in V^{\mathit{ell}_{1}} , \forall v_{2} \in V^{\mathit{ell}_{2}} \tag{eq\_0030\_b} \\
+  & \begin{aligned}w_{i}^{t p \mathit{ell}_{1}} & \leq & \left(\left(d_{v_{1}}^{\mathit{ell}_{1}} + b_{i}^{p \mathit{ell}_{1}}\right) - \left(d_{v_{2}}^{\mathit{ell}_{2}} + b_{i}^{p \mathit{ell}_{2}} + r_{i}^{p \mathit{ell}_{2}} + m\right)\right) \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell}_{1} \in L^{p} : \\ & & + M \cdot \left(1 - y_{i}^{t p \mathit{ell}_{2} v_{2}}\right) + M \cdot \left(1 - y_{i}^{t p \mathit{ell}_{1} v_{1}}\right) , \mathit{ell}_{1} > 1 , \mathit{ell}_{2} = \mathit{ell}_{1} - 1 , \forall v \in V^{\mathit{ell}_{1}} , \forall v_{2} \in V^{\mathit{ell}_{2}} ,\end{aligned} \tag{eq\_0031} \\
+  & \begin{matrix} & & w_{i}^{t p} \geq 0 , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0032} \\
+  & \begin{matrix} & & w_{i}^{t p \mathit{ell}} \geq 0 , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell} \in L^{p} ,\end{matrix} \tag{eq\_0033} \\
+  & \begin{matrix} & & \mathcal{T}_{i}^{t p} = \sum_{\mathit{ell} \in L^{p}} r_{i}^{p \mathit{ell}} + \mathit{beta}_{W} \cdot w_{i}^{t p} + \mathit{beta}_{T} \cdot \left(\left|\right. L^{p} \left|\right. - 1\right) + \mathit{beta}_{E} \cdot \mathit{delta}_{i}^{t p} + \mathit{beta}_{L} \cdot \mathit{gamma}_{i}^{t p} \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix} & & \mathcal{V}_{i}^{t} = r_{i}^{1} + \mathit{beta}_{W} \cdot c + \mathit{beta}_{T} \cdot u_{i} + \mathit{beta}_{L} \cdot \left(h + c + r_{i}^{1} + m \cdot u_{i} - a_{i}^{t}\right) , \forall i \in I , \forall t \in T_{i} .\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix} & & d_{v}^{\mathit{ell}} - d_{v - 1}^{\mathit{ell}} = 60 \cdot z_{v 1}^{\mathit{ell}} + 120 \cdot z_{v 2}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v > 1 ,\end{matrix} \tag{eq\_0036} \\
+  & \begin{matrix} & & z_{v 1}^{\mathit{ell}} + z_{v 2}^{\mathit{ell}} = 1 , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v > 1 .\end{matrix} \tag{eq\_0037} \\
+\end{align}

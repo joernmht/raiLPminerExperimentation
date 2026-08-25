@@ -1,0 +1,57 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.02.004
+%@ meta id=10.1016_j.trb.2016.02.004 family=milp schema=0.1.0
+%@ name :: An integrated micro–macro approach to robust railway timetabling
+%@ desc :: Mined from An integrated micro–macro approach to robust railway timetabling (Transportation Research Part B Methodological, 2016).
+%@ prov source :: 10.1016/j.trb.2016.02.004
+%@ prov reference :: An integrated micro–macro approach to robust railway timetabling
+%@ prov author :: Nikola Bešinović; Rob M.P. Goverde; Egidio Quaglietta; Roberto Roberti
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted path, cancellation, and connection delay costs
+%@ param d shape=- kind=scalar domain=continuous :: Blocking time of a train on a block section, with start and end times
+%@ param h shape=- kind=scalar domain=continuous :: Minimum headway time between two trains at a timetable point
+%@ index B ordered=0 cyclic=0 :: Set of shared blocks or successive blocks
+%@ param c shape=- kind=scalar domain=continuous :: Cost of a path or blocking time overlap
+%@ index W ordered=0 cyclic=0 :: Cyclic pattern of successive train pairs in a corridor
+%@ index L ordered=0 cyclic=0 :: Set of train lines
+%@ index S ordered=0 cyclic=0 :: Set of timetable points
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is selected
+%@ var y shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable for connection time exceeding lower bound
+%@ index P ordered=0 cyclic=0 :: Set of paths for a line
+%@ index Q ordered=0 cyclic=0 :: Set of connections
+%@ index s ordered=0 cyclic=0 :: Timetable point index
+%@ param M shape=- kind=scalar domain=continuous :: Large enough number
+%@ param u shape=- kind=scalar domain=continuous :: Lower bound for connection time
+%@ index U ordered=0 cyclic=0 :: Set of path cliques
+%@ param u_bar shape=- kind=scalar domain=continuous :: Upper bound for connection time
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of blocking time as sum of setup, sight, approach, running, clearing, and release times
+%@ con eq_0002 kind=linear domain=- indicator=- :: Minimum headway time computed as maximum blocking-time end-start difference over shared blocks
+%@ con eq_0003 kind=linear domain=- indicator=- :: Blocking time overlap between successive trains on a corridor computed over shared blocks
+%@ con eq_0004 kind=linear domain=- indicator=- :: Infrastructure occupation of a corridor as sum of minimum line headways over cyclic train pairs
+%@ con eq_0005 kind=linear domain=- indicator=- :: Cost of a path from penalized running and dwell time deviations from nominal values
+%@ con eq_0007 kind=linear domain=- indicator=- :: Line selection constraint: each line is either assigned exactly one path or cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: Missed connection constraint: cancellation indicators of connected lines bound the missed-connection binary
+%@ con eq_0009 kind=linear domain=- indicator=- :: Lower bound on connection time: departure/arrival difference at least lower bound unless connection missed
+%@ con eq_0010 kind=linear domain=- indicator=- :: Upper bound on connection time: difference at most lower bound plus delay variable unless connection missed
+%@ con eq_0011 kind=linear domain=- indicator=- :: At most one path from each path clique can be selected to avoid conflicts
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary restriction on path-selection variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary restriction on line-cancellation variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds on connection-time exceeding variable y
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary restriction on missed-connection variables
+\begin{align}
+  & d_{t i} = t_{s e t u p , t i} + t_{s i g h t , t i} + t_{a p p r o a c h , t i} + t_{b l o c k , t i} + t_{c l e a r , t i} + t_{r e l e a s e , t i} . \tag{eq\_0001} \\
+  & h_{i j s} = \underset{l \in B_{i j s}}{max} \left(d_{i l}^{e} - d_{j l}^{s}\right) . \tag{eq\_0002} \\
+  & c_{i j \mathit{varphi}} = \underset{l \in B_{\mathit{varphi}}}{max} \left(d_{i l}^{e} - d_{j l}^{s}\right) , \tag{eq\_0003} \\
+  & \mathit{mu} \left(\mathit{varphi}\right) = \sum_{\left(i , j\right) \in W_{\mathit{varphi}}} h_{i j \mathit{varphi}} , \tag{eq\_0004} \\
+  & c_{p} = \mathit{pi}_{l}^{r u n n} \sum_{t \in L_{l}} \sum_{i = 1}^{\left|S_{t}\right| - 1} \left(\mathit{tau}_{s_{i + 1} p}^{A} - \mathit{tau}_{s_{i} p}^{D}\right) - \mathit{pi}_{l}^{d w e l l} \sum_{i = 2}^{\left|S_{t}\right| - 1} \left(\mathit{tau}_{s_{i}}^{D} - \mathit{tau}_{s_{i}}^{A}\right) . \tag{eq\_0005} \\
+  \min\quad & \sum_{l \in L} \sum_{p \in P_{l}} c_{p} \cdot x_{p} + \sum_{l \in L} \mathit{pi}_{l}^{c a n c} \mathit{xi}_{l} + \sum_{q \in Q} \mathit{pi}_{q}^{c o n n} y_{q} + \sum_{q \in Q} \left(\bar{\mathit{pi}}\right)_{q}^{c o n n} \mathit{chi}_{q} \tag{eq\_0006} \\
+  & s . t . \mathit{xi}_{l} + \sum_{p \in P_{l}} x_{p} = 1 l \in L \tag{eq\_0007} \\
+  & \mathit{xi}_{l \left(t_{1}\right)} + \mathit{xi}_{l \left(t_{2}\right)} \leq 2 \mathit{chi}_{q} q = \left(t_{1} , t_{2} , s\right) \in Q \tag{eq\_0008} \\
+  & \underset{p \in P_{l \left(t_{2}\right)}}{\sum} \mathit{tau}_{t s p}^{D} x_{p} - \underset{p \in P_{l \left(t_{1}\right)}}{\sum} \mathit{tau}_{t s p}^{A} x_{p} \geq \left(\underset{̲}{u}\right)_{q} - M \mathit{chi}_{q} q = \left(t_{1} , t_{2} , s\right) \in Q \tag{eq\_0009} \\
+  & \underset{p \in P_{l \left(t_{2}\right)}}{\sum} \mathit{tau}_{t s p}^{D} x_{p} - \underset{p \in P_{l \left(t_{1}\right)}}{\sum} \mathit{tau}_{t s p}^{A} x_{p} \leq \left(\underset{̲}{u}\right)_{q} + y_{q} + M \mathit{chi}_{q} q = \left(t_{1} , t_{2} , s\right) \in Q \tag{eq\_0010} \\
+  & \sum_{p \in U} x_{p} \leq 1 \cdot U \in \mathcal{U} \tag{eq\_0011} \\
+  & x_{p} \in \left\{0 , 1\right\} p \in P_{l} , l \in L \tag{eq\_0012} \\
+  & \mathit{xi}_{l} \in \left\{0 , 1\right\} l \in L \tag{eq\_0013} \\
+  & y_{q} \in \left\{0 , \left(\bar{u}\right)_{q} - \left(\underset{̲}{u}\right)_{q}\right\} q \in Q \tag{eq\_0014} \\
+  & \mathit{chi}_{q} \in \left\{0 , 1\right\} q \in Q \tag{eq\_0015} \\
+\end{align}

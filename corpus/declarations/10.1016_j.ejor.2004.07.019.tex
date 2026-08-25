@@ -1,0 +1,118 @@
+% Declaration sidecar for 10.1016_j.ejor.2004.07.019
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2004.07.019
+% Bicriteria train scheduling for high-speed passenger railroad planning applications
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2004.07.019.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize the sum of the two criteria: expected waiting time variation and total travel time
+
+% d: classified as variable during review
+%@ var d shape=I domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train i
+
+% g: classified as parameter during review
+%@ param g shape=I kind=vector domain=- :: Maximum allowable adjustment for departure time of train i
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of all trains
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Train index
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Number of trains
+
+% y: classified as variable during review
+%@ var y shape=I domain=continuous role=primary drole=- lo=- hi=- :: Interdeparture time between train i and i+1
+
+% x: classified as variable during review
+%@ var x shape=I,K domain=continuous role=primary drole=- lo=- hi=- :: Event time of train i at section k (entry/exit)
+
+% C: classified as variable during review
+%@ var C shape=I domain=continuous role=primary drole=- lo=- hi=- :: Total travel time of train i
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Section index
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of sections
+
+% s: classified as parameter during review
+%@ param s shape=I,K kind=matrix domain=- :: Minimum stop time of train i at station k
+
+% t: classified as variable during review
+%@ var t shape=I,K domain=continuous role=primary drole=- lo=- hi=- :: Acceleration or deceleration time of train i at section k
+
+% p: classified as parameter during review
+%@ param p shape=I,K kind=matrix domain=- :: Pure running time of train type q(i) on section k
+
+% B: classified as variable during review
+%@ var B shape=I,K domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for acceleration/deceleration or headway order
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+
+% unusable as an identifier, rename or drop: τ
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Number of sections
+
+% h: classified as parameter during review
+%@ param h shape=I,J,K kind=matrix domain=- :: Minimum headway between train types at section k
+
+% either: classified as parameter during review
+%@ param either shape=- kind=scalar domain=- :: Logical operator for either-or constraints
+
+% Var: classified as parameter during review
+%@ param Var shape=- kind=scalar domain=- :: Variance operator
+
+% Y: classified as parameter during review
+%@ param Y shape=- kind=scalar domain=- :: Random variable of interdeparture time
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+
+% Bound by a quantifier or big operator, so no declaration of their own: j
+% (If one of these is really an index family, add a %@ index line for it.)
+%@ index J ordered=0 cyclic=0 :: Train index (second train in headway constraints)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Allowable adjustment for departure time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Interdeparture time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time equality
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total travel time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwell time
+%@ con eq_0006 kind=linear domain=- indicator=- :: Travel time on sections
+%@ con eq_0007 kind=linear domain=- indicator=- :: Acceleration time binary implication
+%@ con eq_0008 kind=linear domain=- indicator=- :: Acceleration time calculation
+%@ con eq_0009 kind=linear domain=- indicator=- :: Deceleration time binary implication
+%@ con eq_0010 kind=linear domain=- indicator=- :: Deceleration time calculation
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum headway either-or (entry times)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum headway either-or (exit times)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Headway linearization entry direction 1
+%@ con eq_0014 kind=linear domain=- indicator=- :: Headway linearization entry direction 2
+%@ con eq_0015 kind=linear domain=- indicator=- :: Headway linearization exit direction 1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Headway linearization exit direction 2
+%@ con eq_0021 kind=linear domain=- indicator=- :: Additional linear constraint 21
+%@ con eq_0022 kind=linear domain=- indicator=- :: Additional linear constraint 22
+%@ con eq_0027 kind=linear domain=- indicator=- :: Lower bound for total travel time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Additional linear constraint 28

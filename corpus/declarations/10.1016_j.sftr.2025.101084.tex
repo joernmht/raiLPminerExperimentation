@@ -1,0 +1,134 @@
+% Declaration sidecar for 10.1016_j.sftr.2025.101084
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.sftr.2025.101084
+% A new type of sustainable operation method for urban rail transit: Joint optimization of train route planning and timetabling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.sftr.2025.101084.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted cost of enterprise operating cost and passenger waiting cost
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total objective cost combining operating and passenger waiting costs
+
+% unusable as an identifier, rename or drop: λ
+% c: classified as parameter during review
+%@ param c shape=F kind=vector domain=- :: Cost per train-kilometer for composition f
+
+% l: classified as parameter during review
+%@ param l shape=R kind=vector domain=- :: Length of route r
+
+% unusable as an identifier, rename or drop: δ
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of directions (1: up, 2: down)
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of train compositions
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of candidate routes
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods (train slots)
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Time index for passenger boarding time window
+
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: χ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passenger groups
+
+% Y: classified as variable during review
+%@ var Y shape=R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if route r is selected
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: ω
+% e: classified as parameter during review
+%@ param e shape=F kind=vector domain=- :: Passenger capacity of composition f
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: η
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: Direction index (1: up, 2: down)
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Station index
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of stations
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of time points for passenger boarding
+
+% unusable as an identifier, rename or drop: ε
+% unusable as an identifier, rename or drop: θ
+% h: classified as variable during review
+%@ var h shape=D,T,N domain=continuous role=primary drole=- lo=- hi=- :: Headway between train t and its forward train at station n in direction d
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for time periods (used in constraints)
+
+% unusable as an identifier, rename or drop: ρ
+% unusable as an identifier, rename or drop: υ
+% z: classified as variable during review
+%@ var z shape=T,F,P domain=continuous role=primary drole=- lo=- hi=- :: Linearization variable for passenger waiting cost calculation
+
+% Bound by a quantifier or big operator, so no declaration of their own: f, p, r, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Equation (2): enterprise operating cost Z1 calculation
+%@ con eq_0003 kind=linear domain=- indicator=- :: Equation (3): passenger waiting cost Z2 expression before linearization
+%@ con eq_0004 kind=linear domain=- indicator=- :: Equation (4): each station is served by at least one route
+%@ con eq_0005 kind=linear domain=- indicator=- :: Equation (5): number of train routes is bounded by omega
+%@ con eq_0006 kind=linear domain=- indicator=- :: Equation (6): train composition on selected route does not exceed route maximum
+%@ con eq_0007 kind=linear domain=- indicator=- :: Equation (7): section capacity meets passenger demand under load factor
+%@ con eq_0008 kind=linear domain=- indicator=- :: Equation (8): train arrival time calculation at stations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Equation (9): train departure time calculation at stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Equation (10): stop variable theta linked to route/composition operation delta
+%@ con eq_0011 kind=linear domain=- indicator=- :: Equation (11): headway calculation for train t=2 with forward train
+%@ con eq_0012 kind=linear domain=- indicator=- :: Equation (12): headway calculation for train t=3 with forward train
+%@ con eq_0013 kind=linear domain=- indicator=- :: Equation (13): headway calculation for train t>=4 with forward train
+%@ con eq_0014 kind=linear domain=- indicator=- :: Equation (14): maximum headway constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Equation (15): minimum headway constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Equation (16): departure-time-window variable rho defined by departure time xi
+%@ con eq_0017 kind=linear domain=- indicator=- :: Equation (17): passenger boarding eligibility requiring train serves both origin and destination
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equation (18): each passenger assigned to exactly one train/composition
+%@ con eq_0019 kind=linear domain=- indicator=- :: Equation (19): passenger load upsilon after departing station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Equation (20): train capacity constraint on passenger load
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21): route selection Y enables train operation on selected route
+%@ con eq_0022 kind=linear domain=- indicator=- :: Equation (22): train operation consecutiveness in each direction
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23): at most one route/composition operation per train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25): piecewise definition of linearization variable lz for waiting cost
+%@ con eq_0026 kind=linear domain=- indicator=- :: Equation (26): upper bound for lz linearization with departure time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Equation (27): lower bound for lz linearization with departure time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28): upper bound for lz using passenger assignment chi
+%@ con eq_0029 kind=linear domain=- indicator=- :: Equation (29): lower bound for lz using passenger assignment chi
+%@ con eq_0030 kind=linear domain=- indicator=- :: Equation (30): linearized passenger waiting cost objective term
+%@ con eq_0031 kind=linear domain=- indicator=- :: Equation (31): linearized arrival time equation for direction 1
+%@ con eq_0032 kind=linear domain=- indicator=- :: Equation (32): linearized arrival time equation for direction 2
+%@ con eq_0033 kind=linear domain=- indicator=- :: Equation (33): upper bound for product delta*xi with operation variable
+%@ con eq_0034 kind=linear domain=- indicator=- :: Equation (34): upper bound for product delta*xi with departure time
+%@ con eq_0035 kind=linear domain=- indicator=- :: Equation (35): lower bound for product delta*xi with departure time
+%@ con eq_0036 kind=linear domain=- indicator=- :: Equation (36): bounding product delta*xi between 0 and |K|
+%@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37): linearization of rho for departure time greater than k
+%@ con eq_0038 kind=linear domain=- indicator=- :: Equation (38): linearization of rho for departure time not greater than k

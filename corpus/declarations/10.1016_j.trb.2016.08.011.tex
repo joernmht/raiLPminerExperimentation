@@ -1,0 +1,137 @@
+% Declaration sidecar for 10.1016_j.trb.2016.08.011
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2016.08.011
+% Rescheduling a metro line in an over-crowded situation after disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2016.08.011.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize sum of total travel time and passenger waiting in the recovery period
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of services (trains) in the metro line
+
+% unusable as an identifier, rename or drop: τ
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of stations in the metro line
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Pure running time between stations
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Running time component
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Minimum dwell time at a station
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Sufficiently large positive constant
+
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Minimum back-turning time
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Maximum number of skipped stations per service
+
+% w: classified as variable during review
+%@ var w shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station i for service k
+
+% n: classified as variable during review
+%@ var n shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on service k at station i
+
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar domain=- :: Passenger flow parameter (possibly OD matrix)
+
+% Q: classified as parameter during review
+%@ param Q shape=S,N kind=matrix domain=- :: Number of passengers already on train at disruption time
+
+% z: classified as variable during review
+%@ var z shape=S,N,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passengers get off early
+
+% f: classified as variable during review
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (travel time or passenger flow)
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Disruption end time
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% unusable as an identifier, rename or drop: μ
+% Std: classified as parameter during review
+%@ param Std shape=- kind=scalar domain=- :: Standard stop pattern passenger counts
+
+% unusable as an identifier, rename or drop: β
+% Bound by a quantifier or big operator, so no declaration of their own: a, d, h, i, j, k, x
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0005 kind=linear domain=- indicator=- :: Back-turning time constraint for downstream services
+%@ con eq_0007 kind=linear domain=- indicator=- :: Nonlinear skip-stop constraint ensuring at least one suitable service in every three consecutive services
+%@ con eq_0008 kind=linear domain=- indicator=- :: Proof equation (8): counterexample assumption for Theorem 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Proof equation (9): product of skip indicators equals zero
+%@ con eq_0010 kind=linear domain=- indicator=- :: Proof equation (10): product of skip indicators equals zero
+%@ con eq_0011 kind=linear domain=- indicator=- :: Proof equation (11): product of skip indicators equals zero
+%@ con eq_0012 kind=linear domain=- indicator=- :: Proof equation (12): sum of skip indicators at station i' at least 2
+%@ con eq_0013 kind=linear domain=- indicator=- :: Proof equation (13): sum of skip indicators at station j' at least 2
+%@ con eq_0014 kind=linear domain=- indicator=- :: Proof equation (14): contradiction implication in Theorem 1
+%@ con eq_0015 kind=linear domain=- indicator=- :: Definition of total waiting passengers at station i for service k
+%@ con eq_0016 kind=linear domain=- indicator=- :: Decomposition of boarding passengers by destination
+%@ con eq_0017 kind=linear domain=- indicator=- :: Piecewise constant approximation of waiting passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Boarding passengers only if service stops at both origin and destination
+%@ con eq_0019 kind=linear domain=- indicator=- :: Passenger flow balance on train k at station i
+%@ con eq_0020 kind=linear domain=- indicator=- :: Capacity constraint on boarding passengers
+%@ con eq_0021 kind=linear domain=- indicator=- :: Total alighting passengers at station i
+%@ con eq_0022 kind=linear domain=- indicator=- :: Well-mixed boarding proportion constraint
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Remaining waiting passengers after boarding (Eq. 22) - part a
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Remaining waiting passengers after boarding (Eq. 22) - part b
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger waiting count for existing services
+%@ con eq_0027 kind=linear domain=- indicator=- :: Remaining waiting passengers for existing services with early alighting
+%@ con eq_0029 kind=linear domain=- indicator=- :: Total travel time objective
+%@ con eq_0030 kind=linear domain=- indicator=- :: Travel time of service k
+%@ con eq_0031 kind=linear domain=- indicator=- :: Total passenger flow objective
+%@ con eq_0032 kind=linear domain=- indicator=- :: Passenger flow objective per service
+%@ con eq_0033 kind=linear domain=- indicator=- :: Upper bound on boarding passengers
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized well-mixed boarding constraints
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization constraint for boarding passenger variables
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization constraint for boarding passenger variables
+%@ con eq_0040 kind=linear domain=- indicator=- :: Well-mixed boarding relation (Eq. 39)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Auxiliary constraint for early-alighting indicator z
+%@ con eq_0043 kind=linear domain=- indicator=- :: Auxiliary constraint for early-alighting indicator z
+%@ con eq_0044_a kind=linear domain=- indicator=- :: Linearization of w^b upper bound by origin stop
+%@ con eq_0044_b kind=linear domain=- indicator=- :: Linearization of w^b upper bound by destination stop
+%@ con eq_0044_c kind=linear domain=- indicator=- :: Linearization of w^b lower bound with big-M
+%@ con eq_0044_d kind=linear domain=- indicator=- :: Nonnegativity of w^b
+%@ con eq_0045_a kind=linear domain=- indicator=- :: Linearization of n^b upper bound by waiting passengers
+%@ con eq_0045_b kind=linear domain=- indicator=- :: Linearization of n^b upper bound by remaining capacity
+%@ con eq_0045_c kind=linear domain=- indicator=- :: Linearization of n^b lower bound with big-M and mu
+%@ con eq_0045_d kind=linear domain=- indicator=- :: Linearization of n^b lower bound with big-M and mu complement
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Linearization of z lower bound
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Linearization of z upper bound
+%@ con eq_0047_c kind=linear domain=- indicator=- :: Binary integrality of z
+%@ con eq_0048_a kind=linear domain=- indicator=- :: Linearization of z relation part a
+%@ con eq_0048_b kind=linear domain=- indicator=- :: Linearization of z relation part b
+%@ con eq_0048_c kind=linear domain=- indicator=- :: Linearization of z relation part c
+%@ con eq_0049 kind=linear domain=- indicator=- :: Constraint linking z and x (early alighting)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint defining z via skip pattern
+%@ con eq_0052 kind=linear domain=- indicator=- :: Objective function transformation (weighted sum)
+%@ con eq_0058_a kind=linear domain=- indicator=- :: Iterative algorithm constraint part a
+%@ con eq_0058_b kind=linear domain=- indicator=- :: Iterative algorithm constraint part b

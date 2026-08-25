@@ -1,0 +1,143 @@
+% Declaration sidecar for 10.1016_j.apm.2017.07.030
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.apm.2017.07.030
+% A decision making procedure for robust train rescheduling based on mixed integer linear programming and Data Envelopment Analysis
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.apm.2017.07.030.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize cumulative delay minus robustness index R, weighted by alpha and beta
+
+% Buff: classified as variable during review
+%@ var Buff shape=E domain=continuous role=primary drole=- lo=0 hi=Buff_max :: Buffer time added to event k, bounded by Buff_max
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Robustness index to be maximized
+
+% h: classified as index during review
+%@ index h ordered=0 cyclic=0 :: Binary parameter indicating if event is station segment
+
+% z: classified as variable during review
+%@ var z shape=E domain=non_negative role=primary drole=- lo=0 hi=- :: Delay of event k
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events
+
+% x: classified as variable during review
+%@ var x shape=E domain=non_negative role=primary drole=- lo=0 hi=- :: Start and end times of events
+
+% K: classified as index during review
+%@ index K ordered=1 cyclic=0 :: Ordered set of events for train i
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Generic event index
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number (last index) of events for train i
+
+% d: classified as parameter during review
+%@ param d shape=E kind=vector domain=- :: Minimum dwell or running time for event k
+
+% delta: classified as parameter during review
+%@ param delta shape=E kind=vector domain=- :: Disturbance magnitude for event k
+
+% egin: classified as parameter during review
+%@ param egin shape=E kind=vector domain=- :: Start time of event k
+
+% epsilon: classified as variable during review
+%@ var epsilon shape=E domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable indicating if delay exceeds threshold
+
+% forall: classified as parameter during review
+%@ param forall shape=- kind=scalar domain=- :: Universal quantifier
+
+% in: classified as parameter during review
+%@ param in shape=- kind=scalar domain=- :: Membership operator
+
+% nd: classified as parameter during review
+%@ param nd shape=E kind=vector domain=- :: End time of event k
+
+% b: classified as index during review
+%@ index b ordered=0 cyclic=0 :: Set of block sections
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Set of events
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of block sections
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of events in block section j
+
+% q: classified as variable during review
+%@ var q shape=L,B,P domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable for track choice
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of tracks in block section j
+
+% k̂: classified as index during review
+%@ index khat ordered=0 cyclic=0 :: Another event index (k-hat in paper)
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: λ
+% o: classified as parameter during review
+%@ param o shape=E kind=vector domain=- :: Origin of train
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
+
+% unusable as an identifier, rename or drop: Δ
+% g: classified as parameter during review
+%@ param g shape=E,E kind=matrix domain=- :: Minimum connection time
+
+% w: classified as parameter during review
+%@ param w shape=E kind=vector domain=- :: Maximum acceptable delay
+
+% unusable as an identifier, rename or drop: ε
+% Bound by a quantifier or big operator, so no declaration of their own: c, i, j, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Train connection: end of event k equals start of next event
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum dwell or running time with disturbance
+%@ con eq_0005 kind=linear domain=- indicator=- :: Nominal start time lower bound for station events
+%@ con eq_0006 kind=linear domain=- indicator=- :: Fixed start time for events with static begin
+%@ con eq_0007 kind=linear domain=- indicator=- :: Fixed end time for events with static end
+%@ con eq_0008 kind=linear domain=- indicator=- :: Definition of delay z_k from end time and buffer
+%@ con eq_0009 kind=linear domain=- indicator=- :: Each event assigned to exactly one track in block section
+%@ con eq_0010 kind=linear domain=- indicator=- :: Track conflict captured by ordering variables
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Headway between events with different origin on same track
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Headway between events with same origin on same track
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Opposite-direction headway through lambda ordering variable
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Same-direction headway through lambda ordering variable
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one ordering variable active for a pair
+%@ con eq_0016 kind=linear domain=- indicator=- :: Track capacity and train-type compatibility
+%@ con eq_0017 kind=big_m domain=- indicator=- :: Binary epsilon flags delay exceeding maximum acceptable delay
+%@ con eq_0018 kind=linear domain=- indicator=- :: Minimum connection time between connecting events
+%@ con eq_0019 kind=linear domain=- indicator=- :: Nonnegativity of event times and delays
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary ordering variables
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary track assignment variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary delay-threshold indicators
+%@ con eq_0023 kind=linear domain=- indicator=- :: Buffer times bounded by Buff_max

@@ -1,0 +1,60 @@
+% Declaration sidecar for 10.1016_j.cor.2016.02.008
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2016.02.008
+% A variable neighbourhood search for fast train scheduling and routing during disturbed railway traffic situations
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cor.2016.02.008.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum consecutive delay (makespan)
+
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Start time of a node in the alternative graph
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Weight of an arc in the alternative graph
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs in the alternative graph
+
+% krj: classified as index during review
+%@ index krj ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% krp: classified as index during review
+%@ index krp ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of alternative pairs in the alternative graph
+
+% krz: classified as index during review
+%@ index krz ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% umi: classified as index during review
+%@ index umi ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% ump: classified as index during review
+%@ index ump ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% umv: classified as index during review
+%@ index umv ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Precedence and disjunctive constraints of the alternative graph formulation

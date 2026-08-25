@@ -1,0 +1,67 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2016.05.005
+%@ meta id=10.1016_j.trc.2016.05.005 family=milp schema=0.1.0
+%@ name :: Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration
+%@ desc :: Mined from Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration (Transportation Research Part C Emerging Technologies, 2016).
+%@ prov source :: 10.1016/j.trc.2016.05.005
+%@ prov reference :: Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration
+%@ prov author :: Xin Zhang; Lei Nie
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the cycle time of the timetable
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Cycle time to be minimized
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ var x shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity (i,j)
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable equal to z_ij * T
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary modulo parameter for activity (i,j)
+%@ param l shape=- kind=matrix domain=- :: Lower bound for running/dwelling activity duration
+%@ param u shape=- kind=matrix domain=- :: Upper bound for running/dwelling activity duration
+%@ param h shape=- kind=matrix domain=- :: Minimum headway for safety activity
+%@ param f shape=- kind=matrix domain=- :: Frequency of line for regularity activity
+%@ param K shape=- kind=scalar domain=- :: Nonnegative integer relaxation level for regularity
+%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for non-collision constraint
+%@ var w shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for non-collision constraint
+%@ var s shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking at dwelling
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for relationship constraints
+%@ con eq_0006 kind=linear domain=- indicator=- :: Event and activity description constraint: x_ij = π_j - π_i + y_ij
+%@ con eq_0007 kind=linear domain=- indicator=- :: Pass activity duration constraint: x_ij = 0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≤ T_max × z_ij
+%@ con eq_0009 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≤ T
+%@ con eq_0010 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≥ T - T_max × (1 - z_ij)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≥ 0
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower and upper bounds for running/dwelling activities: l_ij ≤ x_ij ≤ u_ij
+%@ con eq_0013 kind=linear domain=- indicator=- :: Safety headway constraint: h_ij ≤ x_ij ≤ T - h_ij
+%@ con eq_0014 kind=linear domain=- indicator=- :: Regularity constraint: T/f_ij - K/f_ij ≤ x_ij ≤ T/f_ij + K/f_ij
+%@ con eq_0015 kind=linear domain=- indicator=- :: Train sequence constraint: y_ij = 0 for regular* activities
+%@ con eq_0016 kind=linear domain=- indicator=- :: Binary variable bound: z_ij ∈ {0,1}
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cycle time bounds: T_min ≤ T ≤ T_max
+%@ con eq_0018 kind=linear domain=- indicator=- :: Event time bounds: 0 ≤ π_i ≤ T-1
+%@ con eq_0019 kind=linear domain=- indicator=- :: Activity duration bounds: 0 ≤ x_ij ≤ T-1
+%@ con eq_0020 kind=linear domain=- indicator=- :: Alternative PESP formulation: x_ij = π_j - π_i + z_ij × T
+%@ con eq_0022 kind=linear domain=- indicator=- :: Non-collision constraint: z_ij + z_i'j' + z_ii' + z_jj' = 2 × (w_ii'jj' + v_ii'jj')
+%@ con eq_0023 kind=linear domain=- indicator=- :: Lower bound for overtaking dwelling activities: -x_ii' + [(h_ij + h_i'j') - l_ii'^without] × s_ii' ≤ -l_ii'^without
+%@ con eq_0024 kind=linear domain=- indicator=- :: Upper bound for overtaking dwelling activities: x_ii' + (u_ii'^without - u_ii') × s_ii' ≤ u_ii'^without
+%@ con eq_0025 kind=linear domain=- indicator=- :: Relationship constraints between modulo parameters: (z_ij + z_i'j' + z_ii') - 2 × q_ii'jj' - s_ii'jj' = 0
+%@ con eq_0026 kind=linear domain=- indicator=- :: Logical constraint on binary variables: s_ii' = ∑_{(j,j')∈A_pass} s_ii'jj'
+\begin{align}
+  \min\quad & T \tag{eq\_0005} \\
+  & x_{\mathit{ij}} = \mathit{pi}_{j} - \mathit{pi}_{i} + y_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{pass}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0006} \\
+  & x_{\mathit{ij}} = 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{pass}} . \tag{eq\_0007} \\
+  & y_{\mathit{ij}} \leq T_{\text{max}} \cdot z_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0008} \\
+  & y_{\mathit{ij}} \leq T , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0009} \\
+  & y_{\mathit{ij}} \geq T - T_{\text{max}} \cdot \left(1 - z_{\mathit{ij}}\right) , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0010} \\
+  & y_{\mathit{ij}} \geq 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} . \tag{eq\_0011} \\
+  & l_{\mathit{ij}} \leq x_{\mathit{ij}} \leq u_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} , \tag{eq\_0012} \\
+  & h_{\mathit{ij}} \leq x_{\mathit{ij}} \leq T - h_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{safe}} , \tag{eq\_0013} \\
+  & \frac{T}{f_{\mathit{ij}}} - \frac{K}{f_{\mathit{ij}}} \leq x_{\mathit{ij}} \leq \frac{T}{f_{\mathit{ij}}} + \frac{K}{f_{\mathit{ij}}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{regular}} . \tag{eq\_0014} \\
+  & y_{\mathit{ij}} = 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{regular}^{ \cdot }} . \tag{eq\_0015} \\
+  & z_{\mathit{ij}} \in \left\{0 , 1\right\} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0016} \\
+  & T_{min} \leq T \leq T_{\text{max}} , \tag{eq\_0017} \\
+  & 0 \leq \mathit{pi}_{i} \leq T - 1 , \forall i \in \mathit{epsilon} , \tag{eq\_0018} \\
+  & 0 \leq x_{\mathit{ij}} \leq T - 1 , \forall \left(i , j\right) \in \mathcal{A} . \tag{eq\_0019} \\
+  & x_{\mathit{ij}} = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{\mathit{ij}} \cdot T , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{pass}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} . \tag{eq\_0020} \\
+  & \begin{aligned} & z_{\mathit{ij}} + z_{i^{'} j^{'}} + z_{\mathit{ii}^{'}} + z_{\mathit{jj}^{'}} = 2 \cdot \left(w_{\mathit{ii}^{'} \mathit{jj}^{'}} + v_{\mathit{ii}^{'} \mathit{jj}^{'}}\right) \\ & \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathcal{A}_{\text{run}} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} .\end{aligned} \tag{eq\_0022} \\
+  & - x_{\mathit{ii}^{'}} + \left[\left(h_{\mathit{ij}} + h_{i^{'} j^{'}}\right) - l_{\mathit{ii}^{'}}^{\mathit{without}}\right] \cdot s_{\mathit{ii}^{'}} \leq - l_{\mathit{ii}^{'}}^{\mathit{without}} , \forall \left(i , i^{'}\right) \in \mathcal{A}_{\text{dwell}^{ \cdot }} , \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathcal{A}_{\text{safe}} , \tag{eq\_0023} \\
+  & x_{\mathit{ii}^{'}} + \left(u_{\mathit{ii}^{'}}^{\mathit{without}} - u_{\mathit{ii}^{'}}\right) \cdot s_{\mathit{ii}^{'}} \leq u_{\mathit{ii}^{'}}^{\mathit{without}} , \forall \left(i , i^{'}\right) \in \mathcal{A}_{\text{dwell}^{ \cdot }} , \tag{eq\_0024} \\
+  & \begin{aligned} & \left(z_{\mathit{ij}} + z_{i^{'} j^{'}} + z_{\mathit{ii}^{'}}\right) - 2 \cdot q_{\mathit{ii}^{'} \mathit{jj}^{'}} - s_{\mathit{ii}^{'} \mathit{jj}^{'}} = 0 , \\ & \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathcal{A}_{\text{safe}} , \left(i , i^{'}\right) \in \mathcal{A}_{\text{dwell}^{ \cdot }} , \left(j , j^{'}\right) \in \mathcal{A}_{\text{pass}} ,\end{aligned} \tag{eq\_0025} \\
+  & s_{\mathit{ii}^{'}} = \underset{\left(j , j^{'}\right) \in \mathcal{A}_{\text{pass}}}{\sum} s_{\mathit{ii}^{'} \mathit{jj}^{'}} , \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathcal{A}_{\text{safe}} , \left(i , i^{'}\right) \in \mathcal{A}_{\text{dwell}^{ \cdot }} . \tag{eq\_0026} \\
+\end{align}

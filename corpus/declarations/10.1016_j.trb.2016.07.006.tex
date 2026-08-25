@@ -1,0 +1,94 @@
+% Declaration sidecar for 10.1016_j.trb.2016.07.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2016.07.006
+% Modeling the first train timetabling problem with minimal missed trains and synchronization time differences in subway networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2016.07.006.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total transfer waiting time (or equivalently the number of missed trains)
+
+% t: classified as variable during review
+%@ var t shape=L domain=non_negative role=primary drole=- lo=- hi=- :: Departure time from vehicle depot for line l
+
+% T: classified as variable during review
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total transfer waiting time objective
+
+% H: classified as parameter during review
+%@ param H shape=L kind=vector domain=- :: Headway of line l
+
+% n: classified as variable during review
+%@ var n shape=S,L,L domain=integer role=primary drole=- lo=- hi=- :: Number of missed trains for transfer from line l to l' at station s
+
+% ceil: classified as parameter during review
+%@ param ceil shape=- kind=scalar domain=- :: Ceiling function
+
+% v: classified as parameter during review
+%@ param v shape=S,L,L kind=vector domain=- :: Number of transfer passengers from line l to l' at station s
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Constant term in objective transformation
+
+% unusable as an identifier, rename or drop: Δ
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Line index
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Model identifier
+
+% Bound by a quantifier or big operator, so no declaration of their own: k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of first train to first connecting train (FFCT) at a transfer station
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of transfer waiting time (TWT) for a transfer direction
+%@ con eq_0003 kind=linear domain=- indicator=- :: Piecewise definition of the number of missed trains n for a transfer
+%@ con eq_0004 kind=linear domain=- indicator=- :: Relationship between TWT and FFCT
+%@ con eq_0005 kind=linear domain=- indicator=- :: Inequality bounding the sum of TWTs for the two opposite transfer directions
+%@ con eq_0008 kind=linear domain=- indicator=- :: Expanded expression for the weighted sum of TWTs of opposite directions
+%@ con eq_0009 kind=linear domain=- indicator=- :: Total TWT expressed as a constant plus weighted missed trains and arrival time differences
+%@ con eq_0010 kind=linear domain=- indicator=- :: First train arrival time at station s on line l
+%@ con eq_0011 kind=linear domain=- indicator=- :: First train departure time from station s on line l
+%@ con eq_0012 kind=linear domain=- indicator=- :: Bounds on the first train departure time from the vehicle depot
+%@ con eq_0013 kind=linear domain=- indicator=- :: Dwell time at a station restricted to intermediate or transfer station dwell time
+%@ con eq_0014_b kind=linear domain=- indicator=- :: TWT definition for transfer from line l to line l' in model M1
+%@ con eq_0014_c kind=linear domain=- indicator=- :: Departure time from station s for line l in model M1
+%@ con eq_0014_d kind=linear domain=- indicator=- :: Departure time from station s for line l' in model M1
+%@ con eq_0014_e kind=linear domain=- indicator=- :: Arrival time at station s for line l in model M1
+%@ con eq_0014_f kind=linear domain=- indicator=- :: Arrival time at station s for line l' in model M1
+%@ con eq_0014_g kind=linear domain=- indicator=- :: Piecewise definition of missed trains n in model M1
+%@ con eq_0014_h kind=linear domain=- indicator=- :: Dwell time at station must be either intermediate or transfer dwell time in model M1
+%@ con eq_0014_i kind=linear domain=- indicator=- :: Bounds on departure time from depot for line l in model M1
+%@ con eq_0014_j kind=linear domain=- indicator=- :: Bounds on departure time from depot for line l' in model M1
+%@ con eq_0015 kind=linear domain=- indicator=- :: Linear reformulation of the missed trains determination constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Non-negativity of transfer waiting time
+%@ con eq_0021_a kind=linear domain=- indicator=- :: First condition for non-negative FFCT in two-way synchronization
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Second condition for non-negative FFCT in two-way synchronization
+%@ con eq_0022 kind=linear domain=- indicator=- :: Inequality relating dwell times and transfer times for two-way synchronization

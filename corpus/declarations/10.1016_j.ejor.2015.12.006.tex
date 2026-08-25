@@ -1,0 +1,125 @@
+% Declaration sidecar for 10.1016_j.ejor.2015.12.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2015.12.006
+% Valid inequalities for the synchronization bus timetabling problem
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2015.12.006.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize total weighted number of synchronizations
+
+% N: classified as parameter during review
+%@ param N shape=I,I,B kind=matrix :: Weight for synchronization at node b between lines i and j
+
+% Y: classified as variable during review
+%@ var Y shape=I,I,B,p,q domain=binary role=primary :: Binary variable indicating synchronization between trips p and q at node b
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of synchronization nodes shared by lines i and j
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of bus lines
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Number of trips for line i
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for bus lines
+
+% H: classified as parameter during review
+%@ param H shape=I kind=vector :: Maximum headway time for line i
+
+% X: classified as variable during review
+%@ var X shape=I,p domain=continuous role=primary :: Departure time of trip p on line i
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar :: Possibly a typo or unused symbol
+
+% t: classified as parameter during review
+%@ param t shape=I,B kind=matrix :: Travel time from start to node b for line i
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar :: Planning horizon end time
+
+% h: classified as parameter during review
+%@ param h shape=I kind=vector :: Minimum headway time for line i
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Index for trips on a line
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large constant for linearization
+
+% q: classified as index during review
+%@ index q ordered=0 cyclic=0 :: Index for trips on a line
+
+% w: classified as parameter during review
+%@ param w shape=B kind=vector :: Minimum waiting time for synchronization at node b
+
+% W: classified as parameter during review
+%@ param W shape=B kind=vector :: Maximum waiting time for synchronization at node b
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar :: Possibly a typo or unused symbol
+
+% d: classified as parameter during review
+%@ param d_lower shape=I,p kind=matrix :: Lower bound on departure time for trip p on line i
+
+% d̄: classified as parameter during review
+%@ param d_upper shape=I,p kind=matrix :: Upper bound on departure time for trip p on line i
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar :: Count of later trips on line i synchronized with trip q
+
+% r: classified as parameter during review
+%@ param r shape=- kind=scalar :: Count of later trips on line j synchronized with trip p
+
+% unusable as an identifier, rename or drop: γ
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of 5-tuples (i,j,p,q,b) for synchronizations
+
+% Bound by a quantifier or big operator, so no declaration of their own: b, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear :: First trip of line i departs no later than maximum headway H_i
+%@ con eq_0003 kind=linear :: Departure time of last trip of line i is within [T - H_i, T]
+%@ con eq_0004 kind=linear :: Consecutive trips of line i have headway between h_i and H_i
+%@ con eq_0005 kind=linear :: Synchronization lower bound: if Y is 1, arrival time difference at node b is at least w_b
+%@ con eq_0006 kind=linear :: Synchronization upper bound: if Y is 1, arrival time difference at node b is at most W_b
+%@ con eq_0007_a kind=linear :: Synchronization inequality (7): a trip of line i can synchronize with at most 1 + floor((W_b-w_b)/h_j) trips of line j
+%@ con eq_0007_b kind=linear :: Synchronization inequality (8): a trip of line j can synchronize with at most 1 + floor((W_b-w_b)/h_i) trips of line i
+%@ con eq_0009 kind=linear :: Headway inequality (9): if trips p and q synchronize, later trips of the two lines cannot synchronize without exceeding the allowed waiting window
+%@ con eq_0010 kind=linear :: Headway inequality (10): if trips p and q synchronize, earlier trips of the two lines cannot synchronize without exceeding the allowed waiting window
+%@ con eq_0011 kind=linear :: Generic valid inequality: sum of synchronization variables over E is at most γ
+%@ con eq_0012 kind=linear :: Lifted valid inequality: sum over E' is at most γ times (1 - Y_{p0q0b0}^{i0j0})
+%@ con eq_0014 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0015 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0017 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0018 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0019 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0020 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0021 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0022 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0023 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0024 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0025 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0026 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure

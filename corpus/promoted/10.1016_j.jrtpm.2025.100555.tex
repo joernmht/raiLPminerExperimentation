@@ -1,0 +1,83 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2025.100555
+%@ meta id=10.1016_j.jrtpm.2025.100555 family=milp schema=0.1.0
+%@ name :: Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison
+%@ desc :: Mined from Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison (Journal of Rail Transport Planning & Management, 2025).
+%@ prov source :: 10.1016/j.jrtpm.2025.100555
+%@ prov reference :: Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison
+%@ prov author :: F.W. Fuchs; Bernardo Martin-Iradi; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total duration of all commercial activities
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the Train Flow Network
+%@ index n ordered=0 cyclic=0 :: Index for nodes in the Train Flow Network
+%@ var x shape=W domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train uses a link
+%@ param b shape=A kind=vector domain=- :: Time bound for an activity
+%@ var t shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Timestamp of an event
+%@ index A ordered=0 cyclic=0 :: Set of activities in the Event Activity Network
+%@ param l shape=A kind=vector domain=- :: Lower bound of time difference for an activity
+%@ param u shape=A kind=vector domain=- :: Upper bound of time difference for an activity
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large constant for linearization
+%@ index W ordered=0 cyclic=0 :: Set of arcs in the Train Flow Network
+%@ var z shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a resource path is used
+%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
+%@ param T shape=- kind=scalar domain=- :: Period of the cyclic timetable
+%@ index E ordered=0 cyclic=0 :: Set of events in the Event Activity Network
+%@ param k shape=- kind=scalar domain=- :: Minimum number of periods required for full periodicity
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers (domain for timestamps)
+%@ index P ordered=0 cyclic=0 :: Set of resource paths
+%@ index K ordered=0 cyclic=0 :: Set of conflicting resource path pairs
+%@ con eq_0001 kind=linear domain=- indicator=- :: Flow conservation for route selection in the Train Flow Network
+%@ con eq_0002 kind=linear domain=- indicator=- :: Time bounds for all activities in the Event Activity Network
+%@ con eq_0003 kind=linear domain=- indicator=- :: Itinerary activity time bounds activated by route choice
+%@ con eq_0004 kind=linear domain=- indicator=- :: Time bounds for commercial activities
+%@ con eq_0005 kind=linear domain=- indicator=- :: Vehicle circulation time bounds as commercial activities
+%@ con eq_0006 kind=linear domain=- indicator=- :: Link route choice variables to resource path usage
+%@ con eq_0007 kind=linear domain=- indicator=- :: At most one precedence direction per conflicting resource path pair
+%@ con eq_0008 kind=linear domain=- indicator=- :: Require precedence direction when both resource paths are used
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum separation on shared resource when one path precedes the other
+%@ con eq_0011 kind=linear domain=- indicator=- :: Origin events occur within their periodic time windows
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum number of periods needed for full periodicity
+%@ con eq_0013 kind=linear domain=- indicator=- :: Temporal periodicity of event times
+%@ con eq_0014 kind=linear domain=- indicator=- :: Spatial periodicity of route choices
+%@ con eq_0015 kind=linear domain=- indicator=- :: Full periodic timetable model constraints
+%@ con eq_0030 kind=linear domain=- indicator=- :: Variable period temporal periodicity constraint
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Variable period origin time window constraint (a)
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Variable period origin time window constraint (b)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Relaxed temporal periodicity upper bound constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Relaxed temporal periodicity lower bound constraint
+%@ con eq_0034 kind=linear domain=- indicator=- :: Soft conflict objective counts precedence violations
+%@ con eq_0035 kind=linear domain=- indicator=- :: Soft conflict separation constraint with violation indicator (first direction)
+%@ con eq_0036 kind=linear domain=- indicator=- :: Soft conflict separation constraint with violation indicator (second direction)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Binary domain for soft conflict violation indicator
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
+\begin{align}
+  & \sum_{w \in \mathit{rho} \left(n\right)^{+}} x_{w} - \sum_{w \in \mathit{rho} \left(n\right)^{-}} x_{w} = \left\{\begin{matrix} 1 & \text{if} n \in \mathcal{N}^{\text{Source}} , \\ - 1 & \text{if} n \in \mathcal{N}^{\text{Sink}} , \\ 0 & \text{otherwise} , \end{matrix}\right \tag{eq\_0001} \\
+  & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A} . \tag{eq\_0002} \\
+  & l \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} \leq t_{j} - t_{i} \leq u \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} + M \cdot \left(1 - x_{\mathit{alpha} \left(a\right)}\right) , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{ITI}} , \tag{eq\_0003} \\
+  & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{COM}} . \tag{eq\_0004} \\
+  & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{VEH}} . \tag{eq\_0005} \\
+  & z_{p} \geq \sum_{w \in \mathcal{W}_{p}} x_{w} - \left|\mathcal{W}_{p}\right| + 1 , \tag{eq\_0006} \\
+  & y_{p p^{'}} + y_{p^{'} p} \leq 1 , \tag{eq\_0007} \\
+  & y_{p p^{'}} + y_{p^{'} p} \geq z_{p} + z_{p^{'}} - 1 , \tag{eq\_0008} \\
+  & t_{p^{'}}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p p^{'}}\right) , \tag{eq\_0009} \\
+  & t_{p}^{\text{entry}} - t_{p^{'}}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p^{'} p}\right) , \tag{eq\_0011} \\
+  & k \cdot T \leq t_{e} \leq \left(k + 1\right) \cdot T , \forall e \in \mathcal{E}_{k}^{\text{origin}} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} \tag{eq\_0012} \\
+  & \hat{k} = \left⌈\frac{\mathit{Delta}}{T}\right⌉ + 1 . \tag{eq\_0013} \\
+  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot T , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0014} \\
+  & x_{w}^{\left(k\right)} = x_{w}^{\left(0\right)} , \forall w \in \mathcal{W} , \forall k \in \left\{1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0015} \\
+  \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) , \tag{eq\_0016} \\
+  & t_{e} \in \mathcal{R}^{+} , \forall e \in \mathcal{E} , \tag{eq\_0030} \\
+  & t_{p}^{\text{entry}} , t_{p}^{\text{exit}} \in \mathcal{R}^{+} \tag{eq\_0031\_a} \\
+  & z_{p} \in \left\{0 , 1\right\} , \forall p \in \mathcal{P} \tag{eq\_0031\_b} \\
+  & y_{p p^{'}} , y_{p^{'} p} \in \left\{0 , 1\right\} , \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0032} \\
+  & x_{w} \in \left\{0 , 1\right\} , \forall w \in \mathcal{W} . \tag{eq\_0033} \\
+  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0034} \\
+  & k \cdot \mathit{omega} \leq t_{e} \leq \left(k + 1\right) \cdot \mathit{omega} , \forall e \in \mathcal{E}_{k}^{\text{origin}} \forall k \in \left\{0 , 1 , \ldots \hat{k} - 1\right\} \tag{eq\_0035} \\
+  & t_{e^{\left(k\right)}} \leq t_{e^{\left(0\right)}} + k \bar{T} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0036} \\
+  & t_{e^{\left(k\right)}} \geq t_{e^{\left(0\right)}} + k \underset{̲}{T} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0037} \\
+  & t_{p^{'}}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p p^{'}} + \mathit{lambda}_{p p^{'}}\right) \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0040} \\
+  & t_{p}^{\text{entry}} - t_{p^{'}}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p^{'} p} + \mathit{lambda}_{p p^{'}}\right) \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0041} \\
+  & \mathit{lambda}_{p p^{'}} \in \left\{0 , 1\right\} \forall \left\{p , p^{'}\right\} \in \mathcal{K} . \tag{eq\_0042} \\
+\end{align}

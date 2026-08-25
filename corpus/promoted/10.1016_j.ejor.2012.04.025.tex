@@ -1,0 +1,85 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2012.04.025
+%@ meta id=10.1016_j.ejor.2012.04.025 family=milp schema=0.1.0
+%@ name :: Real-time freight locomotive rescheduling and uncovered train detection during disruption
+%@ desc :: Mined from Real-time freight locomotive rescheduling and uncovered train detection during disruption (European Journal of Operational Research, 2012).
+%@ prov source :: 10.1016/j.ejor.2012.04.025
+%@ prov reference :: Real-time freight locomotive rescheduling and uncovered train detection during disruption
+%@ prov author :: Keisuke Sato; Naoto Fukumura
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of selected locomotive paths
+%@ param sta shape=- kind=scalar domain=- :: Station attribute of a task or locomotive
+%@ param Arr shape=- kind=scalar domain=- :: Arrival station or time of a task
+%@ param Dep shape=- kind=scalar domain=- :: Departure station or time of a task
+%@ index i ordered=0 cyclic=0 :: Index for tasks in I, I-hat, or D
+%@ param time shape=- kind=scalar domain=- :: Time attribute (arrival or departure)
+%@ param Buf shape=- kind=scalar domain=- :: Buffer time needed at a station
+%@ param Ready shape=- kind=scalar domain=- :: Time when locomotive is ready for rescheduling
+%@ param Sta shape=- kind=scalar domain=- :: Station of an inspection node
+%@ index s ordered=0 cyclic=0 :: Index for inspection nodes
+%@ param FinishIns shape=- kind=scalar domain=- :: Completion time of inspection
+%@ param H shape=- kind=scalar domain=- :: Set of tasks assignable to a locomotive after a given node
+%@ param N shape=- kind=scalar domain=- :: Set of tasks between inspections in a path
+%@ param n shape=- kind=scalar domain=- :: Number of inspections in a path
+%@ param c shape=- kind=scalar domain=- :: Cost of a path for a locomotive
+%@ var x shape=K,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is selected for locomotive k
+%@ index K ordered=0 cyclic=0 :: Set of locomotives
+%@ index P ordered=0 cyclic=0 :: Set of feasible paths for a locomotive
+%@ index D ordered=0 cyclic=0 :: Set of convergence tasks
+%@ index I ordered=0 cyclic=0 :: Set of rescheduling tasks to be covered
+%@ param a shape=I,K,P kind=matrix domain=- :: Incidence coefficient: 1 if task i is in path p of locomotive k
+%@ index Ihat ordered=0 cyclic=0 :: Set of deadhead train tasks
+%@ index B ordered=0 cyclic=0 :: Set of depots
+%@ param L shape=B,T kind=matrix domain=- :: Inspection capacity at depot b and time span t
+%@ index T ordered=0 cyclic=0 :: Set of time spans
+%@ index b ordered=0 cyclic=0 :: Index for depots
+%@ index t ordered=0 cyclic=0 :: Index for time spans
+%@ index p ordered=0 cyclic=0 :: Index for paths
+%@ param find shape=- kind=scalar domain=- :: Keyword in subproblem formulation
+%@ param lambda shape=I kind=vector domain=- :: Dual price for task constraints
+%@ param mu shape=K kind=vector domain=- :: Dual price for locomotive constraints
+%@ param nu shape=B,T kind=matrix domain=- :: Dual price for inspection capacity constraints
+%@ var xbar shape=K,P domain=non_negative role=primary drole=- lo=- hi=- :: Optimal solution of restricted master problem
+%@ var ybar shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Optimal value of artificial variable in restricted master problem
+%@ var z shape=K,I domain=non_negative role=primary drole=- lo=- hi=- :: Aggregated variable indicating if task i is covered by locomotive k
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Set-partitioning constraint for rescheduling tasks I: exactly one locomotive covers each task
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Set-partitioning constraint for convergence tasks D: exactly one locomotive covers each task
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Deadhead task constraint: each deadhead task in I-hat may be covered by at most two paths
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Deadhead task constraint: deadhead tasks in I-hat may be left uncovered
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Path selection constraint for each locomotive k: exactly one feasible path is selected
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Path selection constraint for reserve locomotives: exactly one feasible path is selected
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Binary decision variable constraint for path selection
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Binary decision variable constraint ensuring x_p^k in {0,1}
+%@ con eq_0008 kind=linear domain=- indicator=- :: Set-covering constraint for tasks in (I union D) outside restricted set I_l
+%@ con eq_0009 kind=linear domain=- indicator=- :: Set-partitioning constraint for tasks in restricted set I_l
+%@ con eq_0010 kind=linear domain=- indicator=- :: Deadhead task constraint for tasks in I-hat outside restricted set I-hat_l
+%@ con eq_0011 kind=linear domain=- indicator=- :: Deadhead task constraint for tasks in restricted set I-hat_l
+%@ con eq_0012 kind=linear domain=- indicator=- :: Locomotive path selection constraint in restricted master problem with artificial variable
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Branching constraint on task coverage variable z_i^k in branch-and-price
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Branching constraint on task coverage variable z_i^k in branch-and-price (opposite branch)
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Branching constraint on inspection coverage variable z_tb^k in branch-and-price
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Branching constraint on inspection coverage variable z_tb^k in branch-and-price (opposite branch)
+%@ con eq_0024_a kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths
+%@ con eq_0024_b kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths (opposite branch)
+\begin{align}
+  & \mathtt{Arr} \underline \mathtt{sta} \left(k\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i\right) \tag{eq\_0001\_a} \\
+  & \mathtt{Ready} \underline \mathtt{time} \left(k\right) + \mathtt{Buf} \underline \mathtt{time} \left(\mathtt{Arr} \underline \mathtt{sta} \left(k\right)\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i\right) \tag{eq\_0001\_b} \\
+  & \mathtt{Arr} \underline \mathtt{sta} \left(i_{1}\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i_{2}\right) \tag{eq\_0002\_a} \\
+  & \mathtt{Arr} \underline \mathtt{time} \left(i_{1}\right) + \mathtt{Buf} \underline \mathtt{time} \left(\mathtt{Arr} \underline \mathtt{sta} \left(i_{1}\right)\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i_{2}\right) \tag{eq\_0002\_b} \\
+  & \mathtt{Sta} \left(s\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i\right) \tag{eq\_0003\_a} \\
+  & \mathtt{FinishIns} \underline \mathtt{time} \left(s\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i\right) \tag{eq\_0003\_b} \\
+  & H^{k} \left(s_{m}\right) \supseteq N^{p} \left(s_{m} , s_{m + 1}\right) \forall m \in \left\{0 , \ldots , n - 1\right\} \tag{eq\_0006\_a} \\
+  & H^{k} \left(s_{n}\right) \supseteq N^{p} \left(s_{n}\right) \tag{eq\_0006\_b} \\
+  \min\quad & \sum_{k \in K} \sum_{p \in P^{k}} c_{p}^{k} \cdot x_{p}^{k} \tag{eq\_0007} \\
+  & \text{subject to} \sum_{k \in K} \sum_{p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} = 1 \forall i \in I \cup D , \tag{eq\_0008} \\
+  & \sum_{k \in K} \sum_{p \in P^{k}} a_{\hat{i} p}^{k} \cdot x_{p}^{k} \leq 2 \forall \hat{i} \in \hat{I} , \tag{eq\_0009} \\
+  & \sum_{p \in P^{k}} x_{p}^{k} = 1 \forall k \in K , \tag{eq\_0010} \\
+  & \sum_{k \in K} \sum_{p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \leq L_{t}^{b} \forall b \in B \forall t \in T , \tag{eq\_0011} \\
+  & x_{p}^{k} \in \left\{0 , 1\right\} \forall k \in K \forall p \in P^{k} . \tag{eq\_0012} \\
+  & \text{find} k \in K \cdot p \in P^{k} \tag{eq\_0021\_a} \\
+  & \text{such that} c_{p}^{k} - \sum_{i \in I \cup \hat{I} \cup D} a_{\mathit{ip}}^{k} \cdot \mathit{lambda}_{i} - \mathit{mu}^{k} - \sum_{b \in B} \sum_{t \in T} a_{\mathit{tp}}^{\mathit{bk}} \cdot \mathit{nu}_{t}^{b} < 0 \tag{eq\_0021\_b} \\
+  & I_{\mathit{ell} + 1} := I_{\mathit{ell}} \cup \left\{i \in I \cup D \left|\right. \sum_{k \in K} \sum_{p \in P_{\mathit{ell}}^{k}} a_{\mathit{ip}}^{k} \bar{x}_{p}^{k} + \bar{y} > 1\right\} \tag{eq\_0023\_a} \\
+  & \hat{I}_{\mathit{ell} + 1} := \hat{I}_{\mathit{ell}} \cup \left\{\hat{i} \in \hat{I} \left|\right. \sum_{k \in K} \sum_{p \in P_{\mathit{ell}}^{k}} a_{\hat{i} p}^{k} \bar{x}_{p}^{k} + 2 \bar{y} > 2\right\} \tag{eq\_0023\_b} \\
+  & z_{i}^{k} := \sum_{p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} \forall k \in K \forall i \in I \cup \hat{I} \cup D \tag{eq\_0024\_a} \\
+  & z_{t}^{\mathit{bk}} := \sum_{p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \forall k \in K \forall b \in B \forall t \in T \tag{eq\_0024\_b} \\
+\end{align}

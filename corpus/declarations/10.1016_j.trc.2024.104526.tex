@@ -1,0 +1,127 @@
+% Declaration sidecar for 10.1016_j.trc.2024.104526
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2024.104526
+% Integrated robust optimization of maintenance windows and train timetables using ADMM-driven and nested simulation heuristic algorithm
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2024.104526.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of maintenance planning cost and robust train timetable delay
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of the integrated model
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficients for objectives Z1 and Z2
+%@ param pen shape=- kind=scalar domain=- :: Penalty cost for canceling UMA
+%@ var gamma shape=Q,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating selection of maintenance window plan
+%@ index K ordered=0 cyclic=0 :: Set of candidate maintenance window plans
+%@ index Q ordered=0 cyclic=0 :: Set of sections
+%@ index L ordered=0 cyclic=0 :: Set of UMAs
+%@ param omega shape=L,K kind=matrix domain=- :: Binary parameter indicating if UMA l is carried out in plan k
+%@ param z shape=K kind=vector domain=- :: Binary parameter indicating if additional resources invested in plan k
+%@ index i ordered=0 cyclic=0 :: Index for stations or sections
+%@ param C shape=- kind=scalar domain=- :: Cost of arc in space-time network
+%@ param zeta shape=- kind=scalar domain=- :: Weight coefficients for cost and delay terms
+%@ index E ordered=0 cyclic=0 :: Set of arcs in space-time network
+%@ param sup shape=- kind=scalar domain=- :: Supremum operator for worst-case distribution
+%@ var v shape=G,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arc selection in multi-commodity flow
+%@ var x shape=A,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train arc selection
+%@ var y shape=B,E,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
+%@ param epsilon shape=- kind=scalar domain=- :: Delay scenario
+%@ index A ordered=0 cyclic=0 :: Set of trains
+%@ index B ordered=0 cyclic=0 :: Set of maintenance windows
+%@ param end shape=- kind=scalar domain=- :: End time of expected start-time window
+%@ param star shape=- kind=scalar domain=- :: Start time of expected start-time window
+%@ param varsigma shape=- kind=scalar domain=- :: Fluctuation vector for probability distribution
+%@ index p ordered=0 cyclic=0 :: Probability distribution vector
+%@ index P ordered=0 cyclic=0 :: Ambiguity set of probability distributions
+%@ param e shape=- kind=scalar domain=- :: Vector of ones
+%@ param varpi shape=- kind=scalar domain=- :: Bound for infinity norm of fluctuation
+%@ param N shape=- kind=scalar domain=- :: Minimum number of UMAs
+%@ index G ordered=0 cyclic=0 :: Set of trains and maintenance windows
+%@ index T ordered=0 cyclic=0 :: Set of time points
+%@ param des shape=- kind=scalar domain=- :: Destination station of train g
+%@ param ori shape=- kind=scalar domain=- :: Origin station of train g
+%@ index j ordered=0 cyclic=0 :: Index for stations or sections
+%@ index xi ordered=0 cyclic=0 :: Set of incompatible arcs for capacity constraint
+%@ param h shape=Theta,E kind=matrix domain=- :: Delay cost of arc in scenario kappa
+%@ index Theta ordered=0 cyclic=0 :: Set of delay scenarios
+%@ param argmax shape=- kind=scalar domain=- :: Argument of the maximum
+%@ var s shape=Q,T domain=continuous role=primary drole=- lo=- hi=- :: Relaxation variable for capacity constraint
+%@ param theta shape=- kind=scalar domain=- :: Penalty parameter for ADMM
+%@ var lambda shape=Q domain=continuous role=primary drole=- lo=- hi=- :: Lagrange multiplier for cross-resolution consistency
+%@ var mu shape=Q,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter for ADMM
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers
+%@ param cons shape=- kind=scalar domain=- :: Constant value of fixed variable in subproblem
+%@ param n shape=- kind=scalar domain=- :: Number of incompatible arcs
+%@ param phi shape=- kind=scalar domain=- :: Cost coefficient for arc selection
+%@ param delta shape=- kind=scalar domain=- :: Dual variable for DRO reformulation
+% Bound by a quantifier or big operator, so no declaration of their own: a, b, g, k, l, t, κ
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of objective term Z1 for maintenance planning
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of UMA cancellation penalty
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of maintenance resource investment cost
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of objective term Z2 for robust train timetable
+%@ con eq_0006 kind=linear domain=- indicator=- :: Definition of train arc travel time cost
+%@ con eq_0007 kind=linear domain=- indicator=- :: Definition of maintenance arc deviation cost
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of ambiguity set for probability distributions
+%@ con eq_0010 kind=linear domain=- indicator=- :: Unique maintenance window plan per section
+%@ con eq_0011 kind=linear domain=- indicator=- :: Resource investment condition for remaining UMAs
+%@ con eq_0012 kind=linear domain=- indicator=- :: Mandatory maintenance of alerted equipment
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum number of UMAs to be performed
+%@ con eq_0014 kind=linear domain=- indicator=- :: Flow balance for trains and maintenance windows
+%@ con eq_0015 kind=linear domain=- indicator=- :: Track capacity constraint for conflict-free timetable
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cross-resolution consistency between plan and arcs
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary domain of maintenance plan variable
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary domain of train arc variable
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain of maintenance arc variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transformation of worst-case delay into arc costs
+%@ con eq_0024 kind=linear domain=- indicator=- :: Selection of worst-case probability distribution
+%@ con eq_0025 kind=linear domain=- indicator=- :: ADMM objective with Lagrangian and quadratic penalties
+%@ con eq_0026 kind=linear domain=- indicator=- :: Free domain of Lagrange multiplier lambda
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of capacity multiplier mu
+%@ con eq_0028 kind=linear domain=- indicator=- :: Bounds on relaxation variable s
+%@ con eq_0029 kind=linear domain=- indicator=- :: Update rule for Lagrange multiplier lambda
+%@ con eq_0030 kind=linear domain=- indicator=- :: Update rule for capacity multiplier mu
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maintenance subproblem objective in ADMM
+%@ con eq_0032 kind=linear domain=- indicator=- :: Linearization of quadratic cross-resolution penalty
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearized maintenance subproblem objective
+%@ con eq_0034 kind=linear domain=- indicator=- :: Train timetable subproblem objective in ADMM
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of quadratic capacity penalty
+%@ con eq_0036 kind=linear domain=- indicator=- :: Definition of number of incompatible arcs
+%@ con eq_0037 kind=linear domain=- indicator=- :: Single train subproblem objective
+%@ con eq_0038 kind=linear domain=- indicator=- :: Single maintenance window subproblem objective
+%@ con eq_0039 kind=linear domain=- indicator=- :: Definition of train arc cost coefficient
+%@ con eq_0040 kind=linear domain=- indicator=- :: Definition of maintenance arc cost coefficient
+%@ con eq_0041 kind=linear domain=- indicator=- :: Lower-bound train arc cost coefficient
+%@ con eq_0042 kind=linear domain=- indicator=- :: Lower-bound maintenance arc cost coefficient
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization term for capacity penalty
+%@ con eq_0044 kind=linear domain=- indicator=- :: Additional ADMM subproblem equation
+%@ con eq_0047 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0048 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0049 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0050 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0051 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0052 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0055 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0057 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0059 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0060 kind=linear domain=- indicator=- :: Equation in algorithm convergence check

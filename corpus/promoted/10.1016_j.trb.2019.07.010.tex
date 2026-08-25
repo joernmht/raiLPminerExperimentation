@@ -1,0 +1,143 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.07.010
+%@ meta id=10.1016_j.trb.2019.07.010 family=milp schema=0.1.0
+%@ name :: Microscopic optimization model and algorithm for integrating train timetabling and track maintenance task scheduling
+%@ desc :: Mined from Microscopic optimization model and algorithm for integrating train timetabling and track maintenance task scheduling (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.07.010
+%@ prov reference :: Microscopic optimization model and algorithm for integrating train timetabling and track maintenance task scheduling
+%@ prov author :: Yongxiang Zhang; Andrea D’Ariano; Bisheng He; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total train travel time and maintenance tardiness cost
+%@ index B ordered=0 cyclic=0 :: Set of block sections
+%@ var b shape=r,B domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating block section usage
+%@ param t shape=r,l kind=matrix domain=- :: Running time on link l for train r
+%@ var y shape=r,B domain=non_negative role=primary drole=- lo=- hi=- :: Entrance/exit time of train r on block section b
+%@ param Z shape=- kind=scalar domain=- :: Objective function value
+%@ var x shape=r,B domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train route selection
+%@ index R ordered=0 cyclic=0 :: Set of trains
+%@ param M shape=- kind=big_m domain=- :: Big-M constant used in linearization constraints
+%@ index r ordered=0 cyclic=0 :: Train index
+%@ index n ordered=0 cyclic=0 :: Node index
+%@ index L ordered=0 cyclic=0 :: Set of links
+%@ index N ordered=0 cyclic=0 :: Set of nodes
+%@ index l ordered=0 cyclic=0 :: Link index
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index I ordered=0 cyclic=0 :: Set of passing block sections
+%@ index MOT ordered=0 cyclic=0 :: Set of maintenance tasks
+%@ param mot shape=MOT kind=vector domain=- :: Earliest start time of maintenance task m
+%@ param d shape=MOT kind=vector domain=- :: Minimum duration of maintenance task m
+%@ index C ordered=0 cyclic=0 :: Set of maintenance cells
+%@ var z shape=r,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train passing after maintenance
+%@ con eq_0003 kind=linear domain=- indicator=- :: Entrance time zero if train does not occupy block section (big-M)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Exit time zero if train does not occupy block section (big-M)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum running time on non-arrival block sections
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimum dwell and running time at origin departure block sections
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum running time on arrival block sections excluding last link
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure time window lower bound
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time window upper bound
+%@ con eq_0010 kind=linear domain=- indicator=- :: Transition from arrival to departure or turn-around block sections at stations with scheduled stop
+%@ con eq_0011 kind=linear domain=- indicator=- :: Transition between consecutive block sections at non-station nodes
+%@ con eq_0012 kind=linear domain=- indicator=- :: Actual dwell time at least minimum dwell time
+%@ con eq_0013 kind=linear domain=- indicator=- :: No scheduled stop on main track block sections
+%@ con eq_0014 kind=linear domain=- indicator=- :: Network flow conservation for train route selection
+%@ con eq_0015 kind=linear domain=- indicator=- :: Each train selects exactly one arrival block section per station
+%@ con eq_0016 kind=linear domain=- indicator=- :: Conflict resolution on arrival block sections sharing last cell, train r before r'
+%@ con eq_0017 kind=linear domain=- indicator=- :: Conflict resolution on arrival block sections sharing last cell, train r' before r
+%@ con eq_0018 kind=linear domain=- indicator=- :: Conflict resolution between turn-around and other block sections, train r before r'
+%@ con eq_0019 kind=linear domain=- indicator=- :: Conflict resolution between turn-around and other block sections, train r' before r
+%@ con eq_0020 kind=linear domain=- indicator=- :: Conflict resolution at origin node with arrival block sections
+%@ con eq_0021 kind=linear domain=- indicator=- :: Sequencing consistency on passing block sections
+%@ con eq_0022 kind=linear domain=- indicator=- :: Maintenance start time lower bound
+%@ con eq_0023 kind=linear domain=- indicator=- :: Maintenance start time upper bound
+%@ con eq_0024 kind=linear domain=- indicator=- :: Minimum maintenance duration
+%@ con eq_0025 kind=linear domain=- indicator=- :: Train clears block section before maintenance starts if scheduled before
+%@ con eq_0026 kind=linear domain=- indicator=- :: Train enters block section after maintenance ends if scheduled after
+%@ con eq_0027 kind=linear domain=- indicator=- :: Adjacent maintenance tasks overlap or are contiguous, end of m2 after start of m1
+%@ con eq_0028 kind=linear domain=- indicator=- :: Adjacent maintenance tasks overlap or are contiguous, end of m1 after start of m2
+%@ con eq_0029 kind=linear domain=- indicator=- :: Train passes after maintenance only if it uses a block section in the maintenance cell
+%@ con eq_0030 kind=linear domain=- indicator=- :: If train is after maintenance, entrance time is after maintenance end
+%@ con eq_0031 kind=linear domain=- indicator=- :: If train is before maintenance, exit time is before maintenance start
+%@ con eq_0032 kind=linear domain=- indicator=- :: First-train indicator implies train passes after maintenance
+%@ con eq_0033 kind=linear domain=- indicator=- :: If any train passes after maintenance, a first train is identified
+%@ con eq_0034 kind=linear domain=- indicator=- :: Second-train indicator implies train passes after maintenance
+%@ con eq_0035 kind=linear domain=- indicator=- :: If at least two trains pass after maintenance, a second train is identified
+%@ con eq_0036 kind=linear domain=- indicator=- :: First train enters maintenance cell no later than other trains
+%@ con eq_0037 kind=linear domain=- indicator=- :: Second train enters maintenance cell no later than later trains
+%@ con eq_0038 kind=linear domain=- indicator=- :: A train cannot be both first and second after maintenance
+%@ con eq_0041 kind=linear domain=- indicator=- :: Restricted running time on maintained block sections for first and second trains
+%@ con eq_0042 kind=linear domain=- indicator=- :: After-maintenance variable alpha implies entrance after maintenance end
+%@ con eq_0043 kind=linear domain=- indicator=- :: After-maintenance variable alpha zero implies entrance before maintenance end
+%@ con eq_0044 kind=linear domain=- indicator=- :: Before-maintenance speed variable beta implies train can pass before maintenance start
+%@ con eq_0045 kind=linear domain=- indicator=- :: Before-maintenance speed variable beta zero implies train passes after maintenance start
+%@ con eq_0046 kind=linear domain=- indicator=- :: Train cannot be both before and after maintenance
+%@ con eq_0047 kind=linear domain=- indicator=- :: Speed restriction when train running time window intersects maintenance
+%@ con eq_0049 kind=linear domain=- indicator=- :: Entrance and exit times are nonnegative integers
+%@ con eq_0050 kind=linear domain=- indicator=- :: Block section usage variables are binary
+%@ con eq_0051 kind=linear domain=- indicator=- :: Sequencing variables are binary
+%@ con eq_0052 kind=linear domain=- indicator=- :: Station dwell times are nonnegative integers
+%@ con eq_0054 kind=linear domain=- indicator=- :: After and before maintenance speed variables are binary
+%@ con eq_0055 kind=linear domain=- indicator=- :: Maintenance passing variables z, first, second are binary
+%@ con eq_0063 kind=linear domain=- indicator=- :: Constraint from the iterative algorithm subproblem formulation
+%@ con eq_0068 kind=linear domain=- indicator=- :: Variable domain constraint from the iterative algorithm subproblem
+%@ con eq_0073 kind=linear domain=- indicator=- :: Fixed maintenance start time constraint in the train scheduling and routing subproblem
+%@ con eq_0074 kind=linear domain=- indicator=- :: Fixed maintenance end time constraint in the train scheduling and routing subproblem
+%@ con eq_0083_a kind=linear domain=- indicator=- :: Candidate first and second train set R_f,m definition for each maintenance task
+%@ con eq_0083_b kind=linear domain=- indicator=- :: Time window condition for including a train in candidate set R_f,m
+\begin{align}
+  \min\quad & \sum_{r \in R} \left(\underset{b \in B_{r , n_{r}^{d}}^{-}}{\sum} y_{r , b}^{e x i t} - \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r}\right) + \sum_{r \in R} t_{r , s_{r}^{d}}^{s t o p} + \sum_{r \in R} \underset{b \in B_{r , n_{r}^{d}}^{-}}{\sum} x_{r , b} \left(t_{r , l_{b}^{l a s t}} + t_{r , l_{b}^{l a s t}}^{r e c o}\right) \tag{eq\_0001} \\
+  & y_{r , b}^{e n t r} \leq M \cdot x_{r , b} , \forall r \in R , b \in B_{r} \tag{eq\_0003} \\
+  & y_{r , b}^{e x i t} \leq M \cdot x_{r , b} , \forall r \in R , b \in B_{r} \tag{eq\_0004} \\
+  & y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + x_{r , b} \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) , \forall r \in R , b \in \left\{\right. b \left|\right. n_{b}^{+} \neq n_{r}^{o} , b \in B_{r} \backslash B^{a} \left.\right\} \tag{eq\_0005} \\
+  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e x i t} \geq \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} + \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} x_{r , b} \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) + t_{r , s_{r}^{o}}^{s t o p} , \forall r \in R , n_{r}^{o} \notin N^{b} \tag{eq\_0006} \\
+  & y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + x_{r , b} \sum_{l \in L_{b} \backslash l_{b}^{l a s t}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) , \forall r \in R , b \in B_{r} \cap B^{a} \tag{eq\_0007} \\
+  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} \geq t_{r}^{s} , \forall r \in R \tag{eq\_0008} \\
+  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} \leq t_{r}^{e} , \forall r \in R \tag{eq\_0009} \\
+  & \sum_{n \in N_{r , s}} \sum_{b^{'} \in B_{r , n}^{a , -}} y_{r , b^{'}}^{e x i t} + t_{r , s}^{s t o p} + \sum_{n \in N_{r , s}} \sum_{b^{'} \in B_{r , n}^{a , -}} x_{r , b^{'}} \left(t_{r , l_{b^{'}}^{l a s t}} + t_{r , l_{b^{'}}^{l a s t}}^{r e c o}\right) = \sum_{n \in N_{r , s}} \sum_{b \in B_{r , n}^{+}} y_{r , b}^{e n t r} , \forall r \in R , s \in S_{r}^{^{'}} \tag{eq\_0010} \\
+  & \sum_{b^{'} \in B_{r , n}^{-} , b^{'} \notin B^{a}} y_{r , b^{'}}^{e x i t} = \sum_{b \in B_{r , n}^{+}} y_{r , b}^{e n t r} , \forall r \in R , n \in \left\{\right. n \left|\right. n \neq n_{r}^{o} , n \neq n_{r}^{d} , n \in N_{r} \backslash N_{r , s} , s \in S_{r}^{^{'}} \left.\right\} \tag{eq\_0011} \\
+  & t_{r , s}^{s t o p} \geq t_{r , s}^{d w e l l} , \forall r \in R , s \in S_{r} \tag{eq\_0012} \\
+  & t_{r , s}^{s t o p} \leq \left(1 - x_{r , b}\right) M , \forall r \in R , n \in N^{m} , b \in B_{r , n}^{-} , s^{n} \in S_{r} \tag{eq\_0013} \\
+  & \sum_{b \in B_{r , n}^{+}} x_{r , b} - \sum_{b \in B_{r , n}^{-}} x_{r , b} = \begin{cases} 1 \\ - 1 \\ 0 \end{cases} \begin{matrix}n = n_{r}^{o} \\ n = n_{r}^{d} \\ o t h e r w i s e\end{matrix} , \forall r \in R \tag{eq\_0014} \\
+  & \sum_{n \in N^{s}} \sum_{b^{'} \in B_{r , n}^{-}} x_{r , b^{'}} = 1 , \forall r \in R , s \in S_{r}^{'} \tag{eq\_0015} \\
+  & \begin{matrix} & & M \left(1 - x_{r^{'} , b^{'}}\right) + M \left(1 - x_{r , b}\right) + y_{r^{'} , b^{'}}^{e n t r} - y_{r , b}^{e x i t} \geq t_{r^{'} , b^{'}}^{r e s} + t_{r , b}^{r e l} + t_{r , s}^{s t o p} + t_{r , l_{b}^{l a s t}} + t_{r , l_{b}^{l a s t}}^{r e c o} - M \left(1 - \mathit{mu}_{r , b , r^{'} , b^{'}}\right) , \\ & & \forall r , r^{'} \in R , n \in N_{s} , n^{'} \in N_{s} , b \in B_{r , n}^{a , -} , b^{'} \in B_{r^{'} , n^{'}}^{a , -} , r \neq r^{'} , s = s^{n} , l_{b}^{l a s t} = l_{b^{'}}^{l a s t} , s \in S_{r}\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & & M \left(1 - x_{r^{'} , b^{'}}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{r^{'} , b^{'}}^{e x i t} \geq t_{r , b}^{r e s} + t_{r^{'} , b^{'}}^{r e l} + t_{r^{'} , s}^{s t o p} + t_{r^{'} , l_{b^{'}}^{l a s t}} + t_{r , l_{b^{'}}^{l a s t}}^{r e c o} - M \mathit{mu}_{r , b , r^{'} , b^{'}} , \\ & & \forall r , r^{'} \in R , n \in N_{s} , n^{'} \in N_{s} , b \in B_{r , n}^{a , -} , b^{'} \in B_{r^{'} , n^{'}}^{a , -} , r \neq r^{'} , s = s^{n} , l_{b}^{l a s t} = l_{b^{'}}^{l a s t} , s \in S_{r^{'}}\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & & M \left(1 - x_{r^{'} , b^{'}}\right) + M \left(1 - x_{r , b}\right) + y_{r^{'} , b^{'}}^{e n t r} - y_{r , b}^{e x i t} \geq t_{r^{'} , b^{'}}^{r e s} + t_{r , b}^{r e l} - M \left(1 - \mathit{mu}_{r , b , r^{'} , b^{'}}\right) , \\ & & \forall r , r^{'} \in R , b \in B_{r} , b^{'} \in B_{r^{'}} , r \neq r^{'} , \mathit{epsilon}_{b , b^{'}} = 1\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & & M \left(1 - x_{r^{'} , b^{'}}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{r^{'} , b^{'}}^{e x i t} \geq t_{r , b}^{r e s} + t_{r^{'} , b^{'}}^{r e l} - M \mathit{mu}_{r , b , r^{'} , b^{'}} , \\ & & \forall r , r^{'} \in R , b \in B_{r} , b^{'} \in B_{r^{'}} , r \neq r^{'} , \mathit{epsilon}_{b , b^{'}} = 1\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix} & & M \left(1 - x_{r^{'} , b^{'}}\right) + M \left(1 - x_{r , b}\right) + y_{r^{'} , b^{'}}^{e n t r} \geq y_{r , b}^{e x i t} + t_{r^{'} , b^{'}}^{r e s} + t_{r , b}^{r e l} , \\ & & \forall r , r^{'} \in R , b^{'} \in B_{r^{'} , n_{r}^{o}}^{-} , n_{r}^{o} \in N_{s} , r \neq r^{'}\end{matrix} \tag{eq\_0020} \\
+  & \mathit{mu}_{r , b , r^{'} , b} = \mathit{mu}_{r , b^{'} , r^{'} , b^{'}} , \forall r , r^{'} \in R , i \in I , \forall b , b^{'} \in \left(B_{r} \cap B_{r^{'}} \cap B^{p}\right) , r \neq r^{'} , b^{'} = b + 1 \tag{eq\_0021} \\
+  & t_{m}^{s t a r t} \geq \mathit{mot}_{m}^{s} , \forall m \in \mathit{MOT} \tag{eq\_0022} \\
+  & t_{m}^{s t a r t} \leq \mathit{mot}_{m}^{e} , \forall m \in \mathit{MOT} \tag{eq\_0023} \\
+  & t_{m}^{e n d} - t_{m}^{s t a r t} \geq d_{m} , \forall m \in \mathit{MOT} \tag{eq\_0024} \\
+  & y_{r , b}^{e x i t} + t_{r , b}^{r e l} \leq t_{m}^{s t a r t} + M \left(1 - x_{r , b}\right) + M \mathit{alpha}_{r , b , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in B_{r} \cap B_{c} \tag{eq\_0025} \\
+  & M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} \geq t_{m}^{e n d} + t_{r , b}^{r e s} - M \left(1 - \mathit{alpha}_{r , b , c}\right) , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in B_{r} \cap B_{c} \tag{eq\_0026} \\
+  & t_{m_{2}}^{e n d} \geq t_{m_{1}}^{s t a r t} , \forall m_{1} \in \mathit{MOT} , m_{2} \in \mathit{MOT}_{m_{1}}^{^{'}} \tag{eq\_0027} \\
+  & t_{m_{1}}^{e n d} \geq t_{m_{2}}^{s t a r t} , \forall m_{1} \in \mathit{MOT} , m_{2} \in \mathit{MOT}_{m_{1}}^{^{'}} \tag{eq\_0028} \\
+  & z_{r , c} \leq \sum_{b \in B_{r} \cap B_{c}} x_{r , b} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0029} \\
+  & \sum_{b \in B_{r} \cap B_{c}} \left(y_{r , b}^{e n t r} - t_{r , b}^{r e s}\right) + M \left(1 - z_{r , c}\right) \geq t_{m}^{e n d} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0030} \\
+  & \sum_{b \in B_{r} \cap B_{c}} \left(y_{r , b}^{e x i t} + t_{r , b}^{r e l}\right) \leq t_{m}^{s t a r t} + M \cdot z_{r , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0031} \\
+  & z_{r , c}^{1} \leq z_{r , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0032} \\
+  & \sum_{r \in R} z_{r , c} \leq M \sum_{r \in R} z_{r , c}^{1} , \forall m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0033} \\
+  & z_{r , c}^{2} \leq z_{r , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0034} \\
+  & \sum_{r \in R} z_{r , c} - 1 \leq M \sum_{r \in R} z_{r , c}^{2} , \forall m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0035} \\
+  & M \left(1 - z_{r , c}^{1}\right) + M \left(1 - z_{r , c}\right) + M \left(1 - z_{r ^{'} , c}\right) + \underset{b \in B_{r ^{'}} \cap B_{c}}{\sum} y_{r ^{'} , b}^{e n t r} \geq \sum_{b \in B_{r} \cap B_{c}} y_{r , b}^{e n t r} , \forall r , r ^{'} \in R , m \in \mathit{MOT} , c \in C_{m} , r \neq r ^{'} \tag{eq\_0036} \\
+  & \begin{matrix} & & M \left(1 - z_{r , c}^{2}\right) + M \cdot z_{r^{'} , c}^{1} + M \left(1 - z_{r , c}\right) + M \left(1 - z_{r^{'} , c}\right) + \underset{b \in B_{r^{'}} \cap B_{c}}{\sum} y_{r^{'} , b}^{e n t r} \geq \sum_{b \in B_{r} \cap B_{c}} y_{r , b}^{e n t r} , \\ & & \forall r , r^{'} \in R , m \in \mathit{MOT} , c \in C_{m} , r \neq r^{'}\end{matrix} \tag{eq\_0037} \\
+  & z_{r , c}^{1} + z_{r , c}^{2} \leq 1 , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0038} \\
+  & M \left(1 - x_{r , b}\right) + y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + t_{r , b}^{r e s t r i c t} , \forall r \in R , m \in \mathit{MOT} , b \in B_{r} , C_{b} \cap C_{m} \neq \emptyset \tag{eq\_0041} \\
+  & y_{r , b}^{e n t r} + M \left(1 - \mathit{alpha}_{r , b , c}\right) \geq t_{m}^{e n d} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0042} \\
+  & y_{r , b}^{e n t r} \leq t_{m}^{e n d} + M \mathit{alpha}_{r , b , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0043} \\
+  & y_{r , b}^{e n t r} + \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) + M \mathit{beta}_{r , b , c} \geq t_{m}^{s t a r t} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0044} \\
+  & y_{r , b}^{e n t r} + \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) \leq t_{m}^{s t a r t} + M \left(1 - \mathit{beta}_{r , b , c}\right) , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0045} \\
+  & \mathit{alpha}_{r , b , c} + \mathit{beta}_{r , b , c} \leq 1 , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0046} \\
+  & M \left(\mathit{alpha}_{r , b , c} + \mathit{beta}_{r , b , c}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + t_{r , b}^{r e d u c t i o n} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0047} \\
+  & y_{r , b}^{e n t r} , y_{r , b}^{e x i t} \in N , \forall r \in R , b \in B_{r} \tag{eq\_0049} \\
+  & x_{r , b} \in \left\{0 , 1\right\} , \forall r \in R , b \in B_{r} \tag{eq\_0050} \\
+  & \mathit{mu}_{r , b , r^{'} , b^{'}} \in \left\{0 , 1\right\} , \forall r \in R , b \in B_{r} , r^{^{'}} \in R , b \in B_{r^{'}} : r \neq r^{'} \tag{eq\_0051} \\
+  & t_{r , s}^{s t o p} \in N , \forall r \in R , s \in S^{r} \tag{eq\_0052} \\
+  & \mathit{alpha}_{r , b , c} , \mathit{beta}_{r , b , c} \in \left\{0 , 1\right\} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{c}\right) \tag{eq\_0054} \\
+  & z_{r , c} , z_{r , c}^{1} , z_{r , c}^{2} \in \left\{0 , 1\right\} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0055} \\
+  & x_{r , b} = 1 \forall r \in R , b \in B_{r , r e - r o u t e} \tag{eq\_0063} \\
+  & t_{m}^{s t a r t} , t_{m}^{e n d} \in N , \forall m \in \mathit{MOT} \tag{eq\_0068} \\
+  & t_{m}^{s t a r t} = {t_{m}^{s t a r t}} , \forall m \in \mathit{MOT} \tag{eq\_0073} \\
+  & t_{m}^{e n d} = {t_{m}^{e n d}} , \forall m \in \mathit{MOT} \tag{eq\_0074} \\
+  & z_{r , c}^{1} = 0 \tag{eq\_0083\_a} \\
+  & z_{r , c}^{2} = 0 \forall r \notin R_{f , m} , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{c}\right) \tag{eq\_0083\_b} \\
+\end{align}

@@ -1,0 +1,73 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2013.11.003
+%@ meta id=10.1016_j.cor.2013.11.003 family=milp schema=0.1.0
+%@ name :: Exact formulations and algorithm for the train timetabling problem with dynamic demand
+%@ desc :: Mined from Exact formulations and algorithm for the train timetabling problem with dynamic demand (Computers & Operations Research, 2013).
+%@ prov source :: 10.1016/j.cor.2013.11.003
+%@ prov reference :: Exact formulations and algorithm for the train timetabling problem with dynamic demand
+%@ prov author :: Eva Barrena; David Canca; Leandro C. Coelho; Gilbert Laporte
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time over all stations and time intervals
+%@ var f shape=S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station i at end of interval [t-1,t]
+%@ param delta shape=- kind=scalar domain=- :: Length of time interval
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of time intervals
+%@ index n ordered=0 cyclic=0 :: Last station index
+%@ index p ordered=0 cyclic=0 :: Last time interval index
+%@ param d shape=S,S,T kind=matrix domain=- :: Demand: number of passengers arriving at station i at time t destined for j
+%@ index t ordered=0 cyclic=0 :: Time interval index
+%@ var u shape=S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding train leaving station i at time t
+%@ var x shape=S,M,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train k leaves station i at time t
+%@ index M ordered=0 cyclic=0 :: Set of trains
+%@ index m ordered=0 cyclic=0 :: Last train index
+%@ var tx shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from station i (continuous)
+%@ param l shape=S,S kind=matrix domain=- :: Distance between stations i and j
+%@ var s shape=S,M domain=non_negative role=primary drole=- lo=- hi=- :: Inverse of speed of train k when leaving station i
+%@ var w shape=S,M domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train k at station i
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ var v shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Time elapsed between departures of train k from stations i and i+1
+%@ con eq_0002 kind=flow_balance domain=- indicator=- :: Passenger flow conservation at station i: f_i_t = f_i_{t-1} + sum_j d_ij_t - u_i_t
+%@ con eq_0003 kind=linear domain=- indicator=- :: Boarding at station i and time t cannot exceed cumulative demand if a train departs
+%@ con eq_0004 kind=ordering domain=- indicator=- :: Order trains by index so train k can leave only after train k-1
+%@ con eq_0005 kind=linear domain=- indicator=- :: At most m trains can depart from the first station
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each train departs from each station at most once
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure time from station i+1 equals departure from i plus travel and dwell time
+%@ con eq_0008 kind=linear domain=- indicator=- :: Dwell time thresholds for launched trains
+%@ con eq_0009 kind=linear domain=- indicator=- :: Inverse-of-speed thresholds for launched trains
+%@ con eq_0010 kind=headway domain=- indicator=- :: Minimum headway between consecutive trains at each station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Integrality of train departure binary variables
+%@ con eq_0012 kind=linear domain=- indicator=- :: Non-negativity of passenger flow and boarding variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: Non-negativity of inverse-speed and dwell time variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Zero binary variables when departure time cannot reach last station before horizon
+%@ con eq_0015 kind=linear domain=- indicator=- :: A train launched from station i is also launched from station i+1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Upper bound on departure time at station j based on previous station i
+%@ con eq_0017 kind=linear domain=- indicator=- :: Lower bound on departure time at station j based on previous station i
+%@ con eq_0019 kind=linear domain=- indicator=- :: LF2: departure time from i+1 equals departure from i plus elapsed time v
+%@ con eq_0020 kind=linear domain=- indicator=- :: LF2: upper bound on elapsed time between consecutive departure times
+%@ con eq_0021 kind=linear domain=- indicator=- :: LF2: lower bound on elapsed time between consecutive departure times
+%@ con eq_0023 kind=linear domain=- indicator=- :: LF3: upper bound on departure time from station i+1
+%@ con eq_0024 kind=linear domain=- indicator=- :: LF3: lower bound on departure time from station i+1
+\begin{align}
+  \min\quad & \mathit{delta} \sum_{i \in \mathcal{S} â§¹ \left\{n\right\}} \sum_{t \in \mathcal{T} â§¹ \left\{p\right\}} f_{i}^{t} \tag{eq\_0001} \\
+  & f_{i}^{t} = f_{i}^{t - 1} + \sum_{j \in \mathcal{S} , j > i} d_{\mathit{ij}}^{t} - u_{i}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , t \in \mathcal{T} \tag{eq\_0002} \\
+  & u_{i}^{t} \leq \sum_{k \in \mathcal{M}} x_{\mathit{ki}}^{t} \sum_{t ' = 0}^{t} \sum_{j \in \mathcal{S} , j > i} d_{\mathit{ij}}^{t '} , i \in \mathcal{S} â§¹ \left\{n\right\} , t \in \mathcal{T} \tag{eq\_0003} \\
+  & x_{\mathit{ki}}^{t} \leq \sum_{t ' = 0}^{t} x_{k - 1 , i}^{t '} i \in \mathcal{S} , k \in \mathcal{M} â§¹ \left\{1\right\} , t \in \mathcal{T} \tag{eq\_0004} \\
+  & \sum_{t \in \mathcal{T}} \sum_{k \in \mathcal{M}} x_{k 1}^{t} \leq m \tag{eq\_0005} \\
+  & \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq 1 , i \in \mathcal{S} , k \in \mathcal{M} \tag{eq\_0006} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{k , i + 1}^{t} = \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{i}^{k} \cdot l_{i , i + 1} + w_{i + 1}^{k} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0007} \\
+  & w_{\mathit{min}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq w_{i}^{k} \leq w_{\mathit{max}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} , i \in \mathcal{S} , k \in \mathcal{M} â§¹ \left\{m\right\} \tag{eq\_0008} \\
+  & s_{\mathit{min}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq s_{i}^{k} \leq s_{\mathit{max}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0009} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{k + 1 , i}^{t} \geq \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + h_{\mathit{min}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} , i \in \mathcal{S} , k \in \mathcal{M} â§¹ \left\{m\right\} \tag{eq\_0010} \\
+  & x_{\mathit{ki}}^{t} \in \left\{0 , 1\right\} i \in \mathcal{S} , k \in \mathcal{M} , t \in \mathcal{T} \tag{eq\_0011} \\
+  & f_{i}^{t} , u_{i}^{t} \geq 0 , i \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0012} \\
+  & s_{i}^{k} , w_{i}^{k} \geq 0 , i \in \mathcal{S} , k \in \mathcal{M} . \tag{eq\_0013} \\
+  & x_{\mathit{ki}}^{t} = 0 , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} , t \in \mathcal{T} \cap \left[p - \left(s_{\mathit{min}} \cdot l_{\mathit{in}} + \left(n - i - 1\right) w_{\mathit{min}}\right) , p\right] . \tag{eq\_0014} \\
+  & \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} = \sum_{t \in \mathcal{T}} x_{k , i + 1}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} . \tag{eq\_0015} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{kj}}^{t} \leq \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{\mathit{max}} \cdot l_{\mathit{ij}} + \left(j - i\right) w_{\mathit{max}} , i , j \in \mathcal{S} â§¹ \left\{n\right\} , i < j , k \in \mathcal{M} \tag{eq\_0016} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{\mathit{min}} \cdot l_{\mathit{ij}} + \left(j - i\right) w_{\mathit{min}} \leq \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{kj}}^{t} , i , j \in \mathcal{S} â§¹ \left\{n\right\} , i < j , k \in \mathcal{M} . \tag{eq\_0017} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{k , i + 1}^{t} = \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + v_{i}^{k} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0019} \\
+  & v_{i}^{k} \leq \left(s_{\mathit{max}} \cdot l_{i , i + 1} + w_{\mathit{max}}\right) \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0020} \\
+  & \left(s_{\mathit{min}} \cdot l_{i , i + 1} + w_{\mathit{min}}\right) \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq v_{i}^{k} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} . \tag{eq\_0021} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{k , i + 1}^{t} \leq \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{\mathit{max}} \cdot l_{i , i + 1} + w_{\mathit{max}} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0023} \\
+  & \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{\mathit{min}} \cdot l_{i , i + 1} + w_{\mathit{min}} \leq \sum_{t \in \mathcal{T}} \mathit{tx}_{k , i + 1}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} . \tag{eq\_0024} \\
+\end{align}

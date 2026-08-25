@@ -1,0 +1,248 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.dam.2008.03.029",
+  "name": "A general model for cyclic machine scheduling problems",
+  "family": "milp",
+  "description": "Mined from A general model for cyclic machine scheduling problems (Discrete Applied Mathematics, 2008).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.dam.2008.03.029",
+    "reference": "A general model for cyclic machine scheduling problems",
+    "author": "Peter Brucker; Thomas Kampmeyer",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "k",
+      "description": "occurrence index for operations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "generic operation index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "generic operation index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "set of integers",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "l",
+      "description": "occurrence index for operations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "set of generic operations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "ip",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "H",
+      "description": "height (distance) for arc (i,j)",
+      "shape": [
+        "i",
+        "j"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "L",
+      "description": "start-start delay for arc (i,j)",
+      "shape": [
+        "i",
+        "j"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "p",
+      "description": "processing time of operation i",
+      "shape": [
+        "i"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "E",
+      "description": "set of arcs in graph G",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b",
+      "description": "successor or self for blocking/non-blocking",
+      "shape": [
+        "i"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "machine assigned to operation i",
+      "shape": [
+        "i"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "pb",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "t",
+      "description": "starting time of occurrence (i,k)",
+      "shape": [
+        "i",
+        "k"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "alpha",
+      "description": "cycle time",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "K",
+      "description": "binary variable for order of operations on same machine",
+      "shape": [
+        "i",
+        "j"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0015",
+      "description": "uniform precedence (GBCSP): t_i + L_ij - alpha H_ij <= t_j",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "K",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "i",
+              "expr": "b_i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "j",
+              "expr": "ip",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "K",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "i",
+              "expr": "b_{ip}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "j",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "minimize the cycle time alpha",
+    "terms": [
+      {
+        "ref": "alpha",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

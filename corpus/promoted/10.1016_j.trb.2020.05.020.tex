@@ -1,0 +1,95 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.05.020
+%@ meta id=10.1016_j.trb.2020.05.020 family=milp schema=0.1.0
+%@ name :: An MIP-based heuristic solution approach for the locomotive assignment problem focussing on (dis-)connecting processes
+%@ desc :: Mined from An MIP-based heuristic solution approach for the locomotive assignment problem focussing on (dis-)connecting processes (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.05.020
+%@ prov reference :: An MIP-based heuristic solution approach for the locomotive assignment problem focussing on (dis-)connecting processes
+%@ prov author :: Martin Scheffler; Janis S. Neufeld; Michael Hölscher
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Total cost: fixed, penalty, light travel, active/passive travel, and busting costs.
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the network.
+%@ index a ordered=0 cyclic=0 :: Index for arcs.
+%@ var x shape=C,A domain=integer role=primary drole=- lo=- hi=- :: Number of locomotives of consist c assigned to arc a.
+%@ var s shape=L domain=integer role=primary drole=- lo=- hi=- :: Violation of locomotive type limit.
+%@ var u shape=L domain=non_negative role=primary drole=- lo=- hi=- :: Number of used locomotives of type l.
+%@ var w shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if busting occurs on arc a.
+%@ var y shape=C,A domain=integer role=primary drole=- lo=- hi=- :: Number of locomotives of consist c used for connection on arc a.
+%@ index C ordered=0 cyclic=0 :: Set of all consists.
+%@ index L ordered=0 cyclic=0 :: Set of locomotive types.
+%@ index N ordered=0 cyclic=0 :: Set of nodes (stations).
+%@ param t shape=L kind=vector domain=- :: Tractive effort of locomotive type l.
+%@ param K shape=- kind=scalar domain=- :: Maximum number of locomotives per train.
+%@ param T shape=A kind=vector domain=- :: Minimum required tractive effort for train arc a.
+%@ var r shape=C,A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if consist c is used on train arc a.
+%@ index C_hat ordered=0 cyclic=0 :: Set of consists incompatible with consist c.
+%@ index l ordered=0 cyclic=0 :: Index for locomotive types.
+%@ param B shape=L kind=vector domain=- :: Maximum number of locomotives of type l available.
+%@ var v shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary indicating if connection arc a is used.
+%@ param R shape=- kind=scalar domain=- :: Set of real locomotives (not consists).
+%@ index A_hat ordered=0 cyclic=0 :: Reduced set of light arcs.
+%@ index e ordered=0 cyclic=0 :: Index for trains in merge pairs.
+%@ index M ordered=0 cyclic=0 :: Set of merged train pairs.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow conservation for each node and consist.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Limit on number of locomotives per train arc.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum tractive effort requirement for pull arcs.
+%@ con eq_0005 kind=linear domain=- indicator=- :: At least one consist on push arcs.
+%@ con eq_0006 kind=linear domain=- indicator=- :: At least one consist on task arcs.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Link x and y to binary r on train arcs.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Prevent incompatible consists on same train arc.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of used locomotives u_l.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Limit on available locomotives of each type.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Limit on locomotives on connection arcs via v_a.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Exactly one outgoing connection from arrival nodes.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Exactly one incoming connection to departure nodes.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Indicator for consist busting on bust arcs.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Domain of x on train arcs (nonnegative integer).
+%@ con eq_0016 kind=linear domain=- indicator=- :: Domain of x on light arcs (nonnegative integer).
+%@ con eq_0017 kind=linear domain=- indicator=- :: Domain of y (nonnegative integer).
+%@ con eq_0018 kind=linear domain=- indicator=- :: Domain of r (binary).
+%@ con eq_0019 kind=linear domain=- indicator=- :: Domain of v (binary).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain of w (binary).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain of u (nonnegative real).
+%@ con eq_0022 kind=linear domain=- indicator=- :: Domain of s (nonnegative integer).
+%@ con eq_0023 kind=linear domain=- indicator=- :: Forbid x for non-real consists (LFF transformation).
+%@ con eq_0024 kind=linear domain=- indicator=- :: Forbid y for non-real consists (LFF transformation).
+%@ con eq_0025 kind=linear domain=- indicator=- :: At most one consist per train arc (CFF restriction).
+%@ con eq_0026 kind=linear domain=- indicator=- :: x binary on train arcs (CFF restriction).
+%@ con eq_0027 kind=linear domain=- indicator=- :: Transformation of x from consists to real locomotives.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Transformation of y from consists to real locomotives.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Forbid y on change arcs (Ignore-Heuristic).
+%@ con eq_0030 kind=linear domain=- indicator=- :: Forbid x on non-reduced light arcs (Light-Heuristic).
+%@ con eq_0031 kind=linear domain=- indicator=- :: Enforce same consist on merged trains (Merge-Heuristic).
+\begin{align}
+  \min\quad & \sum_{c \in C} \sum_{l \in L_{c}} \left(\mathit{gamma}_{l}^{\text{Fix}} \cdot u_{l} + \mathit{gamma}^{\text{Pen}} \cdot s_{l} + \underset{a \in A^{\text{Light}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Light}} \cdot x_{l a} + \underset{a \in A^{\text{Train}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Active}} \cdot x_{l a} + \underset{a \in A^{\text{Train}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Passive}} \cdot y_{l a}\right) + \underset{a \in A^{\text{Bust}}}{\sum} \mathit{gamma}^{\text{Bust}} \cdot w_{a} \tag{eq\_0001} \\
+  & \text{s}.\text{t}. \underset{a \in A_{i}^{\text{In}} \cap A_{c}}{\sum} \left(x_{c a} + y_{c a}\right) = \underset{a \in A_{i}^{\text{Out}} \cap A_{c}}{\sum} \left(x_{c a} + y_{c a}\right) \forall i \in N , \forall c \in C , \tag{eq\_0002} \\
+  & \sum_{c \in C : a \in A_{c}} \sum_{l \in L_{c}} \left(x_{c a} + y_{c a}\right) \leq K \forall a \in A^{\text{Train}} , \tag{eq\_0003} \\
+  & \sum_{c \in C : a \in A_{c}} \sum_{l \in L_{c}} t_{l} \cdot x_{c a} \geq T_{a} \forall a \in A^{\text{Pull}} , \tag{eq\_0004} \\
+  & \sum_{c \in C^{P u s h} : a \in A_{c}} x_{c a} \geq 1 \forall a \in A^{\text{Push}} , \tag{eq\_0005} \\
+  & \sum_{c \in C : a \in A_{c}} x_{c a} \geq 1 \forall a \in A^{\text{Task}} , \tag{eq\_0006} \\
+  & x_{c a} + y_{c a} \leq r_{c a} \cdot K \forall a \in A^{\text{Train}} , c \in C : a \in A_{c} , \tag{eq\_0007} \\
+  & r_{c a} + r_{\hat{c} a} \leq 1 \forall c \in C , \hat{c} \in \left(\hat{C}\right)_{c} , a \in A^{\text{Train}} \cap A_{c} \cap A_{\hat{c}} , \tag{eq\_0008} \\
+  & u_{l} = \sum_{c \in C : l \in L_{c}} \underset{a \in A^{\text{Sink}} \cap A_{c}}{\sum} y_{c a} \forall l \in L , \tag{eq\_0009} \\
+  & u_{l} - s_{l} \leq B_{l} \forall l \in L , \tag{eq\_0010} \\
+  & \sum_{c \in C} y_{c a} \leq v_{a} \cdot K \forall a \in A^{\text{Connect}} , \tag{eq\_0011} \\
+  & \underset{a \in A_{i}^{\text{Out}}}{\sum} v_{a} = 1 \forall i \in N^{\text{Arrival}} , \tag{eq\_0012} \\
+  & \underset{a \in A_{i}^{\text{In}}}{\sum} v_{a} = 1 \forall i \in N^{\text{Departure}} , \tag{eq\_0013} \\
+  & \sum_{c \in C} y_{c a} - 1 \leq w_{a} \cdot K \forall a \in A^{\text{Bust}} , \tag{eq\_0014} \\
+  & x_{c a} \in \mathcal{N} \forall c \in C , a \in A^{\text{Train}} \cap A_{c} , \tag{eq\_0015} \\
+  & x_{c a} \in \mathcal{N} \forall c \in C , a \in A^{\text{Light}} \cap A_{c} , \tag{eq\_0016} \\
+  & y_{c a} \in \mathcal{N} \forall c \in C , a \in A_{c} \backslash A^{\text{Light}} , \tag{eq\_0017} \\
+  & r_{c a} \in \left\{0 , 1\right\} \forall c \in C , a \in A^{\text{Train}} \cap A_{c} , \tag{eq\_0018} \\
+  & v_{a} \in \left\{0 , 1\right\} \forall a \in A^{\text{Connect}} , \tag{eq\_0019} \\
+  & w_{a} \in \left\{0 , 1\right\} \forall a \in A^{\text{Bust}} , \tag{eq\_0020} \\
+  & u_{l} \in \mathcal{R}^{+} \forall c \in C , \tag{eq\_0021} \\
+  & s_{l} \in \mathcal{N} \forall c \in C . \tag{eq\_0022} \\
+  & x_{c a} = 0 \forall c \in C \backslash L , a \in A_{c} , \tag{eq\_0023} \\
+  & y_{c a} = 0 \forall c \in C \backslash L , a \in A_{c} . \tag{eq\_0024} \\
+  & \sum_{c \in C : a \in A_{c}} x_{c a} \leq 1 \forall a \in A^{\text{Train}} , \tag{eq\_0025} \\
+  & x_{c a} \leq 1 \forall a \in A^{\text{Train}} , c \in C : a \in A_{c} . \tag{eq\_0026} \\
+  & x_{l a} = x_{l a} + x_{c a} \forall c \in C \backslash L , l \in L_{c} , a \in A_{c} \tag{eq\_0027} \\
+  & y_{l a} = y_{l a} + y_{c a} \forall c \in C \backslash L , l \in L_{c} , a \in A_{c} \tag{eq\_0028} \\
+  & y_{c a} = 0 \forall a \in A^{\text{Change}} , c \in C : a \in A_{c} . \tag{eq\_0029} \\
+  & x_{c a} = 0 \forall a \in A^{\text{Light}} \backslash \left(\hat{A}\right)^{\text{Light}} , c \in C : a \in A_{c} \tag{eq\_0030} \\
+  & x_{c e} = x_{c f} \forall \left(e , f\right) \in M , c \in C : e \in A_{c} , f \in A_{c} \tag{eq\_0031} \\
+\end{align}

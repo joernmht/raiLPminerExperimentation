@@ -1,0 +1,82 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2015.12.006
+%@ meta id=10.1016_j.ejor.2015.12.006 family=milp schema=0.1.0
+%@ name :: Valid inequalities for the synchronization bus timetabling problem
+%@ desc :: Mined from Valid inequalities for the synchronization bus timetabling problem (European Journal of Operational Research, 2015).
+%@ prov source :: 10.1016/j.ejor.2015.12.006
+%@ prov reference :: Valid inequalities for the synchronization bus timetabling problem
+%@ prov author :: Pierre Fouilhoux; Omar Jorge Ibarra-Rojas; Safia Kedad‐Sidhoum; Yasmin Rios Solis
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total weighted number of synchronizations
+%@ param N shape=I,I,B kind=matrix :: Weight for synchronization at node b between lines i and j
+%@ var Y shape=I,I,B,p,q domain=binary role=primary :: Binary variable indicating synchronization between trips p and q at node b
+%@ index B ordered=0 cyclic=0 :: Set of synchronization nodes shared by lines i and j
+%@ index I ordered=0 cyclic=0 :: Set of bus lines
+%@ index f ordered=0 cyclic=0 :: Number of trips for line i
+%@ index i ordered=0 cyclic=0 :: Index for bus lines
+%@ param H shape=I kind=vector :: Maximum headway time for line i
+%@ var X shape=I,p domain=continuous role=primary :: Departure time of trip p on line i
+%@ param s shape=- kind=scalar :: Possibly a typo or unused symbol
+%@ param t shape=I,B kind=matrix :: Travel time from start to node b for line i
+%@ param T shape=- kind=scalar :: Planning horizon end time
+%@ param h shape=I kind=vector :: Minimum headway time for line i
+%@ index p ordered=0 cyclic=0 :: Index for trips on a line
+%@ param M shape=- kind=big_m :: Large constant for linearization
+%@ index q ordered=0 cyclic=0 :: Index for trips on a line
+%@ param w shape=B kind=vector :: Minimum waiting time for synchronization at node b
+%@ param W shape=B kind=vector :: Maximum waiting time for synchronization at node b
+%@ param R shape=- kind=scalar :: Possibly a typo or unused symbol
+%@ param d_lower shape=I,p kind=matrix :: Lower bound on departure time for trip p on line i
+%@ param d_upper shape=I,p kind=matrix :: Upper bound on departure time for trip p on line i
+%@ param c shape=- kind=scalar :: Count of later trips on line i synchronized with trip q
+%@ param r shape=- kind=scalar :: Count of later trips on line j synchronized with trip p
+%@ index E ordered=0 cyclic=0 :: Set of 5-tuples (i,j,p,q,b) for synchronizations
+%@ con eq_0002 kind=linear :: First trip of line i departs no later than maximum headway H_i
+%@ con eq_0003 kind=linear :: Departure time of last trip of line i is within [T - H_i, T]
+%@ con eq_0004 kind=linear :: Consecutive trips of line i have headway between h_i and H_i
+%@ con eq_0005 kind=linear :: Synchronization lower bound: if Y is 1, arrival time difference at node b is at least w_b
+%@ con eq_0006 kind=linear :: Synchronization upper bound: if Y is 1, arrival time difference at node b is at most W_b
+%@ con eq_0007_a kind=linear :: Synchronization inequality (7): a trip of line i can synchronize with at most 1 + floor((W_b-w_b)/h_j) trips of line j
+%@ con eq_0007_b kind=linear :: Synchronization inequality (8): a trip of line j can synchronize with at most 1 + floor((W_b-w_b)/h_i) trips of line i
+%@ con eq_0009 kind=linear :: Headway inequality (9): if trips p and q synchronize, later trips of the two lines cannot synchronize without exceeding the allowed waiting window
+%@ con eq_0010 kind=linear :: Headway inequality (10): if trips p and q synchronize, earlier trips of the two lines cannot synchronize without exceeding the allowed waiting window
+%@ con eq_0011 kind=linear :: Generic valid inequality: sum of synchronization variables over E is at most γ
+%@ con eq_0012 kind=linear :: Lifted valid inequality: sum over E' is at most γ times (1 - Y_{p0q0b0}^{i0j0})
+%@ con eq_0014 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0015 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0017 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0018 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0019 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0020 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0021 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0022 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0023 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0024 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0025 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+%@ con eq_0026 kind=linear :: Lifted valid inequality obtained by the generic lifting procedure
+\begin{align}
+  \max\quad & \sum_{i \in I} \sum_{j \in I \left(i\right)} \sum_{b \in B^{i j}} N_{b}^{i j} \sum_{p = 1}^{f^{i}} \sum_{q = 1}^{f^{j}} Y_{p q b}^{i j} \tag{eq\_0001} \\
+  & \begin{matrix}\text{s}.\text{t}. X_{1}^{i} \leq H^{i} \cdot i \in I\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}T - H^{i} \leq X_{f^{i}}^{i} \leq T \cdot i \in I\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}h^{i} \leq X_{p + 1}^{i} - X_{p}^{i} \leq H^{i} \cdot i \in I , p = 1 , \hdots , f^{i} - 1\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix} & & \left(X_{q}^{j} + t_{b}^{j}\right) - \left(X_{p}^{i} + t_{b}^{i}\right) \geq w_{b} - M \left(1 - Y_{p q b}^{i j}\right) i \in I , j \in I \left(i\right) , b \in B^{i j} , \\ & & p = 1 , \hdots , f^{i} , q = 1 , \hdots , f^{j}\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix} & & \left(X_{q}^{j} + t_{b}^{j}\right) - \left(X_{p}^{i} + t_{b}^{i}\right) \leq W_{b} + M \left(1 - Y_{p q b}^{i j}\right) i \in I , j \in I \left(i\right) , b \in B^{i j} , \\ & & p = 1 , \hdots , f^{i} , q = 1 , \hdots , f^{j}\end{matrix} \tag{eq\_0006} \\
+  & X_{p}^{i} \in \mathcal{R} i \in I , p = 1 , \hdots , f^{i} \tag{eq\_0007\_a} \\
+  & Y_{p q b}^{i j} \in \left\{0 , 1\right\} i \in I , j \in I \left(i\right) , b \in B^{i j} , p = 1 , \hdots , f^{i} , q = 1 , \hdots , f^{j} \tag{eq\_0007\_b} \\
+  & \left(\left({X}\right)_{q b}^{j} + t_{b}^{j}\right) - \left(\left({X}\right)_{p b}^{i} + t_{b}^{i}\right) \geq \left(\bar{d}\right)_{p}^{i} + t_{b}^{i} - \left(\underset{̲}{d}\right)_{q}^{j} - t_{b}^{j} . \tag{eq\_0009} \\
+  & \left(\left({X}\right)_{q b}^{j} + t_{b}^{j}\right) - \left(\left({X}\right)_{p b}^{i} + t_{b}^{i}\right) \leq \left(\bar{d}\right)_{q}^{j} + t_{b}^{j} - \left(\underset{̲}{d}\right)_{p}^{i} - t_{b}^{j} . \tag{eq\_0010} \\
+  & \begin{matrix}\sum_{q = 1}^{f^{j}} Y_{p q b}^{i j} \leq 1 + \lfloor \frac{W_{b} - w_{b}}{h^{j}} \rfloor & i \in I , j \in I \left(i\right) , b \in B^{i j} , p \in \left\{1 , \hdots , f^{i}\right\}\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}\sum_{p = 1}^{f^{i}} Y_{p q b}^{i j} \leq 1 + \lfloor \frac{W_{b} - w_{b}}{h^{i}} \rfloor & i \in I , j \in I \left(i\right) , b \in B^{i j} , q \in \left\{1 , \hdots , f^{j}\right\} .\end{matrix} \tag{eq\_0012} \\
+  & \begin{aligned}Y_{p q b}^{i j} & + & \sum_{q^{'} = q + 1}^{f^{j}} Y_{p q^{'} b}^{i j} + \sum_{p^{'} = p + 1}^{f^{i}} Y_{p^{'} q b}^{i j} \leq 1 \\ & + & \lfloor \frac{W_{b} - w_{b}}{min \left(h^{i} , h^{j}\right)} \rfloor \begin{matrix} i \in I , j \in I \left(i\right) , b \in B^{i j} , \\ p \in \left\{1 , \hdots , f^{i}\right\} , q \in \left\{1 , \hdots , f^{j}\right\}\end{matrix}\end{aligned} \tag{eq\_0014} \\
+  & \begin{aligned}Y_{p q b}^{i j} & + & \sum_{q^{'} = 1}^{q - 1} Y_{p q^{'} b}^{i j} + \sum_{p^{'} = 1}^{p - 1} Y_{p^{'} q b}^{i j} \leq 1 \\ & + & \lfloor \frac{W_{b} - w_{b}}{min \left(h^{i} , h^{j}\right)} \rfloor \begin{matrix} i \in I , j \in I \left(i\right) , b \in B^{i j} , \\ p \in \left\{1 , \hdots , f^{i}\right\} , q \in \left\{1 , \hdots , f^{j}\right\} .\end{matrix}\end{aligned} \tag{eq\_0015} \\
+  & \left({Y}\right)_{p q b}^{i j} + c \leq \sum_{p^{'} = 1}^{f^{i}} \left({Y}\right)_{p^{'} q b}^{i j} \leq 1 + \lfloor \frac{W_{b} - w_{b}}{h^{i}} \rfloor \leq 1 + \lfloor \frac{W_{b} - w_{b}}{min \left(h^{i} , h^{j}\right)} \rfloor . \tag{eq\_0017} \\
+  & \left({Y}\right)_{p q b}^{i j} + r \leq \sum_{q^{'} = 1}^{f^{j}} \left({Y}\right)_{p q^{'} b}^{i j} \leq 1 + \lfloor \frac{W_{b} - w_{b}}{h^{j}} \rfloor \leq 1 + \lfloor \frac{W_{b} - w_{b}}{min \left(h^{i} , h^{j}\right)} \rfloor . \tag{eq\_0018} \\
+  & \left({X}\right)_{q + 1}^{j} + t_{b}^{j} \leq \left({X}\right)_{p}^{i} + t_{b}^{i} + W_{b} - \left(r - 1\right) h^{j} . \tag{eq\_0019} \\
+  & \left({X}\right)_{q}^{j} + t_{b}^{j} \geq \left({X}\right)_{p + 1}^{i} + t_{b}^{i} + w_{b} + \left(c - 1\right) h^{i} . \tag{eq\_0020} \\
+  & \begin{aligned}h^{j} & \leq & \left(\left({X}\right)_{q + 1}^{j} + t_{b}^{j}\right) - \left(\left({X}\right)_{q}^{j} + t_{b}^{j}\right) \\ & \leq & \left({X}\right)_{p}^{i} - \left({X}\right)_{p + 1}^{i} + W_{b} - w_{b} - \left(r - 1\right) h^{j} - \left(c - 1\right) h^{i} .\end{aligned} \tag{eq\_0021} \\
+  & h^{j} \leq - h^{i} + W_{b} - w_{b} - \left(r - 1\right) h^{j} - \left(c - 1\right) h^{i} , \tag{eq\_0022} \\
+  & r + c \leq r + c \frac{h^{i}}{h^{j}} \leq \frac{W_{b} - w_{b}}{h^{j}} . \tag{eq\_0023} \\
+  & \left({Y}\right)_{p q b}^{i j} + r + c \leq 1 + \frac{W_{b} - w_{b}}{h^{j}} , \tag{eq\_0024} \\
+  & \sum_{\left(i , j , p , q , b\right) \in E} Y_{p q b}^{i j} \leq \mathit{gamma} \tag{eq\_0025} \\
+  & \sum_{\left(i , j , p , q , b\right) \in E^{'}} Y_{p q b}^{i j} \leq \mathit{gamma} \left(1 - Y_{p_{0} q_{0} b_{0}}^{i_{0} j_{0}}\right) \tag{eq\_0026} \\
+\end{align}

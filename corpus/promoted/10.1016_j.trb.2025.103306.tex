@@ -1,0 +1,169 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2025.103306
+%@ meta id=10.1016_j.trb.2025.103306 family=milp schema=0.1.0
+%@ name :: Integrated optimization of train makeup problem and resource scheduling in railway marshalling yards: A hybrid MILP-CP approach with Logic-based Benders decomposition
+%@ desc :: Mined from Integrated optimization of train makeup problem and resource scheduling in railway marshalling yards: A hybrid MILP-CP approach with Logic-based Benders decomposition (Transportation Research Part B Methodological, 2025).
+%@ prov source :: 10.1016/j.trb.2025.103306
+%@ prov reference :: Integrated optimization of train makeup problem and resource scheduling in railway marshalling yards: A hybrid MILP-CP approach with Logic-based Benders decomposition
+%@ prov author :: Peiran Han; Lingyun Meng; Xiaojie Luan; Nikola Bešinović; Jianrui Miao; Yihui Wang; Zhengwen Liao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: minimize the makespan (maximum completion time) over all outbound trains
+%@ var u shape=J,A,K,B,L,E domain=integer role=primary drole=- lo=- hi=- :: completion time of inbound-train, block, and outbound-train operations
+%@ index K ordered=0 cyclic=0 :: set of blocks
+%@ index k ordered=0 cyclic=0 :: index for blocks
+%@ var r shape=K,L domain=binary role=primary drole=- lo=- hi=- :: binary assignment of block k to outbound train l
+%@ index L ordered=0 cyclic=0 :: set of outbound trains
+%@ param w shape=K,L kind=matrix domain=- :: weight of blocks and outbound-train weight limits
+%@ index l ordered=0 cyclic=0 :: index for outbound trains
+%@ param g shape=K,L kind=matrix domain=- :: length of blocks and outbound-train length limits
+%@ index F ordered=0 cyclic=0 :: set of line locomotives
+%@ var lambda shape=L,F domain=binary role=primary drole=- lo=- hi=- :: binary assignment of line locomotive f to outbound train l
+%@ param T shape=J,K,L,F kind=matrix domain=- :: arrival, departure, and availability times of trains, blocks, and locomotives
+%@ index d ordered=0 cyclic=0 :: destination of block, train, or locomotive
+%@ param t shape=- kind=scalar domain=- :: processing or dwell time
+%@ index A ordered=0 cyclic=0 :: set of stages for inbound trains
+%@ index J ordered=0 cyclic=0 :: set of inbound trains
+%@ index j ordered=0 cyclic=0 :: index for inbound trains
+%@ param p shape=J,A,K,B,L,E kind=matrix domain=- :: processing time of an operation at a stage
+%@ index B ordered=0 cyclic=0 :: set of stages for blocks
+%@ index E ordered=0 cyclic=0 :: set of stages for outbound trains
+%@ var omega shape=J,A,Q,K,B,Q,L,E,Q domain=binary role=primary drole=- lo=- hi=- :: binary assignment of job to resource at a stage
+%@ index Q ordered=0 cyclic=0 :: set of resources at a stage
+%@ index I ordered=0 cyclic=0 :: set of blocks in inbound train j
+%@ param M shape=- kind=big_m domain=- :: large positive constant for linearization
+%@ var s shape=J,J,Q,K,K,Q,L,L,Q domain=binary role=primary drole=- lo=- hi=- :: binary sequencing variable for pairs of jobs on the same resource
+%@ var Z shape=L,E domain=integer role=primary drole=- lo=- hi=- :: integer completion time variable of outbound train stage in CP model
+%@ var x shape=J,A domain=continuous role=primary drole=- lo=- hi=- :: interval variable for inbound train operation at a stage
+%@ param EndBeforeStart shape=- kind=scalar domain=- :: CP constraint ensuring one interval ends before another starts
+%@ var y shape=K,B domain=continuous role=primary drole=- lo=- hi=- :: interval variable for block operation at a stage
+%@ var z shape=L,E domain=continuous role=primary drole=- lo=- hi=- :: interval variable for outbound train operation at a stage
+%@ param Pulse shape=- kind=scalar domain=- :: CP function counting overlapping intervals at a resource
+%@ param EndAtStart shape=- kind=scalar domain=- :: CP constraint forcing one interval to end exactly when another starts
+%@ index H ordered=0 cyclic=0 :: set of blocks assigned to outbound train l
+%@ param StartOf shape=- kind=scalar domain=- :: CP function returning start time of an interval
+%@ param EndOf shape=- kind=scalar domain=- :: CP function returning end time of an interval
+%@ param eta shape=J,L kind=matrix domain=- :: theoretical completion time of inbound or outbound train
+%@ param LB shape=- kind=scalar domain=- :: lower bound on makespan
+%@ param C shape=- kind=scalar domain=- :: makespan of master or subproblem
+%@ index S ordered=0 cyclic=0 :: set of earliest-ready blocks for minimum train composition
+%@ param LSA shape=Q,E kind=matrix domain=- :: left-side availability of resource at a stage
+%@ param RSA shape=Q,E kind=matrix domain=- :: right-side availability of resource at a stage
+%@ param body shape=- kind=scalar domain=- :: middle term in lower bound calculation
+%@ param head shape=- kind=scalar domain=- :: first term in lower bound calculation
+%@ param tail shape=L kind=vector domain=- :: last term in lower bound calculation
+%@ param theta shape=L kind=vector domain=- :: tail time for outbound train
+%@ con eq_0003 kind=linear domain=- indicator=- :: each block assigned to at most one outbound train
+%@ con eq_0004 kind=linear domain=- indicator=- :: total weight of outbound train within required limits
+%@ con eq_0005 kind=linear domain=- indicator=- :: total length of outbound train within required limits
+%@ con eq_0006 kind=linear domain=- indicator=- :: each line locomotive assigned to at most one outbound train
+%@ con eq_0007 kind=linear domain=- indicator=- :: each outbound train assigned exactly one line locomotive
+%@ con eq_0008 kind=linear domain=- indicator=- :: line locomotive assigned only if train is scheduled with blocks
+%@ con eq_0009 kind=linear domain=- indicator=- :: block assignment implies outbound train is scheduled with a line locomotive
+%@ con eq_0010 kind=linear domain=- indicator=- :: incompatible block-train pairs forbidden by destination or timing
+%@ con eq_0011 kind=linear domain=- indicator=- :: incompatible locomotive-train pairs forbidden by destination or timing
+%@ con eq_0012 kind=linear domain=- indicator=- :: binary domain for block-to-train assignment variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: binary domain for locomotive-to-train assignment variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: precedence between consecutive inbound train stages
+%@ con eq_0016 kind=linear domain=- indicator=- :: precedence between consecutive block stages
+%@ con eq_0017 kind=linear domain=- indicator=- :: precedence between consecutive outbound train stages
+%@ con eq_0018 kind=linear domain=- indicator=- :: makespan at least the completion time of each outbound train
+%@ con eq_0019 kind=linear domain=- indicator=- :: each inbound train assigned exactly one resource at each stage
+%@ con eq_0021 kind=linear domain=- indicator=- :: each block assigned exactly one resource at each stage
+%@ con eq_0022 kind=linear domain=- indicator=- :: each outbound train assigned exactly one resource at each stage
+%@ con eq_0023 kind=linear domain=- indicator=- :: roll-in sequence of blocks follows formation order
+%@ con eq_0024 kind=linear domain=- indicator=- :: block humping starts only after inbound train push is completed
+%@ con eq_0026 kind=linear domain=- indicator=- :: outbound classification starts only after last block arrives
+%@ con eq_0027 kind=linear domain=- indicator=- :: inbound first operation starts after train arrival
+%@ con eq_0029 kind=linear domain=- indicator=- :: outbound last operation finishes before departure
+%@ con eq_0030 kind=linear domain=- indicator=- :: non-overlap of inbound trains on the same resource
+%@ con eq_0032 kind=linear domain=- indicator=- :: non-overlap of blocks on the same resource
+%@ con eq_0033 kind=linear domain=- indicator=- :: non-overlap of outbound trains on the same resource
+%@ con eq_0034 kind=linear domain=- indicator=- :: reverse non-overlap for inbound trains on the same resource
+%@ con eq_0035 kind=linear domain=- indicator=- :: reverse non-overlap for blocks on the same resource
+%@ con eq_0036 kind=linear domain=- indicator=- :: reverse non-overlap for outbound trains on the same resource
+%@ con eq_0037 kind=linear domain=- indicator=- :: nonnegative integer completion times for operations
+%@ con eq_0039 kind=linear domain=- indicator=- :: binary resource assignment variables
+%@ con eq_0040 kind=linear domain=- indicator=- :: binary sequencing variables
+%@ con eq_0042 kind=linear domain=- indicator=- :: CP objective minimizing maximum end of outbound train operations
+%@ con eq_0044 kind=linear domain=- indicator=- :: CP precedence between inbound train stages
+%@ con eq_0045 kind=linear domain=- indicator=- :: CP precedence between block stages
+%@ con eq_0046 kind=linear domain=- indicator=- :: CP precedence between outbound train stages
+%@ con eq_0048 kind=linear domain=- indicator=- :: CP resource capacity constraint for inbound train stage
+%@ con eq_0049 kind=linear domain=- indicator=- :: CP resource capacity constraint for block stage
+%@ con eq_0050 kind=linear domain=- indicator=- :: CP resource capacity constraint for outbound train stage
+%@ con eq_0051 kind=linear domain=- indicator=- :: CP roll-in sequence of blocks
+%@ con eq_0053 kind=linear domain=- indicator=- :: CP consistency between inbound train and block operations
+%@ con eq_0054 kind=linear domain=- indicator=- :: CP consistency between block and outbound train operations
+%@ con eq_0056 kind=linear domain=- indicator=- :: CP arrival time constraint for inbound trains
+%@ con eq_0057 kind=linear domain=- indicator=- :: CP departure time constraint for outbound trains
+%@ con eq_0062 kind=linear domain=- indicator=- :: theoretical completion time of inbound trains used in lower bounds
+%@ con eq_0065 kind=linear domain=- indicator=- :: lower bound LB1* based on theoretical inbound completion and outbound processing
+%@ con eq_0066 kind=linear domain=- indicator=- :: lower bound LB2* using resource availability and stage workload
+%@ con eq_0067 kind=linear domain=- indicator=- :: lower bound LB3* using stage workload and train tail times
+%@ con eq_0068 kind=linear domain=- indicator=- :: theoretical completion time of outbound trains in lower bounds
+%@ con eq_0069 kind=linear domain=- indicator=- :: lower bound LB4 based on connection plan between inbound and outbound trains
+%@ con eq_0070 kind=linear domain=- indicator=- :: global lower bound LB* as maximum of existing lower bounds
+%@ con eq_0071 kind=linear domain=- indicator=- :: iteration-dependent lower bound LB_s as maximum of available bounds
+%@ con eq_0072 kind=linear domain=- indicator=- :: feasibility no-good cut preventing repetition of infeasible makeup plans
+%@ con eq_0073 kind=linear domain=- indicator=- :: trivial optimality cut forcing master makespan above historical subproblem value
+%@ con eq_0075 kind=linear domain=- indicator=- :: optimality cut excluding suboptimal assignments
+%@ con eq_0076 kind=linear domain=- indicator=- :: analytical optimality cut based on maximum makespan reduction
+\begin{align}
+  \min\quad & u_{l}^{max} \tag{eq\_0001} \\
+  & \sum_{l \in L} r_{k , l} \leq 1 \forall k \in K \tag{eq\_0003} \\
+  & w_{l}^{min} \leq \sum_{k \in K} w_{k} \cdot r_{k , l} \leq w_{l}^{max} \forall l \in L \tag{eq\_0004} \\
+  & g_{l}^{min} \leq \sum_{k \in K} g_{k} \cdot r_{k , l} \leq g_{l}^{max} \forall l \in L \tag{eq\_0005} \\
+  & \sum_{l \in L} \mathit{lambda}_{l , f} \leq 1 \forall f \in F \tag{eq\_0006} \\
+  & \sum_{f \in F} \mathit{lambda}_{l , f} = 1 \forall l \in L \tag{eq\_0007} \\
+  & \mathit{lambda}_{l , f} \leq \sum_{k \in K} r_{k , l} \forall l \in L , \forall f \in F \tag{eq\_0008} \\
+  & \sum_{f \in F} \mathit{lambda}_{l , f} \geq r_{k , l} \forall l \in L , \forall k \in K \tag{eq\_0009} \\
+  & r_{k , l} = 0 \forall l \in L , \forall k \in K \mid d_{k} \neq d_{l} \text{or} T_{k}^{\text{arr}} + t^{\text{dwe}} \geq T_{l}^{\text{dep}} \tag{eq\_0010} \\
+  & \mathit{lambda}_{l , f} = 0 \forall l \in L , \forall f \in F \mid d_{f} \neq d_{l} \text{or} T_{f}^{\text{ava}} + t^{\text{pre}} \leq T_{l}^{\text{dep}} \tag{eq\_0011} \\
+  & r_{k , l} \in \left\{0 , 1\right\} \forall l \in L , \forall k \in K \tag{eq\_0012} \\
+  & \mathit{lambda}_{l , f} \in \left\{0 , 1\right\} \forall l \in L , \forall f \in F \tag{eq\_0013} \\
+  & u_{j , a}^{'} \geq u_{j , a - 1}^{'} + p_{j , a}^{'} \forall j \in J , \forall a \in \left[2 , \left|A\right|\right] \tag{eq\_0014} \\
+  & u_{k , b}^{' '} \geq u_{k , b - 1}^{' '} + p_{k , b}^{' '} \forall k \in K , \forall b \in \left[2 , \left|B\right|\right] \tag{eq\_0016} \\
+  & u_{l , e}^{' ' '} \geq u_{l , e - 1}^{' ' '} + p_{l , e}^{' ' '} \forall l \in L , \forall e \in \left[2 , \left|E\right|\right] \tag{eq\_0017} \\
+  & u_{l}^{max} \geq u_{l , \left|E\right|}^{' ' '} \forall l \in L \tag{eq\_0018} \\
+  & \sum_{q_{a} \in Q_{a}} \mathit{omega}_{j , a , q_{a}} = 1 \forall j \in J , \forall a \in A \tag{eq\_0019} \\
+  & \sum_{q_{b} \in Q_{b}} \mathit{omega}_{k , b , q_{b}} = 1 \forall k \in K , \forall b \in B \tag{eq\_0021} \\
+  & \sum_{q_{e} \in Q_{e}} \mathit{omega}_{l , e , q_{e}} = 1 \forall l \in L , \forall e \in E \tag{eq\_0022} \\
+  & u_{k_{\mathit{zeta}} , b}^{' '} - p_{k_{\mathit{zeta}} , b}^{' '} = u_{k_{\mathit{zeta} - 1} , b}^{' '} \forall j \in J , \forall \mathit{zeta} \in \left[2 , \left|I_{j}\right|\right] , \forall b \in B \tag{eq\_0023} \\
+  & u_{k , 1}^{' '} \geq u_{j , \left|A\right|}^{'} \forall j \in J , \forall k \in I_{j} , \tag{eq\_0024} \\
+  & u_{k , \left|B\right|}^{' '} \leq u_{l , 1}^{' ' '} - p_{l , 1}^{' ' '} + \mathcal{M} \cdot \left(1 - r_{k , l}\right) \forall l \in L , \forall k \in K \tag{eq\_0026} \\
+  & u_{j , 1}^{'} \geq T_{j}^{\text{arr}} + p_{j , 1}^{'} \forall j \in J \tag{eq\_0027} \\
+  & u_{l , \left|E\right|}^{' ' '} \leq T_{l}^{\text{dep}} \forall l \in L \tag{eq\_0029} \\
+  & u_{j , a}^{'} - p_{j , a}^{'} \geq u_{j^{'} , a}^{'} - \mathcal{M} \cdot \left(3 - s_{j , j^{'} , q_{a}} - \mathit{omega}_{j , a , q_{a}} - \mathit{omega}_{j^{'} , a , q_{a}}\right) \forall a \in A , \forall q_{a} \in Q_{a} , \forall j , j^{'} \in J : j > j^{'} \tag{eq\_0030} \\
+  & u_{k , b}^{' '} - p_{k , b}^{' '} \geq u_{k^{'} , b}^{'} - \mathcal{M} \cdot \left(3 - s_{k , k^{'} , q_{b}} - \mathit{omega}_{k , b , q_{b}} - \mathit{omega}_{k^{'} , b , q_{b}}\right) \forall b \in B , \forall q_{b} \in Q_{b} , \forall k , k^{'} \in K : k > k^{'} \tag{eq\_0032} \\
+  & u_{l , e}^{' ' '} - p_{l , e}^{' ' '} \geq u_{l^{'} , e}^{'} - \mathcal{M} \cdot \left(3 - s_{l , l^{'} , q_{e}} - \mathit{omega}_{l , e , q_{e}} - \mathit{omega}_{l^{'} , e , q_{e}}\right) \forall e \in E , \forall q_{e} \in Q_{e} , \forall l , l^{'} \in L : l > l^{'} \tag{eq\_0033} \\
+  & u_{j^{'} , a}^{'} - p_{j^{'} , a}^{'} \geq u_{j , a}^{'} - \mathcal{M} \cdot \left(2 + s_{j , j^{'} , q_{a}} - \mathit{omega}_{j , a , q_{a}} - \mathit{omega}_{j^{'} , a , q_{a}}\right) \forall a \in A , \forall q_{a} \in Q_{a} , \forall j , j^{'} \in J : j > j^{'} \tag{eq\_0034} \\
+  & u_{k^{'} , b}^{'} - p_{k^{'} , b}^{'} \geq u_{k , b}^{' '} - \mathcal{M} \cdot \left(2 + s_{k , k^{'} , q_{b}} - \mathit{omega}_{k , b , q_{b}} - \mathit{omega}_{k^{'} , b , q_{b}}\right) \forall b \in B , \forall q_{b} \in Q_{b} , \forall k , k^{'} \in K : k > k^{'} \tag{eq\_0035} \\
+  & u_{l^{'} , e}^{'} - p_{l^{'} , e}^{'} \geq u_{l , e}^{' ' '} - \mathcal{M} \cdot \left(2 + s_{l , l^{'} , q_{e}} - \mathit{omega}_{l , e , q_{e}} - \mathit{omega}_{l^{'} , e , q_{e}}\right) \forall e \in E , \forall q_{e} \in Q_{e} , \forall l , l^{'} \in L : l > l^{'} \tag{eq\_0036} \\
+  & u_{j , a}^{'} , u_{k , b}^{' '} , u_{l , e}^{' ' '} \in \mathcal{Z}^{+} \forall a \in A , b \in B , e \in E , j \in J , k \in K , l \in L \tag{eq\_0037} \\
+  & \mathit{omega}_{j , a , q_{a}} , \mathit{omega}_{k , b , q_{b}} , \mathit{omega}_{l , e , q_{e}} \in \left\{0 , 1\right\} \forall a \in A , b \in B , e \in E , j \in J , k \in K , l \in L , q_{a} \in Q_{a} , q_{b} \in Q_{b} , q_{e} \in Q_{E} \tag{eq\_0039} \\
+  & s_{j , j^{'} , q_{a}} , s_{k , k^{'} , q_{b}} , s_{l , l^{'} , q_{e}} \in \left\{0 , 1\right\} \forall j , j^{'} \in J , k , k^{'} \in K , l , l^{'} \in L , q_{a} \in Q_{a} , q_{b} \in Q_{b} , q_{e} \in Q_{E} \tag{eq\_0040} \\
+  & \mathit{EndBeforeStart} \left(x_{j , a - 1} , x_{j , a}\right) \forall j \in J , \forall a \in \left[2 , \left|A\right|\right] \tag{eq\_0042} \\
+  & \mathit{EndBeforeStart} \left(y_{k , b - 1} , y_{k , b}\right) \forall k \in K , \forall b \in \left[2 , \left|B\right|\right] \tag{eq\_0044} \\
+  & \mathit{EndBeforeStart} \left(z_{l , e - 1} , z_{l , e}\right) \forall l \in L , \forall e \in \left[2 , \left|E\right|\right] \tag{eq\_0045} \\
+  & \sum_{j = 1}^{\left|J\right|} \mathit{Pulse} \left(x_{j , a} , 1\right) \leq \left|Q_{a}\right| \forall a \in A \tag{eq\_0046} \\
+  & \sum_{k = 1}^{\left|K\right|} \mathit{Pulse} \left(y_{k , b} , 1\right) \leq \left|Q_{b}\right| \forall b \in B \tag{eq\_0048} \\
+  & \sum_{l = 1}^{\left|L\right|} \mathit{Pulse} \left(z_{l , e} , 1\right) \leq \left|Q_{e}\right| \forall e \in E \tag{eq\_0049} \\
+  & \mathit{EndAtStart} \left(y_{k_{\mathit{zeta} - 1} , b} , y_{k_{\mathit{zeta}} , b}\right) \forall j \in J , \forall \mathit{zeta} \in \left[2 , \left|I_{j}\right|\right] , \forall b \in B \tag{eq\_0050} \\
+  & \mathit{EndBeforeStart} \left(x_{j , \left|A\right|} , y_{k , 1}\right) \forall j \in J , \forall k \in I_{j} \tag{eq\_0051} \\
+  & \mathit{EndBeforeStart} \left(y_{k , \left|B\right|} , z_{l , 1}\right) \forall l \in L , \forall k \in H_{l} \tag{eq\_0053} \\
+  & \mathit{StartOf} \left(x_{j , 1}\right) \geq T_{j}^{\text{arr}} \forall j \in J \tag{eq\_0054} \\
+  & \mathit{EndOf} \left(z_{l , \left|E\right|}\right) \leq T_{l}^{\text{dep}} \forall l \in L \tag{eq\_0056} \\
+  & \mathit{eta}_{j}^{'} = T_{j}^{\text{arr}} + \sum_{a \in A} p_{j , a}^{'} , \forall j \in J \tag{eq\_0057} \\
+  & \mathit{eta}_{l}^{' ' '} = \sum_{e \in E} p_{l , e}^{' ' '} , \forall l \in L \tag{eq\_0062} \\
+  & \mathit{LB}^{ \cdot } = max \left\{\mathit{LB}_{1}^{ \cdot } , \underset{e \in E}{max} \mathit{LB}_{2}^{ \cdot } \left(e\right) , \underset{e \in E}{max} \mathit{LB}_{3}^{ \cdot } \left(e\right)\right\} \tag{eq\_0065} \\
+  & \mathit{LB}^{s} = max \left\{\mathit{LB}^{ \cdot } , \mathit{LB}_{4}^{s} , \mathit{LB}_{5}^{s}\right\} \tag{eq\_0066} \\
+  & \sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right) \geq 0 \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0067} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \left(C_{\text{RS}}^{\mathit{varphi}} - \mathit{LB}^{ \cdot }\right) \cdot \left(\sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right) \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0068} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} \cdot \left(1 - \sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right) \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0069} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \left[\sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right] \cdot \left[C_{\text{RS}}^{\mathit{varphi}} - \underset{l \in L}{max} \left(\underset{k^{'} \in H_{l}^{\mathit{varphi}}}{min} \left(t_{k^{'}}\right) + p_{l}^{' ' '}\right)\right] \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0070} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \left[\sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right] \cdot \left[\underset{l \in L}{max} \left(z_{l , \left|E\right|}^{\mathit{varphi}} - \left(\underset{k^{'} \in S_{l}^{\mathit{varphi}}}{max} \left(t_{k^{'}}\right) + p_{l}^{' ' '}\right)\right)\right] \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0071} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \overset{0}{\overset{︷}{\overset{0}{\overset{︷}{\left[\sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right]}} \cdot \left[C_{\text{RS}}^{\mathit{varphi}} - \underset{l \in L}{max} \left(\underset{k^{'} \in H_{l}^{\mathit{varphi}}}{min} \left(t_{k^{'}}\right) + p_{l}^{' ' '}\right)\right]}} \tag{eq\_0072} \\
+  & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \overset{0}{\overset{︷}{\overset{0}{\overset{︷}{\left[\sum_{k \in K} \sum_{l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right]}} \cdot \left[\underset{l \in L}{max} \left(z_{l , \left|E\right|}^{\mathit{varphi}} - \left(\underset{k^{'} \in S_{l}^{\mathit{varphi}}}{max} \left(t_{k^{'}}\right) + p_{l}^{' ' '}\right)\right)\right]}} \tag{eq\_0073} \\
+  & \mathit{LB}_{2} \left(e\right) = \frac{1}{\left|Q_{e}\right|} \left(\sum_{q_{e} \in Q_{e}} \text{LSA} \left(q_{e} , e\right) + \sum_{l \in L} p_{l , e}^{' ' '} + \sum_{q_{e} \in Q_{e}} \text{RSA} \left(q_{e} , e\right)\right) \tag{eq\_0075} \\
+  & \mathit{LB}_{3} \left(e\right) = \overset{\text{head}}{{\underset{l \in L}{min} \mathit{phi}_{l}}} + \overset{\text{body}}{\overset{︷}{\frac{\sum_{l \in L} p_{l , e}^{' ' '}}{\left|Q_{e}\right|}}} + \overset{\text{tail}}{{\underset{l \in L}{min} \mathit{theta}_{l}}} \tag{eq\_0076} \\
+\end{align}

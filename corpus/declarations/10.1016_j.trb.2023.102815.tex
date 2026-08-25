@@ -1,0 +1,171 @@
+% Declaration sidecar for 10.1016_j.trb.2023.102815
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2023.102815
+% Integrated optimization of rolling stock allocation and train timetables for urban rail transit networks: A benders decomposition approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2023.102815.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of rolling stock investment cost and passenger service quality deviation
+
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Objective function value (cost or service quality)
+
+% z: classified as variable during review
+%@ var z shape=D domain=integer role=primary drole=- lo=- hi=- :: Fleet size of rolling stock allocated to depot d
+
+% unusable as an identifier, rename or drop: λ
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of depots
+
+% x: classified as variable during review
+%@ var x shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc a is selected in train schedule
+
+% unusable as an identifier, rename or drop: α
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in space-time network
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of time periods
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: ω
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Maximum fleet size of rolling stock in network
+
+% r: classified as variable during review
+%@ var r shape=D,L domain=integer role=primary drole=- lo=- hi=- :: Fleet size of rolling stock assigned to line l from depot d
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of timestamps
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations on a line
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Space-time node
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: σ
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Arc index
+
+% c: classified as parameter during review
+%@ param c shape=D kind=vector domain=- :: Maximum capacity of depot d
+
+% F: classified as parameter during review
+%@ param F shape=L kind=vector domain=- :: Subproblem objective function for line l
+
+% unusable as an identifier, rename or drop: θ
+% r̂: classified as parameter during review
+%@ param r_hat shape=D,L kind=vector domain=- :: Given solution for r from master problem
+
+% y: classified as variable during review
+%@ var y shape=A domain=integer role=primary drole=- lo=- hi=- :: Cumulative flow variable for arc a
+
+% Â: classified as index during review
+%@ index A_hat ordered=0 cyclic=0 :: Set of arcs for cumulative flow at start of period
+
+% unusable as an identifier, rename or drop: γ
+% T̂: classified as index during review
+%@ index T_hat ordered=0 cyclic=0 :: Set of timestamps in a time period
+
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar domain=- :: Right-hand side vector in matrix form
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Loading capacity of each train
+
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Number of constraints in matrix form
+
+% Bound by a quantifier or big operator, so no declaration of their own: d, i, k, l, s, t, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0012 kind=linear domain=- indicator=- :: Total allocated fleet size must not exceed the maximum fleet size Z_max
+%@ con eq_0014 kind=linear domain=- indicator=- :: Rolling stock assigned from depot d to lines cannot exceed its allocated fleet z_d
+%@ con eq_0018 kind=linear domain=- indicator=- :: Cumulative train flow on line l up to time t cannot exceed rolling stock assigned from depot d
+%@ con eq_0019 kind=linear domain=- indicator=- :: Rolling stock balance: fleet size at the end of horizon equals that at the beginning
+%@ con eq_0020 kind=linear domain=- indicator=- :: Flow balance at each space-time node for selected train arcs
+%@ con eq_0023 kind=linear domain=- indicator=- :: At most one departure from each station platform within each headway window
+%@ con eq_0024 kind=linear domain=- indicator=- :: At most one arrival at each station platform within each headway window
+%@ con eq_0025 kind=linear domain=- indicator=- :: Service quality deviation phi is at least the shortfall of scheduled services versus expected demand
+%@ con eq_0026 kind=linear domain=- indicator=- :: Service quality deviation phi is at least the excess of scheduled services over expected demand
+%@ con eq_0027 kind=linear domain=- indicator=- :: Train schedule arc selection variables x_a are binary
+%@ con eq_0028 kind=linear domain=- indicator=- :: Service quality deviation variables phi are nonnegative
+%@ con eq_0029 kind=linear domain=- indicator=- :: Rolling stock allocation variables z_d are integers within depot capacity c_d
+%@ con eq_0032 kind=linear domain=- indicator=- :: Subproblem rolling stock usage on line l cannot exceed the allocated fleet from master problem
+%@ con eq_0033 kind=linear domain=- indicator=- :: Subproblem rolling stock balance at the end of the horizon
+%@ con eq_0034 kind=linear domain=- indicator=- :: Subproblem flow balance at each space-time node
+%@ con eq_0037_a kind=linear domain=- indicator=- :: Subproblem departure headway constraint (first variant)
+%@ con eq_0037_b kind=linear domain=- indicator=- :: Subproblem departure headway constraint (second variant)
+%@ con eq_0037_c kind=linear domain=- indicator=- :: Subproblem arrival headway constraint (first variant)
+%@ con eq_0037_d kind=linear domain=- indicator=- :: Subproblem arrival headway constraint (second variant)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Subproblem service quality lower bound on phi
+%@ con eq_0040 kind=linear domain=- indicator=- :: Subproblem service quality upper bound on phi
+%@ con eq_0041 kind=linear domain=- indicator=- :: Subproblem train arc selection variables x_a are binary
+%@ con eq_0042 kind=linear domain=- indicator=- :: Subproblem service quality deviation variables phi are nonnegative
+%@ con eq_0043 kind=linear domain=- indicator=- :: Cumulative flow rolling stock usage on line l cannot exceed allocated fleet
+%@ con eq_0044 kind=linear domain=- indicator=- :: Cumulative flow rolling stock balance at end of horizon
+%@ con eq_0045 kind=linear domain=- indicator=- :: Cumulative flow balance at each space-time node
+%@ con eq_0046 kind=linear domain=- indicator=- :: Cumulative departure headway: at most one train between time t and t+t_head
+%@ con eq_0047 kind=linear domain=- indicator=- :: Cumulative arrival headway: at most one train between time t and t+t_head
+%@ con eq_0048 kind=linear domain=- indicator=- :: Adjacent arc ordering: cumulative flow y_a - y_{a'} >= 0 for consecutive arcs
+%@ con eq_0049 kind=linear domain=- indicator=- :: Cumulative service quality lower bound on phi
+%@ con eq_0050 kind=linear domain=- indicator=- :: Cumulative service quality upper bound on phi
+%@ con eq_0051 kind=linear domain=- indicator=- :: Cumulative flow variables y_a are nonnegative integers
+%@ con eq_0052 kind=linear domain=- indicator=- :: Cumulative service quality deviation variables phi are nonnegative
+%@ con eq_0054 kind=linear domain=- indicator=- :: Binding constraint fixing master rolling stock solution in Benders subproblem
+%@ con eq_0055 kind=linear domain=- indicator=- :: Benders optimality cut: theta_l >= subproblem objective plus dual correction
+%@ con eq_0056 kind=linear domain=- indicator=- :: Dual variable definition for binding rolling stock constraint
+%@ con eq_0057 kind=linear domain=- indicator=- :: Dual variable definition for network flow constraints
+%@ con eq_0058 kind=linear domain=- indicator=- :: Dual variable definition for headway constraints
+%@ con eq_0059 kind=linear domain=- indicator=- :: Dual variable definition for service quality constraints
+%@ con eq_0060 kind=linear domain=- indicator=- :: Dual variable sign restriction for less-than-or-equal constraints
+%@ con eq_0061 kind=linear domain=- indicator=- :: Dual variable sign restriction for greater-than-or-equal constraints
+%@ con eq_0062 kind=linear domain=- indicator=- :: Dual variable unrestricted sign for equality constraints
+%@ con eq_0063 kind=linear domain=- indicator=- :: Dual objective expression for Benders subproblem
+%@ con eq_0071 kind=linear domain=- indicator=- :: Benders cut added to master problem for line l
+%@ con eq_0073 kind=linear domain=- indicator=- :: Master problem objective: weighted investment cost plus service quality
+%@ con eq_0074 kind=linear domain=- indicator=- :: Master problem total fleet size constraint
+%@ con eq_0075 kind=linear domain=- indicator=- :: Master problem depot capacity assignment constraint
+%@ con eq_0076 kind=linear domain=- indicator=- :: Master problem coupling: theta_l bounded below by subproblem value
+%@ con eq_0077 kind=linear domain=- indicator=- :: Master problem integrality of z_d and r_{d,l}
+%@ con eq_0078_a kind=linear domain=- indicator=- :: Master problem rolling stock assignment variable bounds (part a)
+%@ con eq_0078_b kind=linear domain=- indicator=- :: Master problem rolling stock assignment variable bounds (part b)
+%@ con eq_0079 kind=linear domain=- indicator=- :: Dual value gamma for binding constraint in Benders cut
+%@ con eq_0081 kind=linear domain=- indicator=- :: Linear relaxation of row for integrality property proof
+%@ con eq_0083 kind=linear domain=- indicator=- :: Reformulated constraint in cumulative flow model
+%@ con eq_0084 kind=linear domain=- indicator=- :: Reformulated headway constraint in cumulative flow model
+%@ con eq_0085_a kind=linear domain=- indicator=- :: Reformulated flow balance constraint (direction a)
+%@ con eq_0085_b kind=linear domain=- indicator=- :: Reformulated flow balance constraint (direction b)
+%@ con eq_0087 kind=linear domain=- indicator=- :: Feasibility of line subproblem for any rolling stock allocation
+%@ con eq_0088 kind=linear domain=- indicator=- :: Boundedness of line subproblem objective
+%@ con eq_0089_a kind=linear domain=- indicator=- :: Benders cut separation constraint (part a)
+%@ con eq_0089_b kind=linear domain=- indicator=- :: Benders cut separation constraint (part b)
+%@ con eq_0089_c kind=linear domain=- indicator=- :: Benders cut separation constraint (part c)
+%@ con eq_0089_d kind=linear domain=- indicator=- :: Benders cut separation constraint (part d)
+%@ con eq_0090_a kind=linear domain=- indicator=- :: Optimality cut aggregated over depots (part a)
+%@ con eq_0090_b kind=linear domain=- indicator=- :: Optimality cut aggregated over depots (part b)

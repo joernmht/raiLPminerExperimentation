@@ -1,0 +1,66 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2010.09.001
+%@ meta id=10.1016_j.trb.2010.09.001 family=milp schema=0.1.0
+%@ name :: Optimizing the demand captured by a railway system with a regular timetable
+%@ desc :: Mined from Optimizing the demand captured by a railway system with a regular timetable (Transportation Research Part B Methodological, 2010).
+%@ prov source :: 10.1016/j.trb.2010.09.001
+%@ prov reference :: Optimizing the demand captured by a railway system with a regular timetable
+%@ prov author :: Roberto Cordone; F. Redaelli
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize total demand captured by the railway over all O/D pairs
+%@ index C ordered=0 cyclic=0 :: Cycle in the event-activity network
+%@ var x shape=A domain=continuous role=primary drole=- lo=- hi=- :: Time span between events for each arc a in A
+%@ param Pq shape=- kind=scalar domain=- :: Product of period P and integer cycle variable q_C
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the event-activity network
+%@ param l shape=A kind=vector domain=- :: Lower bound on arc time variable x_a
+%@ param u shape=A kind=vector domain=- :: Upper bound on arc time variable x_a
+%@ param h shape=C kind=vector domain=- :: Lower bound on cycle integer variable q_C
+%@ param k shape=C kind=vector domain=- :: Upper bound on cycle integer variable q_C
+%@ var q shape=C domain=integer role=primary drole=- lo=- hi=- :: Integer variable associated to each cycle C
+%@ index R ordered=0 cyclic=0 :: Set of real numbers (domain for x_a)
+%@ index Z ordered=0 cyclic=0 :: Set of integers (domain for q_C)
+%@ index P ordered=0 cyclic=0 :: Period of the regular timetable
+%@ var t shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Trip time for an O/D pair on its predefined path
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total captured demand)
+%@ var lambda shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Captured demand for an O/D pair
+%@ index S ordered=0 cyclic=0 :: Set of stations (origins/destinations)
+%@ param tbar shape=S,S kind=matrix domain=- :: Upper bound on trip time for an O/D pair
+%@ con eq_0001 kind=linear domain=- indicator=- :: Trip time definition: t_od = sum_{a in P_od} x_a
+%@ con eq_0002 kind=linear domain=- indicator=- :: Logit demand–trip time relation between λ_od and t_od
+%@ con eq_0003 kind=linear domain=- indicator=- :: Periodicity constraint around each cycle: cycle sum equals P q_C
+%@ con eq_0004 kind=linear domain=- indicator=- :: Lower bound on arc time variables: x_a >= l_a
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upper bound on arc time variables: x_a <= u_a
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Lower bound on cycle integer variables: q_C >= h_C
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Upper bound on cycle integer variables: q_C <= k_C
+%@ con eq_0008 kind=linear domain=- indicator=- :: Integrality of cycle integer variables: q_C in Z
+%@ con eq_0013 kind=linear domain=- indicator=- :: Trip time bounds from arc bounds: t̲_od <= t_od <= t̄_od
+%@ con eq_0019_a kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at lower trip time
+%@ con eq_0019_b kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at upper/inflection trip time
+%@ con eq_0019_c kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by secant between extreme trip times
+%@ param tlow shape=- domain=- role=parameter drole=- lo=- hi=- :: Lower bound on t_{o,d}
+%@ index OD
+%@ param Cplus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: positive arcs of cycle C
+%@ param Cminus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: negative arcs of cycle C
+%@ var v shape=\mathcal{C} domain=integer role=auxiliary drole=- lo=- hi=- :: integer auxiliary for q
+%@ var tup shape=\mathcal{OD} domain=continuous role=auxiliary drole=- lo=- hi=- :: upper bound on travel time
+\begin{align}
+  & \sum_{a \in Cplus_{C}} x_{a} - \sum_{a \in Cminus_{C}} x_{a} = \mathit{Pq}_{C} \qquad \forall C \in \mathcal{C} \tag{eq\_0001} \\
+  & l_{a} \leq x_{a} \qquad \forall a \in A \tag{eq\_0002\_a} \\
+  & x_{a} \leq u_{a} \qquad \forall a \in A \tag{eq\_0002\_b} \\
+  & h_{C} \leq q_{C} \qquad \forall C \in \mathcal{C} \tag{eq\_0003\_a} \\
+  & q_{C} \leq k_{C} \qquad \forall C \in \mathcal{C} \tag{eq\_0003\_b} \\
+  & x_{a} - x_{a} = 0 \qquad \forall a \in A \tag{eq\_0004} \\
+  & q_{C} = v_{C} \qquad \forall C \in \mathcal{C} \tag{eq\_0005} \\
+  & h_{C} = \left\lceil\frac{\sum_{a \in Cplus_{C}} l_{a} - \sum_{a \in Cminus_{C}} u_{a}}{P}\right\rceil \qquad \forall C \in \mathcal{C} \tag{eq\_0006\_a} \\
+  & k_{C} = \left\lfloor\frac{\sum_{a \in Cplus_{C}} u_{a} - \sum_{a \in Cminus_{C}} l_{a}}{P}\right\rfloor \qquad \forall C \in \mathcal{C} \tag{eq\_0006\_b} \\
+  & t_{o,d} = \sum_{a \in P_{o,d}} x_{a} \qquad \forall o \in \mathcal{S}, d \in \mathcal{S} \tag{eq\_0008} \\
+  \max\quad & \sum_{o \in \mathcal{S}, d \in \mathcal{S}} \mathit{lambda}_{\mathit{od}} \tag{eq\_0011} \\
+  & t_{o,d} = \sum_{a \in P_{o,d}} x_{a} \qquad \forall o \in \mathcal{S}, d \in \mathcal{S} \tag{eq\_0013} \\
+  & t_{\mathit{od}} = \sum_{a \in P_{\mathit{od}}} x_{a} \qquad \forall \mathit{od} \in \mathcal{OD} \tag{eq\_0019\_a} \\
+  & l_{a} \leq x_{a} \qquad \forall a \in A \tag{eq\_0019\_b} \\
+  & x_{a} \leq u_{a} \qquad \forall a \in A \tag{eq\_0019\_c} \\
+  & tlow_{\mathit{od}} = \sum_{a \in P_{\mathit{od}}} l_{a} \qquad \forall \mathit{od} \in \mathcal{OD} \tag{eq\_0019\_d} \\
+  & tlow_{\mathit{od}} \leq t_{\mathit{od}} \qquad \forall \mathit{od} \in \mathcal{OD} \tag{eq\_0019\_e} \\
+  & t_{\mathit{od}} \leq \sum_{a \in P_{\mathit{od}}} u_{a} \qquad \forall \mathit{od} \in \mathcal{OD} \tag{eq\_0019\_f} \\
+  & \sum_{a \in P_{\mathit{od}}} u_{a} = tup_{\mathit{od}} \qquad \forall \mathit{od} \in \mathcal{OD} \tag{eq\_0019\_g} \\
+\end{align}

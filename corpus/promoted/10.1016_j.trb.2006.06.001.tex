@@ -1,0 +1,98 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2006.06.001
+%@ meta id=10.1016_j.trb.2006.06.001 family=milp schema=0.1.0
+%@ name :: N-tracked railway traffic re-scheduling during disturbances
+%@ desc :: Mined from N-tracked railway traffic re-scheduling during disturbances (Transportation Research Part B Methodological, 2006).
+%@ prov source :: 10.1016/j.trb.2006.06.001
+%@ prov reference :: N-tracked railway traffic re-scheduling during disturbances
+%@ prov author :: Johanna Törnquist; Jan Persson
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimise total final delay (1a) or weighted delay cost (1b)
+%@ var z shape=k domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event k
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index k ordered=0 cyclic=0 :: Event index
+%@ var x shape=k domain=non_negative role=primary drole=- lo=- hi=- :: Start or end time of event k
+%@ param K shape=T kind=vector domain=- :: Set of events for train i
+%@ param n shape=T kind=vector domain=- :: Last event index for train i
+%@ param E shape=- kind=scalar domain=- :: Set of all events
+%@ param d shape=k kind=vector domain=- :: Minimum running time for event k
+%@ param b shape=k kind=vector domain=- :: Earliest start time or static start time for event k
+%@ param h shape=k kind=vector domain=- :: Indicator if event k has a planned stop
+%@ param e shape=k kind=vector domain=- :: Initial or static end time for event k
+%@ param B shape=- kind=scalar domain=- :: Set of segments
+%@ param L shape=j kind=vector domain=- :: Set of events on segment j
+%@ index j ordered=0 cyclic=0 :: Segment index
+%@ var q shape=k,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k uses track t
+%@ index P ordered=0 cyclic=0 :: Set of tracks on segment j
+%@ index k_hat ordered=0 cyclic=0 :: Another event index
+%@ var gamma shape=k,k_hat domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k occurs before event k_hat as in initial timetable
+%@ var lambda shape=k,k_hat domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if event k is re-scheduled after event k_hat
+%@ param o shape=k kind=vector domain=- :: Train origin for event k
+%@ param M shape=- kind=big_m domain=- :: Large constant
+%@ param Delta shape=j kind=vector domain=- :: Minimum headway time between events on segment j
+%@ param g shape=k,k_bar kind=matrix domain=- :: Connection time (or train/track attribute, overloaded)
+%@ param w shape=T kind=vector domain=- :: Threshold delay for train i
+%@ var epsilon shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train i has delay larger than w_i
+%@ index k_bar ordered=0 cyclic=0 :: Another event index for connections
+%@ param Omega shape=- kind=scalar domain=- :: Set of events of disturbed train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Succession of consecutive events of a train
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum running time for each event
+%@ con eq_0006 kind=linear domain=- indicator=- :: Earliest start time after planned stop
+%@ con eq_0007 kind=linear domain=- indicator=- :: Fix start times of events already started
+%@ con eq_0008 kind=linear domain=- indicator=- :: Fix end times of events already ended
+%@ con eq_0009 kind=linear domain=- indicator=- :: Define delay of event k
+%@ con eq_0010 kind=capacity domain=- indicator=- :: Each event assigned exactly one track on its segment
+%@ con eq_0011 kind=linear domain=- indicator=- :: Track conflict resolved by ordering variables
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Headway when event k before k_hat, different origins
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Headway when event k before k_hat, same origin
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Headway when event k re-scheduled after k_hat, different origins
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Headway when event k re-scheduled after k_hat, same origin
+%@ con eq_0016 kind=ordering domain=- indicator=- :: Ordering variables mutually exclusive
+%@ con eq_0017 kind=capacity domain=- indicator=- :: Train/track compatibility
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Activate epsilon_i if final delay exceeds threshold
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum connection time between connecting events
+%@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegativity of event times and delays
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary ordering variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary track assignment variables
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary delay-threshold variables
+%@ con eq_0024 kind=ordering domain=- indicator=- :: Initial train sequence maintained (Strategy 1)
+%@ con eq_0025 kind=ordering domain=- indicator=- :: Disallow reordered overtaking (Strategy 1)
+%@ con eq_0026 kind=ordering domain=- indicator=- :: Limit reordering around disturbed train (Strategy 3)
+%@ con eq_0027 kind=ordering domain=- indicator=- :: Swaps only with events following disturbed train (Strategy 3)
+%@ index khat set=L_j
+%@ index kbar shape=- domain=- role=index drole=- lo=- hi=- :: bar k
+%@ var xbegin shape=- domain=continuous role=variable drole=- lo=- hi=- :: begin time
+%@ var xend shape=- domain=continuous role=variable drole=- lo=- hi=- :: end time
+%@ param binitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial b
+%@ param einitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial e
+%@ param gtrain shape=- domain=- role=parameter drole=- lo=- hi=- :: train capacity g
+%@ param gtrack shape=- domain=- role=parameter drole=- lo=- hi=- :: track capacity g
+%@ param gconn shape=- domain=- role=parameter drole=- lo=- hi=- :: connection time g
+%@ param Econn shape=- domain=- role=set drole=- lo=- hi=- :: connection set
+\begin{align}
+  \min\quad & \sum_{i \in T} z_{n_{i}} \tag{eq\_0002} \\
+  & x_{k}^{\text{end}} = x_{k + 1}^{\text{begin}} , k \in K_{i} , i \in T : k \neq n_{i} , \tag{eq\_0004} \\
+  & xend_{k} \geq xbegin_{k} + d_{k} \qquad \forall k \in E \tag{eq\_0005} \\
+  & xbegin_{k} \geq binitial_{k} \qquad \forall k \in E : h_{k} = 1 \tag{eq\_0006} \\
+  & x_{k}^{\text{begin}} = b_{k}^{\text{static}} , k \in E : b_{k}^{\text{static}} > 0 , \tag{eq\_0007} \\
+  & x_{k}^{\text{end}} = e_{k}^{\text{static}} , k \in E : e_{k}^{\text{static}} > 0 , \tag{eq\_0008} \\
+  & xend_{k} - einitial_{k} \leq z_{k} \qquad \forall k \in E \tag{eq\_0009} \\
+  & \sum_{t \in P_{j}} q_{k,t} = 1 \qquad \forall k \in L_{j}, j \in B \tag{eq\_0010} \\
+  & q_{k,t} + q_{khat,t} - 1 \leq \mathit{lambda}_{k,khat} + \mathit{gamma}_{k,khat} \qquad \forall k, khat \in L_{j}, t \in P_{j}, j \in B : k < khat \tag{eq\_0011} \\
+  & xbegin_{khat} - xend_{k} \geq \mathit{Delta}_{j}^{M} \cdot \mathit{gamma}_{k,khat} - M \cdot (1 - \mathit{gamma}_{k,khat}) \qquad \forall k, khat \in L_{j}, j \in B : k < khat, o_{khat} \neq o_{k} \tag{eq\_0012} \\
+  & xbegin_{khat} - xend_{k} \geq \mathit{Delta}_{j}^{F} \cdot \mathit{gamma}_{k,khat} - M \cdot (1 - \mathit{gamma}_{k,khat}) \qquad \forall k, khat \in L_{j}, j \in B : k < khat, o_{khat} = o_{k} \tag{eq\_0013} \\
+  & xbegin_{k} - xend_{khat} \geq \mathit{Delta}_{j}^{M} \cdot \mathit{lambda}_{k,khat} - M \cdot (1 - \mathit{lambda}_{k,khat}) \qquad \forall k, khat \in L_{j}, j \in B : k < khat, o_{khat} \neq o_{k} \tag{eq\_0014} \\
+  & xbegin_{k} - xend_{khat} \geq \mathit{Delta}_{j}^{F} \cdot \mathit{lambda}_{k,khat} - M \cdot (1 - \mathit{lambda}_{k,khat}) \qquad \forall k, khat \in L_{j}, j \in B : k < khat, o_{khat} = o_{k} \tag{eq\_0015} \\
+  & \mathit{lambda}_{k,khat} + \mathit{gamma}_{k,khat} \leq 1 \qquad \forall k, khat \in L_{j}, j \in B : k < khat \tag{eq\_0016} \\
+  & gtrain_{i} \cdot q_{k,t} \leq gtrack_{j,t} \qquad \forall k \in (K_{i} \cap L_{j}), t \in P_{j}, j \in B, i \in T \tag{eq\_0017} \\
+  & z_{i} - w_{i} \leq M \cdot \mathit{epsilon}_{i} \qquad \forall i \in T \tag{eq\_0018} \\
+  & xbegin_{kbar} - xend_{k} \geq gconn_{k,kbar} \qquad \forall k, kbar \in E : (k, kbar) \in Econn \tag{eq\_0019} \\
+  & x_{k}^{\text{begin}} , x_{k}^{\text{end}} , z_{k} \geq 0 , k \in E , \tag{eq\_0020} \\
+  & \mathit{gamma}_{k \hat{k}} , \mathit{lambda}_{k \hat{k}} \in \left\{0 , 1\right\} , k , \hat{k} \in L_{j} , j \in B : k < \hat{k} , \tag{eq\_0021} \\
+  & q_{\mathit{kt}} \in \left\{0 , 1\right\} , k \in L_{j} , t \in P_{j} , j \in B , \tag{eq\_0022} \\
+  & \mathit{epsilon}_{i} \in \left\{0 , 1\right\} , i \in T . \tag{eq\_0023} \\
+  & x_{k}^{\text{begin}} \leq x_{\hat{k}}^{\text{begin}} , k , \hat{k} \in L_{j} , j \in B : k < \hat{k} , \tag{eq\_0024} \\
+  & \mathit{lambda}_{k \hat{k}} = 0 , k , \hat{k} \in L_{j} , j \in B : k < \hat{k} . \tag{eq\_0025} \\
+  & \mathit{lambda}_{k \hat{k}} = 0 , k , \hat{k} \in L_{j} , j \in B : k \notin \mathit{Omega} , k < \hat{k} , \tag{eq\_0026} \\
+  & \mathit{lambda}_{k \hat{k}} = 0 , k , \hat{k} \in L_{j} , k \in \mathit{Omega} , j \in B : \hat{k} \notin \mathit{Omega}_{k} , k < \hat{k} . \tag{eq\_0027} \\
+\end{align}

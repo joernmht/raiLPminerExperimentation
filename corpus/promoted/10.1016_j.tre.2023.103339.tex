@@ -1,0 +1,177 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2023.103339
+%@ meta id=10.1016_j.tre.2023.103339 family=milp schema=0.1.0
+%@ name :: Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles
+%@ desc :: Mined from Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles (Transportation Research Part E Logistics and Transportation Review, 2023).
+%@ prov source :: 10.1016/j.tre.2023.103339
+%@ prov reference :: Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles
+%@ prov author :: Xiaoyu Liu; Azita Dabiri; Jing Xun; Bart De Schutter
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger travel time and energy consumption in bi-level MPC
+%@ index k ordered=0 cyclic=0 :: Time phase index for the higher-level model
+%@ index S ordered=0 cyclic=0 :: Set of all stations in the network
+%@ index p ordered=0 cyclic=0 :: Line platform index
+%@ index q ordered=0 cyclic=0 :: Line platform index for transfers and shared-platform interactions
+%@ index e ordered=0 cyclic=0 :: Destination station index
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index j ordered=0 cyclic=0 :: Train index for depot departures and ordering
+%@ index b ordered=0 cyclic=0 :: Train speed profile option index
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ index cop ordered=0 cyclic=0 :: Line platforms at the same station as p
+%@ index P ordered=0 cyclic=0 :: Set of all line platforms
+%@ index phy ordered=0 cyclic=0 :: Line platforms using same physical platform as p
+%@ index Z ordered=0 cyclic=0 :: Set of depots
+%@ index z ordered=0 cyclic=0 :: Depot index
+%@ index in ordered=0 cyclic=0 :: Line platforms corresponding to entering link of depot
+%@ index out ordered=0 cyclic=0 :: Lines corresponding to output link of depot
+%@ index N ordered=0 cyclic=0 :: Number of phases in prediction horizon
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index J ordered=0 cyclic=0 :: Set of trains departing from output link of depot
+%@ index B ordered=0 cyclic=0 :: Set of speed profile options for train i at line platform p
+%@ index V ordered=0 cyclic=0 :: Set of line platforms that train i will visit
+%@ param rho shape=p,e,k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
+%@ param lambda shape=p,e,k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
+%@ param T shape=- kind=scalar domain=- :: Length of time step for the absorption model
+%@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
+%@ param chi shape=p,q,e kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
+%@ param sta shape=p kind=vector domain=- :: Station corresponding to line platform p
+%@ param t shape=q,p kind=matrix domain=- :: Mean transfer time from line platform q to p
+%@ param gamma shape=p,k kind=matrix domain=- :: Mean time of trains from depot to line platform
+%@ param h shape=p kind=vector domain=- :: Minimum departure-arrival headway at line platform
+%@ param sigma shape=p,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive value
+%@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
+%@ param eta shape=- kind=scalar domain=- :: Weight for energy consumption in objective
+%@ param epsilon shape=- kind=tolerance domain=- :: Sufficiently small number
+%@ param m shape=- kind=scalar domain=- :: Minimum value of a variable
+%@ param pt shape=i,l kind=matrix domain=- :: Preceding train of train i at line
+%@ param A shape=- kind=scalar domain=- :: State matrix in MLD model
+%@ param D shape=- kind=scalar domain=- :: Matrix in MLD inequality constraints
+%@ param zeta shape=- kind=scalar domain=- :: Weighting factor for departure time deviation
+%@ param s shape=p kind=vector domain=- :: Station corresponding to line platform
+%@ var n shape=p,e,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
+%@ var C shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
+%@ var f shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
+%@ var r shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train from line platform to succeeding
+%@ var u shape=l,k domain=non_negative role=primary drole=- lo=- hi=- :: Departure frequency from depot for line
+%@ var beta shape=p,k domain=integer role=primary drole=- lo=- hi=- :: Number of phases for trains from depot to line platform
+%@ var phi shape=p,k domain=continuous role=primary drole=- lo=- hi=- :: Remainder of gamma/T
+%@ var tau shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train at line platform
+%@ var a shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at line platform
+%@ var d shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train at line platform
+%@ var y shape=i,j,l,p domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j departs before train i
+%@ var x shape=i,p,b domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating speed profile selection
+%@ var xi shape=i,j,p,q domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of trains from different lines
+%@ var E shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Vector of optimized control inputs over horizon
+%@ var w shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
+%@ var delta shape=k,p domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for absorption transformation
+%@ con eq_0001 kind=linear domain=- indicator=- :: Passenger arrival rate at line platform
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger flow balance at line platform
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passengers absorbed by trains at platform
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total boardings as minimum of remaining capacity and waiting passengers
+%@ con eq_0005 kind=linear domain=- indicator=- :: Total passengers wanting to board at platform
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Total stranded passengers per line platform
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Total passenger arrival rate per line platform
+%@ con eq_0006_c kind=linear domain=- indicator=- :: Total transfer arrivals per line platform
+%@ con eq_0007 kind=linear domain=- indicator=- :: Remaining train capacity at line platform
+%@ con eq_0008 kind=linear domain=- indicator=- :: On-board passengers arriving from preceding platform
+%@ con eq_0009 kind=linear domain=- indicator=- :: Transfer passengers from line platform p to q
+%@ con eq_0010 kind=linear domain=- indicator=- :: Alighting passengers at platform or destination station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Departing passengers after boarding and alighting
+%@ con eq_0012 kind=linear domain=- indicator=- :: Transfer passengers arriving at platform from other platforms
+%@ con eq_0013 kind=linear domain=- indicator=- :: Integer part of depot-to-platform travel time in phases
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure frequency at platform from depot frequency
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum departure frequency at platform
+%@ con eq_0017 kind=linear domain=- indicator=- :: Physical platform headway and dwell capacity constraint
+%@ con eq_0018 kind=linear domain=- indicator=- :: Depot rolling stock balance
+%@ con eq_0019 kind=linear domain=- indicator=- :: Nonnegativity of trains available at depot
+%@ con eq_0021 kind=linear domain=- indicator=- :: Dwell time bounds at platform
+%@ con eq_0022 kind=linear domain=- indicator=- :: Arrival time from preceding departure and running time
+%@ con eq_0023 kind=linear domain=- indicator=- :: Definition of train order binary variable y
+%@ con eq_0024 kind=linear domain=- indicator=- :: Lower-level rolling stock circulation constraint
+%@ con eq_0025 kind=linear domain=- indicator=- :: Running time bounds between platforms
+%@ con eq_0026 kind=linear domain=- indicator=- :: Running time as weighted sum of speed profile options
+%@ con eq_0027 kind=linear domain=- indicator=- :: Exactly one speed profile selected per train and platform
+%@ con eq_0028 kind=linear domain=- indicator=- :: Same-line headway constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Definition of cross-line train order binary variable xi
+%@ con eq_0030 kind=linear domain=- indicator=- :: Cross-line headway constraint for shared physical platforms
+%@ con eq_0031 kind=linear domain=- indicator=- :: Train order consistency constraint
+%@ con eq_0032 kind=linear domain=- indicator=- :: Passenger travel time cost term
+%@ con eq_0033 kind=linear domain=- indicator=- :: Higher-level MPC objective with passenger cost and energy penalty
+%@ con eq_0034 kind=linear domain=- indicator=- :: Big-M reformulation of absorption min condition
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized passenger boarding count
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Linearization of binary-continuous product, part a
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Linearization of binary-continuous product, part b
+%@ con eq_0037 kind=linear domain=- indicator=- :: Higher-level MPC reformulated as MILP state and inequality constraints
+%@ con eq_0038_a kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part a
+%@ con eq_0038_b kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part b
+%@ con eq_0038_c kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part c
+%@ con eq_0038_d kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part d
+%@ con eq_0039_a kind=linear domain=- indicator=- :: MILP reformulation component a
+%@ con eq_0039_b kind=linear domain=- indicator=- :: MILP reformulation component b
+%@ con eq_0039_c kind=linear domain=- indicator=- :: MILP reformulation component c
+%@ con eq_0040 kind=linear domain=- indicator=- :: Optimized control sequence over the prediction horizon
+%@ con eq_0041 kind=linear domain=- indicator=- :: Energy consumption of train from selected speed profile
+%@ con eq_0042 kind=linear domain=- indicator=- :: Lower-level objective with energy consumption and departure headway deviation
+%@ con eq_0043 kind=linear domain=- indicator=- :: Lower-level MPC optimization problem
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linear reformulation of cross-line train order binary
+%@ con eq_0046_a kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint a
+%@ con eq_0046_b kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint b
+%@ con eq_0066 kind=linear domain=- indicator=- :: Constraint 66 from the paper
+\begin{align}
+  & \mathit{rho}_{p , e} \left(k\right) = \mathit{lambda}_{s_{p} , p , e} \left(k\right) \mathit{rho}_{s_{p} , e}^{station} \left(k\right) , \tag{eq\_0001} \\
+  & n_{p , e} \left(k + 1\right) = n_{p , e} \left(k\right) + \mathit{rho}_{p , e} \left(k\right) T + n_{p , e}^{trans,arrive} \left(k\right) - n_{p , e}^{absorb} \left(k\right) , \tag{eq\_0002} \\
+  & n_{p , e}^{absorb} \left(k\right) = \mathit{alpha}_{p , e} \left(k\right) n_{p}^{absorb} \left(k\right) , \tag{eq\_0003} \\
+  & n_{p}^{absorb} \left(k\right) = min \left(C_{p} \left(k\right) , n_{p}^{want} \left(k\right)\right) , \tag{eq\_0004} \\
+  & n_{p}^{want} \left(k\right) = n_{p} \left(k\right) + \mathit{rho}_{p} \left(k\right) T + n_{p}^{trans,arrive} \left(k\right) , \tag{eq\_0005} \\
+  & n_{p} \left(k\right) = \sum_{e \in \mathcal{S}} n_{p , e} \left(k\right) \tag{eq\_0006\_a} \\
+  & \mathit{rho}_{p} \left(k\right) = \sum_{e \in \mathcal{S}} \mathit{rho}_{p , e} \left(k\right) \tag{eq\_0006\_b} \\
+  & n_{p}^{trans,arrive} \left(k\right) = \sum_{e \in \mathcal{S}} n_{p , e}^{trans,arrive} \left(k\right) \tag{eq\_0006\_c} \\
+  & C_{p} \left(k\right) = f_{p} \left(k\right) \cdot C_{train} - \sum_{e \in \mathcal{S}} n_{p , e}^{on-board} \left(k\right) + \sum_{e \in \mathcal{S}} n_{p , e}^{alight} \left(k\right) , \tag{eq\_0007} \\
+  & n_{p , e}^{on-board} \left(k\right) = \frac{T - {r}_{p^{pla} \left(p\right)}}{T} n_{p^{pla} \left(p\right) , e}^{depart} \left(k\right) + \frac{{r}_{p^{pla} \left(p\right)}}{T} n_{p^{pla} \left(p\right) , e}^{depart} \left(k - 1\right) , \tag{eq\_0008} \\
+  & n_{p , q , e}^{transfer} \left(k\right) = \mathit{chi}_{p , q , e} \cdot n_{p , e}^{on-board} \left(k\right) , \forall q \in cop \left(p\right) \backslash \left\{p\right\} , \tag{eq\_0009} \\
+  & n_{p , e}^{alight} \left(k\right) = \left\{\begin{matrix} \sum_{q \in cop \left(p\right)} n_{p , q , e}^{transfer} \left(k\right) , if e \in \mathcal{S} \backslash \left\{sta \left(p\right)\right\} , \\ n_{p , e}^{on-board} \left(k\right) , if e = sta \left(p\right) , \end{matrix}\right \tag{eq\_0010} \\
+  & n_{p , e}^{depart} \left(k\right) = n_{p , e}^{on-board} \left(k\right) - n_{p , e}^{alight} \left(k\right) + n_{p , e}^{absorb} \left(k\right) , \tag{eq\_0011} \\
+  & n_{p , e}^{trans,arrive} \left(k\right) = \sum_{q \in cop \left(p\right) \backslash \left\{p\right\}} \left(\frac{T - t_{q , p}^{transfer}}{T} n_{q , p , e}^{transfer} \left(k\right) + \frac{t_{q , p}^{transfer}}{T} n_{q , p , e}^{transfer} \left(k - 1\right)\right) , \tag{eq\_0012} \\
+  & \mathit{beta}_{p} \left(k\right) = \left⌊\frac{\mathit{gamma}_{p} \left(k\right)}{T}\right⌋ , \tag{eq\_0013} \\
+  & \mathit{phi}_{p} \left(k\right) = \mathit{gamma}_{p} \left(k\right) - \mathit{beta}_{p} \left(k\right) T , \tag{eq\_0015} \\
+  & f_{p} \left(k\right) = \frac{T - \mathit{phi}_{p} \left(k\right)}{T} u_{\mathit{ell}} \left(k - \mathit{beta}_{p} \left(k\right)\right) + \frac{\mathit{phi}_{p} \left(k\right)}{T} u_{\mathit{ell}} \left(k - \mathit{beta}_{p} \left(k\right) - 1\right) , p \in \mathcal{P}_{\mathit{ell}} , \tag{eq\_0016} \\
+  & f_{p} \left(k\right) \geq f_{min} , \tag{eq\_0017} \\
+  & \sum_{p^{'} \in phy \left(p\right)} f_{p^{'}} \left(k\right) \left(h_{p}^{min} + \mathit{tau}_{p}^{min}\right) \leq T , \tag{eq\_0018} \\
+  & \mathit{theta}_{z} \left(k\right) = \mathit{theta}_{z} \left(k - 1\right) + \sum_{p \in in \left(z\right)} f_{p} \left(k\right) - \sum_{\mathit{ell} \in out \left(z\right)} u_{\mathit{ell}} \left(k\right) , \forall z \in \mathcal{Z} \tag{eq\_0019} \\
+  & \mathit{theta}_{z} \left(k\right) \geq 0 , \forall z \in \mathcal{Z} , \tag{eq\_0021} \\
+  & d_{i , p} = a_{i , p} + \mathit{tau}_{i , p} , \tag{eq\_0022} \\
+  & \mathit{tau}_{p}^{min} \leq \mathit{tau}_{i , p} \leq \mathit{tau}_{p}^{max} , \tag{eq\_0023} \\
+  & a_{i , p} = d_{i , p^{pla} \left(p\right)} + r_{i , p^{pla} \left(p\right)} , \tag{eq\_0024} \\
+  & y_{i , j , \mathit{ell} , p} = \left\{\begin{matrix} 1 , if d_{j , p} \leq d_{i , \mathit{ell}}^{depot} ; \\ 0 , otherwise . \end{matrix}\right \tag{eq\_0025} \\
+  & \sum_{\mathit{ell} \in out \left(z\right)} \sum_{j \in \mathcal{J}_{\mathit{ell}}} y_{i , j , \mathit{ell} , p} - \sum_{p \in in \left(z\right)} \sum_{j \in \mathcal{I}_{p}} y_{i , j , \mathit{ell} , p} \leq N_{z}^{train} , \tag{eq\_0026} \\
+  & r_{p}^{min} \leq r_{i , p} \leq r_{p}^{max} , \tag{eq\_0027} \\
+  & r_{i , p} = \sum_{b \in \mathcal{B}_{i , p}} x_{i , p , b} \cdot r_{i , p , b} , \tag{eq\_0028} \\
+  & \sum_{b \in \mathcal{B}_{i , p}} x_{i , p , b} = 1 . \tag{eq\_0029} \\
+  & a_{i , p} \geq d_{p_{\mathit{ell}}^{tra} \left(i\right) , p} + h_{p}^{min} , \tag{eq\_0030} \\
+  & \mathit{xi}_{i , i^{'} , p , p^{'}} = \left\{\begin{matrix} 1 , if a_{i , p} \leq a_{i^{'} , p^{'}} ; \\ 0 , otherwise . \end{matrix}\right \tag{eq\_0031} \\
+  & a_{i , p} - d_{i^{'} , p^{'}} \geq h_{p}^{min} - M_{a} \left(1 - \mathit{sigma}_{p , p^{'}} + \mathit{xi}_{i , i^{'} , p , p^{'}}\right) , \tag{eq\_0032} \\
+  & \mathit{xi}_{i , i^{'} , p , p^{'}} + \mathit{xi}_{i^{'} , i , p^{'} , p} = 1 , \tag{eq\_0033} \\
+  & J^{pass} \left(k\right) = \sum_{p \in \mathcal{P}} \left(n_{p} \left(k\right) T + n_{p}^{depart} \left(k\right) {r}_{p} + n_{p}^{trans,arrive} \left(k\right) t_{p}^{transfer}\right) , \tag{eq\_0034} \\
+  & \underset{\mathbf{\mathit{u}} \left(k\right)}{min} J^{high} = \sum_{k = k_{0}}^{k_{0} + N - 1} \left(J^{pass} \left(k\right) + \mathit{eta} \sum_{p \in \mathcal{P}} f_{p} \left(k\right) {E}_{p}\right) + L_{N} \left(k_{0}\right) \tag{eq\_0035} \\
+  & f_{k , p}^{absorb} \leq M_{p} \left(1 - \mathit{delta}_{k , p}^{absorb}\right) \tag{eq\_0036\_a} \\
+  & f_{k , p}^{absorb} \geq \mathit{varepsilon} + \left(m_{p} - \mathit{varepsilon}\right) \mathit{delta}_{k , p}^{absorb} \tag{eq\_0036\_b} \\
+  & n_{p}^{absorb} \left(k\right) = \mathit{delta}_{k , p}^{absorb} \cdot n_{p}^{want} \left(k\right) + \left(1 - \mathit{delta}_{k , p}^{absorb}\right) C_{p} \left(k\right) . \tag{eq\_0037} \\
+  & {g} \leq M_{{y}} {\mathit{delta}} \tag{eq\_0038\_a} \\
+  & {g} \geq m_{{y}} {\mathit{delta}} \tag{eq\_0038\_b} \\
+  & {g} \leq {y} - m_{{y}} \left(1 - {\mathit{delta}}\right) \tag{eq\_0038\_c} \\
+  & {g} \geq {y} - M_{{y}} \left(1 - {\mathit{delta}}\right) \tag{eq\_0038\_d} \\
+  & \underset{\genfrac{}{}{0pt}{}{\mathbf{\mathit{x}} \left(k\right) , \mathbf{\mathit{u}} \left(k\right)}{\mathbf{\mathit{\mathit{delta}}} \left(k\right) , \mathbf{\mathit{z}} \left(k\right)}}{min} J^{high} = \sum_{k = k_{0}}^{k_{0} + N - 1} \left(J^{pass} \left(k\right) + \mathit{eta} \sum_{p \in \mathcal{P}} f_{p} \left(k\right) {E}_{p}\right) + L_{N} \left(k_{0}\right) \tag{eq\_0039\_a} \\
+  & \mathbf{\mathit{x}} \left(k + 1\right) = A_{k} \mathbf{\mathit{x}} \left(k\right) + B_{1 , k} \mathbf{\mathit{u}} \left(k\right) + B_{2 , k} \mathbf{\mathit{\mathit{delta}}} \left(k\right) + B_{3 , k} \mathbf{\mathit{z}} \left(k\right) \tag{eq\_0039\_b} \\
+  & D_{2 , k} \mathbf{\mathit{\mathit{delta}}} \left(k\right) + D_{3 , k} \mathbf{\mathit{z}} \left(k\right) \leq D_{1 , k} \mathbf{\mathit{u}} \left(k\right) + D_{4 , k} \mathbf{\mathit{x}} \left(k\right) + D_{5 , k} \tag{eq\_0039\_c} \\
+  & \mathbf{\mathit{U}} \left(k_{0}\right) = \left[\left(\mathbf{\mathit{u}}^{ \cdot } \left(k_{0}\right)\right)^{T} , \left(\mathbf{\mathit{u}}^{ \cdot } \left(k_{0} + 1\right)\right)^{T} , \ldots , \left(\mathbf{\mathit{u}}^{ \cdot } \left(k_{0} + N - 1\right)\right)^{T}\right]^{T} , \tag{eq\_0040} \\
+  & \mathbf{\mathit{x}}^{ \cdot } \left(k_{0} + 1\right) = A_{k_{0}} \mathbf{\mathit{x}} \left(k_{0}\right) + B_{1 , k_{0}} \mathbf{\mathit{u}}^{ \cdot } \left(k_{0}\right) + B_{2 , k_{0}} \mathbf{\mathit{\mathit{delta}}}^{ \cdot } \left(k_{0}\right) + B_{3 , k_{0}} \mathbf{\mathit{z}}^{ \cdot } \left(k_{0}\right) . \tag{eq\_0041} \\
+  & \mathbf{\mathit{U}} \left(k_{0} + 1\right) = \left[\left(\mathbf{\mathit{u}}^{ \cdot } \left(k_{0} + 1\right)\right)^{T} , \ldots , \left(\mathbf{\mathit{u}}^{ \cdot } \left(k_{0} + N - 1\right)\right)^{T} , \left(\mathbf{\mathit{u}} \left(k_{0} + N\right)\right)^{T}\right]^{T} , \tag{eq\_0042} \\
+  & E_{i} \left(p\right) = \sum_{b \in \mathcal{B}_{i , p}} x_{i , p , b} \cdot E_{i , b} \left(p\right) , \tag{eq\_0043} \\
+  & J^{low} = \sum_{i \in \mathcal{I} \left(k , \mathit{vartheta}\right)} \sum_{p \in \mathcal{V}_{i}} \left(E_{i} \left(p\right) + \mathit{zeta} \left|\frac{T}{u_{\mathit{ell}} \left(k\right)} - \left(d_{i , p} - d_{i - 1 , p}\right)\right|\right) , \tag{eq\_0044} \\
+  \min_{\mathbf{g}\quad & \left(k , \mathit{vartheta}\right)} J^{low} = \sum_{i \in \mathcal{I} \left(k , \mathit{vartheta}\right)} \sum_{p \in \mathcal{V}_{i}} \left(E_{i} \left(p\right) + \mathit{zeta} \left|\frac{T}{u_{\mathit{ell}} \left(k\right)} - \left(d_{i , p} - d_{i - 1 , p}\right)\right|\right) , s .t . (\text{20})\text{ }–\text{ }(\text{31}),(\text{41}), \tag{eq\_0045} \\
+  & a_{i , p} - a_{i^{'} , p^{'}} \leq \left(1 - \mathit{xi}_{i , i^{'} , p , p^{'}}\right) \left(M_{a} - a_{i^{'} , p^{'}}\right) \tag{eq\_0046\_a} \\
+  & a_{i , p} - a_{i^{'} , p^{'}} \geq \mathit{varepsilon} + \mathit{xi}_{i , i^{'} , p , p^{'}} \left(m_{a} - a_{i^{'} , p^{'}} - \mathit{varepsilon}\right) \tag{eq\_0046\_b} \\
+  & w_{p} \left(k\right) = n_{p}^{want} \left(k\right) - n_{p}^{absorb} \left(k\right) , \tag{eq\_0066} \\
+\end{align}

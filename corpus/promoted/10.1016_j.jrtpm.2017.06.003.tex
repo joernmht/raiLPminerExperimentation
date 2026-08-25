@@ -1,0 +1,69 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2017.06.003
+%@ meta id=10.1016_j.jrtpm.2017.06.003 family=milp schema=0.1.0
+%@ name :: Solving large-scale train timetable adjustment problems under infrastructure maintenance possessions
+%@ desc :: Mined from Solving large-scale train timetable adjustment problems under infrastructure maintenance possessions (Journal of Rail Transport Planning & Management, 2017).
+%@ prov source :: 10.1016/j.jrtpm.2017.06.003
+%@ prov reference :: Solving large-scale train timetable adjustment problems under infrastructure maintenance possessions
+%@ prov author :: Sander Van Aken; Nikola Bešinović; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: minimize weighted passenger delay and cancellation penalties
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ param T shape=- kind=scalar domain=- :: Cycle time
+%@ param l shape=A kind=vector domain=- :: Lower bound on activity duration
+%@ var p shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for event order within period
+%@ param u shape=A kind=vector domain=- :: Upper bound on activity duration
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event j
+%@ var v shape=E domain=continuous role=primary drole=- lo=- hi=- :: Alternative timetable event time
+%@ var x shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train line m
+%@ index M ordered=0 cyclic=0 :: Set of train lines
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for event order in alternative timetable
+%@ var c shape=X,Y domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating presence of train at station
+%@ index X ordered=0 cyclic=0 :: Set of arrival events
+%@ index Y ordered=0 cyclic=0 :: Set of departure events
+%@ param N shape=S kind=vector domain=- :: Number of available tracks at station
+%@ param w shape=E,M kind=matrix domain=- :: Weight for delay or cancellation in objective
+%@ param h shape=A kind=vector domain=- :: Minimum headway time
+%@ param t shape=- kind=scalar domain=- :: Shunting time
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param B shape=- kind=scalar domain=- :: Upper bound in station capacity constraints
+%@ param L shape=- kind=scalar domain=- :: Lower bound in station capacity constraints
+%@ param U shape=- kind=scalar domain=- :: Upper bound in station capacity constraints
+%@ con eq_0001 kind=linear domain=- indicator=- :: Limits on duration between activities
+%@ con eq_0002 kind=linear domain=- indicator=- :: Event time bounds within period
+%@ con eq_0003 kind=linear domain=- indicator=- :: Binary variables for event order in original timetable
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link retimed event time to original and delay
+%@ con eq_0005 kind=linear domain=- indicator=- :: Set event times to zero for cancelled train lines
+%@ con eq_0006 kind=linear domain=- indicator=- :: Relaxed process constraints for activities
+%@ con eq_0007 kind=linear domain=- indicator=- :: Delay bounds and period-border indicators
+%@ con eq_0008 kind=linear domain=- indicator=- :: Binary variables for train line cancellations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Binary variables for event order in alternative timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity constraints for simultaneous occupation
+%@ con eq_0011 kind=linear domain=- indicator=- :: Limit number of trains present at station arrival
+%@ con eq_0016 kind=linear domain=- indicator=- :: Condition for removing non-essential headway activities
+%@ con eq_0017 kind=linear domain=- indicator=- :: Turnaround process constraint for short-turned trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Identify shunting process crossing period border
+%@ con eq_0019 kind=linear domain=- indicator=- :: Select one short-turning location or cancel train line
+%@ con eq_0020 kind=linear domain=- indicator=- :: Enforce turnaround time if short-turning location chosen
+%@ con eq_0021 kind=linear domain=- indicator=- :: Adjusted station capacity constraints with short-turning relaxations
+\begin{align}
+  & l_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + p_{i j} \cdot T \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0001} \\
+  & 0 \leq \mathit{pi}_{i} \leq T - 1 \forall i \in E \tag{eq\_0002} \\
+  & p_{i j} \in \left\{0,1\right\} \forall \left(i , j\right) \in A \tag{eq\_0003} \\
+  & d_{j}^{+} = v_{j} + T \mathit{alpha}_{j} - \mathit{pi}_{j} \left(1 - x_{m}\right) \forall j \in E \tag{eq\_0004} \\
+  & 0 \leq v_{j} \leq \left(T - 1\right) \left(1 - x_{m}\right) \forall j \in E_{m} , m \in M \tag{eq\_0005} \\
+  & l_{i j} \left(1 - \mathit{gamma}_{i j}\right) \leq v_{j} - v_{i} + q_{i j} \cdot T \leq u_{i j} + \left(T - 1\right) \mathit{gamma}_{i j} \forall \left(i , j\right) \in A \tag{eq\_0006} \\
+  & 0 \leq d_{j}^{+} \leq d_{m a x}^{+} ; \mathit{alpha}_{j} \in \left\{0,1\right\} \forall j \in E \tag{eq\_0007} \\
+  & x_{m} \in \left\{0,1\right\} \forall m \in M \tag{eq\_0008} \\
+  & q_{i j} \in \left\{0,1\right\} \forall \left(i , j\right) \in A \tag{eq\_0009} \\
+  & \left(1 - c_{i j} - \mathit{gamma}_{i j}\right) \mathit{delta}_{i} \leq v_{j} - v_{i} + T \cdot q_{i j} \leq T - 1 - \mathit{delta}_{j} \left(1 - c_{j i} - \mathit{gamma}_{i j}\right) \forall i \in X , \forall j \in Y \tag{eq\_0010} \\
+  & \sum_{i \neq j} c_{i j} \leq N_{t r a c k s}^{s} - 1 \forall j \in X \cup Y \tag{eq\_0011} \\
+  \min\quad & \sum_{j \in E_{a r r}} w_{j}^{d e l a y} \cdot d_{j}^{+} + \sum_{m \in M} w_{m}^{c a n c e l} \cdot x_{m} . \tag{eq\_0012} \\
+  & h_{i j} + d_{m a x}^{+} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot q_{i j} \leq T - h_{j i} - d_{m a x}^{+} \tag{eq\_0016} \\
+  & \mathit{tau}_{i k} \left(1 - x_{m} - x_{n}\right) \leq v_{k} - v_{i} + q_{i k} \cdot T \leq \mathit{tau}_{i k} + \left(T - 1\right) \left(x_{m} + x_{n}\right) \tag{eq\_0017} \\
+  & 0 \leq v_{k} - t_{s h u n t} + T \cdot q_{k}^{s h u n t} \leq T - 1 \forall k \in E_{s , d e p}^{s h u n t} \tag{eq\_0018} \\
+  & \sum_{s \in S_{S T , \left(m , n\right)}} \mathit{sigma}_{m , n}^{s} + x_{m} = 1 \forall m \in M \tag{eq\_0019} \\
+  & \mathit{tau}_{i k} \mathit{sigma}_{m , n}^{s} \leq v_{k} - v_{i} + q_{i k} \cdot T \leq \mathit{tau}_{i k} + \left(T - 1\right) \left(1 - \mathit{sigma}_{m , n}^{s}\right) \forall s \in S_{S T , \left(m , n\right)} \tag{eq\_0020} \\
+  & L \cdot B \leq v_{j} - v_{i} + T \cdot q_{i j} \leq U \cdot B \tag{eq\_0021} \\
+\end{align}

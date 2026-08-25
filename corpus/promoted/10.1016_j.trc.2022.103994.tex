@@ -1,0 +1,79 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2022.103994
+%@ meta id=10.1016_j.trc.2022.103994 family=milp schema=0.1.0
+%@ name :: Joint optimization of train scheduling and routing in a coupled multi-resolution space–time railway network
+%@ desc :: Mined from Joint optimization of train scheduling and routing in a coupled multi-resolution space–time railway network (Transportation Research Part C Emerging Technologies, 2022).
+%@ prov source :: 10.1016/j.trc.2022.103994
+%@ prov reference :: Joint optimization of train scheduling and routing in a coupled multi-resolution space–time railway network
+%@ prov author :: Entai Wang; Lixing Yang; Peiheng Li; Chuntian Zhang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of selected space-time arcs
+%@ index T ordered=0 cyclic=0 :: Macro time index
+%@ index I ordered=0 cyclic=0 :: Macro station index
+%@ index J ordered=0 cyclic=0 :: Macro station index (destination)
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs in the network
+%@ var x shape=K,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ index t ordered=0 cyclic=0 :: Micro time index
+%@ index i ordered=0 cyclic=0 :: Micro station index
+%@ index j ordered=0 cyclic=0 :: Micro station index (destination)
+%@ param h shape=- kind=scalar domain=- :: Minimum headway time between trains on a segment
+%@ var d shape=K,I,J,T domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
+%@ index G ordered=0 cyclic=0 :: Coupling set between macro and micro nodes
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total cost)
+%@ param c shape=K,A kind=matrix domain=- :: Cost of using space-time arc a by train k
+%@ con eq_0001 kind=linear domain=- indicator=- :: Macro flow balance constraint (Eq. 1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Micro flow balance constraint (Eq. 2)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of incompatible arc set Ψ (Eq. 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure resource occupation setting (Eq. 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival resource occupation setting (Eq. 6)
+%@ con eq_0007 kind=headway domain=- indicator=- :: Macro departure resource headway constraint (Eq. 7)
+%@ con eq_0008 kind=headway domain=- indicator=- :: Macro arrival resource headway constraint (Eq. 8)
+%@ con eq_0009 kind=headway domain=- indicator=- :: Macro departure resource - train path relationship (Eq. 9)
+%@ con eq_0010 kind=headway domain=- indicator=- :: Macro arrival resource - train path relationship (Eq. 10)
+%@ con eq_0011 kind=headway domain=- indicator=- :: Micro departure resource headway constraint (Eq. 11)
+%@ con eq_0012 kind=headway domain=- indicator=- :: Micro arrival resource headway constraint (Eq. 12)
+%@ con eq_0013 kind=headway domain=- indicator=- :: Micro departure resource - train path relationship (Eq. 13)
+%@ con eq_0014 kind=headway domain=- indicator=- :: Micro arrival resource - train path relationship (Eq. 14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Macro-micro coupling: outgoing micro path equals macro arc (Eq. 15)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Macro-micro coupling: incoming micro path equals macro arc (Eq. 16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Binary restriction for macro arc variables (Eq. 17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary restriction for macro departure resource variables (Eq. 18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary restriction for macro arrival resource variables (Eq. 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary restriction for micro arc variables (Eq. 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary restriction for micro departure resource variables (Eq. 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary restriction for micro arrival resource variables (Eq. 22)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Objective function definition (Eq. 23/24)
+%@ con eq_0033 kind=headway domain=- indicator=- :: Updated departure headway constraint for train pair (Eq. 33)
+%@ con eq_0034 kind=headway domain=- indicator=- :: Updated arrival headway constraint for train pair (Eq. 34)
+%@ con eq_0035 kind=headway domain=- indicator=- :: Additional headway constraint updating equation
+%@ con eq_0036 kind=headway domain=- indicator=- :: Additional headway constraint updating equation
+\begin{align}
+  & \underset{\left(J , T^{'}\right) \in A^{S M^{+}} \left(I , T\right)}{\sum} x \left(k , I , J , T , T^{'}\right) - \underset{\left(J , T^{'}\right) \in A^{S M^{-}} \left(I , T\right)}{\sum} x \left(k , J , I , T^{'} , T\right) = \left\{\begin{matrix} 1 & \left(I , T\right) = \left(I^{o} \left(k\right) , T^{o} \left(k\right)\right) \\ - 1 & \left(I , T\right) = \left(I^{d} \left(k\right) , T^{d} \left(k\right)\right) \\ 0 & o t h e r w i s e \forall k \in K \end{matrix}\right \tag{eq\_0001} \\
+  & \underset{\left(j , t^{'}\right) \in A^{S m^{+}} \left(i , t\right)}{\sum} x \left(k , i , j , t , t^{'}\right) - \underset{\left(j , t^{'}\right) \in A^{S m^{-}} \left(i , t\right)}{\sum} x \left(k , j , i , t^{'} , t\right) = \left\{\begin{matrix} 1 & \left(i , t\right) = \left(i^{o} \left(k\right) , t^{o} \left(k\right)\right) \\ - 1 & \left(i , t\right) = \left(i^{d} \left(k\right) , t^{d} \left(k\right)\right) \\ 0 & o t h e r w i s e \forall k \in K \end{matrix}\right \tag{eq\_0002} \\
+  & \mathit{Psi} \left(a^{S M}\right) = \left\{\left(I , J , \mathit{tau} , \mathit{tau}^{'}\right) \left|\right. 0 \leq \left(\mathit{tau} - T\right) < h^{D} \left(I , J\right) , 0 \leq \left(\mathit{tau}^{'} - T^{'}\right) < h^{A} \left(I , J\right)\right\} \forall a^{S M} = \left(I , J , T , T^{'}\right) \in A^{S M} \tag{eq\_0003} \\
+  & \sum_{k \in K} \sum_{\left(I , J , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{Psi} \left(\left(I , J , T , T^{'}\right)\right)} x \left(k , I , J , \mathit{tau} , \mathit{tau}^{'}\right) \leq 1 \forall \left(I , J , T , T^{'}\right) \in A^{S M} \tag{eq\_0005} \\
+  & d \left(k , I , J , \mathit{tau}\right) = 1 \forall \mathit{tau} \in \left[T , T + h^{D} \left(I , J\right)\right) , \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0006} \\
+  & a \left(k , I , J , \mathit{tau}^{'}\right) = 1 \forall \mathit{tau}^{'} \in \left[T^{'} , T^{'} + h^{A} \left(I , J\right)\right) , \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0007} \\
+  & \sum_{k \in K} d \left(k , I , J , T\right) \leq 1 \forall \left(I , J\right) \in A^{M} , T \in \mathcal{T}^{M} \tag{eq\_0008} \\
+  & \sum_{k \in K} a \left(k , I , J , T^{'}\right) \leq 1 \forall \left(I , J\right) \in A^{M} , T^{'} \in \mathcal{T}^{M} \tag{eq\_0009} \\
+  & \sum_{T^{'} \in \mathcal{T}^{M}} x \left(k , I , J , T , T^{'}\right) = d \left(k , I , J , \mathit{tau}\right) \forall \mathit{tau} \in \left[T , T + h^{D} \left(I , J\right)\right) , \left(I , J\right) \in A^{M} , T \in \mathcal{T}^{M} , k \in K \tag{eq\_0010} \\
+  & \sum_{T \in \mathcal{T}^{M}} x \left(k , I , J , T , T^{'}\right) = a \left(k , I , J , \mathit{tau}^{'}\right) \forall \mathit{tau}^{'} \in \left[T^{'} , T^{'} + h^{A} \left(I , J\right)\right) , \left(I , J\right) \in A^{M} , T^{'} \in \mathcal{T}^{M} , k \in K \tag{eq\_0011} \\
+  & \sum_{k \in K} d \left(k , i , j , t\right) \leq 1 \forall \left(i , j\right) \in A^{m} , t \in \mathcal{T}^{m} \tag{eq\_0012} \\
+  & \sum_{k \in K} a \left(k , i , j , t^{'}\right) \leq 1 \forall \left(i , j\right) \in A^{m} , t^{'} \in \mathcal{T}^{m} \tag{eq\_0013} \\
+  & \sum_{t^{'} \in \mathcal{T}^{m}} x \left(k , i , j , t , t^{'}\right) = d \left(k , i , j , \mathit{tau}\right) \forall \mathit{tau} \in \left[t , t + h^{D} \left(i , j\right)\right) , \left(i , j\right) \in A^{m} , t \in \mathcal{T}^{m} , k \in K \tag{eq\_0014} \\
+  & \sum_{t \in \mathcal{T}^{m}} x \left(k , i , j , t , t^{'}\right) = a \left(k , i , j , \mathit{tau}^{'}\right) \forall \mathit{tau}^{'} \in \left[t^{'} , t^{'} + h^{A} \left(i , j\right)\right) , \left(i , j\right) \in A^{m} , t^{'} \in \mathcal{T}^{m} , k \in K \tag{eq\_0015} \\
+  & x \left(k , I , J , T , T^{'}\right) = \sum_{\left(i , t\right) \in G^{S m} \left(\left(I , T\right)\right)} \sum_{\left(j , t^{'}\right) \in A^{S m +} \left(i , t\right)} x \left(k , i , j , t , t^{'}\right) \forall \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0016} \\
+  & x \left(k , I , J , T , T^{'}\right) = \sum_{\left(j , t^{'}\right) \in G^{S m} \left(\left(J , T^{'}\right)\right)} \sum_{\left(i , t\right) \in A^{S m -} \left(j , t^{'}\right)} x \left(k , i , j , t , t^{'}\right) \forall \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0017} \\
+  & x \left(k , I , J , T , T^{'}\right) \in \left\{0 , 1\right\} \forall \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0018} \\
+  & d \left(k , I , J , T\right) \in \left\{0 , 1\right\} \forall \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0019} \\
+  & a \left(k , I , J , T^{'}\right) \in \left\{0 , 1\right\} \forall \left(I , J , T , T^{'}\right) \in A^{S M} , k \in K \tag{eq\_0020} \\
+  & x \left(k , i , j , t , t^{'}\right) \in \left\{0 , 1\right\} \forall \left(i , j , t , t^{'}\right) \in A^{S m} , k \in K \tag{eq\_0021} \\
+  & d \left(k , i , j , t\right) \in \left\{0 , 1\right\} \forall \left(i , j , t , t^{'}\right) \in A^{S m} , k \in K \tag{eq\_0022} \\
+  & a \left(k , i , j , t^{'}\right) \in \left\{0 , 1\right\} \forall \left(i , j , t , t^{'}\right) \in A^{S m} , k \in K \tag{eq\_0023} \\
+  \min\quad & \sum_{k \in K} \sum_{\left(I , J , T , T^{'}\right) \in A^{S M}} c \left(k , I , J , T , T^{'}\right) \cdot x \left(k , I , J , T , T^{'}\right) . \tag{eq\_0024} \\
+  & \sum_{T^{'} \in \mathcal{T}^{M}} x \left(k , I^{D} , I + 1 , T , T^{'}\right) = d \left(k , I^{D} , I + 1 , \mathit{tau}\right) \forall \mathit{tau} \in \left[T , T + h^{D} \left(I^{D} , I + 1\right)\right) , T \in \mathcal{T}^{M} , k \in K \tag{eq\_0033} \\
+  & \sum_{T \in \mathcal{T}^{M}} x \left(k , I - 1 , I^{A} , T , T^{'}\right) = a \left(k , I - 1 , I^{A} , \mathit{tau}^{'}\right) \forall \mathit{tau}^{'} \in \left[T^{'} , T^{'} + h^{A} \left(I - 1 , I^{A}\right)\right) , T^{'} \in \mathcal{T}^{M} , k \in K \tag{eq\_0034} \\
+  & \sum_{T^{'} \in \mathcal{T}^{M}} x \left(k_{m} , I^{D} , I + 1 , T , T^{'}\right) = d \left(k_{m} , I^{D} , I + 1 , \mathit{tau}\right) \forall \mathit{tau} \in \left[T , T + h^{D} \left(I^{D} , I + 1 , k_{m} , k_{n}\right)\right) , T \in \mathcal{T}^{M} \tag{eq\_0035} \\
+  & \sum_{T \in \mathcal{T}^{M}} x \left(k_{m} , I - 1 , I^{A} , T , T^{'}\right) = a \left(k_{m} , I - 1 , I^{A} , \mathit{tau}^{'}\right) \forall \mathit{tau}^{'} \in \left[T^{'} , T^{'} + h^{A} \left(I - 1 , I^{A} , k_{m} , k_{n}\right)\right) , T^{'} \in \mathcal{T}^{M} . \tag{eq\_0036} \\
+\end{align}

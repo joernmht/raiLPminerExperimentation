@@ -1,0 +1,208 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2024.104681
+%@ meta id=10.1016_j.trc.2024.104681 family=milp schema=0.1.0
+%@ name :: Integrated capacity allocation and timetable coordination for multimodal railway networks
+%@ desc :: Mined from Integrated capacity allocation and timetable coordination for multimodal railway networks (Transportation Research Part C Emerging Technologies, 2024).
+%@ prov source :: 10.1016/j.trc.2024.104681
+%@ prov reference :: Integrated capacity allocation and timetable coordination for multimodal railway networks
+%@ prov author :: Simin Chai; Jiateng Yin; Tao Tang; Lixing Yang; Ronghui Liu; Qin Luo
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of rolling-stock operational cost, railway passenger travel time, metro passenger travel time, and transfer waiting time.
+%@ index T ordered=1 cyclic=0 :: Set of time stamps for metro train departures.
+%@ index s ordered=0 cyclic=0 :: Index for metro stations.
+%@ var w shape=K,S,J domain=integer role=primary drole=- lo=- hi=- :: Departure time of metro train k at station s on line j.
+%@ index J ordered=0 cyclic=0 :: Set of metro lines.
+%@ index K ordered=0 cyclic=0 :: Set of metro trains on a line.
+%@ index S ordered=0 cyclic=0 :: Set of stations on a metro line.
+%@ param h shape=J kind=vector domain=- :: Minimum or maximum headway time between metro trains on line j.
+%@ var b shape=K,S,T,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether time stamp τ is between metro trains k-1 and k at station s on line j.
+%@ index D ordered=0 cyclic=0 :: Set of depots.
+%@ param Z shape=D kind=vector domain=- :: Maximum fleet size of rolling stock in depot d.
+%@ var v shape=D,J domain=integer role=primary drole=- lo=- hi=- :: Fleet size of rolling stock assigned to line j from depot d.
+%@ var c shape=K,J domain=integer role=primary drole=- lo=- hi=- :: Number of carriages coupled to metro train k on line j.
+%@ var n shape=K,S,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
+%@ index E ordered=0 cyclic=0 :: Set of events in railway network.
+%@ index I ordered=0 cyclic=0 :: Set of railway lines.
+%@ param N shape=P kind=vector domain=- :: Number of passengers in passenger group p.
+%@ param R shape=I,J,V kind=matrix domain=- :: Transfer ratio at transfer station s between railway line i and metro line j.
+%@ index V ordered=0 cyclic=0 :: Set of transfer stations between metro line j and railway line i.
+%@ var r shape=P,E,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger group p chooses train l_e on railway line i.
+%@ index P ordered=0 cyclic=0 :: Set of passenger groups on railway line i.
+%@ param Q shape=S,J kind=matrix domain=- :: Proportion of passengers alighting at station s on line j.
+%@ param q shape=E,I kind=matrix domain=- :: Earliest time for event e on railway line i.
+%@ index A ordered=0 cyclic=0 :: Set of arcs in railway network.
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization.
+%@ index B ordered=0 cyclic=0 :: Set of pairs of arcs with same order.
+%@ param L shape=I,J,V kind=matrix domain=- :: Minimum coordination time at transfer station s between railway line i and metro line j.
+%@ var x shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k departs no earlier than the minimum coordination time after railway train l_e arrives at transfer station s.
+%@ param Lmax shape=I,J,V kind=matrix domain=- :: Maximum coordination time at transfer station s between railway line i and metro line j.
+%@ var z shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k departs no later than the maximum coordination time after railway train l_e arrives at transfer station s.
+%@ var y shape=K,E,V,I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether metro train k is the first connecting train for railway train l_e at transfer station s.
+%@ param g shape=- kind=scalar domain=- :: Operational cost per carriage per service.
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function component (operational cost, rail/metro travel time, transfer time).
+%@ index Y ordered=0 cyclic=0 :: Set of metro trains for branching strategy.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Metro train departure time propagation between consecutive stations using running and dwell times.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Maximum headway constraint between successive metro trains.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of the interval-between-trains indicator b from departure indicators d.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Expression of metro departure time via time-indexed departure indicators.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Monotonicity of time-indexed departure indicators over time stamps.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Depot rolling stock capacity constraint.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Number of carriages used on a line does not exceed the fleet size allocated from a depot.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Number of boarding passengers equals number of waiting passengers at each metro station.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Boarding passengers cannot exceed residual train capacity.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Waiting passengers consist of new station arrivals and transferring railway passengers at transfer stations.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Number of alighting passengers is proportional to onboard passengers at the previous station.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Passenger flow balance giving remaining onboard passengers after boarding and alighting.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Earliest event time lower bound for adjustable railway events.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Earliest event time fixed for railway events that are not adjusted.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Railway running time equality for running activities.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum dwell time constraint for railway dwell activities.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary event-order variable definition for track activities.
+%@ con eq_0022 kind=linear domain=- indicator=- :: No-overtaking order consistency between departure and arrival event pairs.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Each passenger group selects exactly one departure event.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Each passenger group selects exactly one arrival event.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Passenger train-choice variables are consistent along train activities.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Passenger departure choice limited by available time before departure.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Passenger arrival choice limited by dwell time at destination.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Railway train capacity constraint for each event.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Coordination lower-bound implication (reverse direction) using big-M.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Coordination upper-bound constraint for transfer time window.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Coordination upper-bound implication (reverse direction) using big-M.
+%@ con eq_0033 kind=linear domain=- indicator=- :: First connecting train indicator obtained from differences of lower-bound indicators.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Coordination indicator equals product of first-train and upper-bound indicators (linearized).
+%@ con eq_0035 kind=linear domain=- indicator=- :: Exactly one metro train coordinates with each railway arrival at a transfer station.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Metro total passenger travel time objective component.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Railway total passenger travel time objective component.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Passenger transfer waiting time objective component.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Objective: minimize weighted sum of operational cost and passenger time components.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Valid inequality: exactly one first connecting metro train for each railway train.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Valid inequality: coordination upper-bound variable z dominates first-train variable y.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Valid inequality: lower bound on total coordination-window indicators.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Valid inequality: upper bound on total coordination-window indicators.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Valid inequality: limit on coordinated metro trains per railway train imposed by headway and coordination window.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Special ordered set constraint used for branching on coordination variables.
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger travel time product terms.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger departure-time product.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Linearization constraint for railway passenger arrival-time product.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linearization constraint for metro transfer time product terms.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linearization constraint for coordination indicator product.
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linearization constraint for metro residual capacity product.
+%@ con eq_0058 kind=linear domain=- indicator=- :: Linearization constraint for metro waiting passenger product.
+%@ con eq_0062 kind=linear domain=- indicator=- :: Linearization constraint for event-time/passenger-choice product.
+%@ con eq_0063 kind=linear domain=- indicator=- :: Linearization constraint for transfer time difference product.
+%@ con eq_0064_a kind=linear domain=- indicator=- :: Linearization of transfer time term, first case.
+%@ con eq_0064_b kind=linear domain=- indicator=- :: Linearization of transfer time term, second case.
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time auxiliary variables.
+%@ con eq_0066 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time lower bound.
+%@ con eq_0067 kind=linear domain=- indicator=- :: Linearization constraint for railway travel time upper bound.
+%@ con eq_0068 kind=linear domain=- indicator=- :: Linearization constraint for transfer time auxiliary variable.
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization constraint for transfer time lower bound.
+%@ con eq_0070 kind=linear domain=- indicator=- :: Linearization constraint for transfer time upper bound.
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint for rolling stock allocation product.
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint for carriage count product.
+%@ con eq_0076 kind=linear domain=- indicator=- :: Linearization constraint for passenger flow capacity product.
+%@ con eq_0078_a kind=linear domain=- indicator=- :: Linearization of coordination indicator product, first case.
+%@ con eq_0078_b kind=linear domain=- indicator=- :: Linearization of coordination indicator product, second case.
+%@ con eq_0078_c kind=linear domain=- indicator=- :: Linearization of coordination indicator product, third case.
+%@ con eq_0078_d kind=linear domain=- indicator=- :: Linearization of coordination indicator product, fourth case.
+%@ con eq_0079_a kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, first case.
+%@ con eq_0079_b kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, second case.
+%@ con eq_0079_c kind=linear domain=- indicator=- :: Linearization of transfer waiting time product, third case.
+%@ con eq_0080 kind=linear domain=- indicator=- :: Linearization constraint for objective transfer time component.
+%@ con eq_0082_a kind=linear domain=- indicator=- :: Linearization of first-train indicator product, first case.
+%@ con eq_0082_b kind=linear domain=- indicator=- :: Linearization of first-train indicator product, second case.
+%@ con eq_0082_c kind=linear domain=- indicator=- :: Linearization of first-train indicator product, third case.
+%@ con eq_0082_d kind=linear domain=- indicator=- :: Linearization of first-train indicator product, fourth case.
+%@ con eq_0083 kind=linear domain=- indicator=- :: Linearization constraint for headway valid inequality.
+%@ con eq_0085_a kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, first case.
+%@ con eq_0085_b kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, second case.
+%@ con eq_0085_c kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, third case.
+%@ con eq_0085_d kind=linear domain=- indicator=- :: Linearization of coordination upper-bound indicator, fourth case.
+%@ con eq_0086_a kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, first case.
+%@ con eq_0086_b kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, second case.
+%@ con eq_0086_c kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, third case.
+%@ con eq_0086_d kind=linear domain=- indicator=- :: Linearization of coordination lower-bound indicator, fourth case.
+\begin{align}
+  & w_{k , s + 1}^{j} - w_{k , s}^{j} = T_{k , s , j}^{\text{run}} + T_{k , s + 1 , j}^{\text{dwell}} , \forall k \in \mathcal{K}_{j} , s , s + 1 \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0001} \\
+  & w_{k + 1 , s}^{j} - w_{k , s}^{j} \geq h_{j}^{\text{min}} , \forall k , k + 1 \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0003} \\
+  & w_{k + 1 , s}^{j} - w_{k , s}^{j} \leq h_{j}^{\text{max}} , \forall k , k + 1 \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0004} \\
+  & b_{k , s , \mathit{tau}}^{j} = \left\{\begin{matrix} 1 - d_{k , s , \mathit{tau}}^{j} , & \forall k = 1 , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \\ d_{k - 1 , s , \mathit{tau}}^{j} - d_{k , s , \mathit{tau}}^{j} , & \forall k \in \mathcal{K}_{j} \backslash \left\{1\right\} , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \end{matrix}\right \tag{eq\_0005} \\
+  & w_{k , s}^{j} = d_{k , s , 1}^{j} + \sum_{\mathit{tau} \in \mathcal{T} \backslash \left\{1\right\}} \mathit{tau} \cdot \left(d_{k , s , \mathit{tau}}^{j} - d_{k , s , \mathit{tau} - 1}^{j}\right) , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0006} \\
+  & d_{k , s , \mathit{tau} - 1}^{j} - d_{k , s , \mathit{tau}}^{j} \leq 0 . \forall \mathit{tau} , \mathit{tau} - 1 \in \mathcal{T} , k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0007} \\
+  & \sum_{j \in \mathcal{J}_{d}} v_{d}^{j} \leq Z_{d}^{\text{max}} , \forall d \in \mathcal{D} \tag{eq\_0008} \\
+  & \sum_{k \in \mathcal{K}_{j}} c_{k}^{j} \leq v_{d}^{j} , \forall j \in \mathcal{J}_{d} , d \in \mathcal{D} \tag{eq\_0010} \\
+  & c_{j}^{\text{min}} \leq c_{k}^{j} \leq c_{j}^{\text{max}} . \forall k \in \mathcal{K}_{j} , j \in \mathcal{J} \tag{eq\_0011} \\
+  & n \cdot b_{k , s}^{j} = n \cdot w_{k , s}^{j} , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0012} \\
+  & n \cdot b_{k , s}^{j} \leq n \cdot c_{k , s}^{j} , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0014} \\
+  & n \cdot w_{k , s}^{j} = \left\{\begin{matrix} \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot r_{p , e}^{i} \cdot \mathit{varphi}_{k , e , s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0015} \\
+  & n \cdot c_{k , s}^{j} = \left\{\begin{matrix} c_{k}^{j} \cdot D^{\text{met}} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ c_{k}^{j} \cdot D^{\text{met}} - n \cdot r_{k s - 1}^{j} + n a_{k , s}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0016} \\
+  & n a_{k , s}^{j} = \left\{\begin{matrix} 0 , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ Q_{s}^{j} \cdot n \cdot r_{k , s - 1}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0017} \\
+  & n \cdot r_{k , s}^{j} = \left\{\begin{matrix} n \cdot b_{k , s}^{j} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ n \cdot r_{k , s - 1}^{j} + n \cdot b_{k , s}^{j} - n a_{k , s}^{j} . & \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} \backslash \left\{1\right\} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0018} \\
+  & d_{k , s^{'} , \mathit{tau}^{'}}^{j} - d_{k , s , \mathit{tau}}^{j} = 0 , \forall \mathit{tau} , \mathit{tau}^{'} \in \mathcal{T} : \mathit{tau}^{'} = \mathit{tau} + \sum_{s^{' '} = 1}^{s^{'} - 1} \left(T_{k , s^{' '} , j}^{\text{run}} + T_{k , s^{' '} , j}^{\text{dwell}}\right) , s = 1 , s^{'} \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \tag{eq\_0019} \\
+  & t_{e}^{i} - q_{e}^{i} \geq 0 , \forall e \in E_{i}^{c r} , i \in \mathcal{I} \tag{eq\_0020} \\
+  & t_{e}^{i} - q_{e}^{i} = 0 , \forall e \in E_{i} \backslash E_{i}^{c r} , i \in \mathcal{I} \tag{eq\_0022} \\
+  & t_{f}^{i} - t_{e}^{i} = T_{a}^{\text{run}} , \forall a = \left(e , f\right) \in A_{i}^{\text{run}} , i \in \mathcal{I} \tag{eq\_0023} \\
+  & t_{f}^{i} - t_{e}^{i} \geq T_{a}^{\text{dwe}} , \forall a = \left(e , f\right) \in A_{i}^{\text{dw}} , i \in \mathcal{I} \tag{eq\_0024} \\
+  & \mathit{lambda}_{a}^{i} + \mathit{lambda}_{a^{'}}^{i} = 1 , \forall a = \left(e , f\right) \in A_{i}^{\text{track}} \land a^{'} = \left(f , e\right) \in A_{i}^{\text{track}} , i \in \mathcal{I} \tag{eq\_0025} \\
+  & t_{f}^{i} - t_{e}^{i} + M_{1} \left(1 - \mathit{lambda}_{a}^{i}\right) \geq h_{a}^{\text{min}} , \forall a = \left(e , f\right) \in A_{i}^{\text{track}} , i \in \mathcal{I} \tag{eq\_0026} \\
+  & \mathit{lambda}_{a}^{i} - \mathit{lambda}_{a^{'}}^{i} = 0 . \forall \left(a , a^{'}\right) \in B_{i} , i \in \mathcal{I} \tag{eq\_0027} \\
+  & \underset{e \in E_{i o_{p}}^{\text{dep}}}{\sum} r_{p , e}^{i} = 1 , \forall p \in \mathcal{P}_{i} , i \in \mathcal{I} \tag{eq\_0028} \\
+  & \underset{e \in E_{i d_{p}}^{\text{arr}}}{\sum} r_{p , e}^{i} = 1 , \forall p \in \mathcal{P}_{i} , i \in \mathcal{I} \tag{eq\_0030} \\
+  & r_{p , e}^{i} = r_{p , f}^{i} , \forall p \in \mathcal{P}_{i} , \left(e , f\right) \in A_{i}^{\text{train}} , i \in \mathcal{I} \tag{eq\_0031} \\
+  & r_{p , e}^{i} \leq \text{max} \left\{0 , \text{min} \left\{t_{e}^{i} - T_{p} + 1 , T_{a}^{\text{dwe}}\right\}\right\} , \forall p \in \mathcal{P}_{i} , a = \left(e , f\right) \in A_{i}^{\text{dw}} : e \in E_{i o_{p}}^{\text{dep}} , i \in \mathcal{I} \tag{eq\_0032} \\
+  & r_{p , e}^{i} \leq T_{a}^{\text{dwe}} , \forall p \in \mathcal{P}_{i} , a = \left(e , f\right) \in A_{i}^{\text{dw}} : e \in E_{i d_{p}}^{\text{arr}} , i \in \mathcal{I} \tag{eq\_0033} \\
+  & \sum_{p \in \mathcal{P}_{i}} r_{p , e}^{i} \cdot N_{p} \leq D^{\text{rail}} . \forall e \in E_{i} , i \in \mathcal{I} \tag{eq\_0034} \\
+  & w_{k , s}^{j} - t_{e}^{i} \geq \underset{̲}{L}_{s}^{i j} - M_{2} \left(1 - x_{k , e , s}^{i j}\right) , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0035} \\
+  & w_{k , s}^{j} - t_{e}^{i} < \underset{̲}{L}_{s}^{i j} + M_{3} \cdot x_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0037} \\
+  & w_{k , s}^{j} - t_{e}^{i} \leq \bar{L}_{s}^{i j} + M_{4} \left(1 - z_{k , e , s}^{i j}\right) , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0038} \\
+  & w_{k , s}^{j} - t_{e}^{i} > \bar{L}_{s}^{i j} - M_{5} \cdot z_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0039} \\
+  & y_{k , e , s}^{i j} = x_{k , e , s}^{i j} - x_{k - 1 , e s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k , k - 1 \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0040} \\
+  & \mathit{varphi}_{k , e , s}^{i j} = y_{k , e , s}^{i j} \cdot z_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0041} \\
+  & \sum_{k \in \mathcal{K}_{j}} \mathit{varphi}_{k , e , s}^{i j} = 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0042} \\
+  & M^{\text{cost}} = \sum_{j \in \mathcal{J}} \sum_{k \in \mathcal{K}_{j}} g \cdot c_{k}^{j} \tag{eq\_0043} \\
+  & F^{\text{metro}} = \sum_{j \in \mathcal{J}} \sum_{k \in \mathcal{K}_{j}} \sum_{s \in \mathcal{S}_{j}} \sum_{\mathit{tau} \in \mathcal{T}} \sum_{t \geq \mathit{tau}} b_{k , s , t}^{j} \cdot n_{s , t , j}^{\text{arr}} \cdot T^{\text{unit}} + \sum_{j \in \mathcal{J}} \sum_{k \in \mathcal{K}_{j}} \sum_{s \in \mathcal{S}_{j}} T_{k , s , j}^{\text{run}} \cdot n \cdot r_{k , s}^{j} \tag{eq\_0044} \\
+  & F^{\text{rail}} = \sum_{i \in \mathcal{I}} \sum_{p \in \mathcal{P}_{i}} \underset{e \in E_{i d_{p}}^{\text{arr}}}{\sum} \left(t_{e}^{i} \cdot r_{p , e}^{i} - T_{p}\right) \cdot N_{p} \tag{eq\_0045} \\
+  & F^{\text{tra}} = \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J}} \sum_{k \in \mathcal{K}_{j}} \sum_{s \in \mathcal{V}_{i j}} \sum_{p \in \mathcal{P}_{i}} \underset{e \in E_{i s}^{\text{arr}}}{\sum} N_{p} \cdot r_{p , e}^{i} \cdot \mathit{varphi}_{k , e , s}^{i j} \cdot \left(w_{k , s}^{j} - t_{e}^{i}\right) \cdot R_{s}^{i j} \tag{eq\_0046} \\
+  \min\quad & \mathit{theta}_{1} \cdot M^{\text{cost}} + \mathit{theta}_{2} \cdot F^{\text{rail}} + \mathit{theta}_{3} \cdot F^{\text{metro}} + \mathit{theta}_{4} \cdot F^{\text{tra}} \tag{eq\_0047} \\
+  & \sum_{k \in \mathcal{K}_{j}} y_{k , e , s}^{i j} = 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0051} \\
+  & z_{k , e , s}^{i j} - y_{k , e , s}^{i j} \geq 0 , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0052} \\
+  & x_{k^{'} , e , s}^{i j} = 1 , k^{'} \in \left\{k , k + 1 , \ldots , K_{j}\right\} \tag{eq\_0053} \\
+  & x_{k^{'} , e , s}^{i j} = 0 , k^{'} \in \left\{1 , 2 , \ldots , k - 1\right\} \tag{eq\_0055} \\
+  & z_{k^{'} , e , s}^{i j} = 0 , k^{'} \in \left\{k , k + 1 , \ldots , K_{j}\right\} \tag{eq\_0056} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} + \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} \geq \left|\mathcal{K}_{j}\right| + 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0057} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} + \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{j}^{\text{min}}} + \left|\mathcal{K}_{j}\right| + 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0058} \\
+  & z_{k^{'} , e , s}^{i j} = 1 , k^{'} \in \left\{1 , 2 , \ldots , k + 1\right\} \tag{eq\_0062} \\
+  & z_{k^{'} , e , s}^{i j} = 0 , k^{'} \in \left\{k + 2 , k + 3 \hdots , K_{j}\right\} \tag{eq\_0063} \\
+  & \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} = \left|\mathcal{K}_{j}\right| - k + 1 \tag{eq\_0064\_a} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} = k + 1 \tag{eq\_0064\_b} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} + \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} = \left|\mathcal{K}_{j}\right| + 2 \geq \left|\mathcal{K}_{j}\right| + 1 , \tag{eq\_0065} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} + \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} = \left|\mathcal{K}_{j}\right| + 2 \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{j}^{\text{min}}} + \left|\mathcal{K}_{j}\right| + 1 \tag{eq\_0066} \\
+  & \sum_{k \in \mathcal{K}_{j}} z_{k , e , s}^{i j} + \sum_{k \in \mathcal{K}_{j}} x_{k , e , s}^{i j} = \left|\mathcal{K}_{j}\right| + 3 \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{j}^{\text{min}}} + \left|\mathcal{K}_{j}\right| + 1 \tag{eq\_0067} \\
+  & \underset{e \in E_{i s}^{\text{arr}}}{\sum} \mathit{varphi}_{k , e , s}^{i j} \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{a}^{\text{min}}} + 1 , \forall k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0068} \\
+  & \underset{e \in E_{i s}^{\text{arr}}}{\sum} \mathit{varphi}_{k , e , s}^{i j} = 2 \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{a}^{\text{min}}} + 1 \tag{eq\_0069} \\
+  & \underset{e \in E_{i s}^{\text{arr}}}{\sum} \mathit{varphi}_{k , e , s}^{i j} = 3 \leq \frac{\bar{L}_{s}^{i j} - \underset{̲}{L}_{s}^{i j}}{h_{j}^{\text{min}}} + 1 \tag{eq\_0070} \\
+  & \sum_{k \in \mathcal{K}_{j}} {\mathit{varphi}}_{k , e , s}^{i j} = 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0073} \\
+  & \sum_{k \in Y_{j}} \mathit{varphi}_{k , e , s}^{i j} = 1 \text{or} \sum_{k \in Y_{j}} \mathit{varphi}_{k , e , s}^{i j} = 0 \tag{eq\_0075} \\
+  & n \cdot w_{k , s}^{j} = \left\{\begin{matrix} \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot \mathit{beta}_{p e k s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0076} \\
+  & \mathit{beta}_{p e k s}^{i j} \leq r_{p , e}^{i} \tag{eq\_0078\_a} \\
+  & \mathit{beta}_{p e k s}^{i j} \leq \mathit{varphi}_{k , e , s}^{i j} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0078\_b} \\
+  & \mathit{beta}_{p e k s}^{i j} \geq r_{p , e}^{i} + \mathit{varphi}_{k , e , s}^{i j} - 1 \tag{eq\_0078\_c} \\
+  & \mathit{beta}_{p e k s}^{i j} \in \left\{0 , 1\right\} . \tag{eq\_0078\_d} \\
+  & \mathit{varphi}_{k , e , s}^{i j} \leq y_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_a} \\
+  & \mathit{varphi}_{k , e , s}^{i j} \leq z_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_b} \\
+  & \mathit{varphi}_{k , e , s}^{i j} \geq y_{k , e , s}^{i j} + z_{k , e , s}^{i j} - 1 . \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_c} \\
+  & F^{\text{rail}} = \sum_{i \in \mathcal{I}} \sum_{p \in \mathcal{P}_{i}} \underset{e \in E_{i d_{p}}^{\text{arr}}}{\sum} \left(\mathit{gamma}_{p e}^{i} - T_{p}\right) \cdot N_{p} \tag{eq\_0080} \\
+  & \mathit{gamma}_{p e}^{i} \leq M_{6} \cdot r_{p , e}^{i} \tag{eq\_0082\_a} \\
+  & \mathit{gamma}_{p e}^{i} \leq t_{e}^{i} , \forall p \in \mathcal{P}_{i} , e \in E_{i d_{p}}^{\text{arr}} , i \in \mathcal{I} \tag{eq\_0082\_b} \\
+  & \mathit{gamma}_{p e}^{i} \geq t_{e}^{i} - M_{6} \left(1 - r_{p , e}^{i}\right) \tag{eq\_0082\_c} \\
+  & \mathit{gamma}_{p e}^{i} \geq 0 . \tag{eq\_0082\_d} \\
+  & F^{\text{tra}} = \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J}} \sum_{k \in \mathcal{K}_{j}} \sum_{s \in \mathcal{V}_{i j}} \sum_{p \in \mathcal{P}_{i}} \underset{e \in E_{i s}^{\text{arr}}}{\sum} N_{p} \cdot \left(\hat{\mathit{mu}}_{p e k s}^{i j} - {\mathit{mu}}_{p e k s}^{i j}\right) \cdot R_{s}^{i j} \tag{eq\_0083} \\
+  & \hat{\mathit{mu}}_{p e k s}^{i j} \leq M_{6} \mathit{beta}_{p e k s}^{i j} \tag{eq\_0085\_a} \\
+  & \hat{\mathit{mu}}_{p e k s}^{i j} \leq w_{k , s}^{j} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0085\_b} \\
+  & \hat{\mathit{mu}}_{p e k s}^{i j} \geq w_{k , s}^{j} - M_{6} \left(1 - \mathit{beta}_{p e k s}^{i j}\right) \tag{eq\_0085\_c} \\
+  & \hat{\mathit{mu}}_{p e k s}^{i j} \geq 0 . \tag{eq\_0085\_d} \\
+  & {\mathit{mu}}_{p e k s}^{i j} \leq M_{6} \mathit{beta}_{p e k s}^{i j} \tag{eq\_0086\_a} \\
+  & {\mathit{mu}}_{p e k s}^{i j} \leq t_{e}^{i} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0086\_b} \\
+  & {\mathit{mu}}_{p e k s}^{i j} \geq t_{e}^{i} - M_{6} \left(1 - \mathit{beta}_{p e k s}^{i j}\right) \tag{eq\_0086\_c} \\
+  & {\mathit{mu}}_{p e k s}^{i j} \geq 0 . \tag{eq\_0086\_d} \\
+\end{align}

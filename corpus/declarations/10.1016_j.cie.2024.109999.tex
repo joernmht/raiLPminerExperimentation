@@ -1,0 +1,197 @@
+% Declaration sidecar for 10.1016_j.cie.2024.109999
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2024.109999
+% Demand-adapted train timetabling with coupling-decoupling operations on a bidirectional intercity railway line
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2024.109999.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time, capacity mismatch, train units used, and coupling/decoupling operations
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of train services in the timetable
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations on the line
+
+% a: classified as variable during review
+%@ var a shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train j at station s
+
+% d: classified as variable during review
+%@ var d shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train j from station s
+
+% r: classified as parameter during review
+%@ param r shape=- kind=scalar domain=- :: Running time on segment v
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for stations
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Dwelling time at station v
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Number of stations (index for last station)
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Minimum and maximum headway
+
+% h: classified as variable during review
+%@ var h shape=J,J domain=non_negative role=primary drole=- lo=- hi=- :: Headway between consecutive trains
+
+% R: classified as variable during review
+%@ var R shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Sectional demand (undersaturated) for train j at station s
+
+% I: classified as variable during review
+%@ var I shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding train j at station s
+
+% O: classified as variable during review
+%@ var O shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers alighting from train j at station s
+
+% D: classified as variable during review
+%@ var D shape=J domain=non_negative role=primary drole=- lo=- hi=- :: Maximum sectional demand for train j
+
+% P: classified as variable during review
+%@ var P shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train j at station s (oversaturated)
+
+% B: classified as variable during review
+%@ var B shape=J,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding train j at station s for destination v
+
+% RP: classified as variable during review
+%@ var RP shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Sectional demand (oversaturated) for train j at station s
+
+% IP: classified as variable during review
+%@ var IP shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Passengers boarding in oversaturated conditions
+
+% OP: classified as variable during review
+%@ var OP shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Passengers alighting in oversaturated conditions
+
+% DP: classified as variable during review
+%@ var DP shape=J domain=non_negative role=primary drole=- lo=- hi=- :: Maximum sectional demand in oversaturated conditions
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the DAG (services)
+
+% ifl: classified as parameter during review
+%@ param ifl shape=N,N kind=matrix domain=- :: Slack time gap between services i and j
+
+% y: classified as variable during review
+%@ var y shape=N,N domain=non_negative role=primary drole=- lo=- hi=- :: Flow of train units on linkage arc (i,j)
+
+% unusable as an identifier, rename or drop: τ
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: Maximum number of train units per service
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number of services in each direction
+
+% g: classified as parameter during review
+%@ param g shape=- kind=scalar domain=- :: Capacity of a single train unit
+
+% C: classified as variable during review
+%@ var C shape=J domain=non_negative role=primary drole=- lo=- hi=- :: Capacity of service j
+
+% unusable as an identifier, rename or drop: α
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Big-M constant
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: δ
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Total number of available train units
+
+% l: classified as variable during review
+%@ var l shape=N,N domain=non_negative role=primary drole=- lo=- hi=- :: Slack time gap between services i and j
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time in a direction
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function values
+
+% LP: classified as variable during review
+%@ var LP shape=J,S domain=non_negative role=primary drole=- lo=- hi=- :: Latest boarding time for train j at station s
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Planning horizon length
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, p, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Upstream arrival time at station s (constraint 1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Upstream departure time at station s (constraint 2)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Downstream arrival time at station s (constraint 3)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Downstream departure time at station s (constraint 4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum headway between upstream services (constraint 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Maximum headway between upstream services (constraint 6)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum headway between downstream services (constraint 7)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maximum headway between downstream services (constraint 8)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Upstream headway definition (constraint 9)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Downstream headway definition (constraint 10)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Upstream sectional demand balance (constraint 17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Upstream initial sectional demand (constraint 18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Downstream sectional demand balance (constraint 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Downstream initial sectional demand (constraint 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Upstream maximum sectional demand (constraint 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Downstream maximum sectional demand (constraint 22)
+%@ con eq_0024_a kind=linear domain=- indicator=- :: Oversaturated alighting upstream (constraint 24a)
+%@ con eq_0024_b kind=linear domain=- indicator=- :: Oversaturated alighting downstream (constraint 24b)
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Oversaturated boarding upstream (constraint 25a)
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Oversaturated boarding downstream (constraint 25b)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Oversaturated sectional demand balance (constraint 29)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Oversaturated initial sectional demand (constraint 30)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Upstream oversaturated maximum sectional demand (constraint 31)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Downstream oversaturated maximum sectional demand (constraint 32)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linkage flow forced to zero when slack time below turnaround threshold (constraint 34)
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linkage flow upper bounded by maximum train units per service (constraint 35)
+%@ con eq_0036 kind=linear domain=- indicator=- :: Flow conservation for train units at upstream terminal (constraint 36)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Flow conservation for train units at downstream terminal (constraint 37)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Capacity of upstream service from assigned train units (constraint 38)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Capacity of downstream service from assigned train units (constraint 39)
+%@ con eq_0043 kind=linear domain=- indicator=- :: At least one train unit assigned to each upstream service (constraint 43)
+%@ con eq_0044 kind=linear domain=- indicator=- :: At least one train unit assigned to each downstream service (constraint 44)
+%@ con eq_0045 kind=linear domain=- indicator=- :: Maximum number of train units on an upstream service (constraint 45)
+%@ con eq_0046 kind=linear domain=- indicator=- :: Maximum number of train units on a downstream service (constraint 46)
+%@ con eq_0047 kind=linear domain=- indicator=- :: Total train units used limited by available fleet (constraint 47)
+%@ con eq_0048 kind=linear domain=- indicator=- :: Slack time requirement for coupling/decoupling at upstream terminal (constraint 48)
+%@ con eq_0049 kind=linear domain=- indicator=- :: Slack time requirement for coupling/decoupling at downstream terminal (constraint 49)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Complete multi-objective MINLP model formulation (equation 50)
+%@ con eq_0051 kind=linear domain=- indicator=- :: Chromosome feasibility: upstream headways sum to planning horizon (equation 51)
+%@ con eq_0052 kind=linear domain=- indicator=- :: Chromosome feasibility: downstream headways sum to planning horizon (equation 52)
+%@ con eq_0053 kind=linear domain=- indicator=- :: Fitness function with penalties for chromosome feasibility (equation 53)
+%@ con eq_0054 kind=linear domain=- indicator=- :: Linearization: α_ij ≤ y_ij for linkage arc indicator
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linearization: y_ij ≤ M α_ij for linkage arc indicator
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linearization: β_pj ≤ n_pj for departure-from-depot indicator
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linearization: n_pj ≤ M β_pj for departure-from-depot indicator
+%@ con eq_0058 kind=linear domain=- indicator=- :: Linearization: δ_jp ≤ m_jp for return-to-depot indicator
+%@ con eq_0059 kind=linear domain=- indicator=- :: Linearization: m_jp ≤ M δ_jp for return-to-depot indicator
+%@ con eq_0061 kind=linear domain=- indicator=- :: Flow conservation of train units at upstream terminal in the subproblem
+%@ con eq_0062 kind=linear domain=- indicator=- :: Flow conservation of train units at downstream terminal in the subproblem
+%@ con eq_0063_a kind=linear domain=- indicator=- :: Capacity of an upstream service in the train unit allocation subproblem
+%@ con eq_0063_b kind=linear domain=- indicator=- :: Capacity of a downstream service in the train unit allocation subproblem
+%@ con eq_0063_c kind=linear domain=- indicator=- :: Upper bound on service capacity by maximum train units
+%@ con eq_0064 kind=linear domain=- indicator=- :: At least one train unit assigned to each service in the subproblem
+%@ con eq_0065 kind=linear domain=- indicator=- :: Maximum number of train units per service in the subproblem
+%@ con eq_0066_a kind=linear domain=- indicator=- :: Balance of train units leaving the depot in the subproblem
+%@ con eq_0066_b kind=linear domain=- indicator=- :: Balance of train units returning to the depot in the subproblem
+%@ con eq_0067 kind=linear domain=- indicator=- :: Total train units used does not exceed available fleet in the subproblem
+%@ con eq_0068 kind=linear domain=- indicator=- :: Slack time requirement for coupling/decoupling at upstream terminal in the subproblem
+%@ con eq_0069 kind=linear domain=- indicator=- :: Slack time requirement for coupling/decoupling at downstream terminal in the subproblem

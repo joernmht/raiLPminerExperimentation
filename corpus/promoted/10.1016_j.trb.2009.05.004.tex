@@ -1,0 +1,25 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2009.05.004
+%@ meta id=10.1016_j.trb.2009.05.004 family=lp schema=0.1.0
+%@ name :: A tabu search algorithm for rerouting trains during rail operations
+%@ desc :: Mined from A tabu search algorithm for rerouting trains during rail operations (Transportation Research Part B Methodological, 2009).
+%@ prov source :: 10.1016/j.trb.2009.05.004
+%@ prov reference :: A tabu search algorithm for rerouting trains during rail operations
+%@ prov author :: Francesco Corman; Andrea D’Ariano; Dario Pacciarelli; Marco Pranzo
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total train delay
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Train event time (departure/arrival) at a node
+%@ param F shape=- kind=scalar domain=- :: Set of fixed precedence constraints between events
+%@ index i ordered=0 cyclic=0 :: Index for an event node
+%@ index j ordered=0 cyclic=0 :: Index for an event node
+%@ param w shape=- kind=scalar domain=- :: Minimum time difference between events i and j
+%@ param A shape=- kind=scalar domain=- :: Set of alternative precedence constraints (disjunctive)
+%@ index h ordered=0 cyclic=0 :: Index for an event node in alternative constraint
+%@ index k ordered=0 cyclic=0 :: Index for an event node in alternative constraint
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Fixed precedence constraints
+%@ con eq_0001_c kind=linear domain=- indicator=- :: Alternative precedence constraints
+\begin{align}
+  \min\quad & t_{n} - t_{0} \tag{eq\_0001\_a} \\
+  & t_{j} - t_{i} \geq w_{\mathit{ij}} \left(i , j\right) \in F \tag{eq\_0001\_b} \\
+  & \left(t_{j} - t_{i} \geq w_{\mathit{ij}}\right) \vee \left(t_{k} - t_{h} \geq w_{\mathit{hk}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0001\_c} \\
+\end{align}

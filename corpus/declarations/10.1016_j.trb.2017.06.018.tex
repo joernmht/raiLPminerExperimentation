@@ -1,0 +1,89 @@
+% Declaration sidecar for 10.1016_j.trb.2017.06.018
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.06.018
+% Train timetabling by skip-stop planning in highly congested lines
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2017.06.018.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Maximize total profit of selected arcs
+
+%@ param p shape=T kind=vector domain=- :: Profit of train t, used in objective to maximize total profit
+%@ var x shape=T,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc a is selected for train t
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the time-space network
+%@ index T ordered=0 cyclic=0 :: Set of trains, including existing and new ones
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: σ
+
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the time-space network
+%@ index v ordered=0 cyclic=0 :: Node in the time-space network
+
+% unusable as an identifier, rename or drop: τ
+
+%@ var z shape=T,V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t stops at node v
+%@ var y shape=V domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if any train stops at node v
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ index R ordered=0 cyclic=0 :: Set of tracks (routes) between stations
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes for a given station and track
+%@ index h ordered=0 cyclic=0 :: Station index (used in pairs with i)
+%@ index w ordered=0 cyclic=0 :: Departure node in the time-space network
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes for a given station and track
+%@ index H ordered=0 cyclic=0 :: Set of headway values (time intervals)
+%@ param c shape=S kind=vector domain=- :: Capacity of station i (maximum number of trains)
+%@ param q shape=- kind=scalar domain=- :: Headway value used in capacity constraints
+%@ param d shape=S kind=vector domain=- :: Minimum dwelling time at a station
+%@ param maxstr shape=T kind=vector domain=- :: Maximum total stretch (delay) allowed for train t
+
+% unusable as an identifier, rename or drop: Δ
+
+%@ param maxcanc shape=T kind=vector domain=- :: Maximum number of cancellations (skipped stops) for train t
+%@ param l shape=T,S,S kind=matrix domain=- :: Minimum travel time of train t between stations h and i
+%@ param acc shape=T kind=vector domain=- :: Acceleration time of train t
+%@ param dec shape=T kind=vector domain=- :: Deceleration time of train t
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, r, t, u
+% (If one of these is really an index family, add a %@ index line for it.)
+
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Flow conservation at intermediate nodes for each train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Relates stop variable z to selected incoming arc for each train and node
+%@ con eq_0005 kind=linear domain=- indicator=- :: Relates station stop indicator y to any train stopping at node
+%@ con eq_0006 kind=headway domain=- indicator=- :: Departure headway constraint: at most one train can depart within a headway time interval at each track
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint: at most one train can arrive within a headway time interval at each track
+%@ con eq_0008 kind=capacity domain=- indicator=- :: Station track capacity constraint limiting number of trains simultaneously at a station
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraints on maximum total stretch (delay) allowed for each train
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraints on maximum number of skipped stops (cancellations) for each train
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Overtaking constraints on selected arcs to prevent train collisions
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary domain for arc selection and stop variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary domain for station stop indicator
+%@ con eq_0014 kind=ordering domain=- indicator=- :: Strengthened overtaking constraint based on departure nodes only
+%@ con eq_0015_a kind=linear domain=- indicator=- :: Overtaking constraint component (a)
+%@ con eq_0015_b kind=linear domain=- indicator=- :: Overtaking constraint component (b)
+%@ con eq_0015_c kind=linear domain=- indicator=- :: Overtaking constraint component (c)
+%@ con eq_0015_d kind=linear domain=- indicator=- :: Overtaking constraint component (d)
+%@ con eq_0015_e kind=linear domain=- indicator=- :: Overtaking constraint component (e)
+%@ con eq_0015_f kind=linear domain=- indicator=- :: Overtaking constraint component (f)
+%@ index T_new shape=- domain=- role=set drole=index lo=- hi=- :: New train indices
+%@ param qbar
+%@ index Hbar
+%@ param dw
+%@ param theta

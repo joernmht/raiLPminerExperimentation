@@ -1,0 +1,131 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2025.100534
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2025.100534
+% Train rescheduling for a metro corridor under unidirectional disruptions considering the trade-off between confirm phase and interrupt phase
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2025.100534.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted delay: sum of turn-around train arrival/departure times at DRS plus M-weighted sum of opposite-direction train times
+
+% N: classified as index during review
+%@ index N ordered=1 cyclic=0 :: Set of trains in a direction, ordered by train index
+
+% S: classified as index during review
+%@ index S ordered=1 cyclic=0 :: Set of stations in a direction, ordered by station index
+
+% a: classified as variable during review
+%@ var a shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train at station
+
+% d: classified as variable during review
+%@ var d shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train from station
+
+% unusable as an identifier, rename or drop: θ
+%@ param theta shape=S kind=vector domain=- :: Dwell time at station
+
+% c: classified as parameter during review
+%@ param c shape=S kind=vector domain=- :: Running time between adjacent stations
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway (h1 for departures, h2 for arrival-departure safety)
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Scheduled headway I_plan
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Reference time t0 when disruption is confirmed
+
+% J: classified as parameter during review
+%@ param J shape=- kind=scalar domain=- :: Last train index in the direction
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Turn-around time
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for big-M constraints
+
+% z: classified as parameter during review
+%@ param z shape=- kind=scalar domain=- :: Objective value / minimum turn-around time z_min
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, l
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dwell time in disruption direction: d_i,k^x >= a_i,k^x + theta_k^x
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running time between consecutive stations in disruption direction: d_i,k+1^x = d_i,k^x + c_k,k+1
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival no earlier than planned time: a_i,k^x >= a_i,k^x(0)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwell time in non-disruption direction: d_j,l^y >= a_j,l^y + theta_l^y
+%@ con eq_0006 kind=linear domain=- indicator=- :: Running time between consecutive stations in non-disruption direction: d_j,l+1^y = d_j,l^y + c_l,l+1
+%@ con eq_0007 kind=linear domain=- indicator=- :: Arrival no earlier than planned time: a_j,l^y >= a_j,l^y(0)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum departure headway in disruption direction: d_i+1,k^x - d_i,k^x >= h1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Safe arrival-departure interval in disruption direction: a_i+1,k^x - d_i,k^x >= h2
+%@ con eq_0010 kind=linear domain=- indicator=- :: Minimum departure headway in non-disruption direction: d_j+1,l^y - d_j,l^y >= h1
+%@ con eq_0011 kind=linear domain=- indicator=- :: Safe arrival-departure interval in non-disruption direction: a_j+1,l^y - d_j,l^y >= h2
+%@ con eq_0012 kind=linear domain=- indicator=- :: Turn-around arrival interval bounded by max delay and scheduled headway: a_i+1,A^x - a_i,A^x <= t_max + I_plan
+%@ con eq_0013 kind=linear domain=- indicator=- :: Last train turn-around time: d_J,D^y - a_J,A^y = w
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Big-M headway between directions: d_i,D^x - d_j,D^y >= h1 - M*a_ij
+%@ con eq_0015 kind=big_m domain=- indicator=- :: Big-M safe interval: a_i,D^x - d_j,D^y >= h2 - M*a_ij
+%@ con eq_0016 kind=big_m domain=- indicator=- :: Big-M opposite headway: d_j,D^y - d_i,D^x >= h1 - M*(1-a_ij)
+%@ con eq_0017 kind=big_m domain=- indicator=- :: Big-M opposite arrival-departure: a_j,A^y - d_i,D^x >= h2 - M*(1-a_ij)
+%@ con eq_0018 kind=linear domain=- indicator=- :: First turn-around train arrival equals planned: a_1,A^x = a_1,p^x(0)
+%@ con eq_0019 kind=linear domain=- indicator=- :: First turn-around train return-track arrival: a_1,R^x = t0 + z_in + c_ar
+%@ con eq_0020 kind=linear domain=- indicator=- :: First turn-around train departure lower bound: d_1,D^x >= a_1,R^x + z_min - theta_p^x - c_ar
+%@ con eq_0021 kind=linear domain=- indicator=- :: Second turn-around train earliest arrival: a_2,A^x >= t0 + z_in + h2
+%@ con eq_0022 kind=linear domain=- indicator=- :: Second turn-around train return-track arrival: a_2,R^x = d_1,D^x - theta_{n-p+1}^y - c_rd + h2
+%@ con eq_0023 kind=linear domain=- indicator=- :: Second turn-around train departure lower bound: d_2,D^x >= a_2,R^x + z_min - theta_p^x - c_ar = d_1,D^x + h2 + w
+%@ con eq_0024 kind=linear domain=- indicator=- :: Later turn-around train arrival after previous leaves arrival track: a_i,A^x >= a_i-1,R^x - c_ar + h2, i>2
+%@ con eq_0025 kind=linear domain=- indicator=- :: Later turn-around train return-track arrival: a_i,R^x = d_i-1,D^x - theta_{n-p+1}^y - c_rd + h2, i>2
+%@ con eq_0026 kind=linear domain=- indicator=- :: Later turn-around train departure headway: d_i,D^x >= d_i-1,D^x + h2 + w, i>2
+%@ con eq_0027 kind=big_m domain=- indicator=- :: Big-M headway between directions: d_i,D^x - d_j,D^y >= h1 - M*a_ij
+%@ con eq_0028 kind=big_m domain=- indicator=- :: Big-M headway with turn-around time: d_i,D^x - d_j,D^y >= h2 + w - M*a_ij
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Big-M safe interval: a_i,D^x - d_j,D^y >= h2 - M*a_ij
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Big-M opposite headway: d_j,D^y - d_i,D^x >= h1 - M*(1-a_ij)
+%@ con eq_0031 kind=big_m domain=- indicator=- :: Big-M opposite arrival-departure: a_j,A^y - d_i,D^x >= h2 - M*(1-a_ij)
+%@ con eq_0032 kind=linear domain=- indicator=- :: First turn-around train arrival equals planned: a_1,A^x = a_1,p^x(0)
+%@ con eq_0033 kind=linear domain=- indicator=- :: First turn-around train departure from arrival track lower bound: d_1,A^x >= t0 + z_in
+%@ con eq_0034 kind=linear domain=- indicator=- :: First turn-around train departure from DRS lower bound: d_1,D^x >= d_1,A^x + z_min - theta_p^x
+%@ con eq_0035 kind=linear domain=- indicator=- :: Later turn-around train arrival after previous leaves arrival track: a_i,A^x >= d_i-1,A^x + h2, i>1
+%@ con eq_0036 kind=linear domain=- indicator=- :: Later turn-around train departure from arrival track: d_i,A^x = d_i,D^x + z_min - theta_p^x, i>1
+%@ con eq_0037 kind=linear domain=- indicator=- :: Dwell time on arrival track for later trains: d_i,A^x - a_i,A^x >= theta_p^x, i>1
+%@ con eq_0038 kind=big_m domain=- indicator=- :: Big-M headway between directions: d_i,D^x - d_j,D^y >= h1 - M*a_ij
+%@ con eq_0039 kind=big_m domain=- indicator=- :: Big-M opposite headway: d_j,D^y - d_i,D^x >= h1 - M*(1-a_ij)
+%@ con eq_0040 kind=linear domain=- indicator=- :: First turn-around train arrival equals planned: a_1,A^x = a_1,p^x(0)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Consecutive turn-around train arrival headway: a_i+1,A^x - a_i,A^x >= h2
+%@ con eq_0042 kind=linear domain=- indicator=- :: Turn-around time for each turn-around train: d_i,D^x - a_i,A^x = w
+%@ con eq_0043 kind=big_m domain=- indicator=- :: Big-M headway between directions: d_i,D^x - d_j,D^y >= h1 - M*a_ij
+%@ con eq_0044 kind=big_m domain=- indicator=- :: Big-M headway with turn-around time: d_i,D^x - d_j,D^y >= h2 + w - M*a_ij
+%@ con eq_0045 kind=big_m domain=- indicator=- :: Big-M opposite headway: d_j,D^y - d_i,D^x >= h1 - M*(1-a_ij)
+%@ con eq_0046 kind=big_m domain=- indicator=- :: Big-M opposite arrival-departure: a_j,D^y - d_i,D^x >= h2 - M*(1-a_ij)
+%@ con eq_0047 kind=linear domain=- indicator=- :: First turn-around train arrival no later than max delay: a_1,A^x <= t0 + t_max
+%@ con eq_0048 kind=linear domain=- indicator=- :: Consecutive turn-around train arrival after previous departure: a_i+1,A^x - d_i,D^x >= h2
+%@ con eq_0049 kind=big_m domain=- indicator=- :: Big-M headway between directions: d_i,D^x - d_j,D^y >= h1 - M*a_ij
+%@ con eq_0050 kind=big_m domain=- indicator=- :: Big-M headway with turn-around time: d_i,D^x - d_j,D^y >= h2 + w - M*a_ij
+%@ con eq_0051 kind=big_m domain=- indicator=- :: Big-M opposite headway: d_j,D^y - d_i,D^x >= h1 - M*(1-a_ij)
+%@ con eq_0052 kind=big_m domain=- indicator=- :: Big-M opposite arrival-departure: a_j,A^y - d_i,D^x >= h2 - M*(1-a_ij)
+%@ con eq_0053 kind=linear domain=- indicator=- :: First turn-around train arrival equals planned: a_1,A^x = a_1,p^x(0)
+%@ con eq_0054 kind=linear domain=- indicator=- :: First turn-around train return-track arrival: a_1,R^x = t0 + z_in + c_ar
+%@ con eq_0055 kind=linear domain=- indicator=- :: First turn-around train departure lower bound: d_1,D^x >= a_1,R^x + z_min - w - c_ar
+%@ con eq_0056 kind=linear domain=- indicator=- :: Second turn-around train earliest arrival: a_2,A^x >= t0 + z_in + h2
+%@ con eq_0057 kind=linear domain=- indicator=- :: Second turn-around train return-track arrival: a_2,R^x = d_1,D^x - w - c_rd + h2
+%@ con eq_0058 kind=linear domain=- indicator=- :: Second turn-around train departure lower bound: d_2,D^x >= a_2,R^x + z_min - w - c_ar = d_1,D^x + h2 + w
+%@ con eq_0059 kind=linear domain=- indicator=- :: Later turn-around train arrival after previous leaves arrival track: a_i,A^x >= a_i-1,R^x - c_ar + h2, i>2
+%@ con eq_0060 kind=linear domain=- indicator=- :: Later turn-around train return-track arrival: a_i,R^x = d_i-1,D^x - w - c_rd + h2, i>2
+%@ con eq_0061 kind=linear domain=- indicator=- :: Later turn-around train departure headway: d_i,D^x >= d_i-1,D^x + h2 + w, i>2

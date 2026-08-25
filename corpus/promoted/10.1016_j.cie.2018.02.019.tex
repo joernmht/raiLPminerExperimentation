@@ -1,0 +1,130 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2018.02.019
+%@ meta id=10.1016_j.cie.2018.02.019 family=lp schema=0.1.0
+%@ name :: Real-time optimal train regulation design for metro lines with energy-saving
+%@ desc :: Mined from Real-time optimal train regulation design for metro lines with energy-saving (Computers & Industrial Engineering, 2018).
+%@ prov source :: 10.1016/j.cie.2018.02.019
+%@ prov reference :: Real-time optimal train regulation design for metro lines with energy-saving
+%@ prov author :: Huimin Zhang; Shukai Li; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of timetable deviation, headway deviation, control action magnitudes, and energy consumption
+%@ var td shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train j from station i
+%@ var r shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual run time of train j from station i to i+1
+%@ var s shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual stop time of train j at station i+1
+%@ param R shape=i kind=vector domain=- :: Nominal run time from station i to i+1
+%@ var ur shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Control action for run time of train j from station i to i+1
+%@ param S shape=- kind=scalar domain=- :: Minimum stop time at a station
+%@ param p shape=- kind=scalar domain=- :: Weight of timetable deviation in objective
+%@ var ta shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival time of train j at station i+1
+%@ var up shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Control action for stop time of train j at station i+1
+%@ param Td shape=i,j kind=matrix domain=- :: Nominal departure time of train j from station i+1
+%@ var X shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Time deviation from nominal departure time
+%@ param H shape=- kind=scalar domain=- :: Nominal headway
+%@ var Y shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Headway deviation between trains
+%@ param T shape=- kind=scalar domain=- :: Nominal arrival time or nominal time vector
+%@ index i ordered=0 cyclic=0 :: Index of stations
+%@ index M ordered=0 cyclic=0 :: Number of stations
+%@ var E shape=i,j domain=continuous role=primary drole=- lo=- hi=- :: Energy consumption of train j between stations i and i+1
+%@ param P shape=- kind=scalar domain=- :: Power consumption coefficients
+%@ param u shape=i kind=vector domain=- :: Coefficients for traction energy consumption
+%@ param I shape=- kind=scalar domain=- :: Identity matrix or minimum departure-arrival interval
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ param a shape=- kind=scalar domain=- :: Weight of run-time control action
+%@ param b shape=- kind=scalar domain=- :: Weight of stop-time control action
+%@ param c shape=- kind=scalar domain=- :: Weight of energy consumption
+%@ param q shape=- kind=scalar domain=- :: Weight of headway deviation
+%@ param C shape=M kind=vector domain=- :: Row vector of energy consumption weights
+%@ param UR shape=i kind=vector domain=- :: Bounds for run-time control action
+%@ param UP shape=i kind=vector domain=- :: Bounds for stop-time control action
+%@ index j ordered=0 cyclic=0 :: Index of trains
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: State variable representing time
+%@ index k ordered=0 cyclic=0 :: Stage index in real-time model
+%@ con eq_0001 kind=linear domain=- indicator=- :: Recursive departure time update: td_{i+1}^j = td_i^j + r_i^j + s_{i+1}^j
+%@ con eq_0002 kind=linear domain=- indicator=- :: Actual run time decomposition: r_i^j = R_i + ur_i^j + ωr_i^j
+%@ con eq_0003 kind=linear domain=- indicator=- :: Actual stop time with control and delay rate: s_{i+1}^j = S0 + up_{i+1}^j + ωp_{i+1}^j + λ_{i+1}^j(ta_{i+1}^j - td_{i+1}^{j-1})
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival time update: ta_{i+1}^j = td_i^j + r_i^j
+%@ con eq_0005 kind=linear domain=- indicator=- :: Timetable deviation definition: X_{i+1}^j = td_{i+1}^j - Td_{i+1}^j
+%@ con eq_0006 kind=linear domain=- indicator=- :: Headway deviation definition: Y_{i+1}^j = (td_{i+1}^j - td_{i+1}^{j-1}) - H = X_{i+1}^j - X_{i+1}^{j-1}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Vector arrival time dynamic: ta_k = Λ·td_k + T0,k + R + ur_k + ωr_k
+%@ con eq_0008 kind=linear domain=- indicator=- :: Vector departure time dynamic: td_{k+1} = Λ·td_k + T0,k + R + ur_k + ωr_k + S0 + up_k + ωp_k + λ_k(ta_k - td_k)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Vector timetable deviation update: X_{k+1} = td_{k+1} - Td_{k+1}
+%@ con eq_0010 kind=linear domain=- indicator=- :: Vector headway deviation update: Y_{k+1} = X_{k+1} - X_k
+%@ con eq_0011 kind=linear domain=- indicator=- :: Onboard passenger flow balance for train j at station i
+%@ con eq_0012 kind=linear domain=- indicator=- :: Boundary condition: no onboard passengers at first station (αob,1^j = 0)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Vector passenger flow dynamic with boarding passengers and upstream destinations
+%@ con eq_0014 kind=linear domain=- indicator=- :: Total energy decomposition: E_{i+1}^j = E_tr,i+1^j + E_aux,i+1^j
+%@ con eq_0015 kind=linear domain=- indicator=- :: Auxiliary energy consumption: E_aux,i+1^j = (P_ac·αob,i+1^j + P_lc)(td_{i+1}^j - td_i^j)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Traction energy with no passengers: E_tr0,i+1^j = u1,i/(u2,i - r_i^j) + u3,i
+%@ con eq_0017 kind=linear domain=- indicator=- :: Traction energy with passengers: E_tr,i+1^j = (1 + ωp·αob,i+1^j)·u1,i/(u2,i - r_i^j) + u3,i
+%@ con eq_0018 kind=linear domain=- indicator=- :: Vector energy decomposition: E_{k+1} = E_tr,k+1 + E_aux,k+1
+%@ con eq_0019 kind=linear domain=- indicator=- :: Vector auxiliary energy: E_aux,k+1 = (P_ac·αob,k + P_lc·I)(td_{k+1} - Λ·td_k - T0,k)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Vector traction energy: E_tr,k+1 = (I + ωp·diag(αob,k))·E_tr0,k+1
+%@ con eq_0021 kind=linear domain=- indicator=- :: Objective function: minimize weighted sum of timetable deviation, headway deviation, control actions, and energy consumption
+%@ con eq_0022 kind=linear domain=- indicator=- :: Vector objective: J_k = p·X^T X + q·Y^T Y + a·ur^T ur + b·up^T up + C·E
+%@ con eq_0023 kind=linear domain=- indicator=- :: Safety constraint: ta_{i+1}^j - td_{i+1}^{j-1} ≥ I_{i+1,min}
+%@ con eq_0024 kind=linear domain=- indicator=- :: Stop-time constraint: s_{i+1}^j ≥ S0
+%@ con eq_0025 kind=linear domain=- indicator=- :: Transformed stop-time constraint: up + ωp + λ(ta - td) ≥ 0
+%@ con eq_0026 kind=linear domain=- indicator=- :: Run-time control bounds: UR_min ≤ ur_i^j ≤ UR_max
+%@ con eq_0027 kind=linear domain=- indicator=- :: Stop-time control bounds: UP_min ≤ up_i^j ≤ UP_max
+%@ con eq_0028 kind=linear domain=- indicator=- :: Vector safety constraint: ta_k - td_k ≥ I_min
+%@ con eq_0029 kind=linear domain=- indicator=- :: Vector stop-time constraint: up_k + ωp_k + λ_k(ta_k - td_k) ≥ 0
+%@ con eq_0030 kind=linear domain=- indicator=- :: Vector run-time control bounds: UR_min ≤ ur_k ≤ UR_max
+%@ con eq_0031 kind=linear domain=- indicator=- :: Vector stop-time control bounds: UP_min ≤ up_k ≤ UP_max
+%@ con eq_0032_b kind=linear domain=- indicator=- :: MPC state equation: ta_k = Λ·td_k + T0,k + R + ur_k + ωr_k
+%@ con eq_0032_c kind=linear domain=- indicator=- :: MPC state equation: td_{k+1} = Λ·td_k + T0,k + R + ur_k + ωr_k + S0 + up_k + ωp_k + λ_k(ta_k - td_k)
+%@ con eq_0032_d kind=linear domain=- indicator=- :: MPC state equation: X_{k+1} = td_{k+1} - Td_{k+1}
+%@ con eq_0032_e kind=linear domain=- indicator=- :: MPC state equation: Y_{k+1} = X_{k+1} - X_k
+%@ con eq_0032_f kind=linear domain=- indicator=- :: MPC passenger flow equation: αob,k = Λ[αob,k-1 + α_{k-1}(td_k - td_{k-1})] - Σ Λ^{θ+1} αl_k^θ (td_{k-θ} - td_{k-θ-1})
+%@ con eq_0032_g kind=linear domain=- indicator=- :: MPC auxiliary energy equation: E_aux,k+1 = (P_ac·αob,k + P_lc·I)(td_{k+1} - Λ·td_k - T0,k)
+%@ con eq_0032_h kind=linear domain=- indicator=- :: MPC traction energy equation: E_tr,k+1 = (I + ωp·diag(αob,k))·E_tr0,k+1
+%@ con eq_0032_i kind=linear domain=- indicator=- :: MPC total energy equation: E_{k+1} = E_tr,k+1 + E_aux,k+1
+%@ con eq_0032_j kind=linear domain=- indicator=- :: MPC safety constraint: ta_k - td_k ≥ I_min
+%@ con eq_0032_k kind=linear domain=- indicator=- :: MPC stop-time constraint: up_k + ωp_k + λ_k(ta_k - td_k) ≥ 0
+%@ con eq_0032_l kind=linear domain=- indicator=- :: MPC run-time control constraint: UR_min ≤ ur_k ≤ UR_max
+%@ con eq_0032_m kind=linear domain=- indicator=- :: MPC stop-time control constraint: UP_min ≤ up_k ≤ UP_max
+\begin{align}
+  & \mathit{td}_{i + 1}^{j} = \mathit{td}_{i}^{j} + r_{i}^{j} + s_{i + 1}^{j} , \tag{eq\_0001} \\
+  & r_{i}^{j} = R_{i} + \mathit{ur}_{i}^{j} + \mathit{omega} r_{i}^{j} , \tag{eq\_0002} \\
+  & s_{i + 1}^{j} = S_{0} + \mathit{up}_{i + 1}^{j} + \mathit{omega} p_{i + 1}^{j} + \mathit{lambda}_{i + 1}^{j} \cdot \left(\mathit{ta}_{i + 1}^{j} - \mathit{td}_{i + 1}^{j - 1}\right) , \tag{eq\_0003} \\
+  & \mathit{ta}_{i + 1}^{j} = \mathit{td}_{i}^{j} + r_{i}^{j} . \tag{eq\_0004} \\
+  & X_{i + 1}^{j} = \mathit{td}_{i + 1}^{j} - \mathit{Td}_{i + 1}^{j} , \tag{eq\_0005} \\
+  & Y_{i + 1}^{j} = \left(\mathit{td}_{i + 1}^{j} - \mathit{td}_{i + 1}^{j - 1}\right) - H = X_{i + 1}^{j} - X_{i + 1}^{j - 1} , \tag{eq\_0006} \\
+  & \mathit{ta}_{k} = \mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k} + R + \mathit{ur}_{k} + \mathit{omega} r_{k} , \tag{eq\_0007} \\
+  & \mathit{td}_{k + 1} = \mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k} + R + \mathit{ur}_{k} + \mathit{omega} r_{k} + S_{0} + \mathit{up}_{k} + \mathit{omega} p_{k} + \mathit{lambda}_{k} \cdot \left(\mathit{ta}_{k} - \mathit{td}_{k}\right) , \tag{eq\_0008} \\
+  & X_{k + 1} = \mathit{td}_{k + 1} - \mathit{Td}_{k + 1} , \tag{eq\_0009} \\
+  & Y_{k + 1} = X_{k + 1} - X_{k} , \tag{eq\_0010} \\
+  & \mathit{alpha}_{\mathit{ob} , i + 1}^{j} = \mathit{alpha}_{\mathit{ob} , i}^{j} + \mathit{alpha}_{i}^{j} \cdot \left(\mathit{td}_{i}^{j} - \mathit{td}_{i}^{j - 1}\right) - \sum_{l = 1}^{i - 1} \mathit{alpha} l_{l , i}^{j} \cdot \left(\mathit{td}_{l}^{j} - \mathit{td}_{l}^{j - 1}\right) , \tag{eq\_0011} \\
+  & \mathit{alpha}_{\mathit{ob} , 1}^{j} = 0 , \tag{eq\_0012} \\
+  & \mathit{alpha}_{\mathit{ob} , k} = \mathit{Lambda} \cdot \left[\mathit{alpha}_{\mathit{ob} , k - 1} + \mathit{alpha}_{k - 1} \cdot \left(\mathit{td}_{k} - \mathit{td}_{k - 1}\right)\right] - \sum_{\mathit{theta} = 1}^{M - 2} \mathit{Lambda}^{\mathit{theta} + 1} \left[\mathit{alpha} l_{k}^{\mathit{theta}} \cdot \left(\mathit{td}_{k - \mathit{theta}} - \mathit{td}_{k - \mathit{theta} - 1}\right)\right] , \tag{eq\_0013} \\
+  & E_{i + 1}^{j} = E_{\mathit{tr} , i + 1}^{j} + E_{\mathit{aux} , i + 1}^{j} , \tag{eq\_0014} \\
+  & E_{\mathit{aux} , i + 1}^{j} = \left(P_{\mathit{ac}} \cdot \mathit{alpha}_{\mathit{ob} , i + 1}^{j} + P_{\mathit{lc}}\right) \left(\mathit{td}_{i + 1}^{j} - \mathit{td}_{i}^{j}\right) , \tag{eq\_0015} \\
+  & E_{\mathit{tr} 0 , i + 1}^{j} = \left(\frac{u_{1 , i}}{u_{2 , i} - r_{i}^{j}} + u_{3 , i}\right) , \tag{eq\_0016} \\
+  & E_{\mathit{tr} , i + 1}^{j} = \left(1 + \mathit{omega}_{p} \mathit{alpha}_{\mathit{ob} , i + 1}^{j}\right) \left(\frac{u_{1 , i}}{u_{2 , i} - r_{i}^{j}} + u_{3 , i}\right) , \tag{eq\_0017} \\
+  & E_{k + 1} = E_{\mathit{tr} , k + 1} + E_{\mathit{aux} , k + 1} , \tag{eq\_0018} \\
+  & E_{\mathit{aux} , k + 1} = \left(P_{\mathit{ac}} \cdot \mathit{alpha}_{\mathit{ob} , k} + P_{\mathit{lc}} \cdot I\right) \left(\mathit{td}_{k + 1} - \left(\mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k}\right)\right) , \tag{eq\_0019} \\
+  & E_{\mathit{tr} , k + 1} = \left(I + \mathit{omega}_{p} \mathit{alpha}_{\mathit{ob} , k}^{'}\right) \cdot E_{\mathit{tr} 0 , k + 1} , \tag{eq\_0020} \\
+  & J = p \sum_{i , j} \left(X_{i + 1}^{j}\right)^{2} + q \sum_{i , j} \left(Y_{i + 1}^{j}\right)^{2} + a \sum_{i , j} \left(\mathit{ur}_{i}^{j}\right)^{2} + b \sum_{i , j} \left(\mathit{up}_{i}^{j}\right)^{2} + c \sum_{i , j} E_{i + 1}^{j} , \tag{eq\_0021} \\
+  & J_{k} = p \cdot X_{k + 1}^{T} \cdot X_{k + 1} + q \cdot Y_{k + 1}^{T} \cdot Y_{k + 1} + a \cdot \mathit{ur}_{k}^{T} \cdot \mathit{ur}_{k} + b \cdot \mathit{up}_{k}^{T} \cdot \mathit{up}_{k} + C \cdot E_{k + 1} , \tag{eq\_0022} \\
+  & \mathit{ta}_{i + 1}^{j} - \mathit{td}_{i + 1}^{j - 1} \geq I_{i + 1 , min} , \tag{eq\_0023} \\
+  & s_{i + 1}^{j} \geq S_{0} , \tag{eq\_0024} \\
+  & \mathit{up}_{i + 1}^{j} + \mathit{omega} p_{i + 1}^{j} + \mathit{lambda}_{i + 1}^{j} \cdot \left(\mathit{ta}_{i + 1}^{j} - \mathit{td}_{i + 1}^{j - 1}\right) \geq 0 . \tag{eq\_0025} \\
+  & \mathit{UR}_{i , min} \leq \mathit{ur}_{i}^{j} \leq \mathit{UR}_{i , max} , \tag{eq\_0026} \\
+  & \mathit{UP}_{i , min} \leq \mathit{up}_{i}^{j} \leq \mathit{UP}_{i , max} , \tag{eq\_0027} \\
+  & \mathit{ta}_{k} - \mathit{td}_{k} \geq I_{min} , \tag{eq\_0028} \\
+  & \mathit{up}_{k} + \mathit{omega} p_{k} + \mathit{lambda}_{k} \left(\mathit{ta}_{k} - \mathit{td}_{k}\right) \geq 0 , \tag{eq\_0029} \\
+  & \mathit{UR}_{\mathit{min}} \leq \mathit{ur}_{k} \leq \mathit{UR}_{\mathit{max}} , \tag{eq\_0030} \\
+  & \mathit{UP}_{\mathit{min}} \leq \mathit{up}_{k} \leq \mathit{UP}_{\mathit{max}} , \tag{eq\_0031} \\
+  \min\quad & \sum_{j_{0}}^{j_{f}} p \cdot X_{k + 1}^{T} \cdot X_{k + 1} + q \cdot Y_{k + 1}^{T} \cdot Y_{k + 1} + a \cdot \mathit{ur}_{k}^{T} \cdot \mathit{ur}_{k} + b \cdot \mathit{up}_{k}^{T} \cdot \mathit{up}_{k} + C \cdot E_{k + 1}^{T} \tag{eq\_0032\_a} \\
+  & \mathit{ta}_{k} = \mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k} + R + \mathit{ur}_{k} + \mathit{omega} r_{k} \tag{eq\_0032\_b} \\
+  & \mathit{td}_{k + 1} = \mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k} + R + \mathit{ur}_{k} + \mathit{omega} r_{k} + S_{0} + \mathit{up}_{k} + \mathit{omega} p_{k} + \mathit{lambda}_{k} \cdot \left(\mathit{ta}_{k} - \mathit{td}_{k}\right) \tag{eq\_0032\_c} \\
+  & X_{k + 1} = t_{k + 1} - T_{k + 1} \tag{eq\_0032\_d} \\
+  & Y_{k + 1} = X_{k + 1} - X_{k} \tag{eq\_0032\_e} \\
+  & \mathit{alpha}_{\mathit{ob} , k} = \mathit{Lambda} \cdot \left[\mathit{alpha}_{\mathit{ob} , k - 1} + \mathit{alpha}_{k - 1} \cdot \left(\mathit{td}_{k} - \mathit{td}_{k - 1}\right)\right] - \sum_{\mathit{theta} = 1}^{M - 2} \mathit{Lambda}^{\mathit{theta} + 1} \left[\mathit{alpha} l_{k}^{\mathit{theta}} \cdot \left(\mathit{td}_{k - \mathit{theta}} - \mathit{td}_{k - \mathit{theta} - 1}\right)\right] \tag{eq\_0032\_f} \\
+  & E_{\mathit{aux} , k + 1} = \left(P_{\mathit{ac}} \cdot \mathit{alpha}_{\mathit{ob} , k} + P_{\mathit{lc}} \cdot I\right) \cdot \left(\mathit{td}_{k + 1} - \left(\mathit{Lambda} \cdot \mathit{td}_{k} + T_{0 , k}\right)\right) \tag{eq\_0032\_g} \\
+  & E_{\mathit{tr} , k + 1} = \left(I + \mathit{omega}_{p} \mathit{alpha}_{\mathit{ob} , k}\right) E_{\mathit{tr} 0 , k + 1} \tag{eq\_0032\_h} \\
+  & E_{k + 1} = E_{\mathit{tr} , k + 1} + E_{\mathit{aux} , k + 1} \tag{eq\_0032\_i} \\
+  & \mathit{ta}_{k} - \mathit{td}_{k} \geq I_{min} , k = j_{0} , \ldots , j_{f} \tag{eq\_0032\_j} \\
+  & \mathit{up}_{k} + \mathit{omega} p_{k} + \mathit{lambda}_{k} \left(\mathit{ta}_{k} - \mathit{td}_{k}\right) \geq 0 , k = j_{0} , \ldots , j_{f} \tag{eq\_0032\_k} \\
+  & \mathit{UR}_{min} \leq \mathit{ur}_{k} \leq \mathit{UR}_{max} , k = j_{0} , \ldots , j_{f} \tag{eq\_0032\_l} \\
+  & \mathit{UP}_{min} \leq \mathit{up}_{k} \leq \mathit{UP}_{max} , k = j_{0} , \ldots , j_{f} \tag{eq\_0032\_m} \\
+\end{align}

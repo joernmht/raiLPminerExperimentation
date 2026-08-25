@@ -1,0 +1,116 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.07.011
+%@ meta id=10.1016_j.trb.2019.07.011 family=milp schema=0.1.0
+%@ name :: (untitled)
+%@ desc :: Mined from (untitled) (EUR Research Repository (Erasmus University Rotterdam), 2019).
+%@ prov source :: 10.1016/j.trb.2019.07.011
+%@ prov reference :: (untitled)
+%@ prov author :: Gert-Jaap Polinder; Thomas Breugem; Twan Dollevoet; Gábor Maróti
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted sum of activity durations (planned travel times)
+%@ index A ordered=0 cyclic=0 :: Set of activities (driving, dwell, transfer, safety)
+%@ param T shape=- kind=scalar domain=- :: Cycle period length (e.g., one hour)
+%@ var p shape=A domain=integer role=primary drole=- lo=- hi=- :: Integer variable for period count in PESP modulo constraint
+%@ param u shape=A kind=vector domain=- :: Upper bound on time difference for each activity
+%@ param w shape=Abar kind=vector domain=- :: Objective weight for each activity (in Ā)
+%@ index Abar ordered=0 cyclic=0 :: Set of activities in objective (Ā)
+%@ index Z ordered=0 cyclic=0 :: Uncertainty set of disturbance scenarios
+%@ param s shape=- kind=scalar domain=- :: Abbreviation 's.t.' (subject to); not a model parameter
+%@ param t shape=- kind=scalar domain=- :: Abbreviation 's.t.' (subject to); not a model parameter
+%@ var y shape=V,Z domain=non_negative role=primary drole=- lo=- hi=- :: Adjustment to event time for disturbance scenario
+%@ index Vbar ordered=0 cyclic=0 :: Set of events in objective (V̄)
+%@ index D ordered=0 cyclic=0 :: Set of disturbed activities
+%@ param g shape=D kind=vector domain=- :: Increase in lower bound for each disturbed activity
+%@ index V ordered=0 cyclic=0 :: Set of events
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers (notation), not a model parameter
+%@ index N ordered=0 cyclic=0 :: Set of events in reformulated adjustment budget constraint (N̄)
+%@ index L ordered=0 cyclic=0 :: Set of scenarios for lower-bound constraints
+%@ index U ordered=0 cyclic=0 :: Set of scenarios for upper-bound constraints
+%@ param a shape=- kind=scalar domain=- :: Constant term in robust constraint
+%@ param b shape=- kind=scalar domain=- :: Coefficient vector in robust constraint (dimension d)
+%@ param d shape=- kind=scalar domain=- :: Dimension of uncertainty set
+%@ con eq_0001 kind=linear domain=- indicator=- :: PESP periodic interval constraint for each activity
+%@ con eq_0004 kind=linear domain=- indicator=- :: Uncertainty budget: sum of adjustments over V̄ ≤ β for all ζ∈Z
+%@ con eq_0005 kind=linear domain=- indicator=- :: Robust lower bound for disturbed activity (i,j)∈D
+%@ con eq_0006 kind=linear domain=- indicator=- :: Robust lower bound for non-disturbed activity (i,j)∈A∖D
+%@ con eq_0007 kind=linear domain=- indicator=- :: Robust upper bound for activity (i,j)∈A
+%@ con eq_0008 kind=linear domain=- indicator=- :: Nominal scenario: y_iζ0 = 0 for all events i
+%@ con eq_0009 kind=linear domain=- indicator=- :: Domain: p_ij ∈ Z_+
+%@ con eq_0010 kind=linear domain=- indicator=- :: Domain: π_i ∈ {0,1,…,T−1}
+%@ con eq_0011 kind=linear domain=- indicator=- :: Domain: y_iζ ∈ R_+
+%@ con eq_0022 kind=linear domain=- indicator=- :: Reformulated budget constraint: αλ + Σ μ_ij ≤ β
+%@ con eq_0023 kind=linear domain=- indicator=- :: Dual constraint: λ + μ_kl ≥ Σ_i δ^i_kl for each (k,l)∈D
+%@ con eq_0024 kind=linear domain=- indicator=- :: Robust lower bound for disturbed activity over scenarios L
+%@ con eq_0025 kind=linear domain=- indicator=- :: Robust lower bound for non-disturbed activity over scenarios L
+%@ con eq_0026 kind=linear domain=- indicator=- :: Robust upper bound for activity over scenarios U
+%@ con eq_0027 kind=linear domain=- indicator=- :: Domain: p_ij ∈ Z_+ in reformulated model
+%@ con eq_0028_a kind=linear domain=- indicator=- :: Event time domain: π_i ≥ 0
+%@ con eq_0028_b kind=linear domain=- indicator=- :: Event time domain: π_i ≤ T−1
+%@ con eq_0028_c kind=linear domain=- indicator=- :: Event time domain: π_i integer
+%@ con eq_0028_d kind=linear domain=- indicator=- :: Event time domain: π_i ∈ {0,1,…,T−1}
+%@ con eq_0030 kind=linear domain=- indicator=- :: Domain: δ_i^kl ∈ R_+
+%@ con eq_0031 kind=linear domain=- indicator=- :: Domain: μ_ij ∈ R_+
+%@ con eq_0032 kind=linear domain=- indicator=- :: Domain: λ ∈ R_+
+%@ con eq_0033 kind=linear domain=- indicator=- :: Robust counterpart inequality for disturbed activity lower bound
+%@ con eq_0034 kind=linear domain=- indicator=- :: Robust counterpart inequality for disturbed activity upper bound
+%@ con eq_0035 kind=linear domain=- indicator=- :: Robust counterpart inequality for non-disturbed activity lower bound
+%@ con eq_0036 kind=linear domain=- indicator=- :: Robust counterpart inequality for non-disturbed activity upper bound
+%@ con eq_0037 kind=linear domain=- indicator=- :: Dual reformulation constraint for activity under uncertainty set
+%@ con eq_0038 kind=linear domain=- indicator=- :: Dual reformulation constraint linking disturbance coefficient
+%@ con eq_0039 kind=linear domain=- indicator=- :: Dual reformulation constraint for lower bound increase g
+%@ con eq_0044 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for disturbed activity lower bound
+%@ con eq_0045 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for disturbed activity upper bound
+%@ con eq_0048 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for non-disturbed activity lower bound
+%@ con eq_0049 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for non-disturbed activity upper bound
+%@ con eq_0050 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for nominal activity bound
+%@ con eq_0051 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for disturbed activity with scenario
+%@ con eq_0052 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for non-disturbed activity with scenario
+%@ con eq_0053 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for activity upper bound with scenario
+%@ con eq_0054 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for robust constraint
+%@ con eq_0056 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for adjustment budget
+%@ con eq_0057 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for lower bound increase
+%@ con eq_0058 kind=linear domain=- indicator=- :: Cutting-plane feasibility cut for upper bound increase
+\begin{align}
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \in \left[\mathit{ell}_{i j} , u_{i j}\right] \forall \left(i , j\right) \in A \tag{eq\_0001} \\
+  \min\quad & \sum_{\left(i , j\right) \in \bar{A}} w_{i j} \left(\mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j}\right) \tag{eq\_0003} \\
+  & \text{s}.\text{t}. \sum_{i \in \bar{V}} y_{i \mathit{zeta}} \leq \mathit{beta} \forall \mathit{zeta} \in Z \tag{eq\_0004} \\
+  & \mathit{pi}_{j} + y_{j \mathit{zeta}} - \mathit{pi}_{i} - y_{i \mathit{zeta}} + T \cdot p_{i j} \geq \mathit{ell}_{i j} + g_{i j} \mathit{zeta}_{i j} \forall \left(i , j\right) \in D , \mathit{zeta} \in Z \tag{eq\_0005} \\
+  & \mathit{pi}_{j} + y_{j \mathit{zeta}} - \mathit{pi}_{i} - y_{i \mathit{zeta}} + T \cdot p_{i j} \geq \mathit{ell}_{i j} \forall \left(i , j\right) \in A \backslash D , \mathit{zeta} \in Z \tag{eq\_0006} \\
+  & \mathit{pi}_{j} + y_{j \mathit{zeta}} - \mathit{pi}_{i} - y_{i \mathit{zeta}} + T \cdot p_{i j} \leq u_{i j} \forall \left(i , j\right) \in A , \mathit{zeta} \in Z \tag{eq\_0007} \\
+  & y_{i \mathit{zeta}^{0}} = 0 \forall i \in V \tag{eq\_0008} \\
+  & p_{i j} \in \mathcal{Z}_{+} \forall \left(i , j\right) \in A \tag{eq\_0009} \\
+  & \mathit{pi}_{i} \in \left\{0 , 1 , \ldots , T - 1\right\} \forall i \in V \tag{eq\_0010} \\
+  & y_{i \mathit{zeta}} \in \mathcal{R}_{+} \forall i \in V , \mathit{zeta} \in Z . \tag{eq\_0011} \\
+  & \sum_{\left(i , j\right) \in D} \mathit{zeta}_{i j} \leq \mathit{alpha} . \tag{eq\_0022} \\
+  & y_{i \mathit{zeta}} = \sum_{\left(k , l\right) \in D} \mathit{delta}_{k l}^{i} \mathit{zeta}_{k l} , \tag{eq\_0023} \\
+  & \sum_{i \in \bar{N}} \sum_{\left(k , l\right) \in D} \mathit{delta}_{k l}^{i} \mathit{zeta}_{k l} \leq \mathit{beta} \forall \mathit{zeta} \in Z \tag{eq\_0024} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \geq \mathit{ell}_{i j} + g_{i j} \mathit{zeta}_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in D , \mathit{zeta} \in Z \tag{eq\_0025} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \geq \mathit{ell}_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in A \backslash D , \mathit{zeta} \in Z \tag{eq\_0026} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \leq u_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in A , \mathit{zeta} \in Z . \tag{eq\_0027} \\
+  & \mathit{alpha} \mathit{lambda} + \sum_{\left(i , j\right) \in D} \mathit{mu}_{i j} \leq \mathit{beta} \tag{eq\_0028\_a} \\
+  & \mathit{lambda} + \mathit{mu}_{k l} \geq \sum_{i \in \bar{N}} \mathit{delta}_{k l}^{i} \forall \left(k , l\right) \in D \tag{eq\_0028\_b} \\
+  & \mathit{mu}_{i j} \in \mathcal{R}_{+} \forall \left(i , j\right) \in D \tag{eq\_0028\_c} \\
+  & \mathit{lambda} \in \mathcal{R}_{+} \tag{eq\_0028\_d} \\
+  & \text{s}.\text{t}. \mathit{alpha} \mathit{lambda} + \sum_{\left(i , j\right) \in D} \mathit{mu}_{i j} \leq \mathit{beta} \tag{eq\_0030} \\
+  & \mathit{lambda} + \mathit{mu}_{k l} \geq \sum_{i \in \bar{V}} \mathit{delta}_{k l}^{i} \forall \left(k , l\right) \in D \tag{eq\_0031} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \geq \mathit{ell}_{i j} + g_{i j} \mathit{zeta}_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in D , \mathit{zeta} \in L_{\mathit{alpha}}^{i j} \tag{eq\_0032} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \geq \mathit{ell}_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in A \backslash D , \mathit{zeta} \in L_{\mathit{alpha}}^{i j} \tag{eq\_0033} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \leq u_{i j} + \sum_{\left(k , l\right) \in D} \left(\mathit{delta}_{k l}^{i} - \mathit{delta}_{k l}^{j}\right) \mathit{zeta}_{k l} \forall \left(i , j\right) \in A , \mathit{zeta} \in U_{\mathit{alpha}}^{i j} \tag{eq\_0034} \\
+  & p_{i j} \in \mathcal{Z}_{+} \forall \left(i , j\right) \in A \tag{eq\_0035} \\
+  & \mathit{pi}_{i} \in \left\{0 , 1 , \ldots , T - 1\right\} \forall i \in V \tag{eq\_0036} \\
+  & \mathit{delta}_{k l}^{i} \in \mathcal{R}_{+} \forall i \in V , \left(k , l\right) \in D \tag{eq\_0037} \\
+  & \mathit{mu}_{i j} \in \mathcal{R}_{+} \forall \left(i , j\right) \in D \tag{eq\_0038} \\
+  & \mathit{lambda} \in \mathcal{R}_{+} , \tag{eq\_0039} \\
+  & a + \mathbf{b}^{\mathsf{T}} \mathbf{\mathit{\mathit{zeta}}} \leq u \forall \mathbf{\mathit{\mathit{zeta}}} \in Z , \tag{eq\_0044} \\
+  & Z = \left\{\mathbf{\mathit{\mathit{zeta}}} \in \mathcal{R}^{d} : \mathbf{D} \mathbf{\mathit{\mathit{zeta}}} \leq \mathbf{d}\right\} , \tag{eq\_0045} \\
+  & a + \mathbf{d}^{\mathsf{T}} \mathbf{\mathit{\mathit{theta}}} \leq u \tag{eq\_0048} \\
+  & \mathbf{D}^{\mathsf{T}} \mathbf{\mathit{\mathit{theta}}} = \mathbf{b} \tag{eq\_0049} \\
+  & \mathbf{\mathit{\mathit{theta}}} \in \mathcal{R}_{+}^{p} . \tag{eq\_0050} \\
+  & a + \mathit{alpha} \mathit{lambda} + 1^{\mathsf{T}} \mathbf{\mathit{\mathit{mu}}} \leq u \tag{eq\_0051} \\
+  & \mathit{lambda} 1 - \mathbf{\mathit{\mathit{phi}}} + \mathbf{\mathit{\mathit{mu}}} = \mathbf{b} \tag{eq\_0052} \\
+  & \mathit{lambda} \in \mathcal{R}_{+} \tag{eq\_0053} \\
+  & \mathbf{\mathit{\mathit{phi}}} , \mathbf{\mathit{\mathit{mu}}} \in \mathcal{R}_{+}^{d} . \tag{eq\_0054} \\
+  & \mathit{lambda} 1 + \mathbf{\mathit{\mathit{mu}}} \geq \mathbf{b} \tag{eq\_0056} \\
+  & \mathit{lambda} \in \mathcal{R}_{+} \tag{eq\_0057} \\
+  & \mathbf{\mathit{\mathit{mu}}} \in \mathcal{R}_{+}^{d} . \tag{eq\_0058} \\
+\end{align}

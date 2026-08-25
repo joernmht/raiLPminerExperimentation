@@ -1,0 +1,71 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2020.102960
+%@ meta id=10.1016_j.trc.2020.102960 family=milp schema=0.1.0
+%@ name :: A priority-based ADMM approach for flexible train scheduling problems
+%@ desc :: Mined from A priority-based ADMM approach for flexible train scheduling problems (Transportation Research Part C Emerging Technologies, 2021).
+%@ prov source :: 10.1016/j.trc.2020.102960
+%@ prov reference :: A priority-based ADMM approach for flexible train scheduling problems
+%@ prov author :: Ruhu Gao; Huimin Niu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of arcs visited by all trains
+%@ param c shape=- kind=scalar domain=- :: Cost of arc (u,t;v,s) in space-time network
+%@ var x shape=I,A domain=binary role=primary drole=- lo=- hi=- :: Binary arc-based variable indicating if train i uses arc a
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in space-time network
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index dbar ordered=0 cyclic=0 :: Virtual destination node for train i
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index obar ordered=0 cyclic=0 :: Virtual origin node for train i
+%@ index Ubar ordered=0 cyclic=0 :: Set of stations where train i must stop
+%@ index d ordered=0 cyclic=0 :: Destination station of train i
+%@ index o ordered=0 cyclic=0 :: Origin station of train i
+%@ param w shape=I,U kind=matrix domain=- :: Dwell time bounds for train i at station u
+%@ var y shape=I,U domain=binary role=primary drole=- lo=- hi=- :: Binary stopping variable indicating if train i stops at station u
+%@ index U ordered=0 cyclic=0 :: Set of all stations
+%@ index a ordered=0 cyclic=0 :: Arc index
+%@ var e shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Total number of times arc a selected by all trains except i
+%@ var L shape=I domain=continuous role=primary drole=- lo=- hi=- :: Augmented Lagrangian subproblem objective for train i
+%@ param lambda shape=I,A kind=matrix domain=- :: Lagrangian multiplier for train i and arc a
+%@ param rho shape=- kind=scalar domain=- :: Quadratic penalty parameter
+%@ var vi shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual for train i and arc a
+%@ var vio shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual (alternative notation) for train i and arc a
+%@ param gamma shape=- kind=scalar domain=- :: Threshold parameter for penalty update
+%@ param theta shape=- kind=scalar domain=- :: Increment for penalty parameter
+%@ con eq_0006 kind=linear domain=- indicator=- :: Flow conservation constraint ensuring one space-time path per train
+%@ con eq_0007 kind=linear domain=- indicator=- :: Stopping constraint requiring stops at specified stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Dwell time constraint bounding dwell arcs at intermediate stations
+%@ con eq_0012 kind=linear domain=- indicator=- :: Incompatibility constraint forbidding conflicting train trajectories
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary domain constraint for arc selection variables x_i(a)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary domain constraint for stopping variables y_i(u)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equality constraint introducing slack variable d_i(a) for incompatibility
+%@ con eq_0020 kind=linear domain=- indicator=- :: Definition of auxiliary variable e_i(a) as total usage of arc a by other trains
+%@ con eq_0027 kind=linear domain=- indicator=- :: Definition of augmented Lagrangian subproblem objective L_i
+%@ con eq_0029 kind=linear domain=- indicator=- :: Definition of revised arc cost c_i'(a) in subproblem
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearized quadratic penalty term for augmented Lagrangian
+%@ con eq_0032 kind=linear domain=- indicator=- :: Dual cost parameter c_i''(a) based on Lagrangian multipliers
+%@ con eq_0033 kind=linear domain=- indicator=- :: Arc cost re-expression combining dual cost and penalty term
+%@ con eq_0034 kind=linear domain=- indicator=- :: Path-based dual cost dc_i^q for priority ordering
+%@ con eq_0035 kind=linear domain=- indicator=- :: Priority ordering of trains by nondecreasing dual cost
+%@ con eq_0036 kind=linear domain=- indicator=- :: Multiplier update formula for Lagrangian multipliers
+%@ con eq_0037 kind=linear domain=- indicator=- :: Primal residual definition for incompatibility constraints
+%@ con eq_0038 kind=linear domain=- indicator=- :: Penalty parameter update rule based on primal residual
+\begin{align}
+  \min\quad & \sum_{i \in I} \sum_{\left(u , t ; v , s\right) \in A} c \left(u , t ; v , s\right) \cdot x_{i} \left(u , t ; v , s\right) \tag{eq\_0005} \\
+  & \sum_{\left(u , t\right) : \left(u , t ; v , s\right) \in A_{i}} x_{i} \left(u , t ; v , s\right) - \sum_{\left(u , t\right) : \left(v , s ; u , t\right) \in A_{i}} x_{i} \left(v , s ; u , t\right) = \left\{\begin{matrix} - 1 \text{if }( v , s ) = \left(\bar{o}\right)_{i} \\ 1 \text{if }( v , s ) = \left(\bar{d}\right)_{i} \\ 0 \text{otherwise} \end{matrix}\right \forall i \in I \tag{eq\_0006} \\
+  & \underset{\left(u , t ; u , s\right) \in A_{i}^{\text{dwell}}}{\sum} x_{i} \left(u , t ; u , s\right) \geq 1 \forall u \in \left(\bar{U}\right)_{i} \backslash \left\{o_{i} , d_{i}\right\} , i \in I \tag{eq\_0007} \\
+  & y_{i} \left(u\right) \cdot t w_{i , u}^{\text{min}} \leq \underset{\left(u , t ; u , s\right) \in A_{i}^{\text{dwell}}}{\sum} x_{i} \left(u , t ; u , s\right) \leq y_{i} \left(u\right) \cdot t w_{i , u}^{\text{max}} \forall u \in U_{i} \backslash \left\{o_{i} , d_{i}\right\} , i \in I \tag{eq\_0008} \\
+  & \sum_{a^{'} \in A \left(a\right) ; a^{'} \neq a} x_{i} \left(a^{'}\right) + \sum_{j \in I} x_{j} \left(a\right) \leq 1 \forall i \in I , a \in A^{\text{run}} \tag{eq\_0012} \\
+  & x_{i} \left(u , t ; v , s\right) \in \left\{0 , 1\right\} \forall i \in I , \left(u , t ; v , s\right) \in A \tag{eq\_0013} \\
+  & y_{i} \left(u\right) \in \left\{0 , 1\right\} \forall i \in I , u \in U \tag{eq\_0014} \\
+  & \sum_{j \in I} x_{j} \left(a\right) + \sum_{a^{'} \in A \left(a\right) : a^{'} \neq a} x_{i} \left(a^{'}\right) - 1 + d_{i} \left(a\right) = 0 \forall i \in I , a \in A^{\mathit{run}} \tag{eq\_0018} \\
+  & e_{i} \left(a\right) = \sum_{j \in I \backslash \left\{i\right\}} x_{j} \left(a\right) \forall i \in I , a \in A_{ }^{\text{run}} \tag{eq\_0020} \\
+  & d_{i}^{ \cdot } \left(a\right) = 1 - e_{i} \left(a\right) - \sum_{a^{'} \in A \left(a\right)} x_{i} \left(a^{'}\right) \tag{eq\_0027} \\
+  & L_{i}^{ } = \sum_{a \in A} c_{i}^{'} \left(a\right) \cdot x_{i} \left(a\right) \tag{eq\_0029} \\
+  & c_{i}^{'} \left(a\right) = c \left(a\right) + \sum_{j \in I} \mathit{lambda}_{j} \left(a\right) + \sum_{a^{'} \in A \left(a\right) : a^{'} \neq a} \mathit{lambda}_{i} \left(a^{'}\right) + max \left\{0 , \mathit{rho} \cdot \sum_{a^{'} \in A \left(a\right)} e_{i} \left(a^{'}\right) - \frac{\mathit{rho}}{2}\right\} \tag{eq\_0031} \\
+  & \mathit{lambda}_{i}^{q + 1} \left(a\right) = max \left\{0 , \mathit{lambda}_{i}^{q} \left(a\right) + \mathit{rho}^{q} \cdot \left[\right. \sum_{j \in I} x_{j} \left(a\right) + \sum_{a^{'} \in A \left(a\right) : a^{'} \neq a} x_{i} \left(a^{'}\right) - 1 \left]\right.\right\} \tag{eq\_0032} \\
+  & \mathit{vi} \cdot a_{i} \left(a\right) = max \left\{0 , \sum_{j \in I} x_{j} \left(a\right) + \sum_{a^{'} \in A \left(a\right) : a^{'} \neq a} x_{i} \left(a^{'}\right) - 1\right\} \forall i \in I \tag{eq\_0033} \\
+  & \mathit{rho}^{q + 1} = \left\{\begin{matrix} \mathit{rho}^{q} + \mathit{theta} \text{if} \sum_{i \in I} \underset{a \in A^{\text{run}}}{\sum} \left|\right| \mathit{vio}_{i} \left(a\right) \left|\right|^{2} \geq \mathit{gamma} \cdot \sum_{i \in I} \underset{a \in A^{\text{run}}}{\sum} \mathit{vi} \cdot o_{i} \left(a\right) \\ \mathit{rho}^{q} \text{otherwise} \end{matrix}\right \tag{eq\_0034} \\
+  & c_{i}^{''} \left(a\right) = \sum_{j \in I} \mathit{lambda}_{j} \left(a\right) + \sum_{a^{'} \in A \left(a\right) : a^{'} \neq a} \mathit{lambda}_{i} \left(a^{'}\right) \tag{eq\_0035} \\
+  & c_{i}^{'} \left(a\right) = c_{i}^{''} \left(a\right) + c_{i} \left(a\right) + max \left\{0 , \mathit{rho} \cdot \sum_{a^{'} \in A \left(a\right)} e_{i} \left(a^{'}\right) - \frac{\mathit{rho}}{2}\right\} \tag{eq\_0036} \\
+  & d \cdot c_{i}^{q} = \sum_{a \in A} c_{i}^{" q} \left(a\right) \cdot x_{i}^{q} \left(a\right) \tag{eq\_0037} \\
+  & d \cdot c_{1}^{q} \leq d \cdot c_{2}^{q} \leq \hdots \leq d \cdot c_{\left|I\right|}^{q} \tag{eq\_0038} \\
+\end{align}

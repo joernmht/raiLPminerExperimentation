@@ -1,0 +1,102 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.09.004
+%@ meta id=10.1016_j.trb.2020.09.004 family=milp schema=0.1.0
+%@ name :: Decomposition and distributed optimization of real-time traffic management for large-scale railway networks
+%@ desc :: Mined from Decomposition and distributed optimization of real-time traffic management for large-scale railway networks (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.09.004
+%@ prov reference :: Decomposition and distributed optimization of real-time traffic management for large-scale railway networks
+%@ prov author :: Xiaojie Luan; Bart De Schutter; Lingyun Meng; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted delay of all trains
+%@ param A shape=- kind=matrix :: Constraint matrix in the general MILP formulation
+%@ param b shape=- kind=vector :: Right-hand side vector in the general MILP formulation
+%@ param s shape=- kind=vector :: Slack variable added in the ADMM reformulation to handle inequality constraints
+%@ index t ordered=0 cyclic=0 :: Time interval index for the time-interval-based decomposition
+%@ param B shape=- kind=matrix :: Matrix in the ADMM linear equality constraint A*z1 + B*z2 = b
+%@ index E ordered=0 cyclic=0 :: Set of block sections in the railway network
+%@ index F ordered=0 cyclic=0 :: Set of trains
+%@ index R ordered=0 cyclic=0 :: Set of regions in the geography-based decomposition
+%@ index Q ordered=0 cyclic=0 :: Set of subproblems coupled with a given subproblem
+%@ var z shape=- domain=continuous role=primary :: Primal variable in the ADMM reformulation
+%@ param C shape=- kind=scalar :: Function measuring violation of the coupling constraints in ADMM
+%@ param T shape=- kind=matrix :: Matrix parameterizing allowable changes of communicated solutions in CDRSBK
+%@ param D shape=- kind=scalar :: Desired departure time used in the objective function
+%@ var Z shape=- domain=continuous role=primary :: Objective function value
+%@ var d shape=F,E domain=continuous role=primary :: Departure time of train f from block section e
+%@ var w shape=F,E domain=continuous role=primary :: Waiting time of train f on block section e
+%@ var x shape=F,E domain=binary role=primary :: Binary variable indicating whether train f uses block section e
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the railway network
+%@ var a shape=F,E domain=continuous role=primary :: Arrival time of train f at block section e
+%@ param u shape=F kind=vector :: Direction of train f
+%@ param M shape=- kind=big_m :: Large constant used in big-M constraints
+%@ param g shape=F,E kind=matrix :: Minimum headway time for train f on block section e
+%@ param h shape=F,E kind=matrix :: Additional headway time for train f on block section e
+%@ con eq_0002 kind=linear :: Objective function definition minimizing total delay
+%@ con eq_0004 kind=linear :: Objective of the geography-based decomposition
+%@ con eq_0005 kind=linear :: Definition of region-change variables in the GEO decomposition
+%@ con eq_0006 kind=big_m :: Force beta to 1 when consecutive block sections belong to different regions
+%@ con eq_0007 kind=linear :: Bound region assignment variable mu to the predefined regions
+%@ con eq_0008 kind=big_m :: Link binary alpha to region assignment variable mu
+%@ con eq_0009 kind=linear :: Ensure each region contains at least one block section
+%@ con eq_0011 kind=linear :: Local constraints A_loc * lambda <= b_loc
+%@ con eq_0012 kind=linear :: Complicating constraints A_cpl * lambda <= b_cpl
+%@ con eq_0014 kind=linear :: Local constraints of subproblem p
+%@ con eq_0019 kind=linear :: ADMM update of primal variable z1
+%@ con eq_0024 kind=linear :: ADMM update of railway subproblem variables
+%@ con eq_0026 kind=linear :: ADMM update of dual variables / residual evaluation
+%@ con eq_0027 kind=linear :: Priority-rule algorithm coupling constraint using current iteration solutions
+%@ con eq_0028 kind=linear :: CDRSBK objective including actively coupled neighbor objectives
+%@ con eq_0029 kind=linear :: CDRSBK local constraints of subproblem p
+%@ con eq_0030 kind=linear :: CDRSBK local constraints of actively coupled subproblems
+%@ con eq_0031 kind=linear :: CDRSBK coupling constraints for non-active neighbors
+%@ con eq_0032 kind=linear :: CDRSBK coupling constraints for active neighbors
+%@ con eq_0034 kind=linear :: CDRSBK coupling constraints between active neighbors and their other neighbors
+%@ con eq_0035 kind=linear :: CDRSBK coupling constraints between two actively coupled neighbors
+%@ con eq_0036 kind=linear :: Parameterized update of communicated solution lambda_q = lambda_bar_q + T_q * xi_q
+%@ con eq_0037 kind=flow_balance :: Flow conservation for train routes in the network
+%@ con eq_0038 kind=flow_balance :: Route selection and node balance constraints for trains
+%@ con eq_0039 kind=big_m :: Minimum running time constraint on a block section
+%@ con eq_0040 kind=big_m :: Waiting time definition at a block section
+%@ con eq_0041 kind=ordering :: Train ordering variable constraints on shared block sections
+%@ con eq_0042 kind=headway :: Minimum headway between consecutive train departures
+%@ con eq_0043 kind=capacity :: Block section capacity constraint
+%@ con eq_0044 kind=big_m :: Earliest departure time constraint from train origin
+%@ con eq_0045 kind=linear :: Time transition constraint across decomposition boundaries
+%@ con eq_0046_a kind=capacity :: Capacity constraint (A.1l): minimum headway between departures on a block section
+%@ con eq_0046_b kind=capacity :: Capacity constraint (A.1m): minimum headway between arrivals on a block section
+\begin{align}
+  & \text{s}.\text{t}. A \cdot \mathit{lambda} \leq b \tag{eq\_0002} \\
+  & \frac{\left|\left(B_{f} \cdot \mathit{mu}\right)_{j}\right|}{\left|R\right| - 1} \leq \left(\mathit{beta}_{f}\right)_{j} , \forall f \in F , j \in \left\{1 , \ldots , \left|\right. E_{f} \left|\right. - 1\right\} , \tag{eq\_0004} \\
+  & \left(\mathit{mu}\right)_{i} \in \left\{1 , \ldots , \left|R\right|\right\} , \forall i \in \left\{1 , \ldots , \left|E\right|\right\} , \tag{eq\_0005} \\
+  & \left(\mathit{alpha}_{r}\right)_{i} \leq 1 - \frac{\left|\mathit{mu}_{i} - r\right|}{\left|R\right| - 1} , \forall r \in \left\{1 , \ldots , \left|R\right|\right\} , i \in \left\{1 , \ldots , \left|E\right|\right\} , \tag{eq\_0006} \\
+  & \parallel \mathit{alpha}_{r} \parallel_{1} \geq 1 , \forall r \in \left\{1 , \ldots , \left|R\right|\right\} \tag{eq\_0007} \\
+  & A^{\text{loc}} \cdot \mathit{lambda} \leq b^{\text{loc}} \tag{eq\_0008} \\
+  & A^{\text{cpl}} \cdot \mathit{lambda} \leq b^{\text{cpl}} \tag{eq\_0009} \\
+  & s . t . A_{p}^{\text{loc}} \cdot \mathit{lambda}_{p} \leq b_{p}^{\text{loc}} \tag{eq\_0011} \\
+  & A_{p , q}^{\text{cpl}} \cdot \mathit{lambda}_{p} + A_{q , p}^{\text{cpl}} \cdot \mathit{lambda}_{q} \leq b_{p , q}^{\text{cpl}} , \forall q \in Q_{p} \tag{eq\_0012} \\
+  & \text{s}.\text{t}. A \cdot z_{1} + B \cdot z_{2} = b , \tag{eq\_0014} \\
+  & \mathbf{\mathcal{C}}_{p} \left(\mathit{lambda}_{p} , \mathit{lambda}_{q}\right) = 0 \tag{eq\_0019} \\
+  & A_{p , q}^{\text{cpl}} \cdot \mathit{lambda}_{p} + A_{q , p}^{\text{cpl}} \cdot \left(\bar{\mathit{lambda}}\right)_{q} \leq b_{p , q}^{\text{cpl}} , \forall q \in Q_{p} \tag{eq\_0024} \\
+  & \text{s}.\text{t}. A_{p}^{\text{loc}} \cdot \mathit{lambda}_{p} \leq b_{p}^{\text{loc}} \tag{eq\_0026} \\
+  & A_{q}^{\text{loc}} \cdot \left(\left(\bar{\mathit{lambda}}\right)_{q} + T_{q} \cdot \mathit{xi}_{q}\right) \leq b_{q}^{\text{loc}} , \forall q \in Q_{p}^{act} \tag{eq\_0027} \\
+  & A_{p , q}^{\text{cpl}} \cdot \mathit{lambda}_{p} + A_{q , p}^{\text{cpl}} \cdot \left(\bar{\mathit{lambda}}\right)_{q} \leq b_{p , q}^{\text{cpl}} , \forall q \in Q_{p} \backslash Q_{p}^{act} \tag{eq\_0028} \\
+  & A_{p , q}^{\text{cpl}} \cdot \mathit{lambda}_{p} + A_{q , p}^{\text{cpl}} \cdot \left(\left(\bar{\mathit{lambda}}\right)_{q} + T_{q} \cdot \mathit{xi}_{q}\right) \leq b_{p , q}^{\text{cpl}} , \forall q \in Q_{p}^{act} \tag{eq\_0029} \\
+  & A_{o , q}^{\text{cpl}} \cdot \left(\bar{\mathit{lambda}}\right)_{o} + A_{q , o}^{\text{cpl}} \cdot \left(\left(\bar{\mathit{lambda}}\right)_{q} + T_{q} \cdot \mathit{xi}_{q}\right) \leq b_{o , q}^{\text{cpl}} , \forall o \in Q_{q} \backslash Q_{p}^{act} , q \in Q_{p}^{act} \tag{eq\_0030} \\
+  & \begin{matrix} \begin{matrix}A_{q_{1} , q_{2}}^{\text{cpl}} \cdot \left(\left(\bar{\mathit{lambda}}\right)_{q_{1}} + T_{q_{1}} \cdot \mathit{xi}_{q_{1}}\right) + A_{q_{2} , q_{1}}^{\text{cpl}} \cdot \left(\left(\bar{\mathit{lambda}}\right)_{q_{2}} + T_{q_{2}} \cdot \mathit{xi}_{q_{2}}\right) \leq b_{q_{1} , q_{2}}^{\text{cpl}} , \forall q_{1} , q_{2} \in Q_{p}^{act} , q_{2} \in Q_{q_{1}} , q_{1} \in Q_{q_{2}}\end{matrix}\end{matrix} \tag{eq\_0031} \\
+  & \mathit{lambda}_{q} = \left(\bar{\mathit{lambda}}\right)_{q} + T_{q} \cdot \mathit{xi}_{q} \tag{eq\_0032} \\
+  \min\quad & \sum_{f \in F} \underset{\left(i , j\right) \in E_{f}^{\text{stop}}}{\sum} \left|d_{f , i , j} - w_{f , i , j} - D_{f , i , j}\right| , \tag{eq\_0033} \\
+  & \sum_{j : \left(\mathit{psi}_{f} , j\right) \in E_{f}} x_{f , \mathit{psi}_{f} , j} = 1 , \forall f \in F \tag{eq\_0034} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} x_{f , i , j} = \sum_{k : \left(j , k\right) \in E_{f}} x_{f , j , k} , \forall f \in F , j \in V \backslash \left\{\mathit{psi}_{f} , \mathit{sigma}_{f}\right\} \tag{eq\_0035} \\
+  & \sum_{j : \left(i , \mathit{sigma}_{f}\right) \in E_{f}} x_{f , i , \mathit{sigma}_{f}} = 1 , \forall f \in F \tag{eq\_0036} \\
+  & a_{f , \mathit{psi}_{f} , j} \geq \left(\mathit{phi}_{f} + \mathit{phi}_{f}^{\text{pri}}\right) \cdot x_{f , \mathit{psi}_{f} , j} , \forall f \in F , \left(\mathit{psi}_{f} , j\right) \in E_{f} , \tag{eq\_0037} \\
+  & d_{f , i , j} \geq a_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f} . \tag{eq\_0038} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} d_{f , i , j} = \sum_{k : \left(j , k\right) \in E_{f}} a_{f , j , k} , \forall f \in F , j \in V \backslash \left\{\mathit{psi}_{f} , \mathit{sigma}_{f}\right\} \tag{eq\_0039} \\
+  & w_{f , i , j}^{min} \cdot x_{f , i , j} \leq w_{f , i , j} \leq w_{f , i , j}^{max} \cdot x_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f} \tag{eq\_0040} \\
+  & d_{f , i , j} - w_{f , i , j} - a_{f , i , j} \geq \mathit{tau}_{f , i , j}^{\text{min}} \cdot x_{f , i , j} , \forall f \in F , \left(i , j\right) \in E_{f} \tag{eq\_0041} \\
+  & \mathit{theta}_{f , f^{'} , i , j} + \mathit{theta}_{f^{'} , f , i , j} \geq x_{f , i , j} + x_{f^{'} , i , j} - 1 , \forall f , f^{'} \in F , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} , \tag{eq\_0042} \\
+  & \mathit{theta}_{f , f^{'} , i , j} + \mathit{theta}_{f^{'} , f , i , j} \leq 3 - x_{f , i , j} - x_{f^{'} , i , j} , \forall f , f^{'} \in F , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} . \tag{eq\_0043} \\
+  & \begin{matrix}a_{f^{'} , i , j} - g_{f^{'} , i , j} + \left[3 - x_{f , i , j} - x_{f^{'} , i , j} - \mathit{theta}_{f , f^{'} , i , j}\right] \cdot M \geq d_{f , i , j} + h_{f , i , j} , \\ \forall f \in F , f^{'} \in F , f \neq f^{'} , u_{f} = u_{f^{'}} , \left(i , j\right) \in E_{f} \cap E_{f^{'}}\end{matrix} \tag{eq\_0044} \\
+  & \begin{matrix}a_{f^{'} , j , i} - g_{f^{'} , j , i} + \left[3 - x_{f , i , j} - x_{f^{'} , i , j} - \mathit{theta}_{f , f^{'} , i , j}\right] \cdot M \geq d_{f , i , j} + h_{f , i , j} , \\ \forall f \in F , f^{'} \in F , f \neq f^{'} , u_{f} \neq u_{f^{'}} , \left(i , j\right) \in E_{f} , \left(j , i\right) \in E_{f^{'}}\end{matrix} \tag{eq\_0045} \\
+  & B_{f_{1}} = \begin{bmatrix} \begin{matrix}1 & - 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & - 1 & 0\end{matrix} \end{bmatrix} \tag{eq\_0046\_a} \\
+  & \mathit{beta}_{f_{1}} = \begin{bmatrix} \begin{matrix}\left(\mathit{beta}_{f_{1}}\right)_{1} \\ \left(\mathit{beta}_{f_{1}}\right)_{2}\end{matrix} \end{bmatrix} , \mathit{mu} = \begin{bmatrix} \begin{matrix}\mathit{mu}_{1} & \mathit{mu}_{2} & \mathit{mu}_{3} & \mathit{mu}_{4} & \mathit{mu}_{5}\end{matrix} \end{bmatrix} ^{\top} . \tag{eq\_0046\_b} \\
+\end{align}

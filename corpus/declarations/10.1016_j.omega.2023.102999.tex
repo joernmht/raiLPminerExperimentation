@@ -1,0 +1,128 @@
+% Declaration sidecar for 10.1016_j.omega.2023.102999
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2023.102999
+% Optimization of train schedule with uncertain maintenance plans in high-speed railways: A stochastic programming approach
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2023.102999.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize expected travel time of SDSA-trains over all scenarios
+
+% p: classified as parameter during review
+%@ param p shape=W kind=vector domain=- :: Probability of occurrence for each scenario w
+
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (expected travel time)
+
+% f: classified as variable during review
+%@ var f shape=W,K domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train k at destination in scenario w
+
+% t: classified as variable during review
+%@ var t shape=W,K,N domain=continuous role=primary drole=- lo=- hi=- :: Arrival/departure time of train k at station i in scenario w
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of all trains
+
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Set of all scenarios
+
+% d: classified as parameter during review
+%@ param d shape=K kind=vector domain=- :: Earliest/latest departure time from origin for train k
+
+% T: classified as variable during review
+%@ var T shape=K domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index of trains
+
+% a: classified as parameter during review
+%@ param a shape=K kind=vector domain=- :: Earliest/latest arrival time at destination for train k
+
+% x: classified as variable during review
+%@ var x shape=W,K,N domain=binary role=primary drole=- lo=- hi=- :: 1 if train k stops at station i in scenario w, else 0
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive number
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of all stations
+
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Origin station of train k
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Destination station of train k
+
+% unusable as an identifier, rename or drop: τ
+% g: classified as parameter during review
+%@ param g shape=K kind=vector domain=- :: Acceleration/deceleration time of train k
+
+% v: classified as parameter during review
+%@ param v shape=K,N kind=matrix domain=- :: Upper/lower bound of pure running time on section i for train k
+
+% h: classified as parameter during review
+%@ param h shape=N kind=vector domain=- :: Minimal headway times at station i
+
+% y: classified as variable during review
+%@ var y shape=W,K,K,N domain=binary role=primary drole=- lo=- hi=- :: 1 if train k departs earlier than train l at station i in scenario w
+
+% unusable as an identifier, rename or drop: λ
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of station tracks at station i
+
+% m: classified as parameter during review
+%@ param m shape=W,N kind=matrix domain=- :: Start/end time of maintenance window on section i in scenario w
+
+% unusable as an identifier, rename or drop: δ
+% Bound by a quantifier or big operator, so no declaration of their own: i, l, q, w
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time window: d_k^e <= T_k^d <= d_k^l for all k
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival time window: a_k^e <= t_{w,k,s_k}^a <= a_k^l for all k,w
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwelling time: tau_i x <= t^d - t^a <= M x for all k,i,w
+%@ con eq_0006 kind=linear domain=- indicator=- :: Running time lower bound between consecutive stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Running time upper bound between consecutive stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Departure headway constraint between trains at stations
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival headway constraint between trains at stations
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station track assignment: sum_q lambda_{w,k,i,q}=1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Track choice for non-stopping trains: lambda_{w,k,i,1}=1-x_{w,k,i}
+%@ con eq_0014 kind=linear domain=- indicator=- :: Same-track departure-arrival headway constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Maintenance conflict: departure after maintenance end if delta=0
+%@ con eq_0017 kind=linear domain=- indicator=- :: Maintenance conflict: departure before maintenance start if delta=1
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maintenance conflict: arrival at next station before maintenance start if delta=1
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part a)
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part b)
+%@ con eq_0020_c kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part c)
+%@ con eq_0020_d kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part d)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Scenario subproblem: departure time window constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: Scenario subproblem: arrival time window constraint
+%@ con eq_0031 kind=linear domain=- indicator=- :: Scenario subproblem: dwelling time constraint
+%@ con eq_0032 kind=linear domain=- indicator=- :: Scenario subproblem: running time lower-bound constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Scenario subproblem: running time upper-bound constraint
+%@ con eq_0034 kind=linear domain=- indicator=- :: Scenario subproblem: first-section running time lower-bound constraint
+%@ con eq_0035 kind=linear domain=- indicator=- :: Scenario subproblem: first-section running time upper-bound constraint
+%@ con eq_0036 kind=linear domain=- indicator=- :: Scenario subproblem: departure headway constraint
+%@ con eq_0037 kind=linear domain=- indicator=- :: Scenario subproblem: arrival headway constraint
+%@ con eq_0038 kind=linear domain=- indicator=- :: Scenario subproblem: station track assignment constraint
+%@ con eq_0039 kind=linear domain=- indicator=- :: Scenario subproblem: track choice constraint for non-stopping trains
+%@ con eq_0040 kind=linear domain=- indicator=- :: Scenario subproblem: same-track departure-arrival headway constraint
+%@ con eq_0041 kind=linear domain=- indicator=- :: Scenario subproblem: maintenance conflict constraints

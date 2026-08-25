@@ -1,0 +1,91 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2021.04.014
+%@ meta id=10.1016_j.trb.2021.04.014 family=milp schema=0.1.0
+%@ name :: Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach
+%@ desc :: Mined from Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach (Transportation Research Part B Methodological, 2021).
+%@ prov source :: 10.1016/j.trb.2021.04.014
+%@ prov reference :: Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach
+%@ prov author :: Yinghui Wu; Hai Yang; Shuo Zhao; Pan Shang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum waiting time (unfairness index) over all passenger groups.
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index J ordered=0 cyclic=0 :: Set of stations
+%@ param a shape=I,J kind=matrix domain=- :: Arrival time of train i at station j
+%@ var d shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train i from station j
+%@ index i ordered=0 cyclic=0 :: Index for trains
+%@ param s shape=I,J kind=matrix domain=- :: Dwelling time of train i at station j
+%@ var x shape=I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train i stops at station j
+%@ param tau shape=J kind=vector domain=- :: Running time between stations j and j+1
+%@ param h shape=- kind=scalar domain=- :: Headway between consecutive trains
+%@ index K ordered=0 cyclic=0 :: Set of passenger groups
+%@ var y shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger group k boards train i
+%@ param M shape=- kind=big_m domain=- :: Large number for linearization, bound by maximum difference of departure times and passenger arrival times
+%@ param t shape=K kind=vector domain=- :: Arrival time of passenger group k at station o_k
+%@ var z shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if passenger group k can board train i
+%@ index K_hat ordered=0 cyclic=0 :: Set of passenger groups boarding at station j
+%@ var c shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Available capacity of train i when leaving station j
+%@ param g shape=K kind=vector domain=- :: Number of passengers in group k
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ var eta shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Maximum waiting time (unfairness index)
+%@ var w shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Waiting time of passenger group k
+%@ param A shape=- kind=scalar domain=- :: Departure time of first train from origin
+%@ param S shape=I,J kind=matrix domain=- :: Cumulative dwelling time of train i up to station j
+%@ con eq_0001 kind=linear domain=- indicator=- :: Departure time definition: d_ij = a_ij + s_ij x_ij
+%@ con eq_0002 kind=linear domain=- indicator=- :: Arrival time propagation: a_i(j+1) = d_ij + tau_j
+%@ con eq_0003 kind=headway domain=- indicator=- :: Headway bounds between consecutive train departures at each station
+%@ con eq_0004 kind=linear domain=- indicator=- :: Each passenger group boards exactly one train
+%@ con eq_0005 kind=linear domain=- indicator=- :: Boarding requires train stops at passenger origin station
+%@ con eq_0006 kind=linear domain=- indicator=- :: Boarding requires train stops at passenger destination station
+%@ con eq_0007 kind=big_m domain=- indicator=- :: Big-M linking z_ki with passenger arrival and train departure
+%@ con eq_0008 kind=big_m domain=- indicator=- :: Big-M constraint ensuring if z_ki=1 passenger arrives before departure
+%@ con eq_0009 kind=linear domain=- indicator=- :: Boarding implies eligibility: y_ki <= z_ki
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Spatial FIFO: upstream passengers board available trains before downstream groups
+%@ con eq_0012 kind=capacity domain=- indicator=- :: Available capacity of train i at origin station
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Capacity balance for train i leaving station j
+%@ con eq_0014 kind=capacity domain=- indicator=- :: Capacity bounds: 0 <= c_ij <= C
+%@ con eq_0018 kind=big_m domain=- indicator=- :: Linearized waiting time lower bound: w_k >= d_i(o_k) - t(o_k,k) when y_ki=1
+%@ con eq_0019 kind=linear domain=- indicator=- :: Waiting time nonnegativity: w_k >= 0
+%@ con eq_0020 kind=linear domain=- indicator=- :: Maximum unfairness bound: eta >= w_k
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary domain for x_ij
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary domain for y_ki
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary domain for z_ki
+%@ con eq_0024 kind=linear domain=- indicator=- :: Departure time window for first train from station j
+%@ con eq_0025 kind=linear domain=- indicator=- :: Departure time window for subsequent trains from station j
+%@ index r shape=- domain=- role=- drole=- lo=- hi=- :: Summation index
+%@ param o shape=- domain=- role=- drole=- lo=- hi=- :: Origin station of train k
+%@ param e shape=- domain=- role=- drole=- lo=- hi=- :: Destination station of train k
+%@ param jmax shape=- domain=- role=- drole=- lo=- hi=- :: Cardinality of J
+%@ param imax shape=- domain=- role=- drole=- lo=- hi=- :: Cardinality of I
+%@ param hmin shape=- domain=- role=- drole=- lo=- hi=- :: Minimum headway
+%@ param hmax shape=- domain=- role=- drole=- lo=- hi=- :: Maximum headway
+%@ param n :: cardinality of J
+%@ param m :: cardinality of I
+%@ index Khat :: set K-hat
+%@ param I_last shape=- domain=integer role=parameter drole=- lo=- hi=- :: I_last
+%@ param J_last shape=- domain=integer role=parameter drole=- lo=- hi=- :: J_last
+\begin{align}
+  & d_{i,j} = a_{i,j} + s \cdot x_{i,j} \qquad \forall i \in I, j \in J \tag{eq\_0001} \\
+  & a_{i,\left(j + 1\right)} = d_{i,j} + \mathit{tau}_{j,\left(j + 1\right)} \qquad \forall i \in I, j \in J \setminus \{ J_{last} \} \tag{eq\_0002} \\
+  & hmin \leq d_{\left(i + 1\right),j} - d_{i,j} \qquad \forall i \in I \setminus \{ I_{last} \}, j \in J \tag{eq\_0003\_a} \\
+  & d_{\left(i + 1\right),j} - d_{i,j} \leq hmax \qquad \forall i \in I \setminus \{ I_{last} \}, j \in J \tag{eq\_0003\_b} \\
+  & \sum_{i \in I} y_{k,i} = 1 \qquad \forall k \in K \tag{eq\_0004} \\
+  & y_{k,i} \leq x_{i,o_{k}} \qquad \forall k \in K, i \in I \tag{eq\_0005} \\
+  & y_{k,i} \leq x_{i,e_{k}} \qquad \forall k \in K, i \in I \tag{eq\_0006} \\
+  & M \cdot z_{k,i} + t_{o_{k},k} \geq d_{i,o_{k}} \qquad \forall k \in K, i \in I \tag{eq\_0007} \\
+  & M \cdot (z_{k,i} - 1) + t_{o_{k},k} \leq d_{i,o_{k}} \qquad \forall k \in K, i \in I \tag{eq\_0008} \\
+  & y_{k,i} \leq z_{k,i} \qquad \forall k \in K, i \in I \tag{eq\_0009} \\
+  & M \cdot \sum_{p \in I} y_{k,p} \geq M \cdot (x_{i,j} - 1) + c_{i,j} - (g_{k} - 1) + M \cdot (z_{k,i} - 1) \qquad \forall i \in I, j \in J, k \in Khat_{j} \tag{eq\_0011} \\
+  & c_{i,1} = C - \sum_{k \in Khat_1} g \cdot y_{k,i} \qquad \forall i \in I \tag{eq\_0012} \\
+  & c_{i,j} = c_{i,j-1} + \sum_{k \in K_j} g \cdot y_{k,i} - \sum_{k \in Khat_j} g \cdot y_{k,i} \qquad \forall i \in I, j \in J \setminus \{1\} \tag{eq\_0013} \\
+  & 0 \leq c_{i,j} \qquad \forall i \in I, j \in J \tag{eq\_0014\_a} \\
+  & c_{i,j} \leq C \qquad \forall i \in I, j \in J \tag{eq\_0014\_b} \\
+  \min\quad & \mathit{eta} \tag{eq\_0017} \\
+  & w_{k} \geq M \cdot (y_{k,i} - 1) + d_{i,o_{k}} - t_{o_{k},k} \qquad \forall i \in I, k \in K \tag{eq\_0018} \\
+  & w_{k} \geq 0 \qquad \forall k \in K \tag{eq\_0019} \\
+  & \mathit{eta} \geq w_{k} \qquad \forall k \in K \tag{eq\_0020} \\
+  & x_{i j} \in \left\{0 , 1\right\} , \forall i \in I , j \in J \tag{eq\_0021} \\
+  & y_{k i} \in \left\{0 , 1\right\} , \forall k \in K , i \in I \tag{eq\_0022} \\
+  & z_{k i} \in \left\{0 , 1\right\} , \forall k \in K , i \in I \tag{eq\_0023} \\
+  & d_{1 j} \in \left[A , A + S_{1 j}\right] , \forall j \in J \tag{eq\_0024} \\
+  & d_{i j} \in \left[\text{max} \left\{d_{\left(i - 1\right) j} + h^{m i n} , A + \left(i - 1\right) h\right\} , \text{min} \left\{d_{\left(i - 1\right) j} + h^{m a x} , A + \left(i - 1\right) h + S_{i j}\right\}\right] , \forall i \in I \backslash \left\{1\right\} , j \in J \tag{eq\_0025} \\
+\end{align}

@@ -1,0 +1,53 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2017.03.012
+%@ meta id=10.1016_j.trc.2017.03.012 family=milp schema=0.1.0
+%@ name :: Rescheduling through stop-skipping in dense railway systems
+%@ desc :: Mined from Rescheduling through stop-skipping in dense railway systems (Transportation Research Part C Emerging Technologies, 2017).
+%@ prov source :: 10.1016/j.trc.2017.03.012
+%@ prov reference :: Rescheduling through stop-skipping in dense railway systems
+%@ prov author :: Estelle Altazin; Stéphane Dauzère‐Pérès; François Ramond; Sabine Tréfond
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Objective: minimize recovery time, passenger waiting time, weighted skipped stops, total delay and number of late events
+%@ index e ordered=0 cyclic=0 :: Event index representing a train event (arrival/departure) at a station
+%@ index L ordered=0 cyclic=0 :: Set of pairs of scheduled stops at the same station and direction
+%@ param p shape=- kind=scalar :: Number of passengers boarding or alighting at a stop event
+%@ param pt shape=- kind=scalar :: Passenger weight for waiting time between stops
+%@ var D shape=- domain=binary role=primary :: Binary variable indicating if event e is late compared to original schedule
+%@ var P shape=- domain=continuous role=primary :: Rescheduled time of event e
+%@ var RT shape=- domain=continuous role=primary :: Recovery time, maximum deviation from scheduled times
+%@ var S shape=- domain=binary role=primary :: Binary variable indicating if stop e is skipped
+%@ index SN ordered=0 cyclic=0 :: Set of events that can be skipped
+%@ var WT shape=- domain=continuous role=primary :: Waiting time for passengers between scheduled stops e_i and e_j
+%@ index s ordered=0 cyclic=0 :: Index for scheduled time of event e
+%@ param w shape=- kind=scalar :: Weight for skipping stop e
+%@ index N ordered=0 cyclic=0 :: Set of all events
+%@ index A ordered=0 cyclic=0 :: Set of consecutive events with running/dwell times
+%@ param d shape=- kind=scalar :: Minimal running or dwell time between events
+%@ index t ordered=0 cyclic=0 :: Index for time period (used for scheduled times)
+%@ index E ordered=0 cyclic=0 :: Set of events with minimal turning time
+%@ param h shape=- kind=scalar :: Minimal safe headway time between trains
+%@ index DN ordered=0 cyclic=0 :: Set of events that cannot be skipped
+%@ param M shape=- kind=big_m :: Large constant for linearization
+%@ con eq_0003 kind=linear domain=- indicator=- :: Minimal running/dwell time between non-skippable consecutive events (constraint 2)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Dwell time between skippable events with saved time if stop e is skipped (constraint 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimal turning time between trains using same rolling-stock unit (constraint 4)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimal safe headway time between consecutive trains on same infrastructure segment (constraint 5)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Respect scheduled time for events that cannot be skipped (constraint 6)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Link late indicator D_e to rescheduled time relative to scheduled time (constraint 7)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Define recovery time RT as maximum deviation from scheduled times (constraint 8)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Bound passenger waiting time WT_ei,ej based on rescheduled times and skipped stops (constraint 9)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain for D_e (constraint 10)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary domain for S_e (constraint 11)
+\begin{align}
+  \min\quad & \mathit{alpha} \mathit{RT} + \mathit{beta} \sum_{\left(e_{i} , e_{j}\right) \in \mathcal{L}} \left(p_{e_{j}} + \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{e \in \mathcal{SN}}{\left(e_{i} , e\right) \in \mathcal{L}}}{\left(e , e_{j}\right) \in \mathcal{L}}}{\sum} p_{e}\right) \mathit{WT}_{e_{i} e_{j}} + \mathit{gamma} \sum_{e \in \mathcal{SN}} w_{e} \cdot S_{e} + \mathit{delta} \sum_{e \in \mathcal{N}} \left(P_{e} - s_{e}\right) + \mathit{eta} \sum_{e \in \mathcal{N}} D_{e} . \tag{eq\_0001} \\
+  & P_{e^{'}} \geq P_{e} + d_{\mathit{ee}^{'}} \forall \left(e , e^{'}\right) \in \mathcal{A} s . t . e \notin \mathcal{SN} \tag{eq\_0003} \\
+  & P_{e^{'}} \geq P_{e} + d_{\mathit{ee}^{'}} - d_{\mathit{ee}^{'}}^{\mathit{saved}} \cdot S_{e} \forall \left(e , e^{'}\right) \in \mathcal{A} s . t . e \in \mathcal{SN} \tag{eq\_0004} \\
+  & P_{e^{'}} \geq P_{e} + d_{\mathit{ee}^{'}} \forall \left(e , e^{'}\right) \in \mathcal{E} \tag{eq\_0005} \\
+  & P_{e^{'}} \geq P_{e} + h_{\mathit{ee}^{'}} \forall \left(e , e^{'}\right) \in \mathcal{S} \tag{eq\_0006} \\
+  & P_{e} \geq s_{e} \forall e \in \mathcal{DN} \tag{eq\_0007} \\
+  & D_{e} \geq \left(P_{e} - s_{e}\right) / M_{1} , \forall e \in \mathcal{N} , \tag{eq\_0008} \\
+  & \mathit{RT} \geq s_{e} \cdot D_{e} , \forall e \in \mathcal{N} , \tag{eq\_0009} \\
+  & \mathit{WT}_{e_{i} , e_{j}} \geq P_{e_{j}} - P_{e_{i}} - \underset{\genfrac{}{}{0pt}{}{e \in \mathcal{SN}}{\left(e_{i} , e\right) \in \mathcal{L}} \left(e , e_{j}\right) \in \mathcal{L}}{\sum} \left(1 - S_{e}\right) M_{2} \forall \left(e_{i} , e_{j}\right) \in \mathcal{L} , \tag{eq\_0010} \\
+  & D_{e} \in \left\{0 , 1\right\} , \forall e \in \mathcal{N} , \tag{eq\_0011} \\
+  & S_{e} \in \left\{0 , 1\right\} , \forall e \in \mathcal{SN} . \tag{eq\_0012} \\
+\end{align}

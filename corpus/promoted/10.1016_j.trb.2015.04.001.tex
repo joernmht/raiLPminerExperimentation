@@ -1,0 +1,59 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2015.04.001
+%@ meta id=10.1016_j.trb.2015.04.001 family=milp schema=0.1.0
+%@ name :: Real-time high-speed train rescheduling in case of a complete blockage
+%@ desc :: Mined from Real-time high-speed train rescheduling in case of a complete blockage (Transportation Research Part B Methodological, 2015).
+%@ prov source :: 10.1016/j.trb.2015.04.001
+%@ prov reference :: Real-time high-speed train rescheduling in case of a complete blockage
+%@ prov author :: Shuguang Zhan; Leo Kroon; Lucas P. Veelenturf; Joris Wagenaar
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted delay and number of canceled trains
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e in the disposition timetable
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t is canceled
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ param M shape=- kind=big_m domain=- :: Large number (M1 or M2) used in constraints
+%@ index q ordered=0 cyclic=0 :: Scheduled time of event e in original timetable
+%@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Scheduled time of event e in disposition timetable
+%@ index H ordered=0 cyclic=0 :: Disruption start and end times
+%@ index A ordered=0 cyclic=0 :: Set of activities (train, headway, station)
+%@ param L shape=A kind=vector domain=- :: Minimum duration of activity a
+%@ index B ordered=0 cyclic=0 :: Set of order activity pairs
+%@ param C shape=S kind=vector domain=- :: Capacity of station s
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param U shape=S kind=vector domain=- :: Utilization measure of station s until disruption end
+%@ con eq_0003 kind=linear domain=- indicator=- :: Ensure that an event cannot take place earlier than its scheduled time; canceled trains are moved to the end of the time horizon
+%@ con eq_0004 kind=linear domain=- indicator=- :: Define delay of event e; zero delay for canceled trains
+%@ con eq_0005 kind=linear domain=- indicator=- :: Prevent trains from entering disrupted segment during disruption
+%@ con eq_0006 kind=linear domain=- indicator=- :: Keep original timetable for events before disruption start
+%@ con eq_0007 kind=linear domain=- indicator=- :: Cannot cancel trains that already departed from origin before disruption start
+%@ con eq_0010 kind=linear domain=- indicator=- :: Respect minimum running and dwell times for each train activity
+%@ con eq_0012 kind=linear domain=- indicator=- :: Ensure each pair of events has a well-defined order
+%@ con eq_0013 kind=linear domain=- indicator=- :: Respect minimum headway time between consecutive trains
+%@ con eq_0014 kind=linear domain=- indicator=- :: Prevent overtaking within a segment by enforcing same order at both stations
+%@ con eq_0016 kind=linear domain=- indicator=- :: Station capacity constraint: ensure free track for each arrival
+%@ con eq_0017 kind=linear domain=- indicator=- :: Respect minimum station headway time between departure and arrival
+%@ con eq_0019 kind=linear domain=- indicator=- :: Define whether a departure occurs before disruption end
+%@ con eq_0020 kind=linear domain=- indicator=- :: Limit departures during disruption by station capacity and utilization
+%@ con eq_0027 kind=linear domain=- indicator=- :: Canceled trains do not depart before disruption end
+%@ con eq_0028 kind=linear domain=- indicator=- :: Consistency between arrival and departure order for same train
+%@ con eq_0029 kind=linear domain=- indicator=- :: First scheduled first served: preserve scheduled order unless a train is canceled
+\begin{align}
+  \min\quad & \sum_{t \in T} \mathit{gamma}_{t} y_{t} + \sum_{e \in E} \mathit{mu}_{e} d_{e} \tag{eq\_0002} \\
+  & M_{1} \cdot y_{t_{e}} \leq x_{e} - q_{e} \leq M_{1} \forall e \in E \tag{eq\_0003} \\
+  & d_{e} \geq x_{e} - q_{e} - M_{1} \cdot y_{t_{e}} \forall e \in E \tag{eq\_0004} \\
+  & x_{e} \geq H_{\mathit{dis}}^{\mathit{end}} \forall e \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{e} \leq H_{\mathit{dis}}^{\mathit{end}} \tag{eq\_0005} \\
+  & x_{e} = q_{e} \forall e \in E : q_{e} \leq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0006} \\
+  & y_{t_{e}} = 0 \forall e \in E_{s_{1}}^{\mathit{dep}} : q_{e} \leq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0007} \\
+  & x_{f} - x_{e} \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{train}} \tag{eq\_0010} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} \land a^{'} = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track}} \tag{eq\_0012} \\
+  & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{lambda}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} \tag{eq\_0013} \\
+  & \mathit{lambda}_{a} - \mathit{lambda}_{a^{'}} = 0 \forall \left(a , a^{'}\right) \in B \tag{eq\_0014} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0016} \\
+  & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{varphi}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A^{\mathit{station}} \tag{eq\_0017} \\
+  & H_{\mathit{dis}}^{\mathit{end}} \cdot \left(1 - \mathit{chi}_{e}^{\mathit{dep}}\right) < x_{e} \leq H_{\mathit{dis}}^{\mathit{end}} + \left(1 - \mathit{chi}_{e}^{\mathit{dep}}\right) \cdot M_{2} \forall i < k ; e \in E_{s_{i}}^{\mathit{dep}} \tag{eq\_0019} \\
+  & \underset{e \in E_{s_{i - 1}}^{2}}{\sum} \mathit{chi}_{e}^{\mathit{dep}} \leq C_{s_{i}} - U_{s_{i}} \forall i \leq k \tag{eq\_0020} \\
+  & \mathit{chi}_{e}^{\mathit{dep}} + y_{t_{e}} \leq 1 \forall e \in E_{s}^{\mathit{dep}} , s \in S \tag{eq\_0027} \\
+  & \begin{aligned} & \mathit{lambda}_{a} \geq \mathit{varphi}_{a^{'}} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} , a^{'} = \left(e^{'} , f\right) \in A^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , e^{'} \in E_{s}^{\mathit{dep}} , t_{e} = t_{e^{'}} , f \in E_{s}^{\mathit{arr}} , s \in {S}\end{aligned} \tag{eq\_0028} \\
+  & \mathit{lambda}_{a} + y_{t_{e}} + y_{t_{f}} \geq 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} : q_{e} < q_{f} \tag{eq\_0029} \\
+\end{align}

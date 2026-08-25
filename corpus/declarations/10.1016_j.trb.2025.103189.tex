@@ -1,0 +1,164 @@
+% Declaration sidecar for 10.1016_j.trb.2025.103189
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2025.103189
+% An exact and heuristic framework for rolling stock rescheduling with railway infrastructure availability constraints
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2025.103189.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize weighted sum of carriage kilometers, seat-shortage hours, cancellations, off-balances, additional (un)coupled units, and composition differences
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar :: Weight for objective function components
+
+% x: classified as variable during review
+%@ var x shape=T,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition c is chosen for trip t
+
+% n: classified as variable during review
+%@ var n shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
+
+% I: classified as variable during review
+%@ var I shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
+
+% c: classified as variable during review
+%@ var c shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
+
+% carr: classified as parameter during review
+%@ param carr shape=C kind=vector :: Carriage kilometers for composition c
+
+% h: classified as parameter during review
+%@ param h shape=A kind=vector :: Headway time for activity
+
+% l: classified as parameter during review
+%@ param l shape=A kind=vector :: Lower bound for activity duration
+
+% p: classified as variable during review
+%@ var p shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating different composition than planned
+
+% seat: classified as parameter during review
+%@ param seat shape=T,C kind=matrix :: Seat capacity for composition c on trip t
+
+% u: classified as variable during review
+%@ var u shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of uncoupled units
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of compositions
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of rolling stock unit types
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trips
+
+% Cprime: added for z shape
+%@ index Cprime ordered=0 cyclic=0 :: Set of successor compositions
+
+% z: classified as variable during review
+%@ var z shape=T,C,Cprime domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
+
+% unusable as an identifier, rename or drop: Γ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: τ
+% pt: classified as parameter during review
+%@ param pt shape=T kind=vector :: Original planned composition for trip t
+
+% unusable as an identifier, rename or drop: ρ
+% o: classified as parameter during review
+%@ param o shape=T kind=vector :: Original number of coupled/uncoupled units
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar :: Set of real numbers (domain indicator)
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar :: End of time horizon in minutes
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of trains (including shunting movements)
+
+% X: classified as variable during review
+%@ var X shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if shunting movement is canceled
+
+% v: classified as variable during review
+%@ var v shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Time of event
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities
+
+% q: classified as variable during review
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of infrastructure points
+
+% d: classified as variable during review
+%@ var d shape=E domain=continuous role=primary drole=- lo=- hi=- :: Deviation from original event time
+
+% unusable as an identifier, rename or drop: π
+% a: classified as variable during review
+%@ var a shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Absolute deviation of event time
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, m, s, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: One composition per trip (eq. 2)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Linking x and z for successor trips (eq. 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Linking x and z for predecessor trips (eq. 4)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Coupling units in composition change (eq. 5)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Uncoupling units in composition change (eq. 6)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Inventory balance after departure (eq. 7)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Ending inventory per station and type (eq. 8)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Different composition indicator (eq. 9)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Additional coupled units (eq. 10)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Additional uncoupled units (eq. 11)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Positive off-balance (eq. 12)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Negative off-balance (eq. 13)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Initial inventory fixed (eq. 14)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Pre-disruption compositions fixed (eq. 15)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Domain of coupling and inventory variables (eq. 16)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Domain of initial and ending inventory variables (eq. 17)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Domain of additional coupled/uncoupled variables (eq. 18)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain of composition variables (eq. 19)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain of composition change variables (eq. 20)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Domain of difference indicator (eq. 21)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Second objective function (eq. 22)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Shunting movement timing with big-M (eq. 25)
+%@ con eq_0027 kind=linear domain=- indicator=- :: Headway constraints on infrastructure points (eq. 26)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Deviation from original time (eq. 27)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Maximum deviation for passenger trains (eq. 28)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Maximum deviation for shunting movements (eq. 29)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Absolute deviation lower bound (eq. 30)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Absolute deviation upper bound (eq. 31)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Passenger trains cannot be canceled (eq. 32)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Domain of event time and absolute deviation (eq. 33)
+%@ con eq_0035 kind=linear domain=- indicator=- :: Domain of deviation (eq. 34)
+%@ con eq_0036 kind=linear domain=- indicator=- :: Domain of order binary variable (eq. 35)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Domain of cancellation binary variable (eq. 36)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+%@ con eq_0039 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+%@ con eq_0040 kind=linear domain=- indicator=- :: Additional constraint from heuristic

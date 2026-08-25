@@ -1,0 +1,101 @@
+% Declaration sidecar for 10.1016_j.trb.2016.02.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2016.02.004
+% An integrated micro–macro approach to robust railway timetabling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2016.02.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted path, cancellation, and connection delay costs
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=continuous :: Blocking time of a train on a block section, with start and end times
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=continuous :: Minimum headway time between two trains at a timetable point
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of shared blocks or successive blocks
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=continuous :: Cost of a path or blocking time overlap
+
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: φ
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Cyclic pattern of successive train pairs in a corridor
+
+% unusable as an identifier, rename or drop: τ
+% unusable as an identifier, rename or drop: π
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of train lines
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of timetable points
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is selected
+
+% y: classified as variable during review
+%@ var y shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable for connection time exceeding lower bound
+
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: π̄
+% unusable as an identifier, rename or drop: χ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of paths for a line
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of connections
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Timetable point index
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=continuous :: Large enough number
+
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=continuous :: Lower bound for connection time
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of path cliques
+
+% ū: classified as parameter during review
+%@ param u_bar shape=- kind=scalar domain=continuous :: Upper bound for connection time
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, l, p, q, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of blocking time as sum of setup, sight, approach, running, clearing, and release times
+%@ con eq_0002 kind=linear domain=- indicator=- :: Minimum headway time computed as maximum blocking-time end-start difference over shared blocks
+%@ con eq_0003 kind=linear domain=- indicator=- :: Blocking time overlap between successive trains on a corridor computed over shared blocks
+%@ con eq_0004 kind=linear domain=- indicator=- :: Infrastructure occupation of a corridor as sum of minimum line headways over cyclic train pairs
+%@ con eq_0005 kind=linear domain=- indicator=- :: Cost of a path from penalized running and dwell time deviations from nominal values
+%@ con eq_0007 kind=linear domain=- indicator=- :: Line selection constraint: each line is either assigned exactly one path or cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: Missed connection constraint: cancellation indicators of connected lines bound the missed-connection binary
+%@ con eq_0009 kind=linear domain=- indicator=- :: Lower bound on connection time: departure/arrival difference at least lower bound unless connection missed
+%@ con eq_0010 kind=linear domain=- indicator=- :: Upper bound on connection time: difference at most lower bound plus delay variable unless connection missed
+%@ con eq_0011 kind=linear domain=- indicator=- :: At most one path from each path clique can be selected to avoid conflicts
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary restriction on path-selection variables
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary restriction on line-cancellation variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds on connection-time exceeding variable y
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary restriction on missed-connection variables

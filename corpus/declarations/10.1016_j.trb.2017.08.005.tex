@@ -1,0 +1,144 @@
+% Declaration sidecar for 10.1016_j.trb.2017.08.005
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.08.005
+% Multi-periodic train timetabling using a period-type-based Lagrangian relaxation decomposition
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2017.08.005.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of all period-type trains
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of all sections in the rail network
+
+% m: classified as index during review
+%@ index m ordered=1 cyclic=0 :: Number of trains of a period-type
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Time index in the planning horizon
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Arrival node in the time-space network
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Departure node in the time-space network
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f of period-type w uses arc a
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=0 :: Planning time horizon
+
+% d: classified as variable during review
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train f of period-type w from section (i,j)
+
+% G: classified as variable during review
+%@ var G shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total travel time)
+
+% c: classified as parameter during review
+%@ param c shape=A kind=vector domain=- :: Cost (travel time) of arc a
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the directed graph
+
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Set of period-types
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of origin nodes for a period-type
+
+% F: classified as parameter during review
+%@ param F shape=E,W kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of departure arcs
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of junction stations
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of headway times
+
+% cap: classified as parameter during review
+%@ param cap shape=S kind=vector domain=- :: Parking capacity of station i
+
+% Â: classified as index during review
+%@ index A_in ordered=0 cyclic=0 :: Set of inbound arcs to a node
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the time-space network
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Node index
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Set of destination nodes
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: ρ
+% unusable as an identifier, rename or drop: Γ
+% unusable as an identifier, rename or drop: ε
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Path-unit in the time-space network
+
+% n̄: classified as index during review
+%@ index nbar ordered=0 cyclic=0 :: Terminal node of a path-unit
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, f, i, j, r, w, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of arrival time of train f of period-type w into section (i,j)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of departure time of train f of period-type w from section (i,j)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of operation period length of period-type w
+%@ con eq_0005 kind=ordering domain=- indicator=- :: Equal headway between consecutive trains of same period-type entering a section
+%@ con eq_0006 kind=ordering domain=- indicator=- :: Equal headway between consecutive trains of same period-type leaving a section
+%@ con eq_0007 kind=ordering domain=- indicator=- :: Equal headway of same period-type trains entering and leaving a section
+%@ con eq_0008 kind=ordering domain=- indicator=- :: Equal headway of same period-type trains between consecutive sections
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum load factor for first train: cannot choose origin transition arcs before its minimum departure time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Minimum load factor for other trains: enforce minimum departure interval from origin to maintain load factor
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum travel time of first train in each section
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum dwell time of first train at stations
+%@ con eq_0013 kind=headway domain=- indicator=- :: Safety headway constraint for trains entering sections
+%@ con eq_0014 kind=headway domain=- indicator=- :: Safety headway constraint for trains leaving sections
+%@ con eq_0015 kind=headway domain=- indicator=- :: Safety headway constraint for trains entering junction stations
+%@ con eq_0016 kind=capacity domain=- indicator=- :: Station parking capacity constraint
+%@ con eq_0017 kind=flow_balance domain=- indicator=- :: Flow balance: each train departs from exactly one origin node
+%@ con eq_0018 kind=flow_balance domain=- indicator=- :: Flow balance at intermediate nodes
+%@ con eq_0019 kind=flow_balance domain=- indicator=- :: Flow balance: each train arrives at exactly one destination node
+%@ con eq_0025 kind=linear domain=- indicator=- :: Nonnegativity of arrival headway Lagrangian multipliers
+%@ con eq_0026 kind=linear domain=- indicator=- :: Nonnegativity of departure headway Lagrangian multipliers
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of station capacity Lagrangian multipliers
+%@ con eq_0028 kind=linear domain=- indicator=- :: Nonnegativity of junction headway Lagrangian multipliers
+%@ con eq_0029 kind=linear domain=- indicator=- :: Sub-gradient definition for arrival headway multipliers
+%@ con eq_0030 kind=linear domain=- indicator=- :: Sub-gradient definition for departure headway multipliers
+%@ con eq_0031 kind=linear domain=- indicator=- :: Sub-gradient definition for junction headway multipliers
+%@ con eq_0032 kind=linear domain=- indicator=- :: Sub-gradient definition for station capacity multipliers
+%@ con eq_0038 kind=linear domain=- indicator=- :: Available operation period condition ensuring minimum load factors
+%@ con eq_0039 kind=linear domain=- indicator=- :: Planning horizon constraint for last train arrival
+%@ con eq_0041 kind=linear domain=- indicator=- :: Path-unit must avoid all arcs in the forbidden arc set

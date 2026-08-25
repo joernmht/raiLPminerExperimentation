@@ -1,0 +1,179 @@
+% Declaration sidecar for 10.1016_j.apm.2025.116670
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.apm.2025.116670
+% An adaptive multi-agent deep reinforcement learning approach to unify disturbances and disruptions for high-speed railway rescheduling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.apm.2025.116670.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total delay and cancellation penalties
+
+% p: classified as variable during review
+%@ var p shape=N,T domain=non_negative role=primary drole=- lo=- hi=- :: Estimated time of train n at time step t
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of all trains
+
+% f: classified as variable during review
+%@ var f shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Stop plan indicator for train n at time step t
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Station index
+
+% a: classified as variable during review
+%@ var a shape=N,T domain=integer role=primary drole=- lo=- hi=- :: Action selected by train n at time step t
+
+% t̄: classified as parameter during review
+%@ param t shape=N,I kind=matrix domain=- :: Reference running time of train n on segment i
+
+% unusable as an identifier, rename or drop: Δ
+
+% c: classified as parameter during review
+%@ param c shape=N,I kind=matrix domain=- :: Predetermined departure time of train n at station i
+
+% w: classified as parameter during review
+%@ param w shape=N,I kind=matrix domain=- :: Predetermined arrival time of train n at station i
+
+% unusable as an identifier, rename or drop: τ
+
+% y: classified as variable during review
+%@ var y shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Constraints violation indicator for train n at time step t
+
+% G: classified as parameter during review
+%@ param G shape=N kind=vector domain=- :: Final station index for train n
+
+% g: classified as variable during review
+%@ var g shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Completion indicator for train n at time step t
+
+% o: classified as parameter during review
+%@ param o shape=K kind=vector domain=- :: Origin station for train k
+
+% r: classified as variable during review
+%@ var r shape=N,T domain=continuous role=primary drole=- lo=- hi=- :: Reward signal for train n at time step t
+
+% s: classified as variable during review
+%@ var s shape=N,T domain=continuous role=primary drole=- lo=- hi=- :: State of train n at time step t
+
+% d: classified as variable during review
+%@ var d shape=N,I domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled departure time of train n at station i
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of stations
+
+% unusable as an identifier, rename or drop: κ
+
+% x: classified as variable during review
+%@ var x shape=K,E domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable for train k on arc (i,i',t,t')
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of time points in rescheduling horizon
+
+% unusable as an identifier, rename or drop: σ
+
+% M: classified as parameter during review
+%@ param M shape=I kind=vector domain=- :: Number of side tracks at station i
+
+% z: classified as variable during review
+%@ var z shape=N,I,H domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if train n occupies side track at station i at time h
+
+% u: classified as parameter during review
+%@ param u shape=N,I kind=matrix domain=- :: Predetermined stop plan of train n at station i
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Reward constants (R_v, R_m, R_p, R_d)
+
+% unusable as an identifier, rename or drop: ι
+
+% unusable as an identifier, rename or drop: β
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of arcs in time-space network
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains in optimization model
+
+% arr: classified as parameter during review
+%@ param arr shape=K,I kind=matrix domain=- :: Scheduled arrival time of train k at station i
+
+% dep: classified as parameter during review
+%@ param dep shape=K,I kind=matrix domain=- :: Scheduled departure time of train k at station i
+
+% e: classified as parameter during review
+%@ param e shape=K kind=vector domain=- :: Earliest departure time for train k
+
+% l: classified as parameter during review
+%@ param l shape=K kind=vector domain=- :: Latest arrival time for train k
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for arcs in conflict set
+
+% unusable as an identifier, rename or drop: ξ
+
+% C: classified as parameter during review
+%@ param C shape=I,I kind=matrix domain=- :: Capacity of station i,i'
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time points
+
+% unusable as an identifier, rename or drop: ρ
+
+% unusable as an identifier, rename or drop: μ
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of station pairs
+
+% unusable as an identifier, rename or drop: η
+
+% Bound by a quantifier or big operator, so no declaration of their own: h, k, n, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: State update for move-stop: position update (Eq. 4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Stop plan indicator set to 1 after move-stop (Eq. 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: State update for move-not-stop: position update (Eq. 6)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Stop plan indicator set to 0 after move-not-stop (Eq. 7)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Station index advances to next station (Eq. 8)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Adjusted running time based on acceleration/slowdown action (Eq. 9)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Position update for dwell action (Eq. 10)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Stop plan indicator set to 1 for dwell (Eq. 11)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station index unchanged for dwell (Eq. 12)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Deviation update for executed action (Eq. 13)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Completion indicator equation (Eq. 14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: State remains unchanged for unactivated trains (Eq. 15)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum departure headway constraint (Eq. 16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimum arrival headway constraint (Eq. 17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Block-section occupation and no-overtaking constraint (Eq. 18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Arrival time within rescheduling horizon (Eq. 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Disruption section entry constraint (Eq. 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Departure time not earlier than planned (Eq. 21)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Side-track occupation capacity constraint (Eq. 23)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Mandatory stop plan constraint (Eq. 24)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Reward signal definition for non-cancellation actions (Eq. 25)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Cancellation reward definition (Eq. 26)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Termination indicator definition (Eq. 28)
+%@ con eq_0048 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0049 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0051 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0052 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0053 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linear constraint in the rescheduling optimization model

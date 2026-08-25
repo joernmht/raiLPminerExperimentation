@@ -1,0 +1,30 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2024.103429
+%@ meta id=10.1016_j.tre.2024.103429 family=lp schema=0.1.0
+%@ name :: Handling uncertainty in train timetable rescheduling: A review of the literature and future research directions
+%@ desc :: Mined from Handling uncertainty in train timetable rescheduling: A review of the literature and future research directions (Transportation Research Part E Logistics and Transportation Review, 2024).
+%@ prov source :: 10.1016/j.tre.2024.103429
+%@ prov reference :: Handling uncertainty in train timetable rescheduling: A review of the literature and future research directions
+%@ prov author :: Shuguang Zhan; Jiemin Xie; S.C. Wong; Yongqiu Zhu; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize expected cost of train rescheduling across all perturbation scenarios
+%@ param d shape=- kind=scalar domain=- :: Occurrence of perturbation scenario
+%@ param f shape=- kind=scalar domain=- :: Cost function of train rescheduling under scenario
+%@ param p shape=- kind=scalar domain=- :: Probability of scenario
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Decision variables for train rescheduling
+%@ index omega ordered=0 cyclic=0 :: Set of perturbation scenarios
+%@ param Z shape=- kind=scalar domain=- :: Constraint set for decision variables under scenario
+%@ param s shape=- kind=scalar domain=- :: System state
+%@ param t shape=- kind=scalar domain=- :: Time index
+%@ param X shape=- kind=scalar domain=- :: Feasible set for train operation state
+%@ param S shape=- kind=scalar domain=- :: System state function
+%@ param R shape=- kind=scalar domain=- :: Set of feasible system state trajectories
+%@ con eq_0002 kind=linear domain=- indicator=- :: Decision variables must satisfy scenario-dependent constraint set Zω for each scenario
+%@ con eq_0006 kind=linear domain=- indicator=- :: Train operation state x must be within feasible set X
+%@ con eq_0007 kind=linear domain=- indicator=- :: System state trajectory S_1 x,...,S_T x must be within feasible set R
+\begin{align}
+  \min\quad & \sum_{\mathit{omega} \in \mathit{Omega}} p_{\mathit{omega}} \cdot f \left(x , d_{\mathit{omega}}\right) \tag{eq\_0001} \\
+  & s . t . x \in Z_{\mathit{omega}} , \forall \mathit{omega} \in \mathit{Omega} \tag{eq\_0002} \\
+  & s . t . x \in X \tag{eq\_0006} \\
+  & \left(S_{1} \left(x\right) , \left(\hdots , S\right)_{T} \left(x\right)\right) \in \mathcal{R} \tag{eq\_0007} \\
+\end{align}

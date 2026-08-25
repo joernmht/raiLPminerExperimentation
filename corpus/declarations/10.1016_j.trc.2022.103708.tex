@@ -1,0 +1,181 @@
+% Declaration sidecar for 10.1016_j.trc.2022.103708
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2022.103708
+% Joint optimization of train scheduling and rolling stock circulation planning with passenger flow control on tidal overcrowded metro lines
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2022.103708.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time and operating costs
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Time index for discrete timestamps
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: Service index
+
+% N: classified as index during review
+%@ index N ordered=1 cyclic=0 :: Set of services in downstream direction
+
+% N̄: classified as index during review
+%@ index Nbar ordered=1 cyclic=0 :: Set of services in upstream direction
+
+% S: classified as index during review
+%@ index S ordered=1 cyclic=0 :: Set of stations in downstream direction
+
+% S̄: classified as index during review
+%@ index Sbar ordered=1 cyclic=0 :: Set of stations in upstream direction
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=0 :: Set of discrete time points
+
+% z: classified as variable during review
+%@ var z shape=l,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary arrival indicator for service l at station k at time t
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway bounds (h_min, h_max)
+
+% P: classified as variable during review
+%@ var P shape=k,t domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (waiting, boarding, alighting, etc.)
+
+% unusable as an identifier, rename or drop: η
+% b: classified as variable during review
+%@ var b shape=l,k,t domain=binary role=primary drole=- lo=- hi=- :: Boarding indicator for service l at station k at time t
+
+% unusable as an identifier, rename or drop: δ
+% y: classified as variable during review
+%@ var y shape=l,j domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service l uses rolling stock type j
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of rolling stock types
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+
+% C̄: classified as parameter during review
+%@ param Cbar shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 1
+
+% C: classified as parameter during review
+%@ param C shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 2
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
+
+% R: classified as variable during review
+%@ var R shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total fixed costs of online services
+
+% unusable as an identifier, rename or drop: λ
+% F: classified as variable during review
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Index for origin station
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Index for running time
+
+% unusable as an identifier, rename or drop: ω
+% unusable as an identifier, rename or drop: ζ̄
+% unusable as an identifier, rename or drop: ψ
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: π̄
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: ψ̄
+% unusable as an identifier, rename or drop: φ̄
+% unusable as an identifier, rename or drop: π
+
+% Bound by a quantifier or big operator, so no declaration of their own: j, k, s, t̄, v, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+%@ index j ordered=0 cyclic=0 :: Index for rolling stock type
+%@ index k ordered=1 cyclic=0 :: Index for station
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Arrival time definition: t_l,k^a = t_l,k-1^d + running time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Departure time definition: t_l,k^d = t_l,k^a + dwell time
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Upstream first service arrival time at origin
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Upstream last service arrival time at origin lower bound
+%@ con eq_0004_a kind=linear domain=- indicator=- :: Downstream first service arrival time at origin
+%@ con eq_0004_b kind=linear domain=- indicator=- :: Downstream last service arrival time at origin lower bound
+%@ con eq_0005 kind=linear domain=- indicator=- :: Arrival time via z indicator: t_l,k^a = sum_t t * (z_l,k(t)-z_l,k(t-1))
+%@ con eq_0008 kind=linear domain=- indicator=- :: Headway constraint upstream
+%@ con eq_0009 kind=linear domain=- indicator=- :: Headway constraint downstream
+%@ con eq_0010 kind=linear domain=- indicator=- :: Passenger waiting count at station k and time t
+%@ con eq_0011 kind=linear domain=- indicator=- :: Nonnegativity of waiting passengers
+%@ con eq_0012 kind=linear domain=- indicator=- :: All arriving passengers served
+%@ con eq_0013 kind=linear domain=- indicator=- :: Boarding passengers by destination (nonlinear)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Total boarding passengers at station
+%@ con eq_0015 kind=linear domain=- indicator=- :: Total alighting passengers at station
+%@ con eq_0016 kind=linear domain=- indicator=- :: In-vehicle passenger load evolution
+%@ con eq_0021 kind=linear domain=- indicator=- :: Connection limit for upstream services
+%@ con eq_0022 kind=linear domain=- indicator=- :: Alpha definition for upstream services
+%@ con eq_0023 kind=linear domain=- indicator=- :: Connection limit for downstream services
+%@ con eq_0024 kind=linear domain=- indicator=- :: Alpha definition for downstream services
+%@ con eq_0025 kind=linear domain=- indicator=- :: Next service limit for upstream services
+%@ con eq_0026 kind=linear domain=- indicator=- :: Beta definition for upstream services
+%@ con eq_0027 kind=linear domain=- indicator=- :: Next service limit for downstream services
+%@ con eq_0028 kind=linear domain=- indicator=- :: Beta definition for downstream services
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Rolling stock type consistency for connected services
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Turn-around time lower bound (downstream to upstream)
+%@ con eq_0031 kind=big_m domain=- indicator=- :: Turn-around time upper bound (downstream to upstream)
+%@ con eq_0032_a kind=big_m domain=- indicator=- :: Turn-around time lower bound (upstream to downstream)
+%@ con eq_0032_b kind=big_m domain=- indicator=- :: Turn-around time upper bound (upstream to downstream)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Available rolling stock constraint at depot 1
+%@ con eq_0035 kind=linear domain=- indicator=- :: Available rolling stock constraint at depot 2
+%@ con eq_0036 kind=linear domain=- indicator=- :: Total passenger waiting time definition
+%@ con eq_0037 kind=linear domain=- indicator=- :: Total fixed costs of services definition
+%@ con eq_0038 kind=linear domain=- indicator=- :: Total movement costs of rolling stocks exiting depots
+%@ con eq_0040 kind=linear domain=- indicator=- :: Linearized boarding passenger sum
+%@ con eq_0042 kind=linear domain=- indicator=- :: Linearized depot 1 inventory constraint
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization inequalities for depot 1 auxiliary variables
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linearized depot 2 inventory constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Objective function definition
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Linearization of boarding product: omega <= M * b
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Linearization of boarding product: omega <= P_in * delta
+%@ con eq_0047_c kind=linear domain=- indicator=- :: Linearization of boarding product: omega >= P_in * delta - M*(1-b)
+%@ con eq_0049 kind=linear domain=- indicator=- :: Auxiliary variable bounds for depot 1 linearization
+%@ con eq_0050_a kind=linear domain=- indicator=- :: Depot 1 linearization: phi <= 1 - beta
+%@ con eq_0050_b kind=linear domain=- indicator=- :: Depot 1 linearization: phi <= y
+%@ con eq_0050_c kind=linear domain=- indicator=- :: Depot 1 linearization: phi >= y - beta
+%@ con eq_0050_d kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) <= phi
+%@ con eq_0050_e kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) <= z_terminal(t - ...)
+%@ con eq_0050_f kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) >= phi + z_terminal(...) - 1
+%@ con eq_0050_g kind=linear domain=- indicator=- :: Depot 1 linearization: pi <= 1 - alpha
+%@ con eq_0050_h kind=linear domain=- indicator=- :: Depot 1 linearization: pi <= y
+%@ con eq_0050_i kind=linear domain=- indicator=- :: Depot 1 linearization: pi >= y - alpha
+%@ con eq_0050_j kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) <= pi
+%@ con eq_0050_k kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) <= z_origin(t + ...)
+%@ con eq_0050_l kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) >= pi + z_origin(...) - 1
+%@ con eq_0052 kind=linear domain=- indicator=- :: Auxiliary variable bounds for depot 2 linearization
+%@ con eq_0053_a kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar <= 1 - beta_l'
+%@ con eq_0053_b kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar <= y
+%@ con eq_0053_c kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar >= y - beta_l'
+%@ con eq_0053_d kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) <= phi_bar
+%@ con eq_0053_e kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) <= z_station(t - ...)
+%@ con eq_0053_f kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) >= phi_bar + z_station(...) - 1
+%@ con eq_0053_g kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar <= 1 - alpha_l
+%@ con eq_0053_h kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar <= y
+%@ con eq_0053_i kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar >= y - alpha_l
+%@ con eq_0053_j kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) <= pi_bar
+%@ con eq_0053_k kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) <= z_origin(t + ...)
+%@ con eq_0053_l kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) >= pi_bar + z_origin(...) - 1

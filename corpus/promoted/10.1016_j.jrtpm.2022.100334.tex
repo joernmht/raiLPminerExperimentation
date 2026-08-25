@@ -1,0 +1,56 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2022.100334
+%@ meta id=10.1016_j.jrtpm.2022.100334 family=milp schema=0.1.0
+%@ name :: A genetic algorithm for heterogeneous high-speed railway timetabling with dense traffic: The train-sequence matrix encoding scheme
+%@ desc :: Mined from A genetic algorithm for heterogeneous high-speed railway timetabling with dense traffic: The train-sequence matrix encoding scheme (Journal of Rail Transport Planning & Management, 2022).
+%@ prov source :: 10.1016/j.jrtpm.2022.100334
+%@ prov reference :: A genetic algorithm for heterogeneous high-speed railway timetabling with dense traffic: The train-sequence matrix encoding scheme
+%@ prov author :: Zhiyuan Yao; Lei Nie; Zhenhuan He
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of all trains plus weighted headway violations (Eqs. 1 and 11)
+%@ var a shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station m
+%@ var d shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station m
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ param t shape=- kind=scalar domain=- :: Time-related parameters (running, additional times)
+%@ var p shape=I,S domain=binary role=primary drole=- lo=- hi=- :: Binary stop plan: 1 if train i stops at station m, 0 otherwise
+%@ param s shape=S kind=vector domain=- :: Number of platform tracks at station m
+%@ param r shape=I,S kind=matrix domain=- :: Pure running time of train i in section (m,m+1)
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index m ordered=0 cyclic=0 :: Station index
+%@ param w shape=- kind=scalar domain=- :: Dwell time bounds and weight in objective
+%@ param A shape=- kind=scalar domain=- :: Arrival headway times between train types
+%@ param H shape=- kind=scalar domain=- :: Headway times (arrival/departure) between train types
+%@ param M shape=- kind=big_m domain=- :: Large positive number for big-M constraints
+%@ index O ordered=0 cyclic=0 :: Train sequence matrix: order of trains in sections
+%@ index j ordered=0 cyclic=0 :: Train index (secondary)
+%@ param D shape=- kind=scalar domain=- :: Departure headway times between train types
+%@ param W shape=- kind=scalar domain=- :: Operation time window bounds (lower and upper)
+%@ var y shape=I,I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Headway violation variables for adjacent trains
+%@ con eq_0002 kind=linear domain=- indicator=- :: Section running time constraint: pure running plus starting/stopping additional times if stop (Eq. 2)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Station dwell time constraint: dwell time within bounds if stop, zero otherwise (Eq. 3)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival headway constraint with stop-pattern-dependent headways and train order (Eq. 4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure headway constraint with stop-pattern-dependent headways and train order (Eq. 5)
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Operation time window constraint for departure at origin station (Eq. 6)
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Operation time window constraint for arrival at terminal station (Eq. 6)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Overtaking pattern constraint: at most two successive overtakes/overtaken trains per station, limited by platform tracks (Eq. 7)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Overtaking qualification constraint: lower-speed trains cannot overtake higher-speed trains (Eq. 8)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Overtaking qualification constraint: stopping trains cannot overtake others (Eq. 9)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum dwell time constraint considering overtaking: extra dwell time allowed when overtaken (Eq. 10)
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Relaxed arrival headway constraint using y violation variables for adjacent trains (Eq. 12)
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Relaxed departure headway constraint using y violation variables for adjacent trains (Eq. 12)
+\begin{align}
+  \min\quad & \sum_{i \in I} \left(a_{i}^{m_{d}} - d_{i}^{m_{\text{o}}}\right) \tag{eq\_0001} \\
+  & t \cdot r_{i , \left(m , m + 1\right)}^{min} + t \cdot s_{i , m + 1}^{a} \cdot p_{i}^{m + 1} + t \cdot s_{i , m}^{d} \cdot p_{i}^{m} \leq a_{i}^{m + 1} - d_{i}^{m} \leq t \cdot r_{i , \left(m , m + 1\right)}^{max} + t \cdot s_{i , m + 1}^{a} \cdot p_{i}^{m + 1} + t \cdot s_{i , m}^{d} \cdot p_{i}^{m} \forall i \in I , \forall m \in \left\{1,2 , ... , S - 1\right\} \tag{eq\_0002} \\
+  & \begin{matrix}p_{i}^{m} \cdot t \cdot w_{i , m}^{min} \leq d_{i}^{m} - a_{i}^{m} \leq p_{i}^{m} \cdot t \cdot w_{i , m}^{max} \\ \forall i \in I , \forall m \in \left\{2,3 , \ldots , S - 1\right\}\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}a_{i}^{m + 1} - a_{j}^{m + 1} + M \cdot O_{i , j}^{m , m + 1} \geq \begin{cases} H \cdot A^{s , p} \\ H \cdot A^{p , s} \\ H \cdot A^{s , s} \\ H \cdot A^{p , p} \end{cases} \begin{matrix}\text{if} \\ \text{if} \\ \text{if} \\ \text{if}\end{matrix} \begin{matrix}p_{i}^{m + 1} = 0 , p_{j}^{m + 1} = 1 \\ p_{i}^{m + 1} = 1 , p_{j}^{m + 1} = 0 \\ p_{i}^{m + 1} = 1 , p_{j}^{m + 1} = 1 \\ p_{i}^{m + 1} = 0 , p_{j}^{m + 1} = 0\end{matrix} a_{j}^{m + 1} - a_{i}^{m + 1} + M \cdot \left(1 - O_{i , j}^{m , m + 1}\right) \geq \begin{cases} H \cdot A^{p , s} \\ H \cdot A^{s , p} \\ H \cdot A^{s , s} \\ H \cdot A^{p , p} \end{cases} \begin{matrix}\text{if} \\ \text{if} \\ \text{if} \\ \text{if}\end{matrix} \begin{matrix}p_{i}^{m + 1} = 0 , p_{j}^{m + 1} = 1 \\ p_{i}^{m + 1} = 1 , p_{j}^{m + 1} = 0 \\ p_{i}^{m + 1} = 1 , p_{j}^{m + 1} = 1 \\ p_{i}^{m + 1} = 0 , p_{j}^{m + 1} = 0\end{matrix} \\ \forall i \in I , \forall j \in I \backslash i , \forall m \in \left\{1,2 , ... , S - 1\right\}\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}d_{i}^{m} - d_{j}^{m} + M \cdot O_{i , j}^{m , m + 1} \geq \begin{cases} H \cdot D^{s , p} \\ H \cdot D^{p , s} \\ H \cdot D^{s , s} \\ H \cdot D^{p , p} \end{cases} \begin{matrix}\text{if} \\ \text{if} \\ \text{if} \\ \text{if}\end{matrix} \begin{matrix}p_{i}^{m} = 0 , p_{j}^{m} = 1 \\ p_{i}^{m} = 1 , p_{j}^{m} = 0 \\ p_{i}^{m} = 1 , p_{j}^{m} = 1 \\ p_{i}^{m} = 0 , p_{j}^{m} = 0\end{matrix} d_{j}^{m} - d_{i}^{m} + M \cdot \left(1 - O_{i , j}^{m , m + 1}\right) \geq \begin{cases} H \cdot D^{p , s} \\ H \cdot D^{s , p} \\ H \cdot D^{s , s} \\ H \cdot D^{p , p} \end{cases} \begin{matrix}\text{if} \\ \text{if} \\ \text{if} \\ \text{if}\end{matrix} \begin{matrix}p_{i}^{m} = 0 , p_{j}^{m} = 1 \\ p_{i}^{m} = 1 , p_{j}^{m} = 0 \\ p_{i}^{m} = 1 , p_{j}^{m} = 1 \\ p_{i}^{m} = 0 , p_{j}^{m} = 0\end{matrix} \\ \forall i \in I , \forall j \in I \backslash i , \forall m \in \left\{1,2 , ... , S - 1\right\}\end{matrix} \tag{eq\_0005} \\
+  & W^{l} \leq d_{i}^{m_{o}} \leq W^{u} \tag{eq\_0006\_a} \\
+  & W^{l} \leq a_{i}^{m_{d}} \leq W^{u} \forall i \in I \tag{eq\_0006\_b} \\
+  & - 2 \leq \sum_{j \in I \backslash i} \left(O_{i , j}^{m , m + 1} - O_{i , j}^{m - 1 , m}\right) \leq min \left\{s_{m} , 2\right\} \forall i \in I , \forall m \in \left\{2,3 , \ldots , S - 1\right\} \tag{eq\_0007} \\
+  & \begin{matrix}\sum_{j \in I^{L o w}} \left(O_{i , j}^{m , m + 1} - O_{i , j}^{m - 1 , m}\right) \geq 0 \\ \forall i \in I^{H i g h} , \forall m \in \left\{2,3 , \ldots , S - 1\right\}\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}\sum_{j \in I \backslash i} \left(O_{i , j}^{m , m + 1} - O_{i , j}^{m - 1 , m}\right) \leq 0 \\ \forall i \in \left\{\right. i \left|\right. i \in I , p_{i}^{m} = 1 \left.\right\} , \forall m \in \left\{2,3 , \ldots S - 1\right\}\end{matrix} \tag{eq\_0009} \\
+  & p_{i}^{m} \cdot t \cdot w_{i , m}^{min} \leq d_{i}^{m} - a_{i}^{m} \leq p_{i}^{m} \cdot \left(t \cdot w_{i , m}^{max} + t^{o} \cdot \sum_{j \in I \backslash i} \left(O_{i , j}^{m - 1 , m} - O_{i , j}^{m , m + 1}\right)\right) \forall i \in I , \forall m \in \left\{2,3 , \ldots , S - 1\right\} \tag{eq\_0010} \\
+  & y_{i , j , m + 1}^{a} \geq H \cdot A^{i , j} - \left(a_{j}^{m + 1} - a_{i}^{m + 1}\right) \tag{eq\_0012\_a} \\
+  & y_{i , j , m}^{d} \geq H \cdot D^{i , j} - \left(d_{j}^{m} - d_{i}^{m}\right) \forall m \in S / m_{d} , \forall i , j \in \{ i , j \left|\right. \sum_{k \in I / i} O_{i , k}^{m , m + 1} - \sum_{k \in I / j} O_{j , k}^{m , m + 1} = 1 \} \tag{eq\_0012\_b} \\
+\end{align}

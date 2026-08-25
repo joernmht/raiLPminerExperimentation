@@ -1,0 +1,83 @@
+% Declaration sidecar for 10.1016_j.trb.2014.08.013
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2014.08.013
+% Single-line rail rapid transit timetabling under dynamic passenger demand
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2014.08.013.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger average waiting time approximation
+
+% x: classified as variable during review
+%@ var x shape=S,M domain=integer role=primary drole=- lo=- hi=- :: Launch time of train k at station i
+
+% D: classified as parameter during review
+%@ param D shape=S kind=vector domain=continuous :: Cumulative demand function at station i
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of train indices
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of station indices
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Number of trains (last index in M)
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=continuous :: End of planning horizon
+
+% y: classified as variable during review
+%@ var y shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k is used
+
+% l: classified as parameter during review
+%@ param l shape=S kind=vector domain=continuous :: Distance between stations i and i+1
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Last station index
+
+% s: classified as variable during review
+%@ var s shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Inverse of speed of train k leaving station i
+
+% w: classified as variable during review
+%@ var w shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train k at station i
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=continuous :: Minimum headway between trains
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of natural numbers (positive integers)
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dummy train at start: x_0^i = 0 for all stations i
+%@ con eq_0003 kind=linear domain=- indicator=- :: Dummy train at end: x_{m+1}^i = p for all stations i
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link launch times and usage: p(1-y_k) <= x_k^i <= p
+%@ con eq_0005 kind=linear domain=- indicator=- :: Order trains: x_k^i <= x_{k+1}^i
+%@ con eq_0006 kind=linear domain=- indicator=- :: Travel time relation: x_k^{i+1} = x_k^i + s_i^k l_{i,i+1} + w_{i+1}^k
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell time bounds: y_k w_min <= w_i^k <= y_k w_max
+%@ con eq_0008 kind=linear domain=- indicator=- :: Speed bound: y_k s_min <= s_i^k <= y_k s_max
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum headway: x_{k+1}^i >= x_k^i + h_min y_{k+1}
+%@ con eq_0010 kind=linear domain=- indicator=- :: Integrality of departure times: x_k^i in N+
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary usage variables: y_k in {0,1}
+%@ con eq_0013 kind=linear domain=- indicator=- :: F2 upper bound on departure from next station: x_k^{i+1} <= x_k^i + y_k(s_max l_{i,i+1} + w_max)
+%@ con eq_0014 kind=linear domain=- indicator=- :: F2 lower bound on departure from next station: x_k^i + y_k(s_min l_{i,i+1} + w_min) <= x_k^{i+1}

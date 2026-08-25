@@ -1,0 +1,135 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.aej.2025.03.003
+%@ meta id=10.1016_j.aej.2025.03.003 family=milp schema=0.1.0
+%@ name :: Combined timetabling of periodic and aperiodic trains using an efficient train-based Lagrangian relaxation decomposition
+%@ desc :: Mined from Combined timetabling of periodic and aperiodic trains using an efficient train-based Lagrangian relaxation decomposition (Alexandria Engineering Journal, 2025).
+%@ prov source :: 10.1016/j.aej.2025.03.003
+%@ prov reference :: Combined timetabling of periodic and aperiodic trains using an efficient train-based Lagrangian relaxation decomposition
+%@ prov author :: Naijie Chai; Wenliang Zhou; Ziyu Chen; Qipeng Sun
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of all scheduled trains plus penalty for cancelled aperiodic trains
+%@ var a shape=m,s domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of a train at a station
+%@ var d shape=m,s domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of a train from a station
+%@ param L shape=- kind=scalar domain=- :: Penalty cost for cancelling an aperiodic train
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ var y shape=k domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if aperiodic train k is operated
+%@ index K ordered=0 cyclic=0 :: Set of aperiodic trains
+%@ index P ordered=0 cyclic=0 :: Set of periodic train operation modes
+%@ index f ordered=0 cyclic=0 :: Index for period number of periodic trains
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index m ordered=0 cyclic=0 :: Index for periodic train operation mode
+%@ index s ordered=0 cyclic=0 :: Index for station
+%@ index p ordered=0 cyclic=0 :: Destination station of a train
+%@ index k ordered=0 cyclic=0 :: Index for aperiodic train
+%@ param g shape=s kind=vector domain=- :: Dwell time bounds at station s
+%@ index o ordered=0 cyclic=0 :: Origin station of a train
+%@ index E ordered=0 cyclic=0 :: Set of sections (edges) in the network
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large number for big-M constraints
+%@ param h shape=s kind=vector domain=- :: Safety time interval at station s
+%@ param t shape=- kind=scalar domain=- :: Time point in discretized network
+%@ index u ordered=0 cyclic=0 :: Node in space-time network representing station and time
+%@ index v ordered=0 cyclic=0 :: Node in space-time network representing station and time
+%@ var x shape=k domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train uses an arc in space-time network
+%@ index R ordered=0 cyclic=0 :: Set of arcs in space-time network
+%@ index N ordered=0 cyclic=0 :: Set of nodes in space-time network
+%@ con eq_0002 kind=linear domain=- indicator=- :: Periodic train arrival time at equal intervals
+%@ con eq_0003 kind=linear domain=- indicator=- :: Periodic train departure time at equal intervals
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum and maximum running time for periodic trains
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum and maximum running time for aperiodic trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimum and maximum dwell time for periodic trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Minimum and maximum dwell time for aperiodic trains
+%@ con eq_0008 kind=linear domain=- indicator=- :: Consistency between dwell and operation of aperiodic train
+%@ con eq_0009_a kind=linear domain=- indicator=- :: No overtaking between two periodic trains (departure order)
+%@ con eq_0009_b kind=linear domain=- indicator=- :: No overtaking between two periodic trains (arrival order)
+%@ con eq_0010_a kind=linear domain=- indicator=- :: No overtaking between periodic and aperiodic train (departure, periodic before aperiodic)
+%@ con eq_0010_b kind=linear domain=- indicator=- :: No overtaking between periodic and aperiodic train (arrival, periodic before aperiodic)
+%@ con eq_0010_c kind=linear domain=- indicator=- :: No overtaking between periodic and aperiodic train (departure, aperiodic before periodic)
+%@ con eq_0010_d kind=linear domain=- indicator=- :: No overtaking between periodic and aperiodic train (arrival, aperiodic before periodic)
+%@ con eq_0011_a kind=linear domain=- indicator=- :: No overtaking between two aperiodic trains (departure, first before second)
+%@ con eq_0011_b kind=linear domain=- indicator=- :: No overtaking between two aperiodic trains (arrival, first before second)
+%@ con eq_0011_c kind=linear domain=- indicator=- :: No overtaking between two aperiodic trains (departure, second before first)
+%@ con eq_0011_d kind=linear domain=- indicator=- :: No overtaking between two aperiodic trains (arrival, second before first)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure safety interval between two aperiodic trains (first before second)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure safety interval between two aperiodic trains (second before first)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Departure safety interval between aperiodic and periodic train (periodic before aperiodic)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure safety interval between aperiodic and periodic train (aperiodic before periodic)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure safety interval between two periodic trains (first before second)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Departure safety interval between two periodic trains (second before first)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Arrival safety interval between two aperiodic trains (first before second)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Arrival safety interval between two aperiodic trains (second before first)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Arrival safety interval between aperiodic and periodic train (periodic before aperiodic)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Arrival safety interval between aperiodic and periodic train (aperiodic before periodic)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Arrival safety interval between two periodic trains (first before second)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Arrival safety interval between two periodic trains (second before first)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Consistency of order for two aperiodic trains
+%@ con eq_0025 kind=linear domain=- indicator=- :: Consistency of order between aperiodic and periodic train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Consistency of order for two periodic trains
+%@ con eq_0027 kind=linear domain=- indicator=- :: Departure time window for aperiodic train
+%@ con eq_0028 kind=linear domain=- indicator=- :: Departure time window for first periodic train
+%@ con eq_0029 kind=linear domain=- indicator=- :: Planning horizon start for aperiodic train
+%@ con eq_0030 kind=linear domain=- indicator=- :: Planning horizon end for aperiodic train
+%@ con eq_0031 kind=linear domain=- indicator=- :: Planning horizon start for periodic train
+%@ con eq_0032 kind=linear domain=- indicator=- :: Planning horizon end for periodic train
+%@ con eq_0034 kind=linear domain=- indicator=- :: Equal time interval for periodic trains in space-time network
+%@ con eq_0035 kind=linear domain=- indicator=- :: Incompatible arc constraint for aperiodic train
+%@ con eq_0036 kind=linear domain=- indicator=- :: Incompatible arc constraint for periodic train
+%@ con eq_0040 kind=linear domain=- indicator=- :: Departure arc selection for periodic train
+%@ con eq_0041 kind=linear domain=- indicator=- :: Departure or cancellation arc selection for aperiodic train
+%@ con eq_0042 kind=linear domain=- indicator=- :: Path outflow from origin for periodic train
+%@ con eq_0043 kind=linear domain=- indicator=- :: Flow conservation for periodic train at intermediate node
+%@ con eq_0044 kind=linear domain=- indicator=- :: Path inflow to destination for periodic train
+%@ con eq_0045 kind=linear domain=- indicator=- :: Path outflow from origin for aperiodic train
+%@ con eq_0046 kind=linear domain=- indicator=- :: Flow conservation for aperiodic train at intermediate node
+%@ con eq_0047 kind=linear domain=- indicator=- :: Path inflow to destination for aperiodic train
+\begin{align}
+  \min\quad & \sum_{k \in K} \left({a}_{k}^{p_{k}} - {d}_{k}^{o_{k}}\right) + \sum_{m \in P} \left[F \cdot \left(a_{m}^{p_{m}} - d_{m}^{o_{m}}\right)\right] + \sum_{k \in K} \left[\left(1 - y_{k}\right) \cdot \mathcal{L}\right] \tag{eq\_0001} \\
+  & a_{\left〈m , f\right〉}^{s} = a_{m}^{s} + \left(f - 1\right) \cdot \mathit{Gamma} , \forall f = 2 , 3 , \hdots , F ; m \in P ; s \in S_{m} \tag{eq\_0002} \\
+  & d_{\left〈m , f\right〉}^{s} = d_{m}^{s} + \left(f - 1\right) \cdot \mathit{Gamma} , \forall f = 2 , 3 , \hdots , F ; m \in P ; s \in S_{m} \tag{eq\_0003} \\
+  & \wp_{s}^{min} \leq a_{m}^{s + 1} - d_{m}^{s} \leq \wp_{s}^{max} , \forall m \in P ; s \in S_{m} \backslash \left\{p_{m}\right\} \tag{eq\_0004} \\
+  & \wp_{s}^{min} \cdot y_{k} \leq {a}_{k}^{s + 1} - {d}_{k}^{s} \leq \wp_{s}^{max} \cdot y_{k} , \forall k \in K ; s \in S_{k} \backslash \left\{p_{k}\right\} \tag{eq\_0005} \\
+  & \mathcal{g}_{s}^{min} \leq d_{m}^{s} - a_{m}^{s} \leq \mathcal{g}_{s}^{max} , \forall m \in P ; s \in S_{m} \backslash \left\{o_{m} , p_{m}\right\} \tag{eq\_0006} \\
+  & \mathcal{g}_{s}^{min} \cdot \mathcal{y}_{k , s} \leq {d}_{k}^{s} - {a}_{k}^{s} \leq \mathcal{g}_{s}^{max} \cdot \mathcal{y}_{k , s} , \forall k \in K ; s \in S_{k} \backslash \left\{o_{k} , p_{k}\right\} \tag{eq\_0007} \\
+  & \mathcal{y}_{k , s} \leq y_{k} , \forall k \in K ; s \in S_{k} \backslash \left\{o_{k} , p_{k}\right\} \tag{eq\_0008} \\
+  & \left(\mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} - 1\right) \cdot M < d_{\left〈m^{'} , f^{'}\right〉}^{s} - d_{\left〈m , f\right〉}^{s} < \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} \cdot M , \forall m , m^{'} \in P ; s \in E_{\left〈m , f\right〉} \cap E_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0009\_a} \\
+  & \left(\mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} - 1\right) \cdot M < a_{\left〈m^{'} , f^{'}\right〉}^{s} - a_{\left〈m , f\right〉}^{s} < \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} \cdot M , \forall m , m^{'} \in P ; s \in E_{\left〈m , f\right〉} \cap E_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0009\_b} \\
+  & \left(\mathit{theta}_{k , \left〈m , f\right〉}^{s} - 1\right) \cdot M < d_{\left〈m , f\right〉}^{s} - {d}_{k}^{s} , \forall m \in P ; k \in K ; s \in E_{k} \cap E_{\left〈m , f\right〉} \tag{eq\_0010\_a} \\
+  & \left(\mathit{theta}_{k , \left〈m , f\right〉}^{s} - 1\right) \cdot M < a_{\left〈m , f\right〉}^{s} - {a}_{k}^{s} , \forall m \in P ; k \in K ; s \in E_{k} \cap E_{\left〈m , f\right〉} \tag{eq\_0010\_b} \\
+  & \left(\mathit{theta}_{\left〈m , f\right〉 , k}^{s} - 1\right) \cdot M < {d}_{k}^{s} - d_{\left〈m , f\right〉}^{s} , \forall m \in P ; k \in K ; s \in E_{k} \cap E_{\left〈m , f\right〉} \tag{eq\_0010\_c} \\
+  & \left(\mathit{theta}_{\left〈m , f\right〉 , k}^{s} - 1\right) \cdot M < {a}_{k}^{s} - a_{\left〈m , f\right〉}^{s} , \forall m \in P ; k \in K ; s \in E_{k} \cap E_{\left〈m , f\right〉} \tag{eq\_0010\_d} \\
+  & \left(\mathit{theta}_{k , k^{'}}^{s} - 1\right) \cdot M < {d}_{k^{'}}^{s} - {d}_{k}^{s} , \forall k , k^{'} \in K ; \forall s \in E_{k} \cap E_{k^{'}} \tag{eq\_0011\_a} \\
+  & \left(\mathit{theta}_{k , k^{'}}^{s} - 1\right) \cdot M < {a}_{k^{'}}^{s} - {a}_{k}^{s} , \forall k , k^{'} \in K ; \forall s \in E_{k} \cap E_{k^{'}} \tag{eq\_0011\_b} \\
+  & \left(\mathit{theta}_{k^{'} , k}^{s} - 1\right) \cdot M < {d}_{k}^{s} - {d}_{k^{'}}^{s} , \forall k , k^{'} \in K ; \forall s \in E_{k} \cap E_{k^{'}} \tag{eq\_0011\_c} \\
+  & \left(\mathit{theta}_{k^{'} , k}^{s} - 1\right) \cdot M < {a}_{k}^{s} - {a}_{k^{'}}^{s} , \forall k , k^{'} \in K ; \forall s \in E_{k} \cap E_{k^{'}} \tag{eq\_0011\_d} \\
+  & {d}_{k^{'}}^{s} - {d}_{k}^{s} + M \cdot \left(1 - \mathit{theta}_{k , k^{'}}^{s}\right) \geq h_{s}^{exit} , \forall k , k^{'} \in K ; s \in S_{k} \cap S_{k^{'}} \tag{eq\_0012} \\
+  & {d}_{k}^{s} - {d}_{k^{'}}^{s} + M \cdot \mathit{theta}_{k \left(, k\right)^{'}}^{s} \geq h_{s}^{exit} , \forall k , k^{'} \in K ; s \in S_{k} \cap S_{k^{'}} \tag{eq\_0013} \\
+  & d_{\left〈m , f\right〉}^{s} - {d}_{k}^{s} + M \cdot \left(1 - \mathit{theta}_{k , \left〈m , f\right〉}^{s}\right) \geq h_{s}^{exit} , \forall k \in K ; m \in P ; f = 1 , 2 , \hdots , F ; s \in S_{k} \cap S_{\left〈m , f\right〉} \tag{eq\_0014} \\
+  & {d}_{k}^{s} - d_{\left〈m , f\right〉}^{s} + M \cdot \mathit{theta}_{k , \left〈m , f\right〉}^{s} \geq h_{s}^{exit} , \forall k \in K ; m \in P ; f = 1 , 2 , \hdots , F ; s \in S_{k} \cap S_{\left〈m , f\right〉} \tag{eq\_0015} \\
+  & d_{\left〈m^{'} , f^{'}\right〉}^{s} - d_{\left〈m , f\right〉}^{s} + M \cdot \left(1 - \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s}\right) \geq h_{s}^{exit} , \forall m , m^{'} \in P ; f , f^{'} = 1 , 2 , \hdots , F ; s \in S_{\left〈m , f\right〉} \cap S_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0016} \\
+  & d_{\left〈m , f\right〉}^{s} - d_{\left〈m^{'} , f^{'}\right〉}^{s} + M \cdot \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} \geq h_{s}^{exit} , \forall m , m^{'} \in P ; f , f^{'} = 1 , 2 , \hdots , F ; s \in S_{\left〈m , f\right〉} \cap S_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0017} \\
+  & {a}_{k^{'}}^{s} - {a}_{k}^{s} + M \cdot \left(1 - \mathit{theta}_{k , k^{'}}^{s}\right) \geq h_{s}^{enter} , \forall k , k^{'} \in K ; s \in S_{k} \cap S_{k^{'}} \tag{eq\_0018} \\
+  & {a}_{k}^{s} - {a}_{k^{'}}^{s} + M \cdot \mathit{theta}_{k , k^{'}}^{s} \geq h_{s}^{enter} , \forall k , k^{'} \in K ; s \in S_{k} \cap S_{k^{'}} \tag{eq\_0019} \\
+  & a_{\left〈m , f\right〉}^{s} - {a}_{k}^{s} + M \cdot \left(1 - \mathit{theta}_{k , \left〈m , f\right〉}^{s}\right) \geq h_{s}^{enter} , \forall k \in K ; m \in P ; f = 1 , 2 , \hdots , F ; s \in S_{k} \cap S_{\left〈m , f\right〉} \tag{eq\_0020} \\
+  & {a}_{k}^{s} - a_{\left〈m , f\right〉}^{s} + M \cdot \mathit{theta}_{k , \left〈m , f\right〉}^{s} \geq h_{s}^{enter} , \forall k \in K ; m \in P ; f = 1 , 2 , \hdots , F ; s \in S_{k} \cap S_{\left〈m , f\right〉} \tag{eq\_0021} \\
+  & a_{\left〈m^{'} , f^{'}\right〉}^{s} - a_{\left〈m , f\right〉}^{s} + M \cdot \left(1 - \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s}\right) \geq h_{s}^{enter} , \forall m , m^{'} \in P ; f , f^{'} = 1 , 2 , \hdots , F ; s \in S_{\left〈m , f\right〉} \cap S_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0022} \\
+  & a_{\left〈m , f\right〉}^{s} - a_{\left〈m^{'} , f^{'}\right〉}^{s} + M \cdot \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} \geq h_{s}^{enter} , \forall m , m^{'} \in P ; f , f^{'} = 1 , 2 , \hdots , F ; s \in S_{\left〈m , f\right〉} \cap S_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0023} \\
+  & y_{k} + y_{k^{'}} - 1 \leq \mathit{theta}_{k , k^{'}}^{s} + \mathit{theta}_{k^{'} , k}^{s} \leq 0.5 \cdot \left(y_{k} + y_{k^{'}}\right) , \forall k , k^{'} \in K ; s \in S_{k} \cap S_{k^{'}} \tag{eq\_0024} \\
+  & \left(\mathit{theta}_{k , \left〈m , f\right〉}^{s} + \mathit{theta}_{\left〈m , f\right〉 , k}^{s}\right) \cdot y_{k} \leq 1 , \forall k \in K ; m \in P ; f = 1 , 2 , \hdots , F ; s \in S_{k} \cap S_{\left〈m , f\right〉} \tag{eq\_0025} \\
+  & \mathit{theta}_{\left〈m , f\right〉 , \left〈m^{'} , f^{'}\right〉}^{s} + \mathit{theta}_{\left〈m^{'} , f^{'}\right〉 , \left〈m , f\right〉}^{s} = 1 , \forall m , m^{'} \in P ; f , f^{'} = 1 , 2 , \hdots , F ; s \in S_{\left〈m , f\right〉} \cap S_{\left〈m^{'} , f^{'}\right〉} \tag{eq\_0026} \\
+  & t_{f_{k}}^{L} \cdot y_{k} \leq {d}_{k}^{o_{k}} \leq t_{f_{k}}^{U} \cdot y_{k} , \forall k \in K \tag{eq\_0027} \\
+  & t_{1}^{L} \leq d_{m}^{o_{m}} \leq t_{1}^{U} , \forall m \in P \tag{eq\_0028} \\
+  & {d}_{k}^{o_{k}} \geq y_{k} \cdot t_{\mathit{start}} , \forall k \in K \tag{eq\_0029} \\
+  & {a}_{k}^{p_{k}} \leq y_{k} \cdot t_{\mathit{end}} , \forall k \in K \tag{eq\_0030} \\
+  & d_{m}^{o_{m}} \geq t_{\mathit{start}} , \forall m \in P \tag{eq\_0031} \\
+  & a_{\left〈m , F\right〉}^{p_{m}} \leq t_{\mathit{end}} , \forall m \in P \tag{eq\_0032} \\
+  & x_{\left〈m , 1\right〉} \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right) = x_{\left〈m , f\right〉} \left(u_{s}^{t + \left(f - 1\right) \cdot \mathit{Gamma}} , v_{s + 1}^{\mathit{tau} + \left(f - 1\right) \cdot \mathit{Gamma}}\right) , \forall m \in P ; \left(s , s + 1\right) \in E_{m} ; f = 2 , 3 , \hdots , F \tag{eq\_0034} \\
+  & x_{k} \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right) + \sum_{r \in {R} \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right)} \left[\sum_{k^{'} \neq k} x_{k^{'}} \left(r\right) + \sum_{\left〈m , f\right〉} x_{\left〈m , f\right〉} \left(r\right)\right] \leq 1 , \forall k \in K ; \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right) \in R_{k} \tag{eq\_0035} \\
+  & x_{\left〈m , f\right〉} \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right) + \sum_{r \in {R} \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right)} \left[\sum_{k} x_{k} \left(r\right) + \sum_{\left〈m^{'} , f^{'}\right〉 \neq \left〈m , f\right〉} x_{\left〈m^{'} , f^{'}\right〉} \left(r\right)\right] \leq 1 , \forall \left〈m , f\right〉 ; \left(u_{s}^{t} , v_{s + 1}^{\mathit{tau}}\right) \in R_{\left〈m , f\right〉} \tag{eq\_0036} \\
+  & \underset{r \in \left\{\left(\mathit{delta} , u_{o_{m}}^{t}\right) \left|\right.,t \in \left[t_{1}^{L} , t_{1}^{U}\right]\right\}}{\sum} x_{\left〈m , 1\right〉} \left(r\right) = 1 , \forall m \in P \tag{eq\_0040} \\
+  & \underset{r \in \left\{\left(\mathit{delta} , \mathit{vartheta}\right)\right\} \cup \left\{\left(\mathit{delta} , u_{o_{k}}^{t}\right) \left|\right.,t \in \left[t_{f_{k}}^{L} , t_{f_{k}}^{U}\right]\right\}}{\sum} x_{k} \left(r\right) = 1 , \forall k \in K \tag{eq\_0041} \\
+  & \sum_{r \in R^{-} \left(\mathit{delta}\right)} x_{\left〈m , 1\right〉} \left(r\right) = 1 , \forall m \in P \tag{eq\_0042} \\
+  & \sum_{r \in R^{+} \left(v\right)} x_{\left〈m , 1\right〉} \left(r\right) = \sum_{r \in R^{-} \left(v\right)} x_{\left〈m , 1\right〉} \left(r\right) , \forall m \in P ; \forall v \in N \backslash \left\{\mathit{delta} , \mathit{vartheta}\right\} \tag{eq\_0043} \\
+  & \sum_{r \in R^{+} \left(\mathit{vartheta}\right)} x_{\left〈m , 1\right〉} \left(r\right) = 1 , \forall m \in P \tag{eq\_0044} \\
+  & \sum_{r \in R_{k}^{-} \left(\mathit{delta}\right)} x_{k} \left(r\right) = 1 , \forall k \in K \tag{eq\_0045} \\
+  & \sum_{r \in R^{+} \left(v\right)} x_{k} \left(r\right) = \sum_{r \in R^{-} \left(v\right)} x_{k} \left(r\right) , \forall k \in K , \forall v \in N \backslash \left\{\mathit{delta} , \mathit{vartheta}\right\} \tag{eq\_0046} \\
+  & \sum_{r \in R_{k}^{+} \left(\mathit{vartheta}\right)} x_{k} \left(r\right) = 1 , \forall k \in K \tag{eq\_0047} \\
+\end{align}

@@ -1,0 +1,123 @@
+% Declaration sidecar for 10.1016_j.trc.2020.102823
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2020.102823
+% Simultaneously re-optimizing timetables and platform schedules under planned track maintenance for a high-speed railway network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2020.102823.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total cancellation cost plus weighted train travel time.
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Cancellation cost per train.
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Objective function value.
+
+% c: classified as parameter during review
+%@ param c shape=F,A kind=matrix domain=- :: Cost coefficient for arc g used by train f.
+
+% x: classified as variable during review
+%@ var x shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train f uses arc g.
+
+% unusable as an identifier, rename or drop: θ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the space-time network.
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of trains.
+
+% unusable as an identifier, rename or drop: σ
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Origin node of an arc.
+
+% unusable as an identifier, rename or drop: δ
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the space-time network for a train.
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+% D: classified as parameter during review
+%@ param D shape=F,K kind=matrix domain=- :: Dwell time requirement for train f at station k.
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of stations.
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in a station.
+
+% S: classified as parameter during review
+%@ param S shape=F,K kind=matrix domain=- :: Binary parameter indicating whether train f is planned to stop at station k.
+
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: Destination node of an arc.
+
+% unusable as an identifier, rename or drop: ψ
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Destination node index.
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Departure time index.
+
+% unusable as an identifier, rename or drop: τ
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Origin node index.
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Headway or dwell time parameter.
+
+% U: classified as parameter during review
+%@ param U shape=- kind=big_m domain=- :: Large constant used in linearization.
+
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar domain=- :: Parameter larger than 1 used in constraint (16).
+
+% y: classified as variable during review
+%@ var y shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating implicit occupation of waiting arc g by train f.
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Residual or violation measure in Lagrangian relaxation.
+
+% Bound by a quantifier or big operator, so no declaration of their own: P, f, g, k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0009 kind=linear domain=- indicator=- :: At most one outgoing arc from the origin node for each train.
+%@ con eq_0010 kind=flow_balance domain=- indicator=- :: Flow conservation at intermediate nodes of each train's space-time network.
+%@ con eq_0011 kind=capacity domain=- indicator=- :: Minimum required dwell time for planned stopping trains.
+%@ con eq_0012 kind=capacity domain=- indicator=- :: Minimum dwell time on a platform track for revised stopping trains.
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Maximum permitted dwell time on stopping tracks.
+%@ con eq_0014 kind=ordering domain=- indicator=- :: No departure earlier than the planned departure time.
+%@ con eq_0015 kind=headway domain=- indicator=- :: Headway requirement on segment tracks via incompatible arc sets.
+%@ con eq_0016 kind=headway domain=- indicator=- :: Headway requirement between receiving routes.
+%@ con eq_0017 kind=headway domain=- indicator=- :: Headway requirement between departure routes.
+%@ con eq_0018 kind=headway domain=- indicator=- :: Headway requirement between receiving and departure routes.
+%@ con eq_0019 kind=big_m domain=- indicator=- :: Linearization linking implicit occupation y to explicit occupation x on waiting arcs.
+%@ con eq_0020 kind=headway domain=- indicator=- :: Stopping-track headway: at most one train explicitly or implicitly occupies a waiting arc.
+%@ con eq_0021 kind=linear domain=- indicator=- :: If train f uses any arc then it cannot be cancelled.
+%@ con eq_0022 kind=linear domain=- indicator=- :: A non-cancelled train must use at least one arc in its network.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Binary domain of x variables.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Binary domain of y variables.
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Constraint (26a) in the ADMM-based decomposition.
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Constraint (26b) in the ADMM-based decomposition.
+%@ con eq_0026_c kind=linear domain=- indicator=- :: Constraint (26c) in the ADMM-based decomposition.
+%@ con eq_0026_d kind=linear domain=- indicator=- :: Constraint (26d) in the ADMM-based decomposition.
+%@ con eq_0026_e kind=linear domain=- indicator=- :: Constraint (26e) in the ADMM-based decomposition.

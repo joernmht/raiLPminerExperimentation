@@ -1,0 +1,105 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2017.12.010
+%@ meta id=10.1016_j.cie.2017.12.010 family=milp schema=0.1.0
+%@ name :: Integrated stochastic optimization approaches for tactical scheduling of trains and railway infrastructure maintenance
+%@ desc :: Mined from Integrated stochastic optimization approaches for tactical scheduling of trains and railway infrastructure maintenance (Computers & Industrial Engineering, 2017).
+%@ prov source :: 10.1016/j.cie.2017.12.010
+%@ prov reference :: Integrated stochastic optimization approaches for tactical scheduling of trains and railway infrastructure maintenance
+%@ prov author :: Andrea D’Ariano; Lingyun Meng; Gabriele Centulio; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total train arrival deviation and negative paired maintenance works
+%@ param PCT shape=F kind=vector :: Planned arrival time at destination for train f
+%@ param Pr shape=S kind=vector :: Probability of scenario s
+%@ var d shape=F,E,S domain=non_negative role=primary :: Departure time of train f from cell (i,j) in scenario s
+%@ index f ordered=0 cyclic=0 :: Train index
+%@ index i ordered=0 cyclic=0 :: Node index
+%@ index s ordered=0 cyclic=0 :: Scenario index
+%@ index E ordered=0 cyclic=0 :: Set of arcs in the time-space network
+%@ index F ordered=0 cyclic=0 :: Set of trains
+%@ index S ordered=0 cyclic=0 :: Set of scenarios
+%@ index O ordered=0 cyclic=0 :: Origin node of train f
+%@ index j ordered=0 cyclic=0 :: Node index
+%@ var x shape=F,E,S domain=binary role=primary :: Binary routing variable: 1 if train f uses arc (i,j) in scenario s
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the physical network
+%@ param EST shape=F kind=vector :: Earliest start time of train f
+%@ var a shape=F,E,S domain=non_negative role=primary :: Arrival time of train f at node j in scenario s
+%@ param M shape=- kind=big_m :: Large positive constant
+%@ var t shape=F,E,S domain=non_negative role=primary :: Travel and dwell time of train f on arc (i,j) in scenario s
+%@ param FT shape=F,E,S kind=matrix :: Free flow travel time of train f on arc (i,j) in scenario s
+%@ param w shape=F,E,S kind=matrix :: Minimum or maximum dwell time of train f on arc (i,j) in scenario s
+%@ var o shape=F,F,E,S domain=binary role=primary :: Binary ordering variable: 1 if train f precedes f' on arc (i,j) in scenario s
+%@ param g shape=F,E kind=matrix :: Safety time interval required by train f to start occupying a cell
+%@ param h shape=F,E kind=matrix :: Safety time interval required by train f to release a cell
+%@ index B ordered=0 cyclic=0 :: Set of maintenance areas
+%@ index P ordered=0 cyclic=0 :: Set of maintenance works on an arc
+%@ var l shape=P,F,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p precedes train f on arc (i,j) in scenario s
+%@ param mh shape=P,E kind=matrix :: Safety time interval required after/before maintenance work p on arc (i,j)
+%@ var MT shape=P,E,S domain=non_negative role=primary :: Duration of maintenance work p on arc (i,j) in scenario s
+%@ var y shape=P,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p is paired with previous work on arc (i,j) in scenario s
+%@ param My shape=- kind=big_m :: Large positive constant used in pairing constraints
+%@ param T shape=- kind=scalar :: Time horizon
+%@ con eq_0003 kind=flow_balance :: Flow balance at origin: each train leaves its origin exactly once in each scenario
+%@ con eq_0004 kind=flow_balance :: Flow balance at intermediate nodes: for every train, inflow equals outflow at each intermediate node
+%@ con eq_0005 kind=flow_balance :: Flow balance at destination: each train reaches its destination exactly once in each scenario
+%@ con eq_0006 kind=linear :: Entrance time at origin is at least the earliest start time when the first arc is selected
+%@ con eq_0007 kind=linear :: Cell-to-cell transition: exit time from an incoming arc equals entrance time to the next arc at each intermediate node
+%@ con eq_0008 kind=big_m :: Mapping constraint: arrival time on an arc is zero unless the arc is selected, and is bounded by M if selected
+%@ con eq_0009 kind=big_m :: Mapping constraint: departure time on an arc is zero unless the arc is selected, and is bounded by M if selected
+%@ con eq_0010 kind=linear :: Travel and dwell time on an arc equals departure time minus arrival time
+%@ con eq_0011 kind=linear :: Minimum dwell and travel time: at least free-flow plus minimum dwell when the arc is used
+%@ con eq_0012 kind=linear :: Maximum dwell and travel time: at most free-flow plus maximum dwell when the arc is used
+%@ con eq_0013 kind=ordering :: Ordering mapping for same-direction trains: an ordering decision is forced when both trains use the same arc
+%@ con eq_0014 kind=ordering :: Ordering mapping for opposite-direction trains: an ordering decision is forced when both trains use the same physical segment in opposite directions
+%@ con eq_0015 kind=ordering :: Ordering variable is bounded above by the routing variable of train f (same direction)
+%@ con eq_0016 kind=ordering :: Ordering variable is bounded above by the routing variable of train f' (same direction)
+%@ con eq_0017 kind=ordering :: Ordering variable is bounded above by the routing variable of train f (opposite direction)
+%@ con eq_0018 kind=ordering :: Ordering variable is bounded above by the routing variable of train f' (opposite direction)
+%@ con eq_0019 kind=headway :: Headway for same direction, f before f': f' enters the arc only after f exits plus safety intervals
+%@ con eq_0020 kind=headway :: Headway for same direction, f' before f: f enters the arc only after f' exits plus safety intervals
+%@ con eq_0021 kind=headway :: Headway for opposite directions, f before f' on reverse arc: f' enters only after f exits plus safety intervals
+%@ con eq_0022 kind=headway :: Headway for opposite directions, f' before f on reverse arc: f enters only after f' exits plus safety intervals
+%@ con eq_0023 kind=capacity :: Capacity: if maintenance work p precedes train f on an arc, train f enters after p ends plus safety intervals
+%@ con eq_0024 kind=capacity :: Capacity: if train f precedes maintenance work p, p starts after f exits plus safety intervals
+%@ con eq_0025 kind=capacity :: Capacity for opposite directions: train f on the reverse arc enters after p ends plus safety intervals
+%@ con eq_0026 kind=capacity :: Capacity for opposite directions: maintenance p starts after train f exits the reverse arc plus safety intervals
+%@ con eq_0027 kind=linear :: Consecutive maintenance works: start time of a maintenance work is after the end time of the previous work on the same arc
+%@ con eq_0028 kind=linear :: Duration of a maintenance work equals its end time minus its start time
+%@ con eq_0029 kind=big_m :: Pairing constraint: if paired (y=1), start of p equals end of previous work; if not paired, the gap is only bounded by M
+%@ con eq_0030 kind=big_m :: Pairing constraint: when not paired, the start of a work is at least one time unit after the previous end; when paired, the gap can be zero
+%@ con eq_0031 kind=linear :: Deadline: each maintenance work ends within the time horizon
+%@ con eq_0032 kind=linear :: Deadline: each train exits the network within the time horizon
+%@ con eq_0033 kind=linear :: Routing stability: route chosen in the nominal scenario is kept in every scenario
+\begin{align}
+  \min\quad & min \sum_{s \in S} \left[\mathit{Pr}_{s} \sum_{f \in F} \sum_{i : \left(i , D_{f}\right) \in E_{f}} \left|d_{f} \left(i , D_{f} , s\right) - \mathit{PCT}_{f}\right|\right] \tag{eq\_0001} \\
+  & \sum_{j : \left(O_{f} , j\right) \in E_{f}} x_{f} \left(O_{f} , j , s\right) = 1 \forall f \in F , \forall s \in S \tag{eq\_0003} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} x_{f} \left(i , j , s\right) = \sum_{k : \left(j , k\right) \in E_{f}} x_{f} \left(j , k , s\right) \forall f \in F , \forall j \in V_{f} \backslash \left\{O_{f} , D_{f}\right\} , \forall s \in S \tag{eq\_0004} \\
+  & \sum_{i : \left(i , D_{f}\right) \in E_{f}} x_{f} \left(i , D_{f} , s\right) = 1 \forall f \in F , \forall s \in S \tag{eq\_0005} \\
+  & a_{f} \left(O_{f} , j , s\right) \geq \mathit{EST}_{f} \cdot x_{f} \left(O_{f} , j , s\right) \forall f \in F , \forall j : \left(O_{f} , j\right) \in E_{f} , \forall s \in S \tag{eq\_0006} \\
+  & \sum_{i : \left(i , j\right) \in E_{f}} d_{f} \left(i , j , s\right) = \sum_{k : \left(j , k\right) \in E_{f}} a_{f} \left(j , k , s\right) \forall f \in F , \forall j \in V_{f} \backslash \left\{O_{f} , D_{f}\right\} , \forall s \in S \tag{eq\_0007} \\
+  & x_{f} \left(i , j , s\right) - 1 \leq a_{f} \left(i , j , s\right) \leq x_{f} \left(i , j , s\right) M \forall f \in F , \left(i , j\right) \in E_{f} , \forall s \in S \tag{eq\_0008} \\
+  & x_{f} \left(i , j , s\right) - 1 \leq d_{f} \left(i , j , s\right) \leq x_{f} \left(i , j , s\right) M \forall f \in F , \left(i , j\right) \in E_{f} , \forall s \in S \tag{eq\_0009} \\
+  & t_{f} \left(i , j , s\right) = d_{f} \left(i , j , s\right) - a_{f} \left(i , j , s\right) \forall f \in F , \left(i , j\right) \in E_{f} , \forall s \in S \tag{eq\_0010} \\
+  & t_{f} \left(i , j , s\right) \geq \left[w_{f}^{\mathit{min}} \left(i , j , s\right) + \mathit{FT}_{f} \left(i , j , s\right)\right] x_{f} \left(i , j , s\right) \forall f \in F , \forall \left(i , j\right) \in E_{f} , \forall s \in S \tag{eq\_0011} \\
+  & t_{f} \left(i , j , s\right) \leq \left[w_{f}^{\mathit{max}} \left(i , j , s\right) + \mathit{FT}_{f} \left(i , j , s\right)\right] x_{f} \left(i , j , s\right) \forall f \in F , \forall \left(i , j\right) \in E_{f} , \forall s \in S \tag{eq\_0012} \\
+  & \begin{aligned} & x_{f} \left(i , j , s\right) + x_{f^{'}} \left(i , j , s\right) - 1 \leq o \left(f , f^{'} , i , j , s\right) + o \left(f^{'} , f , i , j , s\right) \leq 3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(i , j , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} = \mathit{delta}_{f^{'}} ; \forall \left(i , j\right) \in E_{f} \cap E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0013} \\
+  & \begin{aligned} & x_{f} \left(i , j , s\right) + x_{f^{'}} \left(j , i , s\right) - 1 \leq o \left(f , f^{'} , i , j , s\right) + o \left(f^{'} , f , i , j , s\right) \leq 3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(j , i , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} \neq \mathit{delta}_{f^{'}} ; \forall i , j \in V : \left(i , j\right) \in E_{f} \land \left(j , i\right) \in E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0014} \\
+  & \begin{aligned} & o \left(f , f^{'} , i , j , s\right) \leq x_{f} \left(i , j , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} = \mathit{delta}_{f^{'}} ; \forall \left(i , j\right) \in E_{f} \cap E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0015} \\
+  & \begin{aligned} & o \left(f , f^{'} , i , j , s\right) \leq x_{f^{'}} \left(i , j , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} = \mathit{delta}_{f^{'}} ; \forall \left(i , j\right) \in E_{f} \cap E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0016} \\
+  & \begin{aligned} & o \left(f , f^{'} , i , j , s\right) \leq x_{f} \left(i , j , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} \neq \mathit{delta}_{f^{'}} ; \forall i , j \in V : \left(i , j\right) \in E_{f} \land \left(j , i\right) \in E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0017} \\
+  & \begin{aligned} & o \left(f , f^{'} , i , j , s\right) \leq x_{f} \left(j , i , s\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} \neq \mathit{delta}_{f^{'}} ; \forall i , j \in V : \left(i , j\right) \in E_{f} \land \left(j , i\right) \in E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0018} \\
+  & \begin{aligned} & a_{f^{'}} \left(i , j , s\right) + \left[3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(i , j , s\right) - o \left(f , f^{'} , i , j , s\right)\right] M \geq d_{f} \left(i , j , s\right) + g_{f^{'}} \left(i , j\right) + h_{f} \left(i , j\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} = \mathit{delta}_{f^{'}} ; \forall \left(i , j\right) \in E_{f} \cap E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0019} \\
+  & \begin{aligned} & a_{f} \left(i , j , s\right) + \left[3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(i , j , s\right) - o \left(f^{'} , f , i , j , s\right)\right] M \geq d_{f^{'}} \left(i , j , s\right) + g_{f} \left(i , j\right) + h_{f^{'}} \left(i , j\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} = \mathit{delta}_{f^{'}} ; \forall \left(i , j\right) \in E_{f} \cap E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0020} \\
+  & \begin{aligned} & a_{f^{'}} \left(j , i , s\right) + \left[3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(j , i , s\right) - o \left(f , f^{'} , i , j , s\right)\right] M \geq d_{f} \left(i , j , s\right) + g_{f^{'}} \left(j , i\right) + h_{f} \left(i , j\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} \neq \mathit{delta}_{f^{'}} ; \forall i , j \in V : \left(i , j\right) \in E_{f} \land \left(j , i\right) \in E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0021} \\
+  & \begin{aligned} & a_{f} \left(i , j , s\right) + \left[3 - x_{f} \left(i , j , s\right) - x_{f^{'}} \left(j , i , s\right) - o \left(f , f^{'} , i , j , s\right)\right] M \geq d_{f^{'}} \left(j , i , s\right) + g_{f} \left(i , j\right) + h_{f^{'}} \left(j , i\right) \\ & \forall f , f^{'} \in F : f \neq f^{'} , \mathit{delta}_{f} \neq \mathit{delta}_{f^{'}} ; \forall i , j \in V : \left(i , j\right) \in E_{f} \land \left(j , i\right) \in E_{f^{'}} ; \forall s \in S\end{aligned} \tag{eq\_0022} \\
+  & \begin{aligned} & a_{f} \left(i , j , s\right) + \left[2 - x_{f} \left(i , j , s\right) - l_{p} \left(f , i , j , s\right)\right] M \geq d_{p} \left(i , j , s\right) + \mathit{mh}_{p} \left(i , j\right) + g_{f} \left(i , j\right) \\ & \forall f \in F , \forall b \in B , \forall \left(i , j\right) \in E_{f} \cap E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S\end{aligned} \tag{eq\_0023} \\
+  & \begin{aligned} & a_{p} \left(i , j , s\right) + l_{p} \left(f , i , j , s\right) M \geq d_{f} \left(i , j , s\right) + \left[\mathit{mh}_{p} \left(i , j\right) + h_{f} \left(i , j\right)\right] x_{f} \left(i , j , s\right) \\ & \forall f \in F , \forall b \in B , \forall \left(i , j\right) \in E_{f} \cap E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S\end{aligned} \tag{eq\_0024} \\
+  & \begin{aligned} & a_{f} \left(j , i , s\right) + \left[2 - x_{f} \left(j , i , s\right) - l_{p} \left(f , i , j , s\right)\right] M \geq d_{p} \left(i , j , s\right) + \mathit{mh}_{p} \left(i , j\right) + g_{f} \left(j , i\right) \\ & \forall f \in F , \forall b \in B , \forall \left(i , j\right) : \left(j , i\right) \in E_{f} \land \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S\end{aligned} \tag{eq\_0025} \\
+  & \begin{aligned} & a_{p} \left(i , j , s\right) + l_{p} \left(f , i , j , s\right) M \geq d_{f} \left(j , i , s\right) + \left[\mathit{mh}_{p} \left(i , j\right) + h_{f} \left(j , i\right)\right] x_{f} \left(j , i , s\right) \\ & \forall f \in F , \forall b \in B , \forall \left(i , j\right) : \left(j , i\right) \in E_{f} \land \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S\end{aligned} \tag{eq\_0026} \\
+  & \begin{aligned} & a_{p} \left(i , j , s\right) \geq d_{p - 1} \left(i , j , s\right) \\ & \forall b \in B , \forall \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} \backslash \left\{1\right\} , \forall s \in S\end{aligned} \tag{eq\_0027} \\
+  & \begin{aligned} & \mathit{MT}_{p} \left(i , j , s\right) = d_{p} \left(i , j , s\right) - a_{p} \left(i , j , s\right) \\ & \forall b \in B , \forall \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S\end{aligned} \tag{eq\_0028} \\
+  & \begin{aligned} & M \left[1 - y_{p} \left(i , j , s\right)\right] \geq a_{p} \left(i , j , s\right) - d_{p - 1} \left(i , j , s\right) \\ & \forall b \in B , \forall \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} \backslash \left\{1\right\} , \forall s \in S\end{aligned} \tag{eq\_0029} \\
+  & \begin{aligned} & - \mathit{My}_{p} \left(i , j , s\right) \leq a_{p} \left(i , j , s\right) - d_{p - 1} \left(i , j , s\right) - 1 \\ & \forall b \in B , \forall \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} \backslash \left\{1\right\} , \forall s \in S\end{aligned} \tag{eq\_0030} \\
+  & d_{p} \left(i , j , s\right) \leq T \forall b \in B , \forall \left(i , j\right) \in E_{b} , \forall p \in P_{\left(i , j\right)} , \forall s \in S \tag{eq\_0031} \\
+  & d_{f} \left(i , D_{f} , s\right) \leq T \forall f \in F , \forall s \in S \tag{eq\_0032} \\
+  & x_{f} \left(i , j , s\right) = x_{f} \left(i , j , s - 1\right) \forall f \in F , \forall \left(i , j\right) \in E_{f} , \forall s \in S \backslash \left\{1\right\} \tag{eq\_0033} \\
+\end{align}

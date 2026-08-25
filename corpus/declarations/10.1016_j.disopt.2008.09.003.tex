@@ -1,0 +1,105 @@
+% Declaration sidecar for 10.1016_j.disopt.2008.09.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.disopt.2008.09.003
+% Integral cycle bases for cyclic timetabling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.disopt.2008.09.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize transformed objective F_CPF of the Cycle Periodicity Formulation
+
+% unusable as an identifier, rename or drop: π
+%@ param T shape=- kind=scalar domain=- :: Cycle period time
+
+%@ var p shape=A domain=integer role=primary drole=- lo=- hi=- :: Integer periodicity variable p_a for each arc a in A
+
+%@ param u shape=A kind=vector domain=- :: Upper bound on periodic tension u_a for arc a
+
+% unusable as an identifier, rename or drop: ℓ
+%@ param F shape=- kind=scalar domain=- :: Objective function
+
+%@ param PESP shape=- kind=scalar domain=- :: Periodic Event Scheduling Problem instance
+
+%@ index A ordered=0 cyclic=0 :: Set of arcs (event pairs)
+
+%@ index j ordered=0 cyclic=0 :: Index for events (nodes in constraint graph)
+
+%@ param Z shape=- kind=scalar domain=- :: Set of integers
+
+%@ var x shape=A domain=continuous role=primary drole=- lo=- hi=- :: Periodic tension x_a on arc a
+
+%@ var q shape=C domain=integer role=primary drole=- lo=- hi=- :: Integer cycle variable q_C for cycle C
+
+%@ index C ordered=0 cyclic=0 :: Index for a cycle in graph G
+
+%@ param CPF shape=- kind=scalar domain=- :: Cycle Periodicity Formulation instance
+
+%@ index G ordered=0 cyclic=0 :: Set of cycles in graph
+
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers
+
+%@ param b shape=C kind=vector domain=- :: Upper bound b_C for cycle integer variable q_C
+
+%@ param modulo shape=- kind=scalar domain=- :: Modulo operation
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: ν
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: γ
+%@ index D ordered=0 cyclic=0 :: Index for a cycle in a cycle basis
+
+%@ param W shape=- kind=scalar domain=- :: Width of a cycle basis, W(B)
+
+%@ index B ordered=0 cyclic=0 :: Index for a cycle in a cycle basis
+
+%@ param log shape=- kind=scalar domain=- :: Logarithm function
+
+%@ param w shape=A kind=vector domain=- :: Width w_a = u_a - ℓ_a of arc a
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, i
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Periodic time window constraint (1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: PESP time window constraint (2b)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Cycle periodicity constraint (4a)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Cycle periodicity constraint (3)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Bounds on periodic tension (4b)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Integer cycle bounds (4e)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Cycle basis modulo-2 relation (5)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Cycle basis relation (6)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Cycle inequality lower bound a_C <= q_C
+%@ con eq_0012 kind=linear domain=- indicator=- :: Cycle inequality upper bound q_C <= b_C
+%@ con eq_0013 kind=linear domain=- indicator=- :: Width product definition (7)
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Approximate width objective part (8)
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Approximate width objective part (8)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Periodic tension cycle constraint for basis cycle
+%@ con eq_0017 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0018 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0020 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0021 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0023 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0025 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0029 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model
+%@ con eq_0030 kind=linear domain=- indicator=- :: Linear constraint of cyclic timetabling model

@@ -1,0 +1,132 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2016.06.040
+%@ meta id=10.1016_j.apm.2016.06.040 family=lp schema=0.1.0
+%@ name :: Train timetabling for an urban rail transit line using a Lagrangian relaxation approach
+%@ desc :: Mined from Train timetabling for an urban rail transit line using a Lagrangian relaxation approach (Applied Mathematical Modelling, 2016).
+%@ prov source :: 10.1016/j.apm.2016.06.040
+%@ prov reference :: Train timetabling for an urban rail transit line using a Lagrangian relaxation approach
+%@ prov author :: Erfan Hassannayebi; Seyed Hessameddin Zegordi; Masoud Yaghini
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize average waiting time per passenger
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train r at station k on path f
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station k for train r on path f
+%@ param T shape=- kind=scalar domain=- :: Planning horizon length
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
+%@ index D ordered=0 cyclic=0 :: Number of train services on path f
+%@ index m ordered=0 cyclic=0 :: Number of stations
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between trains
+%@ param R shape=- kind=scalar domain=- :: Running time from station k to k+1 on path f
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ var b shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding train r at station k on path f
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on train r after departing station k on path f
+%@ param t shape=- kind=scalar domain=- :: Minimum layover time at terminal
+%@ var u shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Lagrangian multiplier for vehicle circulation constraint
+%@ var H shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Headway between train r and r+1 at station k on path f
+%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Linearized waiting time term in Lagrangian objective
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Lagrangian objective function value
+%@ index F ordered=0 cyclic=0 :: Set of paths (inbound and outbound)
+%@ var AWT shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time per passenger
+%@ param LP shape=- kind=scalar domain=- :: Label of the linear programming surrogate model
+%@ var S shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Linear surrogate performance measure
+%@ con eq_0001 kind=linear domain=- indicator=- :: Objective function: total passenger waiting time over the planning horizon
+%@ con eq_0004 kind=linear domain=- indicator=- :: Headway constraint: departure time difference at least minimum headway
+%@ con eq_0005 kind=linear domain=- indicator=- :: Ordering constraint: departure of next train at station k not before departure of previous train at next station
+%@ con eq_0006 kind=linear domain=- indicator=- :: Dwell time bounds: difference between departure and arrival at station minus running time within dwell limits
+%@ con eq_0007 kind=linear domain=- indicator=- :: Last train must reach the end terminal within the planning horizon
+%@ con eq_0008 kind=linear domain=- indicator=- :: Passenger load at station equals waiting plus newly arrived passengers
+%@ con eq_0009 kind=linear domain=- indicator=- :: Newly arrived passengers during headway equal headway times arrival rate
+%@ con eq_0010 kind=linear domain=- indicator=- :: Newly arrived passengers after last train equal remaining time times arrival rate
+%@ con eq_0011 kind=linear domain=- indicator=- :: Boarding passengers limited by residual train capacity considering alighting
+%@ con eq_0012 kind=linear domain=- indicator=- :: Passenger load update after boarding
+%@ con eq_0013 kind=linear domain=- indicator=- :: Initial load at first station equals boarding passengers
+%@ con eq_0014 kind=linear domain=- indicator=- :: Waiting passengers before train r equal leftover from previous train minus boarders
+%@ con eq_0015 kind=linear domain=- indicator=- :: Initial waiting passengers equal arrivals before first train minus boarders
+%@ con eq_0016 kind=linear domain=- indicator=- :: First train boarding at first station limited by train capacity
+%@ con eq_0017 kind=linear domain=- indicator=- :: Vehicle circulation link: return train departs no earlier than arrival, running time and layover at terminal
+%@ con eq_0018 kind=linear domain=- indicator=- :: Nonnegativity of departure, load, waiting, leftover and boarding variables
+%@ con eq_0019 kind=linear domain=- indicator=- :: Lagrangian objective with vehicle circulation multipliers u
+%@ con eq_0020 kind=linear domain=- indicator=- :: Path decomposition of Lagrangian objective over paths F
+%@ con eq_0021 kind=linear domain=- indicator=- :: Lagrangian objective for one path f
+%@ con eq_0022 kind=linear domain=- indicator=- :: Decomposition identity: Z_LR(u) = Z_LR^1(u) + Z_LR^2(u)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Single-path subproblem objective Z_LR^1(u) after dropping path index f
+%@ con eq_0025 kind=linear domain=- indicator=- :: Subproblem headway constraint
+%@ con eq_0026 kind=linear domain=- indicator=- :: Subproblem train ordering constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Subproblem dwell time bounds
+%@ con eq_0028 kind=linear domain=- indicator=- :: Subproblem terminal arrival time bound
+%@ con eq_0029 kind=linear domain=- indicator=- :: Subproblem load balance at station
+%@ con eq_0030 kind=linear domain=- indicator=- :: Subproblem headway demand relation
+%@ con eq_0031 kind=linear domain=- indicator=- :: Subproblem last-train arrival demand relation
+%@ con eq_0032 kind=linear domain=- indicator=- :: Subproblem boarding capacity constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Subproblem load update equation
+%@ con eq_0034 kind=linear domain=- indicator=- :: Subproblem initial load equation
+%@ con eq_0035 kind=linear domain=- indicator=- :: Subproblem waiting passenger update
+%@ con eq_0036 kind=linear domain=- indicator=- :: Subproblem initial waiting passengers
+%@ con eq_0037 kind=linear domain=- indicator=- :: Subproblem first train boarding capacity
+%@ con eq_0040 kind=linear domain=- indicator=- :: Linear surrogate objective S: total waiting plus missed last-train passengers
+%@ con eq_0041 kind=linear domain=- indicator=- :: Lagrangian objective after relaxing train capacity constraints with multipliers mu
+%@ con eq_0042 kind=linear domain=- indicator=- :: Capacity-relaxed boarding equals previous passengers for trains after first
+%@ con eq_0043 kind=linear domain=- indicator=- :: Capacity-relaxed initial boarding equals initial arrivals
+%@ con eq_0044 kind=linear domain=- indicator=- :: Nonnegativity of variables in capacity-relaxed model A
+%@ con eq_0045 kind=linear domain=- indicator=- :: Combined Lagrangian objective relaxing circulation and capacity constraints
+%@ con eq_0046 kind=linear domain=- indicator=- :: Combined subproblem boarding equals previous headway demand
+%@ con eq_0047 kind=linear domain=- indicator=- :: Combined subproblem initial boarding equals initial arrivals
+%@ con eq_0048 kind=linear domain=- indicator=- :: Nonnegativity of variables in combined relaxed subproblem
+%@ con eq_0055 kind=linear domain=- indicator=- :: Linear programming surrogate model constraint (55)
+%@ con eq_0056 kind=linear domain=- indicator=- :: Linear programming surrogate model constraint (56)
+%@ con eq_0057 kind=linear domain=- indicator=- :: Linear programming surrogate model constraint (57)
+%@ index K shape=- domain=- role=index drole=- lo=- hi=- :: train index set
+%@ index Kpair shape=- domain=- role=index drole=- lo=- hi=- :: consecutive train index pairs
+%@ index Arc shape=- domain=- role=index drole=- lo=- hi=- :: consecutive station index pairs per direction
+%@ index Sta shape=- domain=- role=index drole=- lo=- hi=- :: station indices per direction
+%@ param dwell shape=- domain=continuous role=parameter drole=- lo=- hi=- :: dwell time bound
+%@ param Df shape=- domain=integer role=parameter drole=- lo=- hi=- :: number of stations
+\begin{align}
+  & z = \sum_{f \in F, k \in K, (r, rplus) \in Arc_{f}} (w_{r,k,f} + \frac{1}{2} \cdot \mathit{delta}_{r,k,f}) \cdot (d_{rplus,k,f} - d_{r,k,f}) + \sum_{f \in F, k \in K} \frac{1}{2} \cdot \mathit{lambda}_{k,f} \cdot d_{1,k,f}^{2} + \sum_{f \in F, k \in K} (w_{Df,k,f} + \frac{1}{2} \cdot \mathit{delta}_{Df,k,f}) \cdot (T - d_{Df,k,f}) \tag{eq\_0001} \\
+  & d_{rplus,k,f} - d_{r,k,f} \geq h_{min} \qquad \forall f \in F, k \in K, (r, rplus) \in Arc_{f} \tag{eq\_0004} \\
+  & d_{rplus,k,f} \geq d_{r,kplus,f} \qquad \forall f \in F, (r, rplus) \in Arc_{f}, (k, kplus) \in Kpair \tag{eq\_0005} \\
+  & dwell_{kplus,f}^{min} \leq d_{r,kplus,f} - d_{r,k,f} - R_{k,f} \qquad \forall f \in F, r \in Sta_{f}, (k, kplus) \in Kpair \tag{eq\_0006\_a} \\
+  & d_{r,kplus,f} - d_{r,k,f} - R_{k,f} \leq dwell_{kplus,f}^{max} \qquad \forall f \in F, r \in Sta_{f}, (k, kplus) \in Kpair \tag{eq\_0006\_b} \\
+  & d_{Df,m,f} + R_{m,f} \leq T \qquad \forall f \in F \tag{eq\_0007} \\
+  & \mathit{tau}_{r,k,f} = w_{r,k,f} + \mathit{delta}_{r,k,f} \qquad \forall f \in F, k \in K, r \in Sta_{f} \tag{eq\_0008} \\
+  & \mathit{delta}_{r,k,f} = (d_{rplus,k,f} - d_{r,k,f}) \cdot \mathit{lambda}_{k,f} \qquad \forall f \in F, k \in K, (r, rplus) \in Arc_{f} \tag{eq\_0009} \\
+  & \mathit{delta}_{Df,k,f} = (T - d_{Df,k,f}) \cdot \mathit{lambda}_{k,f} \qquad \forall f \in F, k \in K \tag{eq\_0010} \\
+  & b_{r,k,f} \leq C - n_{r,kprev,f} \cdot (1 - \mathit{varphi}_{k,f}) \qquad \forall f \in F, r \in Sta_{f}, (kprev, k) \in Kpair \tag{eq\_0011} \\
+  & n_{r,k,f} = n_{r,kprev,f} \cdot (1 - \mathit{varphi}_{k,f}) + b_{r,k,f} \qquad \forall f \in F, r \in Sta_{f}, (kprev, k) \in Kpair \tag{eq\_0012} \\
+  & n_{r,1,f} = b_{r,1,f} \qquad \forall f \in F, r \in Sta_{f} \tag{eq\_0013} \\
+  & w_{r,k,f} = \mathit{tau}_{rprev,k,f} - b_{r,k,f} \qquad \forall f \in F, k \in K, (rprev, r) \in Arc_{f} \tag{eq\_0014} \\
+  & w_{1 k f} = d_{1 k f} \cdot \mathit{lambda}_{k f} - b_{1 k f} \forall f , k , \tag{eq\_0015} \\
+  & b_{r 1 f} \leq C \forall f , r , \tag{eq\_0016} \\
+  & d_{n_{f} + r , 1 , f} \geq d_{r , m , 3 - f} + R_{m , 3 - f} + t_{m i n} \forall f , r + n_{f} \leq D_{f} , \tag{eq\_0017} \\
+  & d_{r k f} , n_{r k f} , w_{r k f} , \mathit{tau}_{r k f} , \mathit{delta}_{r k f} , b_{r k f} \in \mathcal{R}^{+} . \tag{eq\_0018} \\
+  & \begin{aligned}Z_{L R} \left(u\right) & = & \sum_{f = 1}^{2} \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f} - 1} L_{r k f} \cdot H_{r k f} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k f} \cdot d_{1 k f}^{2} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \left(w_{D_{f} , k , f} + \frac{1}{2} \mathit{delta}_{D_{f} , k , f}\right) \cdot \left(T - d_{D_{f} , k , f}\right) \\ & & - \sum_{f = 1}^{2} \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(d_{n_{f} + r , 1 , f} - d_{r , m , 3 - f} - R_{m , 3 - f} - t_{min}\right) \\ & = & \sum_{f = 1}^{2} \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f} - 1} L_{r k f} \cdot H_{r k f} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k f} \cdot d_{1 k f}^{2} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \left(w_{D_{f} , k , f} + \frac{1}{2} \mathit{delta}_{D_{f} , k , f}\right) \cdot \left(T - d_{D_{f} , k , f}\right) \\ & & - \sum_{f = 1}^{2} \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(d_{n_{f} + r , 1 , f} - d_{r , m , 3 - f}\right) + \sum_{f = 1}^{2} \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(R_{m , 3 - f} + t_{min}\right) .\end{aligned} \tag{eq\_0019} \\
+  & Z_{L R} \left(u\right) = \sum_{f \in F} Z_{L R} \left(u , f\right) , \tag{eq\_0020} \\
+  & \begin{aligned}Z_{L R} \left(u , f\right) & = & \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f} - 1} L_{r k f} \cdot H_{r k f} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k f} \cdot d_{1 k f}^{2} \\ & & + \sum_{k = 1}^{m} \left(w_{D_{f} , k , f} + \frac{1}{2} \mathit{delta}_{D_{f} , k , f}\right) \cdot \left(T - d_{D_{f} , k , f}\right) - \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(d_{n_{f} + r , 1 , f} - d_{r , m , f}\right) + \sum_{r = 1}^{D_{f} - n_{f}} u_{r} f \cdot \left(R_{m , f} + t_{m i n}\right) .\end{aligned} \tag{eq\_0021} \\
+  & Z_{L R} \left(u\right) = Z_{L R}^{1} \left(u\right) + Z_{L R}^{2} \left(u\right) , \tag{eq\_0022} \\
+  & Z_{L R}^{1} \left(u\right) = \sum_{k = 1}^{m} \sum_{r = 1}^{D - 1} L_{r k} \cdot H_{r k} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k} \cdot d_{1 k}^{2} + \sum_{k = 1}^{m} \left(w_{D , k} + \frac{1}{2} \mathit{delta}_{D , k}\right) \cdot \left(T - d_{D , k}\right) - \sum_{r = 1}^{D - n} u_{r} \cdot \left(d_{n + r , 1} - d_{r , m}\right) + \sum_{r = 1}^{D - n} u_{r} \cdot \left(R_{m} + t_{m i n}\right) . \tag{eq\_0024} \\
+  & d_{r + 1 , k} - d_{r k} \geq h_{m i n} \forall k , r \leq D - 1 , \tag{eq\_0025} \\
+  & d_{r + 1 , k} \geq d_{r , k + 1} k \leq m - 1 , r \leq D - 1 , \tag{eq\_0026} \\
+  & d \cdot w_{k + 1}^{m i n} \leq d_{r , k + 1} - d_{r k} - R_{k} \leq d \cdot w_{k + 1}^{m a x} \forall r , k \leq m - 1 , \tag{eq\_0027} \\
+  & d_{D , m} + R_{m} \leq T , \tag{eq\_0028} \\
+  & \mathit{tau}_{r k} = w_{r k} + \mathit{delta}_{r k} \forall k , r \leq D , \tag{eq\_0029} \\
+  & \mathit{delta}_{r k} = H_{r k} \cdot \mathit{lambda}_{k} \forall k , r \leq D - 1 , \tag{eq\_0030} \\
+  & \mathit{delta}_{D , k} = \left(T - d_{D , k}\right) \cdot \mathit{lambda}_{k} \forall k , \tag{eq\_0031} \\
+  & b_{r k} \leq C - n_{r , k - 1} \cdot \left(1 - \mathit{varphi}_{k}\right) r \leq D , k \geq 2 , \tag{eq\_0032} \\
+  & n_{r k} = n_{r , k - 1} \cdot \left(1 - \mathit{varphi}_{k}\right) + b_{r k} r \leq D , k \geq 2 , \tag{eq\_0033} \\
+  & n_{r 1} = b_{r 1} r \leq D , \tag{eq\_0034} \\
+  & w_{r k} = \mathit{tau}_{r - 1 , k} - b_{r k} \forall k , r \geq 2 , \tag{eq\_0035} \\
+  & w_{1 k} = d_{1 k} \cdot \mathit{lambda}_{k} - b_{1 k} \forall k , \tag{eq\_0036} \\
+  & b_{r 1} \leq C \forall r . \tag{eq\_0037} \\
+  \min\quad & \mathit{AWT} \tag{eq\_0039} \\
+  & \left[\mathbf{\mathit{LP}}\right] \mathbf{\mathit{Minimize}} S = \sum_{f = 1}^{2} \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f}} w_{r k f} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \mathit{delta}_{D_{f} , k , f} . \tag{eq\_0040} \\
+  & \begin{matrix} & & \mathbf{\mathit{Minimize}} Z_{L R} \left(\mathit{mu}\right) \\ & & = \sum_{f = 1}^{2} \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f} - 1} \frac{1}{2} \mathit{delta}_{r k f} \cdot H_{r k f} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k f} \cdot d_{1 k f}^{2} + \sum_{f = 1}^{2} \sum_{k = 1}^{m} \frac{1}{2} \mathit{delta}_{D f , k ,} f \cdot \left(T - d_{D f , k , f}\right) \\ & & + \sum_{f = 1}^{2} \sum_{k = 2}^{m} \sum_{r = 1}^{D_{f}} \mathit{mu}_{r k f} \cdot \left(C - n_{r , k - 1 , f} \cdot \left(1 - \mathit{varphi}_{k f}\right) - b_{r k f}\right) + \sum_{f = 1}^{2} \sum_{r = 1}^{D_{f}} \mathit{mu}_{r 1 f} \cdot \left(C - b_{r 1 f}\right) .\end{matrix} \tag{eq\_0041} \\
+  & b_{r k f}^{ } = \mathit{delta}_{r - 1 , k , f} \forall f , k , r \geq 2 , \tag{eq\_0042} \\
+  & b_{1 k f} = d_{1 k f} \cdot \mathit{lambda}_{k f} \forall f , k , \tag{eq\_0043} \\
+  & d_{r k f} , \mathit{delta}_{r k f}^{ } , b_{r k f}^{ } , n_{r k f}^{ } , H_{r k f}^{ } \in \mathcal{R}^{+} . \tag{eq\_0044} \\
+  & \begin{matrix}\mathbf{\mathit{Minimize}} Z_{L R} \left(u , \mathit{mu}\right) \\ \\ = \sum_{k = 1}^{m} \sum_{r = 1}^{D - 1} \frac{1}{2} \mathit{delta}_{D , k} \cdot H_{r k} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k} \cdot d_{1 k}^{2} + \sum_{k = 1}^{m} \frac{1}{2} \mathit{delta}_{D , k} \cdot \left(T - d_{D , k}\right) \\ \\ + \sum_{r = 1}^{D - n} u_{r} \cdot \left(d_{r , m} + R_{m} + t_{m i n} - d_{n + r , 1}\right) + \sum_{k = 2}^{m} \sum_{r = 1}^{D} \mathit{mu}_{r k} \cdot \left(C - n_{r , k - 1} \cdot \left(1 - \mathit{varphi}_{k}\right) - b_{r k}\right) + \sum_{r = 1}^{D} \mathit{mu}_{r 1} \cdot \left(C - b_{r 1}\right) .\end{matrix} \tag{eq\_0045} \\
+  & b_{r k} = \mathit{delta}_{r - 1 , k} \forall k , r \geq 2 , \tag{eq\_0046} \\
+  & b_{1 k} = d_{1 k} \cdot \mathit{lambda}_{k} \forall k , \tag{eq\_0047} \\
+  & d_{r k} , \mathit{delta}_{r k} , b_{r k} , n_{r k} , H_{r k} \in \mathcal{R}^{+} . \tag{eq\_0048} \\
+  & \begin{aligned}Z_{L R} \left(u , 1\right) & = & \sum_{k = 1}^{m} \sum_{r = 1}^{D_{1} - 1} L_{r k 1} \cdot H_{r k 1} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k 1} \cdot d_{1 k 1}^{2} \\ & & + \sum_{k = 1}^{m} \left(w_{D_{1} , k , 1} + \frac{1}{2} \mathit{delta}_{D_{1} , k , 1}\right) \cdot \left(T - d_{D_{1} , k , 1}\right) - \sum_{r = 1}^{D_{1} - n_{1}} u_{r 1} \cdot \left(d_{n_{1} + r , 1 , 1} - d_{r , m , 2}\right) + \sum_{r = 1}^{D_{1} - n_{1}} u_{r 1} \cdot \left(R_{m , 2} + t_{m i n}\right) ,\end{aligned} \tag{eq\_0055} \\
+  & \begin{aligned}Z_{L R} \left(u , 2\right) & = & \sum_{k = 1}^{m} \sum_{r = 1}^{D_{2} - 1} L_{r k 2} \cdot H_{r k 2} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k 2} \cdot d_{1 k 2}^{2} \\ & & + \sum_{k = 1}^{m} \left(w_{D_{2} , k , 2} + \frac{1}{2} \mathit{delta}_{D_{2} , k , 2}\right) \cdot \left(T - d_{D_{2} , k , 2}\right) - \sum_{r = 1}^{D_{2} - n_{2}} u_{r 2} \cdot \left(d_{n_{2} + r , 1 , 2} - d_{r , m , 1}\right) + \sum_{r = 1}^{D_{2} - n_{2}} u_{r 2} \cdot \left(R_{m , 1} + t_{m i n}\right) .\end{aligned} \tag{eq\_0056} \\
+  & \begin{aligned}Z_{L R} \left(u , f\right) & = & \sum_{k = 1}^{m} \sum_{r = 1}^{D_{f} - 1} L_{r k f} \cdot H_{r k f} + \sum_{k = 1}^{m} \frac{1}{2} \cdot \mathit{lambda}_{k f} \cdot d_{1 k f}^{2} \\ & & + \sum_{k = 1}^{m} \left(w_{D f , k , f} + \frac{1}{2} \mathit{delta}_{D f , k , f}\right) \cdot \left(T - d_{D f , k , f}\right) - \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(d_{n_{f} + r , 1 , f} - d_{r , m , f}\right) + \sum_{r = 1}^{D_{f} - n_{f}} u_{r f} \cdot \left(R \cdot m , f + t_{m i n}\right) .\end{aligned} \tag{eq\_0057} \\
+\end{align}

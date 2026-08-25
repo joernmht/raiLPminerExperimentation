@@ -1,0 +1,117 @@
+% Declaration sidecar for 10.1016_j.tre.2025.104641
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2025.104641
+% Train timetable optimization for urban railway systems under the virtual formation mode combined with the rolling stock utilization strategy
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of negative rolling stock connections and total detained passengers
+%@ param T shape=- kind=scalar :: Time variable prefix for departure and arrival times
+%@ param A shape=- kind=scalar :: Arrival time variable prefix
+%@ index D ordered=0 cyclic=0 :: Set of rolling stock types
+%@ index G ordered=0 cyclic=0 :: Set of directions
+%@ index I ordered=0 cyclic=0 :: Set of train services
+%@ index L ordered=0 cyclic=0 :: Set of stations
+%@ index i ordered=0 cyclic=0 :: Index for train services
+%@ var eps shape=I,L,G domain=continuous role=primary :: Dwell time at station
+%@ var r shape=I,L,G domain=continuous role=primary :: Running time between stations
+%@ index z ordered=0 cyclic=0 :: Last station index
+%@ var n shape=I,L,G domain=non_negative role=primary :: Number of passengers (various types)
+%@ var p shape=I,L,G domain=binary role=primary :: Binary variable for coupling state
+%@ param t shape=- kind=scalar :: Time parameters (headway bounds, turnaround times)
+%@ var y shape=I,I,G domain=binary role=primary :: Binary variable for rolling stock connection
+%@ var alpha shape=I,G domain=binary role=primary :: Binary variable indicating service starts from depot
+%@ var beta shape=I,G domain=binary role=primary :: Binary variable indicating service ends at depot
+%@ param M shape=- kind=big_m :: Large constant for linearization
+%@ var e shape=I,D,G domain=binary role=primary :: Binary variable for rolling stock type assignment
+%@ param N shape=D,G kind=vector :: Quantity of rolling stock of each type in depot by direction
+%@ var delta shape=I,I,G domain=binary role=primary :: Binary variable for rolling stock availability
+%@ param lambda shape=- kind=scalar :: Maximum convoy length (λ_max)
+%@ param b shape=I,L,G kind=vector :: Passenger arrival rate at station l for service i direction f
+%@ var h shape=I,L,G domain=integer role=primary :: Headway interval
+%@ var F shape=- domain=continuous role=primary :: Objective value (weighted sum)
+%@ param eta shape=- kind=scalar :: Weight coefficients for objectives
+%@ param T_hat shape=I,L,G kind=vector :: Predetermined departure times
+%@ param m shape=- kind=scalar :: Small constant for linearization (lower bound)
+%@ index O ordered=0 cyclic=0 :: Set of objects for linearization
+%@ param a shape=- kind=scalar :: Acceleration bounds (a_max, a_min)
+%@ param phi shape=- kind=scalar :: Small constant for linearization
+%@ var x shape=- domain=continuous role=primary :: Auxiliary variable in linearization (e.g., pt1, pt2, n_add)
+%@ var u shape=I,L,G domain=binary role=primary :: Binary variable for min linearization of passenger boarding
+% Bound by quantifier or big operator: d, f, l, o (no declarations)
+%@ con eq_0001 kind=linear :: Departure time equals arrival time plus dwell time at station
+%@ con eq_0002 kind=linear :: Dwell time bounds at station
+%@ con eq_0003 kind=linear :: Arrival time at next station equals departure time plus running time
+%@ con eq_0004 kind=linear :: Running time bounds
+%@ con eq_0005 kind=linear :: Minimum headway between consecutive departures
+%@ con eq_0006 kind=linear :: Maximum headway between consecutive departures
+%@ con eq_0007 kind=linear :: Minimum headway between consecutive arrivals
+%@ con eq_0008 kind=linear :: Maximum headway between consecutive arrivals
+%@ con eq_0009 kind=linear :: Platform occupancy constraint for non-coupled services
+%@ con eq_0013 kind=linear :: Definition of start-from-depot binary variable α
+%@ con eq_0014 kind=linear :: Definition of end-at-depot binary variable β
+%@ con eq_0015 kind=linear :: Connection consistency upper bound with big-M
+%@ con eq_0016 kind=linear :: Connection consistency lower bound with big-M
+%@ con eq_0017 kind=linear :: Minimum turnaround time under connection
+%@ con eq_0018 kind=linear :: Maximum turnaround time under connection
+%@ con eq_0019 kind=linear :: Each service assigned exactly one rolling stock type
+%@ con eq_0020 kind=linear :: Same rolling stock type for connected services (upper bound)
+%@ con eq_0021 kind=linear :: Same rolling stock type for connected services (lower bound)
+%@ con eq_0023 kind=linear :: Depot rolling stock availability constraint
+%@ con eq_0024 kind=linear :: Maximum convoy length constraint
+%@ con eq_0025 kind=linear :: No coupling at first station
+%@ con eq_0026 kind=linear :: No coupling at last station
+%@ con eq_0028 kind=linear :: Newly arrived passengers during headway
+%@ con eq_0030 kind=linear :: Detained passengers balance
+%@ con eq_0031 kind=linear :: Nonnegativity of detained passengers
+%@ con eq_0032 kind=linear :: Total detained passengers per station (nonlinear form)
+%@ con eq_0037 kind=linear :: Objective: maximize connections (negative sum)
+%@ con eq_0038 kind=linear :: Objective: minimize total detained passengers
+%@ con eq_0039 kind=linear :: Weighted objective function
+%@ con eq_0041_a kind=linear :: Linearization of p*TD: p t1 ≤ M p
+%@ con eq_0041_b kind=linear :: Linearization of p*TD: p t1 ≥ m p
+%@ con eq_0041_c kind=linear :: Linearization of p*TD: p t1 ≤ TD - m(1-p)
+%@ con eq_0041_d kind=linear :: Linearization of p*TD: p t1 ≥ TD - M(1-p)
+%@ con eq_0042_a kind=linear :: Linearization of p*TA: pt2 ≤ M p
+%@ con eq_0042_b kind=linear :: Linearization of p*TA: pt2 ≥ m p
+%@ con eq_0042_c kind=linear :: Linearization of p*TA: pt2 ≤ TA - m(1-p)
+%@ con eq_0042_d kind=linear :: Linearization of p*TA: pt2 ≥ TA - M(1-p)
+%@ con eq_0043 kind=linear :: Linearized platform occupancy constraint
+%@ con eq_0044_a kind=linear :: Linearization of p*n_det: n_add ≤ M p
+%@ con eq_0044_b kind=linear :: Linearization of p*n_det: n_add ≥ m p
+%@ con eq_0044_c kind=linear :: Linearization of p*n_det: n_add ≤ n_det - m(1-p)
+%@ con eq_0044_d kind=linear :: Linearization of p*n_det: n_add ≥ n_det - M(1-p)
+%@ con eq_0045 kind=linear :: Linearized total detained passengers
+%@ con eq_0046_a kind=linear :: Linearization of α*e: αe ≤ α
+%@ con eq_0046_b kind=linear :: Linearization of α*e: αe ≤ e
+%@ con eq_0046_c kind=linear :: Linearization of α*e: αe ≥ α + e - 1
+%@ con eq_0047_a kind=linear :: Linearization of δ*e': δe ≤ δ
+%@ con eq_0047_b kind=linear :: Linearization of δ*e': δe ≤ e'
+%@ con eq_0047_c kind=linear :: Linearization of δ*e': δe ≥ δ + e' - 1
+%@ con eq_0048_a kind=linear :: Linearization of δe*β: ℏ ≤ δe
+%@ con eq_0048_b kind=linear :: Linearization of δe*β: ℏ ≤ β
+%@ con eq_0048_c kind=linear :: Linearization of δe*β: ℏ ≥ δe + β - 1
+%@ con eq_0049 kind=linear :: Linearized depot availability constraint
+%@ con eq_0050 kind=linear :: Big-M for indicator constraint: δ=1 implies A≤0 (upper bound)
+%@ con eq_0051 kind=linear :: Big-M for indicator constraint: δ=1 implies A≥0 (lower bound)
+%@ con eq_0052 kind=linear :: Linearization of availability definition: time sufficiency upper bound
+%@ con eq_0053 kind=linear :: Linearization of availability definition: time sufficiency lower bound
+%@ con eq_0054_a kind=linear :: Linearization of min(x,y): z ≤ y
+%@ con eq_0054_b kind=linear :: Linearization of min(x,y): z ≤ x
+%@ con eq_0054_c kind=linear :: Linearization of min(x,y): z ≥ y - M(1-u)
+%@ con eq_0054_d kind=linear :: Linearization of min(x,y): z ≥ x - M u
+%@ con eq_0055_a kind=linear :: Linearization of boarding min: n_ina ≤ n_remain
+%@ con eq_0055_b kind=linear :: Linearization of boarding min: n_ina ≤ n_wait
+%@ con eq_0055_c kind=linear :: Linearization of boarding min: n_ina ≥ n_remain - M(1-u)
+%@ con eq_0055_d kind=linear :: Linearization of boarding min: n_ina ≥ n_wait - M u
+%@ con eq_0056 kind=linear :: Upper bound on departure times for logical inference
+%@ con eq_0057 kind=linear :: Lower bound on departure times for logical inference
+%@ con eq_0058 kind=linear :: Upper bound on arrival times for logical inference
+%@ con eq_0059 kind=linear :: Lower bound on arrival times for logical inference
+%@ con eq_0060 kind=linear :: Logical inference: α=0 if turnaround insufficient
+%@ con eq_0061 kind=linear :: Logical inference: β=0 if turnaround insufficient
+%@ con eq_0062 kind=linear :: Logical inference: y=0 if min turnaround not met
+%@ con eq_0063 kind=linear :: Logical inference: y=0 if max turnaround exceeded
+%@ con eq_0064 kind=linear :: Logical inference: δ=0 if rolling stock arrives too late
+%@ con eq_0065 kind=linear :: Logical inference: δ=1 if rolling stock arrives early enough

@@ -1,0 +1,82 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2020.101882
+%@ meta id=10.1016_j.tre.2020.101882 family=milp schema=0.1.0
+%@ name :: Train schedule optimization based on schedule-based stochastic passenger assignment
+%@ desc :: Mined from Train schedule optimization based on schedule-based stochastic passenger assignment (Transportation Research Part E Logistics and Transportation Review, 2020).
+%@ prov source :: 10.1016/j.tre.2020.101882
+%@ prov reference :: Train schedule optimization based on schedule-based stochastic passenger assignment
+%@ prov author :: Jiemin Xie; S.C. Wong; Shuguang Zhan; Siuming Lo; Anthony Chen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total itinerary cost over all OD pairs and itineraries
+%@ var t shape=n,s domain=continuous role=primary :: Scheduled time of train at station (arrival/departure)
+%@ var Delta shape=n,R domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
+%@ param D shape=R kind=vector :: Demand for OD pair R
+%@ var F shape=- domain=continuous role=primary :: Objective function value (total itinerary cost)
+%@ index I ordered=0 cyclic=0 :: Set of itineraries for OD pair R
+%@ param Prob shape=R,I kind=matrix :: Probability of choosing itinerary I for OD pair R
+%@ index R ordered=0 cyclic=0 :: Set of OD pairs
+%@ var u shape=R,I domain=continuous role=primary :: Itinerary cost for itinerary I of OD pair R
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ param M shape=- kind=big_m :: Large positive constant for big-M constraints
+%@ var b shape=n,n,s domain=binary role=primary :: Binary variable for train ordering or platform assignment
+%@ param h shape=- kind=scalar :: Minimum headway between trains
+%@ index n ordered=0 cyclic=0 :: Train index
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param stopping shape=n,s kind=matrix :: Indicator if train stops at station
+%@ index train ordered=0 cyclic=0 :: Train index (same as n)
+%@ param non shape=n,s kind=matrix :: Indicator for non-stopping train
+%@ index P ordered=0 cyclic=0 :: Set of platforms
+%@ var x shape=R,I domain=continuous role=primary :: Itinerary time components (wait, walk, etc.)
+%@ con eq_0018 kind=linear :: Connects schedule differences with scheduled and ideal times for OD pair and train
+%@ con eq_0019 kind=linear :: Positive schedule difference must be non-negative
+%@ con eq_0020 kind=linear :: Negative schedule difference must be non-negative
+%@ con eq_0023 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0024 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0025 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0026 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0027 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0028 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0029 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0031 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0032 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0033 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0034 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0035 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0036 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0037 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0038 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0039 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0040 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0041 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0042 kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_a kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_b kind=linear :: Train scheduling constraint (Appendix A.1)
+%@ con eq_0043_c kind=linear :: Train scheduling constraint (Appendix A.1)
+\begin{align}
+  & t_{n s_{n}^{t 1}}^{D} - t_{\mathit{nr}}^{I} - \mathit{Delta} \cdot t_{\mathit{nr}}^{+} + \mathit{Delta} \cdot t_{\mathit{nr}}^{-} = 0 , \tag{eq\_0018} \\
+  & \mathit{Delta} \cdot t_{\mathit{nr}}^{+} \geq 0 , \tag{eq\_0019} \\
+  & \mathit{Delta} \cdot t_{\mathit{nr}}^{-} \geq 0 , \tag{eq\_0020} \\
+  \min\quad & \underset{r \in \mathbf{\mathit{R}}}{\sum} \underset{i \in \mathbf{\mathit{I}}_{r}}{\sum} \mathit{Prob}_{r} \left(i\right) \cdot D_{r} \cdot u_{\mathit{ri}} , \tag{eq\_0021} \\
+  & T_{l}^{d e p} \leq t_{\mathit{ns}}^{D} \leq T_{l}^{a r r} , \tag{eq\_0023} \\
+  & T_{l}^{d e p} \leq t_{\mathit{ns}}^{A} \leq T_{l}^{a r r} . \tag{eq\_0024} \\
+  & t_{n^{'} s}^{A} + h \leq t_{\mathit{ns}}^{A} + \left(1 - b_{n^{'} n s}\right) \cdot M , \tag{eq\_0025} \\
+  & t_{n^{'} s}^{D} + h \leq t_{\mathit{ns}}^{D} + \left(1 - b^{'}_{n^{'} n s}\right) \cdot M , \tag{eq\_0026} \\
+  & b_{n^{'} n s} + b_{n n^{'} s} = 1 , \tag{eq\_0027} \\
+  & \left(b '\right)_{n^{'} n s} + \left(b '\right)_{n n^{'} s} = 1 , \tag{eq\_0028} \\
+  & \left(b '\right)_{n^{'} n s} - b_{n^{'} n s^{'}} = 0 , \tag{eq\_0029} \\
+  & t_{n^{'} s}^{D} + h \leq t_{\mathit{ns}}^{A} + \left(3 - b_{\mathit{np}}^{T r} - b_{n^{'} p}^{T r} - b_{n^{'} n s}\right) \cdot M , \tag{eq\_0031} \\
+  & \left\{\begin{matrix} \sum_{p \in \mathbf{\mathit{P}}_{s}^{2}} b_{\mathit{np}}^{T r} + b_{\mathit{ns}}^{T r \cdot } = 1 , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = b_{\mathit{ns}}^{T r \cdot } , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = 1 , & \text{for} \text{stopping} \text{train} n \end{matrix}\right , \tag{eq\_0032} \\
+  & D_{\mathit{sl}}^{m i n} \leq t_{\mathit{ns}}^{D} - t_{\mathit{ns}}^{A} . \tag{eq\_0033} \\
+  & 0 \leq t_{\mathit{ns}}^{D} - t_{\mathit{ns}}^{A} . \tag{eq\_0034} \\
+  & T_{\mathit{lv}}^{r u n} \leq t_{n s^{'}}^{A} - t_{\mathit{ns}}^{D} , \tag{eq\_0035} \\
+  & x_{\mathit{ri}}^{1} = \sum_{n \in \mathbf{\mathit{T}}_{i} , s = s_{\mathit{in}}^{A} , s^{'} = s_{\mathit{in}}^{B}} \left(t_{\mathit{ns}}^{A} - t_{n s^{'}}^{D}\right) ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0036} \\
+  & x_{\mathit{ri}}^{2} = \sum_{n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) , n^{'} = n_{\mathit{in}}^{T} , s = s_{\mathit{in}}^{A} , s^{'} = s_{i n^{'}}^{B}} \left(t_{n^{'} s^{'}}^{D} - t_{\mathit{ns}}^{A} - t_{\mathit{in} n^{'} s}^{w a l k}\right) + \sum_{n = n_{i}^{O} , s = s_{\mathit{in}}^{B} , z = z_{r}^{O}} \left(t_{\mathit{ns}}^{D} - T_{r}^{d e} - T^{w a i t} \cdot t_{i}^{w a i t - H} - T_{\mathit{sz}}^{z o n e}\right) ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0037} \\
+  & x_{\mathit{ri}}^{3} = T^{w a i t} \cdot t_{i}^{w a i t - H} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0038} \\
+  & x_{\mathit{ri}}^{4} = \sum_{n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) , n^{'} = n_{\mathit{in}}^{T} , s = s_{\mathit{in}}^{A} , s^{'} = s_{i n^{'}}^{B}} \left(t_{\mathit{in} n^{'} s}^{w a l k}\right) ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0039} \\
+  & t_{\mathit{ns}}^{D} - \left(T_{r}^{d e} + T^{w a i t} \cdot t_{i}^{w a i t - H} + T_{\mathit{sz}}^{z o n e}\right) \geq 0 ; s = s_{\mathit{in}}^{B} ; n = n_{i}^{O} ; z = z_{r}^{O} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0040} \\
+  & t_{n^{'} s^{'}}^{D} - t_{\mathit{ns}}^{A} - t_{\mathit{in} n^{'} s}^{w a l k} \geq 0 ; \forall n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) ; n^{'} = n_{\mathit{in}}^{T} ; s = s_{\mathit{in}}^{A} ; s^{'} = s_{i n^{'}}^{B} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0041} \\
+  & t_{\mathit{in} n^{'} s}^{w a l k} = \underset{p \in \mathbf{\mathit{P}}_{s}}{\sum} \underset{p^{'} \in \mathbf{\mathit{P}}_{s^{'}}}{\sum} \left(t_{p p^{'}}^{w p} \cdot b_{n n^{'} p p^{'} s s^{'}}^{T T}\right) ; \forall n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) ; n^{'} = n_{\mathit{in}}^{T} ; s = s_{\mathit{in}}^{A} ; s^{'} = s_{i n^{'}}^{B} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} ; \tag{eq\_0042} \\
+  & b_{n n^{'} p p^{'} s s^{'}}^{T T} \leq b_{\mathit{np}}^{T r} , p \in \mathbf{\mathit{P}}_{s} ; p^{'} \in \mathbf{\mathit{P}}_{s^{'}} ; \forall n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) ; n = n_{\mathit{in}}^{T} ; s = s_{\mathit{in}}^{A} ; s^{'} = s_{i n^{'}}^{B} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} \tag{eq\_0043\_a} \\
+  & b_{n n^{'} p p^{'} s s^{'}}^{T T} \leq b_{n^{'} p^{'}}^{T r} , p \in \mathbf{\mathit{P}}_{s} ; p^{'} \in \mathbf{\mathit{P}}_{s^{'}} ; \forall n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) ; n = n_{\mathit{in}}^{T} ; s = s_{\mathit{in}}^{A} ; s^{'} = s_{i n^{'}}^{B} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} \tag{eq\_0043\_b} \\
+  & b_{\mathit{np}}^{T r} + b_{n^{'} p^{'}}^{T r} \leq 1 + b_{n n^{'} p p^{'} s s^{'}}^{T T} , p \in \mathbf{\mathit{P}}_{s} ; p^{'} \in \mathbf{\mathit{P}}_{s^{'}} ; \forall n \in \left(\mathbf{\mathit{T}}_{i} - n_{i}^{D}\right) ; n = n_{\mathit{in}}^{T} ; s = s_{\mathit{in}}^{A} ; s^{'} = s_{i n^{'}}^{B} ; \forall i \in \mathbf{\mathit{I}}_{r} ; \forall r \in \mathbf{\mathit{R}} \tag{eq\_0043\_c} \\
+\end{align}

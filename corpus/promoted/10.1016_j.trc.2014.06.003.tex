@@ -1,0 +1,55 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2014.06.003
+%@ meta id=10.1016_j.trc.2014.06.003 family=milp schema=0.1.0
+%@ name :: Demand-driven timetable design for metro services
+%@ desc :: Mined from Demand-driven timetable design for metro services (Transportation Research Part C Emerging Technologies, 2014).
+%@ prov source :: 10.1016/j.trc.2014.06.003
+%@ prov reference :: Demand-driven timetable design for metro services
+%@ prov author :: Lijun Sun; Jian Gang Jin; Der‐Horng Lee; Kay W. Axhausen; Alexander Erath
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time
+%@ var w shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time for passengers entering at interval u (or at station s in interval u)
+%@ var y shape=T,P domain=continuous role=primary drole=- lo=- hi=- :: Proportion of passengers entering at interval u choosing waiting profile p (or at station s)
+%@ index P ordered=1 cyclic=0 :: Set of possible waiting profiles
+%@ param B shape=T kind=vector domain=- :: Passenger demand: total demand in interval u (B^u), or disaggregated origin-destination demand B_{o,d}^u
+%@ index T ordered=1 cyclic=0 :: Set of equivalent time intervals
+%@ index t ordered=1 cyclic=0 :: Index for equivalent time intervals
+%@ var x shape=t domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train departs at the end of interval t
+%@ param K shape=- kind=scalar domain=- :: Total number of train services to be operated
+%@ index s ordered=1 cyclic=0 :: Index for stations
+%@ var q shape=t,s domain=non_negative role=primary drole=- lo=- hi=- :: Occupancy of train services departing at the end of interval t at station s
+%@ index S ordered=1 cyclic=0 :: Set of stations
+%@ param CAP shape=- kind=scalar domain=- :: Train capacity
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of average waiting time for interval u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Binary train departure variable x_t
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total number of train services equals K
+%@ con eq_0005 kind=headway domain=- indicator=- :: Maximum headway: at most one departure in any window of N_min intervals
+%@ con eq_0006 kind=headway domain=- indicator=- :: Minimum headway: at least one departure in any window of N_max intervals
+%@ con eq_0007 kind=linear domain=- indicator=- :: Final interval T_n must have a train departure (x_{T_n}=1)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Waiting profile proportions bounded between 0 and 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Sum of waiting profile proportions equals 1 for each interval
+%@ con eq_0010 kind=linear domain=- indicator=- :: Consistency: a train departs if passengers are assigned to board at that interval
+%@ con eq_0011 kind=linear domain=- indicator=- :: Definition of station-specific average waiting time w_s^u
+%@ con eq_0021 kind=flow_balance domain=- indicator=- :: Occupancy balance along the line after alighting and boarding
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Occupancy cannot exceed train capacity CAP
+%@ con eq_0024 kind=headway domain=- indicator=- :: Peak/off-peak headway selection: x_t forces either N_Peak or N_Off headway
+%@ con eq_0025 kind=headway domain=- indicator=- :: Peak headway: at most one departure in any peak window of N_Peak intervals
+%@ con eq_0026 kind=ordering domain=- indicator=- :: Peak and off-peak headways are not selected simultaneously when N_Off != 2*N_Peak
+%@ index u shape=- domain=- role=- drole=- lo=- hi=- :: Time index
+%@ param a shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Nmin-1]
+%@ param b shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Nmax-1]
+%@ param c shape=- domain=- role=auxiliary drole=- lo=- hi=- :: indicator for t in window [t1, t1+Npeak-1]
+%@ index Tmin shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Nmin-1 in T
+%@ index Tmax shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Nmax-1 in T
+%@ index Tpeak shape=- domain=- role=index drole=- lo=- hi=- :: t1 in T with t1+Npeak-1 in T
+%@ index Tpo shape=- domain=- role=index drole=- lo=- hi=- :: t in T with t+Npeak and t+Noff in T
+\begin{align}
+  \min\quad & \sum_{u \in T} B_u \cdot w_u \tag{eq\_0002} \\
+  & x_{T_{n}} = 1 \tag{eq\_0007} \\
+  & 0 \le y_{u,p} \qquad \forall u \in T, p \in P \tag{eq\_0008\_a} \\
+  & y_{u,p} \le 1 \qquad \forall u \in T, p \in P \tag{eq\_0008\_b} \\
+  & \sum_{p \in [1, \min(T_{n} - u + 1, P_{n})]} y_{u,p} = 1 \qquad \forall u \in T \tag{eq\_0009} \\
+  & x_{u+p-1} \ge y_{u,p} \qquad \forall u \in T, p \in P, u+p-1 \in T \tag{eq\_0010} \\
+  & x_{t+N_{\mathit{Peak}}} + x_{t+N_{\mathit{Off}}} \ge x_{t} \qquad \forall t \in T, t+N_{\mathit{Peak}} \in T, t+N_{\mathit{Off}} \in T \tag{eq\_0024} \\
+  & x_{t+N_{Peak}} + x_{t+N_{Off}} \le 1 \qquad \forall t \in \mathit{Tpo} \tag{eq\_0026} \\
+\end{align}

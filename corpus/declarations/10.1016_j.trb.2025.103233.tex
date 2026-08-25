@@ -1,0 +1,185 @@
+% Declaration sidecar for 10.1016_j.trb.2025.103233
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2025.103233
+% A risk-averse two-stage stochastic programming approach for backup rolling stock allocation and metro train rescheduling under uncertain disturbances
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2025.103233.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize backup rolling stock allocation cost plus mean-CVaR of negative disturbance impact.
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of potential backup train units.
+
+% z: classified as index during review
+%@ index z ordered=0 cyclic=0 :: Index for backup train units.
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of station nodes.
+
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: ω
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of train services.
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for train services.
+
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: μ
+% unusable as an identifier, rename or drop: π
+% e: classified as parameter during review
+%@ param e shape=I kind=vector :: Initial number of available storage lines at each station node.
+
+% pt: classified as parameter during review
+%@ param pt shape=I,I,F kind=matrix :: Passenger demand in segment (i,j) during time period f.
+
+% y: classified as variable during review
+%@ var y shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service k serves station node i.
+
+% a: classified as variable during review
+%@ var a shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train service k at station node i.
+
+% d: classified as variable during review
+%@ var d shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train service k from station node i.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant used in big-M reformulations.
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar :: Bounds on dwell time at stations.
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of segments.
+
+% g: classified as parameter during review
+%@ param g shape=I,I kind=matrix :: Lower and upper bounds on running time in segment (i,j).
+
+% x: classified as variable during review
+%@ var x shape=K,I,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train service k operates segment (i,j).
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar :: Minimum headway time between train services.
+
+% unusable as an identifier, rename or drop: φ
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar :: Minimum time for a backup train to travel from depot to station.
+
+% t: classified as parameter during review
+%@ param t shape=F kind=vector :: Time instants used for passenger demand evaluation.
+
+% unusable as an identifier, rename or drop: Ω
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar :: Bounds on turnaround time for train units.
+
+% s: classified as variable during review
+%@ var s shape=I,I,F domain=continuous role=primary drole=- lo=- hi=- :: Passenger flow variable in segment (i,j) during time period f.
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of time periods.
+
+% Q: classified as variable during review
+%@ var Q shape=- domain=continuous role=primary drole=- lo=- hi=- :: Negative disturbance impact for a given first-stage allocation and scenario.
+
+% MCVaR: classified as parameter during review
+%@ param MCVaR shape=- kind=scalar :: Mean conditional value-at-risk of second-stage negative disturbance impact.
+
+% c: classified as parameter during review
+%@ param c shape=B kind=vector :: Allocation cost of backup train unit b.
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar :: Lower bound of MCVaR used in integer optimality cuts.
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of allocated backup train units.
+
+% unusable as an identifier, rename or drop: κ
+% unusable as an identifier, rename or drop: ψ
+% unusable as an identifier, rename or drop: ζ
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Passenger capacity of a train service.
+
+% unusable as an identifier, rename or drop: ρ
+% Bound by a quantifier or big operator, so no declaration of their own: N, b, f, i, j, m, n
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Each backup train unit can be allocated to at most one depot.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Pre-disturbance rolling-stock connection fixed for planned services.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Pre-disturbance return-to-depot indicator fixed for planned services.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Planned service is performed by a connecting train, a backup train, or is canceled.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Emergency service is performed by at most one backup train.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Planned services cannot originate at infeasible station nodes.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Emergency services cannot originate at infeasible station nodes.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Rolling-stock flow conservation after completing a planned service.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Emergency service train returns to depot after completion.
+%@ con eq_0016 kind=linear domain=- indicator=- :: IF-THEN definition of precedence indicator at intermediate stations.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Definition of storage-line usage indicator.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Definition of station-service indicator y for planned services.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Definition of station-service indicator y for emergency services.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Definition of segment-operation indicator x.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Arrival times of unaffected planned services fixed to planned values.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Initial primary delay insertion for the disturbed service.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Arrival times cannot be earlier than planned times.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Minimum dwell time at served station nodes.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maximum running time in operated segments.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Minimum headway among emergency train services.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Headway between planned and emergency service when the emergency service precedes.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Arrival time of a backup train respects earliest dispatching time from depot.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Minimum turnaround time for connected train services.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Definition of departure-time indicator relative to time instants.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Definition of segment-entry indicator.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Passenger load equals the minimum of train capacity and accumulated demand.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Unsatisfied passenger demand update.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Service cancellation penalty based on skipped stations.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Unsatisfied passenger demand penalty.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Weighted-sum negative disturbance impact for a scenario.
+%@ con eq_0048 kind=linear domain=- indicator=- :: Master problem objective relaxation with auxiliary theta.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Valid inequality for arrival-time lower bound after turnaround.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Valid inequality for departure-time lower bound after turnaround.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Dominating valid inequality for arrival-time lower bound.
+%@ con eq_0055 kind=linear domain=- indicator=- :: Dominating valid inequality for departure-time lower bound.
+%@ con eq_0064 kind=linear domain=- indicator=- :: Linearization of the precedence-indicator if-then condition.
+%@ con eq_0065 kind=linear domain=- indicator=- :: Linearization of the precedence-indicator if-then condition complement.
+%@ con eq_0069 kind=linear domain=- indicator=- :: Linearization of the storage-line usage product.
+%@ con eq_0073 kind=linear domain=- indicator=- :: Linearization of the segment-operation product.
+%@ con eq_0075 kind=linear domain=- indicator=- :: Linearization of the service-cancellation disjunction.
+%@ con eq_0076 kind=linear domain=- indicator=- :: Linearization of the segment-entry indicator product.
+%@ con eq_0078 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (capacity bound).
+%@ con eq_0079 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (demand bound).
+%@ con eq_0080 kind=linear domain=- indicator=- :: Linearization of the passenger-load capacity min (nonnegativity).
+%@ con eq_0082_a kind=linear domain=- indicator=- :: Linearization of unsatisfied passenger demand definition (a).
+%@ con eq_0082_b kind=linear domain=- indicator=- :: Linearization of unsatisfied passenger demand definition (b).
+%@ con eq_0084_a kind=linear domain=- indicator=- :: Linearization of cancellation penalty definition (a).
+%@ con eq_0084_b kind=linear domain=- indicator=- :: Linearization of cancellation penalty definition (b).
+%@ con eq_0085_a kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (a).
+%@ con eq_0085_b kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (b).
+%@ con eq_0085_c kind=linear domain=- indicator=- :: Linearization of weighted disturbance impact (c).
+%@ con eq_0087_a kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (a).
+%@ con eq_0087_b kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (b).
+%@ con eq_0087_c kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (c).
+%@ con eq_0088_a kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (d).
+%@ con eq_0088_b kind=linear domain=- indicator=- :: Linearization of mean-CVaR objective (e).
+%@ con eq_0090_a kind=linear domain=- indicator=- :: Integer optimality cut linearization (a).
+%@ con eq_0090_b kind=linear domain=- indicator=- :: Integer optimality cut linearization (b).
+%@ con eq_0090_c kind=linear domain=- indicator=- :: Integer optimality cut linearization (c).
+%@ con eq_0090_d kind=linear domain=- indicator=- :: Integer optimality cut linearization (d).

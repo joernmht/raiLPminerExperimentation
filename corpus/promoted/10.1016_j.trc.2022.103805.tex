@@ -1,0 +1,81 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2022.103805
+%@ meta id=10.1016_j.trc.2022.103805 family=milp schema=0.1.0
+%@ name :: Enhancing the interaction of railway timetabling and line planning with infrastructure awareness
+%@ desc :: Mined from Enhancing the interaction of railway timetabling and line planning with infrastructure awareness (Transportation Research Part C Emerging Technologies, 2022).
+%@ prov source :: 10.1016/j.trc.2022.103805
+%@ prov reference :: Enhancing the interaction of railway timetabling and line planning with infrastructure awareness
+%@ prov author :: Florian Fuchs; Alessio Trivella; Francesco Corman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger travel time in the line planning problem and weighted activity duration in the timetabling problem.
+%@ index X ordered=0 cyclic=0 :: Set of line pool candidates (l,f,r) and their conflict subsets.
+%@ var p shape=S,OD domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on edge s for relation od.
+%@ var t shape=A,E domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity a or timestamp of event e in the periodic timetable.
+%@ index OD ordered=0 cyclic=0 :: Set of origin-destination passenger relations.
+%@ index S ordered=0 cyclic=0 :: Set of directed edges in the space-time / route graph.
+%@ index L ordered=0 cyclic=0 :: Set of railway lines.
+%@ param mandatory shape=L kind=vector domain=- :: Indicator whether line l is mandatory (1) or optional (0).
+%@ var x shape=L,F,R domain=binary role=primary drole=- lo=- hi=- :: Binary selection of line pool candidate (l,f,r).
+%@ index F ordered=0 cyclic=0 :: Set of possible service frequencies.
+%@ index R ordered=0 cyclic=0 :: Set of possible vehicle compositions.
+%@ index v ordered=0 cyclic=0 :: Node of the railway network used in passenger flow conservation.
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the railway network.
+%@ index I ordered=0 cyclic=0 :: Set of track sections in the infrastructure-aware route constraints.
+%@ param cap shape=R kind=vector domain=- :: Passenger capacity of vehicle composition r.
+%@ index G ordered=0 cyclic=0 :: Set of rolling stock types.
+%@ param mix shape=G,R kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+%@ index C ordered=0 cyclic=0 :: Set of conflicts among line pool candidates.
+%@ var variables shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for selecting an event in the timetable.
+%@ param u shape=A kind=vector domain=- :: Upper bound on the duration of activity a.
+%@ var y shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selectable activity a (0=active duration bounds, 1=relaxed).
+%@ param T shape=- kind=scalar domain=- :: Period length of the periodic timetable.
+%@ index A ordered=0 cyclic=0 :: Set of activities in the event-activity network.
+%@ var z shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether selectable event e is part of the chosen itinerary.
+%@ index Y ordered=0 cyclic=0 :: Set of selectable activities (route itinerary edges).
+%@ index Z ordered=0 cyclic=0 :: Set of selectable events (route itinerary nodes).
+%@ index e ordered=0 cyclic=0 :: Event in the event-activity network.
+%@ var k shape=A domain=integer role=primary drole=- lo=- hi=- :: Integer period adjustment for the duration of activity a.
+%@ index E ordered=0 cyclic=0 :: Set of events in the event-activity network.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Conflict elimination inequality: a conflicting set of line pool candidates cannot be fully selected.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Duration computation for edges: wait edges use T/(2f) and running edges use scaled minimal time.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Line configuration selection: exactly one for mandatory lines, at most one for optional lines.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Passenger flow conservation at every node for every origin-destination relation.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Track-section capacity: total passenger flow cannot exceed the capacity of selected line configurations.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Rolling stock type availability: total used units per type cannot exceed the available fleet.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Track-section frequency capacity: selected frequencies must respect the maximum frequency per section.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Conflict constraint: at most |X_conflict|-1 candidates of each conflict set may be selected.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Selectable activity upper bound: duration does not exceed u_a plus the relaxation term.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Selectable activity lower bound: duration is at least l_a minus the relaxation term.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linking activity selection: a selected activity requires its origin and destination events to be selected.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Flow conservation for selected events and activities in the route-itinerary network.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Exactly one source event per line must be selected in the route-itinerary.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Periodic duration relation: t_a = t_{e^-} - t_{e^+} + k_a T.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain constraint for event timestamps in discrete time steps.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Non-negativity of activity durations.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary restrictions on selectable event and activity variables.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Integrality of the period adjustment variables k_a.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
+\begin{align}
+  & 0 < \left|\mathcal{X}_{\text{conflict}}\right| \leq \left|\mathcal{X}_{\text{plan}}\right| \leq \left|\mathcal{X}_{\text{pool}}\right| . \tag{eq\_0001} \\
+  \min\quad & \sum_{o d \in \mathcal{OD}} \sum_{s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\
+  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}} \sum_{r \in \mathcal{R}_{l}} x_{l , f , r} \left\{\begin{matrix} = 1 & \text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} , \\ \leq 1 & \text{otherwise} , \end{matrix}\right \forall l \in \mathcal{L} , \tag{eq\_0005} \\
+  & \sum_{s \in \mathit{delta}^{-} \left(v\right)} p_{s}^{o d} - \sum_{s \in \mathit{delta}^{+} \left(v\right)} p_{s}^{o d} = \left\{\begin{matrix} - \mathit{gamma}^{o d} & \text{if} v = o , \\ \mathit{gamma}^{o d} & \text{if} v = d , \\ 0 & \text{otherwise} , \end{matrix}\right \forall v \in \mathcal{V} , \forall o d \in \mathcal{OD} , \tag{eq\_0006} \\
+  & \sum_{o d \in \mathcal{OD}} p_{s}^{o d} \leq \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot \left(\mathit{cap}\right)_{r} \cdot f , \forall i \in \mathcal{I} , \tag{eq\_0007} \\
+  & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{pool}}}{\sum} x_{l , f , r} \cdot \left(\mathit{mix}\right)_{g , r} \cdot f \leq g_{\text{max}} , \forall g \in \mathcal{G} , \tag{eq\_0008} \\
+  & \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot f \leq f_{i , \text{max}} , \forall i \in \mathcal{I} , \tag{eq\_0009} \\
+  & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{conflict}}}{\sum} x_{l , f , r} \leq \left|\mathcal{X}_{\text{conflict}}\right| - 1 , \forall \mathcal{X}_{\text{conflict}} \in \mathcal{C} , \tag{eq\_0010} \\
+  & \text{variables}: x_{l , f , r} \in \left\{0 , 1\right\} , \forall \left(l , f , r\right) \in \mathcal{X}_{\text{pool}} , \tag{eq\_0011} \\
+  & p_{s}^{o d} \geq 0 , \forall s \in \mathcal{S} , \forall o d \in \mathcal{OD} . \tag{eq\_0012} \\
+  & l_{a} - l_{a} \cdot y_{a} \leq t_{a} \leq u_{a} + \left(T - u_{a}\right) \cdot y_{a} , \tag{eq\_0013} \\
+  & \text{subject}\textrm{ }\text{to}: t_{a} \leq u_{a} + y_{a} \left(T - u_{a} - d t\right) , \forall a \in \mathcal{A} , \tag{eq\_0016} \\
+  & t_{a} \geq l_{a} - y_{a} \cdot l_{a} , \forall a \in \mathcal{A} , \tag{eq\_0017} \\
+  & z_{a^{+}} + z_{a^{-}} + 2 \cdot y_{a} \leq 2 , \forall a \in \mathcal{Y} , \tag{eq\_0018} \\
+  & \sum_{a \in \mathit{delta}^{+} \left(e\right)} y_{a} = \sum_{a \in \mathit{delta}^{-} \left(e\right)} y_{a} = z_{e} , \forall e \in \mathcal{Z} , \tag{eq\_0019} \\
+  & \underset{z_{e} \in \mathcal{Z}_{\text{source}}^{l}}{\sum} z_{e} = 1 , \forall l \in \mathcal{L}^{'} , \tag{eq\_0020} \\
+  & t_{a} = \left(t_{e_{a^{-}}} - t_{e_{a^{+}}}\right) d t + k_{a} \cdot T , \forall a \in \mathcal{A} , \tag{eq\_0021} \\
+  & \text{variables}: t_{e} \in \left\{0 , 1 , . . , \left(T - d t\right) / d t\right\} , \forall e \in \mathcal{E} , \tag{eq\_0022} \\
+  & t_{a} \geq 0 , \forall a \in \mathcal{A} , \tag{eq\_0023} \\
+  & z_{e} , y_{a} \in \left\{0 , 1\right\} , \forall e \in \mathcal{Z} , \forall a \in \mathcal{Y} \tag{eq\_0024} \\
+  & k_{a} \in \mathcal{Z} , \forall a \in \mathcal{A} \tag{eq\_0025} \\
+\end{align}

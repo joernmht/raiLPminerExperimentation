@@ -1,0 +1,118 @@
+% Declaration sidecar for 10.1016_j.omega.2016.11.004
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2016.11.004
+% An exact micro–macro approach to cyclic and non-cyclic train timetabling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2016.11.004.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize sum of deviations from desired times
+
+% a: classified as variable during review
+%@ var a shape=i,s domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station s
+
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Time of atomic movement
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Train index
+
+% d: classified as variable during review
+%@ var d shape=i,s domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i at station s
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Train index
+
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: Set of stations
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% J: classified as parameter during review
+%@ param J shape=- kind=scalar domain=- :: Set of trains
+
+% F: classified as parameter during review
+%@ param F shape=- kind=scalar domain=- :: Set of disjunctive pairs
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Atomic movement index
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Atomic movement index
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for route choice
+
+% Q: classified as parameter during review
+%@ param Q shape=i,j,s kind=scalar domain=- :: Minimum dwell time between trains
+
+% b: classified as parameter during review
+%@ param b shape=i,s kind=scalar domain=- :: Lower bound for departure time
+
+% w: classified as index during review
+%@ index w ordered=0 cyclic=0 :: Atomic movement index
+
+% z: classified as index during review
+%@ index z ordered=0 cyclic=0 :: Atomic movement index
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large constant
+
+% p: classified as variable during review
+%@ var p shape=i,j,s domain=continuous role=primary drole=- lo=- hi=- :: Deviation from desired departure time
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Objective function
+
+% o: classified as variable during review
+%@ var o shape=i,j,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of arrivals
+
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for disjunctive choice
+
+% D: classified as parameter during review
+%@ param D shape=i,j,s kind=scalar domain=- :: Minimum headway between arrivals
+
+% L: classified as parameter during review
+%@ param L shape=i,s kind=scalar domain=- :: Lower bound for arrival time
+
+% U: classified as parameter during review
+%@ param U shape=i,s kind=scalar domain=- :: Upper bound for arrival time
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of routes
+
+% binary: classified as parameter during review
+%@ param binary shape=- kind=scalar domain=- :: Indicates binary variables
+
+% e: classified as parameter during review
+%@ param e shape=- kind=scalar domain=- :: Base of natural logarithm
+
+% real: classified as parameter during review
+%@ param real shape=- kind=scalar domain=- :: Indicates real variables
+
+% unusable as an identifier, rename or drop: ε
+% Bound by a quantifier or big operator, so no declaration of their own: l, r
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Arrival time at station s is at least the time of atomic movement u
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Arrival time at station s is at least the time of atomic movement u

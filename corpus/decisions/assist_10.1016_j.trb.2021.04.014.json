@@ -1,0 +1,255 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.trb.2021.04.014",
+      "doi": "10.1016/j.trb.2021.04.014",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "corrected",
+          "note": "d_{i,j} = a_{i,j} + s \\cdot x_{i,j} \\qquad \\forall i \\in I, j \\in J",
+          "parts": [
+            "d_{i,j} = a_{i,j} + s \\cdot x_{i,j} \\qquad \\forall i \\in I, j \\in J"
+          ]
+        },
+        {
+          "id": "eq-0002",
+          "status": "corrected",
+          "note": "a_{i,\\left(j + 1\\right)} = d_{i,j} + \\tau_{j,\\left(j + 1\\right)} \\qquad \\forall i \\in I, j \\in J \\setminus \\{ J_{last} \\}",
+          "parts": [
+            "a_{i,\\left(j + 1\\right)} = d_{i,j} + \\tau_{j,\\left(j + 1\\right)} \\qquad \\forall i \\in I, j \\in J \\setminus \\{ J_{last} \\}"
+          ]
+        },
+        {
+          "id": "eq-0003",
+          "status": "corrected",
+          "note": "hmin \\leq d_{\\left(i + 1\\right),j} - d_{i,j} \\qquad \\forall i \\in I \\setminus \\{ I_{last} \\}, j \\in J",
+          "parts": [
+            "hmin \\leq d_{\\left(i + 1\\right),j} - d_{i,j} \\qquad \\forall i \\in I \\setminus \\{ I_{last} \\}, j \\in J",
+            "d_{\\left(i + 1\\right),j} - d_{i,j} \\leq hmax \\qquad \\forall i \\in I \\setminus \\{ I_{last} \\}, j \\in J"
+          ]
+        },
+        {
+          "id": "eq-0004",
+          "status": "corrected",
+          "note": "\\sum_{i \\in I} y_{k,i} = 1 \\qquad \\forall k \\in K",
+          "parts": [
+            "\\sum_{i \\in I} y_{k,i} = 1 \\qquad \\forall k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "y_{k,i} \\leq x_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I",
+          "parts": [
+            "y_{k,i} \\leq x_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "corrected",
+          "note": "y_{k,i} \\leq x_{i,e_{k}} \\qquad \\forall k \\in K, i \\in I",
+          "parts": [
+            "y_{k,i} \\leq x_{i,e_{k}} \\qquad \\forall k \\in K, i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "M \\cdot z_{k,i} + t_{o_{k},k} \\geq d_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I",
+          "parts": [
+            "M \\cdot z_{k,i} + t_{o_{k},k} \\geq d_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "corrected",
+          "note": "M \\cdot (z_{k,i} - 1) + t_{o_{k},k} \\leq d_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I",
+          "parts": [
+            "M \\cdot (z_{k,i} - 1) + t_{o_{k},k} \\leq d_{i,o_{k}} \\qquad \\forall k \\in K, i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0009",
+          "status": "corrected",
+          "note": "y_{k,i} \\leq z_{k,i} \\qquad \\forall k \\in K, i \\in I",
+          "parts": [
+            "y_{k,i} \\leq z_{k,i} \\qquad \\forall k \\in K, i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0010",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "M \\cdot \\sum_{p \\in I} y_{k,p} \\geq M \\cdot (x_{i,j} - 1) + c_{i,j} - (g_{k} - 1) + M \\cdot (z_{k,i} - 1) \\qquad \\forall i \\in I, j \\in J, k \\in Khat_{j}",
+          "parts": [
+            "M \\cdot \\sum_{p \\in I} y_{k,p} \\geq M \\cdot (x_{i,j} - 1) + c_{i,j} - (g_{k} - 1) + M \\cdot (z_{k,i} - 1) \\qquad \\forall i \\in I, j \\in J, k \\in Khat_{j}"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "c_{i,1} = C - \\sum_{k \\in Khat_1} g \\cdot y_{k,i} \\qquad \\forall i \\in I",
+          "parts": [
+            "c_{i,1} = C - \\sum_{k \\in Khat_1} g \\cdot y_{k,i} \\qquad \\forall i \\in I"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "corrected",
+          "note": "c_{i,j} = c_{i,j-1} + \\sum_{k \\in K_j} g \\cdot y_{k,i} - \\sum_{k \\in Khat_j} g \\cdot y_{k,i} \\qquad \\forall i \\in I, j \\in J \\setminus \\{1\\}",
+          "parts": [
+            "c_{i,j} = c_{i,j-1} + \\sum_{k \\in K_j} g \\cdot y_{k,i} - \\sum_{k \\in Khat_j} g \\cdot y_{k,i} \\qquad \\forall i \\in I, j \\in J \\setminus \\{1\\}"
+          ]
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "0 \\leq c_{i,j} \\qquad \\forall i \\in I, j \\in J",
+          "parts": [
+            "0 \\leq c_{i,j} \\qquad \\forall i \\in I, j \\in J",
+            "c_{i,j} \\leq C \\qquad \\forall i \\in I, j \\in J"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0016",
+          "status": "duplicate",
+          "duplicate_of": "eq-0017"
+        },
+        {
+          "id": "eq-0017",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0018",
+          "status": "corrected",
+          "note": "w_{k} \\geq M \\cdot (y_{k,i} - 1) + d_{i,o_{k}} - t_{o_{k},k} \\qquad \\forall i \\in I, k \\in K",
+          "parts": [
+            "w_{k} \\geq M \\cdot (y_{k,i} - 1) + d_{i,o_{k}} - t_{o_{k},k} \\qquad \\forall i \\in I, k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0019",
+          "status": "corrected",
+          "note": "w_{k} \\geq 0 \\qquad \\forall k \\in K",
+          "parts": [
+            "w_{k} \\geq 0 \\qquad \\forall k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0020",
+          "status": "corrected",
+          "note": "\\eta \\geq w_{k} \\qquad \\forall k \\in K",
+          "parts": [
+            "\\eta \\geq w_{k} \\qquad \\forall k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0021",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0022",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0023",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0024",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0025",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0026",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0027",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0028",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0029",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0030",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0031",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0032",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0033",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0034",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0035",
+          "status": "rejected"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.trb.2021.04.014",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.trb.2021.04.014",
+      "symbols": {
+        "A": "parameter",
+        "C": "parameter",
+        "I": "index",
+        "J": "index",
+        "K": "index",
+        "K̂": "index",
+        "M": "parameter",
+        "S": "parameter",
+        "a": "parameter",
+        "c": "variable",
+        "d": "variable",
+        "g": "parameter",
+        "h": "parameter",
+        "i": "index",
+        "s": "parameter",
+        "t": "parameter",
+        "w": "variable",
+        "x": "variable",
+        "y": "variable",
+        "z": "variable",
+        "η": "variable",
+        "τ": "parameter"
+      }
+    }
+  ]
+}

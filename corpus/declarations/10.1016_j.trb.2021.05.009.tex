@@ -1,0 +1,170 @@
+% Declaration sidecar for 10.1016_j.trb.2021.05.009
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2021.05.009
+% An exact method for the integrated optimization of subway lines operation strategies with asymmetric passenger demand and operating costs
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2021.05.009.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of normalized passenger service quality and operating costs
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of effective services in a direction
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for services
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of discrete times
+
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: Departure time variable
+
+% N̄: classified as parameter during review
+%@ param Nbar shape=- kind=scalar domain=- :: Maximum difference between the number of effective services in the two directions
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Headway between services
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% a: classified as variable during review
+%@ var a shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of a service at a station
+
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Off-peak period indicator
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Index for speed profile
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for speed profile selection on a segment
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of speed profiles for a segment
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: χ
+% unusable as an identifier, rename or drop: φ
+% T̄: classified as parameter during review
+%@ param Tbar shape=- kind=scalar domain=- :: Upper bound for turn-back time
+
+% unusable as an identifier, rename or drop: χ
+% unusable as an identifier, rename or drop: φ
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for destination station
+
+% P: classified as parameter during review
+%@ param P shape=S,j,T kind=matrix domain=- :: Passenger demand matrix
+
+% pt: classified as parameter during review
+%@ param pt shape=- kind=scalar domain=- :: Passenger travel time
+
+% W: classified as parameter during review
+%@ param W shape=- kind=scalar domain=- :: Weight for waiting time
+
+% n: classified as variable during review
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers traversing a segment
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Cost coefficient
+
+% U: classified as parameter during review
+%@ param U shape=- kind=scalar domain=- :: Utilization cost
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Maximum number of available rolling stock units
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Maintenance cost
+
+% E: classified as parameter during review
+%@ param E shape=- kind=scalar domain=- :: Energy consumption
+
+% e: classified as variable during review
+%@ var e shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption over a segment at a time
+
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: σ
+% obj: classified as variable during review
+%@ var obj shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: Weight for objective components
+
+% F: classified as variable during review
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Contribution function in dynamic programming
+
+% unusable as an identifier, rename or drop: Ψ
+% Bound by a quantifier or big operator, so no declaration of their own: i, l, s, t, u, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Upstream service is effective only if it departs in time to meet the planning horizon
+%@ con eq_0002 kind=linear domain=- indicator=- :: Downstream service is effective only if it departs in time to meet the planning horizon
+%@ con eq_0003 kind=linear domain=- indicator=- :: Limits the absolute difference in the number of effective upstream and downstream services
+%@ con eq_0004 kind=linear domain=- indicator=- :: Peak and off-peak upstream services together form the upstream service set
+%@ con eq_0005 kind=linear domain=- indicator=- :: Peak and off-peak upstream services are disjoint
+%@ con eq_0006 kind=linear domain=- indicator=- :: Peak and off-peak downstream services together form the downstream service set
+%@ con eq_0007 kind=linear domain=- indicator=- :: Peak and off-peak downstream services are disjoint
+%@ con eq_0008 kind=linear domain=- indicator=- :: Defines departure times of upstream services with peak/off-peak headways
+%@ con eq_0009 kind=linear domain=- indicator=- :: Defines departure times of downstream services with peak/off-peak headways
+%@ con eq_0010 kind=linear domain=- indicator=- :: Dwell time relationship between arrival and departure at a station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Running time relationship linking arrival to previous departure and speed profile
+%@ con eq_0012 kind=linear domain=- indicator=- :: Exactly one speed profile is selected per segment
+%@ con eq_0013 kind=linear domain=- indicator=- :: Turn-back connection at depot 1: alpha relation for upstream service
+%@ con eq_0014 kind=linear domain=- indicator=- :: Turn-back connection at depot 1: beta relation for downstream service
+%@ con eq_0015 kind=linear domain=- indicator=- :: Lower bound on the turn-back time at depot 1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Upper bound on the turn-back time at depot 1
+%@ con eq_0017 kind=linear domain=- indicator=- :: Depot-1 connection is allowed only when the upstream service starts from the depot
+%@ con eq_0018 kind=linear domain=- indicator=- :: Depot-1 connection is allowed only when the downstream service ends at the depot
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimum connection time through depot 1
+%@ con eq_0020 kind=linear domain=- indicator=- :: Number of rolling stock units dispatched from depot 1
+%@ con eq_0021 kind=linear domain=- indicator=- :: Total passenger waiting time
+%@ con eq_0022 kind=linear domain=- indicator=- :: Last upstream service must be no earlier than the last passenger arrival
+%@ con eq_0023 kind=linear domain=- indicator=- :: Last downstream service must be no earlier than the last passenger arrival
+%@ con eq_0024 kind=linear domain=- indicator=- :: Total passenger travel time
+%@ con eq_0025 kind=linear domain=- indicator=- :: Rolling stock utilization cost
+%@ con eq_0026 kind=linear domain=- indicator=- :: Fleet size availability constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Maintenance cost
+%@ con eq_0028 kind=linear domain=- indicator=- :: Energy cost
+%@ con eq_0029 kind=linear domain=- indicator=- :: Energy consumption over a segment pair with regenerative braking
+%@ con eq_0030 kind=linear domain=- indicator=- :: Mapping from upstream operation strategy to electric power profiles
+%@ con eq_0031 kind=linear domain=- indicator=- :: Mapping from downstream operation strategy to electric power profiles
+%@ con eq_0038 kind=linear domain=- indicator=- :: Depot 2 counterpart of the alpha definition in Eq. (13)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Depot 2 counterpart of the beta definition in Eq. (14)
+%@ con eq_0040 kind=linear domain=- indicator=- :: Depot 2 counterpart of the turn-back lower-bound constraint in Eq. (15)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Depot 2 counterpart of the turn-back upper-bound constraint in Eq. (16)
+%@ con eq_0042 kind=linear domain=- indicator=- :: Depot 2 counterpart of the depot-connection alpha constraint in Eq. (17)
+%@ con eq_0043 kind=linear domain=- indicator=- :: Depot 2 counterpart of the depot-connection beta constraint in Eq. (18)
+%@ con eq_0044 kind=linear domain=- indicator=- :: Depot 2 counterpart of the minimum depot-connection time constraint in Eq. (19)
+%@ con eq_0045 kind=linear domain=- indicator=- :: Depot 2 counterpart of the dispatched rolling stock count in Eq. (20)
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint (51) in the forward dynamic programming formulation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint (52) in the forward dynamic programming formulation
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint (53) in the forward dynamic programming formulation
+%@ con eq_0054 kind=linear domain=- indicator=- :: Constraint (54) in the forward dynamic programming formulation
+%@ con eq_0055 kind=linear domain=- indicator=- :: Constraint (55) in the forward dynamic programming formulation
+%@ con eq_0056 kind=linear domain=- indicator=- :: Constraint (56) in the forward dynamic programming formulation
+%@ con eq_0057 kind=linear domain=- indicator=- :: Constraint (57) in the forward dynamic programming formulation
+%@ con eq_0058 kind=linear domain=- indicator=- :: Constraint (58) in the forward dynamic programming formulation

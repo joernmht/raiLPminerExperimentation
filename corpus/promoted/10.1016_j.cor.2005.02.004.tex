@@ -1,0 +1,116 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2005.02.004
+%@ meta id=10.1016_j.cor.2005.02.004 family=milp schema=0.1.0
+%@ name :: Generation of classes of robust periodic railway timetables
+%@ desc :: Mined from Generation of classes of robust periodic railway timetables (Computers & Operations Research, 2005).
+%@ prov source :: 10.1016/j.cor.2005.02.004
+%@ prov reference :: Generation of classes of robust periodic railway timetables
+%@ prov author :: Michiel A. Odijk; H. Edwin Romeijn; Hans van Maaren
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Formal objective placeholder; model is a feasibility/sampling problem
+%@ var tau shape=N domain=continuous role=primary drole=- lo=- hi=- :: Event times vector (arrival/departure times)
+%@ var Tp shape=M domain=integer role=primary drole=- lo=- hi=- :: Periodic event scheduling variable (integrality of event-time differences)
+%@ param u shape=M kind=vector domain=- :: Upper bounds for interval constraints
+%@ param ell shape=M kind=vector domain=- :: Lower bounds for interval constraints
+%@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integral phase shift vector
+%@ param B shape=N,M kind=matrix domain=- :: Incidence matrix of the graph
+%@ param TEx shape=- kind=matrix domain=- :: Matrix product T times E times relaxed phase shift x
+%@ param TI shape=- kind=matrix domain=- :: Identity matrix scaled by T on the M-N subspace
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Relaxed phase shift vector
+%@ param I shape=- kind=matrix domain=- :: Identity matrix on the M-N subspace
+%@ param T shape=- kind=scalar domain=- :: Cycle length of the periodic timetable
+%@ param Lambda_bar shape=- kind=scalar domain=- :: Set of feasible relaxed phase shifts
+%@ param Ex shape=- kind=matrix domain=- :: Matrix E times relaxed phase shift x
+%@ param c shape=M kind=vector domain=- :: Circuit vector
+%@ param U shape=- kind=scalar domain=- :: Operator mapping circuits to U(c)=(1/T)(u^T c^+ - l^T c^-)
+%@ param l shape=M kind=vector domain=- :: Lower bounds (alternative notation)
+%@ param e shape=M kind=vector domain=- :: Unit vector selecting an arc
+%@ param TU shape=- kind=scalar domain=- :: T times operator U
+%@ param Tc shape=M kind=vector domain=- :: T times circuit vector c
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for implicit equalities
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for circuit rays
+%@ param F shape=- kind=matrix domain=- :: Matrix F = I - (B2^{-1}B1)^T
+%@ param Tx shape=- kind=vector domain=- :: T times relaxed phase shift x
+%@ param Q shape=- kind=matrix domain=- :: Projection matrix Q = I - B^T(B B^T)^{-1}B
+%@ param QE shape=- kind=matrix domain=- :: Q times E matrix
+%@ param rho shape=- kind=scalar domain=- :: Distance measure rho(x,x~)=||QE(x-x~)||_2
+%@ param Lambda shape=- kind=scalar domain=- :: Set of feasible integral phase shifts
+%@ param f shape=- kind=vector domain=- :: Columns of F
+%@ index M ordered=0 cyclic=0 :: Number of arcs in the graph
+%@ index N ordered=0 cyclic=0 :: Number of events in the timetable
+%@ index i ordered=0 cyclic=0 :: Index for arcs or events
+%@ param u_hat shape=- kind=vector domain=- :: Upper bounds for phase shifts
+%@ param ell_hat shape=- kind=vector domain=- :: Lower bounds for phase shifts
+%@ param TEp shape=M kind=vector domain=- :: T times E times integral phase shift p
+%@ param p_bar shape=- kind=vector domain=- :: Upper bound for phase shift vector p
+%@ param Z shape=- kind=scalar domain=- :: Set of integers
+%@ param epsilon shape=- kind=scalar domain=- :: Tolerance
+%@ con eq_0001 kind=linear domain=- indicator=- :: Interval constraints: l <= tau_i - tau_j + T p_ij <= u
+%@ con eq_0002 kind=linear domain=- indicator=- :: Relaxed timetable constraints in matrix form: l <= B^T tau + TEx <= u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Constraints defining K(x): l - TEx <= B^T tau <= u - TEx
+%@ con eq_0004 kind=linear domain=- indicator=- :: Upper-bound constraints for forward arcs of a circuit
+%@ con eq_0014 kind=linear domain=- indicator=- :: Equation (14) constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Equation (15) constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Equation (16) constraint
+%@ con eq_0017 kind=linear domain=- indicator=- :: Equation (17) constraint
+%@ con eq_0018 kind=linear domain=- indicator=- :: Equation (18) constraint
+%@ con eq_0019 kind=linear domain=- indicator=- :: Equation (19) constraint
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21) constraint
+%@ con eq_0022 kind=linear domain=- indicator=- :: Equation (22) constraint
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23) constraint
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24) constraint
+%@ con eq_0025 kind=linear domain=- indicator=- :: Equation (25) constraint
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Equation (26a) constraint
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Equation (26b) constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: Equation (28) constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Equation (29) constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: Equation (30) constraint
+%@ con eq_0042 kind=linear domain=- indicator=- :: Equation (42) constraint
+%@ con eq_0044 kind=linear domain=- indicator=- :: Equation (44) constraint
+%@ con eq_0045 kind=linear domain=- indicator=- :: Equation (45) constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Equation (46) constraint
+%@ con eq_0047 kind=linear domain=- indicator=- :: Equation (47) constraint
+%@ con eq_0050 kind=linear domain=- indicator=- :: Equation (50) constraint
+%@ con eq_0051_b kind=linear domain=- indicator=- :: Equation (51b) constraint
+%@ con eq_0052 kind=linear domain=- indicator=- :: Equation (52) constraint
+%@ con eq_0053 kind=linear domain=- indicator=- :: Equation (53) constraint
+%@ con eq_0056_a kind=linear domain=- indicator=- :: Equation (56a) constraint
+%@ con eq_0056_b kind=linear domain=- indicator=- :: Equation (56b) constraint
+%@ con eq_0056_c kind=linear domain=- indicator=- :: Equation (56c) constraint
+%@ con eq_0056_d kind=linear domain=- indicator=- :: Equation (56d) constraint
+\begin{align}
+  & \mathit{ell}_{} \leq \mathit{tau}_{i} - \mathit{tau}_{j} + \mathit{Tp}_{} \leq u_{} , \tag{eq\_0001} \\
+  & 2 \leq \mathit{tau}_{i} - \mathit{tau}_{j} + 60 \cdot p_{} \leq 5 . \tag{eq\_0002} \\
+  & 2 \leq \mathit{tau}_{i} - \mathit{tau}_{j} + 60 \cdot p_{} \leq 58 . \tag{eq\_0003} \\
+  & 28 \leq \mathit{tau}_{i} - \mathit{tau}_{j} + 60 \cdot p_{} \leq 32 . \tag{eq\_0004} \\
+  & \mathit{ell} \leq {B}^{\top} \mathit{tau} + \mathit{TEx} \leq u \tag{eq\_0014} \\
+  & \mathit{ell} \leq \begin{pmatrix} {B}_{1}^{\top} & \mathit{TI}_{M - N} \\ {B}_{2}^{\top} & 0 \end{pmatrix} \begin{pmatrix} \mathit{tau} \\ x \end{pmatrix} \leq u , \tag{eq\_0015} \\
+  & \frac{1}{T} \left(I - \left(\right. {B}_{2}^{- 1} {B}_{1} \left.\right)^{\top}\right) \left(\mathit{ell} + u\right) - x \in \bar{\mathit{Lambda}} , \tag{eq\_0016} \\
+  & \mathit{tau}_{i} - \mathit{tau}_{j} = \mathit{ell}_{} - T \left(\right. \mathit{Ex} \left.\right)_{} \tag{eq\_0017} \\
+  & \mathit{tau}_{i} - \mathit{tau}_{j} = u_{} - T \left(\right. \mathit{Ex} \left.\right)_{} . \tag{eq\_0018} \\
+  & U \left(c\right) = \frac{1}{T} \left(u^{\top} \cdot c^{+} - l^{\top} \cdot c^{-}\right) , \tag{eq\_0019} \\
+  & \mathit{ell} - \mathit{TEx} \leq {B}^{\top} \mathit{tau} \leq u - \mathit{TEx} . \tag{eq\_0021} \\
+  & e_{}^{\top} {B}^{\top} \mathit{tau} \leq e_{}^{\top} \left(u - \mathit{TEx}\right) if c_{} = 1 , \tag{eq\_0022} \\
+  & - e_{}^{\top} {B}^{\top} \mathit{tau} \leq - e_{}^{\top} \left(\mathit{ell} - \mathit{TEx}\right) if c_{} = - 1 . \tag{eq\_0023} \\
+  & \left(\right. c^{+} - c^{-} \left.\right)^{\top} {B}^{\top} \mathit{tau} \leq \left(\right. c^{+} \left.\right)^{\top} \left(u - \mathit{TEx}\right) - \left(\right. c^{-} \left.\right)^{\top} \left(\mathit{ell} - \mathit{TEx}\right) = \mathit{TU} \left(c\right) - \mathit{Tc}^{\top} \cdot \mathit{Ex} = 0 . \tag{eq\_0024} \\
+  & \left(\right. c^{+} - c^{-} \left.\right)^{\top} {B}^{\top} \mathit{tau} = c^{\top} {B}^{\top} \mathit{tau} = 0 , \tag{eq\_0025} \\
+  & y_{1}^{\top} \left(u - \mathit{TEx}\right) - y_{2}^{\top} \left(l - \mathit{TEx}\right) = 0 \tag{eq\_0026\_a} \\
+  & y_{1}^{\top} {B}^{\top} - y_{2}^{\top} {B}^{\top} = 0 \tag{eq\_0026\_b} \\
+  & z_{1}^{\top} \left(u - \mathit{TEx}\right) - z_{2}^{\top} \left(\mathit{ell} - \mathit{TEx}\right) \geq 0 , \tag{eq\_0028} \\
+  & \left(\right. c^{+} \left.\right)^{\top} \left(u - \mathit{TEx}\right) - \left(\right. c^{-} \left.\right)^{\top} \left(\mathit{ell} - \mathit{TEx}\right) = 0 \tag{eq\_0029} \\
+  & c^{\top} \cdot \mathit{Ex} = \frac{1}{T} \left(u^{\top} \cdot c^{+} - \mathit{ell}^{\top} \cdot c^{-}\right) = U \left(c\right) . \tag{eq\_0030} \\
+  & \underset{̲}{x} = \frac{1}{T} F \underset{̲}{z} , \tag{eq\_0042} \\
+  & \begin{pmatrix} {B}_{1}^{\top} & \mathit{TI}_{M - N} \\ {B}_{2}^{\top} & 0 \end{pmatrix}^{- 1} \underset{̲}{z} \tag{eq\_0044} \\
+  & \begin{pmatrix} {B}_{1}^{\top} & \mathit{TI}_{M - N} \\ {B}_{2}^{\top} & 0 \end{pmatrix}^{- 1} = \begin{pmatrix} 0 & \left({B}_{2}^{- 1}\right)^{\top} \\ \frac{1}{T} I_{M - N} & - \frac{1}{T} \left({B}_{2}^{- 1} {B}_{1}\right)^{\top} \end{pmatrix} \tag{eq\_0045} \\
+  & \mathit{ell} - \mathit{Tx} \leq {B}^{\top} \mathit{tau} \leq u - \mathit{Tx} \tag{eq\_0046} \\
+  & \mathit{ell} - T {x} \leq {B}^{\top} \mathit{tau} \leq u - T {x} . \tag{eq\_0047} \\
+  & Q = I - {B}^{\top} \left(\right. {B} {B}^{\top} \left.\right)^{- 1} {B} . \tag{eq\_0050} \\
+  \min\quad & \mathit{rho} \left(x , p\right) = \left\|\mathit{QE} \left(x - p\right)\right\|_{2} \tag{eq\_0051\_a} \\
+  & p \in \mathit{Lambda} . \tag{eq\_0051\_b} \\
+  & \hat{u}_{i} = \left(\left⌊\frac{1}{T} \left(u^{\top} \cdot f_{i}^{+} - \mathit{ell}^{\top} \cdot f_{i}^{-}\right)\right⌋ ,\right) i = 1 , \ldots , M - N \tag{eq\_0052} \\
+  & \hat{\mathit{ell}}_{i} = \left(\left⌈\frac{1}{T} \left(\mathit{ell}^{\top} \cdot f_{i}^{+} - u^{\top} \cdot f_{i}^{-}\right)\right⌉ ,\right) i = 1 , \ldots , M - N , \tag{eq\_0053} \\
+  & \mathit{ell} \leq B^{\top} \cdot \mathit{tau} + \mathit{TEp} \leq u \tag{eq\_0056\_a} \\
+  & \underset{̲}{p} \leq p \leq \bar{p} \tag{eq\_0056\_b} \\
+  & \hat{\mathit{ell}} \leq p \leq \hat{u} \tag{eq\_0056\_c} \\
+  & \left\|\mathit{QE} \left(x - p\right)\right\| \leq \underset{m = 1 , \ldots , n}{min} \left\|\mathit{QE} \left(x - p^{m}\right)\right\| - \mathit{epsilon} , p \in \mathcal{Z}^{M - N} \tag{eq\_0056\_d} \\
+\end{align}

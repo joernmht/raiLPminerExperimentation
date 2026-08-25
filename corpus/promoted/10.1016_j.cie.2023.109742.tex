@@ -1,0 +1,106 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2023.109742
+%@ meta id=10.1016_j.cie.2023.109742 family=milp schema=0.1.0
+%@ name :: Integrated train timetabling and rolling stock rescheduling for a disturbed metro system: A hybrid deep reinforcement learning and adaptive large neighborhood search approach
+%@ desc :: Mined from Integrated train timetabling and rolling stock rescheduling for a disturbed metro system: A hybrid deep reinforcement learning and adaptive large neighborhood search approach (Computers & Industrial Engineering, 2023).
+%@ prov source :: 10.1016/j.cie.2023.109742
+%@ prov reference :: Integrated train timetabling and rolling stock rescheduling for a disturbed metro system: A hybrid deep reinforcement learning and adaptive large neighborhood search approach
+%@ prov author :: Boyi Su; Andrea D’Ariano; Shuai Su; Xuekai Wang; Tao Tang; Tao Tang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted sum of timetable deviation, service cancellations, unsatisfied passenger demand, and energy consumption
+%@ var d shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train service k at node i
+%@ index t ordered=0 cyclic=0 :: Time index
+%@ var a shape=K,I domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train service k at node i
+%@ param h shape=- kind=scalar domain=- :: Headway time (minimum or planned)
+%@ index K ordered=0 cyclic=0 :: Set of train services
+%@ param pt shape=I,T kind=matrix domain=- :: Passenger arrival rate at station node i at time t
+%@ index I ordered=0 cyclic=0 :: Set of nodes (stations and storage lines)
+%@ index i ordered=0 cyclic=0 :: Node index
+%@ var x shape=K,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train service k traverses segment (i,j)
+%@ index L ordered=0 cyclic=0 :: Set of segments (links)
+%@ param M shape=- kind=big_m domain=- :: Large positive constant used in big-M formulations
+%@ param r shape=L,Q kind=matrix domain=- :: Running time of segment (i,j) at operation level q
+%@ index Q ordered=0 cyclic=0 :: Set of operation levels
+%@ param s shape=I,W kind=matrix domain=- :: Dwell time at station node i for dwell level w
+%@ var y shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train service k serves node i
+%@ index W ordered=0 cyclic=0 :: Set of dwell levels
+%@ var m shape=I,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of rolling stocks at storage line i at time t
+%@ index T ordered=0 cyclic=0 :: Set of time points
+%@ var n shape=K,I domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers onboard train service k at node i
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective value (total or per train service)
+%@ param E shape=L,Q kind=matrix domain=- :: Energy consumption of segment (i,j) at operation level q
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints (1)-(35)
+%@ param master shape=- kind=scalar domain=- :: Master model
+%@ param model shape=- kind=scalar domain=- :: Optimization model
+%@ param service shape=- kind=scalar domain=- :: Train service
+%@ param submodel shape=- kind=scalar domain=- :: Submodel for each train service
+%@ param train shape=- kind=scalar domain=- :: Train service
+%@ var A shape=- domain=integer role=primary drole=- lo=- hi=- :: Action in MDP
+%@ var S shape=- domain=continuous role=primary drole=- lo=- hi=- :: State in MDP
+%@ var R shape=- domain=continuous role=primary drole=- lo=- hi=- :: Reward function in MDP
+%@ var O shape=- domain=integer role=primary drole=- lo=- hi=- :: Option in hierarchical policy
+%@ con eq_0001 kind=linear domain=- indicator=- :: Primary delay departure time constraint
+%@ con eq_0002 kind=linear domain=- indicator=- :: Primary delay arrival time constraint
+%@ con eq_0004 kind=linear domain=- indicator=- :: Updated departure time after holding decision and headway compensation
+%@ con eq_0007 kind=linear domain=- indicator=- :: Operation zone constraint: train services start and end only at storage-line nodes
+%@ con eq_0008 kind=linear domain=- indicator=- :: Link between segment usage and service indicators for adjacent nodes
+%@ con eq_0009 kind=linear domain=- indicator=- :: Lower bound on running time with selected operation level
+%@ con eq_0011 kind=linear domain=- indicator=- :: Exactly one operation level is selected for each used segment
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower bound on dwell time with selected dwell level
+%@ con eq_0013 kind=linear domain=- indicator=- :: Upper bound on dwell time with selected dwell level
+%@ con eq_0014 kind=linear domain=- indicator=- :: Exactly one dwell level is selected for each served station
+%@ con eq_0015 kind=linear domain=- indicator=- :: Minimum headway constraint at station nodes
+%@ con eq_0016 kind=linear domain=- indicator=- :: At most one storage-line-to-station segment per train service
+%@ con eq_0017 kind=linear domain=- indicator=- :: At most one station-to-storage-line segment per train service
+%@ con eq_0018 kind=linear domain=- indicator=- :: Rolling stock inventory balance at storage lines
+%@ con eq_0019 kind=linear domain=- indicator=- :: Arrival time equals the selected entering timestamp
+%@ con eq_0020 kind=linear domain=- indicator=- :: Entering indicator is consistent with the ending segment selection
+%@ con eq_0021 kind=linear domain=- indicator=- :: Number of rolling stocks entering a storage line
+%@ con eq_0022 kind=linear domain=- indicator=- :: Number of rolling stocks leaving a storage line
+%@ con eq_0023 kind=linear domain=- indicator=- :: Departure time equals the selected leaving timestamp
+%@ con eq_0024 kind=linear domain=- indicator=- :: Leaving indicator is consistent with the starting segment selection
+%@ con eq_0025 kind=linear domain=- indicator=- :: Storage line capacity constraint
+%@ con eq_0026 kind=linear domain=- indicator=- :: Recursive definition of the latest preceding service arrival time
+%@ con eq_0027 kind=linear domain=- indicator=- :: Waiting passenger calculation at platforms
+%@ con eq_0035 kind=linear domain=- indicator=- :: Energy consumption of a train service
+%@ con eq_0036 kind=linear domain=- indicator=- :: Master model objective: weighted sum of performance indicators
+%@ con eq_0037 kind=linear domain=- indicator=- :: Submodel definition for each train service
+%@ con eq_0038 kind=linear domain=- indicator=- :: MDP state representation
+%@ con eq_0039 kind=linear domain=- indicator=- :: MDP action space
+%@ con eq_0040 kind=linear domain=- indicator=- :: MDP option (rolling stock circulation decision)
+%@ con eq_0041 kind=linear domain=- indicator=- :: Reward function of the MDP
+%@ con eq_0042 kind=linear domain=- indicator=- :: Bellman optimality equation for the Q-function
+\begin{align}
+  & d_{k^{ \cdot } , i^{ \cdot }} = {d}_{k^{ \cdot } , i^{ \cdot }} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0001} \\
+  & a_{k^{ \cdot } , i^{ \cdot }} = {a}_{k^{ \cdot } , i^{ \cdot }} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0002} \\
+  & d_{k , i} = \left(1 - \mathit{xi}_{k , i}\right) {d}_{k , i} + \mathit{xi}_{k , i} \left[{d}_{k , i} + t_{\text{end}} - t_{\text{start}} - \underset{\genfrac{}{}{0pt}{}{k^{'} \in \mathcal{K}}{k^{ \cdot } < k^{'} \leq k}}{\sum} \sum_{i^{'} \in \mathcal{I}} \mathit{xi}_{k^{'} , i^{'}} \left(h_{p} - h_{min}\right)\right] , \tag{eq\_0004} \\
+  & a_{k , i} = {a}_{k , i} , \forall i \in \mathcal{I}_{k}^{r} , k \in \mathcal{K} . \tag{eq\_0007} \\
+  & x_{k , i , j} = {x}_{k , i , j} , \forall j \in \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} . \tag{eq\_0008} \\
+  & \sum_{\left(j , i\right) \in \mathcal{L}} x_{k , j , i} = \sum_{\left(i , j\right) \in \mathcal{L}} x_{k , i , j} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0009} \\
+  & a_{k , j} - d_{k , i} \geq \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} r_{i , j}^{q} - M \cdot \left(1 - x_{k , i , j}\right) , \forall j \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} , \tag{eq\_0011} \\
+  & a_{k , j} - d_{k , i} \leq \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} r_{i , j}^{q} + M \cdot \left(1 - x_{k , i , j}\right) , \forall j \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} , \tag{eq\_0012} \\
+  & \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} = x_{k , i , j} , \forall j \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} . \tag{eq\_0013} \\
+  & d_{k , i} - a_{k , i} \geq \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} s_{i}^{w} - M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} , \tag{eq\_0014} \\
+  & d_{k , i} - a_{k , i} \leq \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} s_{i}^{w} + M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} , \tag{eq\_0015} \\
+  & \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} = y_{k , i} , \forall i \in i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0016} \\
+  & a_{k , i} - d_{k^{'} , i} \geq h_{min} - M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I}_{s} , k , k^{'} \in \mathcal{K} , k^{'} < k . \tag{eq\_0017} \\
+  & \sum_{\left(i , j\right) \in \mathcal{L}_{u}} x_{k , i , j} \leq 1 , \forall k \in \mathcal{K} , \tag{eq\_0018} \\
+  & \sum_{\left(i , j\right) \in \mathcal{L}_{b}} x_{k , i , j} \leq 1 , \forall k \in \mathcal{K} . \tag{eq\_0019} \\
+  & m_{i} \left(t\right) = m_{i} \left(t - \mathit{delta}\right) + m_{i}^{b} \left(t\right) - m_{i}^{u} \left(t\right) , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} \backslash \left\{t_{0}\right\} . \tag{eq\_0020} \\
+  & a_{k , i} = \sum_{t \in \mathcal{T}} t \cdot \mathit{sigma}_{k , i} \left(t\right) , \forall i \in \mathcal{I}_{g} , k \in \mathcal{K} , \tag{eq\_0021} \\
+  & \sum_{t \in \mathcal{T}} \mathit{sigma}_{k , i} \left(t\right) = \sum_{\left(j , i\right) \in \mathcal{L}_{b}} x_{k , j , i} , \forall i \in \mathcal{I}_{g} , k \in \mathcal{K} . \tag{eq\_0022} \\
+  & m_{i}^{b} \left(t\right) = \sum_{k \in \mathcal{K}} \mathit{sigma}_{k , i} \left(t\right) , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} . \tag{eq\_0023} \\
+  & m_{i}^{u} \left(t\right) = \sum_{k \in \mathcal{K}} \mathit{beta}_{k , i} \left(t\right) , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} , \tag{eq\_0024} \\
+  & d_{k , i} = \sum_{t \in \mathcal{T}} t \cdot \mathit{beta}_{k , i} \left(t\right) , \forall i \in \mathcal{I}_{g} , k \in \mathcal{K} , \tag{eq\_0025} \\
+  & \sum_{t \in \mathcal{T}} \mathit{beta}_{k , i} \left(t\right) = \sum_{\left(i , j\right) \in \mathcal{L}_{u}} x_{k , i , j} , \forall i \in \mathcal{I}_{g} , k \in \mathcal{K} . \tag{eq\_0026} \\
+  & 0 \leq m_{i} \left(t\right) \leq 1 , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} . \tag{eq\_0027} \\
+  & n_{k , i} = n_{k , i - 1} - n_{k , i}^{a} + n_{k , i}^{b} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0035} \\
+  & n_{k , i}^{r} = n_{k , i}^{w} - n_{k , i}^{b} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0036} \\
+  & Z_{k}^{d} = \sum_{i \in \mathcal{I}_{k}^{p}} \left(\left|a_{k , i} - {a}_{k , i} \cdot y_{k , i}\right| + \left|d_{k , i} - {d}_{k , i} \cdot y_{k , i}\right|\right) . \tag{eq\_0037} \\
+  & Z_{k}^{c} = \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{s}} \left({y}_{k , i} - y_{k , i}\right) . \tag{eq\_0038} \\
+  & Z_{k}^{p} = \sum_{i \in \mathcal{I}_{k}^{p}} n_{k , i}^{r} . \tag{eq\_0039} \\
+  & Z_{k}^{e} = \sum_{\left(i , j\right) \in \mathcal{L}} \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} E_{i , j}^{q} . \tag{eq\_0040} \\
+  & \left(\text{master \cdot model}\right) \left\{\begin{matrix} & min \textrm{ } Z = \sum_{k \in \mathcal{K}} \left(\mathit{omega}_{d} Z_{k}^{d} + \mathit{omega}_{c} Z_{k}^{c} + \mathit{omega}_{p} Z_{k}^{p} + \mathit{omega}_{e} Z_{k}^{e}\right) , \\ & s . t . \\ & \text{constraints }(\text{1})–(\text{35}), \end{matrix}\right \tag{eq\_0041} \\
+  & \left(\text{submodel} k\right) \left\{\begin{matrix} & min \textrm{ } Z_{k} = \mathit{omega}_{d} Z_{k}^{d} + \mathit{omega}_{c} Z_{k}^{c} + \mathit{omega}_{p} Z_{k}^{p} + \mathit{omega}_{e} Z_{k}^{e} , \\ & s . t . \\ & \text{constraints }(\text{1})–(\text{35})\text{ for train service} k . \end{matrix}\right \tag{eq\_0042} \\
+  \max_{\mathit{pi}}\quad & \mathcal{E} \left[R \left(\mathbf{S}_{k , i} , \mathbf{A}_{k , i}\right) + \mathit{gamma} R \left(\mathbf{S}_{k , j} , \mathbf{A}_{k , j}\right) + \cdots \left|\mathbf{S}_{k , i} , \mathbf{A}_{k , i} , \mathbf{O}_{k} , \mathit{pi}\right)\right] \tag{eq\_0049} \\
+\end{align}

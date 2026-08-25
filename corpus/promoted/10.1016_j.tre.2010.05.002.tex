@@ -1,0 +1,49 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2010.05.002
+%@ meta id=10.1016_j.tre.2010.05.002 family=milp schema=0.1.0
+%@ name :: Freight train scheduling with elastic demand
+%@ desc :: Mined from Freight train scheduling with elastic demand (Transportation Research Part E Logistics and Transportation Review, 2010).
+%@ prov source :: 10.1016/j.tre.2010.05.002
+%@ prov reference :: Freight train scheduling with elastic demand
+%@ prov author :: April Kuo; Elise Miller-Hooks; Hani S. Mahmassani
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total operating cost and delay penalty
+%@ var x shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating whether arc a is used in the timetable
+%@ param c shape=A kind=vector domain=- :: Operating cost of arc a
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value representing total cost
+%@ index A ordered=0 cyclic=0 :: Set of arcs comprising a train slot
+%@ index I ordered=0 cyclic=0 :: Set of candidate train slots on a route
+%@ index K ordered=0 cyclic=0 :: Set of routes
+%@ index k ordered=0 cyclic=0 :: Index for routes
+%@ index d ordered=0 cyclic=0 :: Set of incoming/outgoing arcs at a node
+%@ index i ordered=0 cyclic=0 :: Index for train slots
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the time-space network
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ index n ordered=0 cyclic=0 :: Index for nodes
+%@ index t ordered=0 cyclic=0 :: Index for time periods
+%@ index C ordered=0 cyclic=0 :: Set of conflicts for a specific pair of trains
+%@ var y shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating whether train slot i is selected
+%@ index L ordered=0 cyclic=0 :: Set of loading/unloading terminals
+%@ con eq_0002 kind=linear domain=- indicator=- :: Frequency requirement: selected departure arcs from the source equal the suggested train frequency for each route
+%@ con eq_0003 kind=linear domain=- indicator=- :: At most one departure arc selected per train slot from the pseudo source terminal
+%@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation for each train slot at each node and time period
+%@ con eq_0005 kind=linear domain=- indicator=- :: At most one arrival arc selected per train slot at the pseudo sink terminal
+%@ con eq_0006 kind=linear domain=- indicator=- :: Conflict/headway constraints preventing two trains from using conflicting arcs within minimum headway
+%@ con eq_0007 kind=linear domain=- indicator=- :: Binary integrality of arc decision variables
+%@ con eq_0011 kind=linear domain=- indicator=- :: Frequency constraint: number of selected train slots on each route equals the suggested train frequency
+%@ con eq_0012 kind=linear domain=- indicator=- :: Terminal capacity: train slots using a terminal in a period cannot exceed available slots
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary integrality of train slot selection variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Reduced cost definition for train slot i on route k
+\begin{align}
+  \min\quad & z \left(x\right) = \sum_{k \in K} \sum_{i \in I^{k}} \sum_{a \in A^{i}} c_{a} \cdot x_{a} \tag{eq\_0001} \\
+  & \text{Subject to} \sum_{i \in I^{k}} \sum_{a \in d_{i}^{+} \left(\mathit{alpha}\right)} x_{a} = \mathit{eta}^{k} , \forall k \in K \tag{eq\_0002} \\
+  & \sum_{a \in d_{i}^{+} \left(\mathit{alpha}\right)} x_{a} \leq 1 , \forall i \in I^{k} \forall k \in K \tag{eq\_0003} \\
+  & \sum_{a \in d_{i}^{-} \left(n^{t}\right)} x_{a} = \sum_{a \in d_{i}^{+} \left(n^{t}\right)} x_{a} , \forall i \in I^{k} \forall k \in K \forall n^{t} \in N_{T} \backslash \left\{\mathit{alpha} , \mathit{beta}\right\} \forall t \in T \tag{eq\_0004} \\
+  & \sum_{a \in d_{i}^{-} \left(\mathit{beta}\right)} x_{a} \leq 1 , \forall i \in I^{k} \forall k \in K \tag{eq\_0005} \\
+  & \sum_{a \in C} x_{a} \leq 1 , \forall C \in \hbar \tag{eq\_0006} \\
+  & x_{a} \in \left\{0 , 1\right\} , \forall a \in A^{i} \forall i \in I^{k} \forall k \in K \tag{eq\_0007} \\
+  & \text{subject to} \sum_{i \in I^{k}} y_{i} = \mathit{eta}^{k} , \forall k \in K \tag{eq\_0011} \\
+  & \sum_{k \in K} \sum_{i \in I^{k}} \mathit{delta}_{\mathit{lt}}^{i} \cdot y_{i} \leq \mathit{ell}_{\mathit{lt}} , \forall l \in L \forall t \in T \tag{eq\_0012} \\
+  & y_i \in \{0,1\}, \forall i \in I^k \forall k \in K \tag{eq\_0013} \\
+  & \mathit{lambda}_{i}^{k} = c_{i} + \mathit{rho} \left(\mathit{mu}_{i}\right) + \sum_{t \in T} \sum_{l \in L} \mathit{delta}_{\mathit{lt}}^{i} ϖ_{\mathit{lt}} - \mathit{sigma}^{k} , \forall i \in I^{k} \forall k \in K . \tag{eq\_0014} \\
+\end{align}

@@ -1,0 +1,153 @@
+% Declaration sidecar for 10.1016_j.cor.2015.12.011
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2015.12.011
+% Variable and adaptive neighbourhood search algorithms for rail rapid transit timetabling problem
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cor.2015.12.011.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time
+
+% H: classified as variable during review
+%@ var H shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Headway between consecutive train departures
+
+% MINLP: classified as parameter during review
+%@ param MINLP shape=- kind=scalar domain=- :: Model name for mixed-integer nonlinear programming
+
+% w: classified as variable during review
+%@ var w shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers after departure of train i
+
+% z: classified as variable during review
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total waiting time)
+
+% unusable as an identifier, rename or drop: δ
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of train services
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time intervals in MILP model
+
+% d: classified as variable during review
+%@ var d shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train i
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Total number of train services
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway bounds (min and max)
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large positive constant
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time index for periods or intervals
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of demand periods
+
+% unusable as an identifier, rename or drop: Δ
+% b: classified as variable during review
+%@ var b shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers on train i
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: θ
+% NT: classified as index during review
+%@ index NT ordered=0 cyclic=0 :: Total number of demand periods
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers (domain notation)
+
+% MILP: classified as parameter during review
+%@ param MILP shape=- kind=scalar domain=- :: Model name for mixed-integer linear programming
+
+% unusable as an identifier, rename or drop: α
+% x: classified as variable during review
+%@ var x shape=I,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating dispatch of train i at time t
+
+% MiniMax: classified as parameter during review
+%@ param MiniMax shape=- kind=scalar domain=- :: Model name for minimax objective
+
+% AWT: classified as variable during review
+%@ var AWT shape=- domain=continuous role=primary drole=- lo=- hi=- :: Average waiting time (or total waiting time bound)
+
+% unusable as an identifier, rename or drop: β
+% F: classified as variable during review
+%@ var F shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Frequency of trains in period t
+
+% f: classified as parameter during review
+%@ param f shape=T kind=vector domain=- :: Lower and upper bounds on frequency based on demand
+
+% e: classified as parameter during review
+%@ param e shape=I kind=vector domain=- :: Earliest departure time for train i
+
+% l: classified as parameter during review
+%@ param l shape=I kind=vector domain=- :: Latest departure time for train i
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, p, y
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: MINLP objective function
+%@ con eq_0002 kind=linear domain=- indicator=- :: Total headway sum equals planning horizon
+%@ con eq_0003 kind=linear domain=- indicator=- :: Headway definition between consecutive trains
+%@ con eq_0004 kind=linear domain=- indicator=- :: Headway bounds (min/max)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Link departure time to demand period
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each train assigned to exactly one demand period
+%@ con eq_0007 kind=linear domain=- indicator=- :: Chronological ordering of train demand periods
+%@ con eq_0008 kind=linear domain=- indicator=- :: Passenger flow between consecutive trains
+%@ con eq_0009 kind=linear domain=- indicator=- :: Waiting passenger flow conservation
+%@ con eq_0010 kind=linear domain=- indicator=- :: Train capacity constraint
+%@ con eq_0011 kind=linear domain=- indicator=- :: Upper bound on cumulative passenger arrivals
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower bound on cumulative passenger arrivals
+%@ con eq_0013 kind=linear domain=- indicator=- :: Upper bound on first-headway passenger flow
+%@ con eq_0014 kind=linear domain=- indicator=- :: Lower bound on first-headway passenger flow
+%@ con eq_0015 kind=linear domain=- indicator=- :: Upper bound on last-headway passenger flow
+%@ con eq_0016 kind=linear domain=- indicator=- :: Lower bound on last-headway passenger flow
+%@ con eq_0017 kind=linear domain=- indicator=- :: Initial conditions for waiting and boarding
+%@ con eq_0018 kind=linear domain=- indicator=- :: Variable domain definitions (MINLP)
+%@ con eq_0019 kind=linear domain=- indicator=- :: MILP objective function
+%@ con eq_0020 kind=linear domain=- indicator=- :: MILP headway constraints
+%@ con eq_0021 kind=linear domain=- indicator=- :: Each train dispatches at most once
+%@ con eq_0022 kind=linear domain=- indicator=- :: At most one train per time slot
+%@ con eq_0023 kind=linear domain=- indicator=- :: Waiting passenger balance in MILP
+%@ con eq_0024 kind=linear domain=- indicator=- :: Capacity constraint with dispatch variable
+%@ con eq_0025 kind=linear domain=- indicator=- :: Variable domain definitions (MILP)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Minimax objective function
+%@ con eq_0027 kind=linear domain=- indicator=- :: Bound on average waiting time
+%@ con eq_0028 kind=linear domain=- indicator=- :: Total frequency equals total number of trains
+%@ con eq_0029 kind=linear domain=- indicator=- :: Frequency assignment to demand periods
+%@ con eq_0031 kind=linear domain=- indicator=- :: Variable domain definitions for decoding model
+%@ con eq_0032 kind=linear domain=- indicator=- :: Feasible frequency range for intermediate periods
+%@ con eq_0033 kind=linear domain=- indicator=- :: Feasible frequency range for first period
+%@ con eq_0034 kind=linear domain=- indicator=- :: Frequency for last period
+%@ con eq_0035 kind=linear domain=- indicator=- :: Normalized passenger arrival rate
+%@ con eq_0036 kind=linear domain=- indicator=- :: Lower bound on train frequency
+%@ con eq_0037 kind=linear domain=- indicator=- :: Upper bound on train frequency
+%@ con eq_0038 kind=linear domain=- indicator=- :: Modified frequency bound for first period
+%@ con eq_0039 kind=linear domain=- indicator=- :: Modified frequency bound for intermediate periods
+%@ con eq_0041 kind=linear domain=- indicator=- :: Feasible departure time range
+%@ con eq_0042 kind=linear domain=- indicator=- :: Earliest departure time for first train
+%@ con eq_0043 kind=linear domain=- indicator=- :: Latest departure time for first train
+%@ con eq_0044 kind=linear domain=- indicator=- :: Earliest departure time for intermediate train
+%@ con eq_0045 kind=linear domain=- indicator=- :: Latest departure time for intermediate train

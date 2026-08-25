@@ -1,0 +1,152 @@
+% Declaration sidecar for 10.1016_j.ress.2022.108515
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ress.2022.108515
+% A multi-modal evacuation-based response strategy for mitigating disruption in an intercity railway system
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ress.2022.108515.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total evacuation cost and in-station risk (bi-objective upper level)
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Departure/arrival demand quantity
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Time variables (arrival, departure, travel, etc.)
+
+% GDP: classified as parameter during review
+%@ param GDP shape=- kind=scalar domain=- :: Gross Domestic Product of a city
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar domain=- :: Length of a line segment
+
+% unusable as an identifier, renamed to Delta
+%@ param Delta shape=- kind=scalar domain=- :: Change in trip time, fare, or transfer times
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Index for stations or cities
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: City index
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of links or arcs
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Fare or cost
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar domain=- :: Probability function
+
+% q: classified as parameter during review
+%@ param q shape=- kind=scalar domain=- :: Demand quantity
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of modes
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Number of carriages or vehicles
+
+% N̄: classified as parameter during review, renamed to N_bar
+%@ param N_bar shape=- kind=scalar domain=- :: Fixed number of helicopters
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Mode index
+
+% v: classified as parameter during review
+%@ param v shape=- kind=scalar domain=- :: Speed
+
+% unusable as an identifier, renamed to Deltabar
+%@ param Deltabar shape=- kind=scalar domain=- :: Distance limit for bus bridging
+
+% unusable as an identifier, renamed to alpha
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficients in passenger utility function
+
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=- :: Passenger utility
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Destination index
+
+% U: classified as parameter during review
+%@ param U shape=- kind=scalar domain=- :: System utility
+
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Flow or frequency
+
+% INC: classified as parameter during review
+%@ param INC shape=- kind=scalar domain=- :: Income of a transit line
+
+% INV: classified as parameter during review
+%@ param INV shape=- kind=scalar domain=- :: Investment of a transit line
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Fixed cost component
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Risk measure
+
+% V: classified as parameter during review
+%@ param V shape=- kind=scalar domain=- :: Vacancy or capacity
+
+% Bound by a quantifier or big operator, so no declaration of their own: I, i, l, κ
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total in-station passenger quantity as sum of arrival quantities of all services
+%@ con eq_0005 kind=linear domain=- indicator=- :: OD demand distribution between cities by gravity model based on GDP
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Change in total trip time between origin and destination after disruption
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Change in total fare between origin and destination after disruption
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Change in transfer time for routes using transfer links
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Probability that passengers choose the alternative based on utility changes
+%@ con eq_0008 kind=linear domain=- indicator=- :: Expected OD demand after diversion as original demand times willingness probability
+%@ con eq_0010 kind=linear domain=- indicator=- :: Total expected demand of an origin city as the sum over destinations
+%@ con eq_0011 kind=linear domain=- indicator=- :: Actual evacuated quantity as the sum of evacuated passengers by all alternative lines
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Actual evacuated quantity must not exceed expected demand
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Actual evacuated quantity must not exceed expected demand
+%@ con eq_0014 kind=linear domain=- indicator=- :: Arrival time of a line at a station equals departure plus trip and dwell times
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure time at a station equals arrival time plus holding time
+%@ con eq_0016 kind=linear domain=- indicator=- :: Air shuttle arrival time with helicopter fleet constraint and fixed departure interval
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Bus bridging travel time as a function of distance and transfer quantity
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Bus bridging distance must not exceed the distance limit
+%@ con eq_0017_c kind=linear domain=- indicator=- :: Bus bridging time must not exceed train arrival time at the downstream station
+%@ con eq_0017_d kind=linear domain=- indicator=- :: Bus bridging time must not exceed train arrival time at the upstream station
+%@ con eq_0017_e kind=linear domain=- indicator=- :: Station-to-station connection condition for bus bridging within a city
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Passenger in-vehicle travel time on a route according to the timetable
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Perceived passenger trip time prolonged by occupancy rate
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Passenger walking time during transfer at a station
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Passenger waiting time for connecting service at a transfer station
+%@ con eq_0022 kind=linear domain=- indicator=- :: Total transfer time as weighted combination of walking and waiting time
+%@ con eq_0023 kind=linear domain=- indicator=- :: Passenger utility for an OD pair as weighted sum of trip time, transfer time, fare change, and transfer count
+%@ con eq_0024 kind=linear domain=- indicator=- :: System utility (lower-level objective) as sum of passenger utilities over all routes
+%@ con eq_0025 kind=linear domain=- indicator=- :: Fare income of a transit line as total fare over all passengers
+%@ con eq_0026 kind=linear domain=- indicator=- :: Investment of a transit line as fixed plus variable cost depending on vehicle count
+%@ con eq_0027 kind=linear domain=- indicator=- :: Total evacuation cost (first upper-level objective) as investment minus income over all lines
+%@ con eq_0031 kind=linear domain=- indicator=- :: Demand assignment constraint: evacuated demands are assigned to alternative routes
+%@ con eq_0032 kind=linear domain=- indicator=- :: Capacity constraint: evacuated quantity on a line at a station cannot exceed available vacancy
+%@ con eq_0033 kind=linear domain=- indicator=- :: Fleet size constraint: total vehicles used does not exceed maximum available per mode
+%@ index Line shape=- domain=- role=- drole=- lo=- hi=- :: Set of lines
+%@ index K shape=- domain=- role=- drole=- lo=- hi=- :: Set of categories
+%@ index I_np shape=- domain=- role=- drole=- lo=- hi=- :: Station index prime
+%@ param Nbar_A shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Bar N_A
+%@ param Deltabar_u shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Bar Delta_u

@@ -1,0 +1,103 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2023.103142
+%@ meta id=10.1016_j.tre.2023.103142 family=milp schema=0.1.0
+%@ name :: Synchronization of train timetables in an urban rail network: A bi-objective optimization approach
+%@ desc :: Mined from Synchronization of train timetables in an urban rail network: A bi-objective optimization approach (Transportation Research Part E Logistics and Transportation Review, 2023).
+%@ prov source :: 10.1016/j.tre.2023.103142
+%@ prov reference :: Synchronization of train timetables in an urban rail network: A bi-objective optimization approach
+%@ prov author :: Jiateng Yin; Miao Wang; Andrea D’Ariano; Jinlei Zhang; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time and synchronization quality (weighted sum).
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train q at station s.
+%@ index L ordered=0 cyclic=0 :: Set of lines in the urban rail network.
+%@ index s ordered=0 cyclic=0 :: Station index.
+%@ param tbar shape=L kind=vector domain=- :: Latest departure time for first train of line l at first station (\bar{t}).
+%@ index Q ordered=0 cyclic=0 :: Set of trains on a line.
+%@ index S ordered=0 cyclic=0 :: Set of stations on a line.
+%@ param h shape=- kind=scalar domain=- :: Headway time between consecutive trains.
+%@ var d shape=- domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train q at station s.
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (various types) at station s for train q.
+%@ param R shape=- kind=scalar domain=- :: Passenger arrival rate at station (or transfer rate).
+%@ param T shape=- kind=scalar domain=- :: Time period endpoint or time point parameter.
+%@ index H ordered=0 cyclic=0 :: Set of lines connected to transfer station s.
+%@ var C shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train q at station s.
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at station s for train q.
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable in BCC reformulation.
+%@ param I shape=- kind=scalar domain=- :: Synchronization quality index values (I_min, I_max).
+%@ param BCC shape=- kind=scalar domain=- :: Basic convex combination reformulation parameters.
+%@ var SQI shape=- domain=continuous role=primary drole=- lo=- hi=- :: Synchronization quality indicator for a transfer connection.
+%@ index K ordered=0 cyclic=0 :: Number of time periods.
+%@ index k ordered=0 cyclic=0 :: Time period index.
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative binary variable indicating departure by time period k.
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Continuous variable in BCCxz reformulation.
+%@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Nonnegative variable in BCCxz reformulation.
+%@ param BCCxz shape=- kind=scalar domain=- :: Alternative reformulation parameters for SQI (BCCxz).
+%@ con eq_0001 kind=linear domain=- indicator=- :: Constraint (1): first train departure time at first station within earliest and latest bounds.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Constraint (2): running time relation between consecutive stations.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Constraint (3): dwell time relation between departure and arrival.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Constraint (4): headway between consecutive train departures within bounds.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Constraint (5): dwell time bounds at stations.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Constraint (6): stranded passengers equal waiting minus boarding.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint (7): entering passengers between adjacent train departures (later linearized).
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint (8): entering passengers before first train departure.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint (9): total transfer passengers to a train equals sum over feeder lines.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (10): transfer passengers from a feeder train to destination line equals alighting passengers times transfer rate.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (11): alighting passengers driven by in-vehicle passengers and alighting rate.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (12): no alighting at first station.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (13): in-vehicle passenger balance.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (14): boarding passengers equal minimum of waiting and remaining capacity (nonlinear).
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (15): boarding bounded by waiting passengers.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (16): boarding bounded by remaining capacity.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (17): remaining capacity at first station equals full capacity.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (18): remaining capacity at subsequent stations.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint (19): waiting passengers for subsequent trains (entering + transfer + stranded).
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint (20): waiting passengers for first train (entering + transfer).
+%@ con eq_0021 kind=linear domain=- indicator=- :: Equation (21): waiting time of stranded passengers.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Equation (23): transfer waiting time.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Equation (24): approximate waiting time of entering passengers.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Objective (26): minimize total passenger waiting time.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constraint (32): departure time decomposition into period start and offset.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint (33): each departure belongs to exactly one time interval.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint (34): offset bounds within chosen interval.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint (35): cumulative binary interval indicator.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint (36): linearized entering passenger count.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37): quadratic entering passenger waiting time reformulation.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Equation (38): auxiliary linearization constraint for BCCxz reformulation.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Equation (43): auxiliary linearization constraint for BCCxz reformulation.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Equation (44): auxiliary linearization constraint for BCCxz reformulation.
+\begin{align}
+  & \underset{̲}{t}_{q , l} \leq t_{q s}^{D} \leq \bar{t}_{q , l} , \forall q = 1 , s = 1 , l \in L \tag{eq\_0001} \\
+  & t_{q s}^{A} - t_{q \left(s - 1\right)}^{D} = t_{s}^{r} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L \tag{eq\_0002} \\
+  & t_{q s}^{D} - t_{q s}^{A} - t_{q s}^{d} = 0 , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0003} \\
+  & h_{min} \leq t_{q s}^{D} - t_{\left(q - 1\right) s}^{D} \leq h_{max} , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L \tag{eq\_0004} \\
+  & d_{min} \leq t_{q s}^{d} \leq d_{max} , \forall s \in S_{l} , q \in Q_{l} , l \in L . \tag{eq\_0005} \\
+  & P_{q s}^{R} = P_{q s}^{W} - P_{q s}^{B} , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0006} \\
+  & P_{q s}^{E} = \left(T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right) - t_{\left(q - 1\right) s}^{D}\right) R_{s} \left(t_{\left(q - 1\right) s}^{D}\right) + \left(t_{q s}^{D} - T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right)\right) R_{s} \left(t_{q s}^{D}\right) , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L \tag{eq\_0007} \\
+  & P_{q s}^{E} = R_{s} \left(t_{q s}^{D}\right) \cdot t_{s}^{e} , \forall s \in S_{l} , q = 1 , l \in L \tag{eq\_0008} \\
+  & P_{q s}^{T} = \sum_{l^{'} \in H_{s}} \underset{q^{'} \in Q_{l^{'}}}{\sum} P_{q^{'} q s}^{T} , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0009} \\
+  & \sum_{q \in Q_{l}} P_{q^{'} q s}^{T} = P_{q^{'} s}^{A} \cdot R_{s^{'} s}^{r} , \forall \left\{\right. \left(s^{'} , s\right) \in S^{r} \left|\right. s \in S_{l} , s^{'} \in S_{l^{'}} \left.\right\} , q^{'} \in Q_{l^{'}} , l , l^{'} \in L . \tag{eq\_0010} \\
+  & P_{q s}^{A} = P_{q \left(s - 1\right)}^{O} \cdot R_{q s}^{A} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L \tag{eq\_0011} \\
+  & P_{q s}^{A} = 0 , \forall s = 1 , q \in Q_{l} , l \in L . \tag{eq\_0012} \\
+  & P_{q s}^{O} = P_{q \left(s - 1\right)}^{O} - P_{q s}^{A} + P_{q s}^{B} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L , \tag{eq\_0013} \\
+  & P_{q s}^{B} = min \left\{P_{q s}^{W} , C_{q s}\right\} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L \tag{eq\_0014} \\
+  & P_{q s}^{B} \leq P_{q s}^{W} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L \tag{eq\_0015} \\
+  & P_{q s}^{B} \leq C_{q s} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L \tag{eq\_0016} \\
+  & C_{q s} = C_{0} , \forall s = 1 , q \in Q_{l} , l \in L \tag{eq\_0017} \\
+  & C_{q s} = C_{0} - P_{q \left(s - 1\right)}^{O} + P_{q s}^{A} , \forall s \in S_{l} \backslash \left\{1\right\} , q \in Q_{l} , l \in L , \tag{eq\_0018} \\
+  & P_{q s}^{W} = P_{q s}^{E} + P_{q s}^{T} + P_{\left(q - 1\right) s}^{R} , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L , \tag{eq\_0019} \\
+  & P_{q s}^{W} = P_{q s}^{E} + P_{q s}^{T} , \forall s \in S_{l} , q = 1 , l \in L , \tag{eq\_0020} \\
+  & W_{q s}^{R} = \left(t_{q s}^{D} - t_{\left(q - 1\right) s}^{D}\right) \cdot P_{\left(q - 1\right) s}^{R} , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L \tag{eq\_0021} \\
+  & W_{q s}^{T} = \sum_{l^{'} \in H_{s}} \underset{q^{'} \in Q_{l^{'}}}{\sum} \left(t_{q s}^{D} - t_{q^{'} s^{'}}^{A} - t_{s^{'} s}^{T}\right) \cdot P_{q^{'} q s}^{T} , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0023} \\
+  & W_{q s}^{E} = \frac{1}{2} R_{s} \left(t_{\left(q - 1\right) s}^{D}\right) \cdot \left(T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right) - t_{\left(q - 1\right) s}^{D}\right)^{2} + \frac{1}{2} \left(t_{q s}^{D} - T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right)\right) \left[\right. 2 \cdot R_{s} \left(t_{\left(q - 1\right) s}^{D}\right) \cdot \left(T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right) - t_{\left(q - 1\right) s}^{D}\right) + R_{s} \left(t_{q s}^{D}\right) \cdot \left(t_{q s}^{D} - T^{ \cdot } \left(t_{\left(q - 1\right) s}^{D}\right)\right) \left]\right. , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L . \tag{eq\_0024} \\
+  & W_{q s}^{E} = \frac{1}{2} R_{s} \left(t_{q s}^{D}\right) \cdot \left(t_{s}^{e}\right)^{2} , \forall s \in S_{l} , q = 1 , l \in L \tag{eq\_0026} \\
+  \min\quad & \sum_{l \in L} \sum_{q \in Q_{l}} \sum_{s \in S_{l}} W_{q s} = \sum_{l \in L} \sum_{q \in Q_{l}} \sum_{s \in S_{l}} \left(W_{q s}^{R} + W_{q s}^{E} + W_{q s}^{T}\right) . \tag{eq\_0027} \\
+  & (\text{BCC}) \left\{\begin{matrix} & T^{A} \mathit{lambda}_{q^{'} q s}^{1} + t_{m i n}^{W} \left(\mathit{lambda}_{q^{'} q s}^{2} + \mathit{lambda}_{q^{'} q s}^{3}\right) + t_{i d e a l}^{W} \mathit{lambda}_{q^{'} q s}^{4} + t_{m a x}^{W} \left(\mathit{lambda}_{q^{'} q s}^{5} + \mathit{lambda}_{q^{'} q s}^{6}\right) + T^{B} \mathit{lambda}_{q^{'} q s}^{7} = \mathit{Delta} t \\ & \mathit{SQI}_{q^{'} q s} = 0 \mathit{lambda}_{q^{'} q s}^{1} + 0 \mathit{lambda}_{q^{'} q s}^{2} + I_{m i n} \mathit{lambda}_{q^{'} q s}^{3} + I_{m a x} \mathit{lambda}_{q^{'} q s}^{4} + I_{m i n} \mathit{lambda}_{q^{'} q s}^{5} + 0 \mathit{lambda}_{q^{'} q s}^{6} + 0 \mathit{lambda}_{q^{'} q s}^{7} \\ & \mathit{lambda}_{q^{'} q s}^{1} + \mathit{lambda}_{q^{'} q s}^{2} = y_{q^{'} q s}^{1} \\ & \mathit{lambda}_{q^{'} q s}^{3} + \mathit{lambda}_{q^{'} q s}^{4} = y_{q^{'} q s}^{2} \\ & \mathit{lambda}_{q^{'} q s}^{4} + \mathit{lambda}_{q^{'} q s}^{5} = y_{q^{'} q s}^{3} \\ & \mathit{lambda}_{q^{'} q s}^{6} + \mathit{lambda}_{q^{'} q s}^{7} = y_{q^{'} q s}^{4} \\ & y_{q^{'} q s}^{1} + y_{q^{'} q s}^{2} + y_{q^{'} q s}^{3} + y_{q^{'} q s}^{4} = 1 \\ & \mathit{lambda}_{q^{'} q s}^{i} \geq 0 , \forall i \in \left\{1 , \hdots , 7\right\} \\ & y_{q^{'} q s}^{1} , y_{q^{'} q s}^{2} , y_{q^{'} q s}^{3} , y_{q^{'} q s}^{4} \in \left\{0 , 1\right\} \end{matrix}\right \tag{eq\_0032} \\
+  & t_{q s}^{D} = \sum_{k = 1}^{K} T_{k - 1}^{ \cdot } \cdot \mathit{eta}_{q s}^{k} + \mathit{theta}_{q s}^{k} , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0033} \\
+  & \sum_{k = 1}^{K} \mathit{eta}_{q s}^{k} = 1 , \forall s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0034} \\
+  & 0 \leq \mathit{theta}_{q s}^{k} \leq \left(T_{k}^{ \cdot } - T_{k - 1}^{ \cdot }\right) \cdot \mathit{eta}_{q s}^{k} , \forall k \in \left\{1 , 2 , \hdots , K\right\} , s \in S_{l} , q \in Q_{l} , l \in L \tag{eq\_0035} \\
+  & b_{q s}^{k} = \sum_{j = 1}^{k} \mathit{eta}_{q s}^{j} , \forall k \in \left\{1 , 2 , \hdots , K\right\} , s \in S_{l} , q \in Q_{l} , l \in L . \tag{eq\_0036} \\
+  & P_{q s}^{E} = \sum_{k = 1}^{K} R_{s} \left(T_{k}\right) \left(T_{k}^{ \cdot } - T_{k - 1}^{ \cdot }\right) \left(b_{\left(q - 1\right) s}^{k} - b_{q s}^{k}\right) - \sum_{k = 1}^{K} R_{s} \left(T_{k}\right) \mathit{theta}_{\left(q - 1\right) s}^{k} + \sum_{k = 1}^{K} R_{s} \left(T_{k}\right) \mathit{theta}_{q s}^{k} , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L . \tag{eq\_0037} \\
+  & W_{q s}^{E} = \sum_{k = 1}^{K} R_{s} \left(T_{k}\right) \left\{\frac{1}{2} \cdot \left[\left(\mathit{delta} \mathit{eta}_{\left(q - 1\right) s}^{k} - \mathit{theta}_{\left(q - 1\right) s}^{k}\right)^{2} + \left(\mathit{theta}_{q s}^{k} - \left(\mathit{eta}_{\left(q - 1\right) s}^{k} - \mathit{Delta} b_{q s}^{k}\right) \mathit{delta}\right)^{2}\right] + \mathit{theta}_{q s}^{k + 1} \left(\mathit{delta} \mathit{eta}_{\left(q - 1\right) s}^{k} - \mathit{theta}_{\left(q - 1\right) s}^{k}\right) - \left(\mathit{delta} \mathit{eta}_{q s}^{k} - \mathit{theta}_{q s}^{k}\right) \left(\mathit{delta} \mathit{eta}_{\left(q - 1\right) s}^{k} - \mathit{theta}_{\left(q - 1\right) s}^{k}\right)\right\} , \forall s \in S_{l} , q \in Q_{l} \backslash \left\{1\right\} , l \in L \tag{eq\_0038} \\
+  & h_{m i n} \leq t_{q_{u} s}^{D} - t_{q_{u - 1} s}^{D} \leq h_{m a x} , \tag{eq\_0043} \\
+  & (\text{BCCxz}) \left\{\begin{matrix} & \left(t_{i d e a l}^{W} - T^{A}\right) z \leq I_{m a x} \cdot x + I_{m a x} \cdot T^{A} \\ & \left(t_{m a x}^{W} - t_{i d e a l}^{W}\right) z \leq \left(I_{m i n} - I_{m a x}\right) x + I_{m a x} \cdot t_{m a x}^{W} - I_{m i n} \cdot t_{i d e a l}^{W} \\ & \left(T^{B} - t_{m a x}^{W}\right) z \leq - I_{m i n} \cdot x - I_{m i n} \cdot T^{B} \\ & T^{A} \leq x \leq T^{B} , z \geq 0 \end{matrix}\right \tag{eq\_0044} \\
+\end{align}

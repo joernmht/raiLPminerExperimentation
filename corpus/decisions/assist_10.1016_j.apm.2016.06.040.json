@@ -1,0 +1,334 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.apm.2016.06.040",
+      "doi": "10.1016/j.apm.2016.06.040",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "corrected",
+          "note": "z = \\sum_{f \\in F, k \\in K, (r, rplus) \\in Arc_{f}} (w_{r,k,f} + \\frac{1}{2} \\cdot \\delta_{r,k,f}) \\cdot (d_{rplus,k,f} - d_{r,k,f}) + \\sum_{f \\in F, k \\in K} \\frac{1}{2} \\cdot \\lambda_{k,f} \\cdot d_{1,k,f}^{2} + \\sum_{f \\in F, k \\in K} (w_{Df,k,f} + \\frac{1}{2} \\cdot \\delta_{Df,k,f}) \\cdot (T - d_{Df,k,f})",
+          "parts": [
+            "z = \\sum_{f \\in F, k \\in K, (r, rplus) \\in Arc_{f}} (w_{r,k,f} + \\frac{1}{2} \\cdot \\delta_{r,k,f}) \\cdot (d_{rplus,k,f} - d_{r,k,f}) + \\sum_{f \\in F, k \\in K} \\frac{1}{2} \\cdot \\lambda_{k,f} \\cdot d_{1,k,f}^{2} + \\sum_{f \\in F, k \\in K} (w_{Df,k,f} + \\frac{1}{2} \\cdot \\delta_{Df,k,f}) \\cdot (T - d_{Df,k,f})"
+          ]
+        },
+        {
+          "id": "eq-0002",
+          "status": "duplicate",
+          "duplicate_of": "eq-0001"
+        },
+        {
+          "id": "eq-0003",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0004",
+          "status": "corrected",
+          "note": "d_{rplus,k,f} - d_{r,k,f} \\geq h_{min} \\qquad \\forall f \\in F, k \\in K, (r, rplus) \\in Arc_{f}",
+          "parts": [
+            "d_{rplus,k,f} - d_{r,k,f} \\geq h_{min} \\qquad \\forall f \\in F, k \\in K, (r, rplus) \\in Arc_{f}"
+          ]
+        },
+        {
+          "id": "eq-0005",
+          "status": "corrected",
+          "note": "d_{rplus,k,f} \\geq d_{r,kplus,f} \\qquad \\forall f \\in F, (r, rplus) \\in Arc_{f}, (k, kplus) \\in Kpair",
+          "parts": [
+            "d_{rplus,k,f} \\geq d_{r,kplus,f} \\qquad \\forall f \\in F, (r, rplus) \\in Arc_{f}, (k, kplus) \\in Kpair"
+          ]
+        },
+        {
+          "id": "eq-0006",
+          "status": "corrected",
+          "note": "dwell_{kplus,f}^{min} \\leq d_{r,kplus,f} - d_{r,k,f} - R_{k,f} \\qquad \\forall f \\in F, r \\in Sta_{f}, (k, kplus) \\in Kpair",
+          "parts": [
+            "dwell_{kplus,f}^{min} \\leq d_{r,kplus,f} - d_{r,k,f} - R_{k,f} \\qquad \\forall f \\in F, r \\in Sta_{f}, (k, kplus) \\in Kpair",
+            "d_{r,kplus,f} - d_{r,k,f} - R_{k,f} \\leq dwell_{kplus,f}^{max} \\qquad \\forall f \\in F, r \\in Sta_{f}, (k, kplus) \\in Kpair"
+          ]
+        },
+        {
+          "id": "eq-0007",
+          "status": "corrected",
+          "note": "d_{Df,m,f} + R_{m,f} \\leq T \\qquad \\forall f \\in F",
+          "parts": [
+            "d_{Df,m,f} + R_{m,f} \\leq T \\qquad \\forall f \\in F"
+          ]
+        },
+        {
+          "id": "eq-0008",
+          "status": "corrected",
+          "note": "\\tau_{r,k,f} = w_{r,k,f} + \\delta_{r,k,f} \\qquad \\forall f \\in F, k \\in K, r \\in Sta_{f}",
+          "parts": [
+            "\\tau_{r,k,f} = w_{r,k,f} + \\delta_{r,k,f} \\qquad \\forall f \\in F, k \\in K, r \\in Sta_{f}"
+          ]
+        },
+        {
+          "id": "eq-0009",
+          "status": "corrected",
+          "note": "\\delta_{r,k,f} = (d_{rplus,k,f} - d_{r,k,f}) \\cdot \\lambda_{k,f} \\qquad \\forall f \\in F, k \\in K, (r, rplus) \\in Arc_{f}",
+          "parts": [
+            "\\delta_{r,k,f} = (d_{rplus,k,f} - d_{r,k,f}) \\cdot \\lambda_{k,f} \\qquad \\forall f \\in F, k \\in K, (r, rplus) \\in Arc_{f}"
+          ]
+        },
+        {
+          "id": "eq-0010",
+          "status": "corrected",
+          "note": "\\delta_{Df,k,f} = (T - d_{Df,k,f}) \\cdot \\lambda_{k,f} \\qquad \\forall f \\in F, k \\in K",
+          "parts": [
+            "\\delta_{Df,k,f} = (T - d_{Df,k,f}) \\cdot \\lambda_{k,f} \\qquad \\forall f \\in F, k \\in K"
+          ]
+        },
+        {
+          "id": "eq-0011",
+          "status": "corrected",
+          "note": "b_{r,k,f} \\leq C - n_{r,kprev,f} \\cdot (1 - \\varphi_{k,f}) \\qquad \\forall f \\in F, r \\in Sta_{f}, (kprev, k) \\in Kpair",
+          "parts": [
+            "b_{r,k,f} \\leq C - n_{r,kprev,f} \\cdot (1 - \\varphi_{k,f}) \\qquad \\forall f \\in F, r \\in Sta_{f}, (kprev, k) \\in Kpair"
+          ]
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "n_{r,k,f} = n_{r,kprev,f} \\cdot (1 - \\varphi_{k,f}) + b_{r,k,f} \\qquad \\forall f \\in F, r \\in Sta_{f}, (kprev, k) \\in Kpair",
+          "parts": [
+            "n_{r,k,f} = n_{r,kprev,f} \\cdot (1 - \\varphi_{k,f}) + b_{r,k,f} \\qquad \\forall f \\in F, r \\in Sta_{f}, (kprev, k) \\in Kpair"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "corrected",
+          "note": "n_{r,1,f} = b_{r,1,f} \\qquad \\forall f \\in F, r \\in Sta_{f}",
+          "parts": [
+            "n_{r,1,f} = b_{r,1,f} \\qquad \\forall f \\in F, r \\in Sta_{f}"
+          ]
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "w_{r,k,f} = \\tau_{rprev,k,f} - b_{r,k,f} \\qquad \\forall f \\in F, k \\in K, (rprev, r) \\in Arc_{f}",
+          "parts": [
+            "w_{r,k,f} = \\tau_{rprev,k,f} - b_{r,k,f} \\qquad \\forall f \\in F, k \\in K, (rprev, r) \\in Arc_{f}"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0016",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0017",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0018",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0019",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0020",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0021",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0022",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0023",
+          "status": "duplicate",
+          "duplicate_of": "eq-0001"
+        },
+        {
+          "id": "eq-0024",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0025",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0026",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0027",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0028",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0029",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0030",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0031",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0032",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0033",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0034",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0035",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0036",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0037",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0038",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0039",
+          "status": "corrected",
+          "note": "\\min \\mathit{AWT}",
+          "parts": [
+            "\\min \\mathit{AWT}"
+          ]
+        },
+        {
+          "id": "eq-0040",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0041",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0042",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0043",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0044",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0045",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0046",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0047",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0048",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0049",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0050",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0051",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0052",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0053",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0054",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0055",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0056",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0057",
+          "status": "accepted"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.apm.2016.06.040",
+      "cell": "P1"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.apm.2016.06.040",
+      "symbols": {
+        "AWT": "variable",
+        "C": "parameter",
+        "D": "index",
+        "F": "index",
+        "H": "variable",
+        "L": "variable",
+        "LP": "parameter",
+        "R": "parameter",
+        "S": "variable",
+        "T": "parameter",
+        "Z": "variable",
+        "b": "variable",
+        "d": "variable",
+        "h": "parameter",
+        "m": "index",
+        "n": "variable",
+        "t": "parameter",
+        "u": "variable",
+        "w": "variable",
+        "z": "variable",
+        "δ": "variable",
+        "λ": "parameter",
+        "μ": "variable",
+        "τ": "variable",
+        "φ": "parameter"
+      }
+    }
+  ]
+}

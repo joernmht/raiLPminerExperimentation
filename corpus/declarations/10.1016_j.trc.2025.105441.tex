@@ -1,0 +1,182 @@
+% Declaration sidecar for 10.1016_j.trc.2025.105441
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2025.105441
+% Incorporating reservation strategies into demand management and train scheduling in metro systems
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2025.105441.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time and line congestion
+
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total objective value (weighted sum of passenger waiting time and line congestion)
+
+% unusable as an identifier, rename or drop: λ
+% y: classified as variable during review
+%@ var y shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: 1 if time t falls within headway between train i-1 and i at station s
+
+% D: classified as parameter during review
+%@ param D shape=S,S,T kind=matrix domain=- :: Passenger demand from station s to station v at time step t
+
+% r: classified as variable during review
+%@ var r shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers stranded by train i at station s for destination v
+
+% unusable as an identifier, rename or drop: Δ
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of train services
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time steps
+
+% z: classified as variable during review
+%@ var z shape=I domain=integer role=primary drole=- lo=- hi=- :: Maximum number of waiting passengers for train i
+
+% x: classified as variable during review
+%@ var x shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: 1 if train i has not departed station s at time t, 0 otherwise
+
+% d: classified as variable during review
+%@ var d shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station s
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Lower bound on headway between consecutive trains
+
+% h̄: classified as parameter during review
+%@ param h_bar shape=- kind=scalar domain=- :: Upper bound on headway between consecutive trains
+
+% a: classified as variable during review
+%@ var a shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station s
+
+% unusable as an identifier, rename or drop: ε
+% unusable as an identifier, rename or drop: η
+% b̂: classified as variable during review
+%@ var b_hat shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved passengers boarding train i from s to v
+
+% unusable as an identifier, rename or drop: ρ
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of nonnegative integers
+
+% b: classified as variable during review
+%@ var b shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers boarding train i from s to v
+
+% w: classified as variable during review
+%@ var w shape=I,S,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers waiting at station s for train i destined for v
+
+% unusable as an identifier, rename or drop: κ
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% o: classified as variable during review
+%@ var o shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers on board when train i leaves station s
+
+% ô: classified as variable during review
+%@ var o_hat shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved passengers on board when train i leaves station s
+
+% l: classified as variable during review
+%@ var l shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of unreserved passengers alighting from train i at station s
+
+% unusable as an identifier, rename or drop: θ
+% M: classified as parameter during review
+%@ param M shape=I,S kind=big_m domain=- :: Big-M constant for linearization of product constraints
+
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% TS: classified as parameter during review
+%@ param TS shape=- kind=scalar domain=- :: Train scheduling subproblem
+
+% DM: classified as parameter during review
+%@ param DM shape=- kind=scalar domain=- :: Demand management subproblem
+
+% ŷ: classified as variable during review
+%@ var y_hat shape=I,S,T domain=binary role=primary drole=- lo=- hi=- :: Binary headway variable in demand management subproblem
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, m, s, t, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of total waiting time Fe
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of line congestion Fc
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure time calculation from train operation variables
+%@ con eq_0007 kind=linear domain=- indicator=- :: Headway bounds between consecutive trains
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Arrival time equals departure from previous station plus running time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Definition of headway indicator y
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary domain for train operation variable x
+%@ con eq_0012 kind=linear domain=- indicator=- :: Reserved boarding amount from reservation slots
+%@ con eq_0013 kind=linear domain=- indicator=- :: Conservation of reserved passengers over time
+%@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound on reservation slots by demand
+%@ con eq_0015 kind=linear domain=- indicator=- :: Integer domain for reservation slots
+%@ con eq_0016 kind=linear domain=- indicator=- :: Number of waiting unreserved passengers
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimum service ratio for unreserved passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Number of stranded unreserved passengers
+%@ con eq_0019 kind=linear domain=- indicator=- :: Conservation of unreserved passengers over time
+%@ con eq_0020 kind=linear domain=- indicator=- :: Integer domain for unreserved boarding variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train capacity constraint
+%@ con eq_0022 kind=linear domain=- indicator=- :: Reserved passengers on board calculation
+%@ con eq_0023 kind=linear domain=- indicator=- :: Unreserved passengers on board calculation
+%@ con eq_0024 kind=linear domain=- indicator=- :: Alighting passengers calculation
+%@ con eq_0025 kind=linear domain=- indicator=- :: Upper bound on maximum waiting passengers per train
+%@ con eq_0026 kind=linear domain=- indicator=- :: Original integrated model formulation
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization of product y*y (theta)
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Linearized Fe: term for newly arriving passengers
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Linearized Fe: term for stranded passengers
+%@ con eq_0029_c kind=linear domain=- indicator=- :: Linearized Fe equality
+%@ con eq_0029_d kind=linear domain=- indicator=- :: Linearized Fe (part d)
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Linearization of alpha: b_hat equals sum of alpha
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Linearization of alpha: alpha <= M*y
+%@ con eq_0030_c kind=linear domain=- indicator=- :: Linearization of alpha: alpha <= rho
+%@ con eq_0030_d kind=linear domain=- indicator=- :: Linearization of alpha: alpha >= rho - M*(1-y)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Reformulated waiting passengers w using beta
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Linearization of beta: beta <= M*x
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Linearization of beta: beta <= rho
+%@ con eq_0032_c kind=linear domain=- indicator=- :: Linearization of beta: beta >= rho - M*(1-x)
+%@ con eq_0032_d kind=linear domain=- indicator=- :: Linearization of beta: beta in [0,M]
+%@ con eq_0032_e kind=linear domain=- indicator=- :: Linearization of beta: additional domain constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Equivalent linear programming model formulation
+%@ con eq_0034_a kind=linear domain=- indicator=- :: Valid inequality: sum of headways at first station
+%@ con eq_0034_b kind=linear domain=- indicator=- :: Valid inequality: total trip time bound
+%@ con eq_0034_c kind=linear domain=- indicator=- :: Valid inequality: terminal station arrival bound
+%@ con eq_0034_d kind=linear domain=- indicator=- :: Valid inequality: derived from running times
+%@ con eq_0039 kind=linear domain=- indicator=- :: TS subproblem: train operation non-increasing
+%@ con eq_0040 kind=linear domain=- indicator=- :: TS subproblem: terminal time domain
+%@ con eq_0041_a kind=linear domain=- indicator=- :: TS subproblem: departure time calculation
+%@ con eq_0041_b kind=linear domain=- indicator=- :: TS subproblem: headway bounds
+%@ con eq_0041_c kind=linear domain=- indicator=- :: TS subproblem: departure/arrival link
+%@ con eq_0042 kind=linear domain=- indicator=- :: TS subproblem: arrival/departure link
+%@ con eq_0043_a kind=linear domain=- indicator=- :: DM subproblem: Fe definition
+%@ con eq_0043_b kind=linear domain=- indicator=- :: DM subproblem: Fc definition
+%@ con eq_0043_c kind=linear domain=- indicator=- :: DM subproblem: b_hat from reservation slots
+%@ con eq_0043_d kind=linear domain=- indicator=- :: DM subproblem: conservation of reserved
+%@ con eq_0043_e kind=linear domain=- indicator=- :: DM subproblem: upper bound on rho
+%@ con eq_0043_f kind=linear domain=- indicator=- :: DM subproblem: w definition
+%@ con eq_0043_g kind=linear domain=- indicator=- :: DM subproblem: minimum service ratio
+%@ con eq_0043_h kind=linear domain=- indicator=- :: DM subproblem: stranded passengers
+%@ con eq_0043_i kind=linear domain=- indicator=- :: DM subproblem: conservation of unreserved
+%@ con eq_0043_j kind=linear domain=- indicator=- :: DM subproblem: o_hat calculation
+%@ con eq_0043_k kind=linear domain=- indicator=- :: DM subproblem: o calculation
+%@ con eq_0043_l kind=linear domain=- indicator=- :: DM subproblem: l calculation
+%@ con eq_0043_m kind=linear domain=- indicator=- :: DM subproblem: z definition
+%@ con eq_0043_n kind=linear domain=- indicator=- :: DM subproblem: integer domain for rho
+%@ con eq_0043_o kind=linear domain=- indicator=- :: DM subproblem: integer domain for b
+%@ con eq_0043_p kind=linear domain=- indicator=- :: DM subproblem: capacity penalty constraint

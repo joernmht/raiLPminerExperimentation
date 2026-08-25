@@ -1,0 +1,58 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.12.019
+%@ meta id=10.1016_j.trb.2016.12.019 family=milp schema=0.1.0
+%@ name :: Designing alternative railway timetables under infrastructure maintenance possessions
+%@ desc :: Mined from Designing alternative railway timetables under infrastructure maintenance possessions (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2016.12.019
+%@ prov reference :: Designing alternative railway timetables under infrastructure maintenance possessions
+%@ prov author :: Sander Van Aken; Nikola Bešinović; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total weighted passenger delay and cancellations
+%@ var pi shape=E domain=integer role=primary drole=- lo=- hi=- :: Event time in original timetable
+%@ index A ordered=0 cyclic=0 :: Set of activity arcs
+%@ param T shape=- kind=scalar domain=- :: Period length
+%@ param l shape=A kind=vector domain=- :: Lower bound on activity duration
+%@ var p shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events in original timetable
+%@ param u shape=A kind=vector domain=- :: Upper bound on activity duration
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ index M ordered=0 cyclic=0 :: Set of train lines
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var v shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Event time in alternative timetable
+%@ var x shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train line
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events in alternative timetable
+%@ param dwell shape=M,S kind=matrix domain=- :: Dwell time of train line m at station s
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event j compared to original timetable
+%@ var alpha shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for period shift in delay calculation
+%@ var c shape=X,Y domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train i is present when train j arrives
+%@ param delta shape=E kind=vector domain=- :: Duration of platform occupation after event i
+%@ index X ordered=0 cyclic=0 :: Set of connected or loose arrivals
+%@ index Y ordered=0 cyclic=0 :: Set of connected or loose departures
+%@ param N shape=S kind=vector domain=- :: Number of tracks at station s
+%@ param w shape=E,M kind=matrix domain=- :: Weight for delay/cancellation in objective
+%@ con eq_0002 kind=modulo domain=- indicator=- :: Periodic event scheduling constraints for original timetable
+%@ con eq_0003 kind=linear domain=- indicator=- :: Original event time bounds
+%@ con eq_0004 kind=linear domain=- indicator=- :: Binary variable for original event order
+%@ con eq_0005 kind=linear domain=- indicator=- :: Alternative event time bounds with cancellation
+%@ con eq_0006 kind=modulo domain=- indicator=- :: Running time constraints in alternative timetable with cancellation
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell time constraints in alternative timetable with cancellation
+%@ con eq_0008 kind=modulo domain=- indicator=- :: Other activity constraints with cancellation
+%@ con eq_0009 kind=linear domain=- indicator=- :: Delay definition relative to original timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Delay bounds
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary period shift variable
+%@ con eq_0012 kind=capacity domain=- indicator=- :: Station capacity constraints identifying present trains
+%@ con eq_0013 kind=capacity domain=- indicator=- :: Station capacity constraints ensuring platform availability
+\begin{align}
+  & \begin{matrix}l_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + p_{i j} \cdot T \leq u_{i j} \forall \left(i , j\right) \in A\end{matrix} \tag{eq\_0002} \\
+  & \begin{matrix}0 \leq \mathit{pi}_{i} \leq T - 1 \forall i \in E\end{matrix} \tag{eq\_0003} \\
+  & \begin{matrix}p_{i j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in A\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}0 \leq v_{j} \leq \left(T - 1\right) \left(1 - x_{m}\right) \forall j \in E_{m} , \forall m \in M\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}l_{i j} \left(1 - x_{m}\right) \leq v_{j} - v_{i} + q_{i j} \cdot T \leq u_{i j} \left(1 - x_{m}\right) \forall \left(i , j\right) \in A_{r u n}^{m} , \forall m \in M\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}v_{j} - v_{i} + q_{i j} \cdot T = \mathit{dwell}_{m}^{s} \left(1 - x_{m}\right) \forall \left(i , j\right) \in A_{d w e l l}^{m} , \forall m \in M\end{matrix} \tag{eq\_0007} \\
+  & \begin{matrix}\begin{matrix}l_{i j} \left(1 - x_{m} - x_{n}\right) \leq & v_{j} - v_{i} + q_{i j} \cdot T \leq u_{i j} \left(1 - x_{m} - x_{n}\right) + \left(T - 1\right) \left(x_{m} + x_{n}\right) \\ & \forall \left(i , j\right) \in A \backslash \left(A_{r u n} \cup A_{d w e l l}\right) , \forall m , n \in M\end{matrix}\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix}d_{j}^{+} = v_{j} + T \cdot \mathit{alpha}_{j} - \mathit{pi}_{j} \left(1 - x_{m}\right) \forall j \in E\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}0 \leq d_{j}^{+} \leq d_{m a x}^{+} \forall j \in E\end{matrix} \tag{eq\_0010} \\
+  & \begin{matrix}\mathit{alpha}_{j} \in \left\{0 , 1\right\} \forall j \in E\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix}\left(1 - c_{i j} - x_{m} - x_{n}\right) \mathit{delta}_{i} \leq v_{j} - v_{i} + T \cdot q_{i j} \leq T - 1 - \mathit{delta}_{j} \left(1 - c_{j i} - x_{m} - x_{n}\right) \forall i \in X , \forall j \in Y\end{matrix} \tag{eq\_0012} \\
+  & \begin{matrix}\sum_{i \neq j} c_{i j} \leq N_{t r a c k s}^{s} - 1 \forall j \in X \cup Y\end{matrix} \tag{eq\_0013} \\
+  \begin{matrix}min\quad & \sum_{j \in E_{a r r}} w_{j}^{d e l a y} \cdot d_{j}^{+} + \sum_{m \in M} w_{m}^{c a n c e l} \cdot x_{m}\end{matrix} \tag{eq\_0014} \\
+\end{align}

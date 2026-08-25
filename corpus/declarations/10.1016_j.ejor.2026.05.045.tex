@@ -1,0 +1,108 @@
+% Declaration sidecar for 10.1016_j.ejor.2026.05.045
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2026.05.045
+% Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty
+%
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of trip compositions, composition changes, and end-of-day carriage imbalances
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar :: Cost coefficients for trips, composition changes, and balance
+
+% E: classified as variable during review
+%@ var E shape=L,W domain=non_negative role=primary :: End-of-day carriage inventory imbalance for line l and carriage type w
+
+% X: classified as variable during review
+%@ var X shape=T,P domain=binary role=primary :: 1 if composition p is assigned to trip t
+
+% Z: classified as variable during review
+%@ var Z shape=T,Q domain=binary role=primary :: 1 if composition change q is performed at the end of trip t
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of compositions
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of composition changes
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trips
+
+% W: classified as index during review
+%@ index W ordered=0 cyclic=0 :: Set of carriage types
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Index for trips
+
+% unusable as an identifier, rename or drop: τ
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Index for compositions
+
+% o: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Origin composition of a composition change
+
+% U: classified as variable during review
+%@ var U shape=T,W domain=non_negative role=primary :: Number of carriages of type w arriving at the end of trip t
+
+% unusable as an identifier, rename or drop: ν
+% C: classified as variable during review
+%@ var C shape=T,W,D domain=non_negative role=primary :: Number of carriages of type w departing at the start of trip t under disruption scenario i
+
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: ζ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of trips arriving before trip t
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of trips departing after trip t
+
+% pt: classified as parameter during review
+%@ param pt shape=T kind=vector :: Composition assigned to trip t in the original schedule
+
+% Y: classified as variable during review
+%@ var Y shape=T domain=binary role=primary :: 1 if trip t is not robust
+
+% unusable as an identifier, rename or drop: Ψ
+% unusable as an identifier, rename or drop: α
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of rolling stock schedules, one for each disruption scenario
+
+% unusable as an identifier, rename or drop: Ω
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of disruption duration scenarios
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, l, q, w
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear :: Exactly one composition is assigned to each trip
+%@ con eq_0004 kind=linear :: Fix compositions of trips that already departed before rescheduling
+%@ con eq_0005 kind=linear :: Set incoming composition of each trip equal to the composition of the chosen composition change
+%@ con eq_0006 kind=linear :: Set outgoing composition of the composition change to the composition of the affected trip
+%@ con eq_0007 kind=linear :: Compute arriving carriages from composition changes
+%@ con eq_0008 kind=linear :: Compute departing carriages from composition changes
+%@ con eq_0009 kind=linear :: Ensure carriage availability along a trip for each line and carriage type
+%@ con eq_0010 kind=linear :: Compute end-of-day carriage imbalance per line and carriage type
+%@ con eq_0011 kind=linear :: Link non-robust trips to differing compositions under disruption scenarios
+%@ con eq_0012 kind=linear :: Require at least the target number of robust trips
+%@ con eq_0013 kind=linear :: Y variables are binary
+%@ con eq_0014 kind=linear :: X variables are binary
+%@ con eq_0015 kind=linear :: C and U variables are non-negative
+%@ con eq_0016 kind=linear :: E variables are non-negative
+%@ con eq_0017 kind=linear :: Z variables are binary
+%@ con eq_0020 kind=linear :: Exactly one composition is assigned to each trip in the strict robust schedule
+%@ con eq_0021 kind=linear :: Fix compositions of pre-disruption trips in the strict robust schedule
+%@ con eq_0022 kind=linear :: Set incoming composition of each trip from the composition change in the strict robust schedule
+%@ con eq_0023 kind=linear :: Ensure successor trip composition matches the outgoing composition of the composition change
+%@ con eq_0024 kind=linear :: Compute arriving carriages from composition changes in the strict robust schedule
+%@ con eq_0025 kind=linear :: Compute departing carriages per disruption scenario in the strict robust schedule
+%@ con eq_0026 kind=linear :: Ensure carriage availability per disruption scenario in the strict robust schedule
+%@ con eq_0027 kind=linear :: Compute end-of-day carriage imbalance per line, carriage type, and disruption scenario
+%@ con eq_0028 kind=linear :: X variables are binary in the strict robust schedule
+%@ con eq_0029 kind=linear :: C and U variables are non-negative in the strict robust schedule
+%@ con eq_0030 kind=linear :: E variables are non-negative in the strict robust schedule
+%@ con eq_0031 kind=linear :: Z variables are binary in the strict robust schedule

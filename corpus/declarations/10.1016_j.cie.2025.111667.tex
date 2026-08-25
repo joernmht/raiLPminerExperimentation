@@ -1,0 +1,81 @@
+% Declaration sidecar for 10.1016_j.cie.2025.111667
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2025.111667
+% A Lagrangian relaxation-based approach for integrated optimization of line planning and additional trains scheduling
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of railway operator and passenger costs
+%
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%
+% unusable as an identifier, rename or drop: α
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%
+% x: classified as variable during review
+%@ var x shape=K,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k selects stopping pattern l
+%
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of stopping patterns
+%
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%
+% F: classified as parameter during review
+%@ param F shape=K kind=vector domain=- :: Maximum loading capacity of train k
+%
+% p: classified as variable during review
+%@ var p shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers from i to j assigned to train k
+%
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Index for stations
+%
+% P: classified as parameter during review
+%@ param P shape=S,S kind=matrix domain=- :: Passenger demand between stations i and j
+%
+% unusable as an identifier, rename or drop: θ
+% q: classified as parameter during review
+%@ param q shape=S,S kind=matrix domain=- :: Minimum number of trains serving OD pair (i,j) before optimization
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large number, set to train capacity
+%
+% y: classified as variable during review
+%@ var y shape=K,L,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
+%
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%
+% d: classified as parameter during review
+%@ param d shape=K kind=vector domain=- :: Destination station of train k
+%
+% dep: classified as parameter during review
+%@ param dep shape=K kind=vector domain=- :: Departure time of train k at origin
+%
+% o: classified as parameter during review
+%@ param o shape=K kind=vector domain=- :: Origin station of train k
+%
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of space-time arcs for train k
+%
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of physical sections
+%
+% unusable as an identifier, rename or drop: φ
+% Bound by a quantifier or big operator, so no declaration of their own: i, k, l, t, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+%@ con eq_0007 kind=linear domain=- indicator=- :: Each train selects at most one stopping pattern; canceled trains select none
+%@ con eq_0008 kind=capacity domain=- indicator=- :: Passenger load on each train at any station does not exceed its capacity
+%@ con eq_0009 kind=linear domain=- indicator=- :: Total passengers assigned to trains for each OD pair cannot exceed demand
+%@ con eq_0010 kind=linear domain=- indicator=- :: Number of trains serving each OD pair is at least the original service level
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Passengers can be assigned to a train only if the selected stopping pattern includes both origin and destination
+%@ con eq_0012 kind=flow_balance domain=- indicator=- :: Space-time flow balance at each station for every train and stopping pattern
+%@ con eq_0013 kind=headway domain=- indicator=- :: Headway constraints: incompatible space-time arcs cannot be used simultaneously
+%@ con eq_0014 kind=linear domain=- indicator=- :: Arc selection for a pattern requires selecting that pattern; otherwise only dummy arc is used
+%@ con eq_0015 kind=linear domain=- indicator=- :: Binary domain for stopping pattern selection variables
+%@ con eq_0016 kind=linear domain=- indicator=- :: Binary domain for space-time arc selection variables
+%@ con eq_0017 kind=linear domain=- indicator=- :: Non-negativity of passenger flow variables

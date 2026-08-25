@@ -1,0 +1,178 @@
+% Declaration sidecar for 10.1016_j.tre.2017.06.001
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2017.06.001
+% Integrated optimization of regular train schedule and train circulation plan for urban rail transit lines
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2017.06.001.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of headway deviation from service pattern, circulation cost, and headway variation.
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Passenger train capacity, constant parameter.
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Index set / total number of train services.
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Number of time intervals in the service pattern.
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for time intervals.
+
+% unusable as an identifier, rename or drop: Ω
+% unusable as an identifier, rename or drop: κ
+% t: classified as parameter during review
+%@ param t shape=K kind=vector :: Time points partitioning the operation period into K intervals.
+
+% H: classified as parameter during review
+%@ param H shape=K kind=vector :: Headway of each time interval defined by the service pattern.
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar :: Minimal and maximal headway bounds (h_min, h_max).
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Index set of train services/stations.
+
+% a: classified as variable during review
+%@ var a shape=I,J domain=continuous role=primary :: Arrival time of train service i at station j.
+
+% d: classified as variable during review
+%@ var d shape=I,J domain=continuous role=primary :: Departure time of train service i at station j.
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for train services.
+
+% unusable as an identifier, rename or drop: τ
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Station index, last station is J.
+
+% r: classified as variable during review
+%@ var r shape=I,J domain=continuous role=primary :: Running time between consecutive stations / turnaround time.
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: γ
+% unusable as an identifier, rename or drop: β
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Sufficiently large constant (big-M) for linearization.
+
+% unusable as an identifier, rename or drop: λ
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar :: Number of available trains (depot capacity).
+
+% f: classified as variable during review
+%@ var f shape=- domain=continuous role=primary :: Objective function value (weighted sum of criteria).
+
+% w: classified as parameter during review
+%@ param w shape=- kind=vector :: Weights for the three objectives (w1, w2, w3).
+
+% d̄: classified as parameter during review
+%@ param d_bar shape=I kind=vector :: Predefined departure time of the first/last service (d̄).
+
+% y: classified as variable during review
+%@ var y shape=K,I domain=binary role=primary :: Binary indicator whether service i lies in time interval k.
+
+% h̄: classified as variable during review
+%@ var h_bar shape=I domain=continuous role=primary :: Expected headway between service i-1 and i from service pattern.
+
+% unusable as an identifier, rename or drop: χ
+% unusable as an identifier, rename or drop: δ
+% iff: classified as parameter during review
+%@ param iff shape=- kind=scalar :: Logical equivalence operator used in definitions of binary variables.
+
+% true: classified as parameter during review
+%@ param true shape=- kind=scalar :: Boolean constant true in logical transformations.
+
+% z: classified as variable during review
+%@ var z shape=I,I domain=continuous role=auxiliary :: Auxiliary variable for product of gamma and arrival time (γ·a).
+
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: ξ
+% unusable as an identifier, rename or drop: η
+% Bound by a quantifier or big operator, so no declaration of their own: j, m, x, ℓ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear :: Passenger demand handled in time interval k: Ω̃_k = C·κ·I_k.
+%@ con eq_0002 kind=linear :: Headway definition H_k = (t_k - t_{k-1}) / I_k.
+%@ con eq_0003 kind=headway :: Headway bounds h_min ≤ H_k ≤ h_max.
+%@ con eq_0004 kind=linear :: Total number of services I_total = Σ_k I_k.
+%@ con eq_0005_a kind=linear :: Departure = arrival + dwell time at station j.
+%@ con eq_0005_b kind=linear :: Arrival at next station = departure + running time.
+%@ con eq_0006 kind=linear :: Turnaround at station J: a_i,J^dn = d_i,J^up + r_i,J^turn.
+%@ con eq_0007 kind=linear :: Turnaround time bounds at station J.
+%@ con eq_0008 kind=ordering :: One train at a time for turnaround: d_{i+1,J}^up - a_i,J^dn > 0.
+%@ con eq_0009_a kind=headway :: Headway constraints in up direction.
+%@ con eq_0009_b kind=headway :: Headway constraints in down direction.
+%@ con eq_0013 kind=linear :: Train for service i' comes from depot iff no previous service is paired with it.
+%@ con eq_0014 kind=linear :: Train for service i returns to depot iff no later service is paired with it.
+%@ con eq_0015_a kind=big_m :: Big-M link: if γ=1 then α_i'=1 and β_i=1 (upper bound).
+%@ con eq_0015_b kind=big_m :: Big-M link: if γ=1 then α_i'=1 and β_i=1 (lower bound).
+%@ con eq_0016_a kind=big_m :: Turnaround time at station 1 lower bound for paired services.
+%@ con eq_0016_b kind=big_m :: Turnaround time at station 1 upper bound for paired services.
+%@ con eq_0017 kind=ordering :: Order constraint at station 1 for consecutive services.
+%@ con eq_0018 kind=big_m :: Definition of λ_m,i via logical equivalence of depot-enter time.
+%@ con eq_0020 kind=linear :: Objective 1: total headway deviation from service pattern.
+%@ con eq_0022 kind=linear :: Objective 3: headway variation between neighboring services.
+%@ con eq_0023 kind=linear :: Simplified form of headway variation objective.
+%@ con eq_0024 kind=linear :: Weighted multi-objective function.
+%@ con eq_0026 kind=linear :: First/last departure times fixed to predefined values.
+%@ con eq_0028 kind=linear :: Expected headway h̄ from binary interval indicators y.
+%@ con eq_0029_a kind=linear :: Extended objective 1 (headway deviation) with absolute value, part a.
+%@ con eq_0029_b kind=linear :: Extended objective 1 (headway deviation) with absolute value, part b.
+%@ con eq_0030_a kind=linear :: Extended weighted objective, part a.
+%@ con eq_0030_b kind=linear :: Extended weighted objective, part b.
+%@ con eq_0031 kind=linear :: Bounds on affine functions used in big-M linearization.
+%@ con eq_0032 kind=big_m :: Logical equivalence [f≤0] ↔ [δ=1] via big-M constraints.
+%@ con eq_0033 kind=linear :: Product of two logical variables δ3 = δ1 δ2.
+%@ con eq_0034 kind=big_m :: Product of logical and real variable z = δ f.
+%@ con eq_0035_a kind=big_m :: Linearization of z=γ·a (upper/lower bounds), part a.
+%@ con eq_0035_b kind=big_m :: Linearization of z=γ·a (upper/lower bounds), part b.
+%@ con eq_0036 kind=ordering :: Station 1 order constraint rewritten with auxiliary z.
+%@ con eq_0037_a kind=big_m :: Linearization of λ definition, inequality a.
+%@ con eq_0037_b kind=big_m :: Linearization of λ definition, inequality b.
+%@ con eq_0037_c kind=big_m :: Linearization of λ definition, inequality c.
+%@ con eq_0038_a kind=linear :: Bounds for M~ in λ linearization, part a.
+%@ con eq_0038_b kind=linear :: Bounds for M~ in λ linearization, part b.
+%@ con eq_0038_c kind=linear :: Bounds for m̃ in λ linearization, part c.
+%@ con eq_0038_d kind=linear :: Bounds for m̃ in λ linearization, part d.
+%@ con eq_0039_a kind=linear :: Linearization of φ=β·λ, inequality a.
+%@ con eq_0039_b kind=linear :: Linearization of φ=β·λ, inequality b.
+%@ con eq_0039_c kind=linear :: Linearization of φ=β·λ, inequality c.
+%@ con eq_0039_d kind=linear :: Linearization of φ=β·λ, inequality d.
+%@ con eq_0040 kind=capacity :: Depot capacity constraint rewritten with auxiliary φ.
+%@ con eq_0041_a kind=linear :: Auxiliary ξ bound for absolute headway deviation (positive side).
+%@ con eq_0041_b kind=linear :: Auxiliary ξ bound for absolute headway deviation (negative side).
+%@ con eq_0042_a kind=linear :: Auxiliary η bound for absolute headway variation (positive side).
+%@ con eq_0042_b kind=linear :: Auxiliary η bound for absolute headway variation (negative side).
+%@ con eq_0043_a kind=linear :: Linearization of indicator/intermediate product for extended model, part a.
+%@ con eq_0043_b kind=linear :: Linearization of indicator/intermediate product for extended model, part b.
+%@ con eq_0043_c kind=linear :: Linearization of indicator/intermediate product for extended model, part c.
+%@ con eq_0044 kind=linear :: MILP constraint from the extended integrated model.
+%@ con eq_0045 kind=linear :: MILP constraint from the extended integrated model.
+%@ con eq_0046 kind=linear :: MILP constraint from the extended integrated model.
+%@ con eq_0047_a kind=linear :: MILP constraint from the extended integrated model, part a.
+%@ con eq_0047_b kind=linear :: MILP constraint from the extended integrated model, part b.
+%@ con eq_0048_a kind=linear :: MILP constraint from the extended integrated model, part a.
+%@ con eq_0048_b kind=linear :: MILP constraint from the extended integrated model, part b.
+%@ con eq_0049 kind=linear :: MILP constraint from the extended integrated model.
+%@ con eq_0050_a kind=linear :: MILP constraint from the extended integrated model, part a.
+%@ con eq_0050_b kind=linear :: MILP constraint from the extended integrated model, part b.

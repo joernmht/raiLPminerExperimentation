@@ -1,0 +1,71 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2016.11.007
+%@ meta id=10.1016_j.trc.2016.11.007 family=milp schema=0.1.0
+%@ name :: Optimizing train operational plan in an urban rail corridor based on the maximum headway function
+%@ desc :: Mined from Optimizing train operational plan in an urban rail corridor based on the maximum headway function (Transportation Research Part C Emerging Technologies, 2016).
+%@ prov source :: 10.1016/j.trc.2016.11.007
+%@ prov reference :: Optimizing train operational plan in an urban rail corridor based on the maximum headway function
+%@ prov author :: Feng Shi; Shuo Zhao; Zhou Zhao; Pu Wang; Michael G.H. Bell
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the number of train trips 2n in the train departure profile model (M1).
+%@ index s ordered=0 cyclic=0 :: Station index in the set S.
+%@ index S ordered=0 cyclic=0 :: Set of stations on the corridor.
+%@ var x shape=i domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of down-direction train trip i.
+%@ param F shape=- kind=scalar domain=- :: Maximum headway function for direction D or U.
+%@ param t shape=- kind=scalar domain=- :: Time variable for capacity constraints.
+%@ var y shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of up-direction train trip j.
+%@ index i ordered=0 cyclic=0 :: Index for down-direction train trips.
+%@ param n shape=- kind=scalar domain=- :: Number of train trips in each direction.
+%@ index j ordered=0 cyclic=0 :: Index for up-direction train trips.
+%@ param C shape=- kind=scalar domain=- :: Parking capacity at terminal (C^A or C^B).
+%@ var Z shape=- domain=integer role=primary drole=- lo=- hi=- :: Objective value representing total number of train trips.
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints (7)-(16) in model M1.
+%@ param M_hat shape=- kind=scalar domain=- :: Set of feasible train-trip pair connections at terminal with yard.
+%@ param M shape=- kind=scalar domain=- :: Assignment of up-direction to down-direction train trips.
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains parking at terminal s_A at time t.
+%@ param trains shape=- kind=scalar domain=- :: Unit for capacity C^B.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Cumulative demand plus detained flow equals capacity to determine time τ_i^{s_k}.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of maximum headway function F_D(x_i) during off-peak hours.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Detained passenger flow resets to zero after departure governed by the MHF.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Maximum headway function equals minimal headway during peak hours.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Recurrence for detained passenger flow during peak hours.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Latest acceptable departure time of the first down-direction train trip.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Latest acceptable departure time of the first up-direction train trip.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Earliest acceptable departure time of the last down-direction train trip.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Earliest acceptable departure time of the last up-direction train trip.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Minimal headway between consecutive down-direction train trips.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Minimal headway between consecutive up-direction train trips.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Maximum headway constraint for down-direction train trips.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maximum headway constraint for up-direction train trips.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Turning-around time constraint at terminal s_B without a yard.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Parking capacity constraint at terminal s_B without a yard.
+%@ con eq_0028_a kind=linear domain=- indicator=- :: Turning-around time constraint for train-trip pair connection at terminal with a yard.
+%@ con eq_0028_b kind=linear domain=- indicator=- :: Parking capacity constraint at terminal with a yard.
+%@ con eq_0028_c kind=linear domain=- indicator=- :: Definition of v(t), number of down-direction train trips that have left terminal s_A by time t.
+%@ con eq_0028_d kind=linear domain=- indicator=- :: Equivalent parking capacity constraint at terminal with a yard expressed with w(t).
+%@ param tau shape=- domain=continuous role=parameter drole=- lo=- hi=- :: headway parameter
+%@ index I shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for i from 1 to n
+%@ index J shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for j from 1 to n
+%@ index I_after shape=set domain=integer role=index drole=- lo=C^{B}+1 hi=n :: index set for i from C^B+1 to n
+\begin{align}
+  & \mathit{sigma}^{s_{k}} \left(x_{i + 1}\right) = 0 , s_{k} \in S \backslash \left\{s_{B}\right\} \tag{eq\_0003} \\
+  & F^{\text{D}} \left(x_{i}\right) = \mathit{tau}_{\text{min}} \tag{eq\_0004} \\
+  & x_{1} \le t_{L}^{D} \tag{eq\_0007} \\
+  & y_{1} \le t_{L}^{U} \tag{eq\_0008} \\
+  & x_{n} \ge t_{E}^{D} \tag{eq\_0009} \\
+  & y_{n} \ge t_{E}^{U} \tag{eq\_0010} \\
+  & x_{i + 1} - x_{i} \ge tau_{min} \qquad \forall i \in I \setminus \{n\} \tag{eq\_0011} \\
+  & y_{j + 1} - y_{j} \ge tau_{min} \qquad \forall j \in J \setminus \{n\} \tag{eq\_0012} \\
+  & x_{i + 1} - x_{i} \leq F^{\text{D}} \left(x_{i}\right) , i = 1 , 2 , \ldots , n - 1 \tag{eq\_0013} \\
+  & y_{j + 1} - y_{j} \leq F^{\text{U}} \left(y_{j}\right) , j = 1 , 2 , \ldots , n - 1 \tag{eq\_0014} \\
+  & y_{j} \ge x_{j} + tau_{s_{A},s_{B}} + tau^{B} \qquad \forall j \in J \tag{eq\_0015} \\
+  & x_{i} + tau_{s_{A},s_{B}} \ge y_{i - C^{B}} \qquad \forall i \in I_after \tag{eq\_0016} \\
+  \min\quad & 2 \cdot n \tag{eq\_0017} \\
+  & y_{j} + \mathit{tau} \left(s_{A} , s_{B}\right) + \mathit{tau}^{A} \leq x_{i} , \left(j , i\right) \in \hat{M} \tag{eq\_0018} \\
+  & \left|\right. \left\{\right. \left(j , i\right) \left|y_{j} + \mathit{tau} \left(s_{A} , s_{B}\right) \leq t \leq x_{i} , \left(j , i\right) \in M \left.\right\}\right| \leq C^{A} , t = y_{1} + \mathit{tau} \left(s_{A} , s_{B}\right) , y_{2} + \mathit{tau} \left(s_{A} , s_{B}\right) , \ldots , y_{n} + \mathit{tau} \left(s_{A} , s_{B}\right) \tag{eq\_0019} \\
+  & w \left(t\right) \leq C^{A} , t = y_{j_{n - r + 1}} + \mathit{tau} \left(s_{A} , s_{B}\right) , y_{j_{n - r + 2}} + \mathit{tau} \left(s_{A} , s_{B}\right) , \ldots , y_{j_{n}} + \mathit{tau} \left(s_{A} , s_{B}\right) \tag{eq\_0027} \\
+  & \mathit{tau} \left(s_{A} , s_{B}\right) = 58 \text{min} , \mathit{tau}^{B} = 2 \text{min} \tag{eq\_0028\_a} \\
+  & C^{B} = 2 \text{trains} \tag{eq\_0028\_b} \\
+  & t_{\text{L}}^{\text{D}} = 06 : 00 \tag{eq\_0028\_c} \\
+  & t_{\text{L}}^{\text{U}} = 07 : 00 \tag{eq\_0028\_d} \\
+\end{align}

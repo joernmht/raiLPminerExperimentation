@@ -1,0 +1,146 @@
+% Declaration sidecar for 10.1016_j.trb.2017.05.008
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2017.05.008
+% A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2017.05.008.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total secondary delay of trains
+
+% y: classified as variable during review
+%@ var y shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Secondary delay of train t (positive part)
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of block sections for each train
+
+% c: classified as parameter during review
+%@ param c shape=T kind=vector domain=- :: Planned total travel time for train t
+
+% d: classified as parameter during review
+%@ param d shape=T kind=vector domain=- :: Dwell time at station for train t
+
+% e: classified as parameter during review
+%@ param e shape=T,S kind=matrix domain=- :: Planned entry time of train t at section s
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for block sections
+
+% unusable as an identifier, rename or drop: ω
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of consecutive section pairs
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of all block sections
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: Δ
+% unusable as an identifier, rename or drop: β
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of speed levels
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Big-M constant
+
+% w: classified as index during review
+%@ index w ordered=0 cyclic=0 :: Set of switches
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of entrance arcs
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of departure sections
+
+% B̄: classified as index during review
+%@ index Bbar ordered=0 cyclic=0 :: Set of speed levels for train t (maximum)
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs for train ordering
+
+% S̄: classified as index during review
+%@ index Sbar ordered=0 cyclic=0 :: Set of sections impacted by disruption
+
+% W: classified as parameter during review
+%@ param W shape=- kind=vector domain=- :: Start and end times of disruption
+
+% x: classified as variable during review
+%@ var x shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Indicator if train t passes after disruption start
+
+% x̄: classified as variable during review
+%@ var xbar shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Indicator if train t passes before disruption end
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: μ
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of sections in disruption area
+
+% Bound by a quantifier or big operator, so no declaration of their own: f, h, i, j, k, p, q, t, ξ, ψ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Secondary delay definition: y_t >= ω_t,end - e_t,s - c_t - d_t
+%@ con eq_0007_c kind=linear domain=- indicator=- :: Secondary delay non-negativity: y_t >= 0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum running time on sections outside open track
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum running time on open track sections with speed level
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum running time on sections to match speed level
+%@ con eq_0011 kind=linear domain=- indicator=- :: Maximum running time on switches (no-stop sections)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Earliest start time at entrance sections
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum dwell time at station stops
+%@ con eq_0014 kind=linear domain=- indicator=- :: Earliest departure time from stops
+%@ con eq_0015 kind=linear domain=- indicator=- :: Each section assigned exactly one speed level
+%@ con eq_0016 kind=linear domain=- indicator=- :: Speed level transitions limited to adjacent levels
+%@ con eq_0017 kind=linear domain=- indicator=- :: Maximum speed level 1 near stops
+%@ con eq_0018 kind=linear domain=- indicator=- :: Indicator that train passes after disruption start
+%@ con eq_0019 kind=linear domain=- indicator=- :: Indicator that train passes before disruption end
+%@ con eq_0020 kind=linear domain=- indicator=- :: Link speed levels to disruption impact
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train ordering on conflicting sections (alternative 1)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train ordering on conflicting sections (alternative 2)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Distance headway requirement (following train)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Distance headway requirement (leading train)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Disruption area ordering definition
+%@ con eq_0026 kind=linear domain=- indicator=- :: Fix maximum speed for trains not affected by disruption
+%@ con eq_0027 kind=linear domain=- indicator=- :: Fix maximum speed for unaffected sections in disrupted area
+%@ con eq_0028 kind=linear domain=- indicator=- :: Fix maximum speed for sections impacted by disruption
+%@ param dt
+%@ param Dt
+%@ param DtPrev
+%@ param pt
+%@ param omega0
+%@ index sw
+%@ index AD
+%@ index vartheta
+%@ index Next
+%@ index B2
+%@ index B_diff
+%@ index V
+%@ index end
+%@ index eta
+%@ index Far shape=- domain=index role=auxiliary drole=- lo=- hi=- :: pairs with absolute difference > 1
+%@ param deltat shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Time increment
+%@ param dtprev shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Previous time increment
+%@ param planned shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Planned time
+%@ index B1 shape=- domain=- role=set drole=- lo=- hi=- :: Singleton braking level 1
+%@ index B_pair shape=- domain=- role=set drole=- lo=- hi=- :: Forbidden braking level pairs
+%@ index Dplus shape=- domain=- role=set drole=t lo=- hi=- :: Successor positions

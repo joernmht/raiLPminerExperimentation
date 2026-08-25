@@ -1,0 +1,149 @@
+% Declaration sidecar for 10.1016_j.ejor.2008.12.005
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2008.12.005
+% A disjunctive graph model and framework for constructing new train schedules
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2008.12.005.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimise total delay over all operations
+
+% atl: classified as variable during review
+%@ var atl shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Additional time lag for operation o_i,k
+
+% dt: classified as variable during review
+%@ var dt shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Distance travelled up to and including the k-th section
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of jobs
+
+% l: classified as parameter during review
+%@ param l shape=i,j kind=matrix domain=- :: Length of train i or section j
+
+% δ renamed to delta
+%@ param delta shape=i,k kind=matrix domain=- :: Planned dwell time for train i on its k-th section
+
+% fstage: classified as variable during review
+%@ var fstage shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Stage of the front when the rear is departing the k-th section
+
+% fpos: classified as variable during review
+%@ var fpos shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Position of the front when the rear is departing the k-th section
+
+% a: classified as parameter during review
+%@ param a shape=i,k kind=matrix domain=- :: Time to accelerate for operation o_i,k
+
+% apt: classified as variable during review
+%@ var apt shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Additional processing time for operation o_i,k
+
+% d: classified as parameter during review
+%@ param d shape=i,k kind=matrix domain=- :: Time to decelerate for operation o_i,k
+
+% ina: classified as variable during review
+%@ var ina shape=i,k domain=binary role=primary drole=- lo=- hi=- :: Binary flag for acceleration incurred
+
+% ind: classified as variable during review
+%@ var ind shape=i,k domain=binary role=primary drole=- lo=- hi=- :: Binary flag for deceleration incurred
+
+% e: classified as variable during review
+%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Disjunctive arc weight
+
+% p: classified as parameter during review
+%@ param p shape=i,k kind=matrix domain=- :: Processing time of operation o_i,k
+
+% s: classified as parameter during review
+%@ param s shape=o,o kind=matrix domain=- :: Setup time or headway between operations
+
+% entry: classified as variable during review
+%@ var entry shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Scheduled entry time for operation o_i,k
+
+% lpv: classified as variable during review
+%@ var lpv shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Longest path value to operation o_i,k
+
+% exit: classified as variable during review
+%@ var exit shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Scheduled exit time for operation o_i,k
+
+% stl: classified as parameter during review
+%@ param stl shape=i kind=vector domain=- :: Standard time lag for train i
+
+% delay: classified as variable during review
+%@ var delay shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Delay for operation o_i,k
+
+% LB: classified as variable during review
+%@ var LB shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lower bound on makespan
+
+% lb: classified as variable during review
+%@ var lb shape=j domain=continuous role=primary drole=- lo=- hi=- :: Lower bound for machine j
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of machines
+
+% p̄ renamed to pbar
+%@ param pbar shape=i,k kind=matrix domain=- :: Adjusted processing time including dwell and additional times
+
+% τ renamed to tau
+%@ param tau shape=i,k kind=matrix domain=- :: Cumulative processing time up to operation o_i,k
+
+% φ renamed to phi
+%@ param phi shape=i,k kind=matrix domain=- :: Cumulative processing time after operation o_i,k
+
+% U: classified as index during review
+%@ index U ordered=0 cyclic=0 :: Set of operations using machine j
+
+% O: classified as index during review
+%@ index O ordered=0 cyclic=0 :: Set of all operations
+
+% rlt: classified as parameter during review
+%@ param rlt shape=i kind=vector domain=- :: Release time of job i
+
+% Lowercase indices i,j,k,o are declared because they appear in shapes.
+%@ index i ordered=0 cyclic=0 :: Job index
+%@ index j ordered=0 cyclic=0 :: Machine index
+%@ index k ordered=0 cyclic=0 :: Stage (position in machine path) index
+%@ index o ordered=0 cyclic=0 :: Operation index
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Definition of operation set for job i
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Definition of union of operations
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Definition of machine usage set U_j
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Definition of machine visit frequency f_i,j
+%@ con eq_0002_c kind=linear domain=- indicator=- :: Definition of operation pairs on same machine E_j
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of disjunctive graph tuple
+%@ con eq_0004 kind=linear domain=- indicator=- :: Selection of disjunctive arcs S
+%@ con eq_0005 kind=linear domain=- indicator=- :: Additional processing time caused by planned dwell times
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Acceleration flag for first operation is zero
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Acceleration flag for subsequent operations based on previous dwell
+%@ con eq_0014 kind=linear domain=- indicator=- :: Disjunctive arc weight e_2 for front within system
+%@ con eq_0015 kind=linear domain=- indicator=- :: Disjunctive arc weight e_2 for front departed system
+%@ con eq_0016 kind=linear domain=- indicator=- :: Entry time from longest path value
+%@ con eq_0017 kind=linear domain=- indicator=- :: Exit time for last stage
+%@ con eq_0018 kind=linear domain=- indicator=- :: Exit time for intermediate stages by backward projection
+%@ con eq_0019 kind=linear domain=- indicator=- :: Exit time for intermediate stages by forward projection
+%@ con eq_0020 kind=linear domain=- indicator=- :: Delay computation for operation
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 22)
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 23b)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 24)
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 25a)
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 25b)
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 26a)
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 26b)
+%@ con eq_0027_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27a)
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27b)

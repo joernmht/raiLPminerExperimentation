@@ -1,0 +1,47 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2017.04.012
+%@ meta id=10.1016_j.trc.2017.04.012 family=milp schema=0.1.0
+%@ name :: Passenger oriented railway disruption management by adapting timetables and rolling stock schedules
+%@ desc :: Mined from Passenger oriented railway disruption management by adapting timetables and rolling stock schedules (Transportation Research Part C Emerging Technologies, 2017).
+%@ prov source :: 10.1016/j.trc.2017.04.012
+%@ prov reference :: Passenger oriented railway disruption management by adapting timetables and rolling stock schedules
+%@ prov author :: Lucas P. Veelenturf; Leo Kroon; Gábor Maróti
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total costs of rolling stock rescheduling, passenger delays, and timetable rescheduling
+%@ param c shape=- kind=scalar domain=- :: Rolling stock rescheduling cost function
+%@ param d shape=- kind=scalar domain=- :: Service related cost function of passenger flows
+%@ param e shape=- kind=scalar domain=- :: Timetable rescheduling cost function
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Rolling stock schedule decision variable
+%@ var y shape=P,K domain=binary role=primary drole=- lo=- hi=- :: Passenger path choice binary variable
+%@ var z shape=J domain=binary role=primary drole=- lo=- hi=- :: Stopping pattern selection binary variable
+%@ index Z ordered=0 cyclic=0 :: Set of all possible timetables
+%@ index X ordered=0 cyclic=0 :: Set of feasible rolling stock schedules for a given timetable
+%@ param s shape=- kind=scalar domain=- :: Abbreviation for subject to
+%@ index T ordered=0 cyclic=0 :: Set of trips
+%@ index J ordered=0 cyclic=0 :: Set of stopping patterns
+%@ index P ordered=0 cyclic=0 :: Set of passengers
+%@ index K ordered=0 cyclic=0 :: Set of paths for a passenger
+%@ index L ordered=0 cyclic=0 :: Set of paths incompatible with a stopping pattern
+%@ param Cap shape=G kind=vector domain=- :: Capacity of a rolling stock unit
+%@ index G ordered=0 cyclic=0 :: Set of rolling stock types
+%@ con eq_0002 kind=linear domain=- indicator=- :: Feasible timetable domain: z ∈ Z
+%@ con eq_0003 kind=linear domain=- indicator=- :: Feasible rolling stock schedule for a given timetable: x ∈ X_z
+%@ con eq_0006 kind=linear domain=- indicator=- :: Rolling stock rescheduling constraints for a given timetable
+%@ con eq_0007 kind=linear domain=- indicator=- :: Exactly one stopping pattern must be selected for each trip
+%@ con eq_0008 kind=linear domain=- indicator=- :: Every passenger must choose exactly one path
+%@ con eq_0009 kind=linear domain=- indicator=- :: Only compatible stopping patterns and passenger paths can be selected
+%@ con eq_0010 kind=linear domain=- indicator=- :: Capacity constraint on passenger flows versus total seat capacity
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary variable y_k^p is 0 or 1 for all passengers and paths
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary variable z_j is 0 or 1 for all stopping patterns
+\begin{align}
+  \min\quad & c \left(x\right) + d \left(y\right) + e \left(z\right) \tag{eq\_0001} \\
+  & \text{subject to} z \in \mathcal{Z} \tag{eq\_0002} \\
+  & x \in \mathcal{X}_{z} \tag{eq\_0003} \\
+  & s . t . x \in {\mathcal{X}}_{z} \tag{eq\_0006} \\
+  & \sum_{j \in \mathcal{J}_{t}} z_{j} = 1 \forall t \in \mathcal{T} \tag{eq\_0007} \\
+  & \sum_{k \in K^{p}} y_{k}^{p} = 1 \forall p \in \mathcal{P} \tag{eq\_0008} \\
+  & \sum_{k \in K^{p} \cap L^{j}} y_{k}^{p} + z_{j} \leq 1 \forall p \in \mathcal{P} , \text{and} \forall j \in \mathcal{J} \tag{eq\_0009} \\
+  & \sum_{p \in \mathcal{P}} \sum_{k \in K_{t}^{p}} y_{k}^{p} \leq \sum_{g \in \mathcal{G}_{t}} x_{t , g} \cdot \mathit{Cap}_{g} \forall t \in \mathcal{T} \tag{eq\_0010} \\
+  & y_{k}^{p} \in \left\{0 , 1\right\} \forall p \in \mathcal{P} \text{and} \forall k \in K^{p} \tag{eq\_0011} \\
+  & z_{j} \in \left\{0 , 1\right\} \forall j \in \mathcal{J} \tag{eq\_0012} \\
+\end{align}

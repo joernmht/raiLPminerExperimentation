@@ -1,0 +1,106 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.asoc.2011.08.026
+%@ meta id=10.1016_j.asoc.2011.08.026 family=milp schema=0.1.0
+%@ name :: The periodicity and robustness in a single-track train scheduling problem
+%@ desc :: Mined from The periodicity and robustness in a single-track train scheduling problem (Applied Soft Computing, 2011).
+%@ prov source :: 10.1016/j.asoc.2011.08.026
+%@ prov reference :: The periodicity and robustness in a single-track train scheduling problem
+%@ prov author :: Mohammad Ali Shafia; Seyed Jafar Sadjadi; Amin Jamili; Reza Tavakkoli‐Moghaddam; Mohsen Pourseyed Aghaee
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: maximize the satisfaction degree
+%@ index k ordered=0 cyclic=0 :: index for machines/block sections
+%@ param t shape=- kind=scalar domain=- :: required processing/travelling time
+%@ param u shape=- kind=scalar domain=- :: operation index or capacity
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: completion time of job on machine
+%@ index A ordered=0 cyclic=0 :: set of machines/block sections
+%@ index P ordered=0 cyclic=0 :: set of jobs/trains
+%@ param S shape=- kind=scalar domain=- :: schedule or set
+%@ param precedes shape=- kind=scalar domain=- :: precedence relation
+%@ param P_bar shape=- kind=scalar domain=- :: upper bound of fuzzy due date
+%@ param l shape=- kind=scalar domain=- :: planned completion time of job
+%@ param q shape=- kind=scalar domain=- :: fuzzy buffer time
+%@ param M shape=- kind=big_m domain=- :: a big number
+%@ param q_bar shape=- kind=scalar domain=- :: upper bound of fuzzy buffer time
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: binary precedence variable
+%@ param d shape=- kind=scalar domain=- :: fuzzy delivery time
+%@ var del shape=- domain=continuous role=primary drole=- lo=- hi=- :: delivery time of job
+%@ param d_bar shape=- kind=scalar domain=- :: upper bound of fuzzy delivery time
+%@ param T shape=- kind=scalar domain=- :: time period
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: periodic offset
+%@ param s shape=- kind=scalar domain=- :: stopping time
+%@ param t_bar shape=- kind=scalar domain=- :: acceleration time
+%@ index n ordered=0 cyclic=0 :: number of trains
+%@ param C shape=- kind=scalar domain=- :: combination operator
+%@ index N ordered=0 cyclic=0 :: set of trains
+%@ index p ordered=0 cyclic=0 :: train index
+%@ param w shape=- kind=scalar domain=- :: headway time
+%@ param h_bar shape=- kind=scalar domain=- :: upper bound of headway
+%@ con eq_0005 kind=linear domain=- indicator=- :: fuzzy decision membership constraint
+%@ con eq_0006 kind=linear domain=- indicator=- :: crisp equivalent of fuzzy decision
+%@ con eq_0007 kind=linear domain=- indicator=- :: satisfaction degree objective constraint
+%@ con eq_0008 kind=linear domain=- indicator=- :: precedence constraint for operations
+%@ con eq_0009 kind=linear domain=- indicator=- :: fuzzy due date constraint
+%@ con eq_0010 kind=linear domain=- indicator=- :: fuzzy buffer between operations on same machine
+%@ con eq_0012 kind=linear domain=- indicator=- :: reverse fuzzy buffer between operations
+%@ con eq_0013 kind=linear domain=- indicator=- :: fuzzy delivery time interval constraint
+%@ con eq_0014 kind=linear domain=- indicator=- :: reverse fuzzy delivery time interval
+%@ con eq_0015 kind=linear domain=- indicator=- :: periodic event scheduling constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: integer reformulation of periodic constraint
+%@ con eq_0017 kind=linear domain=- indicator=- :: periodic precedence with travelling time
+%@ con eq_0018 kind=linear domain=- indicator=- :: periodic fuzzy buffer lower bound
+%@ con eq_0019 kind=linear domain=- indicator=- :: periodic fuzzy buffer upper bound
+%@ con eq_0020 kind=linear domain=- indicator=- :: periodic fuzzy delivery time lower bound
+%@ con eq_0021 kind=linear domain=- indicator=- :: periodic fuzzy delivery time upper bound
+%@ con eq_0022 kind=linear domain=- indicator=- :: acceleration and deceleration time constraint
+%@ con eq_0023 kind=linear domain=- indicator=- :: fuzzy buffer with acceleration/deceleration lower bound
+%@ con eq_0024 kind=linear domain=- indicator=- :: fuzzy buffer with acceleration/deceleration upper bound
+%@ con eq_0025 kind=linear domain=- indicator=- :: train meet detection constraint
+%@ con eq_0026 kind=linear domain=- indicator=- :: reverse train meet detection constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: simultaneous meet counting constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: station capacity constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: headway constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: headway constraint with acceleration/deceleration
+%@ con eq_0036 kind=linear domain=- indicator=- :: fuzzy headway lower bound constraint
+%@ con eq_0037 kind=linear domain=- indicator=- :: fuzzy headway upper bound constraint
+%@ con eq_0038 kind=linear domain=- indicator=- :: fuzzy headway with acceleration/deceleration constraint
+%@ var lambda shape=- domain=continuous role=variable drole=- lo=- hi=- :: Lagrange multiplier
+%@ var pi shape=- domain=continuous role=variable drole=- lo=- hi=- :: potential variable
+%@ var z_prime shape=- domain=continuous role=variable drole=- lo=- hi=- :: auxiliary binary variable prime
+%@ param P_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of P
+%@ param q_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of q
+%@ param d_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of d
+%@ index u_prime shape=- domain=- role=index drole=- lo=- hi=- :: primed station index
+%@ index k_prime shape=- domain=- role=index drole=- lo=- hi=- :: primed event index
+\begin{align}
+  \max\quad & \mathit{lambda} \tag{eq\_0003} \\
+  & x_{i,k} - x_{i,h} + M \cdot \left(1 - \mathit{precedes}_{i,u,k,h}\right) \ge t_{i,u,k} \qquad \forall i \in P, k \in A_i, h \in A_i \tag{eq\_0005} \\
+  & lambda \cdot \left( P_bar_{i} - P_under_{i} \right) + \left( l_{i} - x_{i,e_p} \right) \le P_bar_{i} \qquad \forall i \in P \tag{eq\_0006} \\
+  & - lambda \cdot \left( q_bar_{i,j} - q_under_{i,j} \right) + \left( x_{i,k} - x_{j,k} - t_{i,u,k} \right) + M \cdot \left(1 - y_{j,i,k}\right) \ge q_under_{i,j} \qquad \forall i \in P, j \in P, k \in A_i \cap A_j \tag{eq\_0007} \\
+  & - lambda \cdot \left( q_bar_{j,i} - q_under_{j,i} \right) + \left( x_{j,k} - x_{i,k} - t_{j,u_prime,k} \right) + M \cdot y_{j,i,k} \ge q_under_{j,i} \qquad \forall i \in P, j \in P, k \in A_i \cap A_j \tag{eq\_0008} \\
+  & - lambda \cdot \left( d_bar_{i,j} - d_under_{i,j} \right) + \left( del_{i} - del_{j} \right) + M \cdot \left(1 - y_{j,i,k_prime}\right) \ge d_under_{i,j} \qquad \forall i \in P, j \in P \tag{eq\_0009} \\
+  & - lambda \cdot \left( d_bar_{j,i} - d_under_{j,i} \right) + \left( del_{j} - del_{i} \right) + M \cdot y_{j,i,k_prime} \ge d_under_{i,j} \qquad \forall i \in P, j \in P \tag{eq\_0010} \\
+  & l_{a} \le pi_{j} - pi_{i} - T \cdot z_{a} \tag{eq\_0012\_a} \\
+  & pi_{j} - pi_{i} - T \cdot z_{a} \le u_{a} \tag{eq\_0012\_b} \\
+  & t_{i,u,k} \le x_{i,k} - x_{i,h} + M \cdot \left(1 - \mathit{precedes}_{i,u,k,h}\right) \qquad \forall i \in P, k \in A_i, h \in A_i \tag{eq\_0013\_a} \\
+  & x_{i,k} - x_{i,h} - M \cdot \left(1 - \mathit{precedes}_{i,u,k,h}\right) \le T - 1 \qquad \forall i \in P, k \in A_i, h \in A_i \tag{eq\_0013\_b} \\
+  & - lambda \cdot \left( q_bar_{i,j} - q_under_{i,j} \right) + \left( x_{i,k} - x_{j,k} - z_{i,j,k} \cdot T \right) \ge q_under_{i,j} + t_{i,u,k} \qquad \forall i \in P, j \in P, k \in A_i \cap A_j \tag{eq\_0014} \\
+  & lambda \cdot \left( q_bar_{j,i} - q_under_{j,i} \right) + \left( x_{i,k} - x_{j,k} - z_{i,j,k} \cdot T \right) \le - q_under_{j,i} + \left( T - t_{j,u_prime,k} \right) \qquad \forall i \in P, j \in P, k \in A_i \cap A_j \tag{eq\_0015} \\
+  & - lambda \cdot \left( d_bar_{i,j} - d_under_{i,j} \right) + del_{i} - del_{j} - z_prime_{i,j} \cdot T \ge d_under_{i,j} \qquad \forall i \in P, j \in P \tag{eq\_0016} \\
+  & lambda \cdot \left( d_bar_{i,j} - d_under_{i,j} \right) + del_{i} - del_{j} - z_prime_{i,j} \cdot T \le T - d_under_{j,i} \qquad \forall i \in P, j \in P \tag{eq\_0017} \\
+  & t_{i k} + \underset{\underline}{t}_{i k} \cdot A_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}} + s_{i k^{'}} \leq x_{i k} - x_{i k^{'}} \leq t_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}} + s_{i k^{'}} + M \cdot A_{i k} , \textrm{ } \forall i \in P \cup P^{'} \forall k \in A_{i} , \tag{eq\_0018} \\
+  & - \mathit{lambda} \left(\left(\bar{q}\right)_{i j} - \underset{\underline}{q}_{i j}\right) + \left(x_{i k} - x_{j k} - z_{i j k} \cdot T\right) \geq \underset{\underline}{q}_{i j} + \left(t_{i k} + \underset{\underline}{t}_{i k} \cdot A_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}}\right) , \textrm{ } \forall i , j \in P \cup P^{'} , \forall k \in A_{i} , \tag{eq\_0019} \\
+  & \mathit{lambda} \left(\left(\bar{q}\right)_{j i} - \underset{\underline}{q}_{j i}\right) + \left(x_{i k} - x_{j k} - z_{i j k} \cdot T\right) \leq - \underset{\underline}{q}_{j i} + \left(T - \left(t_{j k} + \underset{\underline}{t}_{j k} \cdot A_{j k} + \left(\bar{t}\right)_{j k} \cdot A_{j k^{'}}\right)\right) , \textrm{ } \forall i , j \in P \cup P^{'} , \forall k \in A_{i} \tag{eq\_0020} \\
+  & x_{j k + 1} - x_{i k} + z_{i j k} \cdot T > \left[t_{j k + 1} + \underset{\underline}{t}_{j k + 1} \cdot A_{j k + 1} + \left(\bar{t}\right)_{j k + 1} \cdot A_{j k}\right] + M \left(\mathit{delta}_{i j} - 1\right) , \tag{eq\_0021} \\
+  & x_{i k + 1} - x_{j k} - z_{i j k} \cdot T - T > \left[t_{i k + 1} + \underset{\underline}{t}_{i k + 1} \cdot A_{i k + 1} + \left(\bar{t}\right)_{i k + 1} \cdot A_{i k}\right] + M \left(\mathit{delta}_{i j} - 1\right) , \tag{eq\_0022} \\
+  & \sum_{\left(i , j\right) \in N^{'}} \mathit{delta}_{i j A}^{k} - \left(n^{'} \cdot C 2\right) < \mathit{rho}_{k}^{i} \leq 1 - \frac{\left(n^{'} \cdot C 2\right) - \sum_{\left(i , j\right) \in N^{'}} \mathit{delta}_{i j}^{k}}{\left(n^{'} \cdot C 2\right) + 1} , \textrm{ } \forall N^{'} \subset N , \left|N^{'}\right| = n^{'} = i , \forall k \in A , \tag{eq\_0023} \\
+  & \sum_{i = 1}^{n} \mathit{rho}_{k}^{n} + 1 \leq u_{k} , \textrm{ } \forall k \in A . \tag{eq\_0024} \\
+  & h w_{i} \leq x_{i k} - x_{p k} - z_{i p k} \cdot T \leq T - h w_{p} , \textrm{ } \forall i , p \in P \textrm{ }\textrm{ }\textrm{ } \text{or} \textrm{ }\textrm{ }\textrm{ } \forall i , p \in P^{'} , \forall k \in A_{i} \cap A_{p} , \tag{eq\_0025} \\
+  & h w_{i} \leq \left(\left(x_{i k} - \left(t_{i k} + \underset{\underline}{t}_{i k} \cdot A_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}}\right)\right) - \left(x_{p k} - \left(t_{p k} + \underset{\underline}{t}_{p k} \cdot A_{p k} + \left(\bar{t}\right)_{p k} \cdot A_{p k^{'}}\right)\right) - z_{i p k} \cdot T\right) \leq T - h w_{p} , \forall i , p \in p \textrm{ } \text{or} \textrm{ } \forall i , p \in p^{'} , \forall k \in A_{i} \cap A_{p} , \tag{eq\_0026} \\
+  & - \mathit{lambda} \left(\bar{h w}_{i} - \underset{\underline}{h w}_{i}\right) + \left(x_{i k} - x_{j k} - z_{i j k} \cdot T\right) \geq \underset{\underline}{h w}_{i} , \tag{eq\_0027} \\
+  & \mathit{lambda} \left(\bar{h w}_{j} - \underset{\underline}{h w}_{j}\right) + \left(x_{i k} - x_{j k} - z_{i j k} \cdot T\right) \leq T - \underset{\underline}{h w}_{j} , \tag{eq\_0028} \\
+  & - \mathit{lambda} \left(\bar{h w}_{i} - \underset{\underline}{h w}_{i}\right) + \left(x_{i k} - \left(t_{i k} + \underset{\underline}{t}_{i k} \cdot A_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}}\right) - x_{j k} + \left(t_{j k} + \underset{\underline}{t}_{j k} \cdot A_{j k} + \left(\bar{t}\right)_{j k} \cdot A_{j k^{'}}\right) - z_{i j k} \cdot T\right) \geq \underset{\underline}{h w}_{i} , \tag{eq\_0029} \\
+  & \mathit{lambda} \left(\bar{h w}_{j} - \underset{\underline}{h w}_{j}\right) + \left(x_{i k} - \left(t_{i k} + \underset{\underline}{t}_{i k} \cdot A_{i k} + \left(\bar{t}\right)_{i k} \cdot A_{i k^{'}}\right) - x_{j k} + \left(t_{j k} + \underset{\underline}{t}_{j k} \cdot A_{j k} + \left(\bar{t}\right)_{j k} \cdot A_{j k^{'}}\right) z_{i j k} \cdot T\right) \leq T - \underset{\underline}{h w}_{j} , \left(\forall i , j \in P\right) \textrm{ } \text{or} \textrm{ } \left(\forall i , j \in P^{'}\right) , \forall k \in A_{i} \cap A_{j} , \tag{eq\_0030} \\
+  & 0 < x_{i k} - x_{j k} - z_{i j k} \cdot T < T . \tag{eq\_0036} \\
+  & 0 < x_{j k} - x_{i k} + z_{i j k} \cdot T + T < T . \tag{eq\_0037} \\
+  & x_{i k + 1} - x_{j k} - z_{i j k} \cdot T - T > \left[t_{i k + 1} + \left(\underset{\underline}{t}\right)_{i k + 1} \cdot A_{i k + 1} + \left(\bar{t}\right)_{i k + 1} \cdot A_{i k}\right] . \tag{eq\_0038} \\
+\end{align}

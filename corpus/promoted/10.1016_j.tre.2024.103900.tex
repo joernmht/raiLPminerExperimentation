@@ -1,0 +1,40 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2024.103900
+%@ meta id=10.1016_j.tre.2024.103900 family=milp schema=0.1.0
+%@ name :: A multi-task deep reinforcement learning approach to real-time railway train rescheduling
+%@ desc :: Mined from A multi-task deep reinforcement learning approach to real-time railway train rescheduling (Transportation Research Part E Logistics and Transportation Review, 2024).
+%@ prov source :: 10.1016/j.tre.2024.103900
+%@ prov reference :: A multi-task deep reinforcement learning approach to real-time railway train rescheduling
+%@ prov author :: Tao Tang; Simin Chai; Wei Wu; Jiateng Yin; Andrea D’Ariano
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total train delay
+%@ index q ordered=0 cyclic=0 :: Index for trains in the set K
+%@ var t shape=K,U domain=continuous role=primary drole=- lo=- hi=- :: Decision variable for train arrival/departure time
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ index U ordered=0 cyclic=0 :: Set of stations or track segments
+%@ index H ordered=0 cyclic=0 :: Set of disruption events or time windows
+%@ param s shape=- kind=scalar domain=- :: Parameter for start time or slack
+%@ param M shape=- kind=scalar domain=- :: Large positive constant for big-M constraints
+%@ var z_bar shape=K,U domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train is delayed after disruption
+%@ var z shape=K,U domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train is early before disruption
+%@ index F ordered=0 cyclic=0 :: Set of precedence arcs between consecutive operations
+%@ param T shape=K,U kind=matrix domain=- :: Running or dwell time for train k at operation u
+%@ con eq_0047 kind=linear domain=- indicator=- :: Equation (47): linear constraint for train rescheduling
+%@ con eq_0048 kind=linear domain=- indicator=- :: Equation (48): linear constraint for train rescheduling
+%@ con eq_0049 kind=linear domain=- indicator=- :: Equation (49): linear constraint for train rescheduling
+%@ con eq_0050 kind=linear domain=- indicator=- :: Equation (50): linear constraint for train rescheduling
+%@ con eq_0051 kind=linear domain=- indicator=- :: Equation (51): linear constraint for train rescheduling
+%@ con eq_0052 kind=linear domain=- indicator=- :: Equation (52): linear constraint for train rescheduling
+%@ con eq_0053 kind=linear domain=- indicator=- :: Equation (53): linear constraint for train rescheduling
+%@ con eq_0054 kind=linear domain=- indicator=- :: Equation (54): linear constraint for train rescheduling
+\begin{align}
+  \min\quad & \sum_{k \in \mathcal{K}} \sum_{u \in \mathcal{U}_{k}} max \left(0 , t_{k u} - q_{k u}\right) \tag{eq\_0045} \\
+  & s . t . t_{k u} - q_{k u} = 0 , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} : q_{k u} \leq H_{u}^{\text{start}} \tag{eq\_0047} \\
+  & t_{k u} \leq H_{u}^{\text{start}} + M \cdot \bar{z}_{k u} , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0048} \\
+  & t_{k u} \geq H_{u}^{\text{end}} - M \cdot \underset{̲}{z}_{k u} , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0049} \\
+  & t_{k u^{'}} - t_{k u} = \mathit{Delta} t_{k u} , \forall k \in \mathcal{K} , \left(u , u^{'}\right) \in \mathcal{F} , u , u^{'} \in \mathcal{U}_{k} \tag{eq\_0050} \\
+  & \mathit{Delta} t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \backslash \mathcal{U}_{d} \tag{eq\_0051} \\
+  & \mathit{Delta} t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) + \left(\bar{z}_{k u} + \underset{̲}{z}_{k u} - 1\right) \cdot \left(H_{u}^{\text{end}} - H_{u}^{\text{start}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0052} \\
+  & t_{k u} \geq t_{k^{'} u} + \mathit{Delta} t_{k^{'} u} - \mathit{lambda}_{k k^{'}}^{u} M , \forall k , k^{'} \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{k^{'}} \tag{eq\_0053} \\
+  & t_{k^{'} u} \geq t_{k u} + \mathit{Delta} t_{k u} - \left(1 - \mathit{lambda}_{k k^{'}}^{u}\right) M , \forall k , k^{'} \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{k^{'}} \tag{eq\_0054} \\
+\end{align}

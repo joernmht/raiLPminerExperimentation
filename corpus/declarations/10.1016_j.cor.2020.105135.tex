@@ -1,0 +1,78 @@
+% Declaration sidecar for 10.1016_j.cor.2020.105135
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cor.2020.105135
+% Real-time optimization strategy for single-track high-speed train rescheduling with disturbance uncertainties: A scenario-based chance-constrained model predictive control approach
+%
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index N ordered=0 cyclic=0 :: Number of trains (summation bound)
+%@ index E ordered=0 cyclic=0 :: Set of train types
+%@ index L ordered=0 cyclic=0 :: Set of speed limitation sections
+%@ index THETA ordered=0 cyclic=0 :: Set of scenarios
+%
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted normalized positive/negative arrival delays, departure delays, and dwelling plan change penalty
+%
+%@ param Y shape=T,S kind=matrix domain=binary :: Binary parameter indicating scheduled dwelling or virtual station
+%@ param tau shape=T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
+%@ param omega shape=T,S kind=matrix domain=- :: Predictive disturbance for dwelling or running time (renamed from ω)
+%@ param M shape=- kind=big_m domain=- :: Large positive number for linearization
+%@ param Z shape=T,E kind=matrix domain=binary :: Binary parameter indicating train type
+%@ param H shape=L,S kind=matrix domain=- :: Speed limitation time horizon
+%@ param Td shape=T,S kind=matrix domain=- :: Planned departure time of train i at station s
+%@ param C shape=S kind=vector domain=- :: Capacity of station s
+%@ param Ta shape=T,S kind=matrix domain=- :: Scheduled arrival time of train i at station s
+%@ param alpha shape=- kind=scalar domain=- :: Weight for positive arrival delay (renamed from α)
+%@ param beta shape=- kind=scalar domain=- :: Weight for negative arrival delay (renamed from β)
+%@ param gamma shape=- kind=scalar domain=- :: Weight for departure delay (renamed from γ)
+%@ param delta shape=- kind=scalar domain=- :: Weight for dwelling plan change penalty (renamed from δ)
+%@ param g shape=- kind=scalar domain=- :: Function representing constraint violation
+%@ param P shape=THETA kind=vector domain=- :: Probability of scenario
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant for linearization (renamed from ε)
+%@ param m shape=- kind=scalar domain=- :: Lower bound for linearization
+%@ param Mu shape=- kind=scalar domain=- :: Upper bound for linearization
+%@ param mu shape=- kind=scalar domain=- :: Lower bound for linearization
+%
+%@ var u shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or order of arrival/departure
+%@ var ta shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time of train i at station s
+%@ var td shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time of train i from station s
+%@ var x shape=T,T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
+%@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ var da shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Positive or negative arrival delay
+%@ var dd shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure delay
+%@ var f shape=L,THETA domain=non_negative role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for linearization of chance constraints
+%@ var I shape=THETA domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating scenario satisfaction
+%
+% Constraint rows
+%@ con eq_0001 kind=linear domain=- indicator=- :: Dwelling plan change constraint (1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Minimum dwelling time constraint with disturbance (2)
+%@ con eq_0003 kind=big_m domain=- indicator=- :: Upper bound dwelling time constraint (3)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time constraint for train maximum speed (4)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Upper bound running time under speed limitation (5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Lower bound running time under speed limitation (6)
+%@ con eq_0007 kind=headway domain=- indicator=- :: Arrival headway constraint (7)
+%@ con eq_0008 kind=headway domain=- indicator=- :: Departure headway constraint (8)
+%@ con eq_0009 kind=headway domain=- indicator=- :: Departure-arrival headway constraint (9)
+%@ con eq_0010 kind=headway domain=- indicator=- :: Departure-arrival headway constraint (10)
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Arrival order symmetry constraint (11)
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Departure order symmetry constraint (12)
+%@ con eq_0013 kind=ordering domain=- indicator=- :: Overtaking within section constraint (13)
+%@ con eq_0014 kind=ordering domain=- indicator=- :: No overtaking at virtual stations constraint (14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Timetable no-early-departure constraint (15)
+%@ con eq_0016 kind=capacity domain=- indicator=- :: Station capacity constraint (16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Objective term J1 positive arrival delay definition (17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Positive arrival delay lower bound (18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Positive arrival delay nonnegativity (19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Objective term J2 negative arrival delay definition (20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Negative arrival delay lower bound (21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Negative arrival delay nonnegativity (22)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Objective term J3 departure delay definition (23)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Departure delay definition (24)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Objective term J4 dwelling plan change penalty (25)
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Linearization constraint for auxiliary variable f (36)
+%@ con eq_0037 kind=big_m domain=- indicator=- :: Scenario-based chance constraints with dwelling plan changes (37)
+%@ con eq_0038 kind=big_m domain=- indicator=- :: Scenario-based chance constraints without dwelling plan changes (38)
+%@ con eq_0045 kind=linear domain=- indicator=- :: Linearized speed limitation stage model constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Linearized non-speed-limitation stage model constraint

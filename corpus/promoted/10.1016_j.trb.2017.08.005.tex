@@ -1,0 +1,96 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.08.005
+%@ meta id=10.1016_j.trb.2017.08.005 family=milp schema=0.1.0
+%@ name :: Multi-periodic train timetabling using a period-type-based Lagrangian relaxation decomposition
+%@ desc :: Mined from Multi-periodic train timetabling using a period-type-based Lagrangian relaxation decomposition (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.08.005
+%@ prov reference :: Multi-periodic train timetabling using a period-type-based Lagrangian relaxation decomposition
+%@ prov author :: Wenliang Zhou; Junli Tian; Lijuan Xue; Min Jiang; Lianbo Deng; Jin Qin
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of all period-type trains
+%@ index E ordered=0 cyclic=0 :: Set of all sections in the rail network
+%@ index m ordered=1 cyclic=0 :: Number of trains of a period-type
+%@ index t ordered=1 cyclic=0 :: Time index in the planning horizon
+%@ index u ordered=0 cyclic=0 :: Arrival node in the time-space network
+%@ index v ordered=0 cyclic=0 :: Departure node in the time-space network
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f of period-type w uses arc a
+%@ index T ordered=1 cyclic=0 :: Planning time horizon
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train f of period-type w from section (i,j)
+%@ var G shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total travel time)
+%@ param c shape=A kind=vector domain=- :: Cost (travel time) of arc a
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the directed graph
+%@ index W ordered=0 cyclic=0 :: Set of period-types
+%@ index R ordered=0 cyclic=0 :: Set of origin nodes for a period-type
+%@ param F shape=E,W kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index D ordered=0 cyclic=0 :: Set of departure arcs
+%@ index J ordered=0 cyclic=0 :: Set of junction stations
+%@ index H ordered=0 cyclic=0 :: Set of headway times
+%@ param cap shape=S kind=vector domain=- :: Parking capacity of station i
+%@ index A_in ordered=0 cyclic=0 :: Set of inbound arcs to a node
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the time-space network
+%@ index n ordered=0 cyclic=0 :: Node index
+%@ index s ordered=0 cyclic=0 :: Set of destination nodes
+%@ index l ordered=0 cyclic=0 :: Path-unit in the time-space network
+%@ index nbar ordered=0 cyclic=0 :: Terminal node of a path-unit
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of arrival time of train f of period-type w into section (i,j)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of departure time of train f of period-type w from section (i,j)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of operation period length of period-type w
+%@ con eq_0005 kind=ordering domain=- indicator=- :: Equal headway between consecutive trains of same period-type entering a section
+%@ con eq_0006 kind=ordering domain=- indicator=- :: Equal headway between consecutive trains of same period-type leaving a section
+%@ con eq_0007 kind=ordering domain=- indicator=- :: Equal headway of same period-type trains entering and leaving a section
+%@ con eq_0008 kind=ordering domain=- indicator=- :: Equal headway of same period-type trains between consecutive sections
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum load factor for first train: cannot choose origin transition arcs before its minimum departure time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Minimum load factor for other trains: enforce minimum departure interval from origin to maintain load factor
+%@ con eq_0011 kind=linear domain=- indicator=- :: Minimum travel time of first train in each section
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum dwell time of first train at stations
+%@ con eq_0013 kind=headway domain=- indicator=- :: Safety headway constraint for trains entering sections
+%@ con eq_0014 kind=headway domain=- indicator=- :: Safety headway constraint for trains leaving sections
+%@ con eq_0015 kind=headway domain=- indicator=- :: Safety headway constraint for trains entering junction stations
+%@ con eq_0016 kind=capacity domain=- indicator=- :: Station parking capacity constraint
+%@ con eq_0017 kind=flow_balance domain=- indicator=- :: Flow balance: each train departs from exactly one origin node
+%@ con eq_0018 kind=flow_balance domain=- indicator=- :: Flow balance at intermediate nodes
+%@ con eq_0019 kind=flow_balance domain=- indicator=- :: Flow balance: each train arrives at exactly one destination node
+%@ con eq_0025 kind=linear domain=- indicator=- :: Nonnegativity of arrival headway Lagrangian multipliers
+%@ con eq_0026 kind=linear domain=- indicator=- :: Nonnegativity of departure headway Lagrangian multipliers
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of station capacity Lagrangian multipliers
+%@ con eq_0028 kind=linear domain=- indicator=- :: Nonnegativity of junction headway Lagrangian multipliers
+%@ con eq_0029 kind=linear domain=- indicator=- :: Sub-gradient definition for arrival headway multipliers
+%@ con eq_0030 kind=linear domain=- indicator=- :: Sub-gradient definition for departure headway multipliers
+%@ con eq_0031 kind=linear domain=- indicator=- :: Sub-gradient definition for junction headway multipliers
+%@ con eq_0032 kind=linear domain=- indicator=- :: Sub-gradient definition for station capacity multipliers
+%@ con eq_0038 kind=linear domain=- indicator=- :: Available operation period condition ensuring minimum load factors
+%@ con eq_0039 kind=linear domain=- indicator=- :: Planning horizon constraint for last train arrival
+%@ con eq_0041 kind=linear domain=- indicator=- :: Path-unit must avoid all arcs in the forbidden arc set
+\begin{align}
+  & a_{w , f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot x_{w , f} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; \left(i , j\right) \in E_{w} \tag{eq\_0001} \\
+  & d_{w , f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot x_{w , f} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; \left(i , j\right) , \left(j , i^{'}\right) \in E_{w} \tag{eq\_0002} \\
+  & T_{w} = \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) , \forall w ; \left(r_{w} , j\right) \in E_{w} \tag{eq\_0003} \\
+  \min\quad & \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{a \in A_{w}} x_{w , f} \left(a\right) \cdot c \left(a\right) \tag{eq\_0004} \\
+  & \sum_{t = 1}^{T} t \cdot x_{w , f + 2} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) + \sum_{t = 1}^{T} t \cdot x_{w , f} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) = 2 \cdot \sum_{t = 1}^{T} t \cdot x_{w , f + 1} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} - 2 ; \left(i , j\right) \in E_{w} \tag{eq\_0005} \\
+  & \sum_{t = 1}^{T} t \cdot x_{w , f + 2} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) + \sum_{t = 1}^{T} t \cdot x_{w , f} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) = 2 \cdot \sum_{t = 1}^{T} t \cdot x_{w , f + 1} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} - 2 ; \left(i , j\right) , \left(j , i^{'}\right) \in E_{w} \tag{eq\_0006} \\
+  & \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) = \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) , \forall w ; \left(i , j\right) , \left(j , i^{'}\right) \in E_{w} \tag{eq\_0007} \\
+  & \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(v_{i , j}^{t} , u_{j , i^{'}}^{t}\right) = \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(u_{j , i^{'}}^{t} , v_{j , i^{'}}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(u_{j , i^{'}}^{t} , v_{j , i^{'}}^{t}\right) , \forall w ; \left(i , j\right) , \left(j , i^{'}\right) \in E_{w} \tag{eq\_0008} \\
+  & \sum_{t = 1}^{t_{w}^{m i n} - 1} x_{w , 1} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) = 0 , \forall w ; \left(r_{w} , j\right) \in E_{w} \tag{eq\_0009} \\
+  & x_{w , f} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) + \sum_{\mathit{tau} = t + 1}^{t + R T_{w} \left(t\right) - 1} x_{w , f + 1} \left(u_{r_{w} , j}^{\mathit{tau}} , v_{r_{w} , j}^{\mathit{tau}}\right) \leq 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} - 1 ; t = t_{w}^{m i n} , t_{w}^{m i n} + 1 , \hdots , T ; \left(r_{w} , j\right) \in E_{w} \tag{eq\_0010} \\
+  & \sum_{t = 1}^{T - 1} x_{w , 1} \left(v_{i , j}^{t} , v_{i , j}^{t + 1}\right) \geq F \cdot T_{i , j}^{w} , \forall w ; \left(i , j\right) \in E_{w} \tag{eq\_0011} \\
+  & \sum_{t = 1}^{T - 1} x_{w , 1} \left(u_{i , j}^{t} , u_{i , j}^{t + 1}\right) \geq S \cdot T_{i}^{w} , \forall w ; \left(i , j\right) \in E_{w} \tag{eq\_0012} \\
+  & \sum_{\mathit{tau} = t}^{t + A T_{i , j} - 1} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) \in E_{w}} x_{w , f} \left(u_{i , j}^{\mathit{tau}} , v_{i , j}^{\mathit{tau}}\right) \leq 1 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0013} \\
+  & \sum_{\mathit{tau} = t}^{t + D T_{i , j} - 1} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , i^{'}\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , i^{'}}^{\mathit{tau}}\right) \leq 1 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0014} \\
+  & \sum_{\mathit{tau} = t}^{t + H_{j} - 1} \sum_{\left(i , j\right) \in \left({E}\right)_{j}} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , i^{'}\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , i^{'}}^{\mathit{tau}}\right) \leq 1 , \forall j \in J \cdot S ; t = 1 , 2 , \hdots T \tag{eq\_0015} \\
+  & \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) \in E_{w}} x_{w , f} \left(u_{i , j}^{t} , u_{i , j}^{t + 1}\right) \leq \mathit{cap}_{i} , \forall i \in S ; t = 1 , 2 , \hdots T - 1 \tag{eq\_0016} \\
+  & \sum_{n \in N_{w}^{r}} \sum_{a \in \hat{A} \left(n\right)} x_{w , f} \left(a\right) = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0017} \\
+  & \sum_{a \in \hat{A} \left(n\right)} x_{w , f} \left(a\right) = \sum_{a \in {A} \left(n\right)} x_{w , f} \left(a\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; n \in N_{w} / \left(N_{w}^{r} \cup N_{w}^{s}\right) \tag{eq\_0018} \\
+  & \sum_{n \in N_{w}^{s}} \sum_{a \in {A} \left(n\right)} x_{w , f} \left(a\right) = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0019} \\
+  & s . t \mathit{alpha} \left(i , j , t\right) \geq 0 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0025} \\
+  & \mathit{beta} \left(i , j , t\right) \geq 0 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0026} \\
+  & \mathit{beta} \mathit{gamma} \left(i , t\right) \geq 0 , \forall i \in S ; t = 1 , 2 , \hdots T - 1 \tag{eq\_0027} \\
+  & \mathit{delta} \left(j , t\right) \geq 0 , \forall j \in J \cdot S ; t = 1 , 2 , \hdots T \tag{eq\_0028} \\
+  & \mathit{rho}_{a}^{g} \left(i , j , t\right) = \sum_{\mathit{tau} = t}^{t + A T_{i , j} - 1} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) \in E_{w}} x_{w , f} \left(u_{i , j}^{\mathit{tau}} , v_{i , j}^{\mathit{tau}}\right) - 1 \tag{eq\_0029} \\
+  & \mathit{rho}_{\mathit{beta}}^{g} \left(i , j , t\right) = \sum_{\mathit{tau} = t}^{t + D T_{i , j} - 1} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , i^{'}\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , i^{'}}^{\mathit{tau}}\right) - 1 \tag{eq\_0030} \\
+  & \mathit{rho}_{\mathit{delta}}^{g} \left(j , t\right) = \sum_{\mathit{tau} = t}^{t + H_{j} - 1} \sum_{\left(i , j\right) \in \left({E}\right)_{j}} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , i^{'}\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , i^{'}}^{\mathit{tau}}\right) - 1 \tag{eq\_0031} \\
+  & \mathit{rho}_{\mathit{gamma}}^{g} \left(i , t\right) = \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) \in E_{w}} x_{w , f} \left(u_{i , j}^{t} , u_{i , j}^{t + 1}\right) - \mathit{cap}_{i} \tag{eq\_0032} \\
+  & \mathit{Gamma} \geq m a x \left\{R \cdot T_{w} \left(t_{n} + \mathit{varepsilon} \cdot \mathit{Gamma}\right) \left|\right. \mathit{varepsilon} = 0 , 1 , \hdots , m_{w} - 2\right\} \tag{eq\_0038} \\
+  & t_{n} + \left(m_{w} - 1\right) \cdot \mathit{Gamma} + \mathcal{R}_{w} \leq T \tag{eq\_0039} \\
+  & \left(n , n^{'}\right) \notin A_{f o r b i t} , \forall \left(n , n^{'}\right) \in l \left(n_{b} , \bar{n}\right) \tag{eq\_0041} \\
+\end{align}

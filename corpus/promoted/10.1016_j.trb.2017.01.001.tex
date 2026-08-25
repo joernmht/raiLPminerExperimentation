@@ -1,0 +1,96 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2017.01.001
+%@ meta id=10.1016_j.trb.2017.01.001 family=milp schema=0.1.0
+%@ name :: Dynamic passenger demand oriented metro train scheduling with energy-efficiency and waiting time minimization: Mixed-integer linear programming approaches
+%@ desc :: Mined from Dynamic passenger demand oriented metro train scheduling with energy-efficiency and waiting time minimization: Mixed-integer linear programming approaches (Transportation Research Part B Methodological, 2017).
+%@ prov source :: 10.1016/j.trb.2017.01.001
+%@ prov reference :: Dynamic passenger demand oriented metro train scheduling with energy-efficiency and waiting time minimization: Mixed-integer linear programming approaches
+%@ prov author :: Jiateng Yin; Lixing Yang; Tao Tang; Ziyou Gao; Bin Ran
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted total passenger waiting time and train energy consumption (with utilized regenerative energy in RTS model)
+%@ index T ordered=0 cyclic=0 :: Set of timestamps in the planning horizon
+%@ index t ordered=0 cyclic=0 :: Time index
+%@ param W shape=- kind=scalar domain=- :: Weight factor for passenger waiting time
+%@ var n shape=I,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers at station i and time t
+%@ param delta shape=- kind=scalar domain=- :: Time interval length
+%@ index I ordered=0 cyclic=0 :: Set of involved metro stations
+%@ var b shape=I,T domain=integer role=primary drole=- lo=- hi=- :: Number of boarding passengers at station i in time interval (t−δ,t]
+%@ param p shape=I,I,T kind=matrix domain=- :: Time-variant passenger demand ratio from station i to j
+%@ var x shape=I,I,T,T,K domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train k using space-time arc (i,j,t,t′)
+%@ index K ordered=0 cyclic=0 :: Set of in-service trains to be scheduled
+%@ param d shape=I,T kind=matrix domain=- :: Number of arriving passengers at station i at timestamp t
+%@ param E shape=I,I,T,T,K kind=matrix domain=- :: Energy consumption of train k on space-time arc (i,j,t,t′)
+%@ index S ordered=0 cyclic=0 :: Set of involved links
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs
+%@ param D shape=- kind=scalar domain=- :: Dummy destination station
+%@ param w shape=- kind=scalar domain=- :: Weight factor for energy consumption
+%@ param ETS shape=- kind=scalar domain=- :: Model name for energy-efficient train scheduling
+%@ param Z shape=- kind=scalar domain=- :: Objective function value
+%@ param M shape=- kind=scalar domain=- :: Number of time intervals in planning horizon
+%@ param O shape=- kind=scalar domain=- :: Dummy origin station
+%@ param s shape=I,I kind=matrix domain=- :: Length of link (i,j)
+%@ param R shape=- kind=scalar domain=- :: Regenerative braking energy
+%@ param h shape=I,I kind=matrix domain=- :: Minimum headway between successive trains on link (i,j)
+%@ param d_bar shape=I kind=vector domain=- :: Maximum dwelling time at station i
+%@ param C shape=K kind=vector domain=- :: Loading capacity of train k
+%@ param N shape=- kind=scalar domain=- :: Set of nonnegative integer variables (N+)
+%@ param G shape=U,T kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints
+%@ index U ordered=0 cyclic=0 :: Set of power supply substations
+%@ con eq_0004 kind=linear domain=- indicator=- :: Nonnegativity of waiting and boarding passenger counts
+%@ con eq_0005 kind=linear domain=- indicator=- :: Equivalent cumulative-form passenger waiting time expression
+%@ con eq_0006 kind=linear domain=- indicator=- :: Passenger flow balance at first time step after t0
+%@ con eq_0007 kind=linear domain=- indicator=- :: Passenger flow balance at second time step after t0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Ellipsis of intermediate passenger flow balance equations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger flow balance at time t
+%@ con eq_0013 kind=linear domain=- indicator=- :: Definition of train arrival time at station j on link (i,j)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Selection of operation level l* for a space-time arc
+%@ con eq_0015 kind=linear domain=- indicator=- :: Traction force (per unit mass) of train k on a space-time arc
+%@ con eq_0016 kind=linear domain=- indicator=- :: Braking force (per unit mass) of train k on a space-time arc
+%@ con eq_0017 kind=linear domain=- indicator=- :: Energy consumption of train k on a travelling space-time arc
+%@ con eq_0022 kind=linear domain=- indicator=- :: Minimum departure headway constraint between successive trains
+%@ con eq_0023 kind=linear domain=- indicator=- :: Minimum arrival headway constraint between successive trains
+%@ con eq_0024 kind=linear domain=- indicator=- :: Minimum dwelling time constraint at station i
+%@ con eq_0025 kind=linear domain=- indicator=- :: Maximum dwelling time constraint at station i
+%@ con eq_0026 kind=linear domain=- indicator=- :: Definition of train entering time via selected space-time arcs
+%@ con eq_0027 kind=linear domain=- indicator=- :: Definition of train leaving time via selected space-time arcs
+%@ con eq_0028 kind=linear domain=- indicator=- :: Boarding passenger limit determined by dwelling trains and boarding speed
+%@ con eq_0029 kind=linear domain=- indicator=- :: Cumulative boarding passengers cannot exceed cumulative arrivals plus initial waiting
+%@ con eq_0030 kind=linear domain=- indicator=- :: Train loading capacity constraint
+%@ con eq_0031 kind=linear domain=- indicator=- :: Binary restriction on space-time arc selection variables
+%@ con eq_0032 kind=linear domain=- indicator=- :: Integer restriction on boarding passenger variables
+%@ con eq_0033 kind=linear domain=- indicator=- :: Utilized regenerative energy equals minimum of available traction energy and recovered braking energy
+%@ con eq_0034 kind=linear domain=- indicator=- :: Objective function of RTS model with regenerative energy utilization
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized mixed-integer programming formulation of RTS model
+%@ con eq_0036 kind=linear domain=- indicator=- :: Upper bound on utilized regenerative energy from traction energy (r_t^u ≤ F_a(u,t))
+%@ con eq_0046 kind=linear domain=- indicator=- :: Allowable passenger boarding speed cap at each station and time interval (b_t^i ≤ b_max^i)
+\begin{align}
+  & \begin{matrix}W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot n_{t}^{i} ,\end{matrix} \tag{eq\_0004} \\
+  & \begin{matrix}n_{t}^{i} = n_{t - \mathit{delta}}^{i} + \sum_{i \leq j \leq 2 I} p_{i j} \left(t\right) \cdot \mathit{delta} - b_{t}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , i \in \mathcal{I} ,\end{matrix} \tag{eq\_0005} \\
+  & \begin{matrix}b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i t^{'} t}^{k} \cdot b_{m a x}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , t^{'} = t - \mathit{delta} , i \in \mathcal{I} ,\end{matrix} \tag{eq\_0006} \\
+  & \begin{matrix}n_{t}^{i} , b_{t}^{i} \geq 0 , \forall t \in \mathcal{T} , i \in \mathcal{I} .\end{matrix} \tag{eq\_0007} \\
+  & d_{t}^{i} = \sum_{i \leq j \leq 2 I} p_{i j} \left(t\right) \cdot \mathit{delta} , \forall t \in \mathcal{T} , i \in \mathcal{I} \tag{eq\_0008} \\
+  & \begin{matrix}W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{\bar{t} \in \left[t_{0} , t\right]} \left(d_{\bar{t}}^{i} - b_{\bar{t}}^{i}\right)\right) ,\end{matrix} \tag{eq\_0009} \\
+  & \begin{matrix}n_{t}^{i} = n_{t - \mathit{delta}}^{i} + d_{t}^{i} - b_{t}^{i} .\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix}n_{t}^{i} = n_{t_{0}}^{i} + \sum_{\bar{t} \in \left(t_{0} , t\right]} \left(d_{\bar{t}}^{i} - b_{\bar{t}}^{i}\right)\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix}\sum_{\bar{t} \in \left[t_{0} , t\right]} b_{\bar{t}}^{i} \leq n_{t_{0}}^{i} + \sum_{\bar{t} \in \left[t_{0} , t\right]} d_{\bar{t}}^{i} , \forall t \in \mathcal{T} , i \in \mathcal{I} .\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix}T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} t \cdot x_{i j t t^{'}}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} ,\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix}T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} t^{'} \cdot x_{i j t t^{'}}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} .\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix}(\text{ETS}) \underset{\mathbf{x} , \mathbf{b}}{min} Z_{1} \left(\mathbf{x} , \mathbf{b}\right) = w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{\bar{t} \in \left[t_{0} , t\right]} \left(d_{\bar{t}}^{i} - b_{\bar{t}}^{i}\right)\right) + w_{E} \sum_{k \in \mathcal{K}} \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} E_{k} \left(i , j , t , t^{'}\right) x_{i j t t^{'}}^{k}\end{matrix} \tag{eq\_0022} \\
+  & \begin{matrix} \text{s}.\text{t}. \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} x_{i j t t^{'}}^{k} - \sum_{\left(j , i , t^{'} , t\right) \in \mathcal{A}} x_{j i t^{'} t}^{k} = \begin{cases} 1 & i = O , t = t_{0} , \\ - 1 & i = D , t = t_{0} + M \cdot \mathit{delta} , \\ 0 & \text{otherwise} , \end{cases} \forall k \in \mathcal{K}\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & T \cdot E_{2 I , D}^{k} + T \cdot R_{k} \leq T \cdot D_{O 1}^{k + K_{p}} , \forall k , k + K_{p} \in \mathcal{K}\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix} & T \cdot D_{I \left(I + 1\right)}^{k} - T \cdot E_{I \left(I + 1\right)}^{k} = T \cdot A_{k} , \forall k \in \mathcal{K}\end{matrix} \tag{eq\_0025} \\
+  & \begin{matrix} & T \cdot E_{i j}^{k - 1} + h_{i j} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0026} \\
+  & \begin{matrix} & T \cdot D_{i j}^{k - 1} + h_{i j} \leq T \cdot D_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0027} \\
+  & \begin{matrix} & T \cdot D_{j^{'} i}^{k} + \left(\underset{̲}{d}\right)_{i} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(j^{'} , i\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0028} \\
+  & \begin{matrix} & T \cdot E_{i j}^{k} - \left(\bar{d}\right)_{i} \leq T \cdot D_{j^{'} i}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(j^{'} , i\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0029} \\
+  & \begin{matrix} & T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} t \cdot x_{i j t t^{'}}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0030} \\
+  & \begin{matrix} & T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} t^{'} \cdot x_{i j t t^{'}}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0031} \\
+  & \begin{matrix} & b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i t^{'} t}^{k} \cdot b_{m a x}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T} \backslash \left\{t_{0}\right\} , t^{'} = t - \mathit{delta}\end{matrix} \tag{eq\_0032} \\
+  & \begin{matrix} & \sum_{\bar{t} \in \left[t_{0} , t\right]} b_{\bar{t}}^{i} \leq n_{t_{0}}^{i} + \sum_{\bar{t} \in \left[t_{0} , t\right]} d_{\bar{t}}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T}\end{matrix} \tag{eq\_0033} \\
+  & \begin{matrix} & \sum_{i^{'} \in \left[1 , i\right]} \sum_{t \in \mathcal{T}} \left[\sum_{j > i}^{2 I} \mathit{delta} \cdot p_{i^{'} j} \left(t + \mathit{delta}\right) \sum_{{t} \in \left[t_{0} , t\right]} \sum_{t^{'} \in \mathcal{T}} \left(x_{i^{'} \left(i^{'} + 1\right) {t} t^{'}}^{k - 1} - x_{i^{'} \left(i^{'} + 1\right) {t} t^{'}}^{k}\right)\right] \leq C_{k} , \\ & \forall i \in \mathcal{I} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0034} \\
+  & \begin{matrix} & x_{i j t t^{'}}^{k} \in \left\{0 , 1\right\} , \forall \left(i , j , t , t^{'}\right) \in \mathcal{A} , k \in \mathcal{K}\end{matrix} \tag{eq\_0035} \\
+  & \begin{matrix} & b_{t}^{i} \in \mathcal{N}^{+} , \forall i \in \mathcal{I} , t \in \mathcal{T} .\end{matrix} \tag{eq\_0036} \\
+  \begin{matrix}\begin{matrix}\quad & & \underset{\mathbf{x} , \mathbf{b}}{min} Z \left(\mathbf{x} , \mathbf{b}\right) = w_{E} \left[\sum_{k \in \mathcal{K}} \sum_{\left(i , j , t , t^{'}\right) \in \mathcal{A}} E_{k} \left(i , j , t , t^{'}\right) x_{i j t t^{'}}^{k} - \sum_{t \in \mathcal{T}^{M}} \sum_{u \in \mathcal{U}} G_{u} \left(t\right)\right] \\ & + w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \left(n_{t_{0}}^{i} + \sum_{\bar{t} \in \left[t_{0} , t\right]} \left(d_{\bar{t}}^{i} - b_{\bar{t}}^{i}\right)\right) \\ & \text{s}.\text{t}. \text{constraints} \left(19\right) - \left(32\right) .\end{matrix}\end{matrix} \tag{eq\_0040} \\
+  & b_{t}^{i} \leq b_{m a x}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T} . \tag{eq\_0046} \\
+\end{align}

@@ -1,0 +1,102 @@
+% Declaration sidecar for 10.1016_j.trc.2022.103994
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2022.103994
+% Joint optimization of train scheduling and routing in a coupled multi-resolution space–time railway network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2022.103994.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of selected space-time arcs
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Macro time index
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Macro station index
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Macro station index (destination)
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs in the network
+
+% x: classified as variable during review
+%@ var x shape=K,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of trains
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Micro time index
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Micro station index
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Micro station index (destination)
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway time between trains on a segment
+
+% unusable as an identifier, rename or drop: Ψ
+
+% d: classified as variable during review
+%@ var d shape=K,I,J,T domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
+
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Coupling set between macro and micro nodes
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total cost)
+
+% c: classified as parameter during review
+%@ param c shape=K,A kind=matrix domain=- :: Cost of using space-time arc a by train k
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, k, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Macro flow balance constraint (Eq. 1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Micro flow balance constraint (Eq. 2)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of incompatible arc set Ψ (Eq. 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure resource occupation setting (Eq. 5)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival resource occupation setting (Eq. 6)
+%@ con eq_0007 kind=headway domain=- indicator=- :: Macro departure resource headway constraint (Eq. 7)
+%@ con eq_0008 kind=headway domain=- indicator=- :: Macro arrival resource headway constraint (Eq. 8)
+%@ con eq_0009 kind=headway domain=- indicator=- :: Macro departure resource - train path relationship (Eq. 9)
+%@ con eq_0010 kind=headway domain=- indicator=- :: Macro arrival resource - train path relationship (Eq. 10)
+%@ con eq_0011 kind=headway domain=- indicator=- :: Micro departure resource headway constraint (Eq. 11)
+%@ con eq_0012 kind=headway domain=- indicator=- :: Micro arrival resource headway constraint (Eq. 12)
+%@ con eq_0013 kind=headway domain=- indicator=- :: Micro departure resource - train path relationship (Eq. 13)
+%@ con eq_0014 kind=headway domain=- indicator=- :: Micro arrival resource - train path relationship (Eq. 14)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Macro-micro coupling: outgoing micro path equals macro arc (Eq. 15)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Macro-micro coupling: incoming micro path equals macro arc (Eq. 16)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Binary restriction for macro arc variables (Eq. 17)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary restriction for macro departure resource variables (Eq. 18)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary restriction for macro arrival resource variables (Eq. 19)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary restriction for micro arc variables (Eq. 20)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary restriction for micro departure resource variables (Eq. 21)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary restriction for micro arrival resource variables (Eq. 22)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Objective function definition (Eq. 23/24)
+%@ con eq_0033 kind=headway domain=- indicator=- :: Updated departure headway constraint for train pair (Eq. 33)
+%@ con eq_0034 kind=headway domain=- indicator=- :: Updated arrival headway constraint for train pair (Eq. 34)
+%@ con eq_0035 kind=headway domain=- indicator=- :: Additional headway constraint updating equation
+%@ con eq_0036 kind=headway domain=- indicator=- :: Additional headway constraint updating equation

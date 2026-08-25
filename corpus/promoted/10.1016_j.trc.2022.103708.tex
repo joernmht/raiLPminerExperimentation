@@ -1,0 +1,172 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2022.103708
+%@ meta id=10.1016_j.trc.2022.103708 family=milp schema=0.1.0
+%@ name :: Joint optimization of train scheduling and rolling stock circulation planning with passenger flow control on tidal overcrowded metro lines
+%@ desc :: Mined from Joint optimization of train scheduling and rolling stock circulation planning with passenger flow control on tidal overcrowded metro lines (Transportation Research Part C Emerging Technologies, 2022).
+%@ prov source :: 10.1016/j.trc.2022.103708
+%@ prov reference :: Joint optimization of train scheduling and rolling stock circulation planning with passenger flow control on tidal overcrowded metro lines
+%@ prov author :: Housheng Zhou; Jianguo Qi; Lixing Yang; Jungang Shi; Pengli Mo
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting time and operating costs
+%@ index t ordered=1 cyclic=0 :: Time index for discrete timestamps
+%@ index l ordered=0 cyclic=0 :: Service index
+%@ index N ordered=1 cyclic=0 :: Set of services in downstream direction
+%@ index Nbar ordered=1 cyclic=0 :: Set of services in upstream direction
+%@ index S ordered=1 cyclic=0 :: Set of stations in downstream direction
+%@ index Sbar ordered=1 cyclic=0 :: Set of stations in upstream direction
+%@ index T ordered=1 cyclic=0 :: Set of discrete time points
+%@ var z shape=l,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary arrival indicator for service l at station k at time t
+%@ param h shape=- kind=scalar domain=- :: Headway bounds (h_min, h_max)
+%@ var P shape=k,t domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (waiting, boarding, alighting, etc.)
+%@ var b shape=l,k,t domain=binary role=primary drole=- lo=- hi=- :: Boarding indicator for service l at station k at time t
+%@ var y shape=l,j domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if service l uses rolling stock type j
+%@ index J ordered=0 cyclic=0 :: Set of rolling stock types
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+%@ param Cbar shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 1
+%@ param C shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 2
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
+%@ var R shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total fixed costs of online services
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ index o ordered=0 cyclic=0 :: Index for origin station
+%@ index r ordered=0 cyclic=0 :: Index for running time
+%@ index j ordered=0 cyclic=0 :: Index for rolling stock type
+%@ index k ordered=1 cyclic=0 :: Index for station
+%@ con eq_0001 kind=linear domain=- indicator=- :: Arrival time definition: t_l,k^a = t_l,k-1^d + running time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Departure time definition: t_l,k^d = t_l,k^a + dwell time
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Upstream first service arrival time at origin
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Upstream last service arrival time at origin lower bound
+%@ con eq_0004_a kind=linear domain=- indicator=- :: Downstream first service arrival time at origin
+%@ con eq_0004_b kind=linear domain=- indicator=- :: Downstream last service arrival time at origin lower bound
+%@ con eq_0005 kind=linear domain=- indicator=- :: Arrival time via z indicator: t_l,k^a = sum_t t * (z_l,k(t)-z_l,k(t-1))
+%@ con eq_0008 kind=linear domain=- indicator=- :: Headway constraint upstream
+%@ con eq_0009 kind=linear domain=- indicator=- :: Headway constraint downstream
+%@ con eq_0010 kind=linear domain=- indicator=- :: Passenger waiting count at station k and time t
+%@ con eq_0011 kind=linear domain=- indicator=- :: Nonnegativity of waiting passengers
+%@ con eq_0012 kind=linear domain=- indicator=- :: All arriving passengers served
+%@ con eq_0013 kind=linear domain=- indicator=- :: Boarding passengers by destination (nonlinear)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Total boarding passengers at station
+%@ con eq_0015 kind=linear domain=- indicator=- :: Total alighting passengers at station
+%@ con eq_0016 kind=linear domain=- indicator=- :: In-vehicle passenger load evolution
+%@ con eq_0021 kind=linear domain=- indicator=- :: Connection limit for upstream services
+%@ con eq_0022 kind=linear domain=- indicator=- :: Alpha definition for upstream services
+%@ con eq_0023 kind=linear domain=- indicator=- :: Connection limit for downstream services
+%@ con eq_0024 kind=linear domain=- indicator=- :: Alpha definition for downstream services
+%@ con eq_0025 kind=linear domain=- indicator=- :: Next service limit for upstream services
+%@ con eq_0026 kind=linear domain=- indicator=- :: Beta definition for upstream services
+%@ con eq_0027 kind=linear domain=- indicator=- :: Next service limit for downstream services
+%@ con eq_0028 kind=linear domain=- indicator=- :: Beta definition for downstream services
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Rolling stock type consistency for connected services
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Turn-around time lower bound (downstream to upstream)
+%@ con eq_0031 kind=big_m domain=- indicator=- :: Turn-around time upper bound (downstream to upstream)
+%@ con eq_0032_a kind=big_m domain=- indicator=- :: Turn-around time lower bound (upstream to downstream)
+%@ con eq_0032_b kind=big_m domain=- indicator=- :: Turn-around time upper bound (upstream to downstream)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Available rolling stock constraint at depot 1
+%@ con eq_0035 kind=linear domain=- indicator=- :: Available rolling stock constraint at depot 2
+%@ con eq_0036 kind=linear domain=- indicator=- :: Total passenger waiting time definition
+%@ con eq_0037 kind=linear domain=- indicator=- :: Total fixed costs of services definition
+%@ con eq_0038 kind=linear domain=- indicator=- :: Total movement costs of rolling stocks exiting depots
+%@ con eq_0040 kind=linear domain=- indicator=- :: Linearized boarding passenger sum
+%@ con eq_0042 kind=linear domain=- indicator=- :: Linearized depot 1 inventory constraint
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization inequalities for depot 1 auxiliary variables
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linearized depot 2 inventory constraint
+%@ con eq_0046 kind=linear domain=- indicator=- :: Objective function definition
+%@ con eq_0047_a kind=linear domain=- indicator=- :: Linearization of boarding product: omega <= M * b
+%@ con eq_0047_b kind=linear domain=- indicator=- :: Linearization of boarding product: omega <= P_in * delta
+%@ con eq_0047_c kind=linear domain=- indicator=- :: Linearization of boarding product: omega >= P_in * delta - M*(1-b)
+%@ con eq_0049 kind=linear domain=- indicator=- :: Auxiliary variable bounds for depot 1 linearization
+%@ con eq_0050_a kind=linear domain=- indicator=- :: Depot 1 linearization: phi <= 1 - beta
+%@ con eq_0050_b kind=linear domain=- indicator=- :: Depot 1 linearization: phi <= y
+%@ con eq_0050_c kind=linear domain=- indicator=- :: Depot 1 linearization: phi >= y - beta
+%@ con eq_0050_d kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) <= phi
+%@ con eq_0050_e kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) <= z_terminal(t - ...)
+%@ con eq_0050_f kind=linear domain=- indicator=- :: Depot 1 linearization: psi(t) >= phi + z_terminal(...) - 1
+%@ con eq_0050_g kind=linear domain=- indicator=- :: Depot 1 linearization: pi <= 1 - alpha
+%@ con eq_0050_h kind=linear domain=- indicator=- :: Depot 1 linearization: pi <= y
+%@ con eq_0050_i kind=linear domain=- indicator=- :: Depot 1 linearization: pi >= y - alpha
+%@ con eq_0050_j kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) <= pi
+%@ con eq_0050_k kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) <= z_origin(t + ...)
+%@ con eq_0050_l kind=linear domain=- indicator=- :: Depot 1 linearization: zeta(t) >= pi + z_origin(...) - 1
+%@ con eq_0052 kind=linear domain=- indicator=- :: Auxiliary variable bounds for depot 2 linearization
+%@ con eq_0053_a kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar <= 1 - beta_l'
+%@ con eq_0053_b kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar <= y
+%@ con eq_0053_c kind=linear domain=- indicator=- :: Depot 2 linearization: phi_bar >= y - beta_l'
+%@ con eq_0053_d kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) <= phi_bar
+%@ con eq_0053_e kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) <= z_station(t - ...)
+%@ con eq_0053_f kind=linear domain=- indicator=- :: Depot 2 linearization: psi_bar(t) >= phi_bar + z_station(...) - 1
+%@ con eq_0053_g kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar <= 1 - alpha_l
+%@ con eq_0053_h kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar <= y
+%@ con eq_0053_i kind=linear domain=- indicator=- :: Depot 2 linearization: pi_bar >= y - alpha_l
+%@ con eq_0053_j kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) <= pi_bar
+%@ con eq_0053_k kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) <= z_origin(t + ...)
+%@ con eq_0053_l kind=linear domain=- indicator=- :: Depot 2 linearization: zeta_bar(t) >= pi_bar + z_origin(...) - 1
+\begin{align}
+  & t_{l , k}^{a} = t_{l , k - 1}^{d} + t_{l , k - 1}^{r} , \forall l \in \bar{N} , k , k - 1 \in \bar{S} \text{or} \forall l \in \underset{̲}{N} , k , k - 1 \in \underset{̲}{S} . \tag{eq\_0001} \\
+  & t_{l , k}^{d} = t_{l , k}^{a} + t_{l , k}^{w} , \forall l \in \bar{N} , k \in \bar{S} \text{or} \forall l \in \underset{̲}{N} , k \in \underset{̲}{S} . \tag{eq\_0002} \\
+  & t_{1 , 1}^{a} = \bar{t}^{\left(f i\right)} \tag{eq\_0003\_a} \\
+  & t_{\left|\bar{N}\right| , 1}^{a} \geq \bar{t}^{\left(l a\right)} \tag{eq\_0003\_b} \\
+  & t_{1 , \left|S\right| + 1}^{a} = \underset{̲}{t}^{\left(f i\right)} \tag{eq\_0004\_a} \\
+  & t_{\left|\underset{̲}{N}\right| , \left|S\right| + 1}^{a} \geq \underset{̲}{t}^{\left(l a\right)} \tag{eq\_0004\_b} \\
+  & t_{l , k}^{a} = \sum_{t \in T} t \cdot \left[z_{l , k} \left(t\right) - z_{l , k} \left(t - 1\right)\right] , \forall l \in \bar{N} , k \in \bar{S} , t , t - 1 \in T \text{or} \forall l \in \underset{̲}{N} , k \in \underset{̲}{S} , t , t - 1 \in T . \tag{eq\_0005} \\
+  & z_{l , k} \left(t - 1\right) \leq z_{l , k} \left(t\right) , \forall l \in \bar{N} , k \in \bar{S} , t , t - 1 \in T \text{or} \forall l \in \underset{̲}{N} , k \in \underset{̲}{S} , t , t - 1 \in T . \tag{eq\_0008} \\
+  & h_{m i n} \leq t_{l , 1}^{a} - t_{l - 1 , 1}^{a} \leq h_{m a x} , \forall l , l - 1 \in \bar{N} , \tag{eq\_0009} \\
+  & h_{m i n} \leq t_{l , \left|S\right| + 1}^{a} - t_{l - 1 , \left|S\right| + 1}^{a} \leq h_{m a x} , \forall l , l - 1 \in \underset{̲}{N} , \tag{eq\_0010} \\
+  & P_{k}^{w a} \left(t\right) = \sum_{\mathit{tau} = 1}^{t} \mathit{eta}_{k} \left(\mathit{tau}\right) - \sum_{\mathit{tau} = 1}^{t} P_{k}^{i n} \left(\mathit{tau}\right) , \forall k \in \bar{S} , t \in T \text{or} \forall k \in \underset{̲}{S} , t \in T . \tag{eq\_0011} \\
+  & P_{k}^{w a} \left(t\right) \geq 0 , \forall k \in \bar{S} , t \in T \text{or} \forall k \in \underset{̲}{S} , t \in T . \tag{eq\_0012} \\
+  & \sum_{t \in T} \mathit{eta}_{k} \left(t\right) = \sum_{t \in T} P_{k}^{i n} \left(t\right) , \forall k \in \bar{S} \text{or} \forall k \in \underset{̲}{S} . \tag{eq\_0013} \\
+  & P_{l , k , s}^{b o} = \sum_{t \in T} b_{l , k} \left(t\right) \cdot P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) , \forall l \in \bar{N} , k < s \in \bar{S} \text{or} \forall l \in \underset{̲}{N} , k < s \in \underset{̲}{S} . \tag{eq\_0014} \\
+  & P_{l , k}^{b o} = \sum_{s > k} P_{l , k , s}^{b o} , \forall l \in \bar{N} , k < s \in \bar{S} \text{or} \forall l \in \underset{̲}{N} , k < s \in \underset{̲}{S} . \tag{eq\_0015} \\
+  & P_{l , k}^{a l} = \sum_{v < k} P_{l , v , k}^{b o} , \forall l \in \bar{N} , v < k \in \bar{S} \text{or} \forall l \in \underset{̲}{N} , v < k \in \underset{̲}{S} . \tag{eq\_0016} \\
+  & \sum_{t \in T} P_{k}^{i n} \left(t\right) = \sum_{l \in \bar{N}} P_{l , k}^{b o} , \forall k \in \bar{S} . \tag{eq\_0021} \\
+  & \sum_{t \in T} P_{k}^{i n} \left(t\right) = \sum_{l \in \underset{̲}{N}} P_{l , k}^{b o} , \forall k \in \underset{̲}{S} . \tag{eq\_0022} \\
+  & \sum_{j \in J} y_{l , j} = 1 , \forall l \in \underset{̲}{N} \text{or} l \in \bar{N} . \tag{eq\_0023} \\
+  & 0 \leq \sum_{l \in \underset{̲}{N}} \mathit{gamma}_{l , l^{'}} \leq 1 , \forall l^{'} \in \bar{N} . \tag{eq\_0024} \\
+  & \mathit{alpha}_{l^{'}} = \sum_{l \in \underset{̲}{N}} \mathit{gamma}_{l , l^{'}} , \forall l^{'} \in \bar{N} . \tag{eq\_0025} \\
+  & 0 \leq \sum_{l^{'} \in \bar{N}} \mathit{gamma}_{l^{'} , l} \leq 1 , \forall l \in \underset{̲}{N} . \tag{eq\_0026} \\
+  & \mathit{alpha}_{l} = \sum_{l^{'} \in \bar{N}} \mathit{gamma}_{l^{'} , l} , \forall l \in \underset{̲}{N} . \tag{eq\_0027} \\
+  & 0 \leq \sum_{l \in \underset{̲}{N}} \mathit{gamma}_{l^{'} , l} \leq 1 , \forall l^{'} \in \bar{N} . \tag{eq\_0028} \\
+  & \mathit{beta}_{l^{'}} = \sum_{l \in \underset{̲}{N}} \mathit{gamma}_{l^{'} , l} , \forall l^{'} \in \bar{N} . \tag{eq\_0029} \\
+  & 0 \leq \sum_{l^{'} \in \bar{N}} \mathit{gamma}_{l , l^{'}} \leq 1 , \forall l \in \underset{̲}{N} . \tag{eq\_0030} \\
+  & \mathit{beta}_{l} = \sum_{l^{'} \in \bar{N}} \mathit{gamma}_{l , l^{'}} , \forall l \in \underset{̲}{N} . \tag{eq\_0031} \\
+  & y_{l , j} - y_{l^{'} , j} \leq M \cdot \left(1 - \mathit{gamma}_{l , l^{'}}\right) \tag{eq\_0032\_a} \\
+  & y_{l , j} - y_{l^{'} , j} \geq - M \cdot \left(1 - \mathit{gamma}_{l , l^{'}}\right) \tag{eq\_0032\_b} \\
+  & t_{l^{'} , 1}^{a} - t_{l , 2 \left|S\right|}^{d} \geq \underset{̲}{t}^{\left(r o l l\right)} - M \cdot \left(1 - \mathit{gamma}_{l , l^{'}}\right) , \forall l \in \underset{̲}{N} , l^{'} \in \bar{N} . \tag{eq\_0034} \\
+  & t_{l^{'} , 1}^{a} - t_{l , 2 \left|S\right|}^{d} \leq t_{m a x}^{\left(r o l l\right)} + M \cdot \left(1 - \mathit{gamma}_{l , l^{'}}\right) , \forall l \in \underset{̲}{N} , l^{'} \in \bar{N} . \tag{eq\_0035} \\
+  & t_{l , \left|S\right| + 1}^{a} - t_{l^{'} , \left|S\right|}^{d} \geq \bar{t}^{\left(r o l l\right)} - M \cdot \left(1 - \mathit{gamma}_{l^{'} , l}\right) , \forall l \in \underset{̲}{N} , l^{'} \in \bar{N} . \tag{eq\_0036} \\
+  & t_{l , \left|S\right| + 1}^{a} - t_{l^{'} , \left|S\right|}^{d} \leq t_{m a x}^{\left(r o l l\right)} + M \cdot \left(1 - \mathit{gamma}_{l^{'} , l}\right) , \forall l \in \underset{̲}{N} , l^{'} \in \bar{N} . \tag{eq\_0037} \\
+  & \bar{C \cdot N}_{j} + \sum_{l \in \underset{̲}{N}} \left(1 - \mathit{beta}_{l}\right) \cdot y_{l , j} \cdot z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - \underset{̲}{t}^{\left(r e\right)}\right) - \sum_{l^{'} \in \bar{N}} \left(1 - \mathit{alpha}_{l^{'}}\right) \cdot y_{l^{'} , j} \cdot z_{l^{'} , 1} \left(t + \bar{t}^{\left(l e\right)}\right) \geq 0 , \tag{eq\_0038} \\
+  & \underset{̲}{C \cdot N}_{j} + \sum_{l^{'} \in \bar{N}} \left(1 - \mathit{beta}_{l^{'}}\right) \cdot y_{l^{'} , j} \cdot z_{l^{'} , \left|S\right|} \left(t - t_{l^{'} , \left|S\right|}^{w} - \bar{t}^{\left(r e\right)}\right) - \sum_{l \in \underset{̲}{N}} \left(1 - \mathit{alpha}_{l}\right) \cdot y_{l , j} \cdot z_{l , \left|S\right| + 1} \left(t + \underset{̲}{t}^{\left(l e\right)}\right) \geq 0 , \tag{eq\_0040} \\
+  & W \cdot T = \sum_{t \in T} \sum_{k \in \bar{S} \cup \underset{̲}{S}} P_{k}^{w a} \left(t\right) \cdot t_{u n i t} . \tag{eq\_0042} \\
+  & C \cdot R = \sum_{j \in J} \sum_{l \in \bar{N} \cup \underset{̲}{N}} y_{l , j} \cdot M_{j}^{c o s t} . \tag{eq\_0043} \\
+  & C \cdot S = \sum_{l \in \bar{N} \cup \underset{̲}{N}} \left[\left(1 - \mathit{alpha}_{l}\right) \cdot M^{o u t}\right] . \tag{eq\_0044} \\
+  \min\quad & \mathit{lambda}_{1} \cdot \sum_{t \in T} \sum_{k \in \bar{S} \cup \underset{̲}{S}} P_{k}^{w a} \left(t\right) \cdot t_{u n i t} + \mathit{lambda}_{2} \cdot \left(\sum_{j \in J} \sum_{l \in \bar{N} \cup \underset{̲}{N}} y_{l , j} \cdot M_{j}^{c o s t} + \sum_{l \in \bar{N} \cup \underset{̲}{N}} \left[\left(1 - \mathit{alpha}_{l}\right) \cdot M^{o u t}\right]\right) \tag{eq\_0045} \\
+  & P_{l , k , s}^{b o} = \sum_{t \in T} \mathit{omega}_{l , k , s} \left(t\right) , \forall l \in \bar{N} , k < s \in \bar{S} o \cdot r \forall l \in \underset{̲}{N} , k < s \in \underset{̲}{S} . \tag{eq\_0046} \\
+  & 0 \leq \mathit{omega}_{l , k , s} \left(t\right) \leq M \cdot b_{l , k} \left(t\right) \tag{eq\_0047\_a} \\
+  & \mathit{omega}_{l , k , s} \left(t\right) \leq P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) \tag{eq\_0047\_b} \\
+  & \mathit{omega}_{l , k , s} \left(t\right) \geq P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) - M \cdot \left(1 - b_{l , k} \left(t\right)\right) \tag{eq\_0047\_c} \\
+  & \bar{C \cdot N}_{j} + \sum_{l \in \underset{̲}{N}} \underset{̲}{\mathit{psi}}_{l , j} \left(t\right) - \sum_{l^{'} \in \bar{N}} \bar{\mathit{zeta}}_{l^{'} , j} \left(t\right) \geq 0 , \forall j \in J , t , t - t_{l , 2 \left|S\right|}^{w} - \underset{̲}{t}^{\left(r e\right)} , t + \bar{t}^{\left(l e\right)} \in T . \tag{eq\_0049} \\
+  & \underset{̲}{\mathit{phi}}_{l , j} \leq 1 - \mathit{beta}_{l} \tag{eq\_0050\_a} \\
+  & \underset{̲}{\mathit{phi}}_{l , j} \leq y_{l , j} \tag{eq\_0050\_b} \\
+  & \underset{̲}{\mathit{phi}}_{l , j} \geq y_{l , j} - \mathit{beta}_{l} \tag{eq\_0050\_c} \\
+  & \underset{̲}{\mathit{psi}}_{l , j} \left(t\right) \leq \underset{̲}{\mathit{phi}}_{l , j} \tag{eq\_0050\_d} \\
+  & \underset{̲}{\mathit{psi}}_{l , j} \left(t\right) \leq z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - \underset{̲}{t}^{\left(r e\right)}\right) \tag{eq\_0050\_e} \\
+  & \underset{̲}{\mathit{psi}}_{l , j} \left(t\right) \geq \underset{̲}{\mathit{phi}}_{l , j} + z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - \underset{̲}{t}^{\left(r e\right)}\right) - 1 \tag{eq\_0050\_f} \\
+  & \bar{\mathit{pi}}_{l^{'} , j} \leq 1 - \mathit{alpha}_{l^{'}} \tag{eq\_0050\_g} \\
+  & \bar{\mathit{pi}}_{l^{'} , j} \leq y_{l^{'} , j} \tag{eq\_0050\_h} \\
+  & \bar{\mathit{pi}}_{l^{'} , j} \geq y_{l^{'} , j} - \mathit{alpha}_{l^{'}} \tag{eq\_0050\_i} \\
+  & \bar{\mathit{zeta}}_{l^{'} , j} \left(t\right) \leq \bar{\mathit{pi}}_{l^{'} , j} \tag{eq\_0050\_j} \\
+  & \bar{\mathit{zeta}}_{l^{'} , j} \left(t\right) \leq z_{l^{'} , 1} \left(t + \bar{t}^{\left(l e\right)}\right) \tag{eq\_0050\_k} \\
+  & \bar{\mathit{zeta}}_{l^{'} , j} \left(t\right) \geq \bar{\mathit{pi}}_{l^{'} , j} + z_{l^{'} , 1} \left(t + \bar{t}^{\left(l e\right)}\right) - 1 \tag{eq\_0050\_l} \\
+  & \underset{̲}{C \cdot N}_{j} + \sum_{l^{'} \in \bar{N}} \bar{\mathit{psi}}_{l^{'} , j} \left(t\right) - \sum_{l \in \underset{̲}{N}} \underset{̲}{\mathit{zeta}}_{l , j} \left(t\right) \geq 0 , \forall j \in J , t , t - t_{l^{'} , \left|S\right|}^{w} - \bar{t}^{\left(r e\right)} , t + \underset{̲}{t}^{\left(l e\right)} \in T . \tag{eq\_0052} \\
+  & \bar{\mathit{phi}}_{l^{'} , j} \leq 1 - \mathit{beta}_{l^{'}} \tag{eq\_0053\_a} \\
+  & \bar{\mathit{phi}}_{l^{'} , j} \leq y_{l^{'} , j} \tag{eq\_0053\_b} \\
+  & \bar{\mathit{phi}}_{l^{'} , j} \geq y_{l^{'} , j} - \mathit{beta}_{l^{'}} \tag{eq\_0053\_c} \\
+  & \bar{\mathit{psi}}_{l^{'} , j} \left(t\right) \leq \bar{\mathit{phi}}_{l^{'} , j} \tag{eq\_0053\_d} \\
+  & \bar{\mathit{psi}}_{l^{'} , j} \left(t\right) \leq z_{l^{'} , \left|S\right|} \left(t - t_{l^{'} , \left|S\right|}^{w} - \bar{t}^{\left(r e\right)}\right) \tag{eq\_0053\_e} \\
+  & \bar{\mathit{psi}}_{l^{'} , j} \left(t\right) \geq \bar{\mathit{phi}}_{l^{'} , j} + z_{l^{'} , \left|S\right|} \left(t - t_{l^{'} , \left|S\right|}^{w} - \bar{t}^{\left(r e\right)}\right) - 1 \tag{eq\_0053\_f} \\
+  & \underset{̲}{\mathit{pi}}_{l , j} \leq 1 - \mathit{alpha}_{l} \tag{eq\_0053\_g} \\
+  & \underset{̲}{\mathit{pi}}_{l , j} \leq y_{l , j} \tag{eq\_0053\_h} \\
+  & \underset{̲}{\mathit{pi}}_{l , j} \geq y_{l , j} - \mathit{alpha}_{l} \tag{eq\_0053\_i} \\
+  & \underset{̲}{\mathit{zeta}}_{l , j} \left(t\right) \leq \underset{̲}{\mathit{pi}}_{l , j} \tag{eq\_0053\_j} \\
+  & \underset{̲}{\mathit{zeta}}_{l , j} \left(t\right) \leq z_{l , \left|S\right| + 1} \left(t + \underset{̲}{t}^{\left(l e\right)}\right) \tag{eq\_0053\_k} \\
+  & \underset{̲}{\mathit{zeta}}_{l , j} \left(t\right) \geq \underset{̲}{\mathit{pi}}_{l , j} + z_{l , \left|S\right| + 1} \left(t + \underset{̲}{t}^{\left(l e\right)}\right) - 1 \tag{eq\_0053\_l} \\
+\end{align}

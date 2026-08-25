@@ -1,0 +1,69 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2019.100175
+%@ meta id=10.1016_j.jrtpm.2019.100175 family=milp schema=0.1.0
+%@ name :: A concurrent approach to the periodic event scheduling problem
+%@ desc :: Mined from A concurrent approach to the periodic event scheduling problem (Journal of Rail Transport Planning & Management, 2019).
+%@ prov source :: 10.1016/j.jrtpm.2019.100175
+%@ prov reference :: A concurrent approach to the periodic event scheduling problem
+%@ prov author :: Ralf Borndörfer; Niels Lindner; Sarah Roth
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted periodic slack
+%@ param w shape=- kind=vector :: Weight vector for slack variables in objective
+%@ var y shape=- domain=non_negative role=primary :: Periodic slack on activities
+%@ var pi shape=- domain=continuous role=primary :: Periodic timetable values for events
+%@ param ell shape=- kind=vector :: Lower bound on activity durations
+%@ param A shape=- kind=matrix :: Incidence matrix of event-activity network
+%@ param T shape=- kind=scalar :: Period length
+%@ index i ordered=0 cyclic=0 :: Index for events
+%@ index j ordered=0 cyclic=0 :: Index for events
+%@ var p shape=- domain=integer role=primary :: Periodic offsets for activities
+%@ param u shape=- kind=vector :: Upper bound on activity durations
+%@ param Z shape=- kind=scalar :: Set of integers (symbol for integer domain)
+%@ var z shape=- domain=integer role=primary :: Integer variables in cycle formulation
+%@ param Gamma shape=- kind=matrix :: Cycle matrix of the network
+%@ param gamma shape=- kind=vector :: Incidence vector of an oriented cycle
+%@ param alpha shape=- kind=scalar :: Modulo value used in change-cycle inequalities
+%@ con eq_0004 kind=linear :: Periodic slack definition y_ij = pi_j - pi_i - ell_ij + p_ij T
+%@ con eq_0005 kind=linear :: Bounds on periodic slack 0 <= y_ij <= u_ij - ell_ij
+%@ con eq_0006 kind=linear :: Timetable bounds 0 <= pi_i < T
+%@ con eq_0007 kind=linear :: Nonnegative integrality of periodic offsets p_ij
+%@ con eq_0010 kind=linear :: Cycle-matrix equation Gamma(y + ell) = z T
+%@ con eq_0011 kind=linear :: Slack bounds in cycle formulation
+%@ con eq_0012 kind=linear :: Integrality of cycle variables z
+%@ con eq_0015 kind=linear :: Lower cycle inequality for integer cycle variable z_gamma
+%@ con eq_0016 kind=linear :: Upper cycle inequality for integer cycle variable z_gamma
+%@ con eq_0019_a kind=linear :: Change-cycle inequality (Nachtigall) — part (a)
+%@ con eq_0019_b kind=linear :: Change-cycle inequality (Nachtigall) — part (b)
+%@ con eq_0019_c kind=linear :: Change-cycle inequality (Nachtigall) — part (c)
+%@ con eq_0019_d kind=linear :: Change-cycle inequality (Nachtigall) — part (d)
+%@ con eq_0019_e kind=linear :: Change-cycle inequality (Nachtigall) — part (e)
+%@ con eq_0019_f kind=linear :: Change-cycle inequality (Nachtigall) — part (f)
+%@ con eq_0025_a kind=linear :: Additional PESP valid inequality — part (a)
+%@ con eq_0025_b kind=linear :: Additional PESP valid inequality — part (b)
+%@ con eq_0025_c kind=linear :: Additional PESP valid inequality — part (c)
+%@ con eq_0025_d kind=linear :: Additional PESP valid inequality — part (d)
+%@ con eq_0025_e kind=linear :: Additional PESP valid inequality — part (e)
+%@ param wt
+\begin{align}
+  \min\quad & wt \cdot y \tag{eq\_0002} \\
+  & \text{subject}\textrm{ }\text{to} y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{i j} + p_{i j} \cdot T , i \cdot j \in A , 0 \leq y \leq u - \mathit{ell} , \tag{eq\_0004} \\
+  & 0 \leq \mathit{pi} < T , \tag{eq\_0005} \\
+  & p \in \mathcal{Z}_{\geq 0}^{A} . \tag{eq\_0006} \\
+  & y = A^{t} \cdot \mathit{pi} - \mathit{ell} + p \cdot T . \tag{eq\_0007} \\
+  & \text{subject}\textrm{ }\text{to} \mathit{Gamma} \left(y + \mathit{ell}\right) = z \cdot T \tag{eq\_0010} \\
+  & 0 \leq y \leq u - \mathit{ell} , \tag{eq\_0011} \\
+  & z \in \mathcal{Z}^{\mathit{mu}} . \tag{eq\_0012} \\
+  & \left⌈\frac{\mathit{gamma}_{+}^{t} \cdot \mathit{ell} - \mathit{gamma}_{-}^{t} \cdot u}{T}\right⌉ \leq \mathit{gamma}^{t} \cdot p = \frac{\mathit{gamma}^{t} \left(y + \mathit{ell}\right)}{T} \leq \left⌊\frac{\mathit{gamma}_{+}^{t} \cdot u - \mathit{gamma}_{-}^{t} \cdot \mathit{ell}}{T}\right⌋ \tag{eq\_0015} \\
+  & \left(T - \mathit{alpha}\right) \mathit{gamma}_{+}^{t} \cdot y + \mathit{alpha} \cdot \mathit{gamma}_{-}^{t} \cdot y \geq \mathit{alpha} \left(T - \mathit{alpha}\right) , \textrm{ }\text{where}\textrm{ } \mathit{alpha} = \left[- \mathit{gamma}^{t} \cdot \mathit{ell}\right]_{T} . \tag{eq\_0016} \\
+  & y_{B C} + y_{C D} + y_{D F} - y_{E F} + y_{E B} + 55 = 60 \cdot z_{1} \tag{eq\_0019\_a} \\
+  & y_{D F} + y_{F G} + y_{G D} + 80 = 60 \cdot z_{2} \tag{eq\_0019\_b} \\
+  & y_{B C} = y_{E F} = 0 \tag{eq\_0019\_c} \\
+  & y_{A B} , y_{C D} , y_{E B} , y_{F G} \in \left[0 , 10\right] \tag{eq\_0019\_d} \\
+  & y_{D F} \in \left[0 , 20\right] \tag{eq\_0019\_e} \\
+  & y_{G D} \in \left[0 , 25\right] , z_{1} , z_{2} \in \mathcal{Z} \tag{eq\_0019\_f} \\
+  & y_{C D} + y_{D F} + y_{E B} = 5 \tag{eq\_0025\_a} \\
+  & y_{D F} + y_{F G} + y_{G D} = 40 \tag{eq\_0025\_b} \\
+  & y_{A B} , y_{C D} , y_{E B} , y_{F G} \in \left[0 , 10\right] \tag{eq\_0025\_c} \\
+  & y_{D F} \in \left[0 , 20\right] \tag{eq\_0025\_d} \\
+  & y_{G D} \in \left[0 , 25\right] \tag{eq\_0025\_e} \\
+\end{align}

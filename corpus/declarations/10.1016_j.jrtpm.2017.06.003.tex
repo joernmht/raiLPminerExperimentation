@@ -1,0 +1,121 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2017.06.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2017.06.003
+% Solving large-scale train timetable adjustment problems under infrastructure maintenance possessions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2017.06.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: minimize weighted passenger delay and cancellation penalties
+
+% unusable as an identifier, rename or drop: π
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Cycle time
+
+% l: classified as parameter during review
+%@ param l shape=A kind=vector domain=- :: Lower bound on activity duration
+
+% p: classified as variable during review
+%@ var p shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for event order within period
+
+% u: classified as parameter during review
+%@ param u shape=A kind=vector domain=- :: Upper bound on activity duration
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events
+
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event j
+
+% v: classified as variable during review
+%@ var v shape=E domain=continuous role=primary drole=- lo=- hi=- :: Alternative timetable event time
+
+% x: classified as variable during review
+%@ var x shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train line m
+
+% unusable as an identifier, rename or drop: α
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of train lines
+
+% unusable as an identifier, rename or drop: γ
+% q: classified as variable during review
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for event order in alternative timetable
+
+% c: classified as variable during review
+%@ var c shape=X,Y domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating presence of train at station
+
+% unusable as an identifier, rename or drop: δ
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: Set of arrival events
+
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of departure events
+
+% N: classified as parameter during review
+%@ param N shape=S kind=vector domain=- :: Number of available tracks at station
+
+% w: classified as parameter during review
+%@ param w shape=E,M kind=matrix domain=- :: Weight for delay or cancellation in objective
+
+% h: classified as parameter during review
+%@ param h shape=A kind=vector domain=- :: Minimum headway time
+
+% unusable as an identifier, rename or drop: τ
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Shunting time
+
+% unusable as an identifier, rename or drop: σ
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% B: classified as parameter during review
+%@ param B shape=- kind=scalar domain=- :: Upper bound in station capacity constraints
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar domain=- :: Lower bound in station capacity constraints
+
+% U: classified as parameter during review
+%@ param U shape=- kind=scalar domain=- :: Upper bound in station capacity constraints
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, m, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Limits on duration between activities
+%@ con eq_0002 kind=linear domain=- indicator=- :: Event time bounds within period
+%@ con eq_0003 kind=linear domain=- indicator=- :: Binary variables for event order in original timetable
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link retimed event time to original and delay
+%@ con eq_0005 kind=linear domain=- indicator=- :: Set event times to zero for cancelled train lines
+%@ con eq_0006 kind=linear domain=- indicator=- :: Relaxed process constraints for activities
+%@ con eq_0007 kind=linear domain=- indicator=- :: Delay bounds and period-border indicators
+%@ con eq_0008 kind=linear domain=- indicator=- :: Binary variables for train line cancellations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Binary variables for event order in alternative timetable
+%@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity constraints for simultaneous occupation
+%@ con eq_0011 kind=linear domain=- indicator=- :: Limit number of trains present at station arrival
+%@ con eq_0016 kind=linear domain=- indicator=- :: Condition for removing non-essential headway activities
+%@ con eq_0017 kind=linear domain=- indicator=- :: Turnaround process constraint for short-turned trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Identify shunting process crossing period border
+%@ con eq_0019 kind=linear domain=- indicator=- :: Select one short-turning location or cancel train line
+%@ con eq_0020 kind=linear domain=- indicator=- :: Enforce turnaround time if short-turning location chosen
+%@ con eq_0021 kind=linear domain=- indicator=- :: Adjusted station capacity constraints with short-turning relaxations

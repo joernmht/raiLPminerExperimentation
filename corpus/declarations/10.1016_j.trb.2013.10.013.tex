@@ -1,0 +1,194 @@
+% Declaration sidecar for 10.1016_j.trb.2013.10.013
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2013.10.013
+% Optimal train routing and scheduling for managing traffic perturbations in complex junctions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2013.10.013.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total secondary delay suffered by trains (alternative objective: minimize maximum secondary delay D)
+
+% U: classified as variable during review
+%@ var U shape=t,tc domain=continuous role=primary drole=- lo=- hi=- :: Utilization time of a track-circuit by a train
+
+% being: classified as parameter during review
+%@ param being shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% by: classified as parameter during review
+%@ param by shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% in: classified as parameter during review
+%@ param in shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Function returning successor track-circuit
+
+% starts: classified as parameter during review
+%@ param starts shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Train index
+
+% tc: classified as index during review
+%@ index tc ordered=0 cyclic=0 :: Track-circuit index
+
+% time: classified as parameter during review
+%@ param time shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% utilized: classified as parameter during review
+%@ param utilized shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% which: classified as parameter during review
+%@ param which shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% e: classified as parameter during review
+%@ param e shape=- kind=scalar domain=- :: Function indicating if track-circuit is in extreme block section
+
+% ends: classified as parameter during review
+%@ param ends shape=- kind=scalar domain=- :: Word in definition, not a model symbol
+
+% D: classified as variable during review
+%@ var D shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Maximum secondary delay suffered by any train
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of routes
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% TC: classified as index during review
+%@ index TC ordered=0 cyclic=0 :: Set of track-circuits
+
+% init: classified as parameter during review
+%@ param init shape=t kind=vector domain=- :: Earliest start time for train t
+
+% o: classified as variable during review
+%@ var o shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Start time of occupation of track-circuit tc by train t on route r
+
+% x: classified as variable during review
+%@ var x shape=t,R domain=binary role=primary drole=- lo=- hi=- :: Binary route choice indicator for train t on route r
+
+% Mx: classified as parameter during review
+%@ param Mx shape=t,R kind=matrix domain=- :: Upper bound for occupation start time of train t on route r
+
+% rt: classified as parameter during review
+%@ param rt shape=- kind=scalar domain=- :: Running time on track-circuit for a given train type (depends on route, train type, and track-circuit)
+
+% pt: classified as parameter during review
+%@ param pt shape=R,TC kind=matrix domain=- :: Preceding track-circuit function for route r and track-circuit tc
+
+% c: classified as index during review
+%@ index c ordered=0 cyclic=0 :: Connection relation between trains
+
+% ms: classified as parameter during review
+%@ param ms shape=t,t kind=matrix domain=- :: Minimum separation time between train t and train t'
+
+% p: classified as parameter during review
+%@ param p shape=R,TC kind=matrix domain=- :: Preceding track-circuit function for route r and track-circuit tc
+
+% sched: classified as parameter during review
+%@ param sched shape=t kind=vector domain=- :: Scheduled completion time for train t
+
+% bs: classified as parameter during review
+%@ param bs shape=R,TC kind=matrix domain=- :: Block section of track-circuit tc along route r
+
+% d: classified as variable during review
+%@ var d shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Delay suffered by train t in track-circuit tc along route r
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Turnaround/join/split relation between trains
+
+% eU: classified as variable during review
+%@ var eU shape=t,tc domain=non_negative role=primary drole=- lo=- hi=- :: End time of utilization of track-circuit tc by train t
+
+% sU: classified as variable during review
+%@ var sU shape=t,tc domain=non_negative role=primary drole=- lo=- hi=- :: Start time of utilization of track-circuit tc by train t
+
+% PL: classified as parameter during review
+%@ param PL shape=- kind=scalar domain=- :: Set of platforms
+
+% ref: classified as parameter during review
+%@ param ref shape=R,TC kind=matrix domain=- :: Reference track-circuit for a given track-circuit and route
+
+% ul: classified as variable during review
+%@ var ul shape=t,R,TC domain=non_negative role=primary drole=- lo=- hi=- :: Utilization length of track-circuit tc by train t on route r
+
+% y: classified as variable during review
+%@ var y shape=t,t,tc domain=binary role=primary drole=- lo=- hi=- :: Binary ordering variable for track-circuit utilization between trains
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant for disjunctive constraints
+
+% My: classified as parameter during review
+%@ param My shape=- kind=big_m domain=- :: Large constant for disjunctive constraints (alternative)
+
+% ct: classified as parameter during review
+%@ param ct shape=- kind=scalar domain=- :: Clearing time on track-circuit (depends on route, train type, and track-circuit)
+
+% rel: classified as parameter during review
+%@ param rel shape=- kind=scalar domain=- :: Release time for a block section
+
+% Bound by a quantifier or big operator, so no declaration of their own: r
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Constraint (3): trains cannot be operated earlier than init_t
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Constraint (4): start of occupation is zero if route not used
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (5): train cannot start occupying a track-circuit without spending running time in the preceding one
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (6): exactly one route is used by each train
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (7): minimum connection separation between trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (8): secondary delay of a train at completion
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (9): maximum secondary delay definition
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (10): delay variable definition
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (11): minimum separation for turnaround/join/split
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (12): platform reservation continuity for turnaround/join/split
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (13): local rolling-stock/platform coherence
+%@ con eq_0019 kind=linear domain=- indicator=- :: Constraint (14): utilization start time equality
+%@ con eq_0020 kind=linear domain=- indicator=- :: Constraint (15): utilization start time inequality for joined/split trains
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint (16): utilization end time definition
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint (17): disjunctive ordering variables are complementary
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint (18): capacity constraint: if t precedes t' on tc, t ends utilization before t' starts
+%@ con eq_0024 kind=linear domain=- indicator=- :: Constraint (19): capacity constraint: if t' precedes t on tc, t' ends utilization before t starts
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint (20): route-lock route-release utilization end bound
+%@ con eq_0026 kind=linear domain=- indicator=- :: Auxiliary definition of utilization length ul
+%@ con eq_0027 kind=linear domain=- indicator=- :: Additional capacity/disjunctive constraint (part of formulation)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Additional constraint (part of formulation)
+%@ index tp shape=- domain=T role=index drole=- lo=- hi=-
+%@ param ty shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ index tc0 shape=- domain=TC role=index drole=- lo=- hi=-
+%@ index tcinf shape=- domain=TC role=index drole=- lo=- hi=-
+%@ param conn shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ param incomp shape=- domain=- role=parameter drole=- lo=- hi=-
+%@ param for domain=-
+%@ index k
+%@ param alpha shape=- domain=real role=coefficient drole=- lo=- hi=- :: predecessor indicator
+%@ param sigma shape=- domain=real role=coefficient drole=- lo=- hi=- :: successor indicator
+%@ param rho shape=- domain=real role=coefficient drole=- lo=- hi=- :: reference indicator
+%@ param piStart shape=- domain=real role=coefficient drole=- lo=- hi=- :: p start indicator
+%@ param sigEnd shape=- domain=real role=coefficient drole=- lo=- hi=- :: s end indicator
+%@ param mu shape=- domain=real role=coefficient drole=- lo=- hi=- :: tc in TC^r indicator
+%@ param phi shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq21
+%@ param psi shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq22
+%@ param theta shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq17
+%@ param cond shape=- domain=real role=coefficient drole=- lo=- hi=- :: condition eq25/26
+%@ param fo shape=- domain=real role=coefficient drole=- lo=- hi=- :: follow-on headway
+%@ param inc shape=- domain=real role=coefficient drole=- lo=- hi=- :: precedence indicator
+%@ index tcEnd :: end track circuit

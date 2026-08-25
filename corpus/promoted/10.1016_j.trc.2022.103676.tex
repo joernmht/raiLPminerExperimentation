@@ -1,0 +1,41 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2022.103676
+%@ meta id=10.1016_j.trc.2022.103676 family=milp schema=0.1.0
+%@ name :: Flexible train capacity allocation for an overcrowded metro line: A new passenger flow control approach
+%@ desc :: Mined from Flexible train capacity allocation for an overcrowded metro line: A new passenger flow control approach (Transportation Research Part C Emerging Technologies, 2022).
+%@ prov source :: 10.1016/j.trc.2022.103676
+%@ prov reference :: Flexible train capacity allocation for an overcrowded metro line: A new passenger flow control approach
+%@ prov author :: Jungang Shi; Tan Qin; Lixing Yang; Xiaofang Xiao; Junhua Guo; Yong Shen; Housheng Zhou
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total passenger waiting time, passenger accumulation risk, and carriage reservation cost
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var n shape=I,S domain=integer role=primary drole=- lo=- hi=- :: Number of reserved carriages for train i at station k
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index k ordered=0 cyclic=0 :: Station index
+%@ var b shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of boarding passengers for train i at station k
+%@ var l shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers left behind by train i at station k
+%@ var w shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers for train i at station k
+%@ var a shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of alighting passengers for train i at station k
+%@ index p ordered=0 cyclic=0 :: Passenger flow index
+%@ param A shape=S kind=vector domain=- :: Maximum average waiting time limit at station k
+%@ index P ordered=0 cyclic=0 :: Set of passenger flows
+%@ param o shape=P kind=vector domain=- :: Origin station of passenger flow p
+%@ param f shape=- kind=scalar domain=- :: Unit cost of reserving one carriage in a train at a station
+%@ var r shape=S domain=non_negative role=primary drole=- lo=- hi=- :: Risk value of passenger accumulation at station k
+%@ con eq_0001 kind=linear domain=- indicator=- :: Bound the number of reserved carriages for each train at each station between 0 and n_max
+%@ con eq_0002 kind=linear domain=- indicator=- :: Ensure reserved carriages of each train are non-increasing along stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Compute left passengers as waiting passengers minus boarding passengers at each station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Compute alighting passengers at a station as the sum of boarding passengers from previous stations to that destination
+%@ con eq_0012 kind=linear domain=- indicator=- :: Require no passengers are left by the last train at any station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Update waiting passenger count for the next train from left passengers and newly arriving passengers
+%@ con eq_0018 kind=linear domain=- indicator=- :: Objective function minimizing the weighted sum of passenger waiting time, accumulation risk, and carriage reservation cost
+\begin{align}
+  & 0 \leq n_{i , k} \leq n_{\text{max}} , \forall i \in I , k \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0001} \\
+  & n_{i , k} \geq n_{i , k + 1} , \forall i \in I , k , k + 1 \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0002} \\
+  & l_{i , k} = w_{i , k} - b_{i , k} , \forall i \in I , k \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0008} \\
+  & l_{i , k , s} = w_{i , k , s} - b_{i , k , s} , \forall i \in I , k , s \in S , k < s . \tag{eq\_0011} \\
+  & a_{i , k} = \sum_{s = 1}^{k - 1} b_{i , s , k} , \forall i \in I , k \in S \backslash \left\{1 , \left|S\right|\right\} . \tag{eq\_0012} \\
+  & l_{\left|I\right| , k} = 0 , \forall k \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0013} \\
+  & \frac{w_{k}}{\underset{p \in \left\{\right. p^{'} \in P \left|\right. o_{p^{'}} = k \left.\right\}}{\sum} n_{p}} \leq A_{k} , \forall k \in S \backslash \left\{\left|S\right|\right\} , \tag{eq\_0018} \\
+  \min\quad & \mathit{theta}_{1} \cdot \sum_{k \in S \setminus \{|S|\}} w_{k} + \mathit{theta}_{2} \cdot \sum_{k \in S \setminus \{|S|\}} r_{k} \cdot \mathit{mu} + \mathit{theta}_{3} \cdot \sum_{i \in I} \sum_{k \in S \setminus \{|S|\}} f \cdot n_{i , k} \cdot \mathit{nu} \tag{eq\_0019} \\
+\end{align}

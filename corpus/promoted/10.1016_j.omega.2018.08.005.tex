@@ -1,0 +1,162 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2018.08.005
+%@ meta id=10.1016_j.omega.2018.08.005 family=milp schema=0.1.0
+%@ name :: Integrated optimization of train scheduling and maintenance planning on high-speed railway corridors
+%@ desc :: Mined from Integrated optimization of train scheduling and maintenance planning on high-speed railway corridors (Omega, 2018).
+%@ prov source :: 10.1016/j.omega.2018.08.005
+%@ prov reference :: Integrated optimization of train scheduling and maintenance planning on high-speed railway corridors
+%@ prov author :: Chuntian Zhang; Yuan Gao; Lixing Yang; Uday Kumar; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total travel time of SDSA trains.
+%@ index T ordered=0 cyclic=0 :: Set of all trains (SDSA, high-speed, normal-speed).
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Continuous time variables for train events and maintenance start/end.
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive constant for big-M linearization.
+%@ param N shape=- kind=scalar domain=- :: Station set parameters: origin/destination mappings, major/high-speed/normal-speed station sets.
+%@ index i ordered=0 cyclic=0 :: Station index on high-speed or normal-speed railway corridor.
+%@ param C shape=- kind=scalar domain=- :: Mapping from major station to corresponding normal-speed railway station.
+%@ param H shape=- kind=scalar domain=- :: Mapping from major station to corresponding high-speed railway station.
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary stop indicator: 1 if train stops at station.
+%@ index j ordered=0 cyclic=0 :: Major-station segment index; each segment maintained individually.
+%@ param h shape=- kind=scalar domain=- :: Headway times and minimum dwelling times by station and railway type.
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary train-ordering variable at stations.
+%@ index P ordered=0 cyclic=0 :: Set of tracks at a station.
+%@ param D shape=- kind=scalar domain=- :: Constant maintenance window width.
+%@ var Z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary operation-mode selection variable at major station.
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Travel time of a train on its route.
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total travel time of all SDSA trains (objective value).
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running time bounds on high-speed railway segment.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Running time bounds on normal-speed railway segment.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Departure time equality at major stations between high-speed and normal-speed representations.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Arrival time equality at major stations between high-speed and normal-speed representations.
+%@ con eq_0007 kind=linear domain=- indicator=- :: High-speed dwelling time constraints for stops and skips.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Link high-speed stop indicator to high-speed segment state variable.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Link normal-speed stop indicator to normal-speed segment state variable.
+%@ con eq_0011 kind=linear domain=- indicator=- :: High-speed departure headway constraint for ordered train pair.
+%@ con eq_0012 kind=linear domain=- indicator=- :: High-speed departure headway constraint for reverse ordered train pair.
+%@ con eq_0013 kind=linear domain=- indicator=- :: High-speed arrival headway constraint for ordered train pair.
+%@ con eq_0014 kind=linear domain=- indicator=- :: High-speed arrival headway constraint for reverse ordered train pair.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Normal-speed departure headway constraint for ordered train pair.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Normal-speed departure headway constraint for reverse ordered train pair.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Normal-speed arrival headway constraint for ordered train pair.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Normal-speed arrival headway constraint for reverse ordered train pair.
+%@ con eq_0019 kind=linear domain=- indicator=- :: High-speed station track assignment: exactly one track if segment used.
+%@ con eq_0020 kind=linear domain=- indicator=- :: High-speed track-1 assignment for non-stop passage on high-speed segment.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Normal-speed station track assignment: exactly one track if segment used.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Normal-speed track-1 assignment for non-stop passage on normal-speed segment.
+%@ con eq_0023 kind=linear domain=- indicator=- :: High-speed same-track departure-arrival headway for ordered train pair.
+%@ con eq_0024 kind=linear domain=- indicator=- :: High-speed same-track departure-arrival headway for reverse ordered train pair.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Normal-speed same-track departure-arrival headway for ordered train pair.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Normal-speed same-track departure-arrival headway for reverse ordered train pair.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Maintenance window width fixed to constant D.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Mode selection constraint (I), case 1 before maintenance window.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Mode selection constraint (I), case 2 overlapping maintenance window.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Mode 1 waiting: departure from major station after maintenance end.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Mode 3 selection condition relative to normal-speed departure and maintenance end.
+%@ con eq_0033 kind=linear domain=- indicator=- :: At most one operation mode selected at each major station.
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Switching constraint from high-speed to normal-speed at major station.
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Switching constraint from normal-speed to high-speed at major station.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Mode 2 forces normal-speed operation after major station.
+%@ con eq_0039_a kind=linear domain=- indicator=- :: Mode 3 forces high-speed operation after major station.
+%@ con eq_0039_b kind=linear domain=- indicator=- :: State-mode compatibility constraint for Mode 3.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Objective definition: total travel time equals sum of train travel times.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Integrated optimization model: minimize F subject to scheduling and maintenance constraints.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Linearized mode-selection case 1 with auxiliary binaries α1, α2.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization of α1 lower bound on arrival vs maintenance start.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linearization of α1 upper bound on arrival vs maintenance start.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Linearization of α2 lower bound on arrival vs maintenance end.
+%@ con eq_0046 kind=linear domain=- indicator=- :: Linearization of α2 upper bound on arrival vs maintenance end.
+%@ con eq_0048 kind=linear domain=- indicator=- :: Linearized mode-selection case 2 with auxiliary binaries β1, β2.
+%@ con eq_0051_a kind=linear domain=- indicator=- :: Linearization of β1 lower bound on arrival vs maintenance start.
+%@ con eq_0051_b kind=linear domain=- indicator=- :: Linearization of β1 upper bound on arrival vs maintenance start.
+%@ con eq_0051_c kind=linear domain=- indicator=- :: Linearization of β2 lower bound on next arrival vs maintenance start.
+%@ con eq_0051_d kind=linear domain=- indicator=- :: Linearization of β2 upper bound on next arrival vs maintenance start.
+%@ con eq_0051_e kind=linear domain=- indicator=- :: Integrality/logical bounds for β auxiliary variables.
+%@ con eq_0052 kind=linear domain=- indicator=- :: Linearization of Mode 1 departure after maintenance end with big-M.
+%@ con eq_0055_a kind=linear domain=- indicator=- :: Linearization of Mode 3 condition with auxiliary binary γ.
+%@ con eq_0055_b kind=linear domain=- indicator=- :: Linearization of γ lower bound on normal-speed departure vs maintenance end.
+%@ con eq_0055_c kind=linear domain=- indicator=- :: Linearization of γ upper bound on normal-speed departure vs maintenance end.
+%@ con eq_0055_d kind=linear domain=- indicator=- :: Additional logical bound for γ in Mode 3 linearization.
+%@ con eq_0055_e kind=linear domain=- indicator=- :: Additional integrality bound for γ in Mode 3 linearization.
+%@ con eq_0056 kind=linear domain=- indicator=- :: Mode 3 state bound: Z(3) allowed only after normal-speed departure or prior high-speed state.
+%@ con eq_0057 kind=linear domain=- indicator=- :: γ lower bound linearization for Mode 3 departure time relation.
+%@ con eq_0059_a kind=linear domain=- indicator=- :: γ upper bound linearization for Mode 3 departure time relation.
+%@ con eq_0059_b kind=linear domain=- indicator=- :: Additional linearization constraint for γ logical definition.
+%@ con eq_0059_c kind=linear domain=- indicator=- :: Additional integrality constraint for γ logical definition.
+%@ index n0k shape=- domain=- role=index drole=- lo=- hi=- :: train-dependent station index
+%@ index n1k shape=- domain=- role=index drole=- lo=- hi=- :: train-dependent station index
+%@ index lb shape=- domain=- role=index drole=- lo=- hi=- :: lower bound index label
+%@ index ub shape=- domain=- role=index drole=- lo=- hi=- :: upper bound index label
+%@ index ip1 shape=- domain=- role=index drole=- lo=- hi=- :: next station index
+%@ var Hk shape=- domain=- role=auxiliary drole=- lo=- hi=- :: high-speed label
+%@ var Ck shape=- domain=- role=auxiliary drole=- lo=- hi=- :: conventional label
+%@ index hi shape=- domain=- role=index drole=- lo=- hi=- :: high-speed station corresponding to i
+%@ index ci shape=- domain=- role=index drole=- lo=- hi=- :: conventional station corresponding to i
+%@ index I_j shape=- domain=- role=index drole=- lo=- hi=- :: station set for maintenance segment j (H(j)..H(j+1)-1)
+%@ index IC_j shape=- domain=- role=index drole=- lo=- hi=- :: station set for maintenance segment j (C(j)..C(j+1)-1)
+\begin{align}
+  & \mathit{tau}_{k}^{de} \leq t_{k, n0k}^{dH} \qquad \forall k \in T_{n} \tag{eq\_0003\_a} \\
+  & t_{k, n0k}^{dH} \leq \mathit{tau}_{k}^{dl} \qquad \forall k \in T_{n} \tag{eq\_0003\_b} \\
+  & \mathit{tau}_{k}^{ae} \leq t_{k, n1k}^{aH} \qquad \forall k \in T_{n} \tag{eq\_0004\_a} \\
+  & t_{k, n1k}^{aH} \leq \mathit{tau}_{k}^{al} \qquad \forall k \in T_{n} \tag{eq\_0004\_b} \\
+  & t_{i,lb}^{Hk} - M \cdot (1 - \mathit{rho}_{k,j}) \leq t_{k,ip1}^{aH} - t_{k,i}^{dH} \tag{eq\_0005\_a} \\
+  & t_{k,ip1}^{aH} - t_{k,i}^{dH} \leq t_{i,ub}^{Hk} + M \cdot (1 - \mathit{rho}_{k,j}) \tag{eq\_0005\_b} \\
+  & t_{i,lb}^{Ck} - M \cdot \mathit{rho}_{k,j} \leq t_{k,ip1}^{aC} - t_{k,i}^{dC} \tag{eq\_0006\_a} \\
+  & t_{k,ip1}^{aC} - t_{k,i}^{dC} \leq t_{i,ub}^{Ck} + M \cdot \mathit{rho}_{k,j} \tag{eq\_0006\_b} \\
+  & t_{k,hi}^{dH} = t_{k,ci}^{dC} \qquad \forall i \in N_{m}, hi \in N_{H}, ci \in N_{C}, k \in T_{n} \tag{eq\_0007} \\
+  & t_{k,hi}^{aH} = t_{k,ci}^{aC} \qquad \forall i \in N_{m}, hi \in N_{H}, ci \in N_{C}, k \in T_{n} \tag{eq\_0008} \\
+  & \mathit{tau}_{i}^{H} \cdot x_{k,i}^{H} \leq t_{k,i}^{dH} - t_{k,i}^{aH} \qquad \forall i \in N_{H}, k \in T_{n} \tag{eq\_0010\_a} \\
+  & t_{k,i}^{dH} - t_{k,i}^{aH} \leq M \cdot x_{k,i}^{H} \qquad \forall i \in N_{H}, k \in T_{n} \tag{eq\_0010\_b} \\
+  & x_{k,i}^{H} \leq \mathit{rho}_{k,j} \qquad \forall j \in N_{m}, i \in N_{H}, i \in I_{j} \tag{eq\_0011} \\
+  & \mathit{tau}_{i}^{C} \cdot x_{k,i}^{C} \leq t_{k,i}^{dC} - t_{k,i}^{aC} \qquad \forall i \in N_{C}, k \in T_{n} \tag{eq\_0012\_a} \\
+  & t_{k,i}^{dC} - t_{k,i}^{aC} \leq M \cdot x_{k,i}^{C} \qquad \forall i \in N_{C}, k \in T_{n} \tag{eq\_0012\_b} \\
+  & x_{k,i}^{C} \leq 1 - \mathit{rho}_{k,j} \qquad \forall j \in N_{m}, i \in N_{C}, i \in IC_{j} \tag{eq\_0013} \\
+  & \left|\right. t_{l , i}^{d H} - t_{k , i}^{d H} \left|\right. \geq h_{i}^{d H} - M \cdot \left(2 - \mathit{rho}_{l , j} - \mathit{rho}_{k , j}\right) , \tag{eq\_0014} \\
+  & t_{l,i}^{dH} - t_{k,i}^{dH} \geq h_{i}^{dH} - M \cdot (3 - y_{k,l,i} - \mathit{rho}_{l,j} - \mathit{rho}_{k,j}) \tag{eq\_0015} \\
+  & t_{k , i}^{d H} - t_{l , i}^{d H} \geq h_{i}^{d H} - M \cdot \left(3 - y_{l , k , i} - \mathit{rho}_{l , j} - \mathit{rho}_{k , j}\right) . \tag{eq\_0016} \\
+  & t_{l , i}^{a H} - t_{k , i}^{a H} \geq h_{i}^{a H} - M \cdot \left(3 - y_{k , l , i - 1} - \mathit{rho}_{l , j} - \mathit{rho}_{k , j}\right) , \tag{eq\_0017} \\
+  & t_{k , i}^{a H} - t_{l , i}^{a H} \geq h_{i}^{a H} - M \cdot \left(3 - y_{l , k , i - 1} - \mathit{rho}_{l , j} - \mathit{rho}_{k , j}\right) \tag{eq\_0018} \\
+  & t_{l , i}^{d C} - t_{k , i}^{d C} \geq h_{i}^{d C} - M \cdot \left(1 - y_{k , l , i} + \mathit{rho}_{l , j} + \mathit{rho}_{k , j}\right) , \tag{eq\_0019} \\
+  & t_{k , i}^{d C} - t_{l , i}^{d C} \geq h_{i}^{d C} - M \cdot \left(1 - y_{l , k , i} + \mathit{rho}_{l , j} + \mathit{rho}_{k , j}\right) , \tag{eq\_0020} \\
+  & t_{l , i}^{a C} - t_{k , i}^{a C} \geq h_{i}^{a C} - M \cdot \left(1 - y_{k , l , i - 1} + \mathit{rho}_{l , j} + \mathit{rho}_{k , j}\right) , \tag{eq\_0021} \\
+  & t_{k , i}^{a C} - t_{l , i}^{a C} \geq h_{i}^{a C} - M \cdot \left(1 - y_{l , k , i - 1} + \mathit{rho}_{l , j} + \mathit{rho}_{k , j}\right) . \tag{eq\_0022} \\
+  & \sum_{q \in P_{i}} \mathit{lambda}_{k , i , q}^{H} + \left(1 - \mathit{rho}_{k , j}\right) = 1 , \tag{eq\_0023} \\
+  & \mathit{lambda}_{k , i , 1}^{H} = \mathit{rho}_{k , j} - x_{k , i}^{H} , \tag{eq\_0024} \\
+  & \sum_{q \in P_{i}} \mathit{lambda}_{k , i , q}^{C} + \mathit{rho}_{k , j} = 1 , \tag{eq\_0025} \\
+  & \mathit{lambda}_{k , i , 1}^{C} = 1 - \mathit{rho}_{k , j} - x_{k , i}^{C} , \tag{eq\_0026} \\
+  & t_{l , i}^{a H} - t_{k , i}^{d H} \geq h^{d a H} - M \cdot \left(5 - \mathit{rho}_{k , j} - \mathit{rho}_{l , j} - y_{k , l , i} - \mathit{lambda}_{k , i , q}^{H} - \mathit{lambda}_{l , i , q}^{H}\right) , \text{for} \text{all} q \in P_{i} , \tag{eq\_0028} \\
+  & t_{k , i}^{a H} - t_{l , i}^{d H} \geq h^{d a H} - M \cdot \left(5 - \mathit{rho}_{k , j} - \mathit{rho}_{l , j} - y_{l , k , i} - \mathit{lambda}_{k , i , q}^{H} - \mathit{lambda}_{l , i , q}^{H}\right) , \text{for} \text{all} q \in P_{i} , \tag{eq\_0029} \\
+  & t_{l , i}^{a C} - t_{k , i}^{d C} \geq h^{d a C} - M \cdot \left(3 + \mathit{rho}_{k , j} + \mathit{rho}_{k , j} - y_{k , l , i} - \mathit{lambda}_{k , i , q}^{C} - \mathit{lambda}_{l , i , q}^{C}\right) , \text{for} \text{all} q \in P_{i} , \tag{eq\_0030} \\
+  & t_{k , i}^{a C} - t_{l , i}^{d C} \geq h^{d a C} - M \cdot \left(3 + \mathit{rho}_{k , j} + \mathit{rho}_{k , j} - y_{l , k , i} - \mathit{lambda}_{k , i , q}^{C} - \mathit{lambda}_{l , i , q}^{C}\right) , \text{for} \text{all} q \in P_{i} , \tag{eq\_0031} \\
+  & \mathit{tau}_{i s}^{w} \leq t_{i s}^{w} < t_{i e}^{w} \leq \mathit{tau}_{i e}^{w} , i \in N_{m} . \tag{eq\_0032} \\
+  & t_{i e}^{w} = t_{i s}^{w} + D , i \in N_{m} . \tag{eq\_0033} \\
+  & t_{k , H \left(i\right)}^{d H} \geq t_{i e}^{w} \tag{eq\_0036\_a} \\
+  & \mathit{rho}_{k , i} = 1 , \text{if} Z_{k , i}^{\left(1\right)} = 1 . \tag{eq\_0036\_b} \\
+  & Z_{k , i}^{\left(1\right)} + Z_{k , i}^{\left(2\right)} + Z_{k , i}^{\left(3\right)} \leq 1 , i \in N_{m} \tag{eq\_0038} \\
+  & Z_{k , i}^{\left(1\right)} \leq \mathit{rho}_{k , i - 1} \tag{eq\_0039\_a} \\
+  & Z_{k , i}^{\left(1\right)} \leq \mathit{rho}_{k , i} , i \in N_{m} \tag{eq\_0039\_b} \\
+  & Z_{k , i}^{\left(3\right)} \leq 1 - \mathit{rho}_{k , i - 1} , i \in N_{m} \tag{eq\_0040} \\
+  & Z_{k , i}^{\left(2\right)} \geq \mathit{rho}_{k , i - 1} - \mathit{rho}_{k , i} , i \in N_{m} \tag{eq\_0041} \\
+  & Z_{k , i}^{\left(3\right)} \geq \mathit{rho}_{k , i} - \mathit{rho}_{k , i - 1} , i \in N_{m} \tag{eq\_0042} \\
+  & \mathit{rho}_{k , i} \leq 1 - Z_{k , i}^{\left(2\right)} , i \in N_{m} , \tag{eq\_0043} \\
+  & \mathit{rho}_{k , i} \geq Z_{k , i}^{\left(3\right)} , i \in N_{m} . \tag{eq\_0044} \\
+  & f^{\left(k\right)} = t_{k , N^{1} \left(k\right)}^{a H} - t_{k , N^{0} \left(k\right)}^{d H} , \tag{eq\_0045} \\
+  & F = \sum_{k \in T_{n}} f^{\left(k\right)} = \sum_{k \in T_{n}} \left(t_{k , N^{1} \left(k\right)}^{a H} - t_{k , N^{0} \left(k\right)}^{d H}\right) . \tag{eq\_0046} \\
+  \min\quad & F \tag{eq\_0047} \\
+  & Z_{k , i}^{\left(1\right)} + Z_{k , i}^{\left(2\right)} \geq - 2 + \mathit{alpha}_{1} + \mathit{alpha}_{2} + \mathit{rho}_{k , i - 1} , \tag{eq\_0048} \\
+  & \mathit{alpha}_{1} > \frac{t_{k , H \left(i\right)}^{a H} - t_{i s}^{w}}{M} \tag{eq\_0051\_a} \\
+  & \mathit{alpha}_{1} \leq \frac{t_{k , H \left(i\right)}^{a H} - t_{i s}^{w}}{M} + 1 \tag{eq\_0051\_b} \\
+  & \mathit{alpha}_{2} \geq \frac{t_{i s}^{w} + D - t_{k , H \left(i\right)}^{a H}}{M} \tag{eq\_0051\_c} \\
+  & \mathit{alpha}_{2} < \frac{t_{i s}^{w} + D - t_{k , H \left(i\right)}^{a H}}{M} + 1 \tag{eq\_0051\_d} \\
+  & \mathit{alpha}_{1} , \mathit{alpha}_{2} \in \left\{0 , 1\right\} . \tag{eq\_0051\_e} \\
+  & Z_{k , i}^{\left(1\right)} + Z_{k , i}^{\left(2\right)} \geq - 2 + \mathit{beta}_{1} + \mathit{beta}_{2} + \mathit{rho}_{k , i - 1} , \tag{eq\_0052} \\
+  & \mathit{beta}_{1} \geq \frac{t_{i s}^{w} - t_{k , H \left(i\right)}^{a H}}{M} \tag{eq\_0055\_a} \\
+  & \mathit{beta}_{1} < \frac{t_{i s}^{w} - t_{k , H \left(i\right)}^{a H}}{M} + 1 \tag{eq\_0055\_b} \\
+  & \mathit{beta}_{2} \geq \frac{t_{k , H \left(i + 1\right)}^{a H} - t_{i s}^{w}}{M} \tag{eq\_0055\_c} \\
+  & \mathit{beta}_{2} < \frac{t_{k , H \left(i + 1\right)}^{a H} - t_{i s}^{w}}{M} + 1 \tag{eq\_0055\_d} \\
+  & \mathit{beta}_{1} , \mathit{beta}_{2} \in \left\{0 , 1\right\} . \tag{eq\_0055\_e} \\
+  & t_{k , H \left(i\right)}^{d H} \geq t_{i e}^{w} - M \cdot \left(1 - Z_{k , i}^{\left(1\right)}\right) - M \cdot \left(1 - \mathit{rho}_{k , i}\right) . \tag{eq\_0056} \\
+  & Z_{k , i}^{\left(3\right)} \leq \mathit{rho}_{k , i - 1} + \mathit{gamma} \tag{eq\_0057} \\
+  & \mathit{gamma} > \frac{t_{k , C \left(i\right)}^{d C} - t_{i e}^{w}}{M} \tag{eq\_0059\_a} \\
+  & \mathit{gamma} \leq \frac{t_{k , C \left(i\right)}^{d C} - t_{i e}^{w}}{M} + 1 \tag{eq\_0059\_b} \\
+  & \mathit{gamma} \in \left\{0 , 1\right\} . \tag{eq\_0059\_c} \\
+\end{align}

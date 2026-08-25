@@ -1,0 +1,94 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.05.002
+%@ meta id=10.1016_j.trb.2019.05.002 family=milp schema=0.1.0
+%@ name :: Multi-objective periodic railway timetabling on dense heterogeneous railway corridors
+%@ desc :: Mined from Multi-objective periodic railway timetabling on dense heterogeneous railway corridors (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.05.002
+%@ prov reference :: Multi-objective periodic railway timetabling on dense heterogeneous railway corridors
+%@ prov author :: Fei Yan; Nikola Bešinović; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total train journey time over running and dwell activities (primary objective in MOPRT)
+%@ param T shape=- kind=scalar domain=- :: Period length T
+%@ var a shape=A domain=continuous role=primary drole=- lo=- hi=- :: Time difference of activity (i,j)
+%@ var z shape=A domain=binary role=primary drole=- lo=- hi=- :: Modulo parameter indicating order of events i and j in a period
+%@ index A ordered=0 cyclic=0 :: Set of activities (run, dwell, thru, head, regularity)
+%@ param u shape=A kind=vector domain=- :: Upper bound for duration of activity (i,j)
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ var c shape=- domain=integer role=primary drole=- lo=- hi=- :: Auxiliary integer preventing illegal overtaking between running activities
+%@ param N shape=- kind=scalar domain=- :: Number of trains in the corridor
+%@ index L ordered=0 cyclic=0 :: Set of train lines
+%@ param f shape=L kind=vector domain=- :: Frequency of line L (trains per period)
+%@ param h shape=- kind=scalar domain=- :: Reference headway h_p and maximum station headway h_s
+%@ param P shape=- kind=scalar domain=- :: Maximum penalty value P_max
+%@ var w shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable selecting the active piece of the piecewise penalty function for a headway activity
+%@ param M shape=- kind=scalar domain=- :: Large constant for big-M constraints
+%@ param d shape=A kind=vector domain=- :: Maximal dwell time supplement for activity (j,j')
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for overtaking modulo sum
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating whether overtaking occurs between two activities
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating overtaking order between two activities
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary indicating whether dwell activity is overtaken by a through activity
+%@ param O shape=S kind=vector domain=- :: Maximum overtaking capacity (number of siding tracks) at station S
+%@ con eq_0001 kind=linear domain=- indicator=- :: PESP activity duration definition a_ij = π_j - π_i + z_ij·T
+%@ con eq_0003 kind=linear domain=- indicator=- :: Activity duration bounds: l_ij ≤ a_ij ≤ u_ij
+%@ con eq_0004 kind=linear domain=- indicator=- :: Event time periodicity bounds: 0 ≤ π_i < T
+%@ con eq_0005 kind=linear domain=- indicator=- :: Modulo parameters z_ij are binary
+%@ con eq_0006 kind=linear domain=- indicator=- :: Illegal-overtaking prevention: z_ij+z_i'j'+z_ii'+z_jj' = 2·c_ii'jj'
+%@ con eq_0007 kind=linear domain=- indicator=- :: Bounds on auxiliary c: 0 ≤ c_ii'jj' ≤ 2
+%@ con eq_0008 kind=linear domain=- indicator=- :: Auxiliary c is a nonnegative integer
+%@ con eq_0009 kind=linear domain=- indicator=- :: Regularity deviation definition θ_ij = |a_ij - [T/f_l]|
+%@ con eq_0011 kind=linear domain=- indicator=- :: Linearized regularity deviation: -θ_ij ≤ a_ij - [T/f_l] ≤ θ_ij
+%@ con eq_0012 kind=linear domain=- indicator=- :: Regularity deviation tolerance: 0 ≤ θ_ij ≤ β_l
+%@ con eq_0013 kind=linear domain=- indicator=- :: Reference headway definition h_p = ceil(T/N_t)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Maximum penalty definition P_max = φ·(h_p - l_min)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Lower reference headway h^{p_lower}_ij = l_ij + (h_p - l_min)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Upper reference headway h^{p_upper}_ij = u_ij - (h_p - l_min)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Linearized piecewise penalty δ_ij for headway activity (i,j)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Exactly one piece of the piecewise penalty selected (w'+w''+w'''=1)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Piece-selection variables w', w'', w''' are binary
+%@ con eq_0022 kind=linear domain=- indicator=- :: Lower-piece range: a_ij ∈ [l_ij, h_lower] when w'=1
+%@ con eq_0023 kind=linear domain=- indicator=- :: Middle-piece range: a_ij ∈ (h_lower, h_upper] when w''=1
+%@ con eq_0024 kind=linear domain=- indicator=- :: Upper-piece range: a_ij ∈ (h_upper, u_ij] when w'''=1
+%@ con eq_0025 kind=linear domain=- indicator=- :: Objective: minimize total number of overtakings (sum of y)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Overtaking modulo relation: z_ij+z_i'j'+z_ii'+z_jj' = 2·o + p
+%@ con eq_0028 kind=linear domain=- indicator=- :: Binary restrictions on overtaking variables o, p, y
+%@ con eq_0029 kind=linear domain=- indicator=- :: Dwell-time/overtaking relation linking a_ii' and a_jj' to y
+%@ con eq_0030 kind=linear domain=- indicator=- :: x_ii' binary variable for through overtaking existence
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization of x_ii' via number of through overtakings
+%@ con eq_0032 kind=linear domain=- indicator=- :: Dwell time extension limited by overtaking count and station headway h_s
+%@ con eq_0033 kind=linear domain=- indicator=- :: Station capacity: total overtakings at station s_k ≤ O^{max}_{s_k}
+%@ con eq_0034 kind=linear domain=- indicator=- :: Epsilon-constraint bounding a secondary objective in MOPRT
+%@ con eq_0035 kind=linear domain=- indicator=- :: Epsilon-constraint bounding route/capacity-utilization indicator in MOPRT
+\begin{align}
+  & a_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \tag{eq\_0001} \\
+  \min\quad & \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \cup \mathbf{\mathcal{A}}_{dwell}}{\sum} \mathit{alpha}_{i j} \cdot \left(\mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T\right) \tag{eq\_0002} \\
+  & l_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq u_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0003} \\
+  & 0 \leq \mathit{pi}_{i} < T \forall i \in \mathbf{\mathcal{E}} \tag{eq\_0004} \\
+  & z_{i j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0005} \\
+  & z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}} + z_{j j^{'}} = 2 \cdot c_{i i^{'} j j^{'}} \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0006} \\
+  & 0 \leq c_{i i^{'} j j^{'}} \leq 2 \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0007} \\
+  & c_{i i^{'} j j^{'}} \in \mathcal{N}_{0} \forall \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0008} \\
+  & \mathit{theta}_{i j} = \left|a_{i j} - \left[\frac{T}{f_{l}}\right]\right| \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg}^{l} , l \in \mathbf{\mathcal{L}} \tag{eq\_0009} \\
+  & - \mathit{theta}_{i j} \leq a_{i j} - \left[\frac{T}{f_{l}}\right] \leq \mathit{theta}_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg}^{l} , l \in \mathbf{\mathcal{L}} \tag{eq\_0011} \\
+  & 0 \leq \mathit{theta}_{i j} \leq \mathit{beta}_{l} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg}^{l} , l \in \mathbf{\mathcal{L}} \tag{eq\_0012} \\
+  & h^{p} = \lceil \frac{T}{N_{t}} \rceil \tag{eq\_0013} \\
+  & P_{m a x} = \mathit{phi} \cdot \left(h^{p} - l^{m i n}\right) \tag{eq\_0014} \\
+  & h_{i j}^{p \underline l o w e r} = l_{i j} + \left(h^{p} - l^{m i n}\right) \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0016} \\
+  & h_{i j}^{p \underline u p p e r} = u_{i j} - \left(h^{p} - l^{m i n}\right) \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0017} \\
+  & \mathit{delta}_{i j} = w_{i j}^{'} \cdot \left(P_{m a x} - \mathit{phi} \cdot \left(a_{i j} - l_{i j}\right)\right) + w_{i j}^{'' '} \cdot \left(P_{m a x} - \mathit{phi} \cdot \left(u_{i j} - a_{i j}\right)\right) \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0019} \\
+  & w_{i j}^{'} + w_{i j}^{''} + w_{i j}^{'' '} = 1 \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0020} \\
+  & w_{i j}^{'} , w_{i j}^{''} , w_{i j}^{'' '} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0021} \\
+  & l_{i j} \leq a_{i j} \leq h_{i j}^{p \underline l o w e r} + M_{1} \cdot \left(1 - w_{i j}^{'}\right) \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0022} \\
+  & w_{i j}^{''} \cdot h_{i j}^{p \underline l o w e r} < a_{i j} \leq h_{i j}^{p \underline u p p e r} + M_{2} \cdot \left(1 - w_{i j}^{''}\right) \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0023} \\
+  & w_{i j}^{'' '} \cdot h_{i j}^{p \underline u p p e r} < a_{i j} \leq u_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{head} \tag{eq\_0024} \\
+  & h_{s_{k}} = \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{head}^{s_{k}}}{max} \left\{l_{i j} , T - u_{i j}\right\} \tag{eq\_0025} \\
+  & d_{j j^{'}} = u_{j j^{'}} - l_{j j^{'}} \tag{eq\_0026} \\
+  & z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}} + z_{j j^{'}} = 2 \cdot o_{i i^{'} j j^{'}} + p_{i i^{'} j j^{'}} \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} \cup \mathbf{\mathcal{A}}_{thru}^{s_{k}} , \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{head}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0028} \\
+  & y_{i i^{'} j j^{'}} + y_{j j^{'} i i^{'}} = p_{i i^{'} j j^{'}} \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} \cup \mathbf{\mathcal{A}}_{thru}^{s_{k}} , \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{head}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0029} \\
+  & o_{i i^{'} j j^{'}} , p_{i i^{'} j j^{'}} , y_{i i^{'} j j^{'}} , y_{j j^{'} i i^{'}} \in \left\{0 , 1\right\} \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} \cup \mathbf{\mathcal{A}}_{thru}^{s_{k}} , \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{head}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0030} \\
+  & \begin{matrix} & & - y_{j j^{'} i i^{'}} \cdot d_{j j^{'}} - \left(1 - p_{i i^{'} j j^{'}}\right) \cdot \left(u_{j j^{'}} - l_{i i^{'}}\right) \leq a_{i i^{'}} - a_{j j^{'}} \leq y_{i i^{'} j j^{'}} \cdot d_{i i^{'}} + \left(1 - p_{i i^{'} j j^{'}}\right) \cdot \left(u_{i i^{'}} - l_{j j^{'}}\right) \\ & & \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} \cup \mathbf{\mathcal{A}}_{thru}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}}\end{matrix} \tag{eq\_0031} \\
+  & x_{i i^{'}} \in \left\{0 , 1\right\} \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell} \tag{eq\_0032} \\
+  & \frac{1}{M} \underset{\left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{thru}^{s_{k}}}{\sum} y_{i i^{'} j j^{'}} \leq x_{i i^{'}} \leq \underset{\left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{thru}^{s_{k}}}{\sum} y_{i i^{'} j j^{'}} \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0033} \\
+  & a_{i i^{'}} \leq l_{i i^{'}} + 2 \cdot h_{s_{k}} \cdot \left(\underset{\left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}}}{\sum} y_{i i^{'} j j^{'}}\right) + h_{s_{k}} \cdot \left(\underset{\left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{thru}^{s_{k}}}{\sum} y_{i i^{'} j j^{'}}\right) + x_{i i^{'}} \cdot \left(h_{s_{k}} - l_{i i^{'}}\right) \forall \left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0034} \\
+  & \underset{\left(i , i^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}}}{\sum} p_{i i^{'} j j^{'}} \leq O_{s_{k}}^{m a x} \forall \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{dwell}^{s_{k}} \cup \mathbf{\mathcal{A}}_{thru}^{s_{k}} , s_{k} \in \mathbf{\mathcal{S}} \tag{eq\_0035} \\
+\end{align}

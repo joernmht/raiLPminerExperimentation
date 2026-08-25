@@ -1,0 +1,464 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.ejor.2017.04.057",
+  "name": "Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling",
+  "family": "milp",
+  "description": "Mined from Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling (European Journal of Operational Research, 2017).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.ejor.2017.04.057",
+    "reference": "Using a general-purpose Mixed-Integer Linear Programming solver for the practical solution of real-time train rescheduling",
+    "author": "Matteo Fischetti; Michele Monaci",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "R",
+      "description": "Set of routes for a train",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Set of events",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Event index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of fixed arcs of a route",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Event index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of alternative arcs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "h",
+      "description": "Event index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "k",
+      "description": "Event index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "alpha",
+      "description": "origin node index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "omega",
+      "description": "station index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "theta",
+      "description": "train index (renamed from θ)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Theta",
+      "description": "set of train indices (renamed from Θ)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "theta1",
+      "description": "first train index in ordered pair",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "theta2",
+      "description": "second train index in ordered pair",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "r1",
+      "description": "first route index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "r2",
+      "description": "second route index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Theta2",
+      "description": "set of ordered pairs (theta1,theta2) with theta1 < theta2",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "p",
+      "description": "Planned time of event j",
+      "shape": [
+        "N"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large constant for big-M constraints",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "d",
+      "description": "Minimum headway times between events",
+      "shape": [
+        "N",
+        "N"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "B",
+      "description": "Upper bound on tardiness of event j",
+      "shape": [
+        "N"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "U",
+      "description": "Generic upper bound value",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "f",
+      "description": "Objective function value",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Tardiness of event j",
+      "shape": [
+        "N"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary route choice for each train and route",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "t",
+      "description": "Actual time of event j",
+      "shape": [
+        "N"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary ordering variable for alternative arcs",
+      "shape": [
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0004",
+      "description": "Tardiness definition z_j >= t_j - p_j",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "theta",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005",
+      "description": "Upper bound on tardiness z_j <= B_j",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0006",
+      "description": "Actual time cannot precede planned time t_j >= p_j",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "alpha",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Ordering constraint for alternative arcs",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "omega",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "B",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "omega",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "U",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Single route selected for each train",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total tardiness",
+    "terms": [
+      {
+        "ref": "f",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

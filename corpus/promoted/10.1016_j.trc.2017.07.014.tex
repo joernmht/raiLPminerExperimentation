@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2017.07.014
+%@ meta id=10.1016_j.trc.2017.07.014 family=milp schema=0.1.0
+%@ name :: Joint optimization of tram timetables and signal timing adjustments at intersections
+%@ desc :: Mined from Joint optimization of tram timetables and signal timing adjustments at intersections (Transportation Research Part C Emerging Technologies, 2017).
+%@ prov source :: 10.1016/j.trc.2017.07.014
+%@ prov reference :: Joint optimization of tram timetables and signal timing adjustments at intersections
+%@ prov author :: Jungang Shi; Yanshuo Sun; Paul Schonfeld; Jian Qi
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total tram travel time and TSP negative impact on other traffic
+%@ param T shape=I kind=vector domain=continuous :: Expected departure time for tram i from first station
+%@ index I ordered=1 cyclic=0 :: Set of trams
+%@ var t shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival/departure times of trams at stations/intersections
+%@ index S ordered=1 cyclic=0 :: Set of stations and intersections
+%@ param h shape=- kind=scalar domain=continuous :: Minimum headway between trams (arrival/departure)
+%@ param o shape=S,W kind=matrix domain=continuous :: Green time durations for TSP actions (min/max)
+%@ var u shape=S,W,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating activation of TSP action w at intersection s, cycle k
+%@ index K ordered=1 cyclic=0 :: Set of signal cycles at intersection s
+%@ index W ordered=0 cyclic=0 :: Set of TSP actions (alpha, beta, gamma)
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constant for big-M constraints
+%@ param C shape=S,W kind=matrix domain=continuous :: Cost of activating TSP action w at intersection s
+%@ con eq_0001 kind=linear domain=- indicator=- :: Schedule deviation bounds for adjusted departure time
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dwell time range at stations
+%@ con eq_0003 kind=linear domain=- indicator=- :: Non-stop operations at intersections (arrival equals departure)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link travel time range between consecutive locations
+%@ con eq_0005 kind=headway domain=- indicator=- :: Minimum headway between arrivals
+%@ con eq_0006 kind=headway domain=- indicator=- :: Minimum headway between departures
+%@ con eq_0007 kind=headway domain=- indicator=- :: Minimum headway between departure and next arrival
+%@ con eq_0008 kind=linear domain=- indicator=- :: Green extension bounds when activated
+%@ con eq_0009 kind=linear domain=- indicator=- :: Phase insertion green duration equals activation times duration
+%@ con eq_0010 kind=linear domain=- indicator=- :: Early green bounds when activated
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Minimum time between end of previous green and start of inserted phase
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Minimum time between end of inserted phase and start of next green
+%@ con eq_0013 kind=linear domain=- indicator=- :: Red duration formula
+%@ con eq_0014 kind=linear domain=- indicator=- :: At most one TSP action per cycle
+%@ con eq_0015 kind=linear domain=- indicator=- :: Red duration when green extension used
+%@ con eq_0016 kind=linear domain=- indicator=- :: Red duration when phase insertion used
+%@ con eq_0017 kind=linear domain=- indicator=- :: Red duration when early green used
+%@ con eq_0018 kind=linear domain=- indicator=- :: Fixed total green duration in a cycle
+%@ con eq_0019 kind=big_m domain=- indicator=- :: Definition of lambda_isk_alpha via big-M
+%@ con eq_0020 kind=big_m domain=- indicator=- :: Definition of lambda_isk_beta1 via big-M
+%@ con eq_0021 kind=big_m domain=- indicator=- :: Definition of lambda_isk_beta2 via big-M
+%@ con eq_0022 kind=big_m domain=- indicator=- :: Definition of lambda_isk_gamma via big-M
+%@ con eq_0023 kind=linear domain=- indicator=- :: lambda_isk_alpha equals lambda_isk_beta1
+%@ con eq_0024 kind=linear domain=- indicator=- :: lambda_isk_beta2 equals lambda_isk_gamma
+%@ con eq_0025 kind=linear domain=- indicator=- :: Activate beta only if a tram traverses in inserted phase
+%@ con eq_0026 kind=linear domain=- indicator=- :: Activate alpha or gamma only if a tram traverses in relevant cycle
+\begin{align}
+  & T_{i}^{E} \leq t_{i 1}^{D} \leq T_{i}^{E} + \mathit{Delta} \forall i \in I \tag{eq\_0001} \\
+  & \mathit{theta}_{s}^{\text{min}} \leq t_{\mathit{is}}^{D} - t_{\mathit{is}}^{A} \leq \mathit{theta}_{s}^{\text{max}} \forall i \in I , s \in S \backslash {S} \tag{eq\_0002} \\
+  & t_{\mathit{is}}^{D} = t_{\mathit{is}}^{A} \forall i \in I , s \in {S} \tag{eq\_0003} \\
+  & \mathit{rho}_{s , s + 1}^{\text{min}} \leq t_{i , s + 1}^{A} - t_{\mathit{is}}^{D} \leq \mathit{rho}_{s , s + 1}^{\text{max}} \forall i \in I , s \in S \backslash \left\{\left|S\right|\right\} \tag{eq\_0004} \\
+  & t_{i + 1 , s}^{A} - t_{\mathit{is}}^{A} \geq h_{a} \forall i \in I \backslash \left\{\left|I\right|\right\} , s \in S \tag{eq\_0005} \\
+  & t_{i + 1 , s}^{D} - t_{\mathit{is}}^{D} \geq h_{d} \forall i \in I \backslash \left\{\left|I\right|\right\} , s \in S \tag{eq\_0006} \\
+  & t_{i + 1 , s}^{A} - t_{\mathit{is}}^{D} \geq h_{a}^{d} \forall i \in I \backslash \left\{\left|I\right|\right\} , \forall s \in S \tag{eq\_0007} \\
+  & u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{min}}^{\mathit{alpha}} \leq t_{\mathit{sk}}^{\mathit{alpha}} \leq u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{max}}^{\mathit{alpha}} \forall s \in {S} , k \in K_{s} \tag{eq\_0008} \\
+  & t_{\mathit{sk}}^{\mathit{beta}} = u_{\mathit{sk}}^{\mathit{beta}} \cdot o_{s}^{\mathit{beta}} \forall s \in {S} , k \in K_{s} \tag{eq\_0009} \\
+  & u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{min}}^{\mathit{gamma}} \leq t_{\mathit{sk}}^{\mathit{gamma}} \leq u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{max}}^{\mathit{gamma}} \forall s \in {S} , k \in K_{s} \tag{eq\_0010} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0011} \\
+  & t_{\mathit{sk} \mathit{gamma}}^{\text{S}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0012} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , k \in K_{s} \tag{eq\_0013} \\
+  & \sum_{w \in W} u_{\mathit{sk}}^{w} \leq 1 \forall s \in {S} , k \in K_{s} \tag{eq\_0014} \\
+  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0015} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk}}^{RS} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0016} \\
+  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk}}^{RS} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0017} \\
+  & t_{s , k + 1}^{\text{RS}} - t_{\mathit{sk} \mathit{gamma}}^{\text{S}} = t_{s}^{\text{G}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0018} \\
+  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{alpha}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0019} \\
+  & 0 < t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0020} \\
+  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{beta}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0021} \\
+  & 0 < t_{\mathit{sk} \mathit{gamma}}^{S} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0022} \\
+  & \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}} = \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0023} \\
+  & \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} = \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0024} \\
+  & \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \geq u_{\mathit{sk}}^{\mathit{beta}} \forall s \in {S} , k \in K_{s} \tag{eq\_0025} \\
+  & \sum_{i \in I} \mathit{lambda}_{i , s , k + 1}^{\mathit{alpha}} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \geq u_{s , k + 1}^{\mathit{alpha}} + u_{s k}^{\mathit{gamma}} \forall s \in {S} , k \in K_{s} \backslash \left\{\left|K_{s}\right|\right\} \tag{eq\_0026} \\
+  \min\quad & \sum_{i \in I} \left(t_{i , \left|S\right|}^{A} - t_{i , 1}^{D}\right) + \sum_{s \in {S} , w \in W , k \in K_{s}} \left(C_{s}^{w} \cdot u_{\mathit{sk}}^{w} + \mathit{tau}_{s}^{w} \cdot t_{\mathit{sk}}^{w}\right) \tag{eq\_0027} \\
+\end{align}

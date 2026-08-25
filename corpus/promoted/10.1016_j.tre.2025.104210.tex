@@ -1,0 +1,144 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2025.104210
+%@ meta id=10.1016_j.tre.2025.104210 family=milp schema=0.1.0
+%@ name :: Real-time train rescheduling optimization with combined cross-line strategies for urban rail network
+%@ desc :: Mined from Real-time train rescheduling optimization with combined cross-line strategies for urban rail network (Transportation Research Part E Logistics and Transportation Review, 2025).
+%@ prov source :: 10.1016/j.tre.2025.104210
+%@ prov reference :: Real-time train rescheduling optimization with combined cross-line strategies for urban rail network
+%@ prov author :: Entai Wang; Yin Yuan; Pengli Mo; Andrea D’Ariano; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of skipped stop, destination delay, and low frequency penalties
+%@ param P shape=- kind=scalar :: Penalty cost for skipped stops, destination delays, or low frequency
+%@ param p shape=R,I kind=scalar :: Individual stop-skip penalty at station i of trip r
+%@ index I ordered=0 cyclic=0 :: Set of stations
+%@ index R ordered=0 cyclic=0 :: Set of trips
+%@ param M shape=- kind=big_m :: Large positive constant
+%@ var x shape=R,I domain=binary role=primary :: Binary variable indicating if stop at station i of trip r is skipped
+%@ param C shape=- kind=scalar :: Cost per minute for destination delay or low frequency
+%@ var g shape=R domain=non_negative role=primary :: Destination delay of trip r
+%@ param a shape=- kind=scalar :: Cost efficiency for skipped stop penalties
+%@ param H shape=- kind=scalar :: Threshold headway time or planned arrival time
+%@ param L shape=- kind=scalar :: Fixed large value for canceled destination arrival
+%@ param b shape=- kind=scalar :: Cost efficiency for destination delay penalties
+%@ var t shape=R,I domain=integer role=primary :: Arrival or departure time of trip r at station i
+%@ param t_hat shape=R,I kind=scalar :: Planned arrival or departure time
+%@ var z shape=R,I domain=binary role=primary :: Binary variable indicating if event at station i of trip r is canceled
+%@ var h shape=R,R,I domain=non_negative role=primary :: Excessive headway time or minimum headway time
+%@ param w_hat shape=R,I kind=scalar :: Threshold headway time at station i between trip r and previous trip
+%@ var e shape=R domain=binary role=primary :: Binary variable indicating if trip r is canceled
+%@ var d shape=R,I domain=non_negative role=primary :: Extended running or dwelling time
+%@ index U ordered=0 cyclic=0 :: Set of delay types
+%@ param d_hat shape=U,I kind=scalar :: Extended running or dwelling time for delay u
+%@ param T shape=U,I kind=scalar :: Start time of time window for delay u at station i
+%@ param T_hat shape=U,I kind=scalar :: End time of time window for delay u at station i
+%@ var y shape=R,R,I domain=binary role=primary :: Binary variable indicating if trip r' follows trip r at station i
+%@ param K shape=- kind=scalar :: Set of rolling stock units
+%@ param Z shape=- kind=scalar :: Objective function value
+%@ index N ordered=0 cyclic=0 :: Set of headway levels
+%@ con eq_0001 kind=linear :: Skipped stop penalty component definition
+%@ con eq_0002_a kind=linear :: Linearization of skipped stop penalty, upper bound
+%@ con eq_0002_b kind=linear :: Linearization of skipped stop penalty, upper bound
+%@ con eq_0002_c kind=linear :: Linearization of skipped stop penalty, lower bound
+%@ con eq_0003 kind=linear :: Destination delay penalty component definition
+%@ con eq_0004_a kind=linear :: Destination delay nonnegativity
+%@ con eq_0004_b kind=linear :: Destination delay calculation with cancellation
+%@ con eq_0005 kind=linear :: Low frequency penalty component definition
+%@ con eq_0006_a kind=linear :: Excessive headway lower bound
+%@ con eq_0006_b kind=linear :: Excessive headway nonnegativity
+%@ con eq_0007_a kind=linear :: Previous adjacent trip arrival time lower bound
+%@ con eq_0007_b kind=linear :: Previous adjacent trip arrival time upper bound
+%@ con eq_0008 kind=linear :: Exactly one previous adjacent trip selected
+%@ con eq_0009 kind=linear :: Stop-skip only if event not canceled
+%@ con eq_0010_a kind=linear :: Event cancellation consistency lower bound
+%@ con eq_0010_b kind=linear :: Event cancellation consistency upper bound
+%@ con eq_0011 kind=linear :: Running time constraint
+%@ con eq_0012_a kind=linear :: Extended running time activation
+%@ con eq_0012_b kind=linear :: Time window lower bound for extended running time
+%@ con eq_0012_c kind=linear :: Time window upper bound for extended running time
+%@ con eq_0012_d kind=linear :: Time window lower bound for extended running time
+%@ con eq_0012_e kind=linear :: Time window upper bound for extended running time
+%@ con eq_0012_f kind=linear :: Extended running time nonnegativity
+%@ con eq_0013 kind=linear :: Dwelling time requirement when stop is not skipped
+%@ con eq_0014_a kind=linear :: Dwelling time zero when stop skipped but event kept, lower
+%@ con eq_0014_b kind=linear :: Dwelling time zero when stop skipped but event kept, upper
+%@ con eq_0015_a kind=linear :: Extended dwelling time activation
+%@ con eq_0015_b kind=linear :: Time window lower bound for extended dwelling time
+%@ con eq_0015_c kind=linear :: Time window upper bound for extended dwelling time
+%@ con eq_0015_d kind=linear :: Time window lower bound for extended dwelling time
+%@ con eq_0015_e kind=linear :: Time window upper bound for extended dwelling time
+%@ con eq_0015_f kind=linear :: Extended dwelling time nonnegativity
+%@ con eq_0016_a kind=linear :: Safety headway for arrivals
+%@ con eq_0016_b kind=linear :: Safety headway for departures
+%@ con eq_0017 kind=linear :: Trip assignment by an incoming rolling stock arc
+%@ con eq_0018 kind=linear :: Rolling stock flow balance at each vertex
+%@ con eq_0019 kind=linear :: Rolling stock capacity limit
+%@ con eq_0020 kind=linear :: Minimum turn-around time between connected trips
+%@ con eq_0021 kind=linear :: Short-turning start cancels events before station
+%@ con eq_0022 kind=linear :: Short-turning end cancels events after station
+%@ con eq_0023 kind=linear :: Binary domain of stop-skipping variables
+%@ con eq_0024 kind=linear :: Binary domain of rolling stock connection variables
+%@ con eq_0025 kind=linear :: Binary domain of event cancellation variables
+%@ con eq_0026 kind=linear :: Binary domain of trip cancellation variables
+%@ con eq_0027 kind=linear :: Integer domain of arrival and departure times
+%@ con eq_0032_a kind=linear :: Additional constraint 32a
+%@ con eq_0032_b kind=linear :: Additional constraint 32b
+%@ con eq_0032_c kind=linear :: Additional constraint 32c
+%@ con eq_0032_d kind=linear :: Additional constraint 32d
+%@ con eq_0033_a kind=linear :: Additional constraint 33a
+%@ con eq_0033_b kind=linear :: Additional constraint 33b
+%@ con eq_0033_c kind=linear :: Additional constraint 33c
+\begin{align}
+  & P_{h}^{S} = \sum_{r \in \mathcal{R}_{h}} \sum_{i \in \mathcal{I}_{r}^{S}} p_{r , i}^{'} \tag{eq\_0001} \\
+  & p_{r , i}^{'} \leq M \left(1 - x_{r , i}\right) \tag{eq\_0002\_a} \\
+  & p_{r , i}^{'} \leq p_{r , i} \tag{eq\_0002\_b} \\
+  & p_{r , i}^{'} \geq p_{r , i} - M \cdot x_{r , i} \forall i \in \mathcal{I}_{r}^{S} , r \in \mathcal{R}_{h} \tag{eq\_0002\_c} \\
+  & P_{h}^{D} = \sum_{r \in \mathcal{R}_{h}} {C_{D}} \cdot g_{r} \tag{eq\_0003} \\
+  & g_{r} \geq 0 \left(a\right) , \forall r \in \mathcal{R}_{h} \tag{eq\_0004\_a} \\
+  & g_{r} \geq t_{r , i_{d}}^{A} - \bar{t_{r , i_{d}}^{A}} + L \cdot \left(1 - z_{r , i_{d}}\right) - {H_{D}} \left(b\right) , \forall r \in \mathcal{R}_{h} \tag{eq\_0004\_b} \\
+  & P_{h}^{F} = \sum_{r \in \mathcal{R}_{h}} \sum_{i \in \mathcal{I}_{r}} {C_{F}} \cdot {h_{r , i}} \tag{eq\_0005} \\
+  & {h_{r , i}} \geq t_{r , i}^{A} - {t_{r , i}^{A}} - \bar{w_{r , i}} , \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0006\_a} \\
+  & {h_{r , i}} \geq 0 , \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0006\_b} \\
+  & {t_{r , i}^{A}} \geq t_{r^{'} , i}^{A} - M \left(1 - z_{r^{'} , i}\right) , \forall r^{'} \in \mathit{Omega}_{r , i} , i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0007\_a} \\
+  & {t_{r , i}^{A}} \leq t_{r^{'} , i}^{A} + M \left(1 - z_{r^{'} , i}\right) + M \left(1 - \mathit{eta}_{r^{'} , r , i}\right) , \forall r^{'} \in \mathit{Omega}_{r , i} , i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0007\_b} \\
+  & \sum_{r^{'} \in \mathit{Omega}_{r , i}} \mathit{eta}_{r^{'} , r , i} = 1 \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0008} \\
+  & x_{r , i} \leq z_{r , i} \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0009} \\
+  & \sum_{i \in \mathcal{I}_{r}} z_{r , i} \geq 2 + M \left(e_{r} - 1\right) , \forall r \in \mathcal{R}_{h} \tag{eq\_0010\_a} \\
+  & \sum_{i \in \mathcal{I}_{r}} z_{r , i} \leq M \cdot e_{r} , \forall r \in \mathcal{R}_{h} \tag{eq\_0010\_b} \\
+  & t_{r , i}^{A} - t_{r , \mathit{sigma} \left(r , i\right)}^{D} \geq R_{r , \mathit{sigma} \left(r , i\right) , i} + d r_{r , \mathit{sigma} \left(r , i\right) , i} - M \left(2 - z_{r , i} - z_{r , \mathit{sigma} \left(r , i\right)}\right) \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0011} \\
+  & d r_{r , \mathit{sigma} \left(r , i\right) , i} \geq \bar{d r}_{u , \mathit{sigma} \left(r , i\right) , i} - M \left(1 - \underset{̲}{\mathit{varphi}}_{u , r , i}^{R}\right) - M \left(1 - \bar{\mathit{varphi}}_{u , r , i}^{R}\right) , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_a} \\
+  & t_{r , i}^{A} - \underset{̲}{T_{u , i}^{R}} \geq M \left(\underset{̲}{\mathit{varphi}}_{u , r , i}^{R} - 1\right) , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_b} \\
+  & t_{r , i}^{A} - \underset{̲}{T_{u , i}^{R}} \leq M \underset{̲}{\mathit{varphi}}_{u , r , i}^{R} , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_c} \\
+  & \bar{T_{u , i}^{R}} - t_{r , i}^{A} \geq M \left(\bar{\mathit{varphi}}_{u , r , i}^{R} - 1\right) , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_d} \\
+  & \bar{T_{u , i}^{R}} - t_{r , i}^{A} \leq M \bar{\mathit{varphi}}_{u , r , i}^{R} , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_e} \\
+  & d r_{r , \mathit{sigma} \left(r , i\right) , i} \geq 0 , i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{R} , r \in \mathcal{R}_{h} \tag{eq\_0012\_f} \\
+  & t_{r , i}^{D} - t_{r , i}^{A} \geq \left(\bar{t_{r , i}^{D}} - \bar{t_{r , i}^{A}}\right) + d \cdot d_{r , i} - M \left(1 - x_{r , i}\right) \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0013} \\
+  & t_{r , i}^{D} - t_{r , i}^{A} \geq - M \left(1 - z_{r , i}\right) - M \cdot x_{r , i} , \forall r \in \mathcal{R}_{h} \tag{eq\_0014\_a} \\
+  & t_{r , i}^{D} - t_{r , i}^{A} \leq M \left(1 - z_{r , i}\right) + M \cdot x_{r , i} , \forall r \in \mathcal{R}_{h} \tag{eq\_0014\_b} \\
+  & d \cdot d_{r , i} \geq \bar{d \cdot d_{u , i}} - M \left(1 - \underset{̲}{\mathit{varphi}}_{u , r , i}^{D}\right) - M \left(1 - \bar{\mathit{varphi}}_{u , r , i}^{D}\right) \tag{eq\_0015\_a} \\
+  & t_{r , i}^{A} - \underset{̲}{T_{u , i}^{D}} \geq M \left(\underset{̲}{\mathit{varphi}}_{u , r , i}^{D} - 1\right) \tag{eq\_0015\_b} \\
+  & t_{r , i}^{A} - \underset{̲}{T_{u , i}^{D}} \leq M \underset{̲}{\mathit{varphi}}_{u , r , i}^{D} \tag{eq\_0015\_c} \\
+  & \bar{T_{u , i}^{D}} - t_{u , i}^{A} \geq M \left(\bar{\mathit{varphi}}_{u , r , i}^{D} - 1\right) \tag{eq\_0015\_d} \\
+  & \bar{T_{u , i}^{D}} - t_{u , i}^{A} \leq M \bar{\mathit{varphi}}_{u , r , i}^{D} \tag{eq\_0015\_e} \\
+  & d \cdot d_{r , i} \geq 0 i = \mathit{psi} \left(u\right) , \forall u \in \mathcal{U}_{h}^{D} , r \in \mathcal{R}_{h} \tag{eq\_0015\_f} \\
+  & t_{r , i}^{A} - t_{r^{'} , i}^{A} \geq h_{r , r^{'} , i} - M \left(5 - z_{r , i} - z_{r^{'} , i} - z_{r , \mathit{sigma} \left(r , i\right)} - z_{r^{'} , \mathit{sigma} \left(r^{'} , i\right)} - \mathit{eta}_{r^{'} , r , i}\right) , \forall r^{'} \in \mathit{Omega}_{r , i} , i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0016\_a} \\
+  & t_{r , i}^{D} - t_{r^{'} , i}^{D} \geq h_{r , r^{'} , i} - M \left(5 - z_{r , i} - z_{r^{'} , i} - z_{r , \mathit{sigma} \left(r , i\right)} - z_{r^{'} , \mathit{sigma} \left(r^{'} , i\right)} - \mathit{eta}_{r^{'} , r , i}\right) , \forall r^{'} \in \mathit{Omega}_{r , i} , i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0016\_b} \\
+  & \sum_{i \in \mathcal{I}_{r}^{O}} \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{r , i}^{-}} y_{r^{'} , r , i} = e_{r} \forall r \in \mathcal{R}_{h} \tag{eq\_0017} \\
+  & \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{r , i}^{+}} y_{r , r^{'} , i} = \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{r , i}^{-}} y_{r^{'} , r , i} \forall i \in \mathcal{I}_{r}^{O} \cup \mathcal{I}_{r}^{D} , r \in \mathcal{R}_{h} \tag{eq\_0018} \\
+  & \sum_{r \in \mathcal{R}_{h}} \sum_{i \in \mathcal{I}_{r}^{O}} \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{h , r , i}^{D -}} y_{r^{'} , r , i} \leq \left|\mathcal{K}\right| \tag{eq\_0019} \\
+  & t_{r^{'} , i}^{A} - t_{r , i}^{D} \geq C \cdot T_{r , r^{'} , i} + M \left(y_{r , r^{'} , i} - 1\right) \forall i \in \mathcal{I}_{r}^{D} \cap \mathcal{I}_{r^{'}}^{O} , r , r^{'} \in \mathcal{R}_{h} \tag{eq\_0020} \\
+  & \sum_{j \in \mathit{Psi}_{r , i}} z_{r , j} \leq M \left(1 - \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{r , i}^{-}} y_{r^{'} , r , i}\right) \forall i \in \mathcal{I}_{r}^{O} , r \in \mathcal{R}_{h} \tag{eq\_0021} \\
+  & \sum_{j \in \mathit{Phi}_{r , i}} z_{r , j} \leq M \left(1 - \sum_{\left(r^{'} , i\right) \in \mathit{delta}_{r , i}^{+}} y_{r , r^{'} , i}\right) \forall i \in \mathcal{I}_{r}^{D} , r \in \mathcal{R}_{h} \tag{eq\_0022} \\
+  & x_{r , i} \in \left\{0 , 1\right\} \forall i \in \mathcal{I}_{r}^{S} , r \in \mathcal{R}_{h} \tag{eq\_0023} \\
+  & y_{r , r^{'} , i} \in \left\{0 , 1\right\} \forall i \in \mathcal{I}_{r}^{D} \cap \mathcal{I}_{r^{'}}^{O} , r , r^{'} \in \mathcal{R}_{h} \tag{eq\_0024} \\
+  & z_{r , i} \in \left\{0 , 1\right\} \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0025} \\
+  & e_{r} \in \left\{0 , 1\right\} \forall r \in \mathcal{R}_{h} \tag{eq\_0026} \\
+  & t_{r , i}^{A} , t_{r , i}^{D} \in \mathcal{Z}^{+} \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0027} \\
+  \min\quad & \mathit{alpha} P_{h}^{S} + \mathit{beta} P_{h}^{D} + \mathit{gamma} P_{h}^{F} \tag{eq\_0028} \\
+  & R_{r , \mathit{sigma} \left(r , i\right) , i} \geq R_{r , \mathit{sigma} \left(r , i\right) , i}^{1} + R_{r , \mathit{sigma} \left(r , i\right) , i}^{2} \cdot x_{r , \mathit{sigma} \left(r , i\right)} + R_{r , \mathit{sigma} \left(r , i\right) , i}^{3} \cdot x_{r , i} + R_{r , \mathit{sigma} \left(r , i\right) , i}^{4} {x_{r , i}} \tag{eq\_0032\_a} \\
+  & {x_{r , i}} \leq x_{r , i} \tag{eq\_0032\_b} \\
+  & {x_{r , i}} \leq x_{r , \mathit{sigma} \left(r , i\right)} \tag{eq\_0032\_c} \\
+  & {x_{r , i}} \geq x_{r , i} + x_{r , \mathit{sigma} \left(r , i\right)} - 1 \forall i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0032\_d} \\
+  & h_{r , r^{'} , i} = \sum_{n = 1}^{\left|\mathcal{N}\right|} H_{n , i} \mathit{alpha}_{n , r , r^{'} , i} \tag{eq\_0033\_a} \\
+  & \sum_{n = 1}^{\left|\mathcal{N}\right|} n \mathit{alpha}_{n , r , r^{'} , i} = 1 + 8 \cdot x_{r , \mathit{sigma} \left(r , i\right)} + 4 \cdot x_{r , i} + 2 \cdot x_{r^{'} , \mathit{sigma} \left(r^{'} , i\right)} + x_{r^{'} , i} \tag{eq\_0033\_b} \\
+  & \sum_{n = 1}^{\left|\mathcal{N}\right|} \mathit{alpha}_{n , r , r^{'} , i} = 1 \forall r^{'} \in \mathit{Omega}_{r , i} , i \in \mathcal{I}_{r} , r \in \mathcal{R}_{h} \tag{eq\_0033\_c} \\
+\end{align}

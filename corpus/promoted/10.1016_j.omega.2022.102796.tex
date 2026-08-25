@@ -1,0 +1,96 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2022.102796
+%@ meta id=10.1016_j.omega.2022.102796 family=milp schema=0.1.0
+%@ name :: Optimal Train Rescheduling in Oslo Central Station
+%@ desc :: Mined from Optimal Train Rescheduling in Oslo Central Station (Omega, 2022).
+%@ prov source :: 10.1016/j.omega.2022.102796
+%@ prov reference :: Optimal Train Rescheduling in Oslo Central Station
+%@ prov author :: Carlo Mannino; Andreas Nakkerud
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total path cost plus delay penalties
+%@ var t shape=N domain=non_negative role=primary drole=- lo=- hi=- :: Schedule time for each route node
+%@ index N ordered=0 cyclic=0 :: Set of route nodes
+%@ index u ordered=0 cyclic=0 :: Route node index
+%@ param L shape=N kind=vector domain=- :: Traversal time of interlocking route
+%@ param T shape=- kind=scalar domain=- :: Timetable target time at timing nodes
+%@ index K ordered=0 cyclic=0 :: Set of pairs of route nodes in potential conflict
+%@ index v ordered=0 cyclic=0 :: Route node index
+%@ index A ordered=0 cyclic=0 :: Set of trains
+%@ index a ordered=0 cyclic=0 :: Train index
+%@ var w shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary path selection variable
+%@ index P ordered=0 cyclic=0 :: Set of all paths
+%@ param o shape=- kind=scalar domain=- :: Origin node
+%@ var z shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary node active variable
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+%@ index S ordered=0 cyclic=0 :: Set of potential successors of a node
+%@ index i ordered=0 cyclic=0 :: Index for partition of timing nodes
+%@ param r shape=A kind=vector domain=- :: Number of timing node partitions for a train
+%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for conflict pairs
+%@ index b ordered=0 cyclic=0 :: Train index (used in examples)
+%@ index s ordered=0 cyclic=0 :: Route node index (used in examples)
+%@ param c shape=P kind=vector domain=- :: Cost of selecting a path
+%@ param iia shape=- kind=scalar domain=- :: Label for constraint (iia) in formulation
+%@ param iib shape=- kind=scalar domain=- :: Label for constraint (iib) in formulation
+%@ param iic shape=- kind=scalar domain=- :: Label for constraint (iic) in formulation
+%@ param iid shape=- kind=scalar domain=- :: Label for constraint (iid) in formulation
+%@ param iii shape=- kind=scalar domain=- :: Label for constraint (iii) in formulation
+%@ param k shape=A kind=vector domain=- :: Cost of delay per unit for a train
+%@ con eq_0001 kind=linear domain=- indicator=- :: Planning horizon start: t_u >= t_o
+%@ con eq_0002 kind=linear domain=- indicator=- :: Traversal time: t_{u+1} - t_u >= L_u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Earliest release time: t_u - t_o >= Γ_u
+%@ con eq_0004 kind=linear domain=- indicator=- :: Delay definition: η_u = max(0, t_u - T_u)
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Disjunctive conflict precedence, first alternative
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Disjunctive conflict precedence, second alternative
+%@ con eq_0005_c kind=linear domain=- indicator=- :: Disjunctive conflict precedence (pair membership)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each train selects exactly one path
+%@ con eq_0007 kind=linear domain=- indicator=- :: Node active iff a selected path uses it
+%@ con eq_0008 kind=big_m domain=- indicator=- :: Big-M traversal time when path selected
+%@ con eq_0009 kind=linear domain=- indicator=- :: Strengthened path-dependent traversal time
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Big-M release time when node active
+%@ con eq_0011 kind=linear domain=- indicator=- :: Strengthened release time by node activity
+%@ con eq_0014_a kind=big_m domain=- indicator=- :: Delay lower bound when node active
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Nonnegative delay
+%@ con eq_0015_a kind=linear domain=- indicator=- :: Exactly one timing node active in each partition
+%@ con eq_0015_b kind=linear domain=- indicator=- :: Equal target times within a partition
+%@ con eq_0016_a kind=linear domain=- indicator=- :: Delay bound for each partition using active nodes
+%@ con eq_0016_b kind=linear domain=- indicator=- :: Nonnegative partition delay
+%@ con eq_0019_a kind=linear domain=- indicator=- :: Precedence variable bounded by activity of u (first)
+%@ con eq_0019_b kind=linear domain=- indicator=- :: Precedence variable bounded by activity of u (second)
+%@ con eq_0019_c kind=linear domain=- indicator=- :: Precedence variable bounded by activity of v (first)
+%@ con eq_0019_d kind=linear domain=- indicator=- :: Precedence variable bounded by activity of v (second)
+%@ con eq_0020 kind=linear domain=- indicator=- :: At most one direction of precedence is selected
+%@ con eq_0021 kind=linear domain=- indicator=- :: Both active nodes require a precedence direction
+%@ con eq_0022_a kind=big_m domain=- indicator=- :: Big-M conflict constraint for u before v
+%@ con eq_0022_b kind=big_m domain=- indicator=- :: Big-M conflict constraint for v before u
+%@ con eq_0022_c kind=big_m domain=- indicator=- :: Big-M conflict constraint parameterized by path selections
+\begin{align}
+  & t_{u} \geq t_{o} \cdot u \in \mathcal{N} \tag{eq\_0001} \\
+  & t_{u + 1} - t_{u} \geq L_{u} \cdot u \in \mathcal{N} \backslash \mathcal{N}_{S} . \tag{eq\_0002} \\
+  & t_{u} - t_{o} \geq \mathit{Gamma}_{u} u \in \mathcal{N} \tag{eq\_0003} \\
+  & \mathit{eta}_{u} = max \left(0 , t_{u} - T_{u}\right) u \in \mathcal{N}_{T} \tag{eq\_0004} \\
+  & t_{v} - t_{u + 1} \geq \mathit{delta}_{u} \text{or} \tag{eq\_0005\_a} \\
+  & t_{u} - t_{v + 1} \geq \mathit{delta}_{v} \tag{eq\_0005\_b} \\
+  & \left\{u , v\right\} \in \mathcal{K} \tag{eq\_0005\_c} \\
+  & \sum_{p \in \mathcal{P} \left(a\right)} w_{p} = 1 \cdot a \in \mathcal{A} \tag{eq\_0006} \\
+  & z_{u} = \sum_{p \in \mathit{rho} \left(u\right)} w_{p} \cdot u \in \mathcal{N} \backslash \left\{o\right\} \tag{eq\_0007} \\
+  & t_{u_{p}^{+}} - t_{u} - L_{u} \geq M \left(w_{p} - 1\right) u \in \mathcal{N} \backslash \mathcal{N}_{S} , p \in \mathit{rho} \left(u\right) \tag{eq\_0008} \\
+  & t_{v} - t_{u} \geq L_{u} \sum_{p \in \mathit{rho} \left(u\right) \cap \mathit{rho} \left(v\right)} w_{p} \cdot u \in \mathcal{N} \backslash \left(\mathcal{N}_{S} \cup \left\{o\right\}\right) , v \in S \left(u\right) \tag{eq\_0009} \\
+  & t_{u} - t_{o} - \mathit{Gamma}_{u} \geq M \left(z_{u} - 1\right) u \in \mathcal{N} \tag{eq\_0010} \\
+  & t_{u} - t_{o} \geq \mathit{Gamma}_{u} z_{u} u \in \mathcal{N} \tag{eq\_0011} \\
+  & \mathit{eta}_{u} \geq t_{u} - T_{u} - M \left(1 - z_{u}\right) , \begin{matrix} & a \in \mathcal{A} , u \in \mathcal{N}_{T} \left(a\right)\end{matrix} \tag{eq\_0014\_a} \\
+  & \mathit{eta}_{u} \geq 0 , \begin{matrix} & a \in \mathcal{A} , u \in \mathcal{N}_{T} \left(a\right)\end{matrix} \tag{eq\_0014\_b} \\
+  & \sum_{u \in \mathcal{N}_{T}^{i} \left(a\right)} z_{u} = 1 , \begin{matrix} & \text{for} u , v \in \mathcal{N}_{T}^{i} \left(a\right) \\ & i \in \left\{1 , \ldots , r^{a}\right\}\end{matrix} \tag{eq\_0015\_a} \\
+  & T_{u} = T_{v} , \begin{matrix} & \text{for} u , v \in \mathcal{N}_{T}^{i} \left(a\right) \\ & i \in \left\{1 , \ldots , r^{a}\right\}\end{matrix} \tag{eq\_0015\_b} \\
+  & \mathit{eta}_{a}^{i} \geq t_{u} - T_{u} , \begin{matrix} & a \in \mathcal{A} , i = 1 , \hdots , r^{a} , u \in \mathcal{N}_{T}^{i} \left(a\right)\end{matrix} \tag{eq\_0016\_a} \\
+  & \mathit{eta}_{a}^{i} \geq 0 , \begin{matrix} & a \in \mathcal{A} , i = 1 , \hdots , r^{a} , u \in \mathcal{N}_{T}^{i} \left(a\right)\end{matrix} \tag{eq\_0016\_b} \\
+  & y_{u v} \leq z_{u} \tag{eq\_0019\_a} \\
+  & y_{v u} \leq z_{u} \tag{eq\_0019\_b} \\
+  & y_{u v} \leq z_{v} \tag{eq\_0019\_c} \\
+  & y_{v u} \leq z_{v} . \tag{eq\_0019\_d} \\
+  & y_{u v} + y_{v u} \leq 1 \tag{eq\_0020} \\
+  & y_{u v} + y_{v u} \geq z_{u} + z_{v} - 1 . \tag{eq\_0021} \\
+  & \left(i\right) t_{v} - t_{u_{p}^{+}} - \mathit{delta}_{u_{p}^{+}} \geq M \left(y_{u v} + w_{p} - 2\right) p \in \mathit{rho} \left(u\right) \tag{eq\_0022\_a} \\
+  & \left(i \cdot i\right) t_{u} - t_{v_{q}^{+}} - \mathit{delta}_{v_{q}^{+}} \geq M \left(y_{v u} + w_{q} - 2\right) q \in \mathit{rho} \left(v\right) \tag{eq\_0022\_b} \\
+  & \left\{u , v\right\} \in \mathcal{K} \tag{eq\_0022\_c} \\
+  \begin{aligned}\mathbf{min}\quad & & & \sum_{a \in \mathcal{A}} \sum_{p \in \mathcal{P} \left(a\right)} c_{p} \cdot w_{p} + \sum_{a \in \mathcal{A}} \sum_{u \in \mathcal{N}_{T} \left(a\right)} k_{a} \mathit{eta}_{u} \\ \\ \mathbf{s} . \mathbf{t} . & \left(i \cdot a\right) & \sum_{p \in \mathcal{P} \left(a\right)} w_{p} = 1 & a \in \mathcal{A} \\ \mathbf{s} . \mathbf{t} . & \left(i \cdot b\right) & \sum_{p \in \mathit{rho} \left(u\right)} w_{p} = z_{u} & u \in \mathcal{N} \backslash \left\{o\right\} \\ \\ & \left(\mathit{iia}\right) & y_{u v} + y_{v u} \geq \sum_{p \in \mathit{rho} \left(u\right)} w_{p} + \sum_{q \in \mathit{rho} \left(v\right)} w_{q} - 1 & \left\{u , v\right\} \in \mathcal{K} \\ & \left(\mathit{iib}\right) & y_{u v} + y_{v u} \leq 1 & \left\{u , v\right\} \in \mathcal{K} \\ & \left(\mathit{iic}\right) & y_{u v} \leq z_{u} & \left\{u , v\right\} \in \mathcal{K} \\ & \left(\mathit{iid}\right) & y_{u v} \leq z_{v} & \left\{u , v\right\} \in \mathcal{K} \\ \\ & \left(\mathit{iii}\right) & t_{u} - t_{o} - \mathit{Gamma}_{u} \geq M \left(z_{u} - 1\right) & u \in \mathcal{N} \\ & \left(i \cdot v\right) & t_{u_{p}^{+}} - t_{u} - L_{u} \geq M \left(w_{p} - 1\right) & u \in \mathcal{N} \backslash \mathcal{N}_{S} , p \in \mathit{rho} \left(u\right) \\ \\ & \left(v \cdot a\right) & t_{v} - t_{u_{p}^{+}} - \mathit{delta}_{u} \geq M \left(y_{u v} + w_{p} - 2\right) & \left\{u , v\right\} \in \mathcal{K} , p \in \mathit{rho} \left(u\right) \\ & \left(v \cdot b\right) & t_{u} - t_{v_{p}^{+}} - \mathit{delta}_{v} \geq M \left(y_{v u} + w_{q} - 2\right) & \left\{u , v\right\} \in \mathcal{K} , q \in \mathit{rho} \left(v\right) \\ \\ & \left(v \cdot i\right) & \mathit{eta}_{u} - t_{u} + T_{u} \geq M \left(z_{u} - 1\right) & a \in \mathcal{A} , u \in \mathcal{N} \left(a\right) \\ \\ & & t_{u} \geq 0 & u \in \mathcal{N} \\ & & \mathit{eta}_{u} \geq 0 & a \in \mathcal{A} , u \in \mathcal{N}_{T} \left(a\right) \\ & & y_{u v} \in \left\{0 , 1\right\} & \left\{u , v\right\} \in \mathcal{K} \\ & & w_{p} \in \left\{0 , 1\right\} & p \in \mathcal{P} \\ & & z_{u} \in \left\{0 , 1\right\} & u \in \mathcal{N} \backslash \left\{o\right\}\end{aligned} \tag{eq\_0024} \\
+\end{align}

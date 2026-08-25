@@ -1,0 +1,158 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2024.104526
+%@ meta id=10.1016_j.trc.2024.104526 family=milp schema=0.1.0
+%@ name :: Integrated robust optimization of maintenance windows and train timetables using ADMM-driven and nested simulation heuristic algorithm
+%@ desc :: Mined from Integrated robust optimization of maintenance windows and train timetables using ADMM-driven and nested simulation heuristic algorithm (Transportation Research Part C Emerging Technologies, 2024).
+%@ prov source :: 10.1016/j.trc.2024.104526
+%@ prov reference :: Integrated robust optimization of maintenance windows and train timetables using ADMM-driven and nested simulation heuristic algorithm
+%@ prov author :: Haonan Yang; Shaoquan Ni; Haoyang Huo; Xuze Ye; Miaomiao Lv; Qingpeng Zhang; Dingjun Chen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of maintenance planning cost and robust train timetable delay
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of the integrated model
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficients for objectives Z1 and Z2
+%@ param pen shape=- kind=scalar domain=- :: Penalty cost for canceling UMA
+%@ var gamma shape=Q,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating selection of maintenance window plan
+%@ index K ordered=0 cyclic=0 :: Set of candidate maintenance window plans
+%@ index Q ordered=0 cyclic=0 :: Set of sections
+%@ index L ordered=0 cyclic=0 :: Set of UMAs
+%@ param omega shape=L,K kind=matrix domain=- :: Binary parameter indicating if UMA l is carried out in plan k
+%@ param z shape=K kind=vector domain=- :: Binary parameter indicating if additional resources invested in plan k
+%@ index i ordered=0 cyclic=0 :: Index for stations or sections
+%@ param C shape=- kind=scalar domain=- :: Cost of arc in space-time network
+%@ param zeta shape=- kind=scalar domain=- :: Weight coefficients for cost and delay terms
+%@ index E ordered=0 cyclic=0 :: Set of arcs in space-time network
+%@ param sup shape=- kind=scalar domain=- :: Supremum operator for worst-case distribution
+%@ var v shape=G,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arc selection in multi-commodity flow
+%@ var x shape=A,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train arc selection
+%@ var y shape=B,E,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
+%@ param epsilon shape=- kind=scalar domain=- :: Delay scenario
+%@ index A ordered=0 cyclic=0 :: Set of trains
+%@ index B ordered=0 cyclic=0 :: Set of maintenance windows
+%@ param end shape=- kind=scalar domain=- :: End time of expected start-time window
+%@ param star shape=- kind=scalar domain=- :: Start time of expected start-time window
+%@ param varsigma shape=- kind=scalar domain=- :: Fluctuation vector for probability distribution
+%@ index p ordered=0 cyclic=0 :: Probability distribution vector
+%@ index P ordered=0 cyclic=0 :: Ambiguity set of probability distributions
+%@ param e shape=- kind=scalar domain=- :: Vector of ones
+%@ param varpi shape=- kind=scalar domain=- :: Bound for infinity norm of fluctuation
+%@ param N shape=- kind=scalar domain=- :: Minimum number of UMAs
+%@ index G ordered=0 cyclic=0 :: Set of trains and maintenance windows
+%@ index T ordered=0 cyclic=0 :: Set of time points
+%@ param des shape=- kind=scalar domain=- :: Destination station of train g
+%@ param ori shape=- kind=scalar domain=- :: Origin station of train g
+%@ index j ordered=0 cyclic=0 :: Index for stations or sections
+%@ index xi ordered=0 cyclic=0 :: Set of incompatible arcs for capacity constraint
+%@ param h shape=Theta,E kind=matrix domain=- :: Delay cost of arc in scenario kappa
+%@ index Theta ordered=0 cyclic=0 :: Set of delay scenarios
+%@ param argmax shape=- kind=scalar domain=- :: Argument of the maximum
+%@ var s shape=Q,T domain=continuous role=primary drole=- lo=- hi=- :: Relaxation variable for capacity constraint
+%@ param theta shape=- kind=scalar domain=- :: Penalty parameter for ADMM
+%@ var lambda shape=Q domain=continuous role=primary drole=- lo=- hi=- :: Lagrange multiplier for cross-resolution consistency
+%@ var mu shape=Q,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter for ADMM
+%@ param R shape=- kind=scalar domain=- :: Set of real numbers
+%@ param cons shape=- kind=scalar domain=- :: Constant value of fixed variable in subproblem
+%@ param n shape=- kind=scalar domain=- :: Number of incompatible arcs
+%@ param phi shape=- kind=scalar domain=- :: Cost coefficient for arc selection
+%@ param delta shape=- kind=scalar domain=- :: Dual variable for DRO reformulation
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of objective term Z1 for maintenance planning
+%@ con eq_0003 kind=linear domain=- indicator=- :: Definition of UMA cancellation penalty
+%@ con eq_0004 kind=linear domain=- indicator=- :: Definition of maintenance resource investment cost
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of objective term Z2 for robust train timetable
+%@ con eq_0006 kind=linear domain=- indicator=- :: Definition of train arc travel time cost
+%@ con eq_0007 kind=linear domain=- indicator=- :: Definition of maintenance arc deviation cost
+%@ con eq_0009 kind=linear domain=- indicator=- :: Definition of ambiguity set for probability distributions
+%@ con eq_0010 kind=linear domain=- indicator=- :: Unique maintenance window plan per section
+%@ con eq_0011 kind=linear domain=- indicator=- :: Resource investment condition for remaining UMAs
+%@ con eq_0012 kind=linear domain=- indicator=- :: Mandatory maintenance of alerted equipment
+%@ con eq_0013 kind=linear domain=- indicator=- :: Minimum number of UMAs to be performed
+%@ con eq_0014 kind=linear domain=- indicator=- :: Flow balance for trains and maintenance windows
+%@ con eq_0015 kind=linear domain=- indicator=- :: Track capacity constraint for conflict-free timetable
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cross-resolution consistency between plan and arcs
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary domain of maintenance plan variable
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary domain of train arc variable
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain of maintenance arc variable
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transformation of worst-case delay into arc costs
+%@ con eq_0024 kind=linear domain=- indicator=- :: Selection of worst-case probability distribution
+%@ con eq_0025 kind=linear domain=- indicator=- :: ADMM objective with Lagrangian and quadratic penalties
+%@ con eq_0026 kind=linear domain=- indicator=- :: Free domain of Lagrange multiplier lambda
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of capacity multiplier mu
+%@ con eq_0028 kind=linear domain=- indicator=- :: Bounds on relaxation variable s
+%@ con eq_0029 kind=linear domain=- indicator=- :: Update rule for Lagrange multiplier lambda
+%@ con eq_0030 kind=linear domain=- indicator=- :: Update rule for capacity multiplier mu
+%@ con eq_0031 kind=linear domain=- indicator=- :: Maintenance subproblem objective in ADMM
+%@ con eq_0032 kind=linear domain=- indicator=- :: Linearization of quadratic cross-resolution penalty
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linearized maintenance subproblem objective
+%@ con eq_0034 kind=linear domain=- indicator=- :: Train timetable subproblem objective in ADMM
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of quadratic capacity penalty
+%@ con eq_0036 kind=linear domain=- indicator=- :: Definition of number of incompatible arcs
+%@ con eq_0037 kind=linear domain=- indicator=- :: Single train subproblem objective
+%@ con eq_0038 kind=linear domain=- indicator=- :: Single maintenance window subproblem objective
+%@ con eq_0039 kind=linear domain=- indicator=- :: Definition of train arc cost coefficient
+%@ con eq_0040 kind=linear domain=- indicator=- :: Definition of maintenance arc cost coefficient
+%@ con eq_0041 kind=linear domain=- indicator=- :: Lower-bound train arc cost coefficient
+%@ con eq_0042 kind=linear domain=- indicator=- :: Lower-bound maintenance arc cost coefficient
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization term for capacity penalty
+%@ con eq_0044 kind=linear domain=- indicator=- :: Additional ADMM subproblem equation
+%@ con eq_0047 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0048 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0049 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0050 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0051 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0052 kind=linear domain=- indicator=- :: Equation in nested simulation delay update
+%@ con eq_0055 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0057 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0059 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+%@ con eq_0060 kind=linear domain=- indicator=- :: Equation in algorithm convergence check
+\begin{align}
+  \mathit{min\quad & Z} = \mathit{alpha}_{1} \cdot Z_{1} + \mathit{alpha}_{2} \cdot Z_{2} \tag{eq\_0001} \\
+  & Z_{1} = \sum_{i , i^{'} \in Q} \sum_{k \in K} \left(\left(\right. \mathit{pen}\right)_{k} + \mathit{pen}_{k}^{'} \left.\right) \mathit{gamma}_{i , i^{'} , k} \tag{eq\_0002} \\
+  & \mathit{pen}_{k} = \sum_{l \in L} \left(1 - \mathit{omega}_{l , k}\right) \mathit{pen}_{l} , \forall k \in K , l \in L \tag{eq\_0003} \\
+  & \mathit{pen}_{k}^{'} = \mathit{pen}_{f}^{'} + \sum_{l \in L} \left(\mathit{omega}_{l , k} \cdot \mathit{pen}\right)_{l}^{'} + z_{k} \left(\sum_{l \in L} \left(1 - \mathit{omega}_{l , k}\right) \mathit{pen}_{l}^{'}\right) , \forall k \in K , l \in L \tag{eq\_0004} \\
+  & Z_{2} = \mathit{zeta}_{1} \left(\sum_{a \in A} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} C_{a} \left(i , i^{'} , t , t^{'}\right) x_{a} \left(i , i^{'} , t , t^{'}\right) + \sum_{b \in B} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} C_{b} \left(i , i^{'} , t , t^{'}\right) y_{b} \left(i , i^{'} , t , t^{'} , k\right)\right) + \mathit{zeta}_{2} \left(\mathit{sup}\right)_{\mathbf{p} \in P} \left\{\right. \mathcal{E}_{\mathbf{p}} \left[Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} \tag{eq\_0005} \\
+  & C_{a} \left(i , i^{'} , t , t^{'}\right) = t^{'} - t , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{a} , a \in A \tag{eq\_0006} \\
+  & C_{b} \left(i , i^{'} , t , t^{'}\right) = \mathit{pen}^{''} \left(\mathit{max} \left\{\mathit{star}_{b} - t , 0\right\} + \mathit{max} \left\{t - \mathit{end}_{b} , 0\right\}\right) , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{a} , b \in B \tag{eq\_0007} \\
+  & P = \left\{\right. \mathbf{p} = \mathbf{p}_{0} + ϛ \left|\right. \mathbf{e}^{T} ϛ = 0 , \left|\left|ϛ\right|\right|_{\infty} \leq ϖ \left.\right\} \tag{eq\_0009} \\
+  & \sum_{k \in K} \mathit{gamma}_{i , i^{'} , k} = 1 , \forall \left(i , i^{'}\right) \in Q \tag{eq\_0010} \\
+  & 1 - z_{k} \prod_{l \in L} \mathit{omega}_{l , k} \geq \mathit{gamma}_{i , i^{'} , k} , \forall k \in K , \left(i , i^{'}\right) \in Q \tag{eq\_0011} \\
+  & \prod_{l \in L_{n e s}} \mathit{omega}_{l , k} \geq \mathit{gamma}_{i , i^{'} , k} , \forall k \in K , \left(i , i^{'}\right) \in Q \tag{eq\_0012} \\
+  & \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \sum_{l \in L} \mathit{gamma}_{i , i^{'} , k} \cdot \mathit{omega}_{l , k} \geq N_{u m a} \tag{eq\_0013} \\
+  & \sum_{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{g}} v_{g} \left(i , i^{'} , t , t^{'}\right) - \sum_{i , t : \left(i^{'} i , t^{'} , t\right) \in E_{g}} v_{g} \left(i^{'} , i , t^{'} , t\right) = \left\{\begin{matrix} - 1 \cdot i^{'} = \mathit{ori}_{g} , t^{'} = \mathit{star}_{g} \\ 1 \cdot i^{'} = \mathit{des}_{g} , t^{'} = T_{\mathit{max}} \\ 0 o t h e r w i s \cdot e \end{matrix}\right , \forall g \in G \tag{eq\_0014} \\
+  & \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \leq 1 , \forall \left(j , j^{'}\right) \in Q , t^{''} \in T \tag{eq\_0015} \\
+  & \mathit{gamma}_{i , i^{'} , k} = \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right) , \forall \left(i , i^{'}\right) \in Q , k \in K \tag{eq\_0017} \\
+  & \mathit{gamma}_{i , i^{'} , k} \in \left\{0 , 1\right\} , \forall \left(i , i^{'}\right) \in Q , k \in K \tag{eq\_0018} \\
+  & x_{a} \left(i , i^{'} , t , t^{'}\right) \in \left\{0 , 1\right\} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{a} , a \in A \tag{eq\_0019} \\
+  & y_{b} \left(i , i^{'} , t , t^{'} , k\right) \in \left\{0 , 1\right\} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{b} , b \in B \tag{eq\_0020} \\
+  & sup_{\mathbf{p} \in P} \left\{\mathcal{E}_{\mathbf{p}} \left[\right. Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} = \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{g}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) v_{g} \left(i , i^{'} , t , t^{'}\right) \tag{eq\_0021} \\
+  & \mathbf{p} = \mathit{argmax}_{\mathbf{p} \in P} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{g}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) v_{g} \left(i , i^{'} , t , t^{'}\right) \tag{eq\_0024} \\
+  & \mathit{min} Z_{3} = \left(\mathit{alpha}_{1} \cdot Z_{1} + \mathit{alpha}_{2} \cdot Z\right)_{2} + \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \mathit{lambda}_{i , i^{'}} \left(\mathit{gamma}_{i , i^{'} , k} - \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right)\right) + \frac{\mathit{vartheta}}{2} \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \left(\parallel \mathit{gamma}_{i , i^{'} , k} - \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right) \parallel\right)_{2}^{2} + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \mathit{mu}_{j , j^{'} , t^{''}} \left[\sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) - 1\right] + \frac{\mathit{rho}}{2} \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \left(\parallel \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + s_{j , j^{'} , t^{''}} - 1 \parallel\right)_{2}^{2} \tag{eq\_0025} \\
+  & \mathit{lambda}_{i , i^{'}} \in R , \forall \left(i , i^{'}\right) \in Q \tag{eq\_0026} \\
+  & \mathit{mu}_{j , j^{'} , t^{''}} \geq 0 , \forall \left(j , j^{'}\right) \in Q , t^{''} \in T \tag{eq\_0027} \\
+  & 0 \leq s_{j , j^{'} , t^{''}} \leq 1 , \forall \left(j , j^{'}\right) \in Q , t^{''} \in T \tag{eq\_0028} \\
+  & \mathit{lambda}_{i , i^{'}}^{n + 1} = \mathit{lambda}_{i , i^{'}}^{n} + \mathit{vartheta} \sum_{k \in K} \left(\left(\right. \mathit{gamma}\right)_{i , i^{'} , k} - \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right) \left.\right) , \forall \left(i , i^{'}\right) \in Q \tag{eq\_0029} \\
+  & \mathit{mu}_{j , j^{'} , t^{''}}^{n + 1} = m a x \left\{0 , \mathit{mu}_{j , j^{'} , t^{''}}^{n} + \mathit{rho} \left[\sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) - 1\right]\right\} , \forall \left(j , j^{'}\right) \in Q , t^{''} \in T \tag{eq\_0030} \\
+  & \mathit{min} Z_{4} = \left(\mathit{alpha}_{1} \cdot Z\right)_{1} + \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \mathit{lambda}_{i , i^{'}} \left(\mathit{gamma}_{i , i^{'} , k} - \mathit{cons}_{1 , i , i^{'} k}\right) + \frac{\mathit{vartheta}}{2} \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \left(\parallel \mathit{gamma}_{i , i^{'} , k} - \mathit{cons}_{1 , i , i^{'} k} \parallel\right)_{2}^{2} \tag{eq\_0031} \\
+  & \left(\parallel \mathit{gamma}_{i , i^{'} , k} - \mathit{cons}_{1 , i , i^{'} , k} \parallel\right)_{2}^{2} = \mathit{gamma}_{i , i^{'} , k}^{2} + \mathit{cons}_{1 , i , i^{'} , k}^{2} - 2 \cdot \mathit{cons}_{1 , i , i^{'} , k} \cdot \mathit{gamma}_{i , i^{'} , k} \tag{eq\_0032} \\
+  & = \mathit{gamma}_{i , i^{'} , k} + \mathit{cons}_{1 , i , i^{'} , k} - 2 \cdot \mathit{cons}_{1 , i , i^{'} , k} \cdot \mathit{gamma}_{i , i^{'} , k} \tag{eq\_0033} \\
+  & \mathit{min} Z_{4} = \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \left(\left[\mathit{lambda}_{i , i^{'}} + \frac{\mathit{vartheta}}{2} - \mathit{cons}_{1 , i , i^{'} k} \mathit{vartheta} + \mathit{alpha}_{1} \left(\left(\right. \mathit{pen}\right)_{k} + \mathit{pen}_{k}^{'}\right)\right] \mathit{gamma}_{i , i^{'} , k} + \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \left(\frac{\mathit{vartheta}}{2} - \mathit{lambda}_{i , i^{'}}\right) \mathit{cons}_{1 , i , i^{'} , k} \tag{eq\_0034} \\
+  & \mathit{min} Z_{5} = \mathit{alpha}_{2} \cdot Z_{2} + \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \mathit{lambda}_{i , i^{'}} \left(\mathit{cons}_{2 , i , i^{'} , k} - \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right)\right) + \frac{\mathit{vartheta}}{2} \sum_{\left(i , i^{'}\right) \in Q} \sum_{k \in K} \left(\parallel \mathit{cons}_{2 , i , i^{'} , k} - \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} y_{b} \left(i , i^{'} , t , t^{'} , k\right) \parallel\right)_{2}^{2} + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \mathit{mu}_{j , j^{'} , t^{''}} \left[\sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) - 1\right] + \frac{\mathit{rho}}{2} \sum_{\left(j , j^{'}\right) \in G} \sum_{t^{''} \in T} \left(\parallel \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + s_{j , j^{'} , t^{''}} - 1 \parallel\right)_{2}^{2} \tag{eq\_0035} \\
+  & \left(\parallel \sum_{g \in G} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + s_{j , j^{'} , t^{''}} - 1 \parallel\right)_{2}^{2} \tag{eq\_0036} \\
+  & = \left\{\begin{matrix} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \left(2 \cdot n_{g} - 1\right) + \left(n_{g} - 1\right)^{2} n_{g} \geq 1 \\ 0 \cdot n_{g} = 0 \end{matrix}\right \tag{eq\_0037} \\
+  & n_{g} = \sum_{g \in G^{'}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \tag{eq\_0038} \\
+  & Z_{5}^{a} = \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} \mathit{varphi}_{a} \left(i , i^{'} , t , t^{'}\right) x_{a} \left(i , i^{'} , t , t^{'}\right) + \frac{1}{2} \mathit{rho} \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \left(n_{a} - 1\right)^{2} - \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \mathit{mu}_{j , j^{'} , t^{''}} \tag{eq\_0039} \\
+  & Z_{5}^{b} = \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} \mathit{varphi}_{b} \left(i , i^{'} , t , t^{'}\right) y_{b} \left(i , i^{'} , t , t^{'} , k\right) + \frac{1}{2} \mathit{rho} \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \left(n_{b} - 1\right)^{2} - \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T} \mathit{mu}_{j , j^{'} , t^{''}} + \left(\frac{\mathit{vartheta}}{2} + \mathit{lambda}_{i , i^{'}}\right) \mathit{cons}_{2 , i , i^{'} , k} \tag{eq\_0040} \\
+  & \mathit{varphi}_{a} \left(i , i^{'} , t , t^{'}\right) = \mathit{alpha}_{1} \left(\left(\right. \mathit{zeta}\right)_{1} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} C_{a} \left(i , i^{'} , t , t^{'}\right) + \mathit{zeta}_{2} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) \left.\right) + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T : \left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} \left\{\mathit{mu}_{j , j^{'} , t^{''}} + m a x \left\{0 , \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right\}\right\} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{a} \tag{eq\_0041} \\
+  & \mathit{varphi}_{b} \left(i , i^{'} , t , t^{'}\right) = \left(\mathit{alpha}_{2} \left(\right. \mathit{zeta}\right)_{1} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} C_{b} \left(i , i^{'} , t , t^{'}\right) + \mathit{zeta}_{2} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) \left.\right) + \frac{\mathit{vartheta}}{2} \left(- \mathit{cons}\right)_{2 , i , i^{'} , k} \mathit{vartheta} - \mathit{lambda}_{i , i^{'}} + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T : \left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} \left\{\mathit{mu}_{j , j^{'} , t^{''}} + m a x \left\{0 , \frac{\mathit{rho}}{2} \left(2 \cdot n_{a} - 1\right)\right\}\right\} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{b} \tag{eq\_0042} \\
+  & \mathit{varphi}_{a}^{'} \left(i , i^{'} , t , t^{'}\right) = \left(\mathit{alpha}_{2} \left(\right. \mathit{zeta}\right)_{1} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} C_{a} \left(i , i^{'} , t , t^{'}\right) + \mathit{zeta}_{2} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{a}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) \left.\right) + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T : \left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} \mathit{mu}_{j , j^{'} , t^{''}} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{a} \tag{eq\_0043} \\
+  & \mathit{varphi}_{b}^{'} \left(i , i^{'} , t , t^{'}\right) = \mathit{alpha}_{2} \left(\left(\right. \mathit{zeta}\right)_{1} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} C_{b} \left(i , i^{'} , t , t^{'}\right) + \mathit{zeta}_{2} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in E_{b}} h_{\mathit{kappa}} \left(i , i^{'} , t , t^{'}\right) \left.\right) - \mathit{lambda}_{i , i^{'}} + \sum_{\left(j , j^{'}\right) \in Q} \sum_{t^{''} \in T : \left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} \mathit{mu}_{j , j^{'} , t^{''}} , \forall \left(i , i^{'} , t , t^{'}\right) \in E_{b} \tag{eq\_0044} \\
+  & = \left(\parallel \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + n_{g} + s_{j , j^{'} , t^{''}} - 1 \parallel\right)_{2}^{2} \tag{eq\_0047} \\
+  & = \left[\sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right)\right]^{2} + 2 \left[\sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \left(n_{g} + s_{j , j^{'} , t^{''}} - 1\right)\right] + \left(n_{g} + s_{j , j^{'} , t^{''}} - 1\right)^{2} \tag{eq\_0048} \\
+  & = \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + 2 \left[\sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \left(n_{g} + s_{j , j^{'} , t^{''}} - 1\right)\right] + \left(n_{g} + s_{j , j^{'} , t^{''}} - 1\right)^{2} , \tag{eq\_0049} \\
+  & = \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) \left(\left(2 \cdot n\right)_{g} + 2 \cdot s_{j , j^{'} , t^{''}} - 1\right) + \left(n_{g} + s_{j , j^{'} , t^{''}} - 1\right)^{2} \tag{eq\_0050} \\
+  & L_{s_{j , j^{'} , t^{''}}} = s_{j , j^{'} , t^{''}}^{2} + 2 \cdot s_{j , j^{'} , t^{''}} \left[\sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) + n_{g} - 1\right] + P \tag{eq\_0051} \\
+  & s_{j , j^{'} , t^{''}}^{ \cdot } = 1 - \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{xi} \left(j , j^{'} , t^{''}\right)} v_{g} \left(i , i^{'} , t , t^{'}\right) - n_{g} \tag{eq\_0052} \\
+  & \left(\mathit{sup}\right)_{\mathbf{p} \in P} \left\{\right. \mathcal{E}_{\mathbf{p}} \left[Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} = \mathit{min}_{\mathit{delta} , \mathit{gamma} , \mathit{varrho}} \mathbf{P}_{0}^{T} \left(\left[\right. Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right] + ϖ\right)^{T} \mathit{gamma} + ϖ^{T} \mathit{varrho} \tag{eq\_0055} \\
+  & \mathbf{e} \mathit{delta} - \mathit{gamma} + \mathit{varrho} = \mathbf{Q} \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \tag{eq\_0057} \\
+  & = \left(m a x\right)_{\mathbf{p} \in P} \mathbf{p}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \tag{eq\_0059} \\
+  & = \mathbf{p}_{0}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) + \left(m a x\right)_{ϛ} \left\{\right. ϛ^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \left|\right. \mathbf{e}^{T} ϛ = 0 , \left|\left|ϛ\right|\right|_{\infty} \leq ϖ \left.\right\} \tag{eq\_0060} \\
+\end{align}

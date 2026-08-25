@@ -1,0 +1,818 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2017.06.018",
+  "name": "Train timetabling by skip-stop planning in highly congested lines",
+  "family": "milp",
+  "description": "Mined from Train timetabling by skip-stop planning in highly congested lines (Transportation Research Part B Methodological, 2017).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2017.06.018",
+    "reference": "Train timetabling by skip-stop planning in highly congested lines",
+    "author": "Feng Jiang; Valentina Cacchiani; Paolo Toth",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "A",
+      "description": "Set of arcs in the time-space network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of trains, including existing and new ones",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of nodes in the time-space network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Node in the time-space network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Station index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of tracks (routes) between stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "Set of departure nodes for a given station and track",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "h",
+      "description": "Station index (used in pairs with i)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "w",
+      "description": "Departure node in the time-space network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "U",
+      "description": "Set of arrival nodes for a given station and track",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "H",
+      "description": "Set of headway values (time intervals)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T_new",
+      "description": "New train indices",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Hbar",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "p",
+      "description": "Profit of train t, used in objective to maximize total profit",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Capacity of station i (maximum number of trains)",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "q",
+      "description": "Headway value used in capacity constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d",
+      "description": "Minimum dwelling time at a station",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "maxstr",
+      "description": "Maximum total stretch (delay) allowed for train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "maxcanc",
+      "description": "Maximum number of cancellations (skipped stops) for train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "Minimum travel time of train t between stations h and i",
+      "shape": [
+        "T",
+        "S",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "acc",
+      "description": "Acceleration time of train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "dec",
+      "description": "Deceleration time of train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "qbar",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dw",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "theta",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "description": "Binary variable indicating if arc a is selected for train t",
+      "shape": [
+        "T",
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating if train t stops at node v",
+      "shape": [
+        "T",
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating if any train stops at node v",
+      "shape": [
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0003",
+      "description": "Flow conservation at intermediate nodes for each train",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "flow_balance",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0004",
+      "description": "Relates stop variable z to selected incoming arc for each train and node",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005",
+      "description": "Relates station stop indicator y to any train stopping at node",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0006",
+      "description": "Departure headway constraint: at most one train can depart within a headway time interval at each track",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "headway",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007",
+      "description": "Arrival headway constraint: at most one train can arrive within a headway time interval at each track",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "headway",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Station track capacity constraint limiting number of trains simultaneously at a station",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "capacity",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Constraints on maximum total stretch (delay) allowed for each train",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Overtaking constraints on selected arcs to prevent train collisions",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "maxcanc",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0012",
+      "description": "Binary domain for arc selection and stop variables",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        },
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "max",
+    "name": "objective",
+    "description": "Maximize total profit of selected arcs",
+    "terms": [
+      {
+        "ref": "x",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "t",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "A",
+            "expr": "a",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "p",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

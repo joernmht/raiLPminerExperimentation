@@ -1,0 +1,417 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2009.07.007",
+  "name": "Scheduling extra freight trains on railway networks",
+  "family": "milp",
+  "description": "Mined from Scheduling extra freight trains on railway networks (Transportation Research Part B Methodological, 2009).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2009.07.007",
+    "reference": "Scheduling extra freight trains on railway networks",
+    "author": "Valentina Cacchiani; Alberto Caprara; Paolo Toth",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "R",
+      "description": "Set of routes for train j",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta",
+      "description": "Set of arcs entering or leaving a node for a train",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "sigma",
+      "description": "Source node (origin) for trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of nodes in the network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Node in the network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tau",
+      "description": "Sink node (destination) for trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "U",
+      "description": "Set of arrival nodes at an endpoint of an edge",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "Set of departure nodes at an endpoint of an edge",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Endpoint of an edge",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "h",
+      "description": "Endpoint of an edge",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Ttwo",
+      "description": "Renamed set T_2",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T_1",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T_2",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B",
+      "description": "binary domain {0,1}",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "ST",
+      "description": "terminal nodes {sigma, tau}",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "p",
+      "description": "Profit of assigning train j to route r",
+      "shape": [
+        "T",
+        "R"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "description": "Binary variable indicating if train j uses route r",
+      "shape": [
+        "T",
+        "R"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating if train j visits node v",
+      "shape": [
+        "T",
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating if any train visits node v",
+      "shape": [
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0008",
+      "description": "Exactly one path from origin for each fixed train j in T1",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Flow conservation at intermediate nodes v for each train j",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "flow_balance",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Link z_jv to incoming arcs at node v for train j",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Link y_v to z_jv over all trains j visiting node v",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "max",
+    "name": "objective",
+    "description": "Maximize total profit of assigning extra freight trains to routes",
+    "terms": [
+      {
+        "ref": "x",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "j",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "R",
+            "expr": "r",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "p",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "T",
+          "R"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -1,0 +1,76 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.tre.2022.102622
+%@ meta id=10.1016_j.tre.2022.102622 family=milp schema=0.1.0
+%@ name :: Train platforming and rescheduling with flexible interlocking mechanisms: An aggregate approach
+%@ desc :: Mined from Train platforming and rescheduling with flexible interlocking mechanisms: An aggregate approach (Transportation Research Part E Logistics and Transportation Review, 2022).
+%@ prov source :: 10.1016/j.tre.2022.102622
+%@ prov reference :: Train platforming and rescheduling with flexible interlocking mechanisms: An aggregate approach
+%@ prov author :: Gongyuan Lu; Ning Jia; Xiaobo Liu; Yu Nie
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total deviation of actual arrival and departure times from schedule plus penalty for platform changes
+%@ param t shape=R kind=vector :: Total travel time on route p, sum of section traversal times plus train length time (Eq. 1)
+%@ param f shape=S kind=vector :: Constant traversal time on section s
+%@ index S ordered=0 cyclic=0 :: Set of all sections in the station yard network
+%@ var y shape=K domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival, departure, receiving, and leaving times for each train k
+%@ var x shape=K,R domain=binary role=primary drole=- lo=- hi=- :: Binary route assignment variable, 1 if train k uses route p
+%@ index R ordered=0 cyclic=0 :: Set of all receiving and departure routes
+%@ index K ordered=0 cyclic=0 :: Set of trains under consideration
+%@ index I ordered=0 cyclic=0 :: Set of entry points of the station yard
+%@ var o shape=K,I domain=binary role=primary drole=- lo=- hi=- :: Binary indicator of entry point u used by train k
+%@ index O ordered=0 cyclic=0 :: Set of exit points of the station yard
+%@ var d shape=K,O domain=binary role=primary drole=- lo=- hi=- :: Binary indicator of exit point v used by train k
+%@ index T ordered=0 cyclic=0 :: Set of berthing tracks (platforms)
+%@ var w shape=K,T domain=binary role=primary drole=- lo=- hi=- :: Binary platform assignment variable, 1 if train k is assigned to platform i
+%@ var B shape=K,K domain=binary role=primary drole=- lo=- hi=- :: Order indicator for train pair k,k', 0 if k precedes k', 1 otherwise
+%@ param M shape=- kind=big_m :: Large positive number for big-M constraints
+%@ var V shape=K,K domain=binary role=primary drole=- lo=- hi=- :: Order indicator for train pair k,k' under route relationship phi, 0 if k precedes k', 1 otherwise
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
+%@ con eq_0001 kind=linear domain=- indicator=- :: Total travel time on route p equals sum of section traversal times plus train length time (Eq. 1)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Actual arrival time from receiving time and route initialization/traversal/platforming times (Eq. 2)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Leaving time from departure time and route initialization/traversal/platforming times (Eq. 3)
+%@ con eq_0005 kind=big_m domain=- indicator=- :: Route claim time equals receiving or departure time when route assigned, big-M relaxation otherwise (Eq. 4)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Degree of conflict for RLRR mechanism: initialization time plus route travel time plus clearance buffer (Eq. 5)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Degree of conflict for RLSR mechanism: partial route traversal time plus clearance buffer (Eq. 6)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Degree of conflict for SLSR mechanism: RLSR value minus approach time of the conflicting train (Eq. 7)
+%@ con eq_0011 kind=linear domain=- indicator=- :: General degree of conflict for RLRR interlocking (Eq. 8a)
+%@ con eq_0012 kind=linear domain=- indicator=- :: General degree of conflict for RLSR interlocking (Eq. 8b)
+%@ con eq_0013 kind=linear domain=- indicator=- :: General degree of conflict for SLSR interlocking (Eq. 8c)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Conflict free condition: claimed times of conflicting trains separated by degree of conflict (Eq. 9)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Dwell time of train k at its platform at least required dwell time (Eq. 10)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Actual arrival time of train k no earlier than scheduled arrival time (Eq. 11a)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Actual departure time of train k no earlier than scheduled departure time (Eq. 11b)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Entry point indicator equals sum of receiving routes connected to that entry point (Eq. 12a)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Exit point indicator equals sum of departure routes connected to that exit point (Eq. 12b)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Platform assignment variable equals sum of receiving routes connected to that platform (Eq. 13a)
+%@ con eq_0024 kind=linear domain=- indicator=- :: Platform assignment variable equals sum of departure routes connected to that platform (Eq. 13b)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Each train k is assigned exactly one berthing track (Eq. 14)
+%@ con eq_0027 kind=big_m domain=- indicator=- :: Platform conflict free condition when train k precedes k' on same platform (Eq. 15a)
+%@ con eq_0029 kind=big_m domain=- indicator=- :: Platform conflict free condition when train k' precedes k on same platform (Eq. 15b)
+%@ con eq_0030 kind=big_m domain=- indicator=- :: Route conflict free condition when train k precedes k' on conflicting routes (Eq. 16a)
+%@ con eq_0032 kind=big_m domain=- indicator=- :: Route conflict free condition when train k' precedes k on conflicting routes (Eq. 16b)
+\begin{align}
+  & t_{p} = \sum_{s \in \mathcal{S}_{p}} f_{s} + t_{t r a i n} , \tag{eq\_0001} \\
+  & y_{k}^{a} = y_{k}^{r} + \sum_{p \in \mathcal{R}^{r}} \left(\mathit{sigma}_{p}^{l} + t_{p} + \mathit{sigma}_{p}^{c}\right) x_{k , p} , \tag{eq\_0002} \\
+  & y_{k}^{l} = y_{k}^{d} + \sum_{p \in \mathcal{R}^{d}} \left(\mathit{sigma}_{p}^{l} + t_{p} + \mathit{sigma}_{p}^{c}\right) x_{k , p} . \tag{eq\_0003} \\
+  & \mathit{gamma}_{p , q}^{1} = \mathit{sigma}_{p}^{l} + t_{p} + \mathit{rho} , \tag{eq\_0005} \\
+  & \mathit{gamma}_{p , q}^{2} = \mathit{sigma}_{p}^{l} + \sum_{i = 1}^{4} f_{s_{i}} + \mathit{rho} < \mathit{gamma}_{p , q}^{1} . \tag{eq\_0006} \\
+  & \mathit{gamma}_{p , q}^{3} = \mathit{sigma}_{p}^{l} + \sum_{i = 1}^{4} f_{s_{i}} + \mathit{rho} - \left(f_{s_{6}} + \mathit{sigma}_{q}^{c} + \mathit{sigma}_{q}^{l}\right) < \mathit{gamma}_{p , q}^{2} , \tag{eq\_0007} \\
+  & \mathit{gamma}_{p , q}^{2} = \mathit{sigma}_{p}^{l} + t_{p} + \mathit{rho} - \sum_{s \in \mathcal{S}_{p , q}^{p +}} f_{s} ; \tag{eq\_0010} \\
+  & \mathit{gamma}_{p , q}^{3} = \mathit{sigma}_{p}^{l} + t_{p} + \mathit{rho} - \sum_{s \in \mathcal{S}_{p , q}^{p +}} f_{s} - \left(\sum_{s \in \mathcal{S}_{p , q}^{q -}} f_{s} + \mathit{sigma}_{q}^{l} + \mathit{sigma}_{q}^{c}\right) . \tag{eq\_0011} \\
+  & \mathit{tau}_{k^{'} , q} \geq \mathit{tau}_{k , p} + \mathit{gamma}_{p , q}^{\mathit{pi}} . \tag{eq\_0012} \\
+  & y_{k}^{d} - y_{k}^{a} \geq \mathit{Omega}_{k} , \forall k \in \mathcal{K} , \tag{eq\_0013} \\
+  & y_{k}^{a} \geq t_{k}^{a} , \forall k \in \mathcal{K} , \tag{eq\_0014} \\
+  & y_{k}^{d} \geq t_{k}^{d} , \forall k \in \mathcal{K} , \tag{eq\_0016} \\
+  & o_{k , u} = \sum_{p \in \mathcal{R}^{r}} \left(x_{k , p} \mathit{alpha}_{p , u}\right) , \forall k \in \mathcal{K} , \forall u \in \mathcal{I} , \tag{eq\_0017} \\
+  & d_{k , v} = \sum_{p \in \mathcal{R}^{d}} \left(x_{k , p} \mathit{beta}_{p , v}\right) , \forall k \in \mathcal{K} , \forall v \in \mathcal{O} . \tag{eq\_0019} \\
+  & w_{k , i} = \sum_{p \in \mathcal{R}^{r}} \left(x_{k , p} \mathit{theta}_{p , i}\right) , \forall k \in \mathcal{K} , i \in \mathcal{T} , \tag{eq\_0020} \\
+  & w_{k , i} = \sum_{p \in \mathcal{R}^{d}} \left(x_{k , p} \mathit{delta}_{p , i}\right) , \forall k \in \mathcal{K} , i \in \mathcal{T} . \tag{eq\_0022} \\
+  & \sum_{i \in \mathcal{T}} w_{k , i} = 1 , \forall k \in \mathcal{K} . \tag{eq\_0023} \\
+  & M \cdot \left(2 + B_{k , k^{'}} - w_{k , i} - w_{k^{'} , i}\right) + y_{k^{'}}^{r} - y_{k}^{d} \geq \mathit{rho} , \forall k , k^{'} \in \mathcal{K} , k < k^{'} , \forall i \in \mathcal{T} , \tag{eq\_0024} \\
+  & M \cdot \left(3 - B_{k , k^{'}} - w_{k , i} - w_{k^{'} , i}\right) + y_{k}^{r} - y_{k^{'}}^{d} \geq \mathit{rho} , \forall k , k^{'} \in \mathcal{K} , k < k^{'} , \forall i \in \mathcal{T} , \tag{eq\_0026} \\
+  & \mathit{tau}_{k , p} - \mathit{tau}_{k^{'} , p^{'}} + M \cdot \left(3 - V_{k , k^{'}}^{\mathit{phi}} - x_{k , p} - x_{k^{'} , p^{'}}\right) \geq \mathit{gamma}_{p^{'} , p}^{\mathit{pi}} , \forall k , k^{'} \in \mathcal{K} , k \neq k^{'} , \forall p , p^{'} \text{such}\textrm{ }\text{that} \mathit{gamma}_{p^{'} , p}^{\mathit{pi}} > 0 , \tag{eq\_0027} \\
+  & \mathit{tau}_{k^{'} , p^{'}} - \mathit{tau}_{k , p} + M \cdot \left(2 + V_{k , k^{'}}^{\mathit{phi}} - x_{k , p} - x_{k^{'} , p^{'}}\right) \geq \mathit{gamma}_{p , p^{'}}^{\mathit{pi}} , \forall k , k^{'} \in \mathcal{K} , k \neq k^{'} , \forall p , p^{'} \text{such}\textrm{ }\text{that} \mathit{gamma}_{p , p^{'}}^{\mathit{pi}} > 0 , \tag{eq\_0029} \\
+  & M \cdot \left(1 - B_{k , k^{'}}\right) \geq y_{k^{'}}^{a} - y_{k}^{a} , \forall k , k^{'} \in \mathcal{K} , \tag{eq\_0030} \\
+  & M \cdot B_{k , k^{'}} \geq y_{k}^{a} - y_{k^{'}}^{a} , \forall k , k^{'} \in \mathcal{K} . \tag{eq\_0032} \\
+  \min\quad & z \left(\mathbf{x} , \mathbf{y} , \mathbf{w}\right) = \sum_{k \in \mathcal{K}} \left(y_{k}^{a} - t_{k}^{a}\right) + \sum_{k \in \mathcal{K}} \left(y_{k}^{d} - t_{k}^{d}\right) - \mathit{epsilon} \sum_{k \in \mathcal{K}} w_{k , {i}_{k}} , \tag{eq\_0033} \\
+\end{align}

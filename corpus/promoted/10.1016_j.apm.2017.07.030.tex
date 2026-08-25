@@ -1,0 +1,83 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2017.07.030
+%@ meta id=10.1016_j.apm.2017.07.030 family=milp schema=0.1.0
+%@ name :: A decision making procedure for robust train rescheduling based on mixed integer linear programming and Data Envelopment Analysis
+%@ desc :: Mined from A decision making procedure for robust train rescheduling based on mixed integer linear programming and Data Envelopment Analysis (Applied Mathematical Modelling, 2017).
+%@ prov source :: 10.1016/j.apm.2017.07.030
+%@ prov reference :: A decision making procedure for robust train rescheduling based on mixed integer linear programming and Data Envelopment Analysis
+%@ prov author :: Graziana Cavone; Mariagrazia Dotoli; Nicola Epicoco; Carla Seatzu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize cumulative delay minus robustness index R, weighted by alpha and beta
+%@ var Buff shape=E domain=continuous role=primary drole=- lo=0 hi=Buff_max :: Buffer time added to event k, bounded by Buff_max
+%@ param R shape=- kind=scalar domain=- :: Robustness index to be maximized
+%@ index h ordered=0 cyclic=0 :: Binary parameter indicating if event is station segment
+%@ var z shape=E domain=non_negative role=primary drole=- lo=0 hi=- :: Delay of event k
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ var x shape=E domain=non_negative role=primary drole=- lo=0 hi=- :: Start and end times of events
+%@ index K ordered=1 cyclic=0 :: Ordered set of events for train i
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ index k ordered=0 cyclic=0 :: Generic event index
+%@ index n ordered=0 cyclic=0 :: Number (last index) of events for train i
+%@ param d shape=E kind=vector domain=- :: Minimum dwell or running time for event k
+%@ param delta shape=E kind=vector domain=- :: Disturbance magnitude for event k
+%@ param egin shape=E kind=vector domain=- :: Start time of event k
+%@ var epsilon shape=E domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable indicating if delay exceeds threshold
+%@ param forall shape=- kind=scalar domain=- :: Universal quantifier
+%@ param in shape=- kind=scalar domain=- :: Membership operator
+%@ param nd shape=E kind=vector domain=- :: End time of event k
+%@ index b ordered=0 cyclic=0 :: Set of block sections
+%@ index e ordered=0 cyclic=0 :: Set of events
+%@ index B ordered=0 cyclic=0 :: Set of block sections
+%@ index L ordered=0 cyclic=0 :: Set of events in block section j
+%@ var q shape=L,B,P domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable for track choice
+%@ index P ordered=0 cyclic=0 :: Set of tracks in block section j
+%@ index khat ordered=0 cyclic=0 :: Another event index (k-hat in paper)
+%@ param o shape=E kind=vector domain=- :: Origin of train
+%@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
+%@ param g shape=E,E kind=matrix domain=- :: Minimum connection time
+%@ param w shape=E kind=vector domain=- :: Maximum acceptable delay
+%@ con eq_0003 kind=linear domain=- indicator=- :: Train connection: end of event k equals start of next event
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum dwell or running time with disturbance
+%@ con eq_0005 kind=linear domain=- indicator=- :: Nominal start time lower bound for station events
+%@ con eq_0006 kind=linear domain=- indicator=- :: Fixed start time for events with static begin
+%@ con eq_0007 kind=linear domain=- indicator=- :: Fixed end time for events with static end
+%@ con eq_0008 kind=linear domain=- indicator=- :: Definition of delay z_k from end time and buffer
+%@ con eq_0009 kind=linear domain=- indicator=- :: Each event assigned to exactly one track in block section
+%@ con eq_0010 kind=linear domain=- indicator=- :: Track conflict captured by ordering variables
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Headway between events with different origin on same track
+%@ con eq_0012 kind=big_m domain=- indicator=- :: Headway between events with same origin on same track
+%@ con eq_0013 kind=big_m domain=- indicator=- :: Opposite-direction headway through lambda ordering variable
+%@ con eq_0014 kind=big_m domain=- indicator=- :: Same-direction headway through lambda ordering variable
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one ordering variable active for a pair
+%@ con eq_0016 kind=linear domain=- indicator=- :: Track capacity and train-type compatibility
+%@ con eq_0017 kind=big_m domain=- indicator=- :: Binary epsilon flags delay exceeding maximum acceptable delay
+%@ con eq_0018 kind=linear domain=- indicator=- :: Minimum connection time between connecting events
+%@ con eq_0019 kind=linear domain=- indicator=- :: Nonnegativity of event times and delays
+%@ con eq_0020 kind=linear domain=- indicator=- :: Binary ordering variables
+%@ con eq_0021 kind=linear domain=- indicator=- :: Binary track assignment variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary delay-threshold indicators
+%@ con eq_0023 kind=linear domain=- indicator=- :: Buffer times bounded by Buff_max
+\begin{align}
+  \min\quad & \left[\mathit{alpha} \cdot \sum_{k \in E} \left(\right. z_{k} + \mathit{Buff}_{k} \cdot h_{k} \left.\right) - \mathit{beta} \cdot R\right] . \tag{eq\_0001} \\
+  & x_{k}^{e n d} = x_{k + 1}^{b e g i n} , \forall k \in K_{i} - \left\{n_{i}\right\} , i \in T \tag{eq\_0003} \\
+  & x_k^end - x_k^begin - Buff_k \cdot h_k \ge d_k - epsilon_k \cdot delta_k, forall \cdot k \cdot in \cdot E \tag{eq\_0004} \\
+  & x_{k}^{b e g i n} \geq b_{k}^{\text{nominal}} , \forall k \in E : h_{k} = 1 \tag{eq\_0005} \\
+  & x_{k}^{b e g i n} = b_{k}^{s t a t i c} , \forall k \in E : b_{k}^{s t a t i c} > 0 \tag{eq\_0006} \\
+  & x_{k}^{e n d} = e_{k}^{s t a t i c} , \forall k \in E : e_{k}^{s t a t i c} > 0 \tag{eq\_0007} \\
+  & x_{k}^{e n d} - \mathit{Buff}_{k} \cdot h_{k} - e_{k}^{\text{nominal}} \leq z_{k} , \forall k \in E \tag{eq\_0008} \\
+  & \sum_{t c \in P_{j}} q_{k , j , t c} = 1 , \forall k \in L_{j} , j \in B \tag{eq\_0009} \\
+  & q_{k , j , t c} + q_{\hat{k} , j , t c} - 1 \leq \mathit{lambda}_{k , \hat{k}} + \mathit{gamma}_{k , \hat{k}} , \forall k , \hat{k} \in L_{j} , t c \in P_{j} , j \in B ; k < \hat{k} \tag{eq\_0010} \\
+  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{gamma}_{k , \hat{k}} - M \left(1 - \mathit{gamma}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} \neq o_{k} \tag{eq\_0011} \\
+  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{gamma}_{k , \hat{k}} - M \left(1 - \mathit{gamma}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} = o_{k} \tag{eq\_0012} \\
+  & x_{k}^{b e g i n} - x_{\hat{k}}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{lambda}_{k , \hat{k}} - M \left(1 - \mathit{lambda}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} \neq o_{k} \tag{eq\_0013} \\
+  & x_{k}^{b e g i n} - x_{\hat{k}}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{lambda}_{k , \hat{k}} - M \left(1 - \mathit{lambda}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} = o_{k} \tag{eq\_0014} \\
+  & \mathit{lambda}_{k , \hat{k}} + \mathit{gamma}_{k , \hat{k}} \leq 1 \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} \tag{eq\_0015} \\
+  & g_{i}^{t r a i n} \cdot q_{k , j , t c} \leq g_{j , t c}^{t r a c k} \forall k \in \left(K_{i} \cap L_{j}\right) , t c \in P_{j} , j \in B , i \in T \tag{eq\_0016} \\
+  & z_{k} + \mathit{Buff}_{k} \cdot h_{k} - w_{k} \leq M \mathit{varepsilon}_{k} \forall k \in E \tag{eq\_0017} \\
+  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq g_{k , \hat{k}}^{c o n n e c t i o n} \forall k , \hat{k} \in E ; k , \hat{k} \in E^{c o n n e c t i o n} \tag{eq\_0018} \\
+  & x_{k}^{b e g i n} , x_{k}^{e n d} , z_{k} \geq 0 \forall k \in E \tag{eq\_0019} \\
+  & \mathit{gamma}_{k , \hat{k}} , \mathit{lambda}_{k , \hat{k}} \in \left\{0 , 1\right\} \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} \tag{eq\_0020} \\
+  & q_{k , j , t c} \in \left\{0 , 1\right\} \forall k \in L_{j} , t c \in P_{j} , j \in B \tag{eq\_0021} \\
+  & \mathit{varepsilon}_{k} \in \left\{0 , 1\right\} \forall k \in E \tag{eq\_0022} \\
+  & \mathit{Buff}_{k} \in \left[0 , \mathit{Buff}_{max}\right] \forall k \in E \tag{eq\_0023} \\
+\end{align}

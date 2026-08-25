@@ -1,0 +1,50 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2014.08.013
+%@ meta id=10.1016_j.trb.2014.08.013 family=milp schema=0.1.0
+%@ name :: Single-line rail rapid transit timetabling under dynamic passenger demand
+%@ desc :: Mined from Single-line rail rapid transit timetabling under dynamic passenger demand (Transportation Research Part B Methodological, 2014).
+%@ prov source :: 10.1016/j.trb.2014.08.013
+%@ prov reference :: Single-line rail rapid transit timetabling under dynamic passenger demand
+%@ prov author :: Eva Barrena; David Canca; Leandro C. Coelho; Gilbert Laporte
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger average waiting time approximation
+%@ var x shape=S,M domain=integer role=primary drole=- lo=- hi=- :: Launch time of train k at station i
+%@ param D shape=S kind=vector domain=continuous :: Cumulative demand function at station i
+%@ index M ordered=0 cyclic=0 :: Set of train indices
+%@ index S ordered=0 cyclic=0 :: Set of station indices
+%@ index m ordered=0 cyclic=0 :: Number of trains (last index in M)
+%@ param p shape=- kind=scalar domain=continuous :: End of planning horizon
+%@ var y shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k is used
+%@ param l shape=S kind=vector domain=continuous :: Distance between stations i and i+1
+%@ index n ordered=0 cyclic=0 :: Last station index
+%@ var s shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Inverse of speed of train k leaving station i
+%@ var w shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of train k at station i
+%@ param h shape=- kind=scalar domain=continuous :: Minimum headway between trains
+%@ index N ordered=0 cyclic=0 :: Set of natural numbers (positive integers)
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dummy train at start: x_0^i = 0 for all stations i
+%@ con eq_0003 kind=linear domain=- indicator=- :: Dummy train at end: x_{m+1}^i = p for all stations i
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link launch times and usage: p(1-y_k) <= x_k^i <= p
+%@ con eq_0005 kind=linear domain=- indicator=- :: Order trains: x_k^i <= x_{k+1}^i
+%@ con eq_0006 kind=linear domain=- indicator=- :: Travel time relation: x_k^{i+1} = x_k^i + s_i^k l_{i,i+1} + w_{i+1}^k
+%@ con eq_0007 kind=linear domain=- indicator=- :: Dwell time bounds: y_k w_min <= w_i^k <= y_k w_max
+%@ con eq_0008 kind=linear domain=- indicator=- :: Speed bound: y_k s_min <= s_i^k <= y_k s_max
+%@ con eq_0009 kind=linear domain=- indicator=- :: Minimum headway: x_{k+1}^i >= x_k^i + h_min y_{k+1}
+%@ con eq_0010 kind=linear domain=- indicator=- :: Integrality of departure times: x_k^i in N+
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary usage variables: y_k in {0,1}
+%@ con eq_0013 kind=linear domain=- indicator=- :: F2 upper bound on departure from next station: x_k^{i+1} <= x_k^i + y_k(s_max l_{i,i+1} + w_max)
+%@ con eq_0014 kind=linear domain=- indicator=- :: F2 lower bound on departure from next station: x_k^i + y_k(s_min l_{i,i+1} + w_min) <= x_k^{i+1}
+\begin{align}
+  \min\quad & \frac{1}{2} \sum_{i \in \mathcal{S}} \sum_{k \in \mathcal{M} \cup \left\{m + 1\right\}} \left(D_{i} \left(x_{k}^{i}\right) - D_{i} \left(x_{k - 1}^{i}\right)\right) \left(x_{k}^{i} - x_{k - 1}^{i}\right) \tag{eq\_0001} \\
+  & x_{0}^{i} = 0 i \in \mathcal{S} \tag{eq\_0002} \\
+  & x_{m + 1}^{i} = p i \in \mathcal{S} \tag{eq\_0003} \\
+  & p \left(1 - y_{k}\right) \leq x_{k}^{i} \leq p i \in \mathcal{S} , k \in \mathcal{M} \tag{eq\_0004} \\
+  & x_{k}^{i} \leq x_{k + 1}^{i} i \in \mathcal{S} , k \in \mathcal{M} \backslash \left\{m\right\} \tag{eq\_0005} \\
+  & x_{k}^{i + 1} = x_{k}^{i} + s_{i}^{k} \cdot l_{i , i + 1} + w_{i + 1}^{k} i \in \mathcal{S} \backslash \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0006} \\
+  & y_{k} \cdot w_{\mathit{min}} \leq w_{i}^{k} \leq y_{k} \cdot w_{\mathit{max}} i \in \mathcal{S} , k \in \mathcal{M} \tag{eq\_0007} \\
+  & y_{k} \cdot s_{\mathit{min}} \leq s_{i}^{k} \leq y_{k} \cdot s_{\mathit{max}} i \in \mathcal{S} \backslash \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0008} \\
+  & x_{k + 1}^{i} \geq x_{k}^{i} + h_{\mathit{min}} \cdot y_{k + 1} i \in \mathcal{S} , k \in \mathcal{M} \backslash \left\{m\right\} \tag{eq\_0009} \\
+  & x_{k}^{i} \in \mathcal{N}^{+} i \in \mathcal{S} , k \in \mathcal{M} \tag{eq\_0010} \\
+  & y_{k} \in \left\{0 , 1\right\} k \in \mathcal{M} . \tag{eq\_0011} \\
+  & x_{k}^{i + 1} \leq x_{k}^{i} + y_{k} \left(s_{\mathit{max}} \cdot l_{i , i + 1} + w_{\mathit{max}}\right) i \in \mathcal{S} \backslash \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0013} \\
+  & x_{k}^{i} + y_{k} \left(s_{\mathit{min}} \cdot l_{i , i + 1} + w_{\mathit{min}}\right) \leq x_{k}^{i + 1} i \in \mathcal{S} \backslash \left\{n\right\} , k \in \mathcal{M} . \tag{eq\_0014} \\
+\end{align}

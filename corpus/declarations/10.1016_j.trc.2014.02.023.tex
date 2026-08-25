@@ -1,0 +1,73 @@
+% Declaration sidecar for 10.1016_j.trc.2014.02.023
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2014.02.023
+% Multi-objective optimization of train routing problem combined with train scheduling on a high-speed railway network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2014.02.023.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted sum of average travel time, traction energy consumption and total delayed times
+
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (fitness) in the multi-objective optimization
+
+%@ var A shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at a station
+
+%@ var D shape=i,k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train from a station
+
+%@ index N ordered=0 cyclic=0 :: Number of trains
+
+%@ param sgn shape=- kind=scalar domain=- :: Sign function indicating delay
+
+%@ index M ordered=0 cyclic=0 :: Number of stations on the route
+
+%@ param B shape=i,k kind=matrix domain=- :: Minimum dwelling time at station for train
+
+%@ var V shape=i,t domain=non_negative role=primary drole=- lo=- hi=- :: Speed of train
+
+%@ index t ordered=0 cyclic=0 :: Time index
+
+%@ param L shape=i kind=vector domain=- :: Length of the route chosen by train
+
+%@ var X shape=i,t domain=continuous role=primary drole=- lo=- hi=- :: Location of train
+
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fitness function value
+
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: γ
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficient for average travel time
+%@ param beta shape=- kind=scalar domain=- :: Weight coefficient for energy consumption
+%@ param gamma shape=- kind=scalar domain=- :: Weight coefficient for delayed times
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, k
+% (If one of these is really an index family, add a %@ index line for it.)
+%@ index i ordered=0 cyclic=0 :: Train index, i = 1, ..., N
+%@ index k ordered=0 cyclic=0 :: Station index, k = 1, ..., M
+
+%@ con eq_0002 kind=linear domain=- indicator=- :: Actual departure time at station for train is not earlier than planned departure time
+%@ con eq_0004 kind=linear domain=- indicator=- :: Actual dwelling time at station for train is at least the minimum dwelling time
+%@ con eq_0005 kind=linear domain=- indicator=- :: Actual speed of train does not exceed maximum speed
+%@ con eq_0006 kind=linear domain=- indicator=- :: Position update equation of train motion
+%@ con eq_0007 kind=linear domain=- indicator=- :: Speed update equation of train motion
+%@ con eq_0010 kind=linear domain=- indicator=- :: At actual arrival time at terminal station, train location equals route length
+%@ con eq_0015 kind=linear domain=- indicator=- :: Successive trains in the same section maintain at least the safe distance
+%@ param Bmin shape=- domain=- role=parameter drole=- lo=- hi=- :: Minimum dwell time parameter (renamed from B_{i,k}^{min})
+%@ param Vmax shape=- domain=- role=parameter drole=- lo=- hi=- :: Maximum speed parameter (renamed from V_{i,\text{max}})

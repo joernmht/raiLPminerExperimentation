@@ -1,0 +1,81 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2018.02.002
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2018.02.002
+% Impact of railway disruption predictions and rescheduling on passenger delays
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2018.02.002.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: minimize weighted departure and arrival delays and cancelled services
+
+% unusable as an identifier, rename or drop: ω
+% d: classified as variable during review
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Delay variable for arrival or departure of a service
+
+% c: classified as variable during review
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of a service
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of all train services
+
+% Out: classified as index during review
+%@ index Out ordered=0 cyclic=0 :: Set of outgoing short-turning pairs from a service
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines or directions
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations or scenarios
+
+% unusable as an identifier, rename or drop: λ
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of incoming short-turning pairs
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Index for service number in a line
+
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival or departure time of a service
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar :: Large constant for linearization
+
+% unusable as an identifier, rename or drop: θ
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of platform tracks available for a service
+
+% p: classified as variable during review
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for platform assignment
+
+% q: classified as index during review
+%@ index q ordered=0 cyclic=0 :: Index for platform track
+
+% Bound by a quantifier or big operator, so no declaration of their own: l, s, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Every approaching service either short-turns at a station prior to the disruption area, leading to cancellation of one service, or continues after the end of disruption
+%@ con eq_0005 kind=linear domain=- indicator=- :: For every scheduled departure in the opposite direction, there is exactly one matching approaching service in case of short-turning
+%@ con eq_0006 kind=linear domain=- indicator=- :: If a short-turning pair is selected for a service, the next service is cancelled
+%@ con eq_0007 kind=linear domain=- indicator=- :: If a short-turning pair is selected for an opposite-direction service, the previous service is cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: If a service is cancelled, no short-turning pair can be selected for it
+%@ con eq_0009 kind=big_m domain=- indicator=- :: If a short-turning pair is selected, the departure time of the returning service is at least the arrival time of the incoming service plus the minimum turnaround time
+%@ con eq_0010 kind=linear domain=- indicator=- :: If a service is not cancelled, exactly one platform is assigned to it

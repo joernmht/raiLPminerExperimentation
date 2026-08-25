@@ -1,0 +1,142 @@
+% Declaration sidecar for 10.1016_j.cie.2021.107858
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2021.107858
+% Train timetabling for a double-track urban rail transit line under dynamic passenger demand
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2021.107858.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger waiting time plus penalty for non-boarding passengers, equivalent to minimizing average waiting time per passenger.
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of directions (up and down)
+
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of stations on a line
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Station index in Y
+
+% t: classified as variable during review
+%@ var t shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train k from station i in direction f
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Planning horizon length
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of train services
+
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Number of stations (last station index)
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+
+% n: classified as parameter during review
+%@ param n shape=- kind=scalar domain=- :: Number of real train services (last train index)
+
+% v: classified as parameter during review
+%@ param v shape=- kind=scalar domain=- :: Number of virtual trains at start
+
+% unusable as an identifier, rename or drop: τ
+%@ param tau shape=- kind=scalar domain=- :: Minimum turnaround time at terminus
+
+% P: classified as variable during review
+%@ var P shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Passengers arriving at station i for destination j between trains k-1 and k
+
+% PSB: classified as variable during review
+%@ var PSB shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total passengers arriving at origin station i for all destinations
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Destination station index in Y
+
+% PSD: classified as variable during review
+%@ var PSD shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total passengers arriving at all origins for destination j
+
+% pr: classified as variable during review
+%@ var pr shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Passengers arriving in the interval and boarding train k
+
+% pu: classified as variable during review
+%@ var pu shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Passengers arriving in the interval but not boarding train k
+
+% W: classified as variable during review
+%@ var W shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total passengers waiting for train k at station i for destination j
+
+% wr: classified as variable during review
+%@ var wr shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Waiting passengers who board train k
+
+% wu: classified as variable during review
+%@ var wu shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Waiting passengers who cannot board train k
+
+% WSB: classified as variable during review
+%@ var WSB shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting passengers at origin station i for all destinations
+
+% WSD: classified as variable during review
+%@ var WSD shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting passengers for destination j from all origins
+
+% G: classified as variable during review
+%@ var G shape=F,Y,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers for train k at station i for destination j
+
+% GSB: classified as variable during review
+%@ var GSB shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers at origin station i for all destinations
+
+% GSD: classified as variable during review
+%@ var GSD shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers for destination j from all origins
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+
+% RC: classified as variable during review
+%@ var RC shape=F,Y,K domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train k at station i
+
+% D: classified as parameter during review
+%@ param D shape=Y,Y kind=matrix domain=- :: Total demand for OD pair (i,j) over planning horizon
+
+% Bound by a quantifier or big operator, so no declaration of their own: f, k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Fix departure time of virtual train at start of horizon to 0
+%@ con eq_0003 kind=linear domain=- indicator=- :: Fix departure time of virtual train at end of horizon to T
+%@ con eq_0004 kind=linear domain=- indicator=- :: Link departure times at consecutive stations via running and dwell times
+%@ con eq_0005 kind=headway domain=- indicator=- :: Enforce minimum headway between consecutive trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: Bound running time between stations
+%@ con eq_0007 kind=linear domain=- indicator=- :: Bound dwell time at stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Enforce minimum turnaround time at terminus
+%@ con eq_0010 kind=nonlinear domain=- indicator=- :: Compute OD passenger arrivals between consecutive departures from cumulative demand function
+%@ con eq_0011 kind=linear domain=- indicator=- :: Aggregate arriving passengers by origin station
+%@ con eq_0012 kind=linear domain=- indicator=- :: Aggregate arriving passengers by destination station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Split arriving passengers into boarding and non-boarding
+%@ con eq_0014 kind=linear domain=- indicator=- :: Split waiting passengers into boarding and non-boarding
+%@ con eq_0015 kind=linear domain=- indicator=- :: Aggregate waiting passengers by origin station
+%@ con eq_0016 kind=linear domain=- indicator=- :: Aggregate waiting passengers by destination station
+%@ con eq_0017 kind=linear domain=- indicator=- :: Compute total boarding as new arrivals boarding plus waiting passengers boarding
+%@ con eq_0018 kind=linear domain=- indicator=- :: Aggregate boarding passengers by origin station
+%@ con eq_0019 kind=linear domain=- indicator=- :: Aggregate boarding passengers by destination station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Balance origin-specific waiting passengers between consecutive trains
+%@ con eq_0021 kind=linear domain=- indicator=- :: Balance destination-specific waiting passengers between consecutive trains
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Define remaining capacity at start station
+%@ con eq_0023 kind=capacity domain=- indicator=- :: Update remaining capacity at intermediate stations
+%@ con eq_0024 kind=capacity domain=- indicator=- :: Update remaining capacity at end station
+%@ con eq_0025 kind=linear domain=- indicator=- :: Nonnegativity of origin-destination passenger flow variables
+%@ con eq_0026 kind=linear domain=- indicator=- :: Nonnegativity of aggregated passenger and remaining capacity variables
+%@ con eq_0027 kind=linear domain=- indicator=- :: Nonnegativity of time variables
+%@ con eq_0028 kind=linear domain=- indicator=- :: Set initial waiting passengers before the first real train to zero

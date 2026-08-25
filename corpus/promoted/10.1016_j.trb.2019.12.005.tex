@@ -1,0 +1,101 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.12.005
+%@ meta id=10.1016_j.trb.2019.12.005 family=milp schema=0.1.0
+%@ name :: Coupling time-indexed and big-M formulations for real-time train scheduling during metro service disruptions
+%@ desc :: Mined from Coupling time-indexed and big-M formulations for real-time train scheduling during metro service disruptions (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2019.12.005
+%@ prov reference :: Coupling time-indexed and big-M formulations for real-time train scheduling during metro service disruptions
+%@ prov author :: Yeran Huang; Carlo Mannino; Lixing Yang; Tao Tang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger waiting and headway deviation
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ param R shape=- kind=scalar :: Set of passenger arrival sample matrices
+%@ index U ordered=0 cyclic=0 :: Set of platforms
+%@ var a shape=K,U domain=non_negative role=primary :: Arrival time of train at platform
+%@ var d shape=K,U domain=non_negative role=primary :: Departure time of train from platform
+%@ index k ordered=0 cyclic=0 :: Train index
+%@ index u ordered=0 cyclic=0 :: Platform index
+%@ var s shape=K,U domain=non_negative role=primary :: Dwell time of train at platform
+%@ param H shape=- kind=scalar :: Minimum headway between trains
+%@ param M shape=- kind=scalar :: Large constant for big-M constraints
+%@ index l ordered=0 cyclic=0 :: Train index (used in constraints)
+%@ var y shape=K,K domain=binary role=primary :: Binary variable indicating train precedence
+%@ param p shape=Q,U kind=matrix :: Passenger arrival rate at platform u in time interval i
+%@ var b shape=Q,K,U domain=binary role=primary :: Auxiliary binary variable for passenger accumulation
+%@ var c shape=K,U domain=non_negative role=primary :: Residual capacity of train
+%@ var w shape=K,U domain=non_negative role=primary :: Number of waiting passengers
+%@ var f shape=- domain=non_negative role=primary :: Objective function value
+%@ param T shape=Q kind=vector :: Discretized time points
+%@ var x shape=Q,K,U domain=non_negative role=primary :: Slack variable for departure time offset
+%@ var z shape=Q,K,U domain=binary role=primary :: Binary variable indicating departure time interval
+%@ index Q ordered=0 cyclic=0 :: Set of time intervals
+%@ index i ordered=0 cyclic=0 :: Time interval index
+%@ index r ordered=0 cyclic=0 :: Passenger arrival sample index
+%@ param I shape=- kind=scalar :: Set of inner loop trains
+%@ con eq_0001 kind=linear :: Running time constraint
+%@ con eq_0002 kind=linear :: Dwell time constraint
+%@ con eq_0003 kind=headway :: Headway constraint
+%@ con eq_0004_a kind=capacity :: Bidirectional section occupancy constraint (outbound)
+%@ con eq_0004_b kind=capacity :: Bidirectional section occupancy constraint (inbound)
+%@ con eq_0005_a kind=big_m :: Alternate strategy shared-section sequencing constraint (train k before l)
+%@ con eq_0005_b kind=big_m :: Alternate strategy shared-section sequencing constraint (train l before k)
+%@ con eq_0006_a kind=big_m :: ShortTurn right-left shared-region sequencing constraint (left-loop train l before right-loop train k)
+%@ con eq_0006_b kind=big_m :: ShortTurn right-left shared-region sequencing constraint (right-loop train k before left-loop train l)
+%@ con eq_0007_a kind=big_m :: ShortTurn left-bidirectional shared-section headway constraint (bidirectional train j before left-loop train l)
+%@ con eq_0007_b kind=big_m :: ShortTurn left-bidirectional shared-region sequencing constraint (left-loop train l before bidirectional train j)
+%@ con eq_0007_c kind=big_m :: ShortTurn left-bidirectional shared-region sequencing constraint (bidirectional train j before left-loop train l)
+%@ con eq_0012 kind=flow_balance :: Onboard passenger balance constraint
+%@ con eq_0014 kind=linear :: Headway deviation objective term
+%@ con eq_0017 kind=linear :: Departure interval selection (exactly one interval) constraint
+%@ con eq_0018 kind=linear :: Departure offset bounds within selected interval
+%@ con eq_0019_a kind=linear :: Full time-indexed departure time expression
+%@ con eq_0019_b kind=linear :: Full time-indexed departure interval selection constraint
+%@ con eq_0020 kind=linear :: Definition of cumulative departure interval indicator b
+%@ con eq_0022 kind=flow_balance :: Total waiting passenger accumulation constraint
+%@ con eq_0033 kind=linear :: Equation 33 constraint of the hybrid MILP model
+%@ con eq_0034 kind=linear :: Equation 34 constraint of the hybrid MILP model
+%@ con eq_0035 kind=linear :: Equation 35 constraint of the hybrid MILP model
+%@ con eq_0036 kind=linear :: Equation 36 constraint of the hybrid MILP model
+%@ con eq_0037 kind=linear :: Equation 37 constraint of the hybrid MILP model
+%@ con eq_0038 kind=linear :: Equation 38 constraint of the hybrid MILP model
+%@ con eq_0039 kind=linear :: Equation 39 constraint of the hybrid MILP model
+%@ con eq_0041 kind=linear :: Equation 41 constraint of the hybrid MILP model
+%@ con eq_0043_a kind=linear :: Equation 43a constraint of the hybrid MILP model
+%@ con eq_0043_b kind=linear :: Equation 43b constraint of the hybrid MILP model
+%@ con eq_0047 kind=linear :: Equation 47 constraint of the hybrid MILP model
+%@ con eq_0048 kind=linear :: Equation 48 constraint of the hybrid MILP model
+\begin{align}
+  & a_{k}^{v \left(u\right)} - d_{k}^{u} = R^{u , v \left(u\right)} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0001} \\
+  & s_{m i n} \leq d_{k}^{u} - a_{k}^{u} \leq s_{m a x} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0002} \\
+  & d_{k}^{u} - d_{k - 1}^{u} \geq H_{m i n} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \backslash \left\{1 , K + 1\right\} \tag{eq\_0003} \\
+  & d_{k}^{(\bar{E})_{D}} - a_{k-1}^{(\bar{S})_{D}} \geq 0 , k \in \mathbf{\mathcal{K}}_{O} \backslash \left\{K + 1\right\} \tag{eq\_0004\_a} \\
+  & d_{k}^{(\bar{S})_{D}} - a_{k-1}^{(\bar{E})_{D}} \geq 0 , k \in \mathbf{\mathcal{K}}_{I} \backslash \left\{1\right\} \tag{eq\_0004\_b} \\
+  & d_{k}^{S_{b}} - a_{l}^{(\bar{S})_{b}} \geq \mathit{Theta}_{c} - M \cdot y^{k l} , k \in \mathbf{\mathcal{K}}_{\mathbf{\mathcal{I}}} , l \in \mathbf{\mathcal{K}}_{O} \tag{eq\_0005\_a} \\
+  & d_{l}^{(\bar{E})_{a}} - a_{k}^{E_{a}} \geq \mathit{Theta}_{c} + M \left(y^{k l} - 1\right) , k \in \mathbf{\mathcal{K}}_{\mathbf{\mathcal{I}}} , l \in \mathbf{\mathcal{K}}_{O} \tag{eq\_0005\_b} \\
+  & d_{l}^{S_{o}} - a_{k}^{E_{o}} \geq \mathit{Theta}_{c} - M \cdot y^{l k} , l \in \mathbf{\mathcal{K}}_{L} , k \in \mathbf{\mathcal{K}}_{R} \tag{eq\_0006\_a} \\
+  & d_{k}^{(\bar{E})_{o}} - a_{l}^{(\bar{S})_{o}} \geq \mathit{Theta}_{c} + M \left(y^{l k} - 1\right) , l \in \mathbf{\mathcal{K}}_{L} , k \in \mathbf{\mathcal{K}}_{R} \tag{eq\_0006\_b} \\
+  & d_{l}^{(\bar{E})_{a}} - \overset{\rightarrow}{d_{j}^{(\bar{E})_{a}}} \geq H_{m i n} + M \left(y^{j l} - 1\right) , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_a} \\
+  & \overset{\leftarrow}{d_{j}^{(\bar{S})_{a}}} - a_{l}^{E_{a}} \geq \mathit{Theta}_{c} - M \cdot y^{j l} , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_b} \\
+  & d_{l}^{(\bar{E})_{a}} - \overset{\rightarrow}{a_{j}^{(\bar{S})_{a}}} \geq \mathit{Theta}_{c} + M \left(y^{j l} - 1\right) , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_c} \\
+  & \begin{matrix}p \cdot b_{k}^{u} \leq R_{b} \cdot s_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot w_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot c_{k}^{u} ,\end{matrix} \left.\right\} u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0012} \\
+  & f_{w} = \underset{k \in \mathbf{\mathcal{K}}}{\sum} \underset{u \in \mathbf{\mathcal{U}}}{\sum} \left(p \cdot w_{k}^{u} - p \cdot b_{k}^{u}\right) \tag{eq\_0014} \\
+  \min\quad & \mathit{lambda}_{w} \cdot f_{w} + \mathit{lambda}_{h} \cdot f_{h} \tag{eq\_0016} \\
+  & d_{k}^{u} = \sum_{i = 1}^{Q} T_{i} \cdot z_{i}^{k , u} + x_{i}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0017} \\
+  & \sum_{i = 1}^{Q} z_{i}^{k , u} = 1 , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0018} \\
+  & x_{i}^{k , u} \leq \left(T_{i + 1} - T_{i} - \mathit{epsilon}\right) z_{i}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \backslash \left\{Q\right\} \tag{eq\_0019\_a} \\
+  & x_{i}^{k , u} \geq \mathit{epsilon} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0019\_b} \\
+  & d_{k}^{u} = \sum_{i = 1}^{Q} T_{i} \cdot z_{i}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0020} \\
+  & b_{i}^{k , u} = \sum_{j = 1}^{i} z_{j}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0022} \\
+  & d_{k}^{2 N - q} - a_{k - 1}^{2 N - q + 1} \geq 0 , k \in \mathbf{\mathcal{K}}_{O} \backslash \left\{K + 1\right\} \tag{eq\_0033} \\
+  & d_{k}^{2 N - q + 1} - a_{k - 1}^{2 N - q} \geq 0 , k \in \mathbf{\mathcal{K}}_{I} \backslash \left\{1\right\} \tag{eq\_0034} \\
+  & d_{k}^{q - 1} - a_{l}^{2 N - q + 2} \geq \mathit{Theta}_{c} - M \cdot y^{k l} , k \in \mathbf{\mathcal{K}}_{\mathbf{\mathcal{I}}} , l \in \mathbf{\mathcal{K}}_{O} \tag{eq\_0035} \\
+  & d_{l}^{2 N - q - 1} - a_{k}^{q + 2} \geq \mathit{Theta}_{c} + M \left(y^{k l} - 1\right) , k \in \mathbf{\mathcal{K}}_{\mathbf{\mathcal{I}}} , l \in \mathbf{\mathcal{K}}_{O} \tag{eq\_0036} \\
+  & p \cdot b_{k}^{u , r} \leq R_{b} \cdot s_{k}^{u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , r \in \mathbf{\mathcal{R}} \tag{eq\_0037} \\
+  & p \cdot b_{k}^{u , r} \leq p \cdot w_{k}^{u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , r \in \mathbf{\mathcal{R}} \tag{eq\_0038} \\
+  & p \cdot b_{k}^{u , r} \leq p \cdot c_{k}^{u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , r \in \mathbf{\mathcal{R}} \tag{eq\_0039} \\
+  & p \cdot w_{k}^{u , r} \geq \left[p \cdot w_{k - 1}^{u , r} - p \cdot b_{k - 1}^{u , r} + p \left(d_{k - 1}^{u} , d_{k}^{u} , u\right)\right] - M \cdot z_{Q}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \backslash \left\{1 , K + 1\right\} , r \in \mathbf{\mathcal{R}} \tag{eq\_0041} \\
+  & u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \backslash \left\{1 , K + 1\right\} , r \in \mathbf{\mathcal{R}} \tag{eq\_0043\_a} \\
+  & b_{i}^{k , u} = \sum_{j = 1}^{i} z_{j}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0043\_b} \\
+  & z_{i}^{k , u} \in \left\{0 , 1\right\} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0047} \\
+  & d_{k}^{u} , a_{k}^{u} , p \cdot b_{k}^{u , r} , p \cdot w_{k}^{u , r} \in \text{I} \text{R}_{+} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0048} \\
+\end{align}

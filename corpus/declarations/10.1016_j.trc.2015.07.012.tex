@@ -1,0 +1,134 @@
+% Declaration sidecar for 10.1016_j.trc.2015.07.012
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2015.07.012
+% Passenger-demands-oriented train scheduling for an urban rail transit network
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2015.07.012.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of normalized total energy consumption, total passenger travel time, and penalty for passengers left behind.
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time index for events and passenger arrival rate profiles
+
+% λ renamed to lambda.
+%@ param lambda shape=p,m kind=matrix domain=- :: Passenger arrival rate at platform p for destination m
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of platforms in the urban rail transit network
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations in the network
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Platform index
+
+% β renamed to beta.
+%@ param beta shape=p,m kind=matrix domain=- :: Splitting rate of passenger flows to platform p for destination m at a transfer station
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Coefficient for walking time calculation
+
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar domain=- :: Coefficient for walking time calculation
+
+% θ renamed to theta.
+%@ param theta shape=p kind=vector domain=- :: Average walking time parameter for platform p
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Number of corner points defining piecewise constant passenger arrival rate profiles
+
+% n: classified as variable during review
+%@ var n shape=i,p,m domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (onboard, boarding, alighting, or transferring) for train i, platform p, destination m
+
+% w: classified as variable during review
+%@ var w shape=p,m domain=non_negative role=primary drole=- lo=- hi=- :: Number of waiting passengers at platform p with destination m
+
+% d: classified as variable during review
+%@ var d shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from platform p
+
+% r: classified as variable during review
+%@ var r shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Running time of train i on the segment after platform p
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: Station index
+
+% E: classified as variable during review
+%@ var E shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Energy consumption of train i on the segment after platform p
+
+% f: classified as variable during review
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (weighted sum of energy, travel time, and penalty)
+
+% ζ renamed to zeta.
+%@ param zeta shape=- kind=scalar domain=- :: Weight in the weighted-sum objective function
+
+% h: classified as parameter during review
+%@ param h shape=p kind=vector domain=- :: Minimum or maximum headway at a platform (including turnaround headway)
+
+% τ renamed to tau.
+%@ param tau shape=i,p kind=matrix domain=- :: Dwell time of train i at platform p
+
+% c is bound by a quantifier or big operator, so no declaration of its own.
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index m ordered=0 cyclic=0 :: Destination station index (element of S_sta)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=flow_balance domain=- indicator=- :: Sum of passenger flow splitting rates at a transfer station equals 1 for each destination.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Average walking time from station entrance to a platform as a linear function of total passenger arrival rate.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Total passenger walking time from entrances to a platform over the scheduling period.
+%@ con eq_0006 kind=flow_balance domain=- indicator=- :: Sum of train splitting rates equals 1 for each train and destination at a transfer station.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Total passenger walking time from a platform to station exits as a linear function of alighting passengers.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Average walking time for transferring passengers between platforms as a linear function of transfer passenger count.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Total transfer time for alighting passengers from a train at a platform.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Average duration of the transfer process as a linear function of transfer passenger count.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Corner-point representation of passenger arrival rate changes due to passenger transfers.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Total number of waiting passengers at a platform before an event as the sum over destinations.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Update of total waiting time at a platform between consecutive events.
+%@ con eq_0016 kind=capacity domain=- indicator=- :: Number of boarding passengers equals the minimum of waiting passengers and remaining train capacity.
+%@ con eq_0017 kind=capacity domain=- indicator=- :: Remaining capacity on a train after alighting, based on train capacity and current onboard load.
+%@ con eq_0018 kind=flow_balance domain=- indicator=- :: Number of passengers still waiting at a platform immediately after a departure event.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Destination-wise number of passengers left by a train, proportional to the total left waiting.
+%@ con eq_0020 kind=flow_balance domain=- indicator=- :: Number of boarding passengers per destination equals waiting passengers before boarding minus those left behind.
+%@ con eq_0021 kind=flow_balance domain=- indicator=- :: Update of onboard passengers with destination m after the boarding process.
+%@ con eq_0022 kind=capacity domain=- indicator=- :: Total number of passengers onboard after the boarding process at a platform.
+%@ con eq_0023 kind=ordering domain=- indicator=- :: Arrival time at the next platform equals departure time plus running time.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Number of onboard passengers with destination m before boarding is zero at the first station of a line.
+%@ con eq_0026 kind=ordering domain=- indicator=- :: Arrival event generates a departure event at the same platform.
+%@ con eq_0027 kind=flow_balance domain=- indicator=- :: Number of alighting passengers at an intermediate non-transfer station equals onboard passengers with that destination.
+%@ con eq_0029 kind=flow_balance domain=- indicator=- :: Total onboard passengers before boarding at an intermediate station is the sum over destinations other than the current station.
+%@ con eq_0030 kind=flow_balance domain=- indicator=- :: Onboard passengers with destination m before boarding at a transfer station, determined by train splitting rates.
+%@ con eq_0031 kind=flow_balance domain=- indicator=- :: Number of alighting passengers at a transfer station equals total onboard passengers minus those staying on the train.
+%@ con eq_0032 kind=flow_balance domain=- indicator=- :: Number of transfer passengers from a train to another platform equals splitting rate times onboard passengers with the destination.
+%@ con eq_0033 kind=flow_balance domain=- indicator=- :: Total number of transfer passengers from a train at a platform, summed over other platforms and destinations.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Lambda-change event that increases passenger arrival rate after transfer walking time.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Lambda-change event that decreases passenger arrival rate after transfer duration.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Energy consumption of a train during the acceleration phase on a segment.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Energy consumption of a train during the speed-holding phase on a segment.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Objective function: weighted sum of normalized total energy, total passenger travel time, and penalty for left passengers.
+%@ con eq_0045 kind=ordering domain=- indicator=- :: Event times of controlled events (arrivals and departures) are bounded by the scheduling period.
+%@ con eq_0046 kind=headway domain=- indicator=- :: Minimum headway constraint between arrival of a train and departure of the previous train at a platform.
+%@ con eq_0047 kind=headway domain=- indicator=- :: Minimum turnaround headway constraint for trains on transversal lines.
+%@ con eq_0048 kind=ordering domain=- indicator=- :: Departure time at a platform must lie between arrival time plus minimal and maximal dwell times.
+%@ con eq_0049 kind=linear domain=- indicator=- :: Minimal dwell time calculated from predefined minimum, alighting, boarding, and per-door waiting passenger counts.
+%@ con eq_0050_a kind=headway domain=- indicator=- :: Maximum departure–departure headway constraint at a platform.
+%@ con eq_0050_b kind=headway domain=- indicator=- :: Second part of the departure headway constraint (or related bound on departure times).
+%@ con eq_0052 kind=linear domain=- indicator=- :: Rolling-horizon constraint relating event times to the next scheduling period.
+%@ con eq_0053 kind=linear domain=- indicator=- :: Rolling-horizon boundary or initial condition for event times.

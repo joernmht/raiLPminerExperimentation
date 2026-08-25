@@ -1,0 +1,168 @@
+% Declaration sidecar for 10.1016_j.physa.2022.126957
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.physa.2022.126957
+% Jointly optimized demand-oriented train timetable and passenger flow control strategy for a congested subway line under a short-turning operation pattern
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.physa.2022.126957.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: minimize total passenger waiting time (station hall plus platform)
+%
+% h: classified as variable during review
+%@ var h shape=i,r,g domain=non_negative role=primary drole=- lo=- hi=- :: departure headway between consecutive trains at initial station r inside short-turning zone in direction g
+%
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: set of directions (1 up, 2 down)
+%
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: set of train indices
+%
+% i: added for shape declarations
+%@ index i ordered=0 cyclic=0 :: train index
+%
+% g: classified as index during review
+%@ index g ordered=0 cyclic=0 :: direction index
+%
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: last train index in short-turning zone
+%
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: set of timestamps
+%
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: set of stations
+%
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: station index
+%
+% x: added for destination-station shape declarations
+%@ index x ordered=0 cyclic=0 :: destination station index
+%
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: maximum capacity of a train
+%
+% D: classified as parameter during review
+%@ param D shape=v,g kind=matrix domain=- :: dwell time at station v in direction g
+%
+% andi: classified as index during review
+%@ index andi ordered=0 cyclic=0 :: train index (possibly typo for 'and i')
+%
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: initial station inside short-turning zone
+%
+% R: classified as parameter during review
+%@ param R shape=v,g kind=matrix domain=- :: running time between station v and v+1 in direction g
+%
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: last station index
+%
+% w: classified as parameter during review
+%@ param w shape=- kind=scalar domain=- :: number of trains in fleet per direction
+%
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: timestamp index
+%
+% psi: renamed from unusable psi
+%@ param psi shape=v,g,t kind=matrix domain=- :: passenger arrival rate at station v in direction g at timestamp t
+%
+% E: classified as variable during review
+%@ var E shape=v,g,t domain=non_negative role=primary drole=- lo=- hi=- :: total passengers allowed to enter platform up to time t
+%
+% xi: renamed from unusable xi
+%@ var xi shape=v,g,t domain=non_negative role=primary drole=- lo=- hi=- :: passengers allowed to enter platform at timestamp t
+%
+% Y: classified as variable during review
+%@ var Y shape=v,g,t domain=non_negative role=primary drole=- lo=- hi=- :: passengers waiting in station hall
+%
+% ifi: classified as index during review
+%@ index ifi ordered=0 cyclic=0 :: conditional index (likely parsed from 'if i')
+%
+% p: classified as parameter during review
+%@ param p shape=v,x,g,t kind=matrix domain=- :: dynamic percentage of passengers from v to x in direction g at time t
+%
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: terminal station inside short-turning zone
+%
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: number of short-turning trains between full-turning trains
+%
+% B: classified as variable during review
+%@ var B shape=v,i,g domain=non_negative role=primary drole=- lo=- hi=- :: number of boarding passengers
+%
+% A: classified as variable during review
+%@ var A shape=v,i,g domain=non_negative role=primary drole=- lo=- hi=- :: number of alighting passengers
+%
+% N: classified as variable during review
+%@ var N shape=v,i,g domain=non_negative role=primary drole=- lo=- hi=- :: number of in-vehicle passengers
+%
+% W: classified as variable during review
+%@ var W shape=v,g domain=non_negative role=primary drole=- lo=- hi=- :: passenger waiting time at station v in direction g
+%
+% J: classified as variable during review
+%@ var J shape=v,i,g,t domain=non_negative role=primary drole=- lo=- hi=- :: accumulated passengers entering platform between departure of consecutive trains
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: maximum passage capacity of a flow-control facility
+%
+% Q: classified as parameter during review
+%@ param Q shape=g kind=vector domain=- :: bounds on change of passenger flow between contiguous timestamps
+%
+% Omega: renamed from unusable Omega
+%@ param Omega shape=v,g kind=matrix domain=- :: maximum safe capacity of station hall
+%
+% phi: renamed from unusable phi
+%@ param phi shape=v,x,g,t kind=matrix domain=- :: passenger demand for OD pair from v to x in direction g at time t
+%
+% Bound by a quantifier or big operator, so no declaration of their own: j, y, tau
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: headway bounds at initial station inside STZ
+%@ con eq_0002 kind=linear domain=- indicator=- :: last train departure time at initial station inside STZ
+%@ con eq_0003 kind=linear domain=- indicator=- :: departure times at initial station inside STZ
+%@ con eq_0004 kind=linear domain=- indicator=- :: dwell time departure constraints for all stations
+%@ con eq_0005 kind=linear domain=- indicator=- :: running time constraints between consecutive stations
+%@ con eq_0006 kind=linear domain=- indicator=- :: first train departure time at initial station outside STZ
+%@ con eq_0007 kind=linear domain=- indicator=- :: available fleet constraint for full-turn trains at terminal outside STZ
+%@ con eq_0008 kind=linear domain=- indicator=- :: available fleet constraint for short-turn trains at terminal inside STZ
+%@ con eq_0009 kind=linear domain=- indicator=- :: conversion from actual departure time to timestamp
+%@ con eq_0010 kind=linear domain=- indicator=- :: total passenger arrivals at station up to timestamp t
+%@ con eq_0011 kind=linear domain=- indicator=- :: total passengers allowed to enter platform up to timestamp t
+%@ con eq_0012 kind=linear domain=- indicator=- :: station hall queue balance
+%@ con eq_0013 kind=linear domain=- indicator=- :: boarding passengers at station outside STZ
+%@ con eq_0014 kind=linear domain=- indicator=- :: boarding passengers at station inside STZ
+%@ con eq_0015 kind=linear domain=- indicator=- :: dynamic passenger percentage for OD pair
+%@ con eq_0016 kind=linear domain=- indicator=- :: boarding passengers equal platform passengers
+%@ con eq_0017 kind=linear domain=- indicator=- :: alighting passengers at station outside STZ
+%@ con eq_0018 kind=linear domain=- indicator=- :: alighting passengers at station inside STZ
+%@ con eq_0019 kind=linear domain=- indicator=- :: in-vehicle passenger dynamic update
+%@ con eq_0020 kind=linear domain=- indicator=- :: station hall waiting time
+%@ con eq_0021 kind=linear domain=- indicator=- :: accumulated platform passengers at outside-STZ station
+%@ con eq_0022 kind=linear domain=- indicator=- :: platform waiting time for train i at outside-STZ station
+%@ con eq_0023 kind=linear domain=- indicator=- :: total platform waiting time at outside-STZ station
+%@ con eq_0024 kind=linear domain=- indicator=- :: accumulated platform passengers at inside-STZ station
+%@ con eq_0025 kind=linear domain=- indicator=- :: platform waiting time for train i at inside-STZ station
+%@ con eq_0026 kind=linear domain=- indicator=- :: total platform waiting time at inside-STZ station
+%@ con eq_0027 kind=linear domain=- indicator=- :: passenger entry capacity limit
+%@ con eq_0029 kind=linear domain=- indicator=- :: passenger flow change bounds between contiguous timestamps
+%@ con eq_0030 kind=linear domain=- indicator=- :: station hall safe capacity limit
+%@ con eq_0031 kind=linear domain=- indicator=- :: total passenger demand satisfaction
+%@ con eq_0032 kind=linear domain=- indicator=- :: train capacity limit

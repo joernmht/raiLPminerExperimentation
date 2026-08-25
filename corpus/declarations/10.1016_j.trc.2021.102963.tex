@@ -1,0 +1,185 @@
+% Declaration sidecar for 10.1016_j.trc.2021.102963
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2021.102963
+% Train timetabling with dynamic and random passenger demand: A stochastic optimization method
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2021.102963.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted total cost of fixed costs, passenger waiting time, and energy consumption
+
+% z: classified as variable during review
+%@ var z shape=i,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k departs from station i at or before time t
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of candidate train services
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of stations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time intervals in planning horizon
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Station index
+
+% Additional lowercase indices used in shapes:
+%@ index k ordered=0 cyclic=0 :: Service index (k ∈ K)
+%@ index t ordered=0 cyclic=0 :: Time interval index (t ∈ T)
+%@ index f ordered=0 cyclic=0 :: Speed profile index on segment i (f ∈ F)
+%@ index j ordered=0 cyclic=0 :: Destination station index (j ∈ N)
+%@ index omega ordered=0 cyclic=0 :: Scenario index (ω ∈ Ω)
+
+% d: classified as variable during review
+%@ var d shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Departure time of service k at station i
+
+% y: classified as variable during review
+%@ var y shape=k domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k is effective
+
+% a: classified as variable during review
+%@ var a shape=i,k domain=integer role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
+
+% s: classified as variable during review
+%@ var s shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of service k at station i
+
+% r: classified as variable during review
+%@ var r shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Running time of service k on segment i
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Minimum and maximum headway bounds
+
+% h: classified as variable during review
+%@ var h shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Headway between departure times of services k and k-1 at station i
+
+% C: classified as variable during review
+%@ var C shape=i,k,omega domain=non_negative role=primary drole=- lo=- hi=- :: Number of in-vehicle passengers for service k at station i under scenario omega
+
+% L: classified as variable during review
+%@ var L shape=i,k,t domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if passengers arriving at time t can board service k at station i
+
+% P: classified as parameter during review
+%@ param P shape=i,j,t,omega kind=matrix domain=- :: Number of arriving passengers with journey i->j in time interval [t,t+1) under scenario omega
+
+% Ω renamed to omega (already declared above)
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of candidate speed profiles on segment i
+
+% x: classified as variable during review
+%@ var x shape=i,k,f domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if service k selects speed profile f on segment i
+
+% FC: classified as variable during review
+%@ var FC shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total fixed costs of effective services
+
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar domain=- :: Fixed operational cost for executing one effective service
+
+% S: classified as variable during review
+%@ var S shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time under scenario omega
+
+% E: classified as variable during review
+%@ var E shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total energy consumption under scenario omega
+
+% e: classified as parameter during review
+%@ param e shape=i,f kind=matrix domain=- :: Energy consumption of empty train selecting speed profile f on segment i
+
+% u: classified as variable during review
+%@ var u shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: Traction energy consumption of empty train for service k on segment i
+
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Mass ratio of passenger to empty train
+
+% PW: classified as variable during review
+%@ var PW shape=i,k,omega domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary power consumed by service k on segment i under scenario omega
+
+% β renamed to beta
+%@ param beta shape=- kind=scalar domain=- :: Weight coefficients for fixed costs, passenger waiting time, and energy
+
+% Constraints: classified as parameter during review
+%@ param Constraints shape=- kind=scalar domain=- :: Set of constraints in the model
+
+% J: classified as variable during review
+%@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total weighted cost)
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Set of integers for departure time domain
+
+% α renamed to alpha
+%@ param alpha shape=omega kind=vector domain=- :: Probability of scenario omega
+
+% U: classified as parameter during review
+%@ param U shape=- kind=big_m domain=- :: Large positive constant for linearization
+
+% θ renamed to theta
+%@ var theta shape=i,k,f domain=binary role=primary drole=- lo=- hi=- :: Binary auxiliary variable equal to y_k * x_{i,k,f}
+
+% R: classified as variable during review
+%@ var R shape=omega domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger travel time under scenario omega
+
+% (Lowercase indices k,t,f,j,omega are declared above.)
+% Constraint rows:
+
+%@ con eq_0002 kind=linear domain=- indicator=- :: Nondecreasing constraint for departure indicator z_{i,k}(t)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Coupling between departure time d_{i,k} and departure indicator z_{i,k}(t)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Definition of effective loading indicator L_{i,k}(t) from departure indicators
+%@ con eq_0006 kind=linear domain=- indicator=- :: Nonincreasing constraint for effective service indicator y_k
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure time of last effective service at station i not earlier than ideal last service time
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure time of secondary last effective service at station i strictly earlier than ideal last service time
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure time equals arrival time plus dwell time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Arrival time at next station equals departure time plus running time
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure and arrival times belong to the set of time intervals
+%@ con eq_0013 kind=linear domain=- indicator=- :: Headway calculation for first and subsequent services
+%@ con eq_0014 kind=linear domain=- indicator=- :: Headway must lie between minimum safety headway and maximum allowed headway
+%@ con eq_0016 kind=linear domain=- indicator=- :: Number of boarding passengers for service k at station i under scenario omega
+%@ con eq_0017 kind=linear domain=- indicator=- :: Number of alighting passengers from service k at station i under scenario omega
+%@ con eq_0018 kind=linear domain=- indicator=- :: Dynamic evolution of in-vehicle passenger count along the line under scenario omega
+%@ con eq_0019 kind=linear domain=- indicator=- :: Train capacity constraint: in-vehicle passengers cannot exceed maximum capacity
+%@ con eq_0020 kind=linear domain=- indicator=- :: Running time on segment expressed as selected speed profile running time
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exactly one speed profile selected for each service on each segment
+%@ con eq_0022 kind=linear domain=- indicator=- :: Total fixed cost as sum of fixed costs of effective services
+%@ con eq_0023 kind=linear domain=- indicator=- :: Cumulative number of arriving passengers at station i in each time interval
+%@ con eq_0025 kind=linear domain=- indicator=- :: Passenger waiting time for service k at station i under scenario omega
+%@ con eq_0026 kind=linear domain=- indicator=- :: Total passenger waiting time under scenario omega
+%@ con eq_0027 kind=linear domain=- indicator=- :: Total energy consumption under scenario omega as sum of traction and auxiliary energy
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Linearization of last effective service: upper bound on auxiliary departure time d_hat_{i,k}
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Linearization of last effective service: upper bound on (d_{i,k} - d_hat_{i,k})
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearized last effective service departure time constraint at each station
+%@ con eq_0033_a kind=linear domain=- indicator=- :: Linearization of secondary last effective service: upper bound on auxiliary departure time d_check_{i,k}
+%@ con eq_0033_b kind=linear domain=- indicator=- :: Linearization of secondary last effective service: upper bound on (d_{i,k} - d_check_{i,k})
+%@ con eq_0034 kind=linear domain=- indicator=- :: Linearized secondary last effective service departure time constraint at each station
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearization of passenger waiting time: bound on auxiliary waiting time S_tilde_{i,k}^omega(t)
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Linearization of passenger waiting time: lower bound on deviation of passenger waiting term from S_tilde
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Linearization of passenger waiting time: upper bound on deviation of passenger waiting term from S_tilde
+%@ con eq_0037 kind=linear domain=- indicator=- :: Service waiting time as sum of auxiliary waiting times over time intervals
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of product of effective service and speed profile selection indicators
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization of traction energy: bound on auxiliary traction energy E_tilde_tra
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Linearization of traction energy: lower bound on deviation of traction energy term
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Linearization of traction energy: upper bound on deviation of traction energy term
+%@ con eq_0041 kind=linear domain=- indicator=- :: Traction energy as sum of auxiliary traction energy over speed profiles
+%@ con eq_0042_a kind=linear domain=- indicator=- :: Linearization of auxiliary energy: bound on auxiliary auxiliary energy E_tilde_aux
+%@ con eq_0042_b kind=linear domain=- indicator=- :: Linearization of auxiliary energy: lower bound on deviation of auxiliary energy term
+%@ con eq_0043 kind=linear domain=- indicator=- :: Auxiliary energy as sum of auxiliary auxiliary energy over speed profiles
+%@ con eq_0047 kind=linear domain=- indicator=- :: Constraint for total passenger travel time calculation (from appendix)
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linearization constraint for passenger travel time
+%@ con eq_0051 kind=linear domain=- indicator=- :: Constraint for travel time waiting time relation
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint for in-vehicle time calculation
+%@ con eq_0053_a kind=linear domain=- indicator=- :: Lower bound on auxiliary travel time variable
+%@ con eq_0053_b kind=linear domain=- indicator=- :: Upper bound on auxiliary travel time variable
+%@ con eq_0054 kind=linear domain=- indicator=- :: Aggregation of travel time components into total travel time

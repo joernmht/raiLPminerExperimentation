@@ -1,0 +1,94 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2023.102999
+%@ meta id=10.1016_j.omega.2023.102999 family=milp schema=0.1.0
+%@ name :: Optimization of train schedule with uncertain maintenance plans in high-speed railways: A stochastic programming approach
+%@ desc :: Mined from Optimization of train schedule with uncertain maintenance plans in high-speed railways: A stochastic programming approach (Omega, 2023).
+%@ prov source :: 10.1016/j.omega.2023.102999
+%@ prov reference :: Optimization of train schedule with uncertain maintenance plans in high-speed railways: A stochastic programming approach
+%@ prov author :: Hangyu Ji; Rui Wang; Chuntian Zhang; Jiateng Yin; Lin Ma; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize expected travel time of SDSA-trains over all scenarios
+%@ param p shape=W kind=vector domain=- :: Probability of occurrence for each scenario w
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (expected travel time)
+%@ var f shape=W,K domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train k at destination in scenario w
+%@ var t shape=W,K,N domain=continuous role=primary drole=- lo=- hi=- :: Arrival/departure time of train k at station i in scenario w
+%@ index K ordered=0 cyclic=0 :: Set of all trains
+%@ index W ordered=0 cyclic=0 :: Set of all scenarios
+%@ param d shape=K kind=vector domain=- :: Earliest/latest departure time from origin for train k
+%@ var T shape=K domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station
+%@ index k ordered=0 cyclic=0 :: Index of trains
+%@ param a shape=K kind=vector domain=- :: Earliest/latest arrival time at destination for train k
+%@ var x shape=W,K,N domain=binary role=primary drole=- lo=- hi=- :: 1 if train k stops at station i in scenario w, else 0
+%@ param M shape=- kind=big_m domain=- :: Large positive number
+%@ index N ordered=0 cyclic=0 :: Set of all stations
+%@ index o ordered=0 cyclic=0 :: Origin station of train k
+%@ index s ordered=0 cyclic=0 :: Destination station of train k
+%@ param g shape=K kind=vector domain=- :: Acceleration/deceleration time of train k
+%@ param v shape=K,N kind=matrix domain=- :: Upper/lower bound of pure running time on section i for train k
+%@ param h shape=N kind=vector domain=- :: Minimal headway times at station i
+%@ var y shape=W,K,K,N domain=binary role=primary drole=- lo=- hi=- :: 1 if train k departs earlier than train l at station i in scenario w
+%@ index Q ordered=0 cyclic=0 :: Set of station tracks at station i
+%@ param m shape=W,N kind=matrix domain=- :: Start/end time of maintenance window on section i in scenario w
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time window: d_k^e <= T_k^d <= d_k^l for all k
+%@ con eq_0004 kind=linear domain=- indicator=- :: Arrival time window: a_k^e <= t_{w,k,s_k}^a <= a_k^l for all k,w
+%@ con eq_0005 kind=linear domain=- indicator=- :: Dwelling time: tau_i x <= t^d - t^a <= M x for all k,i,w
+%@ con eq_0006 kind=linear domain=- indicator=- :: Running time lower bound between consecutive stations
+%@ con eq_0008 kind=linear domain=- indicator=- :: Running time upper bound between consecutive stations
+%@ con eq_0010 kind=linear domain=- indicator=- :: Departure headway constraint between trains at stations
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival headway constraint between trains at stations
+%@ con eq_0012 kind=linear domain=- indicator=- :: Station track assignment: sum_q lambda_{w,k,i,q}=1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Track choice for non-stopping trains: lambda_{w,k,i,1}=1-x_{w,k,i}
+%@ con eq_0014 kind=linear domain=- indicator=- :: Same-track departure-arrival headway constraint
+%@ con eq_0015 kind=linear domain=- indicator=- :: Maintenance conflict: departure after maintenance end if delta=0
+%@ con eq_0017 kind=linear domain=- indicator=- :: Maintenance conflict: departure before maintenance start if delta=1
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maintenance conflict: arrival at next station before maintenance start if delta=1
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part a)
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part b)
+%@ con eq_0020_c kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part c)
+%@ con eq_0020_d kind=linear domain=- indicator=- :: Non-anticipativity coupling constraint for departure times across scenarios (part d)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Scenario subproblem: departure time window constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: Scenario subproblem: arrival time window constraint
+%@ con eq_0031 kind=linear domain=- indicator=- :: Scenario subproblem: dwelling time constraint
+%@ con eq_0032 kind=linear domain=- indicator=- :: Scenario subproblem: running time lower-bound constraint
+%@ con eq_0033 kind=linear domain=- indicator=- :: Scenario subproblem: running time upper-bound constraint
+%@ con eq_0034 kind=linear domain=- indicator=- :: Scenario subproblem: first-section running time lower-bound constraint
+%@ con eq_0035 kind=linear domain=- indicator=- :: Scenario subproblem: first-section running time upper-bound constraint
+%@ con eq_0036 kind=linear domain=- indicator=- :: Scenario subproblem: departure headway constraint
+%@ con eq_0037 kind=linear domain=- indicator=- :: Scenario subproblem: arrival headway constraint
+%@ con eq_0038 kind=linear domain=- indicator=- :: Scenario subproblem: station track assignment constraint
+%@ con eq_0039 kind=linear domain=- indicator=- :: Scenario subproblem: track choice constraint for non-stopping trains
+%@ con eq_0040 kind=linear domain=- indicator=- :: Scenario subproblem: same-track departure-arrival headway constraint
+%@ con eq_0041 kind=linear domain=- indicator=- :: Scenario subproblem: maintenance conflict constraints
+\begin{align}
+  \min\quad & \sum_{k \in K} \sum_{w \in W} p^{w} \cdot f_{w}^{k} = \sum_{k \in K} \sum_{w \in W} p^{w} \cdot t_{w , k , s_{k}}^{a} \tag{eq\_0002} \\
+  & d_{k}^{e} \leq T_{k}^{d} \leq d_{k}^{l} \forall k \in K \tag{eq\_0003} \\
+  & a_{k}^{e} \leq t_{w , k , s_{k}}^{a} \leq a_{k}^{l} \forall k \in K , w \in W \tag{eq\_0004} \\
+  & \mathit{tau}_{i} \cdot x_{w , k , i} \leq t_{w , k , i}^{d} - t_{w , k , i}^{a} \leq M \cdot x_{w , k , i} \forall k \in k , i \in N \backslash \left\{o_{k} , s_{k}\right\} , w \in W \tag{eq\_0005} \\
+  & t_{w , k , i + 1}^{a} - t_{w , k , i}^{d} \geq x_{w , k , i} \cdot g_{k}^{a} + x_{w , k , i + 1} \cdot g_{k}^{d} + v_{k , i}^{l} \forall k \in K , i \in N \backslash \left\{s_{k}\right\} , w \in W \tag{eq\_0006} \\
+  & t_{w , k , i + 1}^{a} - t_{w , k , i}^{d} \leq x_{w , k , i} \cdot g_{k}^{a} + x_{w , k , i + 1} \cdot g_{k}^{d} + v_{k , i}^{u} \forall k \in K , i \in N \backslash \left\{s_{k}\right\} , w \in W \tag{eq\_0008} \\
+  & t_{w , k , i}^{d} - t_{w , l , i}^{d} \geq h_{i}^{d} - M \cdot \left(1 - y_{w , l , k , i}\right) \forall k , l \in K , k \neq l , i \in N \backslash \left\{s_{k} , s_{l}\right\} , w \in W \tag{eq\_0010} \\
+  & t_{w , k , i}^{a} - t_{w , l , i}^{a} \geq h_{i}^{a} - M \cdot \left(1 - y_{w , l , k , i - 1}\right) \forall k , l \in K , k \neq l , i \in N \backslash \left\{o_{k} , o_{l}\right\} , w \in W \tag{eq\_0011} \\
+  & \sum_{q \in Q_{i}} \mathit{lambda}_{w , k , i , q} = 1 \forall k \in K , i \in N , w \in W \tag{eq\_0012} \\
+  & \mathit{lambda}_{w , k , i , 1} = 1 - x_{w , k , i} \forall k \in K , i \in N , w \in W \tag{eq\_0013} \\
+  & t_{w , k , i}^{a} - t_{w , l , i}^{d} \geq h_{i}^{d a} - M \cdot \left(3 - y_{w , l , k , i} - \mathit{lambda}_{w , k , i , q} - \mathit{lambda}_{w , l , i , q}\right) \forall k , l \in K , k \neq l , i \in N , w \in W \tag{eq\_0014} \\
+  & t_{w , k , i}^{d} \geq m_{i}^{end} - \left(1 - \mathit{delta}_{w , k , i}\right) \cdot M \forall k \in K , i \in N_{m} , w \in W \tag{eq\_0015} \\
+  & t_{w , k , i}^{d} \leq m_{w , i}^{\text{start}} + \mathit{delta}_{w , k , i} \cdot M \forall k \in K , i \in N_{m} , w \in W \tag{eq\_0017} \\
+  & t_{w , k , i + 1}^{a} \leq m_{w , i}^{\text{start}} + \mathit{delta}_{w , k , i} \cdot M \forall k \in K , i \in N_{m} , w \in W . \tag{eq\_0018} \\
+  & T_{1,k}^{d} \leq T_{2,k}^{d} \tag{eq\_0020\_a} \\
+  & T_{2,k}^{d} \leq T_{3,k}^{d} \tag{eq\_0020\_b} \\
+  & T_{3,k}^{d} \leq T_{4,k}^{d} \tag{eq\_0020\_c} \\
+  & T_{|W|,k}^{d} \leq T_{1,k}^{d} \forall k \in K \tag{eq\_0020\_d} \\
+  & \text{s}.\text{t}. d_{k}^{e} \leq T_{k}^{d} \leq d_{k}^{d} \forall k \in K \tag{eq\_0029} \\
+  & a_{k}^{e} \leq t_{k , s_{k}}^{a} \leq a_{k}^{l} \forall k \in K \tag{eq\_0030} \\
+  & \mathit{tau}_{i} \cdot x_{k , i} \leq t_{k , i}^{d} - t_{k , i}^{a} \leq M \cdot x_{k , i} \forall k \in k , i \in N \backslash \left\{o_{k} , s_{k}\right\} \tag{eq\_0031} \\
+  & t_{k , i + 1}^{a} - t_{k , i}^{d} \geq x_{k , i} \cdot g_{k}^{a} + x_{k , i + 1} \cdot g_{k}^{d} + v_{k , i}^{l} \forall k \in K , i \in N \backslash \left\{s_{k}\right\} \tag{eq\_0032} \\
+  & t_{k , i + 1}^{a} - t_{k , i}^{d} \leq x_{k , i} \cdot g_{k}^{a} + x_{k , i + 1} \cdot g_{k}^{d} + v_{k , i}^{u} \forall k \in K , i \in N \backslash \left\{s_{k}\right\} \tag{eq\_0033} \\
+  & t_{k , i}^{d} - t_{l , i}^{d} \geq h_{i}^{d} - M \cdot \left(1 - y_{l , k , i}\right) \forall k , l \in K , k \neq l , i \in N \backslash \left\{s_{k} , s_{l}\right\} \tag{eq\_0034} \\
+  & t_{k , i}^{a} - t_{l , i}^{a} \geq h_{i}^{a} - M \cdot \left(1 - y_{l , k , i - 1}\right) \forall k , l \in K , k \neq l , i \in N \backslash \left\{o_{k} , o_{l}\right\} \tag{eq\_0035} \\
+  & \sum_{q \in Q_{i}} \mathit{lambda}_{k , i , q} = 1 \forall k \in K , i \in N \tag{eq\_0036} \\
+  & \mathit{lambda}_{k , i , 1} = 1 - x_{k , i} \forall k \in K , i \in N \tag{eq\_0037} \\
+  & t_{k , i}^{a} - t_{l , i}^{d} \geq h_{i}^{d a} - M \cdot \left(3 - y_{l , k , i} - \mathit{lambda}_{k , i , q} - \mathit{lambda}_{l , i , q}\right) \forall k , l \in K , k \neq l , i \in N \tag{eq\_0038} \\
+  & t_{k , i}^{d} \geq m_{i}^{\text{end}} - \left(1 - \mathit{delta}_{k , i}\right) \cdot M \forall k \in K , i \in N_{m} \tag{eq\_0039} \\
+  & t_{k , i}^{d} \leq m_{i}^{start} + \mathit{delta}_{k , i} \cdot M \forall k \in K , i \in N_{m} \tag{eq\_0040} \\
+  & t_{k , i + 1}^{a} \leq m_{i}^{\text{start}} + \mathit{delta}_{k , i} \cdot M \forall k \in K , i \in N_{m} \tag{eq\_0041} \\
+\end{align}

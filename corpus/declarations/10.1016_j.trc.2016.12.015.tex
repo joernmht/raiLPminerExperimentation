@@ -1,0 +1,84 @@
+% Declaration sidecar for 10.1016_j.trc.2016.12.015
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2016.12.015
+% Hybrid cyclicity: Combining the benefits of cyclic and non-cyclic timetables
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2016.12.015.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=sum :: Passenger satisfaction (in monetary units)
+
+% d: classified as variable during review
+%@ var d shape=L,V domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train v on line ℓ
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Train index within line ℓ
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of trains on line ℓ
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Cycle length in minutes
+
+% z: classified as variable during review
+%@ var z shape=L,V domain=integer role=primary drole=- lo=- hi=- :: Integer multiplier for cycle spacing between consecutive trains
+
+% unusable as an identifier, rename or drop: Δ
+%@ var delta shape=L,V domain=continuous role=primary drole=- lo=- hi=- :: Deviation from cyclic departure time for train v on line ℓ
+% unusable as an identifier, rename or drop: θ
+%@ param theta shape=- kind=scalar domain=- :: Maximum allowed deviation from cyclic departure time (minutes)
+% unusable as an identifier, rename or drop: η
+%@ param eta shape=- kind=scalar domain=- :: Number of cyclic trains per line
+% unusable as an identifier, rename or drop: ξ
+%@ param xi shape=- kind=scalar domain=- :: Percentage of cyclic trains
+
+% q: classified as variable during review
+%@ var q shape=L,V domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if train v on line ℓ is cyclic
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of cycles in planning horizon
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Cycle index
+
+% y: classified as variable during review
+%@ var y shape=L,K domain=binary role=primary drole=- lo=- hi=- :: Binary indicator if cycle k on line ℓ has a cyclic train
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Planning horizon length in minutes
+
+% Bound by a quantifier or big operator, so no declaration of their own: ℓ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Cyclicity: headway between consecutive trains is exactly one cycle
+%@ con eq_0003 kind=linear domain=- indicator=- :: Relaxed cyclicity: headway is an integer multiple of the cycle
+%@ con eq_0004 kind=ordering domain=- indicator=- :: Ordering: departures are at least one minute apart in chronological order
+%@ con eq_0005 kind=linear domain=- indicator=- :: Shifted cyclicity: cyclic departure times (after deviation) respect the cycle
+%@ con eq_0006 kind=linear domain=- indicator=- :: Deviation bounds for shifted cyclic timetable
+%@ con eq_0007 kind=linear domain=- indicator=- :: Adjusted deviation upper bound preventing train overlap
+%@ con eq_0008 kind=linear domain=- indicator=- :: Partial cyclicity: first η trains on each line are cyclic
+%@ con eq_0009 kind=nonlinear domain=- indicator=- :: Cyclic-train consistency among all cyclic trains
+%@ con eq_0010 kind=linear domain=- indicator=- :: Cycle indicator requires a cyclic train in that cycle
+%@ con eq_0011 kind=big_m domain=- indicator=- :: Non-cyclic trains only in cycles with a cyclic train

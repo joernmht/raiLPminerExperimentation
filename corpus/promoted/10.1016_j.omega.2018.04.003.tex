@@ -1,0 +1,91 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2018.04.003
+%@ meta id=10.1016_j.omega.2018.04.003 family=milp schema=0.1.0
+%@ name :: Last train timetabling optimization and bus bridging service management in urban railway transit networks
+%@ desc :: Mined from Last train timetabling optimization and bus bridging service management in urban railway transit networks (Omega, 2018).
+%@ prov source :: 10.1016/j.omega.2018.04.003
+%@ prov reference :: Last train timetabling optimization and bus bridging service management in urban railway transit networks
+%@ prov author :: Liujiang Kang; Xiaoning Zhu; Huijun Sun; Jianjun Wu; Ziyou Gao; Bin Hu
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize the total number of successful transfer passengers, combining rail-to-rail demand-weighted transfers, bus-bridging demand-weighted transfers, and a large bonus for total last-train connections.
+%@ index p ordered=0 cyclic=0 :: Index for transfer passenger groups from line l to line l' at station k or from station i to station j between lines.
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable, 1 if last-train passengers from line l can transfer to line l' at station k.
+%@ index L ordered=0 cyclic=0 :: Set of subway lines.
+%@ index S ordered=0 cyclic=0 :: Set of stations in a subway line.
+%@ index l ordered=0 cyclic=0 :: Index for subway lines.
+%@ index k ordered=0 cyclic=0 :: Index for stations in a line.
+%@ index z ordered=0 cyclic=0 :: Number of stations in a line (z_l).
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of the last train in line l (also used for dwell-time notation in dwell-time formulas).
+%@ var Arr shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of the last train at station k in line l.
+%@ var Dep shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of the last train at station k in line l.
+%@ param T shape=- kind=scalar domain=- :: Earliest and latest departure time bounds T_l^min and T_l^max for the last train in line l.
+%@ param Tra shape=- kind=scalar domain=- :: Walking time from line l to line l' at station k, or from the subway platform to the bus platform.
+%@ param M shape=- kind=scalar domain=- :: Large positive constant used in big-M linearizations.
+%@ param N shape=- kind=scalar domain=- :: Maximum number of buses that can be employed for bridging services.
+%@ param C shape=- kind=scalar domain=- :: Index of station k in line l, i.e., the station's position along the line.
+%@ param H shape=- kind=scalar domain=- :: Headway of trains (H_l^R) or of bridging buses (H_ij^B).
+%@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Waiting time for transfer passengers, either for rail-to-rail transfers or for rail-to-bus transfers.
+%@ var X shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total number of successful last-train connections.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow conservation: transfer demand at station k equals the sum of O-D demands from preceding stations i to succeeding stations j.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Arrival time of the last train at station k in line l, computed from the line departure time plus running and dwell times.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Departure time of the last train at station k in line l', computed from the line departure time plus running times and dwell times including at station k.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Bounds on the last-train departure time: T_l^min <= t_l^R <= T_l^max.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Bounds on the last-train finishing/departure time at each terminal: Dep_min^l <= Dep_k^l <= Dep_max^l.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Definition of last-train transfer redundant time: Dep_k^{l'} - Arr_k^l - Tra_k^{l l'}.
+%@ con eq_0009 kind=big_m domain=- indicator=- :: Big-M linearization linking transfer redundant time to the binary transfer-success variable x.
+%@ con eq_0010 kind=capacity domain=- indicator=- :: Capacity constraint: the number of deployed bus bridging routes cannot exceed the available bus fleet N.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Bus bridging is not offered when a successful train transfer exists: the transfer-success and bus-route indicators cannot both be 1.
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Station ordering: origin station i must be before transfer station k in line l.
+%@ con eq_0013 kind=ordering domain=- indicator=- :: Station ordering: transfer station k must be before destination station j in line l'.
+%@ con eq_0014 kind=capacity domain=- indicator=- :: The number of bus bridging routes is no greater than the number of missed last-train connections.
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one origin station i is selected for bridging from each feeder line l to connecting line l'.
+%@ con eq_0016 kind=linear domain=- indicator=- :: At most one destination station j is selected for bridging from each feeder line l to connecting line l'.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Binary domain constraints for transfer-success variable x and bus-route variable alpha.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Nonnegativity of last-train departure time t, arrival times Arr, and departure times Dep.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Extended transfer redundant time including the dwell time of the connecting train at station k.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Definition of Delta_k^{l l' R} in terms of line departure times, running times, and walking time.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transfer redundant time expressed as Delta plus the dwell time at the connecting station.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Analytical (nonlinear) rail-to-rail transfer waiting time formula used for analysis only, not in the final MILP.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Definition of X, the total number of last-train connections, as the sum of transfer-success variables.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Nonlinear bus waiting time expression w = max{...}, used only for derivation and replaced by the linear form.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linear rail-to-bus waiting time: bus departure plus buffer minus train arrival and walking time, with a big-M penalty when the bus route is not selected.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Feasible range for bus bridging departure times: t_min^B <= t_ij^B + Delta_ij^B <= t_max^B.
+%@ con eq_0040 kind=linear domain=- indicator=- :: At most one bus deployment plan is adopted for each route of the bridging service.
+%@ con eq_0041 kind=ordering domain=- indicator=- :: Origin station ordering: if a bus is deployed from i to d, it must also be deployed from i to all earlier stations b.
+%@ con eq_0042 kind=ordering domain=- indicator=- :: Station ordering in the origin line: C[d]_{l'} - C[b]_{l'} > 0.
+%@ con eq_0043 kind=ordering domain=- indicator=- :: Destination station ordering: if a bus is deployed from b to j, it must also be deployed from all later stations d to j.
+%@ con eq_0044 kind=ordering domain=- indicator=- :: Station ordering in the destination line: C[d]_l - C[b]_l > 0.
+%@ con eq_0045 kind=linear domain=- indicator=- :: Nonnegativity of bus waiting times w and bus departure times t_ij^B.
+\begin{align}
+  \max\quad & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} p_{l l^{'}}^{k} \cdot x_{l l^{'}}^{k} + \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \cdot p_{l l^{'}}^{i j} \tag{eq\_0001} \\
+  & p_{l l^{'}}^{k} = \sum_{i = 1}^{k - 1} \sum_{j = k + 1}^{z} p_{l l^{'}}^{i j} \cdot k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0002} \\
+  & \mathit{Arr}_{k}^{l} = t_{l}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l} + \sum_{s = 0}^{k - 1} t_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0003} \\
+  & \mathit{Dep}_{k}^{l^{'}} = t_{l^{'}}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l^{'}} + \sum_{s = 0}^{k} t_{s}^{l^{'}} \forall k \in S \left(l\right) , \forall l^{'} \in L \tag{eq\_0004} \\
+  & T_{l}^{min} \leq t_{l}^{R} \leq T_{l}^{max} \forall l \in L \tag{eq\_0005} \\
+  & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \leq \mathit{Dep}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0006} \\
+  & t_{k l l^{'}}^{R} = \mathit{Dep}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0007} \\
+  & M \cdot \left(x_{l l^{'}}^{k} - 1\right) \leq t_{k l l^{'}}^{R} \leq M \cdot x_{l l^{'}}^{k} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0009} \\
+  & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq N \forall l \neq l^{'} , \forall i \neq j \tag{eq\_0010} \\
+  & x_{l l^{'}}^{k} + \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall l , l^{'} \in L , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0011} \\
+  & C \left[k\right]_{l} - C \left[i\right]_{l} > 0 \forall i , k \in S \left(l\right) , \forall l \in L \tag{eq\_0012} \\
+  & C \left[j\right]_{l^{'}} - C \left[k\right]_{l^{'}} > 0 \forall j , k \in S \left(l^{'}\right) , \forall l^{'} \in L \tag{eq\_0013} \\
+  & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall k \in S \left(l\right) \cap S \left(l^{'}\right)} \left(1 - x_{l l^{'}}^{k}\right) - \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \geq 0 \tag{eq\_0014} \\
+  & \sum_{j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall l , l^{'} \in L \tag{eq\_0015} \\
+  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0016} \\
+  & x_{l l^{'}}^{k} , \mathit{alpha}_{l l^{'}}^{i j} \in \left\{0 , 1\right\} \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0017} \\
+  & t_{l}^{R} , \mathit{Arr}_{k}^{l} , \mathit{Dep}_{k}^{l} \geq 0 \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0018} \\
+  & t_{k l l^{'}}^{R} = \left(\mathit{Arr}_{k}^{l^{'}} + t_{k}^{l^{'}}\right) - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} = \left(\mathit{Arr}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}}\right) + t_{k}^{l^{'}} \tag{eq\_0019} \\
+  & \begin{aligned}\mathit{Delta}_{k l l^{'}}^{R} & = & \mathit{Arr}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} \\ & = & \left(t_{l^{'}}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l^{'}} + \sum_{s = 0}^{k - 1} t_{s}^{l^{'}} \right) \\ & & - \left(t_{l}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l} + \sum_{s = 0}^{k - 1} t_{s}^{l}\right) - \mathit{Tra}_{k}^{l l^{'}}\end{aligned} \tag{eq\_0020} \\
+  & t_{k l l^{'}}^{R} = \mathit{Delta}_{k l l^{'}}^{R} + t_{s}^{l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0021} \\
+  & w_{l l^{'}}^{k} = t_{k l l^{'}}^{R} - \left\|t_{k l l^{'}}^{R} / H_{l^{'}}^{R}\right\| \cdot H_{l^{'}}^{R} + M \cdot \left(1 - x_{l l^{'}}^{k}\right) , \tag{eq\_0032} \\
+  & X = \sum_{l \in L} \sum_{l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} x_{l l^{'}}^{k} \forall l , l^{'} \in L , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) \tag{eq\_0033} \\
+  & \begin{aligned}w_{i j}^{B} & = & max \left\{t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{R B} , M \cdot \left(1 - \mathit{alpha}_{l l^{'}}^{i j}\right)\right\} \\ & & \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L\end{aligned} \tag{eq\_0037} \\
+  & \begin{aligned}w_{i j}^{B} & = & t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{\text{RB}} + M \cdot \left(1 - \mathit{alpha}_{l l^{'}}^{i j}\right) \forall i \in S \left(l\right) , \\ & & \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L\end{aligned} \tag{eq\_0038} \\
+  & t_{min}^{B} \leq t_{i j}^{B} + \mathit{Delta}_{i j}^{B} \leq t_{max}^{B} \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0039} \\
+  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l l^{'}}^{i j} + \sum_{j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0040} \\
+  & \mathit{alpha}_{l l^{'}}^{i d} - \mathit{alpha}_{l l^{'}}^{i b} \geq 0 \forall i \in S \left(l\right) , \forall b , d \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0041} \\
+  & C \left[d\right]_{l^{'}} - C \left[b\right]_{l^{'}} > 0 \forall b , d \in S \left(l^{'}\right) , \forall l^{'} \in L \tag{eq\_0042} \\
+  & \mathit{alpha}_{l l^{'}}^{b j} - \mathit{alpha}_{l l^{'}}^{d j} \geq 0 \forall b , d \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0043} \\
+  & C \left[d\right]_{l} - C \left[b\right]_{l} > 0 \forall b , d \in S \left(l\right) , \forall l \in L \tag{eq\_0044} \\
+  & w_{i j}^{B} , t_{i j}^{B} \geq 0 \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0045} \\
+\end{align}

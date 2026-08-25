@@ -1,0 +1,57 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2025.111329
+%@ meta id=10.1016_j.cie.2025.111329 family=lp schema=0.1.0
+%@ name :: Optimizing integrated train rescheduling strategies for diverse disruption scenarios using reinforcement learning
+%@ desc :: Mined from Optimizing integrated train rescheduling strategies for diverse disruption scenarios using reinforcement learning (Computers & Industrial Engineering, 2025).
+%@ prov source :: 10.1016/j.cie.2025.111329
+%@ prov reference :: Optimizing integrated train rescheduling strategies for diverse disruption scenarios using reinforcement learning
+%@ prov author :: Haodong Yin; Lina Liu; Ximing Chang; 浩平 川副; Jianjun Wu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total delay time of all trains
+%@ var t shape=L,V,S domain=continuous role=primary drole=- lo=- hi=- :: Actual arrival/departure time of train v on line l at station s
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total delay time objective value
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index R ordered=0 cyclic=0 :: Set of turnaround stations
+%@ index V ordered=0 cyclic=0 :: Set of trains
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ var h shape=L,V,S domain=continuous role=primary drole=- lo=- hi=- :: Headway between consecutive trains at station
+%@ param tau shape=L,R kind=matrix domain=- :: Short-turning time for line l at turnaround station r
+%@ param ift shape=L,V,S kind=vector domain=- :: Scheduled arrival/departure time (tilde notation)
+%@ param f shape=- kind=scalar domain=- :: Penalty value for unserved stations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Dwell time: departure time equals arrival time plus dwell time
+%@ con eq_0010 kind=linear domain=- indicator=- :: Arrival time at station s equals departure from previous station plus sectional running time
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival headway between consecutive trains at a station
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure headway between consecutive trains at a station
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure-to-arrival headway between consecutive trains
+%@ con eq_0014 kind=linear domain=- indicator=- :: Sectional running time must be at least the minimum running time
+%@ con eq_0015 kind=linear domain=- indicator=- :: Dwell time must be at least the minimum dwell time
+%@ con eq_0016 kind=linear domain=- indicator=- :: Arrival headway must be at least the minimum safe headway
+%@ con eq_0017 kind=linear domain=- indicator=- :: Departure headway must be at least the minimum safe headway
+%@ con eq_0018 kind=linear domain=- indicator=- :: Departure-to-arrival headway must be at least the minimum safe headway
+%@ con eq_0019 kind=linear domain=- indicator=- :: Turnaround: departure plus short-turning time equals opposite-direction arrival at turnaround station
+%@ con eq_0020 kind=linear domain=- indicator=- :: Reverse turnaround: opposite-direction connection at turnaround station
+%@ con eq_0021 kind=linear domain=- indicator=- :: Trains arriving before disruption keep scheduled arrival times
+%@ con eq_0022 kind=linear domain=- indicator=- :: Trains departing after disruption keep scheduled departure times
+%@ con eq_0023_a kind=linear domain=- indicator=- :: No train may depart from downstream end of disruption section before disruption ends
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Condition: scheduled arrival at upstream end is before disruption start
+%@ con eq_0023_c kind=linear domain=- indicator=- :: Condition: scheduled departure from downstream end is before disruption end
+\begin{align}
+  \min\quad & m i n \sum_{l \in L} \sum_{v \in V} \sum_{v_{r} \in V_{r}} \sum_{r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - \left({t}\right)_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - \left({t}\right)_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
+  & t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} = t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} + t_{\text{l},\text{v},\text{s}}^{\mathit{stop}} , \forall l \in L , v \in V , s \in S \tag{eq\_0009} \\
+  & t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v},\text{s}-\text{1}}^{\mathit{dep}} + t_{\text{l},\text{v},[\text{s}-\text{1},\text{s}]}^{\mathit{run}} , \forall l \in L , v \in V , s \in S \tag{eq\_0010} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v}+\text{1},\text{s}}^{\mathit{arr}} - t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} , \forall l \in L , v \in V , s \in S \tag{eq\_0011} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{dep}} = t_{\text{l},\text{v}+\text{1},\text{s}}^{\mathit{dep}} - t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} , \forall l \in L , v \in V , s \in S \tag{eq\_0012} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{dep} - a r r} = t_{\text{l},\text{v}+\text{1},\text{s}}^{\mathit{arr}} - t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} , \forall l \in L , v \in V , s \in S \tag{eq\_0013} \\
+  & t_{\text{l},\text{v},[\text{s}-\text{1},\text{s}]}^{\mathit{run}} \geq t_{\text{min}}^{\text{run}} , \forall l \in L , v \in V , s \in S \tag{eq\_0014} \\
+  & t_{\text{v},\text{s}}^{\mathit{stop}} \geq t_{\text{min}}^{\mathit{stop}} , \forall v \in V , s \in S \tag{eq\_0015} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{arr}} \geq h_{\text{min}} , \forall l \in L , v \in V , s \in S \tag{eq\_0016} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{dep}} \geq h_{\text{min}} , \forall l \in L , v \in V , s \in S \tag{eq\_0017} \\
+  & h_{\text{l},\text{v},\text{s}}^{\mathit{dep} - a r r} \geq h_{\text{min}} , \forall l \in L , v \in V , s \in S \tag{eq\_0018} \\
+  & t_{l^{+} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{+} , r} = t_{l^{-} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{+} \in L^{+} , v \in V , r \in R , l^{-} \in L^{-} \tag{eq\_0019} \\
+  & t_{l^{-} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{-} , r} = t_{l^{+} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{-} \in L^{-} , v \in V , r \in R , l^{+} \in L^{+} \tag{eq\_0020} \\
+  & t_{l , v , e}^{\mathit{arr}} = \left({t}\right)_{l , v , e}^{\mathit{arr}} , \mathit{ift}_{l , v , e}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} , \forall l \in L , v \in V , s \in S \tag{eq\_0021} \\
+  & t_{l , v , e}^{\mathit{dep}} = \left({t}\right)_{l , v , e}^{\mathit{dep}} , \mathit{ift}_{l , v , e}^{\mathit{dep}} > t_{\mathit{break} ,}^{\mathit{end}} , \forall l \in L , v \in V , s \in S \tag{eq\_0022} \\
+  & t_{l , v , j}^{\mathit{dep}} > t_{\mathit{break}}^{\mathit{end}} \tag{eq\_0023\_a} \\
+  & i f \left({t}\right)_{l , v , i}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} \tag{eq\_0023\_b} \\
+  & \left({t}\right)_{l , v , j}^{\text{dep}} < t_{\mathit{break}}^{\mathit{end}} , \forall l \in L , v \in V , i \in S , j \in S \tag{eq\_0023\_c} \\
+\end{align}

@@ -1,0 +1,155 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2021.103209
+%@ meta id=10.1016_j.trc.2021.103209 family=milp schema=0.1.0
+%@ name :: Energy-efficient timetabling and rolling stock circulation planning based on automatic train operation levels for metro lines
+%@ desc :: Mined from Energy-efficient timetabling and rolling stock circulation planning based on automatic train operation levels for metro lines (Transportation Research Part C Emerging Technologies, 2021).
+%@ prov source :: 10.1016/j.trc.2021.103209
+%@ prov reference :: Energy-efficient timetabling and rolling stock circulation planning based on automatic train operation levels for metro lines
+%@ prov author :: Yihui Wang; Songwei Zhu; Andrea D’Ariano; Jiateng Yin; Jianrui Miao; Lingyun Meng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=obj combination=weighted_sum :: Minimize weighted sum of normalized headway deviation, headway variation, depot movements and energy consumption
+%@ index I ordered=1 cyclic=0 :: Set of train services
+%@ index J ordered=1 cyclic=0 :: Set of stations
+%@ var a shape=I,J domain=non_negative role=primary :: Arrival time of train service i at station j
+%@ var d shape=I,J domain=non_negative role=primary :: Departure time of train service i at station j
+%@ index M ordered=1 cyclic=0 :: Set of dwell levels
+%@ param r shape=J,N kind=matrix :: Running time of running level n on section j
+%@ index N ordered=1 cyclic=0 :: Set of running levels
+%@ param T shape=- kind=scalar :: Minimum and maximum turnaround time bounds at terminal stations
+%@ param h shape=- kind=scalar :: Minimum and maximum headway bounds
+%@ index p ordered=0 cyclic=0 :: Peak hour subset
+%@ var x shape=I,J,K domain=binary role=primary :: Binary indicator that departure time of service i at station j lies in time interval k
+%@ index K ordered=1 cyclic=0 :: Set of time intervals
+%@ param t shape=K kind=vector :: Boundary times of the service pattern time intervals
+%@ param H shape=K kind=vector :: Required headway for each service pattern time interval
+%@ var f shape=- domain=non_negative role=primary :: Objective function component values (deviation, variation, depot, energy)
+%@ param E shape=J,N kind=matrix :: Energy consumption of running level n on section j
+%@ param w shape=- kind=scalar :: Weights for normalized objective components
+%@ var z shape=- domain=non_negative role=primary :: Auxiliary variable for linearizing products of binary and continuous variables
+%@ var f_bar shape=- domain=non_negative role=primary :: Auxiliary variable for absolute value terms in headway deviation/variation linearization
+%@ var L shape=I,J,M domain=non_negative role=primary :: Auxiliary variable for product of dwell level selection and peak-hour indicator
+%@ con eq_0001 kind=linear :: Total train services from service pattern intervals
+%@ con eq_0002 kind=linear :: Departure time equals arrival time plus selected dwell time (up direction)
+%@ con eq_0003 kind=linear :: Exactly one dwell level selected per service and station (up direction)
+%@ con eq_0004 kind=linear :: Arrival time at next station equals departure time plus selected running time (up direction)
+%@ con eq_0005 kind=linear :: Exactly one running level selected per service and section (up direction)
+%@ con eq_0006 kind=linear :: Departure time in down direction equals arrival time plus selected dwell time
+%@ con eq_0007 kind=linear :: Arrival time at previous station equals departure time plus selected running time (down direction)
+%@ con eq_0008 kind=linear :: Exactly one dwell level selected per service and station (down direction)
+%@ con eq_0009 kind=linear :: Exactly one running level selected per service and section (down direction)
+%@ con eq_0010 kind=linear :: Turnaround time at terminal station J within given bounds
+%@ con eq_0011 kind=linear :: Ordering of consecutive train services at terminal station J turnaround
+%@ con eq_0012 kind=linear :: Headway bounds between consecutive services (up direction)
+%@ con eq_0013 kind=linear :: Headway bounds between consecutive services (down direction)
+%@ con eq_0014 kind=linear :: Depot entry indicator defined by previous service connection
+%@ con eq_0015 kind=linear :: Depot exit indicator defined by next service connection
+%@ con eq_0016 kind=big_m :: Turnaround time at station 1 enforced via big-M for connected services
+%@ con eq_0017 kind=linear :: Turnaround facility at station 1 used by at most one rolling stock at a time
+%@ con eq_0018 kind=linear :: Peak-hour services restricted to allowed dwell levels (up direction)
+%@ con eq_0019 kind=linear :: Peak-hour services restricted to allowed running levels (up direction)
+%@ con eq_0021 kind=linear :: Each departure time belongs to exactly one time interval
+%@ con eq_0022 kind=linear :: Departure time bounded by selected time interval boundaries
+%@ con eq_0023 kind=linear :: Linearization of absolute headway deviation objective
+%@ con eq_0024 kind=linear :: Linearization of headway variation absolute values (up direction)
+%@ con eq_0025 kind=linear :: Total headway variation is sum of up and down direction variations
+%@ con eq_0026 kind=linear :: Number of depot movements from entry indicators
+%@ con eq_0027 kind=linear :: Total energy consumption from selected running levels
+%@ con eq_0028 kind=linear :: Weighted sum normalization for first objective components
+%@ con eq_0029 kind=linear :: Energy objective normalized by nominal energy
+%@ con eq_0030 kind=linear :: Weighted sum of normalized first and second objectives
+%@ con eq_0031_b kind=linear :: Pre-fixed running level constraints for off-peak services (part b)
+%@ con eq_0031_c kind=linear :: Pre-fixed running level constraints for off-peak services (part c)
+%@ con eq_0032 kind=linear :: Exactly one off-peak dwell level chosen at each station
+%@ con eq_0033 kind=linear :: Exactly one off-peak running level chosen for each section
+%@ con eq_0034 kind=linear :: Off-peak services must use the chosen off-peak dwell level
+%@ con eq_0035 kind=linear :: Off-peak services must use the chosen off-peak running level
+%@ con eq_0036 kind=linear :: Linearized implication for off-peak dwell level selection
+%@ con eq_0037 kind=linear :: Linearized implication for off-peak running level selection
+%@ con eq_0038 kind=linear :: Exactly one peak-hour dwell level chosen at each station
+%@ con eq_0039 kind=linear :: Exactly one peak-hour running level chosen for each section
+%@ con eq_0040 kind=linear :: Peak-hour services must use the chosen peak dwell level
+%@ con eq_0041 kind=linear :: Peak-hour services must use the chosen peak running level
+%@ con eq_0042 kind=linear :: Auxiliary constraint for linearizing binary-continuous products
+%@ con eq_0043_a kind=linear :: Linearization of peak-hour operation level product (part a)
+%@ con eq_0043_b kind=linear :: Linearization of peak-hour operation level product (part b)
+%@ con eq_0043_c kind=linear :: Linearization of peak-hour operation level product (part c)
+%@ con eq_0043_d kind=linear :: Linearization of peak-hour operation level product (part d)
+%@ con eq_0044_a kind=linear :: Linearization of off-peak operation level product (part a)
+%@ con eq_0044_b kind=linear :: Linearization of off-peak operation level product (part b)
+%@ con eq_0044_c kind=linear :: Linearization of off-peak operation level product (part c)
+%@ con eq_0045_a kind=linear :: Linearization of absolute headway deviation (part a)
+%@ con eq_0045_b kind=linear :: Linearization of absolute headway deviation (part b)
+%@ con eq_0046_a kind=linear :: Linearization of headway variation up direction (part a)
+%@ con eq_0046_b kind=linear :: Linearization of headway variation up direction (part b)
+%@ con eq_0046_c kind=linear :: Linearization of headway variation down direction (part c)
+%@ con eq_0046_d kind=linear :: Linearization of headway variation down direction (part d)
+%@ con eq_0047_a kind=linear :: Linearization of rolling stock connection product (part a)
+%@ con eq_0047_b kind=linear :: Linearization of rolling stock connection product (part b)
+%@ con eq_0047_c kind=linear :: Linearization of rolling stock connection product (part c)
+%@ con eq_0048_a kind=linear :: Linearization of peak-hour indicator times operation level (part a)
+%@ con eq_0048_b kind=linear :: Linearization of peak-hour indicator times operation level (part b)
+%@ con eq_0049 kind=linear :: Auxiliary variable constraint for objective linearization
+\begin{align}
+  & I = \sum_{k \in \left\{1 , 2 , \ldots , K\right\}} I_{k} . \tag{eq\_0001} \\
+  & d_{i , j}^{up} = a_{i , j}^{up} + \sum_{m \in \mathcal{M}} \mathit{alpha}_{i , j , m}^{up} \mathit{tau}_{j , m}^{up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \tag{eq\_0002} \\
+  & \sum_{m \in \mathcal{M}} \mathit{alpha}_{i , j , m}^{up} = 1 , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} . \tag{eq\_0003} \\
+  & a_{i , j + 1}^{up} = d_{i , j}^{up} + \sum_{n \in \mathcal{N}} \mathit{beta}_{i , j , n}^{up} r_{j , n}^{up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} , \tag{eq\_0004} \\
+  & \sum_{n \in \mathcal{N}} \mathit{beta}_{i , j , n}^{up} = 1 , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} . \tag{eq\_0005} \\
+  & d_{i , j}^{dn} = a_{i , j}^{dn} + \sum_{m \in \mathcal{M}} \mathit{alpha}_{i , j , m}^{dn} \mathit{tau}_{j , m}^{dn} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \tag{eq\_0006} \\
+  & a_{i , j - 1}^{dn} = d_{i , j}^{dn} + \sum_{n \in \mathcal{N}} \mathit{beta}_{i , j , n}^{dn} r_{j , n}^{dn} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{1\right\} , \tag{eq\_0007} \\
+  & \sum_{m \in \mathcal{M}} \mathit{alpha}_{i , j , m}^{dn} = 1 , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \tag{eq\_0008} \\
+  & \sum_{n \in \mathcal{N}} \mathit{beta}_{i , j , n}^{dn} = 1 , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{1\right\} . \tag{eq\_0009} \\
+  & T_{J}^{min} \leq a_{i , J}^{dn} - d_{i , J}^{up} \leq T_{J}^{max} , \forall i \in \mathcal{I} \tag{eq\_0010} \\
+  & d_{i + 1 , J}^{up} - a_{i , J}^{dn} \geq 0 , \forall i \in \mathcal{I} / \left\{I\right\} , \tag{eq\_0011} \\
+  & h_{min} \leq d_{i + 1 , j}^{up} - d_{i , j}^{up} \leq h_{max} , \tag{eq\_0012} \\
+  & h_{min} \leq d_{i + 1 , j}^{dn} - d_{i , j}^{dn} \leq h_{max} , \tag{eq\_0013} \\
+  & \mathit{zeta}_{i '} = 1 - \sum_{i \in \mathcal{I} , i < i ' ,} \mathit{theta}_{i , i '} , \tag{eq\_0014} \\
+  & \mathit{eta}_{i} = 1 - \sum_{i ' \in \mathcal{I} , i < i '} \mathit{theta}_{i , i '} . \tag{eq\_0015} \\
+  & T_{1}^{min} - M \left(1 - \mathit{theta}_{i , i '}\right) \leq a_{i ' , 1}^{up} - d_{i , 1}^{dn} \leq T_{1}^{max} + M \left(1 - \mathit{theta}_{i , i '}\right) , \tag{eq\_0016} \\
+  & d_{i + 1 , 1}^{dn} - \sum_{i ' \in \mathcal{I} , i ' > i} \mathit{theta}_{i , i '} a_{i ' , 1}^{up} > 0 , \forall i \in \mathcal{I} / \left\{I\right\} . \tag{eq\_0017} \\
+  & \sum_{m \in \mathcal{M} p} \mathit{alpha}_{i , j , m}^{up} \mathit{ell}_{i , j}^{up} = \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} , \tag{eq\_0018} \\
+  & \sum_{n \in \mathcal{N}_{p}} \mathit{beta}_{i , j , n}^{up} \mathit{ell}_{i , j}^{up} = \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} / \left\{J\right\} . \tag{eq\_0019} \\
+  & \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} = 1 , \tag{eq\_0021} \\
+  & \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} \cdot t_{k - 1} \leq d_{i , j}^{up} \leq \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} \cdot t_{k} , \forall i \in \mathcal{I} , j \in \mathcal{J} . \tag{eq\_0022} \\
+  & f_{deviation} = \sum_{i \in \mathcal{I} / \left\{1\right\}} \mid d_{i , 1}^{up} - d_{i - 1 , 1}^{up} - \sum_{k \in \mathcal{K}} x_{i , 1 , k}^{up} \cdot H_{k} \mid . \tag{eq\_0023} \\
+  & f_{variation}^{up} = \sum_{\begin{matrix}i \in \mathcal{I} / \left\{1\right\} , \\ j \in \mathcal{J} '\end{matrix}} \mid \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right) + 1} \mid , \tag{eq\_0024} \\
+  & f_{variation} = f_{variation}^{up} + f_{variation}^{dn} . \tag{eq\_0025} \\
+  & f_{\mathit{zeta}} = \sum_{i \in \mathcal{I}} \mathit{zeta}_{i} . \tag{eq\_0026} \\
+  & f_{energy} = \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{up} \mathit{beta}_{i , j , n}^{up} + \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J} / \left\{1\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{dn} \mathit{beta}_{i , j , n}^{dn} , \tag{eq\_0027} \\
+  & f_{obj 1} = \frac{w_{1} \frac{f_{deviation}}{f_{deviation , nom}} + w_{2} \frac{f_{variation}}{f_{variation , nom}} + w_{3} \frac{f_{\mathit{zeta}}}{f_{\mathit{zeta} , nom}}}{f_{sum , nom}} , \tag{eq\_0028} \\
+  & f_{obj 2} = \frac{f_{energy}}{f_{energy , nom}} , \tag{eq\_0029} \\
+  & f_{obj} = \mathit{gamma} f_{obj 1} + \left(1 - \mathit{gamma}\right) f_{obj 2} . \tag{eq\_0030} \\
+  \min\quad & \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{up} {\mathit{beta}}_{j , n}^{up} \tag{eq\_0031\_a} \\
+  & \sum_{n \in \mathcal{N}} {\mathit{beta}}_{j , n}^{up} = 1 , j \in \mathcal{J} / \left\{J\right\} \tag{eq\_0031\_b} \\
+  & \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} r_{j , n}^{up} {\mathit{beta}}_{j , n}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 1}^{up} = \sum_{j \in \mathcal{J} / \left\{J\right\}} r_{j , 2}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 2}^{up} \tag{eq\_0031\_c} \\
+  & \mathit{beta}_{i , j , \bar{n}_{j}^{up}}^{up} \geq 1 - \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} , \tag{eq\_0032} \\
+  & \sum_{m \in \mathcal{M}} \mathit{alpha}_{j , m}^{op , up} = 1 , \forall j \in \mathcal{J} . \tag{eq\_0033} \\
+  & \sum_{n \in \mathcal{N}} \mathit{beta}_{j , n}^{op , up} = 1 , \forall j \in \mathcal{J} / \left\{J\right\} . \tag{eq\_0034} \\
+  & \left[\mathit{ell}_{i , j}^{up} = 0\right] \Leftrightarrow \left[\mathit{alpha}_{i , j , m}^{up} = \mathit{alpha}_{j , m}^{op , up}\right] , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \forall m \in \mathcal{M} , \tag{eq\_0035} \\
+  & \left[\mathit{ell}_{i , j}^{up} = 0\right] \Leftrightarrow \left[\mathit{beta}_{i , j , n}^{up} = \mathit{beta}_{j , n}^{op , up}\right] , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} , \forall n \in \mathcal{N} , \tag{eq\_0036} \\
+  & \mathit{alpha}_{i , j , m}^{up} \geq \left(1 - \mathit{ell}_{i , j}^{up}\right) \mathit{alpha}_{j , m}^{op , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \forall m \in \mathcal{M} , \tag{eq\_0037} \\
+  & \mathit{beta}_{i , j , n}^{up} \geq \left(1 - \mathit{ell}_{i , j}^{up}\right) \mathit{beta}_{j , n}^{op , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} , \forall n \in \mathcal{N} . \tag{eq\_0038} \\
+  & \sum_{m \in \mathcal{M}_{p}} \mathit{alpha}_{j , m}^{p , up} = 1 , \forall j \in \mathcal{J} , \tag{eq\_0039} \\
+  & \sum_{n \in \mathcal{N}_{p}} \mathit{beta}_{j , n}^{p , up} = 1 , \forall j \in \mathcal{J} / \left\{J\right\} , \tag{eq\_0040} \\
+  & \mathit{alpha}_{i , j , m}^{up} \geq \mathit{ell}_{i , j}^{up} \mathit{alpha}_{j , m}^{p , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \forall m \in \mathcal{M}_{p} , \tag{eq\_0041} \\
+  & \mathit{beta}_{i , j , n}^{up} \geq \mathit{ell}_{i , j}^{up} \mathit{beta}_{j , n}^{p , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} , \forall n \in \mathcal{N}_{p} . \tag{eq\_0042} \\
+  & z \leq f_{max} \mathit{delta} \tag{eq\_0043\_a} \\
+  & z \geq f_{min} \mathit{delta} \tag{eq\_0043\_b} \\
+  & z \leq f - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0043\_c} \\
+  & z \geq f - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0043\_d} \\
+  & \mathit{delta}_{3} \leq \mathit{delta}_{1} \tag{eq\_0044\_a} \\
+  & \mathit{delta}_{3} \leq \mathit{delta}_{2} \tag{eq\_0044\_b} \\
+  & \mathit{delta}_{1} + \mathit{delta}_{2} - \mathit{delta}_{3} \leq 1 \tag{eq\_0044\_c} \\
+  & \bar{f} \geq f \tag{eq\_0045\_a} \\
+  & \bar{f} \geq - f \tag{eq\_0045\_b} \\
+  & \mathit{Theta}_{i , i '}^{up} \leq t_{end} \mathit{theta}_{i , i '} \tag{eq\_0046\_a} \\
+  & \mathit{Theta}_{i , i '}^{up} \geq 0 \tag{eq\_0046\_b} \\
+  & \mathit{Theta}_{i , i '}^{up} \leq a_{i ' , 1}^{up} \tag{eq\_0046\_c} \\
+  & \mathit{Theta}_{i , i '}^{up} \geq a_{i ' , 1}^{up} - t_{end} \left(1 - \mathit{theta}_{i , i '}\right) \tag{eq\_0046\_d} \\
+  & L_{i , j , m}^{up} \leq \mathit{alpha}_{i , j , m}^{up} \tag{eq\_0047\_a} \\
+  & L_{i , j , m}^{up} \leq \mathit{ell}_{i , j}^{up} \tag{eq\_0047\_b} \\
+  & \mathit{alpha}_{i , j , m}^{up} + \mathit{ell}_{i , j}^{up} - L_{i , j , m}^{up} \leq 1 \tag{eq\_0047\_c} \\
+  & f_{i}^{dev} \geq d_{i , 1}^{up} - d_{i - 1 , 1}^{up} - \sum_{k \in \mathcal{K}} x_{i , 1 , k}^{up} \cdot H_{k} \tag{eq\_0048\_a} \\
+  & f_{i}^{dev} \geq - \left(d_{i , 1}^{up} - d_{i - 1 , 1}^{up} - \sum_{k \in \mathcal{K}} x_{i , 1 , k}^{up} \cdot H_{k}\right) \tag{eq\_0048\_b} \\
+  & f_{deviation} = \sum_{i \in \mathcal{I} / 1} f_{i}^{dev} , \tag{eq\_0049} \\
+\end{align}

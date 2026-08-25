@@ -1,0 +1,115 @@
+% Declaration sidecar for 10.1016_j.trb.2014.01.009
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2014.01.009
+% An overview of recovery models and algorithms for real-time railway rescheduling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2014.01.009.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize delays, rescheduling costs, and cancellation costs across the considered recovery models.
+%
+% t: classified as variable during review
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Starting time of operation i.
+%
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs in alternative graph.
+%
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Processing time of operation i or setup time between conflicting operations i and j.
+%
+% unusable as an identifier, rename or drop: σ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs in alternative graph.
+%
+% h: classified as index during review
+%@ index h ordered=0 cyclic=0 :: Successor operation of operation j in a pair of conflicting operations.
+%
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Index for operations, completions, or train unit types.
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Large positive number used for linearizing disjunctive constraints.
+%
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of conflicting operations or assignment of composition/completion.
+%
+% Mx: classified as parameter during review
+%@ param Mx shape=- kind=scalar domain=- :: Product of M and binary variable x used in linearization.
+%
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of trips.
+%
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of compositions.
+%
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating that composition c is changed to composition c' at the end of trip r.
+%
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Initial inventory of train unit type m in station s.
+%
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Coefficient indicating task coverage or inventory change.
+%
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Train unit type.
+%
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station.
+%
+% d: classified as variable during review
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Non-negative off-balance of train unit type m in station s at the end of the day.
+%
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether task i is canceled (1) or covered (0).
+%
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of crew members.
+%
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of possible completions for crew member j.
+%
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of tasks.
+%
+% Bound by a quantifier or big operator, so no declaration of their own: c, i, j, r
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Processing time constraints for fixed arcs: t_sigma(i) >= t_i + f_i for all (i,sigma(i)) in F.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Disjunctive alternative arc constraints: for each ((i,j),(h,k)) in A, either t_k >= t_h + f_hk or t_j >= t_i + f_ij.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Linearized first alternative arc constraint with binary x_jk: t_k >= t_h + f_hk - M(1-x_jk).
+%@ con eq_0005 kind=linear domain=- indicator=- :: Linearized second alternative arc constraint: t_j >= t_i + f_ij - M x_jk.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Exactly one composition is assigned to each trip: sum_{c in C} x_{r,c}=1 for all r in R.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Composition assigned to a trip is changed to some composition at the end of the trip: x_{r,c}=sum_{c'} z_{r,c,c'}.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Composition at the start of a consecutive trip equals the changed composition from the previous trip: x_{r',c'}=sum_c z_{r,c,c'}.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Inventory non-negativity at station s at departure time of trip r: I^0_{s,m}+sum_{r' in R_{s,r}} sum_c a_{s,r',c,m} x_{r',c} >= 0.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Definition of realized end-of-day inventory: I^0_{s,m}+sum_r sum_c a_{s,r,c,m} x_{r,c}=i^∞_{s,m}.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Relates realized inventory to final inventory and off-balance: i^∞_{s,m}=I^∞_{s,m}+d^+_{s,m}-d^-_{s,m}.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Rolling stock assignments of trips already started at rescheduling time τ are fixed: x_{r,c}=x^0_{r,c} for r in R_τ.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary character of composition assignment variables: x_{r,c} in {0,1}.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Every task is either covered by at least one crew completion or canceled: sum_{j in D} sum_{k in K_j} a_{ijk} x_{jk} + y_i >= 1 for all i in T.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Each crew member is assigned exactly one completion: sum_{k in K_j} x_{jk}=1 for all j in D.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary character of crew assignment variables: x_{jk} in {0,1}.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary character of task cancellation variables: y_i in {0,1}.

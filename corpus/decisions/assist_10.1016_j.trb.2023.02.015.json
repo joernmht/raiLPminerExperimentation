@@ -1,0 +1,284 @@
+{
+  "schema_version": "game-decisions-3",
+  "source": "corpusbuilder.assist deepseek-v4-flash",
+  "generated": "2026-08-24",
+  "formula_decisions": [
+    {
+      "paper_key": "10.1016_j.trb.2023.02.015",
+      "doi": "10.1016/j.trb.2023.02.015",
+      "decisions": [
+        {
+          "id": "eq-0001",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0002",
+          "status": "corrected",
+          "note": "v_{i , k + 1} = v_{i , k} + \\frac{u^{PA} - q \\left(v_{i , k} , x_{i , k}\\right)}{m} \\left(t^{switch} - t_{k}\\right)",
+          "parts": [
+            "v_{i , k + 1} = v_{i , k} + \\frac{u^{PA} - q \\left(v_{i , k} , x_{i , k}\\right)}{m} \\left(t^{switch} - t_{k}\\right)",
+            "d_{i , \\left(t_{k} , t_{k + 1}\\right)} = v_{i , k} \\left(t^{switch} - t_{k}\\right) + \\frac{u^{PA} - q \\left(v_{i , k} , x_{i , k}\\right)}{2 m} \\left(t_{0} - t_{k}\\right)^{2} + v_{i , k + 1} \\left(t_{k + 1} - t_{0}\\right) + \\frac{u^{CR} - q \\left(v_{i , k} , x_{i , k}\\right)}{2 m} \\left(t_{k + 1} - t^{switch}\\right)^{2}"
+          ]
+        },
+        {
+          "id": "eq-0003",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0004",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0005",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0006",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0007",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0008",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0009",
+          "status": "duplicate",
+          "duplicate_of": "eq-0008"
+        },
+        {
+          "id": "eq-0010",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0011",
+          "status": "duplicate",
+          "duplicate_of": "eq-0010"
+        },
+        {
+          "id": "eq-0012",
+          "status": "corrected",
+          "note": "C = C_up + C_dn",
+          "parts": [
+            "C = C_up + C_dn",
+            "C_up + C_dn = \\frac{3600 \\cdot \\sum_{k \\in \\mathcal{K} \\setminus K, i \\in \\mathcal{N}} d_{i,(t_k,t_{k+1})}}{X \\cdot T} \\cdot V"
+          ]
+        },
+        {
+          "id": "eq-0013",
+          "status": "duplicate",
+          "duplicate_of": "eq-0012"
+        },
+        {
+          "id": "eq-0014",
+          "status": "corrected",
+          "note": "t_{i + 1 , l , w}^{dep} - t_{i , l , w}^{dep} \\geq h^{min , up} , \\forall e \\in \\mathcal{E} , i \\in \\mathcal{I} / I , w \\in \\mathcal{W}^{up}",
+          "parts": [
+            "t_{i + 1 , l , w}^{dep} - t_{i , l , w}^{dep} \\geq h^{min , up} , \\forall e \\in \\mathcal{E} , i \\in \\mathcal{I} / I , w \\in \\mathcal{W}^{up}",
+            "t_{j + 1 , l , w}^{dep} - t_{j , l , w}^{dep} \\geq h^{min , dn} , \\forall e \\in \\mathcal{E} , j \\in \\mathcal{J} / J , w \\in \\mathcal{W}^{dn}"
+          ]
+        },
+        {
+          "id": "eq-0015",
+          "status": "corrected",
+          "note": "w_{i , k} = \\lceil \\frac{x_{i , 1} + \\sum_{\\sigma = 1}^{k - 1} d_{i , \\left(t_{\\sigma} , t_{\\sigma + 1}\\right)}}{X} \\rceil , \\forall i \\in \\mathcal{I} , k \\in \\mathcal{K}",
+          "parts": [
+            "w_{i , k} = \\lceil \\frac{x_{i , 1} + \\sum_{\\sigma = 1}^{k - 1} d_{i , \\left(t_{\\sigma} , t_{\\sigma + 1}\\right)}}{X} \\rceil , \\forall i \\in \\mathcal{I} , k \\in \\mathcal{K}",
+            "w_{j , k} = \\lceil \\frac{X - x_{j , 1} + \\sum_{\\sigma = 1}^{k - 1} d_{j , \\left(t_{\\sigma} , t_{\\sigma + 1}\\right)}}{X} \\rceil , \\forall j \\in \\mathcal{J} , k \\in \\mathcal{K}"
+          ]
+        },
+        {
+          "id": "eq-0016",
+          "status": "corrected",
+          "note": "t_{e}^{dwell , min} \\leq t_{i , e , w}^{dep} - t_{i , e , w}^{arr} \\leq t_{e}^{dwell , max} , \\forall e \\in \\mathcal{E} , i \\in \\mathcal{I} , w \\in \\mathcal{W}^{up}",
+          "parts": [
+            "t_{e}^{dwell , min} \\leq t_{i , e , w}^{dep} - t_{i , e , w}^{arr} \\leq t_{e}^{dwell , max} , \\forall e \\in \\mathcal{E} , i \\in \\mathcal{I} , w \\in \\mathcal{W}^{up}",
+            "t_{e}^{dwell , min} \\leq t_{j , e , w}^{dep} - t_{j , e , w}^{arr} \\leq t_{e}^{dwell , max} , \\forall e \\in \\mathcal{E} , j \\in \\mathcal{J} , w \\in \\mathcal{W}^{dn}"
+          ]
+        },
+        {
+          "id": "eq-0017",
+          "status": "corrected",
+          "note": "t_{e , e + 1}^{run , min} \\leq t_{i , e + 1 , w}^{arr} - t_{i , e , w}^{dep} \\leq t_{e , e + 1}^{run , max} , \\forall e \\in \\mathcal{E} / E , i \\in \\mathcal{I} , w \\in \\mathcal{W}^{up}",
+          "parts": [
+            "t_{e , e + 1}^{run , min} \\leq t_{i , e + 1 , w}^{arr} - t_{i , e , w}^{dep} \\leq t_{e , e + 1}^{run , max} , \\forall e \\in \\mathcal{E} / E , i \\in \\mathcal{I} , w \\in \\mathcal{W}^{up}",
+            "t_{e , e + 1}^{run , min} \\leq t_{j , e , w}^{arr} - t_{j , e + 1 , w}^{dep} \\leq t_{e , e + 1}^{run , max} , \\forall e \\in \\mathcal{E} / E , j \\in \\mathcal{J} , w \\in \\mathcal{W}^{dn}"
+          ]
+        },
+        {
+          "id": "eq-0018",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0019",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0020",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0021",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0022",
+          "status": "duplicate",
+          "duplicate_of": "eq-0021"
+        },
+        {
+          "id": "eq-0023",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0024",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0025",
+          "status": "corrected",
+          "note": "\\phi \\left(i , k\\right) \\in \\mathcal{I} , \\phi \\left(j , k\\right) \\in \\mathcal{J}",
+          "parts": [
+            "\\phi \\left(i , k\\right) \\in \\mathcal{I} , \\phi \\left(j , k\\right) \\in \\mathcal{J}",
+            "x_{\\phi \\left(i , k\\right) , k} < x_{\\phi \\left(j , k\\right) , k} , \\phi \\left(i , k\\right) , \\phi \\left(j , k\\right) \\in \\mathcal{I}",
+            "x_{\\phi \\left(i , k\\right) , k} < x_{\\phi \\left(j , k\\right) , k} , \\phi \\left(i , k\\right) , \\phi \\left(j , k\\right) \\in \\mathcal{J}"
+          ]
+        },
+        {
+          "id": "eq-0026",
+          "status": "duplicate",
+          "duplicate_of": "eq-0025"
+        },
+        {
+          "id": "eq-0027",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0028",
+          "status": "duplicate",
+          "duplicate_of": "eq-0027"
+        },
+        {
+          "id": "eq-0029",
+          "status": "corrected",
+          "note": "t_{e , k}^{elapsed,up} = t_{k} - max \\{ t_{i , e , w_{i , \\kappa}}^{dep} \\left|\\right. i \\in I , \\kappa \\in \\left[1 , k\\right] \\}",
+          "parts": [
+            "t_{e , k}^{elapsed,up} = t_{k} - max \\{ t_{i , e , w_{i , \\kappa}}^{dep} \\left|\\right. i \\in I , \\kappa \\in \\left[1 , k\\right] \\}",
+            "t_{e , k}^{elapsed,dn} = t_{k} - max \\{ t_{j , e , w_{j , \\kappa}}^{dep} \\left|\\right. j \\in J , \\kappa \\in \\left[1 , k\\right] \\}"
+          ]
+        },
+        {
+          "id": "eq-0030",
+          "status": "duplicate",
+          "duplicate_of": "eq-0029"
+        },
+        {
+          "id": "eq-0031",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0032",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0033",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0034",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0035",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0036",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0037",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0038",
+          "status": "duplicate",
+          "duplicate_of": "eq-0037"
+        },
+        {
+          "id": "eq-0039",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0040",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0041",
+          "status": "accepted"
+        },
+        {
+          "id": "eq-0042",
+          "status": "rejected"
+        },
+        {
+          "id": "eq-0043",
+          "status": "rejected"
+        }
+      ]
+    }
+  ],
+  "paper_cells": [
+    {
+      "paper_key": "10.1016_j.trb.2023.02.015",
+      "cell": "P2"
+    }
+  ],
+  "symbol_tables": [
+    {
+      "paper_key": "10.1016_j.trb.2023.02.015",
+      "symbols": {
+        "C": "variable",
+        "D": "parameter",
+        "E": "index",
+        "F": "parameter",
+        "I": "index",
+        "J": "index",
+        "K": "index",
+        "L": "parameter",
+        "N": "index",
+        "P": "variable",
+        "R": "variable",
+        "T": "parameter",
+        "V": "parameter",
+        "W": "index",
+        "X": "parameter",
+        "Y": "index",
+        "d": "variable",
+        "f": "parameter",
+        "h": "parameter",
+        "h̄": "parameter",
+        "k": "index",
+        "l": "parameter",
+        "m": "parameter",
+        "n": "variable",
+        "q": "parameter",
+        "r": "variable",
+        "t": "index",
+        "u": "variable",
+        "v": "variable",
+        "v̄": "parameter",
+        "x": "variable",
+        "Δ": "parameter",
+        "α": "parameter",
+        "ζ̄": "parameter",
+        "κ": "index",
+        "φ": "parameter",
+        "ω": "parameter"
+      }
+    }
+  ]
+}

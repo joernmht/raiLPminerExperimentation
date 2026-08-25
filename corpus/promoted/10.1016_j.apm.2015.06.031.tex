@@ -1,0 +1,94 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.apm.2015.06.031
+%@ meta id=10.1016_j.apm.2015.06.031 family=milp schema=0.1.0
+%@ name :: Rescheduling subway trains by a discrete event model considering service balance performance
+%@ desc :: Mined from Rescheduling subway trains by a discrete event model considering service balance performance (Applied Mathematical Modelling, 2015).
+%@ prov source :: 10.1016/j.apm.2015.06.031
+%@ prov reference :: Rescheduling subway trains by a discrete event model considering service balance performance
+%@ prov author :: Xiaoming Xu; Keping Li; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: minimize total delay time
+%@ param a_bar shape=I,k kind=matrix domain=continuous :: Original arrival time from pre-specified timetable
+%@ index k ordered=0 cyclic=0 :: Index for stations or sections
+%@ index O ordered=0 cyclic=0 :: Set of outbound trains
+%@ var a shape=I,k domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station k
+%@ param t shape=- kind=scalar domain=continuous :: Current system time
+%@ param d_bar shape=I,k kind=matrix domain=continuous :: Original departure time from pre-specified timetable
+%@ var d shape=I,k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station k
+%@ index I ordered=0 cyclic=0 :: Set of inbound trains
+%@ index l ordered=0 cyclic=0 :: Index for stations, used in l*
+%@ param m shape=- kind=scalar domain=continuous :: Total number of stations
+%@ index E ordered=0 cyclic=0 :: Set of sections
+%@ param M shape=- kind=big_m domain=continuous :: Large positive constant
+%@ param h shape=- kind=scalar domain=continuous :: Headway time
+%@ index j ordered=0 cyclic=0 :: Index for trains
+%@ var q shape=I,j,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train ordering on same direction
+%@ index R ordered=0 cyclic=0 :: Set of stations with crossover tracks
+%@ var p shape=I,j,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train ordering on different directions
+%@ index V ordered=0 cyclic=0 :: Set of stations
+%@ param t_bar shape=I,k kind=matrix domain=continuous :: Minimum dwelling time
+%@ index B ordered=0 cyclic=0 :: Set of stations affected by incident
+%@ index W ordered=0 cyclic=0 :: Set of stations to be recovered
+%@ index G ordered=0 cyclic=0 :: Set of trains trapped in incident
+%@ var T shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total delay time
+%@ var b shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train can proceed
+%@ var r shape=I domain=continuous role=primary drole=- lo=- hi=- :: Time interval for train to reach next state
+%@ con eq_0002 kind=linear domain=- indicator=- :: Close-to-original-schedule constraint for outbound train arrivals
+%@ con eq_0003 kind=linear domain=- indicator=- :: Close-to-original-schedule constraint for outbound train departures
+%@ con eq_0004 kind=linear domain=- indicator=- :: Close-to-original-schedule constraint for inbound train arrivals
+%@ con eq_0005 kind=linear domain=- indicator=- :: Close-to-original-schedule constraint for inbound train departures
+%@ con eq_0006 kind=linear domain=- indicator=- :: Headway constraint for outbound trains when leaving section k (i before j)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Headway constraint for outbound trains when leaving section k (j before i)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Headway constraint for outbound trains when entering section k (i before j)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Headway constraint for outbound trains when entering section k (j before i)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Headway constraint for inbound trains when leaving section k (i before j)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Headway constraint for inbound trains when leaving section k (j before i)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Headway constraint for inbound trains when entering section k (i before j)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Headway constraint for inbound trains when entering section k (j before i)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Headway constraint for trains in different directions at crossover station k*
+%@ con eq_0015 kind=linear domain=- indicator=- :: Headway constraint for trains in different directions at station l*+1
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum dwelling time constraint at each station
+%@ con eq_0017 kind=linear domain=- indicator=- :: Arrival time at destination cannot be earlier than original for outbound trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Arrival time at origin cannot be earlier than original for inbound trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Arrival time at recovered station not earlier than recovery time for inbound trains
+%@ con eq_0020 kind=linear domain=- indicator=- :: Headway between trapped inbound train and entering train at section k*
+%@ con eq_0021 kind=linear domain=- indicator=- :: Headway between entering train and trapped inbound train at section k*
+%@ con eq_0022 kind=linear domain=- indicator=- :: Crossover track constraint for trains using crossover before section k*
+%@ con eq_0023 kind=linear domain=- indicator=- :: Crossover track constraint for trains using crossover before section l*
+%@ con eq_0024 kind=linear domain=- indicator=- :: Predetermined ordering q_ijk=1 for non-trapped trains when i<j
+%@ con eq_0025 kind=linear domain=- indicator=- :: Service balance constraint κ < Γ
+%@ con eq_0026 kind=linear domain=- indicator=- :: Total delay time calculation
+%@ con eq_0027_b kind=linear domain=- indicator=- :: Ordering sum constraint q_ijk + q_jik = 1 for trains in the same direction
+%@ con eq_0027_c kind=linear domain=- indicator=- :: Ordering sum constraint p_ijk + p_jik = 1 for trains in different directions
+%@ con eq_0029 kind=linear domain=- indicator=- :: Waiting time calculation r_i = M(1 - b_i) when train cannot proceed
+\begin{align}
+  & a_{i k} = \left(\bar{a}\right)_{i k} , \text{if} \left(\bar{a}\right)_{i k} \leq t_{s} , i \in O , k \in \left\{2 , 3 , \ldots , k^{\star}\right\} , \tag{eq\_0002} \\
+  & d_{i k} = \left(\bar{d}\right)_{i k} , \text{if} \left(\bar{d}\right)_{i k} \leq t_{s} , i \in O , k \in \left\{1 , 2 , 3 , \ldots , k^{\star} - 1\right\} , \tag{eq\_0003} \\
+  & a_{i k} = \left(\bar{a}\right)_{i k} , \text{if} \left(\bar{a}\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m - 1\right\} , \tag{eq\_0004} \\
+  & d_{i k} = \left(\bar{d}\right)_{i k} , \text{if} \left(\bar{d}\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m\right\} . \tag{eq\_0005} \\
+  & a_{i , k + 1} + h_{0} \leq a_{j , k + 1} + M \left(1 - q_{i j k}\right) , i , j \in O , k \in E , \tag{eq\_0006} \\
+  & a_{j , k + 1} + h_{0} \leq a_{i , k + 1} + M \left(1 - q_{j i k}\right) , i , j \in O , k \in E . \tag{eq\_0007} \\
+  & d_{i k} + h_{0} \leq d_{j k} + M \left(1 - q_{i j k}\right) , i , j \in O , k \in E \tag{eq\_0008} \\
+  & d_{j k} + h_{0} \leq d_{i k} + M \left(1 - q_{j i k}\right) , i , j \in O , k \in E . \tag{eq\_0009} \\
+  & a_{i k} + h_{0} \leq a_{j k} + M \left(1 - q_{i j k}\right) , i , j \in I , k \in E , \tag{eq\_0010} \\
+  & a_{j k} + h_{0} \leq a_{i k} + M \left(1 - q_{j i k}\right) , i , j \in I , k \in E , \tag{eq\_0011} \\
+  & d_{i , k + 1} + h_{0} \leq d_{j , k + 1} + M \left(1 - q_{i j k}\right) , i , j \in I , k \in E , \tag{eq\_0012} \\
+  & d_{j , k + 1} + h_{0} \leq d_{i , k + 1} + M \left(1 - q_{j i k}\right) , i , j \in I , k \in E , \tag{eq\_0013} \\
+  & d_{j k^{\star}} + h_{j i k^{\star}}^{d a} \leq a_{i k^{\star}} + M \left(1 - p_{j i k^{\star}}\right) , i \in O \cap R , j \in I \cap R , \tag{eq\_0014} \\
+  & a_{i , l^{\star} + 1} + h_{i j , l^{\star} + 1}^{a d} \leq d_{j , l^{\star} + 1} + M \left(1 - p_{i j , l^{\star} + 1}\right) , i \in O \cap R , j \in I \cap R . \tag{eq\_0015} \\
+  & d_{i k} - a_{i k} \geq \left(\bar{t}\right)_{i k} , i \in O \cup I , k \in V . \tag{eq\_0016} \\
+  & a_{i n} \geq \left(\bar{a}\right)_{i n} , i \in O , \tag{eq\_0017} \\
+  & a_{j 1} \geq \left(\bar{a}\right)_{j 1} , j \in I . \tag{eq\_0018} \\
+  & a_{i k} \geq t_{r} , i \in B \cap I , k \in W . \tag{eq\_0019} \\
+  & d_{i k^{\star}} + h_{0} \leq d_{j k^{\star}} + M \left(1 - q_{i j k}\right) , i \in I \cap G , j \in I \cap B , \tag{eq\_0020} \\
+  & d_{j k^{\star}} + h_{0} \leq d_{i k^{\star}} + M \left(1 - q_{j i k}\right) , i \in I \cap G , j \in I \cap B . \tag{eq\_0021} \\
+  & \left(\bar{a}\right)_{i , k^{\star} - 1} - \left(\bar{d}\right)_{i k^{\star}} + t_{c} \leq a_{i , k^{\star} - 1} - d_{i k^{\star}} , i \in I \cap R , \tag{eq\_0022} \\
+  & \left(\bar{a}\right)_{i l^{\star}} - \left(\bar{d}\right)_{i , l^{\star} + 1} + t_{c} \leq a_{i l^{\star}} - d_{i , l^{\star} + 1} , i \in I \cap R . \tag{eq\_0023} \\
+  & q_{i j k} = 1 , \text{if} i < j , i , j \in O - G \text{or} i , j \in I - G . \tag{eq\_0024} \\
+  & \mathit{kappa} < \mathit{Gamma} , \tag{eq\_0025} \\
+  & T_{d} = \sum_{i \in O} \left(a_{i n} - \left(\bar{a}\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(\bar{a}\right)_{i 1}\right) . \tag{eq\_0026} \\
+  \min\quad & \sum_{i \in O} \left(a_{i n} - \left(\bar{a}\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(\bar{a}\right)_{i 1}\right) \tag{eq\_0027\_a} \\
+  & q_{i j k} + q_{j i k} = 1 , i , j \in R \cap I , \text{or} i , j \in R \cap O , k \in V \tag{eq\_0027\_b} \\
+  & p_{i j k} + p_{j i k} = 1 , i \in R \cap I \text{and} j \in R \cap O , \text{or} i \in R \cap O \text{and} j \in R \cap I , k \in V \tag{eq\_0027\_c} \\
+  & r_{i} = M \left(1 - b_{i}\right) . \tag{eq\_0029} \\
+\end{align}

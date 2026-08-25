@@ -1,0 +1,230 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.cor.2013.04.002",
+  "name": "An experimental comparison of periodic timetabling models",
+  "family": "milp",
+  "description": "Mined from An experimental comparison of periodic timetabling models (Computers & Operations Research, 2013).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.cor.2013.04.002",
+    "reference": "An experimental comparison of periodic timetabling models",
+    "author": "Michael Siebert; Marc Goerigk",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "A",
+      "description": "Set of activities (driving, waiting, changing, headway) in the event activity network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of events (arrivals and departures) in the event activity network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Set of natural numbers (domain of event time variables π)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "Set of integers (domain of modulo parameters z)",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "w",
+      "description": "Passenger weight for activity a (number of passengers using that activity)",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "Minimal allowed activity duration for activity a",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Maximal allowed activity duration for activity a",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "pi",
+      "description": "Event time variable π_i for each event i in the EAN",
+      "shape": [
+        "E"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Tz",
+      "description": "Product of period T and modulo parameter z_ij for activity (i,j) in A",
+      "shape": [
+        "A"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Modulo parameter for activity (i,j) in A, number of periods added to the duration",
+      "shape": [
+        "A"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "piInt",
+      "description": "auxiliary integer copy of pi",
+      "shape": [],
+      "domain": "integer",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "zInt",
+      "description": "auxiliary integer copy of z",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "z_int",
+      "description": "integer period offset",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005",
+      "description": "Event times are natural numbers: π_i ∈ N for all i in E",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "pi_i",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total passenger traveling time",
+    "terms": [
+      {
+        "ref": "w",
+        "ref_kind": "parameter",
+        "bindings": [
+          {
+            "index": "A",
+            "expr": "\\mathit{ij}",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "A"
+        ]
+      },
+      {
+        "ref": "pi",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "E",
+            "expr": "i",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": -1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Tz",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "A",
+            "expr": "\\mathit{ij}",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

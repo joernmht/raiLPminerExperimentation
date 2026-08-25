@@ -1,0 +1,97 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2024.110544
+%@ meta id=10.1016_j.cie.2024.110544 family=milp schema=0.1.0
+%@ name :: Joint optimization of train platforming and shunting with service scheduling at a railway hub
+%@ desc :: Mined from Joint optimization of train platforming and shunting with service scheduling at a railway hub (Computers & Industrial Engineering, 2024).
+%@ prov source :: 10.1016/j.cie.2024.110544
+%@ prov reference :: Joint optimization of train platforming and shunting with service scheduling at a railway hub
+%@ prov author :: Jintang Shi; Haodong Li; Pieter Vansteenwegen
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total operating cost of all EMUs over the time-space network.
+%@ param c shape=A,e kind=matrix domain=continuous :: Cost of traversing arc u->v for train e.
+%@ var x shape=A,e domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating if train e uses arc u->v.
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the time-space network.
+%@ index E ordered=0 cyclic=0 :: Set of trains (EMUs).
+%@ index e ordered=0 cyclic=0 :: Index for trains.
+%@ var s shape=- domain=non_negative role=slack drole=- lo=- hi=- :: Slack variable for relaxed constraints.
+%@ index t ordered=0 cyclic=0 :: Time index.
+%@ index V ordered=0 cyclic=0 :: Set of vertices in the network.
+%@ index o ordered=0 cyclic=0 :: Source node for each train.
+%@ index a ordered=0 cyclic=0 :: Arrival time of train.
+%@ index d ordered=0 cyclic=0 :: Departure time of train.
+%@ index pre ordered=0 cyclic=0 :: Pre-assignment time.
+%@ index P ordered=0 cyclic=0 :: Set of service tasks.
+%@ index N ordered=0 cyclic=0 :: Set of nodes (track circuits).
+%@ index T ordered=0 cyclic=0 :: Set of time periods.
+%@ index B ordered=0 cyclic=0 :: Set of critical switches.
+%@ var R shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Resource usage violation for relaxed constraints.
+%@ var Z shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective function value.
+%@ param other shape=- kind=scalar domain=continuous :: Other cost term in the modified arc-cost expression.
+%@ index k ordered=0 cyclic=0 :: Iteration index.
+%@ param D shape=A kind=vector domain=continuous :: Modified cost coefficient for ADMM on arc u->v.
+%@ param c_bar shape=A,e kind=matrix domain=continuous :: Modified arc cost including Lagrangian penalties.
+%@ param Constant shape=- kind=scalar domain=continuous :: Constant term in linearization.
+%@ var F shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Function in linearization.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow balance at source: each train starts exactly once.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Flow balance at destination: each train ends exactly once.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation at every intermediate vertex for each train.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Each train receives an arrival platforming service immediately after arrival.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each depot-to-station train receives a departure platforming service before departure.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Non-immediately-reversing train may stay on the platform or go to the depot without a second service.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Each required service task is performed exactly once.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each track circuit in N2 per time period.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each track circuit in N1 per time period.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each critical switch per time period.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Arc-usage decision variables are binary.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Rewritten Lagrangian objective in terms of per-train subproblems and dual penalties.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Per-train Lagrangian subproblem objective before modified-cost substitution.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Per-train Lagrangian subproblem objective with modified arc cost.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Modified arc cost definition including aggregated Lagrangian multipliers.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ1 on N2 track circuits.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ2 on N1 track circuits.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ3 on critical switches.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Augmented Lagrangian relaxation objective with quadratic penalty terms.
+%@ con eq_0022 kind=linear domain=- indicator=- :: ADMM train-specific objective with linearized penalty terms.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Definition of modified ADMM cost D1 on shunting arcs.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Definition of modified ADMM cost D2 on dwelling, service and stabling arcs.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linearization auxiliary constraint defining the quadratic penalty term.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization constraint bounding the auxiliary variable F.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Big-M linearization constraint for the quadratic term.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Big-M linearization constraint linking F to arc variables.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Big-M linearization constraint preserving binary behavior.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization constraint relating F to the modified arc cost.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constant-term definition in the linearization.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Auxiliary constraint from the linearization procedure.
+\begin{align}
+  \min\quad & \sum_{e \in E} \sum_{u \rightarrow v \in A^{e}} c_{u \rightarrow v}^{e} \cdot x_{u \rightarrow v}^{e} \tag{eq\_0001} \\
+  & s . t \sum_{v : \bar{o} \rightarrow v \in A} x_{\bar{o} , v}^{e} = 1 , \forall e \in E \tag{eq\_0002} \\
+  & \sum_{u : u \rightarrow \bar{d} \in A} x_{u , \bar{d}}^{e} = 1 , \forall e \in E \tag{eq\_0003} \\
+  & \sum_{u : u \rightarrow v \in A} x_{u , v}^{e} - \sum_{w : v \rightarrow w \in A} x_{v , w}^{e} = 0 , \forall v \in V \backslash \left\{\bar{o} , \bar{d}\right\} , \forall e \in E \tag{eq\_0004} \\
+  & \sum_{u , v \in A^{e} \cap A_{p l a t}^{e} : t_{u} < a_{e} + 5} x_{u , v}^{e} = 1 , \forall e \in E \tag{eq\_0005} \\
+  & \sum_{u , v \in A^{e} \cap A_{p l a t}^{e} : t_{u} > d_{e} - p r e \left(_ d\right)_{e} - t_{e , d p l a t}^{s e r}} x_{u , v}^{e} = 1 , \forall e \in E^{D P} \tag{eq\_0006} \\
+  & \sum_{u , v \in A^{e} \cap A_{p l a t}^{e} : t_{u} > d_{e} - p r e \left(_ d\right)_{e} - t_{e , d p l a t}^{s e r}} x_{u , v}^{e} \leq 1 , \forall e \in E^{N I R} \tag{eq\_0007} \\
+  & \sum_{u \rightarrow v \in A^{e} \cap A_{p}^{o p e}} x_{u , v}^{e} = 1 , \forall e \in E^{D S} , \forall p \in P \tag{eq\_0008} \\
+  & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} \leq 1 , \forall n \in N^{2} \backslash N^{i n t - t r a} , t = 0 , 1 , \hdots , T_{n}^{'} \tag{eq\_0009} \\
+  & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e} \leq 1 , \forall n \in N^{1} \backslash N^{i n t - t r a} , t = 0 , 1 , \hdots , T_{n}^{'} \tag{eq\_0010} \\
+  & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} \leq 1 , \forall b \in B , t = 0 , 1 , \hdots , T_{b}^{'} \tag{eq\_0011} \\
+  & x_{u , v}^{e} \in \left\{0 , 1\right\} \forall u \rightarrow v \in A , e \in E \tag{eq\_0012} \\
+  & R_{\mathit{nt}}^{1} = \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} - 1 , \forall n \in N^{2} \backslash N^{i n t - t r a} , t \in T_{n}^{'} ; \tag{eq\_0014} \\
+  & R_{\mathit{bt}}^{3} = \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} - 1 , \forall b \in B , t \in T_{b}^{'} \tag{eq\_0015} \\
+  & Z_{L R} = \sum_{e \in E} \left[Z_{L R}^{e}\right] - \sum_{n} \left[\mathit{lambda}_{n}\right] \tag{eq\_0016} \\
+  & Z_{L R}^{e} = \sum_{u \rightarrow v \in A^{e}} c_{u , v}^{e} \cdot x_{u , v}^{e} + \sum_{n \in N^{2} \backslash N^{i n t - t r a}} \sum_{t \in T_{n}^{'}} \mathit{lambda}_{\mathit{nt}}^{1} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{n \in N^{1} \backslash N^{i n t - t r a}} \sum_{t \in T_{n}^{'}} \mathit{lambda}_{\mathit{nt}}^{2} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e} + \sum_{b \in B} \sum_{t \in T_{b}^{'}} \mathit{lambda}_{\mathit{bt}}^{3} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} \tag{eq\_0017} \\
+  & Z_{L R}^{e} = \sum_{u \rightarrow v \in A^{e}} \left({c}\right)_{u , v}^{e} x_{u , v}^{e} \tag{eq\_0018} \\
+  & \left({c}\right)_{u , v}^{e} = \left\{\begin{matrix} c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}} \mathit{lambda}_{\mathit{nt}}^{2} + \sum_{b , t : u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}} \mathit{lambda}_{\mathit{bt}}^{3} \forall u \rightarrow v \in A^{s h u} \\ c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} \forall u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o} \\ c_{u , v}^{e} \cdot \mathit{other} \end{matrix}\right \tag{eq\_0019} \\
+  & \mathit{lambda}_{\mathit{nt}}^{1 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{nt}}^{1 , k} + \mathit{beta}_{1}^{k} \cdot R_{\mathit{nt}}^{1} / \left(k + 1\right)\right\} \tag{eq\_0020} \\
+  & \mathit{lambda}_{\mathit{nt}}^{2 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{nt}}^{2 , k} + \mathit{beta}_{2}^{k} \cdot R_{\mathit{nt}}^{2} / \left(k + 1\right)\right\} \tag{eq\_0021} \\
+  & \mathit{lambda}_{\mathit{bt}}^{3 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{bt}}^{3 , k} + \mathit{beta}_{3}^{k} \cdot R_{\mathit{bt}}^{3} / \left(k + 1\right)\right\} \tag{eq\_0022} \\
+  & Z_{A D M M}^{e} = \sum_{e \in E} \sum_{u \rightarrow v \in A^{e}} c_{u \rightarrow v}^{e} \cdot x_{u \rightarrow v}^{e} + \sum_{u \rightarrow v \in A^{s h u}} x_{u \rightarrow v}^{e} \cdot D_{u \rightarrow v}^{1} + \sum_{u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o}} x_{u \rightarrow v}^{e} \cdot D_{u \rightarrow v}^{2} = \sum_{u \rightarrow v \in A} \left(\bar{\bar{c}}\right)_{u \rightarrow v}^{e} x_{u \rightarrow v}^{e} \tag{eq\_0024} \\
+  & D_{u \rightarrow v}^{2} = \underset{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} \left\{\mathit{lambda}_{\mathit{nt}}^{1} + m a x \left[0 , \frac{\mathit{rho}_{1}}{2} \left(2 \left(\sum_{e^{'} \in E \backslash e} \underset{a^{''} \in A_{\mathit{nt}}^{1}}{\sum} x_{a^{''}}^{e^{'}}\right) - 1\right)\right]\right\} \forall u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o} \tag{eq\_0025} \\
+  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left(\sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{it}}^{1}}{\sum} x_{u , v}^{e} - 1 + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}} - 1 + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right)^{2} + \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}} - 1 + s_{\mathit{nt}}^{1}\right)^{2} + 2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}} - 1 + s_{\mathit{nt}}^{1}\right) \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} \tag{eq\_0026} \\
+  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}}\right) + 2 \cdot s_{\mathit{nt}}^{1} - 1\right] + \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}} - 1 + s_{\mathit{nt}}^{1}\right)^{2} \tag{eq\_0027} \\
+  & F \left(s\right) = s^{2} + 2 \cdot s \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}} - 1\right) + \mathit{Constant} . \tag{eq\_0028} \\
+  & F^{ \cdot } \left(s\right) = F \left(s = 0\right) = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}}\right) - 1\right] + \mathit{Constant} \tag{eq\_0029} \\
+  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left\{\begin{matrix} \left(\sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e^{'}}\right) - 1\right] + \mathit{Constant} , \sum_{e^{'} \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e^{'}} \geq 1 , \\ 0 , \sum_{e^{'} \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e^{'}} = 0 \end{matrix}\right \tag{eq\_0030} \\
+  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e^{'}}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0031} \\
+  & \left(R_{\mathit{nt}}^{2} + s_{\mathit{nt}}^{2}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e^{'}}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0032} \\
+  & \left(R_{\mathit{bt}}^{3} + s_{\mathit{bt}}^{3}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{e^{'} \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e^{'}}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0033} \\
+\end{align}

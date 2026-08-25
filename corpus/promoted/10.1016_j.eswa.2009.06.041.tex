@@ -1,0 +1,39 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.eswa.2009.06.041
+%@ meta id=10.1016_j.eswa.2009.06.041 family=lp schema=0.1.0
+%@ name :: A multi-objective PSO for job-shop scheduling problems
+%@ desc :: Mined from A multi-objective PSO for job-shop scheduling problems (Expert Systems with Applications, 2009).
+%@ prov source :: 10.1016/j.eswa.2009.06.041
+%@ prov reference :: A multi-objective PSO for job-shop scheduling problems
+%@ prov author :: D. Y. Sha; Hsing-Hung Lin
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize job-shop scheduling objectives (makespan, total tardiness, etc.)
+%@ index pi ordered=0 cyclic=0 :: Job permutation sequence in job-shop scheduling
+%@ index i ordered=0 cyclic=0 :: Job position index
+%@ index j ordered=0 cyclic=0 :: Machine index
+%@ var C shape=i,j domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of job at position i on machine j
+%@ param t shape=i,j kind=matrix domain=- :: Processing time of job at position i on machine j
+%@ index n ordered=0 cyclic=0 :: Number of jobs
+%@ index m ordered=0 cyclic=0 :: Number of machines
+%@ var Makespan shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Makespan objective function value
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function (e.g., makespan, total tardiness, total idle time)
+%@ var L shape=i domain=continuous role=primary drole=- lo=- hi=- :: Lateness of job i
+%@ param Total shape=- kind=scalar domain=- :: Part of objective function name 'total tardiness'
+%@ param tardiness shape=- kind=scalar domain=- :: Part of objective function name 'total tardiness'
+%@ con eq_0001 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0002 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0003 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0006 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+%@ con eq_0007 kind=linear domain=- indicator=- :: Job-shop scheduling constraint
+\begin{align}
+  & C \left(\mathit{pi}_{1} , 1\right) = t \left(\mathit{pi}_{1} , 1\right) \tag{eq\_0001} \\
+  & C \left(\mathit{pi}_{i} , 1\right) = C \left(\mathit{pi}_{i - 1} , 1\right) + t \left(\mathit{pi}_{i} , 1\right) i = 2 , \ldots , n \tag{eq\_0002} \\
+  & C(\mathit{pi}_1,j) = C(\mathit{pi}_1,j-1) + t(\mathit{pi}_1,j), j=2,\ldots,m \tag{eq\_0003} \\
+  C\quad & \left(\mathit{pi}_{i} , j\right) = max C \left(\mathit{pi}_{i - 1} , j\right) , C \left(\mathit{pi}_{i} , j - 1\right) \left.\right\} + t \left(\mathit{pi}_{i} , j\right) i = 2 , \ldots , n ; \tag{eq\_0004} \\
+  & j = 2, \ldots, m \tag{eq\_0005\_a} \\
+  & \text{Makespan}, f_{C_{max}} = C(\mathit{pi}_n,m) \tag{eq\_0005\_b} \\
+  & \text{Total \cdot tardiness}, f_{\mathit{total} \mathit{tardiness}} = \sum_{i = 1}^{n} max \left[0 , L_{i}\right] \tag{eq\_0006} \\
+  & f_{\text{total idle time}} = \sum_{j=2}^{m} \left( C(\mathit{pi}_1,j-1) + \sum_{i=2}^{n} \max\{ C(\mathit{pi}_i,j-1) - C(\mathit{pi}_{i-1},j), 0 \} \right) \tag{eq\_0007} \\
+\end{align}

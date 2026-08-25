@@ -1,0 +1,97 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2009.03.022
+%@ meta id=10.1016_j.cor.2009.03.022 family=milp schema=0.1.0
+%@ name :: Computing delay resistant railway timetables
+%@ desc :: Mined from Computing delay resistant railway timetables (Computers & Operations Research, 2009).
+%@ prov source :: 10.1016/j.cor.2009.03.022
+%@ prov reference :: Computing delay resistant railway timetables
+%@ prov author :: Christian Liebchen; Michael Schachtebeck; Anita Schöbel; Sebastian Stiller; André Prigge
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize combined passenger delay and missed-transfer penalties.
+%@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in event-activity network.
+%@ param u shape=A kind=vector :: Upper bounds on activity durations.
+%@ param D shape=- kind=scalar :: Directed graph (V,A) representing event-activity network.
+%@ index V ordered=0 cyclic=0 :: Set of events (nodes) in event-activity network.
+%@ param Tk shape=A kind=vector :: Periodic time offset for activity a (T times integer k).
+%@ index Z ordered=0 cyclic=0 :: Set of integers.
+%@ var k shape=A domain=integer role=primary :: Integer variable for periodic activity time offset.
+%@ param IP shape=- kind=scalar :: Integer programming formulation identifier.
+%@ param PESP shape=- kind=scalar :: Periodic Event Scheduling Problem.
+%@ param f shape=- kind=scalar :: Objective function.
+%@ param p shape=- kind=scalar :: Vector of parameters in objective function.
+%@ param w shape=V,A kind=matrix :: Weights for events or activities.
+%@ param T shape=- kind=scalar :: Period time.
+%@ param kT shape=- kind=scalar :: Multiple of period time.
+%@ param t shape=- kind=scalar :: Time variable in first/last occurrence formulas.
+%@ param activity shape=- kind=scalar :: Generic term for an arc in the network.
+%@ param maintained shape=- kind=scalar :: Indicator for transfer activity being maintained.
+%@ param transfer shape=- kind=scalar :: Type of activity for passenger transfers.
+%@ var z shape=A domain=binary role=primary :: Binary variable indicating if a transfer activity is dropped.
+%@ param before shape=- kind=scalar :: Indicator for event ordering.
+%@ var g shape=A domain=binary role=primary :: Binary variable for headway ordering.
+%@ param starts shape=- kind=scalar :: Indicator for event start.
+%@ param Tz shape=A kind=vector :: Weighted penalty for dropped transfer (T times z).
+%@ param d shape=A kind=vector :: Source delay for activity.
+%@ param Mz shape=- kind=big_m :: Big-M constant for transfer constraints.
+%@ param Mg shape=- kind=big_m :: Big-M constant for headway constraints.
+%@ param N shape=- kind=scalar :: Set of natural numbers.
+%@ param C shape=- kind=scalar :: Cost function.
+%@ param ID shape=- kind=scalar :: Identifier for a timetable variant.
+%@ param DEF shape=- kind=scalar :: Default timetable variant.
+%@ param PoR shape=- kind=scalar :: Price of robustness ratio.
+%@ param RoD shape=- kind=scalar :: Robustness of delay ratio.
+%@ con eq_0001 kind=linear :: Feasible differential problem bounds ℓ_a ≤ π_j − π_i ≤ u_a.
+%@ con eq_0002 kind=linear :: Periodic event scheduling constraint with integer offsets.
+%@ con eq_0003 kind=linear :: Upper bound on periodic activity duration.
+%@ con eq_0004 kind=linear :: Lower bound on periodic activity duration.
+%@ con eq_0005 kind=linear :: Nonnegativity of periodic event times.
+%@ con eq_0006 kind=linear :: Periodic event times bounded above by period T.
+%@ con eq_0007 kind=linear :: Integrality of periodic offset variables.
+%@ con eq_0009 kind=linear :: Disposition event times not earlier than scheduled.
+%@ con eq_0010 kind=linear :: Delay propagation along stop, drive and turn activities.
+%@ con eq_0011 kind=big_m :: Transfer maintenance constraint with big-M.
+%@ con eq_0012 kind=big_m :: Headway constraint with big-M ordering variable.
+%@ con eq_0013 kind=ordering :: Headway pair ordering complementarity.
+%@ con eq_0014 kind=linear :: Definition of periodic tension x_a for activities.
+%@ con eq_0016 kind=linear :: Rolling-out relation for first/last occurrence of events.
+%@ con eq_0017_a kind=linear :: Headway ordering alternative A.
+%@ con eq_0017_b kind=linear :: Headway ordering alternative B.
+%@ con eq_0020 kind=linear :: Constraint for expanded non-periodic network.
+%@ con eq_0021 kind=linear :: Constraint linking periodic and rolled-out event times.
+%@ con eq_0023 kind=linear :: Lower/upper bound for rolled-out activities.
+%@ con eq_0024 kind=linear :: Source delay constraint for delay scenario.
+%@ con eq_0025 kind=linear :: Maintained transfer indicator constraint.
+%@ con eq_0026 kind=linear :: Event ordering constraint.
+%@ con eq_0027 kind=linear :: Start-order relation for events.
+%@ con eq_0028 kind=linear :: Light robustness nominal optimality constraint.
+%@ con eq_0030 kind=linear :: Definition of price of robustness ratio PoR.
+%@ con eq_0031 kind=linear :: Definition of robustness of delay ratio RoD.
+\begin{align}
+  & \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} \leq u_{a} \forall a = \left(i , j\right) \in A . \tag{eq\_0001} \\
+  & \mathit{pi}_{j} \in \left[\mathit{pi}_{i} + \mathit{ell}_{a} , \mathit{pi}_{i} + u_{a}\right] . \tag{eq\_0002} \\
+  & A = A_{drive} \cup A_{stop} \cup A_{transfer} \cup A_{turn} \cup A_{head} . \tag{eq\_0003} \\
+  & \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} \leq - \mathit{ell}_{a^{- 1}} . \tag{eq\_0004} \\
+  & \underset{̲}{D} = \left(\underset{̲}{V} , \underset{̲}{A}\right) \tag{eq\_0005} \\
+  & \forall a = \left(i , j\right) \in \underset{̲}{A} \exists k_{a} \in \mathcal{Z} : \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tk}_{a} \leq u_{a} . \tag{eq\_0006} \\
+  & \underset{̲}{A} = \underset{̲}{A}_{drive} \cup \underset{̲}{A}_{stop} \cup \underset{̲}{A}_{transfer} \cup \underset{̲}{A}_{turn} \cup \underset{̲}{A}_{head} . \tag{eq\_0007} \\
+  & \left(PESP - IP - \mathit{pi}\right) min f \left(\mathit{pi} , p\right) = \sum_{a = \left(i , j\right) \in \underset{̲}{A}} {w}_{a} \left(\mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tk}_{a} - \mathit{ell}_{a}\right) \tag{eq\_0009} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tk}_{a} \leq u_{a} for all a = \left(i , j\right) \in \underset{̲}{A} , \tag{eq\_0010} \\
+  & \mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tk}_{a} \geq \mathit{ell}_{a} for all a = \left(i , j\right) \in \underset{̲}{A} , \tag{eq\_0011} \\
+  & \mathit{pi}_{i} \geq 0 for all i \in \underset{̲}{V} , \tag{eq\_0012} \\
+  & \mathit{pi}_{i} < T for all i \in \underset{̲}{V} , \tag{eq\_0013} \\
+  & k_{a} \in \mathcal{Z} for all a \in \underset{̲}{A} . \tag{eq\_0014} \\
+  & u_{a} - \mathit{ell}_{a} < T . \tag{eq\_0016} \\
+  & \mathit{pi}_{first} \left(i\right) = min \left\{\mathit{pi}_{i} + \mathit{kT} : \mathit{pi}_{i} + \mathit{kT} \geq t_{min} , k \in \mathcal{Z}\right\} \tag{eq\_0017\_a} \\
+  & \mathit{pi}_{last} \left(i\right) = max \left\{\mathit{pi}_{i} + \mathit{kT} : \mathit{pi}_{i} + \mathit{kT} \leq t_{max} , k \in \mathcal{Z}\right\} \tag{eq\_0017\_b} \\
+  & z_{a} = \left\{\begin{matrix} 0 & if transfer activity a is maintained , \\ 1 & otherwise \end{matrix}\right \tag{eq\_0020} \\
+  & g_{a} = \left\{\begin{matrix} 0 & if i starts \cdot before j , \\ 1 & otherwise . \end{matrix}\right \tag{eq\_0021} \\
+  \min\quad & f \left({\mathit{pi}} , z\right) = \sum_{i \in V} w_{i} \left({\mathit{pi}}_{i} - \mathit{pi}_{i}\right) + \sum_{a \in A_{transfer}} w_{a} \cdot \mathit{Tz}_{a} \tag{eq\_0022} \\
+  & {\mathit{pi}}_{i} \geq \mathit{pi}_{i} for all i \in V , \tag{eq\_0023} \\
+  & {\mathit{pi}}_{j} - {\mathit{pi}}_{i} \geq \mathit{ell}_{a} + d_{a} for all a = \left(i , j\right) \in A_{stop} \cup A_{drive} \cup A_{turn} , \tag{eq\_0024} \\
+  & \mathit{Mz}_{a} + {\mathit{pi}}_{j} - {\mathit{pi}}_{i} \geq \mathit{ell}_{a} for all a = \left(i , j\right) \in A_{transfer} , \tag{eq\_0025} \\
+  & \mathit{Mg}_{a} + {\mathit{pi}}_{j} - {\mathit{pi}}_{i} \geq \mathit{ell}_{a} for all a = \left(i , j\right) \in A_{head} , \tag{eq\_0026} \\
+  & g_{a} + g_{a^{- 1}} = 1 for all a , a^{- 1} \in A_{head} , \tag{eq\_0027} \\
+  & {\mathit{pi}}_{i} \in \mathcal{N} for all i \in V , z_{a} \in \left\{0 , 1\right\} for all a \in A_{transfer} , g_{a} \in \left\{0 , 1\right\} for all a \in A_{head} . \tag{eq\_0028} \\
+  & PoR \left(ID\right) := C_{DEF} \left(ID\right) / C_{DEF} \left(DEF\right) , \tag{eq\_0030} \\
+  & RoD \left(ID\right) = C_{ID}^{'} \left(DEF\right) / C_{ID}^{'} \left(ID\right) . \tag{eq\_0031} \\
+\end{align}

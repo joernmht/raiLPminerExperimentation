@@ -1,0 +1,75 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2020.09.010
+%@ meta id=10.1016_j.trb.2020.09.010 family=milp schema=0.1.0
+%@ name :: Optimization of demand-oriented train timetables under overtaking operations: A surrogate-dual-variable column generation for eliminating indivisibility
+%@ desc :: Mined from Optimization of demand-oriented train timetables under overtaking operations: A surrogate-dual-variable column generation for eliminating indivisibility (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2020.09.010
+%@ prov reference :: Optimization of demand-oriented train timetables under overtaking operations: A surrogate-dual-variable column generation for eliminating indivisibility
+%@ prov author :: Xiaopeng Tian; Huimin Niu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of selected paths
+%@ param e shape=- kind=vector domain=continuous :: Cost coefficients for deviation, dwell, and stop penalties
+%@ param c shape=I kind=vector domain=continuous :: Fixed cost of train i
+%@ param b shape=K,P,S,S kind=matrix domain=binary :: 1 if path p departs in period k and stops at both s and s'
+%@ index d ordered=0 cyclic=0 :: Destination station of train i
+%@ param t shape=V kind=vector domain=continuous :: Time of vertex v
+%@ param w shape=P,S kind=matrix domain=continuous :: Dwell time of path p at station s
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index o ordered=0 cyclic=0 :: Origin station of train i
+%@ var x shape=P,I domain=binary role=primary drole=- lo=0 hi=1 :: 1 if path p is selected for train i
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index P ordered=0 cyclic=0 :: Set of paths for train i
+%@ index V ordered=0 cyclic=0 :: Set of space-time vertices
+%@ index K ordered=0 cyclic=0 :: Set of time periods
+%@ param q shape=K,S,S kind=matrix domain=non_negative :: Passenger demand from s to s' in period k
+%@ var y shape=K,I,S,S domain=non_negative role=primary drole=- lo=0 hi=- :: Passengers from s to s' served by train i in period k
+%@ index m ordered=0 cyclic=0 :: Terminal station
+%@ param Cap shape=I kind=vector domain=non_negative :: Capacity of train i
+%@ param R shape=P,I kind=matrix domain=continuous :: Reduced cost of path p for train i
+%@ param b_bar shape=K,P,S kind=matrix domain=binary :: 1 if path p departs from station s in period k and stops at s
+%@ index P_bar ordered=0 cyclic=0 :: Set of paths for train i in restricted master problem
+%@ var Z shape=S,V domain=continuous role=auxiliary drole=- lo=- hi=- :: Value function for vertex v at station s in dynamic programming
+%@ var f shape=I,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: 1 if train i stops at station s
+%@ param r shape=I,S kind=matrix domain=continuous :: Running time of train i on segment s
+%@ con eq_0001 kind=linear domain=- indicator=- :: Path cost definition for train i
+%@ con eq_0003 kind=linear domain=- indicator=- :: Each train selects exactly one path
+%@ con eq_0004 kind=headway domain=- indicator=- :: Safety headway between train departures at stations
+%@ con eq_0005 kind=linear domain=- indicator=- :: Demand loading upper bound for qualified trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: Passenger demand assignment ensuring full service
+%@ con eq_0007 kind=capacity domain=- indicator=- :: Train capacity limits passenger loads
+%@ con eq_0008 kind=linear domain=- indicator=- :: Reduced cost expression for path p
+%@ con eq_0009 kind=linear domain=- indicator=- :: Surrogate origin demand loading constraint
+%@ con eq_0010 kind=linear domain=- indicator=- :: Surrogate destination demand loading constraint
+%@ con eq_0011 kind=linear domain=- indicator=- :: Modified surrogate origin constraint in restricted master
+%@ con eq_0012 kind=linear domain=- indicator=- :: Modified surrogate destination constraint in restricted master
+%@ con eq_0013 kind=linear domain=- indicator=- :: Reduced cost with single-station surrogate dual variables
+%@ con eq_0015 kind=linear domain=- indicator=- :: Reduced cost decomposed for dynamic programming
+%@ con eq_0016 kind=linear domain=- indicator=- :: DP value function at origin station
+%@ con eq_0017 kind=linear domain=- indicator=- :: DP value function at intermediate station
+%@ con eq_0018 kind=linear domain=- indicator=- :: DP value function at terminal station
+%@ con eq_0019 kind=headway domain=- indicator=- :: Aggregated headway inequality for stable set
+%@ con eq_0020 kind=linear domain=- indicator=- :: Additional valid inequality
+%@ con eq_0022 kind=linear domain=- indicator=- :: Additional valid inequality
+\begin{align}
+  & c_{i , p} = e_{1} \cdot \left|t \left(p^{-}\right) - d_{i}^{\text{ideal}}\right| + e_{2} \cdot \sum_{s \in S_{i} \backslash \left\{o \left(i\right) , d \left(i\right)\right\}} w_{p}^{s} + e_{3} \cdot \sum_{s \in S_{i}} \left({b}\right)_{p}^{s} + c_{i} \tag{eq\_0001} \\
+  \min\quad & \sum_{i \in I} \sum_{p \in P_{i}} c_{i , p} \cdot x_{p} \tag{eq\_0002} \\
+  & \sum_{p \in P_{i}} x_{p} = 1 \cdot i \in I \tag{eq\_0003} \\
+  & \sum_{p \in P_{i}^{v}} x_{p} + \underset{v^{'} : 0 \leq \mathit{Delta} \left(v , v^{'}\right) < h_{i , i^{'}}^{s}}{\sum} \underset{p \in P_{i^{'}}^{v^{'}}}{\sum} x_{p} \leq 1 v \in V_{s} , s \in S_{i} \backslash \left\{d \left(i\right)\right\} , i \neq i^{'} , i , i^{'} \in I \tag{eq\_0004} \\
+  & y_{k , i}^{s , s^{'}} \leq q_{k}^{s , s^{'}} \cdot \sum_{p \in P_{i}} b_{k , p}^{s , s^{'}} \cdot x_{p} s^{'} > s , s^{'} , s \in S_{i} , k \in K , i \in I \tag{eq\_0005} \\
+  & \underset{i \in I_{s} \cap I_{s^{'}}}{\sum} y_{k , i}^{s , s^{'}} = q_{k}^{s , s^{'}} s^{'} > s , s \in S \backslash \left\{m\right\} , k \in K \tag{eq\_0006} \\
+  & \sum_{s^{'} \leq s , s^{'} \in S_{i}} \sum_{s < s^{''} , s^{''} \in S_{i}} \sum_{k \in K} y_{k , i}^{s^{'} , s^{''}} \leq \mathit{Cap}_{i} s \in S_{i} \backslash \left\{d \left(i\right)\right\} , i \in I \tag{eq\_0007} \\
+  & R \cdot c_{i , p} = c_{i , p} - \mathit{alpha}_{i} - \underset{v \in V_{p}^{\text{dep}}}{\sum} \mathit{beta}_{i}^{v} + \sum_{k \in K} \sum_{s \in S_{i} \backslash \left\{d \left(i\right)\right\}} \sum_{s^{'} > s , s^{'} \in S_{i}} b_{k , p}^{s , s^{'}} \cdot \mathit{varphi}_{k , i}^{s , s^{'}} \tag{eq\_0008} \\
+  & \sum_{s^{'} > s , s^{'} \in S_{i}} y_{k , i}^{s , s^{'}} \leq \sum_{s^{'} > s , s^{'} \in S_{i}} q_{k}^{s , s^{'}} \cdot \sum_{p \in P_{i}} x_{p} \cdot \left(\bar{b}\right)_{k , p}^{s} s \in S_{i} \backslash \left\{d \left(i\right)\right\} , k \in K , i \in I \tag{eq\_0009} \\
+  & \sum_{k \in K} \sum_{s^{'} < s , s^{'} \in S_{i}} y_{k , i}^{s^{'} , s} \leq \sum_{k \in K} \sum_{s^{'} < s , s^{'} \in S_{i}} q_{k}^{s^{'} , s} \cdot \sum_{p \in P_{i}} x_{p} \cdot \left({b}\right)_{p}^{s} s \in S_{i} \backslash \left\{o \left(i\right)\right\} , i \in I \tag{eq\_0010} \\
+  & \sum_{s^{'} > s , s^{'} \in S_{i}} y_{k , i}^{s , s^{'}} / \sum_{s^{'} > s , s^{'} \in S_{i}} q_{k}^{s , s^{'}} - \sum_{p \in \left(\bar{P}\right)_{i}} x_{p} \cdot \left(\bar{b}\right)_{k , p}^{s} \leq 0 \tag{eq\_0011} \\
+  & \sum_{k \in K} \sum_{s^{'} < s , s^{'} \in S_{i}} y_{k , i}^{s^{'} , s} / \sum_{k \in K} \sum_{s^{'} < s , s^{'} \in S_{i}} q_{k}^{s^{'} , s} - \sum_{p \in \left(\bar{P}\right)_{i}} x_{p} \cdot \left({b}\right)_{p}^{s} \leq 0 \tag{eq\_0012} \\
+  & R \cdot c_{i , p} = c_{i , p} - \mathit{alpha}_{i} - \underset{v \in V_{p}^{\text{dep}}}{\sum} \mathit{beta}_{i}^{v} + \sum_{s \in S_{i}} \left(\right. \sum_{k \in K} \left(\bar{b}\right)_{k , p}^{s} \cdot \mathit{gamma}_{k , i}^{s} + \left({b}\right)_{p}^{s} \cdot \mathit{xi}_{i}^{s} \left.\right) \tag{eq\_0013} \\
+  & R \cdot c_{i , p} = e_{1} \cdot \left|t \left(p^{-}\right) - d_{i}^{\text{ideal}}\right| + e_{2} \cdot \sum_{s \in S_{i} \backslash \left\{o \left(i\right) , d \left(i\right)\right\}} w_{p}^{s} + e_{3} \cdot \sum_{s \in S_{i}} \left({b}\right)_{p}^{s} + c_{i} - \mathit{alpha}_{i} - \underset{v \in V_{p}^{\text{dep}}}{\sum} \mathit{beta}_{i}^{v} + \sum_{s \in S_{i}} \left(\right. \sum_{k \in K} \left(\bar{b}\right)_{k , p}^{s} \cdot \mathit{gamma}_{k , i}^{s} + \left({b}\right)_{p}^{s} \cdot \mathit{xi}_{i}^{s} \left.\right) \tag{eq\_0015} \\
+  & R \cdot c_{i , p} = c_{i} - \mathit{alpha}_{i} + e_{1} \cdot \left|t \left(p^{-}\right) - d_{i}^{\text{ideal}}\right| + e_{2} \cdot \sum_{s \in S_{i} \backslash \left\{o \left(i\right) , d \left(i\right)\right\}} w_{p}^{s} - \underset{v \in V_{p}^{\text{dep}}}{\sum} \mathit{beta}_{i}^{v} + \sum_{s \in S_{i}} \sum_{k \in K} \left(\bar{b}\right)_{k , p}^{s} \left(\right. \mathit{gamma}_{k , i}^{s} + \mathit{xi}_{i}^{s} + e_{3} \left.\right) \tag{eq\_0016} \\
+  & Z \left(o \left(i\right) , v\right) = c_{i} - \mathit{alpha}_{i} + e_{1} \cdot \left|t \left(v\right) - d_{i}^{\text{ideal}}\right| - \mathit{beta}_{i}^{v} + \mathit{gamma}_{h \left(v\right) , i}^{o \left(i\right)} + \mathit{xi}_{i}^{o \left(i\right)} + e_{3} \tag{eq\_0017} \\
+  & Z \left(\right. s + 1 , v^{'} \left.\right) = Z \left(s , v\right) - \mathit{beta}_{i}^{v^{'}} + e_{2} \cdot \left[t \left(v^{'}\right) - t \left(v\right) - r_{i}^{s}\right] + f_{i}^{s + 1} \cdot \left(\mathit{gamma}_{h \left(v^{'}\right) , i}^{s + 1} + \mathit{xi}_{i}^{s + 1} + e_{3}\right) \tag{eq\_0018} \\
+  & Z \left(\right. d \left(i\right) , v^{'} \left.\right) = Z \left(d \left(i\right) - 1 , v\right) + \mathit{gamma}_{h \left(v^{'}\right) , i}^{d \left(i\right)} + \mathit{xi}_{i}^{d \left(i\right)} + e_{3} \tag{eq\_0019} \\
+  & \sum_{v^{'} : 0 \leq \mathit{Delta} \left(v , v^{'}\right) < h_{s}^{max}} \sum_{p \in P_{v ‘}} x_{p} \leq 1 s \in S \backslash \left\{m\right\} , v \in V_{s} \tag{eq\_0020} \\
+  & Z \left(s + 1 , v^{'} , f^{'}\right) = Z \left(s , v , f\right) - \mathit{beta}_{i}^{v} + e_{2} \cdot \left[t \left(v^{'}\right) - t \left(v\right) - r_{i}^{s}\right] + \sum_{s^{'} < s + 1} \left(\mathit{varphi}_{k \left(s^{'}\right) , i}^{s^{'} , s + 1} \cdot f_{k \left(s^{'}\right) , i}^{s^{'}} \cdot f_{k \left(s + 1\right) , i}^{s + 1}\right) + e_{3} \cdot f_{k \left(s + 1\right) , i}^{s + 1} \tag{eq\_0022} \\
+\end{align}

@@ -1,0 +1,96 @@
+% Declaration sidecar for 10.1016_j.trc.2016.05.005
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2016.05.005
+% Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2016.05.005.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize the cycle time of the timetable
+
+% T: classified as variable during review
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Cycle time to be minimized
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities
+
+% unusable as an identifier, rename or drop: π
+% x: classified as variable during review
+%@ var x shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity (i,j)
+
+% y: classified as variable during review
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable equal to z_ij * T
+
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary modulo parameter for activity (i,j)
+
+% l: classified as parameter during review
+%@ param l shape=- kind=matrix domain=- :: Lower bound for running/dwelling activity duration
+
+% u: classified as parameter during review
+%@ param u shape=- kind=matrix domain=- :: Upper bound for running/dwelling activity duration
+
+% h: classified as parameter during review
+%@ param h shape=- kind=matrix domain=- :: Minimum headway for safety activity
+
+% f: classified as parameter during review
+%@ param f shape=- kind=matrix domain=- :: Frequency of line for regularity activity
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar domain=- :: Nonnegative integer relaxation level for regularity
+
+% unusable as an identifier, rename or drop: ε
+% v: classified as variable during review
+%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for non-collision constraint
+
+% w: classified as variable during review
+%@ var w shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for non-collision constraint
+
+% s: classified as variable during review
+%@ var s shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking at dwelling
+
+% q: classified as variable during review
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for relationship constraints
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0006 kind=linear domain=- indicator=- :: Event and activity description constraint: x_ij = π_j - π_i + y_ij
+%@ con eq_0007 kind=linear domain=- indicator=- :: Pass activity duration constraint: x_ij = 0
+%@ con eq_0008 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≤ T_max × z_ij
+%@ con eq_0009 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≤ T
+%@ con eq_0010 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≥ T - T_max × (1 - z_ij)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Linearization constraint: y_ij ≥ 0
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower and upper bounds for running/dwelling activities: l_ij ≤ x_ij ≤ u_ij
+%@ con eq_0013 kind=linear domain=- indicator=- :: Safety headway constraint: h_ij ≤ x_ij ≤ T - h_ij
+%@ con eq_0014 kind=linear domain=- indicator=- :: Regularity constraint: T/f_ij - K/f_ij ≤ x_ij ≤ T/f_ij + K/f_ij
+%@ con eq_0015 kind=linear domain=- indicator=- :: Train sequence constraint: y_ij = 0 for regular* activities
+%@ con eq_0016 kind=linear domain=- indicator=- :: Binary variable bound: z_ij ∈ {0,1}
+%@ con eq_0017 kind=linear domain=- indicator=- :: Cycle time bounds: T_min ≤ T ≤ T_max
+%@ con eq_0018 kind=linear domain=- indicator=- :: Event time bounds: 0 ≤ π_i ≤ T-1
+%@ con eq_0019 kind=linear domain=- indicator=- :: Activity duration bounds: 0 ≤ x_ij ≤ T-1
+%@ con eq_0020 kind=linear domain=- indicator=- :: Alternative PESP formulation: x_ij = π_j - π_i + z_ij × T
+%@ con eq_0022 kind=linear domain=- indicator=- :: Non-collision constraint: z_ij + z_i'j' + z_ii' + z_jj' = 2 × (w_ii'jj' + v_ii'jj')
+%@ con eq_0023 kind=linear domain=- indicator=- :: Lower bound for overtaking dwelling activities: -x_ii' + [(h_ij + h_i'j') - l_ii'^without] × s_ii' ≤ -l_ii'^without
+%@ con eq_0024 kind=linear domain=- indicator=- :: Upper bound for overtaking dwelling activities: x_ii' + (u_ii'^without - u_ii') × s_ii' ≤ u_ii'^without
+%@ con eq_0025 kind=linear domain=- indicator=- :: Relationship constraints between modulo parameters: (z_ij + z_i'j' + z_ii') - 2 × q_ii'jj' - s_ii'jj' = 0
+%@ con eq_0026 kind=linear domain=- indicator=- :: Logical constraint on binary variables: s_ii' = ∑_{(j,j')∈A_pass} s_ii'jj'

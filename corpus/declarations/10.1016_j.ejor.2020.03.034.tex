@@ -1,0 +1,75 @@
+% Declaration sidecar for 10.1016_j.ejor.2020.03.034
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2020.03.034
+% A multi-objective optimization-simulation approach for real time rescheduling in dense railway systems
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2020.03.034.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimizes recovery time, passenger quality of service, and number of proposed rescheduling decisions
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of delayed events
+
+% M: classified as index during review
+%@ index M ordered=0 cyclic=0 :: Set of sufficiently large coefficients
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of events
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of planned times
+
+% m: classified as index during review
+%@ index m ordered=0 cyclic=0 :: Set of tolerance margins
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Set of rescheduled times
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Recovery time
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Time
+
+% time: classified as parameter during review
+%@ param time shape=- kind=scalar domain=- :: Time component in quality of service
+
+% In: classified as parameter during review
+%@ param In shape=- kind=scalar domain=- :: In-vehicle time component
+
+% QS: classified as parameter during review
+%@ param QS shape=- kind=scalar domain=- :: Quality of service
+
+% Waiting: classified as parameter during review
+%@ param Waiting shape=- kind=scalar domain=- :: Waiting time component
+
+% vehicle: classified as parameter during review
+%@ param vehicle shape=- kind=scalar domain=- :: Vehicle time component
+
+% unusable as an identifier, rename or drop: α
+% Bound by a quantifier or big operator, so no declaration of their own: e, passengers
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=big_m domain=- indicator=- :: Defines when an event is delayed based on the tolerance margin and the big-M coefficient
+%@ con eq_0002 kind=linear domain=- indicator=- :: Links recovery time to delayed events so that recovery time equals the latest delayed event time
+%@ con eq_0003 kind=linear domain=- indicator=- :: Computes total passenger quality of service as weighted waiting time plus in-vehicle time

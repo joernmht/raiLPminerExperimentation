@@ -1,0 +1,157 @@
+% Declaration sidecar for 10.1016_j.trc.2020.102925
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2020.102925
+% A schedule-based timetable model for congested transit networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2020.102925.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total running time and passenger cost.
+
+% t: classified as variable during review
+%@ var t shape=n,s domain=non_negative role=primary drole=- lo=- hi=- :: Arrival/departure times at stations.
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Various time parameters (running, headway, dwell, etc.).
+
+% ifb: classified as variable during review
+%@ var ifb shape=n,n,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for departure order.
+
+% b: classified as variable during review
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variables for order, track, line, path.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of platforms.
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index.
+
+% c: classified as variable during review
+%@ var c shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Path costs and extra costs.
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of trains.
+
+% i: classified as parameter during review
+%@ param i shape=- kind=scalar domain=- :: Indicator for wait time.
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Train index.
+
+% unusable as an identifier, rename or drop: Λ
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of lines.
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization.
+
+% Objective: classified as variable during review
+%@ var Objective shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+
+% a: classified as parameter during review
+%@ param a shape=- kind=scalar domain=- :: Coefficient in path cost.
+
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar domain=- :: Origin/destination indicator.
+
+% v: classified as parameter during review
+%@ param v shape=- kind=scalar domain=- :: Variable matrix in matrix form.
+
+% Q: classified as index during review
+%@ index Q ordered=0 cyclic=0 :: Set of paths.
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of OD pairs.
+
+% unusable as an identifier, rename or drop: ξ
+% A: classified as variable during review
+%@ var A shape=Q domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on path q.
+
+% unusable as an identifier, rename or drop: Π
+% D: classified as parameter during review
+%@ param D shape=R kind=vector domain=- :: Total passenger demand for OD pair r.
+
+% unusable as an identifier, rename or drop: λ
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function of LPPA.
+
+% Bound by a quantifier or big operator, so no declaration of their own: l, p, q, r
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time between consecutive stations.
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Operating time-window: departure from origin not before the line departure time.
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Operating time-window: arrival at destination not after the line arrival time.
+%@ con eq_0006 kind=headway domain=- indicator=- :: Safety headway between arrivals at a station.
+%@ con eq_0007 kind=headway domain=- indicator=- :: Safety headway between departures from a station.
+%@ con eq_0008 kind=ordering domain=- indicator=- :: Arrival-order binary variables sum to one for each train pair at a station.
+%@ con eq_0009 kind=ordering domain=- indicator=- :: Departure-order binary variables sum to one for each train pair at a station.
+%@ con eq_0010 kind=headway domain=- indicator=- :: Headway separation between trains using the same platform at a station.
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Each train allocated exactly one platform at each station.
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Overtaking restriction: no overtaking between stations.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Station dwell time between minimum and maximum values.
+%@ con eq_0014 kind=headway domain=- indicator=- :: Minimum departure headway between trains on the same line.
+%@ con eq_0015 kind=ordering domain=- indicator=- :: Line-order binary variables sum to one for each train pair on a line.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Path cost component: total in-vehicle travel time.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Path cost component: total waiting time.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Path cost component: initial waiting time before preferred departure.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Path cost component: walking time for transfers/access/egress.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transfer walking time between platforms.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Path feasibility: non-negative waiting times on path segments.
+%@ con eq_0024 kind=big_m domain=- indicator=- :: Big-M linearization of logical headway and order constraints.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Matrix form: equality linking variable and constant matrices.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Matrix form: linear inequality in the variable matrix.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Matrix form: non-negativity of the variable matrix.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Line set of timetabling model equals all lines.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Decomposition: fix variables of previously scheduled lines.
+%@ con eq_0033 kind=flow_balance domain=- indicator=- :: User equilibrium condition for passenger assignment.
+%@ con eq_0034 kind=flow_balance domain=- indicator=- :: User equilibrium: used paths have equal and minimal cost.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Extra path cost equals sum of train-segment extra costs.
+%@ con eq_0039 kind=capacity domain=- indicator=- :: Vehicle capacity constraint on each train segment.
+%@ con eq_0041 kind=linear domain=- indicator=- :: LPPA objective: minimize total uncongested passenger cost.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Non-negativity of passenger path flows.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Optimality condition (stationarity) for the passenger assignment model.
+%@ con eq_0050_a kind=linear domain=- indicator=- :: Complementary slackness for used paths (part a).
+%@ con eq_0050_b kind=linear domain=- indicator=- :: Complementary slackness for unused paths (part b).
+%@ con eq_0050_c kind=linear domain=- indicator=- :: Equilibrium cost relation (part c).
+%@ con eq_0051_a kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part a).
+%@ con eq_0051_b kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part b).
+%@ con eq_0051_c kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part c).
+%@ con eq_0052_a kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part a).
+%@ con eq_0052_b kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part b).
+%@ con eq_0052_c kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part c).
+%@ con eq_0053 kind=linear domain=- indicator=- :: Strong duality / zero optimality gap for LPPA.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Dual objective value equals primal objective value.
+%@ con eq_0055_a kind=linear domain=- indicator=- :: Path-choice optimality condition (part a).
+%@ con eq_0055_b kind=linear domain=- indicator=- :: Path-choice optimality condition (part b).
+%@ con eq_0055_c kind=linear domain=- indicator=- :: Path-choice optimality condition (part c).
+%@ con eq_0056_a kind=linear domain=- indicator=- :: Capacity-related complementarity (part a).
+%@ con eq_0056_b kind=linear domain=- indicator=- :: Capacity-related complementarity (part b).
+%@ con eq_0056_c kind=linear domain=- indicator=- :: Capacity-related complementarity (part c).
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Flow-conservation complementarity (part a).
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Flow-conservation complementarity (part b).
+%@ con eq_0057_c kind=linear domain=- indicator=- :: Flow-conservation complementarity (part c).
+%@ con eq_0058_a kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part a).
+%@ con eq_0058_b kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part b).
+%@ con eq_0058_c kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part c).

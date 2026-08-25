@@ -1,0 +1,87 @@
+% Declaration sidecar for 10.1016_j.dam.2008.03.029
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.dam.2008.03.029
+% A general model for cyclic machine scheduling problems
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.dam.2008.03.029.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: minimize the cycle time alpha
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: occurrence index for operations
+
+% t: classified as variable during review
+%@ var t shape=i,k domain=non_negative role=primary drole=- lo=- hi=- :: starting time of occurrence (i,k)
+
+% H: classified as parameter during review
+%@ param H shape=i,j kind=matrix domain=- :: height (distance) for arc (i,j)
+
+% L: classified as parameter during review
+%@ param L shape=i,j kind=matrix domain=- :: start-start delay for arc (i,j)
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: generic operation index
+
+% j: classified as index during review
+%@ index j ordered=0 cyclic=0 :: generic operation index
+
+% p: classified as parameter during review
+%@ param p shape=i kind=vector domain=- :: processing time of operation i
+
+% E: classified as parameter during review
+%@ param E shape=- kind=scalar domain=- :: set of arcs in graph G
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: set of integers
+
+% b: classified as parameter during review
+%@ param b shape=i kind=vector domain=- :: successor or self for blocking/non-blocking
+
+% l: classified as index during review
+%@ index l ordered=0 cyclic=0 :: occurrence index for operations
+
+% unusable as an identifier, rename or drop: α
+%@ var alpha shape=- domain=non_negative role=primary drole=- lo=- hi=- :: cycle time
+
+% M: classified as parameter during review
+%@ param M shape=i kind=vector domain=- :: machine assigned to operation i
+
+% K: classified as variable during review
+%@ var K shape=i,j domain=binary role=primary drole=- lo=- hi=- :: binary variable for order of operations on same machine
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: set of generic operations
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: periodicity: t(i;k+1) >= t(i;k) + p_i
+%@ con eq_0004 kind=linear domain=- indicator=- :: uniform precedence: t(i;k)+L_ij <= t(j;k+H_ij)
+%@ con eq_0005 kind=linear domain=- indicator=- :: disjunctive resource: operations on same machine do not overlap
+%@ con eq_0008 kind=linear domain=- indicator=- :: blocking: next occurrence starts after successor starts
+%@ con eq_0010 kind=linear domain=- indicator=- :: machine order: t_{i'} - t_{b(i)} >= p^b_i - alpha K_{b(i)i'}
+%@ con eq_0012 kind=linear domain=- indicator=- :: machine order complementarity: K_b(i)i' + K_b(i')i = 1
+%@ con eq_0014 kind=linear domain=- indicator=- :: integrality of machine order variables K
+%@ con eq_0015 kind=linear domain=- indicator=- :: uniform precedence (GBCSP): t_i + L_ij - alpha H_ij <= t_j
+%@ con eq_0016 kind=linear domain=- indicator=- :: periodicity (GBCSP): alpha >= p_i
+%@ con eq_0018 kind=linear domain=- indicator=- :: uniform precedence (MILP): t_{i'} - t_i >= p_i - alpha H_ii'
+%@ con eq_0020 kind=linear domain=- indicator=- :: loop constraint: t_i + p_i <= t_i + alpha
+%@ index ip shape=- domain=- role=index drole=- lo=- hi=-
+%@ param pb shape=- domain=- role=parameter drole=- lo=- hi=-

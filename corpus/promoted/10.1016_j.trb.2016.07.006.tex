@@ -1,0 +1,75 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2016.07.006
+%@ meta id=10.1016_j.trb.2016.07.006 family=milp schema=0.1.0
+%@ name :: Modeling the first train timetabling problem with minimal missed trains and synchronization time differences in subway networks
+%@ desc :: Mined from Modeling the first train timetabling problem with minimal missed trains and synchronization time differences in subway networks (Transportation Research Part B Methodological, 2016).
+%@ prov source :: 10.1016/j.trb.2016.07.006
+%@ prov reference :: Modeling the first train timetabling problem with minimal missed trains and synchronization time differences in subway networks
+%@ prov author :: Liujiang Kang; Xiaoning Zhu; Huijun Sun; Jakob Puchinger; Mario Ruthmair; Bin Hu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total transfer waiting time (or equivalently the number of missed trains)
+%@ var t shape=L domain=non_negative role=primary drole=- lo=- hi=- :: Departure time from vehicle depot for line l
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total transfer waiting time objective
+%@ param H shape=L kind=vector domain=- :: Headway of line l
+%@ var n shape=S,L,L domain=integer role=primary drole=- lo=- hi=- :: Number of missed trains for transfer from line l to l' at station s
+%@ param ceil shape=- kind=scalar domain=- :: Ceiling function
+%@ param v shape=S,L,L kind=vector domain=- :: Number of transfer passengers from line l to l' at station s
+%@ param C shape=- kind=scalar domain=- :: Constant term in objective transformation
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param M shape=- kind=scalar domain=- :: Model identifier
+%@ con eq_0001 kind=linear domain=- indicator=- :: Definition of first train to first connecting train (FFCT) at a transfer station
+%@ con eq_0002 kind=linear domain=- indicator=- :: Definition of transfer waiting time (TWT) for a transfer direction
+%@ con eq_0003 kind=linear domain=- indicator=- :: Piecewise definition of the number of missed trains n for a transfer
+%@ con eq_0004 kind=linear domain=- indicator=- :: Relationship between TWT and FFCT
+%@ con eq_0005 kind=linear domain=- indicator=- :: Inequality bounding the sum of TWTs for the two opposite transfer directions
+%@ con eq_0008 kind=linear domain=- indicator=- :: Expanded expression for the weighted sum of TWTs of opposite directions
+%@ con eq_0009 kind=linear domain=- indicator=- :: Total TWT expressed as a constant plus weighted missed trains and arrival time differences
+%@ con eq_0010 kind=linear domain=- indicator=- :: First train arrival time at station s on line l
+%@ con eq_0011 kind=linear domain=- indicator=- :: First train departure time from station s on line l
+%@ con eq_0012 kind=linear domain=- indicator=- :: Bounds on the first train departure time from the vehicle depot
+%@ con eq_0013 kind=linear domain=- indicator=- :: Dwell time at a station restricted to intermediate or transfer station dwell time
+%@ con eq_0014_b kind=linear domain=- indicator=- :: TWT definition for transfer from line l to line l' in model M1
+%@ con eq_0014_c kind=linear domain=- indicator=- :: Departure time from station s for line l in model M1
+%@ con eq_0014_d kind=linear domain=- indicator=- :: Departure time from station s for line l' in model M1
+%@ con eq_0014_e kind=linear domain=- indicator=- :: Arrival time at station s for line l in model M1
+%@ con eq_0014_f kind=linear domain=- indicator=- :: Arrival time at station s for line l' in model M1
+%@ con eq_0014_g kind=linear domain=- indicator=- :: Piecewise definition of missed trains n in model M1
+%@ con eq_0014_h kind=linear domain=- indicator=- :: Dwell time at station must be either intermediate or transfer dwell time in model M1
+%@ con eq_0014_i kind=linear domain=- indicator=- :: Bounds on departure time from depot for line l in model M1
+%@ con eq_0014_j kind=linear domain=- indicator=- :: Bounds on departure time from depot for line l' in model M1
+%@ con eq_0015 kind=linear domain=- indicator=- :: Linear reformulation of the missed trains determination constraint
+%@ con eq_0016 kind=linear domain=- indicator=- :: Non-negativity of transfer waiting time
+%@ con eq_0021_a kind=linear domain=- indicator=- :: First condition for non-negative FFCT in two-way synchronization
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Second condition for non-negative FFCT in two-way synchronization
+%@ con eq_0022 kind=linear domain=- indicator=- :: Inequality relating dwell times and transfer times for two-way synchronization
+\begin{align}
+  & t_{s l l^{'}}^{F F C T} = t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \tag{eq\_0001} \\
+  & t_{s l l^{'}}^{T W T} = t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}} \tag{eq\_0002} \\
+  & n_{s l l^{'}} = \begin{cases} 0 , t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \geq 0 \\ \mathit{ceil} \left(\left|\right. t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \left|\right. / H_{l^{'}}\right) , otherwise \end{cases} \tag{eq\_0003} \\
+  & t_{s l l^{'}}^{T W T} = t_{s l l^{'}}^{F F C T} + n_{s l l^{'}} \cdot H_{l^{'}} \tag{eq\_0004} \\
+  & 0 \leq t_{s l l^{'}}^{T W T} + t_{s l^{'} l}^{T W T} \leq H_{l^{'}} \tag{eq\_0005} \\
+  & \begin{matrix} & & v_{s l l^{'}} \cdot t_{s l l^{'}}^{T W T} + v_{s l^{'} l} \cdot t_{s l^{'} l}^{T W T} \\ & & = v_{s l l^{'}} \cdot \left(t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}}\right) + v_{s l^{'} l} \cdot \left(t_{s l}^{D} - t_{s l^{'}}^{A} - T_{s l^{'} l}^{T r a} + n_{s l^{'} l} \cdot H_{l}\right) \\ & & = v_{s l l^{'}} \cdot \left(t_{s l^{'}}^{A} + T_{l^{'} s}^{D w} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}}\right) + v_{s l^{'} l} \cdot \left(t_{s l}^{A} + T_{l s}^{D w} - t_{s l^{'}}^{A} - T_{s l^{'} l}^{T r a} + n_{s l^{'} l} \cdot H_{l}\right) \\ & & = v_{s l l^{'}} \cdot n_{s l l^{'}} \cdot H_{l^{'}} + v_{s l^{'} l} \cdot n_{s l^{'} l} \cdot H_{l} + \left(v_{s l l^{'}} - v_{s l^{'} l}\right) \cdot \left(t_{s l^{'}}^{A} - t_{s l}^{A}\right) + v_{s l l^{'}} \cdot T_{l^{'} s}^{D w} + v_{s l^{'} l} \cdot T_{l s}^{D w} - v_{s l l^{'}} \cdot T_{s l l^{'}}^{T r a} - v_{s l^{'} l} \cdot T_{s l^{'} l}^{T r a} \\ & & = v_{s l l^{'}} \cdot n_{s l l^{'}} \cdot H_{l^{'}} + v_{s l^{'} l} \cdot n_{s l^{'} l} \cdot H_{l} + \left(v_{s l l^{'}} - v_{s l^{'} l}\right) \cdot \left(t_{s l^{'}}^{A} - t_{s l}^{A}\right) + C ,\end{matrix} \tag{eq\_0008} \\
+  & \begin{matrix} & & \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} v_{s l l^{'}} \cdot t_{s l l^{'}}^{T W T} \\ & & = \frac{1}{2} \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left(v_{s l l^{'}} \cdot t_{s l l^{'}}^{T W T} + v_{s l^{'} l} \cdot t_{s l^{'} l}^{T W T}\right) \\ & & = \frac{1}{2} \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left\{v_{s l l^{'}} \cdot n_{s l l^{'}} \cdot H_{l^{'}} + v_{s l^{'} l} \cdot n_{s l^{'} l} \cdot H_{l} + \left(v_{s l l^{'}} - v_{s l^{'} l}\right) \cdot \left(t_{s l^{'}}^{A} - t_{s l}^{A}\right) + C\right\} \\ & & = \frac{1}{2} \left\{\sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} C + \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left(v_{s l l^{'}} \cdot n_{s l l^{'}} \cdot H_{l^{'}} + v_{s l^{'} l} \cdot n_{s l^{'} l} \cdot H_{l}\right) + \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left(v_{s l l^{'}} - v_{s l^{'} l}\right) \cdot \left(t_{s l^{'}}^{A} - t_{s l}^{A}\right)\right\} \\ & & = \mathit{Delta} + \frac{1}{2} \left\{\sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left(v_{s l l^{'}} \cdot n_{s l l^{'}} \cdot H_{l^{'}} + v_{s l^{'} l} \cdot n_{s l^{'} l} \cdot H_{l}\right) + \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} \left(v_{s l l^{'}} - v_{s l^{'} l}\right) \cdot \left(t_{s l^{'}}^{A} - t_{s l}^{A}\right)\right\} ,\end{matrix} \tag{eq\_0009} \\
+  & t_{s l}^{A} = t_{l} + \sum_{k = 1}^{s} T_{l k}^{R} + \sum_{k = 1}^{s - 1} T_{l k}^{D w} \tag{eq\_0010} \\
+  & t_{s l}^{D} = t_{s l}^{A} + T_{l s}^{D w} = t_{l} + \sum_{k = 1}^{s} T_{l k}^{R} + \sum_{k = 1}^{s} T_{l k}^{D w} \tag{eq\_0011} \\
+  & T_{l}^{min} \leq t_{l} \leq T_{l}^{max} \tag{eq\_0012} \\
+  & T_{l s}^{D w} \in \left\{T_{int}^{D w} , T_{tra}^{D w}\right\} \tag{eq\_0013} \\
+  M\quad & 1 : T = min \sum_{s \in S \left(l\right) \cap S \left(l^{'}\right)} \sum_{l \in L} \sum_{l^{'} \in L} v_{s l l^{'}} \cdot t_{s l l^{'}}^{T W T} \tag{eq\_0014\_a} \\
+  & t_{s l l^{'}}^{T W T} = t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}} , \forall l \in L , l^{'} \in L , \forall s \in S \left(l\right) , s \in S \left(l^{'}\right) \tag{eq\_0014\_b} \\
+  & t_{s l}^{D} = t_{l} + \sum_{k = 1}^{s} T_{l k}^{R} + \sum_{k = 1}^{s} T_{l k}^{D w} , \forall l \in L , \forall s \in S \left(l\right) \tag{eq\_0014\_c} \\
+  & t_{s l^{'}}^{D} = t_{l^{'}} + \sum_{k = 1}^{s} T_{l^{'} k}^{R} + \sum_{k = 1}^{s} T_{l^{'} k}^{D w} , \forall l^{'} \in L , \forall s \in S \left(l^{'}\right) \tag{eq\_0014\_d} \\
+  & t_{s l}^{A} = t_{l} + \sum_{k = 1}^{s} T_{l k}^{R} + \sum_{k = 1}^{s - 1} T_{l k}^{D w} , \forall l \in L , \forall s \in S \left(l\right) \tag{eq\_0014\_e} \\
+  & t_{s l^{'}}^{A} = t_{l^{'}} + \sum_{k = 1}^{s} T_{l^{'} k}^{R} + \sum_{k = 1}^{s - 1} T_{l^{'} k}^{D w} , \forall l^{'} \in L , \forall s \in S \left(l^{'}\right) \tag{eq\_0014\_f} \\
+  & n_{s l l^{'}} = \begin{cases} 0 , t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} > = 0 \\ \mathit{ceil} \left(\left|\right. t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \left|\right. / H_{l^{'}}\right) , otherwise \end{cases} , \forall l \in L , l^{'} \in L , \forall s \in S \left(l\right) , s \in S \left(l^{'}\right) \tag{eq\_0014\_g} \\
+  & T_{l s}^{D w} , T_{l^{'} s}^{D w} \in \left\{T_{int}^{D w} , T_{tra}^{D w}\right\} , \forall l \in L , l^{'} \in L , \forall s \in S \left(l\right) , s \in S \left(l^{'}\right) \tag{eq\_0014\_h} \\
+  & T_{l}^{min} \leq t_{l} \leq T_{l}^{max} , \forall l \in L \tag{eq\_0014\_i} \\
+  & T_{l^{'}}^{min} \leq t_{l^{'}} \leq T_{l^{'}}^{max} , \forall l^{'} \in L \tag{eq\_0014\_j} \\
+  & n_{s l l^{'}} = \begin{cases} 0 , t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \geq 0 \\ \mathit{ceil} \left(\left|\right. t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} \left|\right. / H_{l^{'}}\right) , otherwise \end{cases} \Rightarrow t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}} \geq 0 \tag{eq\_0015} \\
+  & t_{s l l^{'}}^{T W T} = t_{s l^{'}}^{D} - t_{s l}^{A} - T_{s l l^{'}}^{T r a} + n_{s l l^{'}} \cdot H_{l^{'}} \geq 0 \tag{eq\_0016} \\
+  & t_{A 2 U}^{D} - t_{A 1 U}^{A} - T_{A 1 U 2 U}^{T r a} \geq 0 \tag{eq\_0021\_a} \\
+  & t_{A 1 U}^{D} - t_{A 2 U}^{A} - T_{A 2 U 1 U}^{T r a} \geq 0 \tag{eq\_0021\_b} \\
+  & T_{A 1 U}^{D w} + T_{A 2 U}^{D w} \geq T_{A 2 U 1 U}^{T r a} + T_{A 1 U 2 U}^{T r a} \tag{eq\_0022} \\
+\end{align}

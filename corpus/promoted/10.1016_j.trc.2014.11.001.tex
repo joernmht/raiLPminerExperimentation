@@ -1,0 +1,72 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2014.11.001
+%@ meta id=10.1016_j.trc.2014.11.001 family=milp schema=0.1.0
+%@ name :: Equity-based timetable synchronization optimization in urban subway network
+%@ desc :: Mined from Equity-based timetable synchronization optimization in urban subway network (Transportation Research Part C Emerging Technologies, 2014).
+%@ prov source :: 10.1016/j.trc.2014.11.001
+%@ prov reference :: Equity-based timetable synchronization optimization in urban subway network
+%@ prov author :: Jianjun Wu; Muhan Liu; Huijun Sun; Tongfei Li; Ziyou Gao; David Z.W. Wang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum weighted transfer waiting time over all transfer directions and stations
+%@ param c shape=- kind=scalar domain=- :: Weight coefficient for transfer waiting time
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (max of weighted waiting times)
+%@ var w shape=t,q,tp,qp,j domain=non_negative role=primary drole=- lo=- hi=- :: Transfer waiting time for passengers from train q on line t to train qp on line tp at station j
+%@ var A shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train q on line t at station j
+%@ var D shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Dwelling time of train q on line t at station j
+%@ var L shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train q on line t at station j
+%@ var R shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train q on line t from station j-1 to j
+%@ index j ordered=0 cyclic=0 :: Index for transfer stations
+%@ var h shape=t domain=non_negative role=primary drole=- lo=- hi=- :: Headway of line t
+%@ param h_bar shape=t kind=vector domain=- :: Upper bound of headway for line t
+%@ param r_lower shape=t,q,j kind=matrix domain=- :: Lower bound of running time for train q on line t at station j
+%@ param r_upper shape=t,q,j kind=matrix domain=- :: Upper bound of running time for train q on line t at station j
+%@ index q ordered=0 cyclic=0 :: Index for trains on a line
+%@ index t ordered=0 cyclic=0 :: Index for subway lines
+%@ index tp ordered=0 cyclic=0 :: Index for connecting lines in transfer pair
+%@ index qp ordered=0 cyclic=0 :: Index for connecting trains
+%@ param M shape=- kind=big_m domain=- :: Large positive number for big-M transfer-feasibility constraints
+%@ var alpha shape=t,q,tp,qp,j domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable indicating whether transfer from train q on line t to train qp on line tp at station j is feasible
+%@ param e shape=t,tp,j kind=matrix domain=- :: Transfer time from line t to line tp at station j
+%@ con eq_0002 kind=linear domain=- indicator=- :: Arrival time calculation: A(t,q,j) = L0(t,q) + sum_{k<=j} R(t,q,k) + sum_{k<j} D(t,q,k)
+%@ con eq_0003 kind=linear domain=- indicator=- :: Departure time calculation: L(t,q,j) = A(t,q,j) + D(t,q,j)
+%@ con eq_0004 kind=headway domain=- indicator=- :: Headway bounds: h_lower_t <= h_t <= h_upper_t
+%@ con eq_0005 kind=headway domain=- indicator=- :: Headway definition: h_t = L(t,q,j) - L(t,q-1,j)
+%@ con eq_0006 kind=linear domain=- indicator=- :: First departure time range: 0 <= L0(t) <= h_upper_t
+%@ con eq_0007 kind=linear domain=- indicator=- :: Running time bounds: r_lower(t,q,j) <= R(t,q,j) <= r_upper(t,q,j)
+%@ con eq_0008 kind=linear domain=- indicator=- :: First-station departure recurrence: L0(t,q) = L0(t) + q * h_t
+%@ con eq_0009 kind=big_m domain=- indicator=- :: Transfer-feasibility linking using binary alpha and big M
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Waiting time lower bound with big M and previous transfer indicator
+%@ con eq_0011 kind=linear domain=- indicator=- :: Waiting time bounds: 0 <= w <= h_tp
+%@ con eq_0013_a kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case a)
+%@ con eq_0013_b kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case b)
+%@ con eq_0013_c kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case c)
+%@ con eq_0013_d kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case d)
+%@ con eq_0013_e kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case e)
+%@ con eq_0013_f kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case f)
+%@ con eq_0013_g kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case g)
+%@ con eq_0013_h kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case h)
+%@ con eq_0013_i kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case i)
+%@ con eq_0013_j kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case j)
+\begin{align}
+  f\quad & = min \left(max \left(c_{t^{'} q^{'} j}^{\mathit{tq}} \cdot w_{t^{'} q^{'} j}^{\mathit{tq}}\right)\right) , \tag{eq\_0001} \\
+  & A_{j}^{\mathit{tq}} = L_{0}^{\mathit{tq}} + \sum_{k = 1}^{j} R_{k}^{\mathit{tq}} + \sum_{k = 1}^{j - 1} D_{k}^{\mathit{tq}} , \tag{eq\_0002} \\
+  & L_{j}^{\mathit{tq}} = A_{j}^{\mathit{tq}} + D_{j}^{\mathit{tq}} , \tag{eq\_0003} \\
+  & \underset{̲}{h}_{t} \leq h_{t} \leq \bar{h}_{t} \tag{eq\_0004} \\
+  & h_{t} = L_{j}^{\mathit{tq}} - L_{j}^{t \left(q - 1\right)} \tag{eq\_0005} \\
+  & 0 \leq L_{0}^{t} \leq \bar{h}_{t} \tag{eq\_0006} \\
+  & \underset{̲}{r}_{j}^{\mathit{tq}} \leq R_{j}^{\mathit{tq}} \leq \bar{r}_{j}^{\mathit{tq}} \tag{eq\_0007} \\
+  & L_{0}^{\mathit{tq}} = L_{0}^{t} + q \cdot h_{t} \tag{eq\_0008} \\
+  & M \left(\mathit{alpha}_{t^{'} q^{'} j}^{\mathit{tq}} - 1\right) \leq L_{j}^{t^{'} q^{'}} - \left(A_{j}^{\mathit{tq}} + e_{t^{'} j}^{t}\right) < M \cdot \mathit{alpha}_{t^{'} q^{'} j}^{\mathit{tq}} , \tag{eq\_0009} \\
+  & L_{j}^{t^{'} q^{'}} - \left(A_{j}^{\mathit{tq}} + e_{t^{'} j}^{t}\right) - M \cdot \mathit{alpha}_{t \left(q^{'} - 1\right)}^{\mathit{tq}} \leq w_{t^{'} q^{'} j}^{\mathit{tq}} \tag{eq\_0010} \\
+  & 0 \leq w_{t^{'} q^{'} j}^{\mathit{tq}} \leq h_{t^{'}} \tag{eq\_0011} \\
+  & A_{j}^{\mathit{tq}} = L_{0}^{\mathit{tq}} + \sum_{k = 1}^{j} R_{k}^{\mathit{tq}} + \sum_{k = 1}^{j} D_{k}^{\mathit{tq}} \tag{eq\_0013\_a} \\
+  & L_{0}^{\mathit{tq}} = L_{0}^{t} + q \cdot h_{t} \tag{eq\_0013\_b} \\
+  & L_{j}^{\mathit{tq}} = A_{j}^{\mathit{tq}} + D_{j}^{\mathit{tq}} \tag{eq\_0013\_c} \\
+  & 0 \leq L_{0}^{t} \leq \bar{h}_{t} \tag{eq\_0013\_d} \\
+  & \underset{̲}{h}_{t} \leq L_{j}^{\mathit{tq}} - L_{j}^{t \left(q - 1\right)} \leq \bar{h}_{t} \tag{eq\_0013\_e} \\
+  & \underset{̲}{r}_{j}^{\mathit{tq}} \leq R_{j}^{\mathit{tq}} \leq \bar{r}_{j}^{\mathit{tq}} \tag{eq\_0013\_f} \\
+  & \underset{̲}{h}_{t} \leq h_{t} \leq \bar{h}_{t} \tag{eq\_0013\_g} \\
+  & M \left(\mathit{alpha}_{t^{'} q^{'} j}^{\mathit{tq}} - 1\right) \leq L_{j}^{t^{'} q^{'}} - \left(A_{j}^{\mathit{tq}} + e_{t^{'} j}^{t}\right) < M \cdot \mathit{alpha}_{t^{'} q^{'} j}^{\mathit{tq}} \tag{eq\_0013\_h} \\
+  & L_{j}^{t^{'} q^{'}} - \left(A_{j}^{\mathit{tq}} + e_{t^{'} j}^{t}\right) - M \cdot \mathit{alpha}_{t^{'} \left(q - 1\right)}^{\mathit{tq}} \leq w_{t^{'} q^{'} j}^{\mathit{tq}} \tag{eq\_0013\_i} \\
+  & 0 \leq w_{t^{'} q^{'} j}^{\mathit{tq}} \leq h_{t^{'}} \tag{eq\_0013\_j} \\
+\end{align}

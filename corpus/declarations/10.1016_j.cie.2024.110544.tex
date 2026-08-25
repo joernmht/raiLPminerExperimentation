@@ -1,0 +1,137 @@
+% Declaration sidecar for 10.1016_j.cie.2024.110544
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2024.110544
+% Joint optimization of train platforming and shunting with service scheduling at a railway hub
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2024.110544.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total operating cost of all EMUs over the time-space network.
+
+% c: classified as parameter during review
+%@ param c shape=A,e kind=matrix domain=continuous :: Cost of traversing arc u->v for train e.
+
+% x: classified as variable during review
+%@ var x shape=A,e domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating if train e uses arc u->v.
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of all arcs in the time-space network.
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of trains (EMUs).
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Index for trains.
+
+% s: classified as variable during review
+%@ var s shape=- domain=non_negative role=slack drole=- lo=- hi=- :: Slack variable for relaxed constraints.
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Time index.
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of vertices in the network.
+
+% ō: classified as index during review
+%@ index o ordered=0 cyclic=0 :: Source node for each train.
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Arrival time of train.
+
+% d: classified as index during review
+%@ index d ordered=0 cyclic=0 :: Departure time of train.
+
+% pre: classified as index during review
+%@ index pre ordered=0 cyclic=0 :: Pre-assignment time.
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of service tasks.
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes (track circuits).
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time periods.
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of critical switches.
+
+% R: classified as variable during review
+%@ var R shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Resource usage violation for relaxed constraints.
+
+% Z: classified as variable during review
+%@ var Z shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective function value.
+
+% unusable as an identifier, rename or drop: λ
+% other: classified as parameter during review
+%@ param other shape=- kind=scalar domain=continuous :: Other cost term in the modified arc-cost expression.
+
+% k: classified as index during review
+%@ index k ordered=0 cyclic=0 :: Iteration index.
+
+% unusable as an identifier, rename or drop: β
+% D: classified as parameter during review
+%@ param D shape=A kind=vector domain=continuous :: Modified cost coefficient for ADMM on arc u->v.
+
+% c̄: classified as parameter during review
+%@ param c_bar shape=A,e kind=matrix domain=continuous :: Modified arc cost including Lagrangian penalties.
+
+% unusable as an identifier, rename or drop: ρ
+% Constant: classified as parameter during review
+%@ param Constant shape=- kind=scalar domain=continuous :: Constant term in linearization.
+
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Function in linearization.
+
+% Bound by a quantifier or big operator, so no declaration of their own: b, d̄, n, p, u, v, w
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Flow balance at source: each train starts exactly once.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Flow balance at destination: each train ends exactly once.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation at every intermediate vertex for each train.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Each train receives an arrival platforming service immediately after arrival.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each depot-to-station train receives a departure platforming service before departure.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Non-immediately-reversing train may stay on the platform or go to the depot without a second service.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Each required service task is performed exactly once.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each track circuit in N2 per time period.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each track circuit in N1 per time period.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Clique/capacity constraint: at most one train uses each critical switch per time period.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Arc-usage decision variables are binary.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Rewritten Lagrangian objective in terms of per-train subproblems and dual penalties.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Per-train Lagrangian subproblem objective before modified-cost substitution.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Per-train Lagrangian subproblem objective with modified arc cost.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Modified arc cost definition including aggregated Lagrangian multipliers.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ1 on N2 track circuits.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ2 on N1 track circuits.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Subgradient update for Lagrangian multiplier λ3 on critical switches.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Augmented Lagrangian relaxation objective with quadratic penalty terms.
+%@ con eq_0022 kind=linear domain=- indicator=- :: ADMM train-specific objective with linearized penalty terms.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Definition of modified ADMM cost D1 on shunting arcs.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Definition of modified ADMM cost D2 on dwelling, service and stabling arcs.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Linearization auxiliary constraint defining the quadratic penalty term.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization constraint bounding the auxiliary variable F.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Big-M linearization constraint for the quadratic term.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Big-M linearization constraint linking F to arc variables.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Big-M linearization constraint preserving binary behavior.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Linearization constraint relating F to the modified arc cost.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constant-term definition in the linearization.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Auxiliary constraint from the linearization procedure.

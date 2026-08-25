@@ -1,0 +1,38 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2018.02.016
+%@ meta id=10.1016_j.trc.2018.02.016 family=milp schema=0.1.0
+%@ name :: Equity-oriented skip-stopping schedule optimization in an oversaturated urban rail transit network
+%@ desc :: Mined from Equity-oriented skip-stopping schedule optimization in an oversaturated urban rail transit network (Transportation Research Part C Emerging Technologies, 2018).
+%@ prov source :: 10.1016/j.trc.2018.02.016
+%@ prov reference :: Equity-oriented skip-stopping schedule optimization in an oversaturated urban rail transit network
+%@ prov author :: Pan Shang; Ruimin Li; Zhiyong Liu; Liya Yang; Yuqiang Wang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of passenger flows in the space-time-state network, balancing equity state transition costs and travel/wait costs
+%@ index i ordered=0 cyclic=0 :: Index for stations in the urban rail transit network
+%@ param c shape=E kind=vector :: Cost of arc in the passenger space-time-state network; includes equity state transition cost and transportation/stopping/waiting cost
+%@ index x ordered=0 cyclic=0 :: Index for passenger commodities (individual passengers)
+%@ index A ordered=0 cyclic=0 :: Set of all passenger commodities
+%@ index E ordered=0 cyclic=0 :: Set of arcs in the passenger and train networks
+%@ param T shape=- kind=scalar :: Time horizon of the planning period
+%@ param d shape=- kind=scalar :: Destination station of passenger commodity a
+%@ param dep shape=- kind=scalar :: Departure time of passenger commodity a
+%@ param o shape=- kind=scalar :: Origin station of passenger commodity a
+%@ var y shape=- domain=binary role=primary :: Binary variable equal to 1 if a train traverses arc (i,j,t,s) in the train space-time network
+%@ param arr shape=- kind=scalar :: Arrival time of train commodity q
+%@ param cap shape=i kind=vector :: Capacity of platform at station i (also used as train capacity on arcs)
+%@ index M ordered=0 cyclic=0 :: Set of equity states, representing the number of missed trains experienced by a passenger
+%@ con eq_0006 kind=flow_balance :: Passenger flow balance constraint: each passenger commodity a is routed from origin o(a) at dep(a) to destination d(a) by T, with state transitions m to m'
+%@ con eq_0007 kind=flow_balance :: Train flow balance constraint: each train commodity q is routed from origin o(q) at dep(q) to destination d(q) at arr(q)
+%@ con eq_0008 kind=capacity :: Train capacity constraint: total passenger flow on arc (i,j,t,s) cannot exceed capacity y(i,j,t,s)*cap(i,j,t,s)
+%@ con eq_0009 kind=capacity :: Station capacity constraint: number of passengers waiting at station i cannot exceed platform capacity cap(i)
+%@ con eq_0010 kind=linear :: Binary definition of passenger flow variables x_a on arcs (i,j,t,s,m,m')
+%@ con eq_0011 kind=linear :: Binary definition of train flow variables y on arcs (i,j,t,s)
+\begin{align}
+  \min\quad & \sum_{a \in A} \sum_{\left(i , j , t , s , m , m^{'}\right) \in E^{''}} x^{a} \left(i , j , t , s , m , m^{'}\right) \cdot c \left(i , j , t , s , m , m^{'}\right) \tag{eq\_0005} \\
+  & \sum_{i , t , m : \left(i , j , t , s , m , m^{'}\right) \in E^{''}} x^{a} \left(i , j , t , s , m , m^{'}\right) - \sum_{i , t , m : \left(j , i , t , s , m^{'} , m\right) \in E^{''}} x^{a} \left(j , i , s , t , m^{'} , m\right) = \left\{\begin{matrix} - 1 & j = o \left(a\right) , s = \mathit{dep} \left(a\right) , m^{'} = m_{0} \\ 1 & j = d \left(a\right) , s = T , m^{'} = m_{0} , \\ 0 & \mathit{otherwise} \end{matrix}\right \forall a \tag{eq\_0006} \\
+  & \sum_{i , t : \left(i , j , t , s\right) \in E^{'}} y \left(i , j , t , s\right) - \sum_{i , t : \left(j , i , t , s\right) \in E^{'}} y \left(j , i , s , t\right) = \left\{\begin{matrix} - 1 & j = o \left(q\right) , s = \mathit{dep} \left(q\right) \\ 1 & j = d \left(q\right) , s = \mathit{arr} \left(q\right) , \forall q \\ 0 & \mathit{otherwise} \end{matrix}\right \tag{eq\_0007} \\
+  & \sum_{a \in A} \sum_{m \in M} x^{a} \left(i , j , t , s , m , m\right) \leq y \left(i , j , t , s\right) \cdot \mathit{cap} \left(i , j , t , s\right) \forall \left(i , j , t , s\right) \tag{eq\_0008} \\
+  & \sum_{a \in A} \sum_{m \in M} \sum_{\forall t^{'} \leq t , \forall s^{'} \geq t : \left(i , i , t^{'} , s^{'} , m , m\right) \in E^{''}} x^{a} \left(i , i , t^{'} , s^{'} , m , m\right) \leq \mathit{cap} \left(i\right) \forall \left(i , t\right) \tag{eq\_0009} \\
+  & x^{a} \left(i , j , t , s , m , m^{'}\right) \in \left\{0 , 1\right\} \tag{eq\_0010} \\
+  & y \left(i , j , t , s\right) \in \left\{0 , 1\right\} \tag{eq\_0011} \\
+\end{align}

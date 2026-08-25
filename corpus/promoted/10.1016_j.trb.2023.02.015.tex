@@ -1,0 +1,116 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2023.02.015
+%@ meta id=10.1016_j.trb.2023.02.015 family=lp schema=0.1.0
+%@ name :: Cooperative train control during the power supply shortage in metro system: A multi-agent reinforcement learning approach
+%@ desc :: Mined from Cooperative train control during the power supply shortage in metro system: A multi-agent reinforcement learning approach (Transportation Research Part B Methodological, 2023).
+%@ prov source :: 10.1016/j.trb.2023.02.015
+%@ prov reference :: Cooperative train control during the power supply shortage in metro system: A multi-agent reinforcement learning approach
+%@ prov author :: Xuekai Wang; Andrea D’Ariano; Shuai Su; Tao Tang
+%@ prov date :: 2026-06-21
+%@ obj sense=max name=objective combination=sum :: Maximize maintained line capacity (total running distance) during PSS
+%@ var v shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Speed of train i at time k
+%@ var x shape=I,K domain=continuous role=primary drole=- lo=- hi=- :: Location of train i at time k
+%@ param L shape=- kind=scalar domain=- :: Set of station locations
+%@ param vmax shape=- kind=scalar domain=- :: Maximum speed at location x
+%@ index t ordered=0 cyclic=0 :: Time index
+%@ param m shape=- kind=scalar domain=- :: Train mass
+%@ param q shape=- kind=scalar domain=- :: Resistance experienced by train
+%@ var u shape=I domain=continuous role=primary drole=- lo=- hi=- :: Applied tractive/braking force
+%@ var d shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Running distance in time interval
+%@ param l shape=- kind=scalar domain=- :: Location of station or substation
+%@ index I ordered=0 cyclic=0 :: Set of up-stream trains
+%@ index J ordered=0 cyclic=0 :: Set of down-stream trains
+%@ index N ordered=0 cyclic=0 :: Set of all trains
+%@ param F shape=- kind=scalar domain=- :: Maximum tractive force
+%@ param f shape=- kind=scalar domain=- :: Maximum braking force
+%@ param V shape=- kind=scalar domain=- :: Passenger capacity of a train
+%@ param X shape=- kind=scalar domain=- :: Length of undersupplied area
+%@ param T shape=- kind=scalar domain=- :: PSS duration
+%@ var C shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Line capacity
+%@ param D shape=- kind=scalar domain=- :: Total running distance
+%@ param hbar shape=- kind=scalar domain=- :: Average headway
+%@ index K ordered=0 cyclic=0 :: Set of time steps
+%@ index E ordered=0 cyclic=0 :: Set of stations
+%@ index W ordered=0 cyclic=0 :: Set of cycles
+%@ param h shape=- kind=scalar domain=- :: Headway
+%@ index k ordered=0 cyclic=0 :: Time step index
+%@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Power
+%@ index Y ordered=0 cyclic=0 :: Set of substations
+%@ var n shape=I,K domain=non_negative role=primary drole=- lo=- hi=- :: Time since last station event
+%@ var R shape=- domain=continuous role=primary drole=- lo=- hi=- :: Global reward
+%@ var r shape=I domain=continuous role=primary drole=- lo=- hi=- :: Local reward
+%@ con eq_0001 kind=linear domain=- indicator=- :: Speed limit and station-stop constraint for feasible vertices
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Speed update under partial acceleration and cruising regimes
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Distance update under partial acceleration and cruising regimes
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running distance in a time unit for up/down trains
+%@ con eq_0004 kind=linear domain=- indicator=- :: Applied force profile within a time unit
+%@ con eq_0005 kind=linear domain=- indicator=- :: Tractive/braking force limit constraints
+%@ con eq_0008 kind=linear domain=- indicator=- :: Up-stream line capacity calculation
+%@ con eq_0010 kind=linear domain=- indicator=- :: Objective: line capacity proportional to total running distance
+%@ con eq_0014_a kind=linear domain=- indicator=- :: Inter-station running time bounds for up-stream trains
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Inter-station running time bounds for down-stream trains
+%@ con eq_0015_a kind=linear domain=- indicator=- :: Up-stream return from last station to waiting zone
+%@ con eq_0015_b kind=linear domain=- indicator=- :: Down-stream return from first station to waiting zone
+%@ con eq_0016_a kind=linear domain=- indicator=- :: No-overtaking constraint for up-stream trains
+%@ con eq_0016_b kind=linear domain=- indicator=- :: No-overtaking constraint for down-stream trains
+%@ con eq_0017_a kind=linear domain=- indicator=- :: Maximum train power required in a time unit
+%@ con eq_0017_b kind=linear domain=- indicator=- :: Maximum train power required in a time unit (continued)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Power supplied by an adjacent substation to a train
+%@ con eq_0019 kind=linear domain=- indicator=- :: Substation load as the sum of supplied train powers
+%@ con eq_0020 kind=linear domain=- indicator=- :: Power supply capacity constraint for each substation
+%@ con eq_0021 kind=linear domain=- indicator=- :: Train ordering rule for state representation
+%@ con eq_0023 kind=linear domain=- indicator=- :: Elapsed time since last departure at each station
+%@ con eq_0024 kind=linear domain=- indicator=- :: Speed transition under stochastic running resistance
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Location transition under stochastic running resistance
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Transition of time since last station event
+%@ con eq_0025_c kind=linear domain=- indicator=- :: Transition of elapsed time at station
+%@ con eq_0027 kind=linear domain=- indicator=- :: Up-direction elapsed time transition
+%@ con eq_0029_a kind=linear domain=- indicator=- :: Remaining PSS time transition
+%@ con eq_0029_b kind=linear domain=- indicator=- :: Down-direction elapsed time transition
+%@ con eq_0033 kind=linear domain=- indicator=- :: Contribution of a train to substation overload
+%@ con eq_0034 kind=linear domain=- indicator=- :: Equation (34) from the paper
+%@ con eq_0035 kind=linear domain=- indicator=- :: Equation (35) from the paper
+%@ con eq_0036 kind=linear domain=- indicator=- :: Equation (36) from the paper
+%@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37) from the paper
+%@ con eq_0039 kind=linear domain=- indicator=- :: Equation (39) from the paper
+%@ con eq_0040 kind=linear domain=- indicator=- :: Equation (40) from the paper
+%@ con eq_0041 kind=linear domain=- indicator=- :: Equation (41) from the paper
+\begin{align}
+  & \left\{\begin{matrix} v_{i , k} = 0 , & if x_{i , k} \in \mathcal{L} \\ 0 < v_{i , k} \leq \bar{v} \left(x_{i , k}\right) , & otherwise . \end{matrix}\right \tag{eq\_0001} \\
+  & v_{i , k + 1} = v_{i , k} + \frac{u^{PA} - q \left(v_{i , k} , x_{i , k}\right)}{m} \left(t^{switch} - t_{k}\right) \tag{eq\_0002\_a} \\
+  & d_{i , \left(t_{k} , t_{k + 1}\right)} = v_{i , k} \left(t^{switch} - t_{k}\right) + \frac{u^{PA} - q \left(v_{i , k} , x_{i , k}\right)}{2 \cdot m} \left(t_{0} - t_{k}\right)^{2} + v_{i , k + 1} \left(t_{k + 1} - t_{0}\right) + \frac{u^{CR} - q \left(v_{i , k} , x_{i , k}\right)}{2 \cdot m} \left(t_{k + 1} - t^{switch}\right)^{2} \tag{eq\_0002\_b} \\
+  & d_{i , \left(t_{k} , t_{k + 1}\right)} = \left\{\begin{matrix} x_{i , k + 1} , & if x_{i , k} = l_{E}^{sta} , i \in \mathcal{I} \\ x_{i , k + 1} - x_{i , k} , & if x_{i , k} \neq l_{E}^{sta} , i \in \mathcal{I} \\ l_{E}^{sta} - x_{i , k + 1} , & if x_{i , k} = l_{1}^{sta} , i \in \mathcal{J} \\ x_{i , k} - x_{i , k + 1} , & if x_{i , k} \neq l_{1}^{sta} , i \in \mathcal{J} , \end{matrix}\right \tag{eq\_0003} \\
+  & u_{i} \left(\mathit{tau}\right) = \left\{\begin{matrix} u_{0} , if \mathit{tau} \in \left[t_{k} , t^{switch}\right) \\ 0 , if \mathit{tau} \in \left[t^{switch} , t_{k + 1}\right) \end{matrix}\right \forall i \in \mathcal{N} , \tag{eq\_0004} \\
+  & - f^{max} \left(v_{i} \left(\mathit{tau}\right)\right) \leq u_{i} \left(\mathit{tau}\right) \leq F^{max} \left(v_{i} \left(\mathit{tau}\right)\right) , \forall i \in \mathcal{N} , \mathit{tau} \in \left[t_{k} , t_{k + 1}\right) , \tag{eq\_0005} \\
+  & C^{up} = \frac{3600}{\bar{h^{up}}} V = \frac{3600 \cdot I}{\bar{\mathit{zeta}^{up}}} V = \frac{3600 \cdot I \bar{v^{up}}}{X} V = \frac{3600 \cdot D^{up}}{X \cdot T} V = \frac{3600 \sum_{k \in \mathcal{K} / K} \sum_{i \in \mathcal{I}} d_{i , \left(t_{k} , t_{k + 1}\right)}}{X \cdot T} V , \tag{eq\_0008} \\
+  & C^{dn} = \frac{3600 \sum_{k \in \mathcal{K} / K} \sum_{j \in \mathcal{J}} d_{j , \left(t_{k} , t_{k + 1}\right)}}{X \cdot T} V , \tag{eq\_0010} \\
+  \max\quad & C^{up} + C^{dn} = \frac{3600 \sum_{k \in \mathcal{K} / K} \sum_{i \in \mathcal{N}} d_{i , \left(t_{k} , t_{k + 1}\right)}}{X \cdot T} V , \tag{eq\_0012} \\
+  & t_{i + 1 , l , w}^{dep} - t_{i , l , w}^{dep} \geq h^{min , up} , \forall e \in \mathcal{E} , i \in \mathcal{I} / I , w \in \mathcal{W}^{up} \tag{eq\_0014\_a} \\
+  & t_{j + 1 , l , w}^{dep} - t_{j , l , w}^{dep} \geq h^{min , dn} , \forall e \in \mathcal{E} , j \in \mathcal{J} / J , w \in \mathcal{W}^{dn} \tag{eq\_0014\_b} \\
+  & w_{i , k} = \lceil \frac{x_{i , 1} + \sum_{\mathit{sigma} = 1}^{k - 1} d_{i , \left(t_{\mathit{sigma}} , t_{\mathit{sigma} + 1}\right)}}{X} \rceil , \forall i \in \mathcal{I} , k \in \mathcal{K} \tag{eq\_0015\_a} \\
+  & w_{j , k} = \lceil \frac{X - x_{j , 1} + \sum_{\mathit{sigma} = 1}^{k - 1} d_{j , \left(t_{\mathit{sigma}} , t_{\mathit{sigma} + 1}\right)}}{X} \rceil , \forall j \in \mathcal{J} , k \in \mathcal{K} \tag{eq\_0015\_b} \\
+  & t_{e}^{dwell , min} \leq t_{i , e , w}^{dep} - t_{i , e , w}^{arr} \leq t_{e}^{dwell , max} , \forall e \in \mathcal{E} , i \in \mathcal{I} , w \in \mathcal{W}^{up} \tag{eq\_0016\_a} \\
+  & t_{e}^{dwell , min} \leq t_{j , e , w}^{dep} - t_{j , e , w}^{arr} \leq t_{e}^{dwell , max} , \forall e \in \mathcal{E} , j \in \mathcal{J} , w \in \mathcal{W}^{dn} \tag{eq\_0016\_b} \\
+  & t_{e , e + 1}^{run , min} \leq t_{i , e + 1 , w}^{arr} - t_{i , e , w}^{dep} \leq t_{e , e + 1}^{run , max} , \forall e \in \mathcal{E} / E , i \in \mathcal{I} , w \in \mathcal{W}^{up} \tag{eq\_0017\_a} \\
+  & t_{e , e + 1}^{run , min} \leq t_{j , e , w}^{arr} - t_{j , e + 1 , w}^{dep} \leq t_{e , e + 1}^{run , max} , \forall e \in \mathcal{E} / E , j \in \mathcal{J} , w \in \mathcal{W}^{dn} \tag{eq\_0017\_b} \\
+  & \left\{\begin{matrix} t_{i , 1 , w + 1}^{arr} = t_{i , E , w}^{dep} , \forall i \in \mathcal{I} , w \in \mathcal{W}^{up} / W^{up} \\ t_{j , E , w + 1}^{arr} = t_{j , 1 , w}^{dep} , \forall j \in \mathcal{J} , w \in \mathcal{W}^{dn} / W^{dn} . \end{matrix}\right \tag{eq\_0018} \\
+  & \left\{\begin{matrix} t_{i + 1 , e , w}^{arr} > t_{i , e , w}^{dep} , \forall i \in \mathcal{I} / I , e \in \mathcal{E} / 1 , w \in \mathcal{W}^{up} \\ t_{j + 1 , e , w}^{arr} > t_{j , e , w}^{dep} , \forall j \in \mathcal{J} / J , e \in \mathcal{E} / E , w \in \mathcal{W}^{dn} . \end{matrix}\right \tag{eq\_0019} \\
+  & P_{i , \left(t_{k} , t_{k + 1}\right)}^{tra} = \underset{\mathit{tau} , t_{k} \leq \mathit{tau} \leq t_{k + 1}}{max} \left\{u_{i} \left(\mathit{tau}\right) v_{i} \left(\mathit{tau}\right)\right\} + P^{aux} , \forall i \in \mathcal{N} , k \in \mathcal{K} / K , \tag{eq\_0020} \\
+  & P_{i , y , \left(t_{k} , t_{k + 1}\right)}^{supply} = \left\{\begin{matrix} \frac{1}{2} P_{i , \left(t_{k} , t_{k + 1}\right)}^{tra} , & if l_{y - 1}^{subs} \leq x_{i , k} < l_{y + 1}^{subs} \\ 0 , & otherwise \end{matrix}\right \forall i \in \mathcal{N} , y \in \mathcal{Y} , k \in \mathcal{K} / K , \tag{eq\_0021} \\
+  & P_{y , \left(t_{k} , t_{k + 1}\right)}^{subs} = \sum_{i \in \mathcal{N}} P_{i , y , \left(t_{k} , t_{k + 1}\right)}^{supply} , \forall y \in \mathcal{Y} , k \in \mathcal{K} / K . \tag{eq\_0023} \\
+  & P_{y , \left(t_{k} , t_{k + 1}\right)}^{subs} \leq P^{max} , \forall y \in \mathcal{Y} , k \in \mathcal{K} / K , \tag{eq\_0024} \\
+  & \mathit{phi} \left(i , k\right) \in \mathcal{I} , \mathit{phi} \left(j , k\right) \in \mathcal{J} \tag{eq\_0025\_a} \\
+  & x_{\mathit{phi} \left(i , k\right) , k} < x_{\mathit{phi} \left(j , k\right) , k} , \mathit{phi} \left(i , k\right) , \mathit{phi} \left(j , k\right) \in \mathcal{I} \tag{eq\_0025\_b} \\
+  & x_{\mathit{phi} \left(i , k\right) , k} < x_{\mathit{phi} \left(j , k\right) , k} , \mathit{phi} \left(i , k\right) , \mathit{phi} \left(j , k\right) \in \mathcal{J} \tag{eq\_0025\_c} \\
+  & n_{i , k} = \left\{\begin{matrix} t_{k} - t_{i , e , w_{i , k}}^{arr} , & \text{if} x_{i , k} = l_{e}^{sta} \\ t_{k} - t_{i , e , w_{i , k}}^{dep} , & otherwise \end{matrix}\right \forall i \in \mathcal{I} , k \in \mathcal{K} . \tag{eq\_0027} \\
+  & t_{e , k}^{elapsed,up} = t_{k} - max \{ t_{i , e , w_{i , \mathit{kappa}}}^{dep} \left|\right. i \in I , \mathit{kappa} \in \left[1 , k\right] \} \tag{eq\_0029\_a} \\
+  & t_{e , k}^{elapsed,dn} = t_{k} - max \{ t_{j , e , w_{j , \mathit{kappa}}}^{dep} \left|\right. j \in J , \mathit{kappa} \in \left[1 , k\right] \} \tag{eq\_0029\_b} \\
+  & n_{i , k + 1} = \left\{\begin{matrix} n_{i , k} + \mathit{Delta} t , & if v_{i , k} , v_{i , k + 1} > 0 or v_{i , k} , v_{i , k + 1} = 0 \\ 0 , & otherwise . \end{matrix}\right \tag{eq\_0033} \\
+  & t_{e , k + 1}^{elapsed,up} = \left\{\begin{matrix} \mathit{Delta} t , & if v_{i , k} = 0 , v_{i , k + 1} > 0 , i \in \mathcal{I} \\ t_{e , k}^{elapsed,up} + \mathit{Delta} t , & otherwise . \end{matrix}\right \tag{eq\_0034} \\
+  & t_{e , k + 1}^{elapsed,dn} = \left\{\begin{matrix} \mathit{Delta} t , & if v_{j , k} = 0 , v_{j , k + 1} > 0 , i \in \mathcal{J} \\ t_{e , k}^{elapsed,dn} + \mathit{Delta} t , & otherwise . \end{matrix}\right \tag{eq\_0035} \\
+  & t_{k + 1}^{remain} = t_{k}^{remain} - \mathit{Delta} t . \tag{eq\_0036} \\
+  & R_{k} = \sum_{i \in \mathcal{N}} d_{i , \left(t_{k} , t_{k + 1}\right)} - \left(1 - \mathit{alpha}\right) \left(max \left\{P^{thr} , \mathit{omega} P_{\left(t_{k} , t_{k + 1}\right)}^{overload}\right\}\right) , \tag{eq\_0037} \\
+  & P_{\left(t_{k} , t_{k + 1}\right)}^{overload} = \sum_{y \in \mathcal{Y}} \left(min \left\{0 , P^{max} - P_{y , \left(t_{k} , t_{k + 1}\right)}^{subs}\right\}\right) . \tag{eq\_0039} \\
+  & r_{i , k} = d_{i , \left(t_{k} , t_{k + 1}\right)} - \left(1 - \mathit{alpha}_{i}\right) \left(max \left\{P^{thr,local} , \mathit{omega} P_{\left(i , t_{k} , t_{k + 1}\right)}^{contribution}\right\}\right) , \tag{eq\_0040} \\
+  & P_{\left(i , t_{k} , t_{k + 1}\right)}^{contribution} = \sum_{y \in \mathcal{Y}_{i}} \frac{\left(min \left\{0 , P^{max} - P_{y , \left(t_{k} , t_{k + 1}\right)}^{subs}\right\}\right) P_{i , \left(t_{k} , t_{k + 1}\right)}^{tra}}{2 \cdot \sum_{i \in \mathcal{N}} P_{i , y , \left(t_{k} , t_{k + 1}\right)}^{supply}} , \tag{eq\_0041} \\
+\end{align}

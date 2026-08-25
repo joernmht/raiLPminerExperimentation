@@ -1,0 +1,100 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.sorms.2012.08.002
+%@ meta id=10.1016_j.sorms.2012.08.002 family=milp schema=0.1.0
+%@ name :: A tutorial on fundamental model structures for railway timetable optimization
+%@ desc :: Mined from A tutorial on fundamental model structures for railway timetable optimization (Surveys in Operations Research and Management Science, 2012).
+%@ prov source :: 10.1016/j.sorms.2012.08.002
+%@ prov reference :: A tutorial on fundamental model structures for railway timetable optimization
+%@ prov author :: Steven Harrod
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted delays/cost in the timetable models
+%@ var a shape=R,B domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train r at control point i
+%@ var d shape=R,B domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train r at control point i
+%@ index B ordered=0 cyclic=0 :: Set of control points (stations, sidings, etc.)
+%@ index R ordered=0 cyclic=0 :: Set of trains
+%@ index i ordered=0 cyclic=0 :: Index for control points
+%@ param pt shape=- kind=scalar :: Possibly a typo; not used in formulas
+%@ index r ordered=0 cyclic=0 :: Index for trains
+%@ var F shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train order at control points
+%@ var G shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train order at control points
+%@ var I shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for meet/pass interaction
+%@ param f shape=R,R,B,B kind=matrix :: Additional time for meet/pass between trains
+%@ param s shape=R,B,B kind=matrix :: Minimum travel time between control points
+%@ param M shape=- kind=big_m :: Large constant for big-M constraints
+%@ param c shape=R,B,T kind=matrix :: Cost coefficient for occupancy or hypergraph
+%@ var x shape=R,B,T domain=integer role=primary drole=- lo=- hi=- :: Binary decision variable for occupancy or hypergraph
+%@ index o ordered=0 cyclic=0 :: Origin station of train r
+%@ index m ordered=0 cyclic=0 :: Index for trains in multicommodity flow
+%@ index p ordered=0 cyclic=0 :: Index for path or event
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ param b shape=B,T kind=matrix :: Capacity of track segment at time t
+%@ index Y ordered=0 cyclic=0 :: Set of track segments and time points for headway constraints
+%@ param h shape=R kind=vector :: Headway time for train r
+%@ param mod shape=- kind=scalar :: Modulo operator in periodic constraints
+%@ param w shape=A kind=vector :: Weight for arc in periodic tension formulation
+%@ index A ordered=0 cyclic=0 :: Set of arcs in event graph
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer vector of cycle tensions
+%@ index Z ordered=0 cyclic=0 :: Set of integers (domain for z)
+%@ con eq_0001 kind=linear domain=- indicator=- :: MISLP (1) objective: weighted sum of arrival/departure delays
+%@ con eq_0002 kind=linear domain=- indicator=- :: MISLP (2) chronological constraint: departure cannot precede arrival
+%@ con eq_0004 kind=linear domain=- indicator=- :: MISLP (3) sequencing indicator constraint for meet/pass and order
+%@ con eq_0005 kind=linear domain=- indicator=- :: MISLP (4) minimum travel time constraint between control points
+%@ con eq_0006 kind=linear domain=- indicator=- :: MISLP big-M ordering constraint for F
+%@ con eq_0007 kind=linear domain=- indicator=- :: MISLP big-M ordering constraint for G
+%@ con eq_0008 kind=linear domain=- indicator=- :: MISLP big-M meet/pass constraint for I
+%@ con eq_0009 kind=linear domain=- indicator=- :: MISLP big-M meet/pass constraint for I at the paired control point
+%@ con eq_0010 kind=linear domain=- indicator=- :: MISLP (5) arrival/departure constraints for the selected interaction
+%@ con eq_0011 kind=linear domain=- indicator=- :: MISLP nonnegativity and binary restrictions on event times and indicators
+%@ con eq_0012 kind=linear domain=- indicator=- :: BIOP (6) objective: minimize occupation cost
+%@ con eq_0014 kind=linear domain=- indicator=- :: BIOP (7) single departure from origin
+%@ con eq_0015 kind=linear domain=- indicator=- :: BIOP (8) flow conservation at intermediate blocks
+%@ con eq_0016 kind=linear domain=- indicator=- :: BIOP (9) single arrival at destination
+%@ con eq_0017 kind=linear domain=- indicator=- :: BIOP (10) capacity/side constraint for multicommodity flow
+%@ con eq_0018 kind=linear domain=- indicator=- :: BIOP binary variable restriction
+%@ con eq_0020 kind=linear domain=- indicator=- :: BIOP integrality/domain restriction for occupancy variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Hypergraph (11b) single departure per train
+%@ con eq_0023 kind=linear domain=- indicator=- :: Hypergraph (11c) flow conservation at nodes
+%@ con eq_0024 kind=linear domain=- indicator=- :: Hypergraph (11d) single arrival per train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Hypergraph (12a) track capacity side constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Hypergraph (12b) headway capacity constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: Hypergraph (12c) northbound headway capacity constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Hypergraph (12d) southbound headway capacity constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: PESP (13) span constraint for periodically repeating events
+%@ con eq_0031 kind=linear domain=- indicator=- :: PESP (14) definition of periodic tension
+%@ con eq_0033 kind=linear domain=- indicator=- :: IP-PESP (16) cycle constraint Γᵀx=Tz
+%@ con eq_0035 kind=linear domain=- indicator=- :: IP-PESP (17) lower and upper bounds on tensions
+%@ con eq_0036 kind=linear domain=- indicator=- :: IP-PESP (18) integrality of cycle tensions z
+%@ con eq_0037 kind=linear domain=- indicator=- :: IP-PESP (19) integrality of arc tensions x
+\begin{align}
+  & min \underset{\genfrac{}{}{0pt}{}{r \in R}{i \in B_{r}}}{\sum} \left[\mathit{beta}_{r , i} \left|d_{r , i} - d_{r , i}^{ \cdot }\right|^{\mathit{phi}} + \mathit{alpha}_{r , i} \left|a_{r , i} - a_{r , i}^{ \cdot }\right|^{\mathit{phi}}\right] \tag{eq\_0001} \\
+  & d_{r , i} \geq a_{r , i} \forall r \in R ; i \in B_{r} \tag{eq\_0002} \\
+  & I_{r , r^{'} , i , j} + F_{r , r^{'} , i , j} + G_{r , r^{'} , i , j} = 1 \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0004} \\
+  & a_{r , i} - d_{r , j} \geq s_{r , i , j} + \underset{\genfrac{}{}{0pt}{}{r^{'} \in R}{i , j \in B_{r} \cap B_{r^{'}}}}{\sum} f_{r , r^{'} , i , j} \cdot I_{r , r^{'} , i , j} \forall r \in R ; i , j \in B_{r} \tag{eq\_0005} \\
+  & d_{r , i} - a_{r^{'} , i} \geq M \left(F_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0006} \\
+  & d_{r^{'} , j} - a_{r , j} \geq M \left(G_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0007} \\
+  & a_{r^{'} , i} - d_{r , i} \geq M \left(I_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0008} \\
+  & a_{r , j} - d_{r^{'} , j} \geq M \left(I_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0009} \\
+  & a , d \geq 0 \cdot I , F , G \in \left\{0 , 1\right\} . \tag{eq\_0010} \\
+  & min \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , t\right) \in B^{r}}}{\sum} c_{i , t}^{r} \cdot x_{i , t}^{r} \tag{eq\_0011} \\
+  & \sum_{\left(i , t\right) \in B^{r} \left|\right. i = o^{r}} x_{i , t}^{r} = 1 \forall r \in R \tag{eq\_0012} \\
+  & x_{i , t}^{r} = \sum_{\left(k , l\right) \in \mathit{Phi}_{i , t}^{r}} x_{k , l}^{r} \forall r \in R ; \left(i , t\right) \in B^{r} \left|\right. i \neq d^{r} \tag{eq\_0014} \\
+  & \sum_{\left(i , t\right) \in B^{r} \left|\right. i = d^{r}} x_{i , t}^{r} = 1 \forall r \in R \tag{eq\_0015} \\
+  & \underset{\genfrac{}{}{0pt}{}{m \in R}{\left(k , l\right) \in B^{m} \cap \left(\mathit{Omega}_{i , t} \cup \left\{\left(i , t\right)\right\}\right)}}{\sum} x_{k , l}^{m} \leq 1 \forall \left(i , t\right) \in \underset{r \in R}{\cup} B^{r} \tag{eq\_0016} \\
+  & x \in \left\{0 , 1\right\} . \tag{eq\_0017} \\
+  & max \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(p_{o}^{r} , j , u , v\right) \in \mathit{Psi}^{r}}}{\sum} \left(c_{p}^{r} + c_{e}^{r} \left(u - p_{e}^{r}\right)\right) x_{p_{o}^{r} , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(p_{d}^{r} , e^{r} , u , v\right) \in \mathit{Psi}^{r}}}{\sum} c_{l}^{r} \left(p_{l}^{r} - v\right) x_{p_{d}^{r} , e^{r} , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. i = j}}{\sum} c_{s}^{r} \cdot x_{i , j , u , v}^{r} . \tag{eq\_0018} \\
+  & \sum_{\left(p_{o}^{r} , j , u , v\right) \in \mathit{Psi}^{r}} x_{p_{o}^{r} , j , u , v}^{r} \leq 1 \forall r \in R \tag{eq\_0020} \\
+  & \sum_{\left(a , i , u , t\right) \in \mathit{Psi}^{r}} x_{a , i , u , t}^{r} = \sum_{\left(i , j , t , v\right) \in \mathit{Psi}^{r}} x_{i , j , t , v}^{r} \forall r \in R , \left\{\right. i \in B \left|\right. i \neq p_{o}^{r} \left.\right\} , t \in T \tag{eq\_0022} \\
+  & \sum_{\left(p_{d}^{r} , e^{r} , u , v\right) \in \mathit{Psi}^{r}} x_{p_{d}^{r} , e^{r} , u , v}^{r} \leq 1 \forall r \in R \tag{eq\_0023} \\
+  & x \in \left\{0 , 1\right\} . \tag{eq\_0024} \\
+  & \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v}}{\sum} x_{i , j , u , v}^{r} \leq b_{t}^{i} \forall i \in B , t \in T \tag{eq\_0025} \\
+  & \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{N}}{v \in \left\{t + 1 - \mathit{epsilon} , \ldots , t + 1 + \mathit{delta}\right\}}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. j = a + 1 , j \neq i}}{\sum} x_{i , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{S}}{v \in \left\{t + 1 - \mathit{epsilon} , \ldots , t + 1 + \mathit{delta}\right\}}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. j = a , j \neq i}}{\sum} x_{i , j , u , v}^{r} \leq \mathit{upsilon}_{t}^{a} \forall \left(a , t\right) \in Y \tag{eq\_0027} \\
+  & \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{N} \left|\right. h^{r} \geq 1}{a \in \left\{i - h , \ldots , i - 1\right\}}}{\left(a , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v , a \neq j}}{\sum} x_{a , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R^{N}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v}}{\sum} x_{i , j , u , v}^{r} \leq b_{t}^{i} \forall i \in B , t \in T \tag{eq\_0028} \\
+  & \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{S} \left|\right. h^{r} \geq 1}{a \in \left\{i + 1 , \ldots , i + h\right\}}}{\left(a , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v , a \neq j}}{\sum} x_{a , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R^{S}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v}}{\sum} x_{a , j , u , v}^{r} \leq b_{t}^{i} \forall i \in B , t \in T . \tag{eq\_0029} \\
+  & \left(\mathit{tau}_{j} - \mathit{tau}_{i} - l_{i j}\right) mod \cdot T \leq u_{i j} - l_{i j} . \tag{eq\_0030} \\
+  & x_{i j} := \left(\mathit{tau}_{j} - \mathit{tau}_{i} - l_{i j}\right) mod \cdot T + l_{i j} . \tag{eq\_0031} \\
+  \min\quad & \sum_{a \in A} w_{a} \cdot x_{a} \tag{eq\_0032} \\
+  & \mathit{Gamma}^{T} x = T \cdot z \tag{eq\_0033} \\
+  & l \leq x \leq u \tag{eq\_0035} \\
+  & z \in \mathcal{Z}^{\mathit{nu}} \tag{eq\_0036} \\
+  & x \in \mathcal{Z}^{\left|A\right|} . \tag{eq\_0037} \\
+\end{align}

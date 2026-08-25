@@ -1,0 +1,68 @@
+% Declaration sidecar for 10.1016_j.tre.2024.103429
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2024.103429
+% Handling uncertainty in train timetable rescheduling: A review of the literature and future research directions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.tre.2024.103429.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=min name=objective combination=sum :: Minimize expected cost of train rescheduling across all perturbation scenarios
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Occurrence of perturbation scenario
+
+% f: classified as parameter during review
+%@ param f shape=- kind=scalar domain=- :: Cost function of train rescheduling under scenario
+
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Probability of scenario
+
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Decision variables for train rescheduling
+
+% unusable as an identifier, rename or drop: Ω
+%@ index omega ordered=0 cyclic=0 :: Set of perturbation scenarios
+
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Constraint set for decision variables under scenario
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: System state
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Time index
+
+% X: classified as parameter during review
+%@ param X shape=- kind=scalar domain=- :: Feasible set for train operation state
+
+% S: classified as parameter during review
+%@ param S shape=- kind=scalar domain=- :: System state function
+
+% R: classified as parameter during review
+%@ param R shape=- kind=scalar domain=- :: Set of feasible system state trajectories
+
+% Bound by a quantifier or big operator, so no declaration of their own: ω
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Decision variables must satisfy scenario-dependent constraint set Zω for each scenario
+%@ con eq_0006 kind=linear domain=- indicator=- :: Train operation state x must be within feasible set X
+%@ con eq_0007 kind=linear domain=- indicator=- :: System state trajectory S_1 x,...,S_T x must be within feasible set R

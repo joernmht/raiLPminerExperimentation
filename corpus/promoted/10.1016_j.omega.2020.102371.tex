@@ -1,0 +1,127 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2020.102371
+%@ meta id=10.1016_j.omega.2020.102371 family=milp schema=0.1.0
+%@ name :: Collaborative real-time optimization strategy for train rescheduling and track emergency maintenance of high-speed railway: A Lagrangian relaxation-based decomposition algorithm
+%@ desc :: Mined from Collaborative real-time optimization strategy for train rescheduling and track emergency maintenance of high-speed railway: A Lagrangian relaxation-based decomposition algorithm (Omega, 2020).
+%@ prov source :: 10.1016/j.omega.2020.102371
+%@ prov reference :: Collaborative real-time optimization strategy for train rescheduling and track emergency maintenance of high-speed railway: A Lagrangian relaxation-based decomposition algorithm
+%@ prov author :: Huimin Zhang; Shukai Li; Yihui Wang; Lixing Yang; Ziyou Gao
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total delay (T1), train cancellation cost (T2), dwelling plan change cost (T3), and track maintenance cost (T4).
+%@ param d shape=- kind=scalar domain=- :: Weight coefficient for T1 (total delay) in the objective function.
+%@ var t shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival/departure time of train at station.
+%@ param M shape=- kind=big_m domain=- :: Large positive number used for linearizing big-M constraints.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ var Y shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for scheduled dwelling or virtual station.
+%@ var u shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or headway order.
+%@ var y shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train cancellation.
+%@ var Z shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train type or auxiliary variable.
+%@ var x shape=N,N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival/departure order of two trains at a station.
+%@ param T shape=N,S kind=matrix domain=- :: Planned time of train at station or start time of maintenance task.
+%@ param C shape=S kind=vector domain=- :: Station capacity or cost coefficient.
+%@ index N ordered=0 cyclic=0 :: Set of trains.
+%@ var m shape=S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance intervention type selection.
+%@ var z shape=N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for first or second train after maintenance.
+%@ var w shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Predictive running time disturbance for first/second train after maintenance.
+%@ var J shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+%@ param b shape=- kind=scalar domain=- :: Weight coefficient for T2 (train cancellation cost) in the objective function.
+%@ param c shape=- kind=scalar domain=- :: Weight coefficient for T3 (dwelling plan change cost) in the objective function.
+%@ con eq_0001 kind=linear domain=- indicator=- :: Minimum dwelling time constraint at station.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Dwelling plan change allowed only for non-scheduled dwell and not virtual station.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Virtual station dwelling time bound.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time in section.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Arrival headway between consecutive trains.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Departure headway between consecutive trains.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Departure-arrival headway when train i enters before train j leaves.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Departure-arrival headway for the reverse order.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Departure order at station equals arrival order at next station for the same pair.
+%@ con eq_0010 kind=linear domain=- indicator=- :: No overtaking at virtual stations.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Arrival order antisymmetry.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Departure order antisymmetry.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Departure time not earlier than planned departure unless canceled.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Station capacity constraint when a train enters.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Canceled train arrival time set to zero.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Canceled train departure time set to zero.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Trains already underway cannot be canceled.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Maintenance section entrance before maintenance start.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Maintenance section entrance after maintenance end.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Maintenance task duration equality with intervention time and disturbance.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Exactly one maintenance intervention type selected per section.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Speed limitation in opposite-direction section during maintenance period.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Speed limitation in maintenance section after maintenance.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Speed limitation in opposite-direction section after maintenance.
+%@ con eq_0027 kind=linear domain=- indicator=- :: First train after maintenance must enter after maintenance end.
+%@ con eq_0028_a kind=linear domain=- indicator=- :: First train after maintenance is the earliest of post-maintenance entering trains.
+%@ con eq_0028_b kind=linear domain=- indicator=- :: First train after maintenance ordering condition.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Second train after maintenance must enter after maintenance end.
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Second train after maintenance ordering condition excluding first train.
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Second train after maintenance ordering condition.
+%@ con eq_0031 kind=linear domain=- indicator=- :: First and second train indicators are mutually exclusive.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Existence of a first train after maintenance.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Existence of a second train after maintenance.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Speed limitation constraints for first and second trains after maintenance.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Definition of total delay T1.
+%@ con eq_0036 kind=linear domain=- indicator=- :: Positive arrival delay lower bound.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Positive arrival delay penalty for canceled trains.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Negative arrival delay lower bound.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Negative arrival delay penalty for canceled trains.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Positive departure delay lower bound.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Positive departure delay penalty for canceled trains.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Train cancellation cost T2 definition.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Dwelling plan change cost T3 definition.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Maintenance intervention cost T4 definition.
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint (a).
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint (b).
+%@ con eq_0059 kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint.
+%@ con eq_0061 kind=linear domain=- indicator=- :: Lagrangian relaxation subproblem constraint.
+\begin{align}
+  & t \cdot d_{i , s} - t a_{i , s} \geq \left(Y_{i , s}^{d} + u \cdot d_{i , s}\right) \left(\mathit{tau}_{i , s}^{d} + \mathit{omega}_{i , s}^{d}\right) - y_{i} \cdot M , s \in S_{i} , \tag{eq\_0001} \\
+  & u_{i , s}^{d} \leq \left(1 - Y_{i , s}^{d}\right) \left(1 - Y_{s}^{v}\right) , s \in S_{i} , \tag{eq\_0002} \\
+  & \left(1 - Y_{s}^{v}\right) \left(t \cdot d_{i , s} - t a_{i , s}\right) \leq \left(1 - Y_{s}^{v}\right) \left(Y_{i , s}^{d} + u_{i , s}^{d}\right) M , s \in S_{i} , \tag{eq\_0003} \\
+  & t a_{i , s + 1} - t \cdot d_{i , s} \geq \mathit{tau}_{i , s}^{r} + \mathit{omega}_{i , s}^{r} - y_{i} \cdot M , s , s + 1 \in S_{i} , \tag{eq\_0004} \\
+  & t a_{j , s} - t a_{i , s} \geq \sum_{e} \mathit{tau}_{e}^{a h} Z_{j}^{e} - \left(1 - x_{i , j , s}^{a}\right) M - \left(y_{i} + y_{j}\right) M , i \neq j , s \in S_{i , j} , \tag{eq\_0005} \\
+  & t \cdot d_{j , s} - t \cdot d_{i , s} \geq \sum_{e} \mathit{tau}_{e}^{d h} Z_{j}^{e} - \left(1 - x_{i , j , s}^{d}\right) M - \left(y_{i} + y_{j}\right) M , i \neq j , s \in S_{i , j} , \tag{eq\_0006} \\
+  & t \cdot d_{j , s} - t a_{i , s} \geq \mathit{tau}_{s}^{a d h} - \left(1 - u_{i , j , s}\right) M - \left(y_{i} + y_{j}\right) M , i \neq j , s \in S_{i , j} , \tag{eq\_0007} \\
+  & t a_{i , s} - t \cdot d_{j , s} \geq \mathit{tau}_{s}^{a d h} - u_{i , j , s} \cdot M - \left(y_{i} + y_{j}\right) M , i \neq j , s \in S_{i , j} , \tag{eq\_0008} \\
+  & x_{i , j , s}^{d} - x_{i , j , s + 1}^{a} = 0 , i \neq j , s , s + 1 \in S_{i , j} , \tag{eq\_0009} \\
+  & Y_{s}^{v} \left(x_{i , j , s}^{a} - x_{i , j , s}^{d}\right) = 0 , i \neq j , s \in S_{i , j} , \tag{eq\_0010} \\
+  & x_{i , j , s}^{a} + x_{j , i , s}^{a} = 1 , i \neq j , s \in S_{i , j} , \tag{eq\_0011} \\
+  & x_{i , j , s}^{d} + x_{j , i , s}^{d} = 1 , i \neq j , s \in S_{i , j} . \tag{eq\_0012} \\
+  & t \cdot d_{i , s} \geq \left(1 - y_{i}\right) \cdot Y_{i , s}^{d} \cdot T \cdot d_{i , s} , s \in S_{i} , \tag{eq\_0013} \\
+  & \sum_{j = 1 , j \neq i , s \in S_{j}}^{N} \left[\left(u_{i , j , s} - x_{i , j , s}^{a}\right) \left(1 - y_{j}\right)\right] - y_{i} \cdot M \leq C_{s} - 1 , s \in S_{i} , \tag{eq\_0014} \\
+  & t a_{i , s} \leq \left(1 - y_{i}\right) M , s \in S_{i} , \tag{eq\_0015} \\
+  & t \cdot d_{i , s} \leq \left(1 - y_{i}\right) M , s \in S_{i} . \tag{eq\_0016} \\
+  & y_{i} = 0 , i \in N_{c u r r e n t} . \tag{eq\_0017} \\
+  & t \cdot d_{i , s} \leq T_{m , s}^{s t a r t} - \mathit{epsilon} + \mathit{delta}_{1 , i , s} M , s , s + 1 \in S_{i , m} , \tag{eq\_0018} \\
+  & t \cdot d_{i , s} \geq t_{m , s}^{e n d} - \left(1 - \mathit{delta}_{1 , i , s}\right) M , s , s + 1 \in S_{i , m} , \tag{eq\_0019} \\
+  & t_{m , s}^{e n d} - T_{m , s}^{s t a r t} = \sum_{a_{q}} m_{a_{q} , s} \cdot T_{min}^{a_{q}} + \mathit{omega}_{s}^{m} , s , s + 1 \in S_{m} , \tag{eq\_0020} \\
+  & \sum_{a_{q}} m_{a_{q} , s} = 1 , s , s + 1 \in S_{m} . \tag{eq\_0021} \\
+  & \begin{aligned}t a_{i , s^{'} + 1} - t \cdot d_{i , s^{'}} & \geq & \left(\mathit{tau}_{i , s}^{m o} + \mathit{omega}_{i , s^{'}}^{r}\right) \left(\mathit{delta}_{2 , i , s} + \mathit{delta}_{3 , i , s} - y_{i} - 1\right) , \\ & & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0024} \\
+  & \begin{aligned}t a_{i , s + 1} - t \cdot d_{i , s} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{m^{'}} + \mathit{omega}_{i , s}^{r}\right) - y_{i} \cdot M - \left(1 - \mathit{delta}_{1 , i , s}\right) M , \\ & & s , s + 1 \in S_{i , m} ,\end{aligned} \tag{eq\_0025} \\
+  & \begin{aligned}t a_{i , s^{'} + 1} - t \cdot d_{i , s^{'}} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{m^{'} o} + \mathit{omega}_{i , s^{'}}^{r}\right) - y_{i} \cdot M - \mathit{delta}_{2 , i , s} M , \\ & & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0026} \\
+  & z_{i , s}^{1} \leq \mathit{delta}_{1 , i , s} , s , s + 1 \in S_{i , m} . \tag{eq\_0027} \\
+  & t \cdot d_{j , s} \geq t \cdot d_{i , s} - \left(1 - z_{i , s}^{1}\right) M - \left(1 - \mathit{delta}_{1 , j , s}\right) M \tag{eq\_0028\_a} \\
+  & i \neq j , s , s + 1 \in S_{i , j , m} \tag{eq\_0028\_b} \\
+  & z_{i , s}^{2} \leq \mathit{delta}_{1 , i , s} , s , s + 1 \in S_{i , m} . \tag{eq\_0029} \\
+  & t \cdot d_{j , s} \geq t \cdot d_{i , s} - \left(1 - z_{i , s}^{2}\right) M - \left(1 - \mathit{delta}_{1 , j , s}\right) M - z_{j , s}^{1} \cdot M \tag{eq\_0030\_a} \\
+  & i \neq j , s , s + 1 \in S_{i , j , m} \tag{eq\_0030\_b} \\
+  & z_{i , s}^{1} + z_{i , s}^{2} \leq 1 , s , s + 1 \in S_{i , m} . \tag{eq\_0031} \\
+  & \sum_{i} \mathit{delta}_{1 , i , s} \leq \sum_{i} z_{i , s}^{1} \cdot M , s , s + 1 \in S_{i , m} , \tag{eq\_0032} \\
+  & \sum_{i} \mathit{delta}_{1 , i , s} - 1 \leq \sum_{i} z_{i , s}^{2} \cdot M , s , s + 1 \in S_{i , m} . \tag{eq\_0033} \\
+  & t a_{i , s + 1} - t \cdot d_{i , s} \geq z_{i , s}^{1} \mathit{tau}_{s}^{m 1} + z_{i , s}^{2} \mathit{tau}_{s}^{m 2} + w_{i , s}^{r} , s , s + 1 \in S_{i , m} , \tag{eq\_0034} \\
+  & T_{1} = \sum_{i} \sum_{s \in S_{i}} d a_{i , s}^{+} + \sum_{i} \sum_{s \in S_{i}} d a_{i , s}^{-} + \sum_{i} \sum_{s \in S_{i}} d \cdot d_{i , s} , \tag{eq\_0035} \\
+  & d a_{i , s}^{+} \geq \left(t a_{i , s} - T a_{i , s}\right) Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0036} \\
+  & d a_{i , s}^{+} \geq y_{i} \cdot M_{1} \cdot Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0037} \\
+  & d a_{i , s}^{-} \geq \left(T a_{i , s} - t a_{i , s}\right) Y_{i , s}^{d} - y_{i} \cdot M , s \in S_{i} , \tag{eq\_0038} \\
+  & d a_{i , s}^{-} \geq y_{i} \cdot M_{1} \cdot Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0039} \\
+  & d \cdot d_{i , s} \geq \left(t \cdot d_{i , s} - T \cdot d_{i , s}\right) Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0040} \\
+  & d \cdot d_{i , s} \geq y_{i} \cdot M_{1} \cdot Y_{i , s}^{d} , s \in S_{i} . \tag{eq\_0041} \\
+  & T_{2} = \sum_{i} C_{y_{i}} \cdot y_{i} . \tag{eq\_0042} \\
+  & T_{3} = \sum_{i} \sum_{s \in S_{i}} u_{i , s}^{d} . \tag{eq\_0043} \\
+  & T_{4} = \sum_{s \in S_{m}} \sum_{a_{q}} C_{a_{q}} \cdot m_{a_{q} , s} , \tag{eq\_0044} \\
+  \min\quad & a T_{1} + b \cdot T_{2} + c \cdot T_{3} + d \cdot T_{4} , \tag{eq\_0045} \\
+  & \sum_{j = 1 , j \neq i , s \in S_{j}}^{N} Z_{i , j , s} - y_{i} \cdot M \leq C_{s} - 1 , s \in S_{i} , Z_{i , j , s} \leq 1 - y_{i} , s \in S_{i} , Z_{i , j , s} \geq 0 , s \in S_{i} , Z_{i , j , s} \leq u_{i , j , s} - x_{i , j , s}^{a} , s \in S_{i} \tag{eq\_0057\_a} \\
+  & Z_{i , j , s} \geq u_{i , j , s} - x_{i , j , s}^{a} - y_{j} , s \in S_{i} \tag{eq\_0057\_b} \\
+  & \begin{matrix}\begin{cases} t \cdot d_{i , s^{'}} - t_{m , s}^{e n d} \leq \left(M_{2 , i , s} - \mathit{epsilon}\right) \left(1 - \mathit{delta}_{2 , i , s}\right) + \mathit{epsilon} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , s^{'}} - t_{m , s}^{e n d} \geq m_{2 , i , s} \mathit{delta}_{2 , i , s} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases} \end{matrix} \tag{eq\_0059} \\
+  & \begin{matrix}\begin{cases} t \cdot d_{i , s^{'}} - T_{m , s}^{s t a r t} \leq \left(M_{3 , i , s} - \mathit{epsilon}\right) \mathit{delta}_{3 , i , s} + \mathit{epsilon} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , s^{'}} - T_{m , s}^{s t a r t} \geq m_{3 , i , s} \left(1 - \mathit{delta}_{3 , i , s}\right) , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases}\end{matrix} \tag{eq\_0061} \\
+\end{align}

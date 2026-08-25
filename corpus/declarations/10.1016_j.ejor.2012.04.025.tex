@@ -1,0 +1,153 @@
+% Declaration sidecar for 10.1016_j.ejor.2012.04.025
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ejor.2012.04.025
+% Real-time freight locomotive rescheduling and uncovered train detection during disruption
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ejor.2012.04.025.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of selected locomotive paths
+
+% sta: classified as parameter during review
+%@ param sta shape=- kind=scalar domain=- :: Station attribute of a task or locomotive
+
+% Arr: classified as parameter during review
+%@ param Arr shape=- kind=scalar domain=- :: Arrival station or time of a task
+
+% Dep: classified as parameter during review
+%@ param Dep shape=- kind=scalar domain=- :: Departure station or time of a task
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for tasks in I, I-hat, or D
+
+% time: classified as parameter during review
+%@ param time shape=- kind=scalar domain=- :: Time attribute (arrival or departure)
+
+% Buf: classified as parameter during review
+%@ param Buf shape=- kind=scalar domain=- :: Buffer time needed at a station
+
+% Ready: classified as parameter during review
+%@ param Ready shape=- kind=scalar domain=- :: Time when locomotive is ready for rescheduling
+
+% Sta: classified as parameter during review
+%@ param Sta shape=- kind=scalar domain=- :: Station of an inspection node
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Index for inspection nodes
+
+% FinishIns: classified as parameter during review
+%@ param FinishIns shape=- kind=scalar domain=- :: Completion time of inspection
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Set of tasks assignable to a locomotive after a given node
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Set of tasks between inspections in a path
+
+% n: classified as parameter during review
+%@ param n shape=- kind=scalar domain=- :: Number of inspections in a path
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Cost of a path for a locomotive
+
+% x: classified as variable during review
+%@ var x shape=K,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is selected for locomotive k
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of locomotives
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of feasible paths for a locomotive
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of convergence tasks
+
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of rescheduling tasks to be covered
+
+% a: classified as parameter during review
+%@ param a shape=I,K,P kind=matrix domain=- :: Incidence coefficient: 1 if task i is in path p of locomotive k
+
+% Î: classified as index during review
+%@ index Ihat ordered=0 cyclic=0 :: Set of deadhead train tasks
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of depots
+
+% L: classified as parameter during review
+%@ param L shape=B,T kind=matrix domain=- :: Inspection capacity at depot b and time span t
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of time spans
+
+% b: classified as index during review
+%@ index b ordered=0 cyclic=0 :: Index for depots
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Index for time spans
+
+% p: classified as index during review
+%@ index p ordered=0 cyclic=0 :: Index for paths
+
+% find: classified as parameter during review
+%@ param find shape=- kind=scalar domain=- :: Keyword in subproblem formulation
+
+% unusable as an identifier, rename or drop: λ
+%@ param lambda shape=I kind=vector domain=- :: Dual price for task constraints
+
+% unusable as an identifier, rename or drop: μ
+%@ param mu shape=K kind=vector domain=- :: Dual price for locomotive constraints
+
+% unusable as an identifier, rename or drop: ν
+%@ param nu shape=B,T kind=matrix domain=- :: Dual price for inspection capacity constraints
+
+% x̄: classified as variable during review
+%@ var xbar shape=K,P domain=non_negative role=primary drole=- lo=- hi=- :: Optimal solution of restricted master problem
+
+% ȳ: classified as variable during review
+%@ var ybar shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Optimal value of artificial variable in restricted master problem
+
+% z: classified as variable during review
+%@ var z shape=K,I domain=non_negative role=primary drole=- lo=- hi=- :: Aggregated variable indicating if task i is covered by locomotive k
+
+% Bound by a quantifier or big operator, so no declaration of their own: î, k, m
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Set-partitioning constraint for rescheduling tasks I: exactly one locomotive covers each task
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Set-partitioning constraint for convergence tasks D: exactly one locomotive covers each task
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Deadhead task constraint: each deadhead task in I-hat may be covered by at most two paths
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Deadhead task constraint: deadhead tasks in I-hat may be left uncovered
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Path selection constraint for each locomotive k: exactly one feasible path is selected
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Path selection constraint for reserve locomotives: exactly one feasible path is selected
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Binary decision variable constraint for path selection
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Binary decision variable constraint ensuring x_p^k in {0,1}
+%@ con eq_0008 kind=linear domain=- indicator=- :: Set-covering constraint for tasks in (I union D) outside restricted set I_l
+%@ con eq_0009 kind=linear domain=- indicator=- :: Set-partitioning constraint for tasks in restricted set I_l
+%@ con eq_0010 kind=linear domain=- indicator=- :: Deadhead task constraint for tasks in I-hat outside restricted set I-hat_l
+%@ con eq_0011 kind=linear domain=- indicator=- :: Deadhead task constraint for tasks in restricted set I-hat_l
+%@ con eq_0012 kind=linear domain=- indicator=- :: Locomotive path selection constraint in restricted master problem with artificial variable
+%@ con eq_0021_a kind=linear domain=- indicator=- :: Branching constraint on task coverage variable z_i^k in branch-and-price
+%@ con eq_0021_b kind=linear domain=- indicator=- :: Branching constraint on task coverage variable z_i^k in branch-and-price (opposite branch)
+%@ con eq_0023_a kind=linear domain=- indicator=- :: Branching constraint on inspection coverage variable z_tb^k in branch-and-price
+%@ con eq_0023_b kind=linear domain=- indicator=- :: Branching constraint on inspection coverage variable z_tb^k in branch-and-price (opposite branch)
+%@ con eq_0024_a kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths
+%@ con eq_0024_b kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths (opposite branch)

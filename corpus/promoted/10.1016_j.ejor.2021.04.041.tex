@@ -1,0 +1,69 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2021.04.041
+%@ meta id=10.1016_j.ejor.2021.04.041 family=milp schema=0.1.0
+%@ name :: A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing
+%@ desc :: Mined from A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing (European Journal of Operational Research, 2021).
+%@ prov source :: 10.1016/j.ejor.2021.04.041
+%@ prov reference :: A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing
+%@ prov author :: Bernardo Martin-Iradi; Stefan Røpke
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total path length of selected line group paths.
+%@ param c shape=Q kind=vector :: Cost of choosing a group of line paths q.
+%@ index Q ordered=0 cyclic=0 :: Set of possible line group paths.
+%@ index L ordered=0 cyclic=0 :: Set of lines.
+%@ index i ordered=0 cyclic=0 :: Station index.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index U ordered=0 cyclic=0 :: Set of arrival nodes at station i for arc a.
+%@ index u ordered=0 cyclic=0 :: Arrival node in U_i^a.
+%@ index v ordered=0 cyclic=0 :: Node in time-space graph.
+%@ index W ordered=0 cyclic=0 :: Set of departure nodes at station i for arc a.
+%@ index w ordered=0 cyclic=0 :: Departure node in W_i^a.
+%@ index T ordered=0 cyclic=0 :: Set of time instants.
+%@ index t ordered=0 cyclic=0 :: Time instant.
+%@ index E ordered=0 cyclic=0 :: Set of single-track segments.
+%@ index A ordered=0 cyclic=0 :: Set of arcs in train graph.
+%@ index d ordered=0 cyclic=0 :: Direction index.
+%@ index h ordered=0 cyclic=0 :: Station index.
+%@ index Y ordered=0 cyclic=0 :: Set of trains.
+%@ index V ordered=0 cyclic=0 :: Set of nodes in line graph.
+%@ index D ordered=0 cyclic=0 :: Set of directions.
+%@ index K ordered=0 cyclic=0 :: Set of commodities.
+%@ var f shape=K,A domain=non_negative role=primary :: Flow on arc a for commodity k.
+%@ index o ordered=0 cyclic=0 :: Origin node for commodity k.
+%@ index Vbar ordered=0 cyclic=0 :: Set of nodes in passenger routing graph.
+%@ index Abar ordered=0 cyclic=0 :: Set of arcs in passenger routing graph.
+%@ var x shape=A domain=binary role=primary :: Binary variable indicating if timetabling arc a is used.
+%@ var z shape=K domain=non_negative role=primary :: Passenger travel time for commodity k.
+%@ con eq_0004 kind=linear :: Minimum headway between consecutive arrivals at each station for each direction.
+%@ con eq_0005 kind=linear :: Minimum headway between consecutive departures at each station for each direction.
+%@ con eq_0006 kind=linear :: Minimum headway for arrivals at stations connected by single-track segments.
+%@ con eq_0007 kind=linear :: Prevent overtaking of trains traveling in the same direction on the same track.
+%@ con eq_0008 kind=linear :: Prevent trains in opposite directions from being on the same single-track segment simultaneously.
+%@ con eq_0009 kind=linear :: Ensure departures of sibling lines are spaced by at least T_s time units.
+%@ con eq_0010 kind=linear :: Objective function for passenger routing: minimize total passenger travel time.
+%@ con eq_0011 kind=linear :: Flow balance at source node: exactly one arc leaves each commodity source.
+%@ con eq_0013 kind=linear :: Flow conservation at intermediate nodes.
+%@ con eq_0014 kind=linear :: Capacity constraint: flow on timetabling arc cannot exceed x_a.
+%@ con eq_0015 kind=linear :: Non-negativity of passenger flow variables.
+%@ con eq_0016 kind=linear :: Relaxed non-negativity for line group path variables: λ_q ≥ 0.
+%@ con eq_0017 kind=linear :: Benders optimality cut for commodity k.
+%@ con eq_0018 kind=linear :: Updated objective function including passenger travel time weighted by α.
+%@ con eq_0019 kind=linear :: Additional constraint (undescribed in prose).
+\begin{align}
+  \min\quad & \sum_{q \in Q} c_{q} \cdot \mathit{lambda}_{q} \tag{eq\_0003} \\
+  & \sum_{q \in Q^{l}} \mathit{lambda}_{q} = 1 \forall l \in L \tag{eq\_0004} \\
+  & \mathit{lambda}_{q} \in \left\{0 , 1\right\} \forall q \in Q \tag{eq\_0005} \\
+  & \sum_{\begin{matrix}v \in U_{i}^{a} : v \preceq u \\ \mathit{Delta} \left(v , u\right) < a \left(i , a\right) \\ \end{matrix}} \sum_{\begin{matrix}q \in Q_{v} \\ \end{matrix}} \mathit{lambda}_{q} \leq 1 , i \in S , a \in \mathit{delta}_{N}^{-} \left(i\right) , u \in U_{i}^{a} , \tag{eq\_0006} \\
+  & \sum_{\begin{matrix}v \in W_{i}^{a} : v \preceq w \\ \mathit{Delta} \left(v , w\right) < d \left(i , a\right)\end{matrix}} \sum_{\begin{matrix}q \in Q_{v}\end{matrix}} \mathit{lambda}_{q} \leq 1 , i \in S , a \in \mathit{delta}_{N}^{+} \left(i\right) , w \in W_{i}^{a} , \tag{eq\_0007} \\
+  & \sum_{\begin{matrix}a \in \mathit{delta}_{N}^{-} \left(i\right) \cap E\end{matrix}} \sum_{\begin{matrix}v , u \in U_{i}^{a} : v \preceq u \\ \mathit{Delta} \left(v , u\right) < h \left(i\right) \\ \mathit{theta} \left(u\right) = t\end{matrix}} \sum_{\begin{matrix}q \in Q_{v}\end{matrix}} \mathit{lambda}_{q} \leq 1 , i \in S^{\star} , t \in T , \tag{eq\_0008} \\
+  & \begin{aligned}\sum_{\begin{matrix}w \in W_{i}^{a} \cap V^{j} : \\ v_{1} \preceq w \prec v_{3}\end{matrix}} \underset{\begin{matrix}q \in Q_{w}^{l^{j}}\end{matrix}}{\sum} \mathit{lambda}_{q} + \sum_{\begin{matrix}w \in W_{i}^{a} \cap V^{k} : \\ v_{2} \preceq w \prec v_{4}\end{matrix}} \\ \underset{\begin{matrix}q \in Q_{w}^{l^{k}}\end{matrix}}{\sum} \mathit{lambda}_{q} \leq 1 , \forall j , k \in Y , v_{1} , v_{2} \in W_{i}^{a} , \\ \left(\text{where} l^{j} \neq l^{k} , d^{j} = d^{k} , i , h \in S^{j} \cap S^{k} , a = \left(i , h\right) \in \left(A^{j} \cap A^{k}\right)\right)\end{aligned} \tag{eq\_0009} \\
+  & \begin{aligned}\sum_{\begin{matrix}w \in W_{i}^{a} \cap V^{j} : \\ v_{1} \preceq w \prec v_{3} \\ \end{matrix}} \underset{\begin{matrix}q \in Q_{w}^{l^{j}} \\ \end{matrix}}{\sum} \mathit{lambda}_{q} + \sum_{\begin{matrix}w \in W_{h}^{a} \cap V^{k} : \\ v_{2} \preceq w \prec v_{4} \\ \end{matrix}} \\ \underset{\begin{matrix}q \in Q_{w}^{l^{k}}\end{matrix}}{\sum} \mathit{lambda}_{q} \leq 1 , \forall j , k \in Y , v_{1} \in W_{i}^{a} , v_{2} \in W_{h}^{a} \\ \left(\right. \text{where} l^{j} \neq l^{k} , d^{j} \neq d^{k} , i , h \in S^{j} \cap S^{k} , \\ a = \left(i , h\right) \in A^{j} \cap E , \left(h , i\right) \in A^{k} \cap E \left.\right)\end{aligned} \tag{eq\_0010} \\
+  & \begin{aligned}\sum_{\begin{matrix}v \in W_{i}^{a} : v \preceq w \\ \mathit{Delta} \left(v , w\right) < T_{s} \\ \end{matrix}} \underset{\begin{matrix}q \in \left\{Q_{v}^{l^{j}} \cup Q_{v}^{l^{k}}\right\} \\ \end{matrix}}{\sum} \mathit{lambda}_{q} \leq 1 , \\ \forall \left(l^{j} , l^{k}\right) \in \mathit{Xi} , d \in D , w \in W_{i}^{a} , \\ \left(\text{where} j , k \in Y , i \in S^{j} \cap S^{k} , a \in \mathit{delta}_{N}^{+} \left(i\right) \cap \left(A^{j} \cap A^{k}\right)\right)\end{aligned} \tag{eq\_0011} \\
+  & \sum_{a \in \mathit{delta}^{+} \left(o_{k}\right)} f_{a}^{k} = 1 \forall k \in K \tag{eq\_0013} \\
+  & \sum_{a \in \mathit{delta}^{-} \left(d_{k}\right)} - f_{a}^{k} = - 1 \forall k \in K \tag{eq\_0014} \\
+  & \sum_{a \in \mathit{delta}^{+} \left(v\right)} f_{a}^{k} - \sum_{a \in \mathit{delta}^{-} \left(v\right)} f_{a}^{k} = 0 \forall k \in K , v \in \bar{V} \backslash \left\{o_{k} , d_{k}\right\} \tag{eq\_0015} \\
+  & f_{a}^{k} - x_{a} \leq 0 \forall k \in K , a \in \left(\bar{A}\right)_{r} \tag{eq\_0016} \\
+  & f_{a}^{k} \geq 0 \forall k \in K , a \in \bar{A} \tag{eq\_0017} \\
+  & \mathit{lambda}_{q} \geq 0 \forall q \in Q \tag{eq\_0018} \\
+  & z_{k} \geq \mathit{pi}_{k}^{1} - \mathit{pi}_{k}^{2} + \sum_{a \in \left(\bar{A}\right)_{r}} \mathit{pi}_{k a}^{4} x_{a} \tag{eq\_0019} \\
+\end{align}

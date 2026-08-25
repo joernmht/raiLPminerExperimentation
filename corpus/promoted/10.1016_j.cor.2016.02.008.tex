@@ -1,0 +1,25 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cor.2016.02.008
+%@ meta id=10.1016_j.cor.2016.02.008 family=lp schema=0.1.0
+%@ name :: A variable neighbourhood search for fast train scheduling and routing during disturbed railway traffic situations
+%@ desc :: Mined from A variable neighbourhood search for fast train scheduling and routing during disturbed railway traffic situations (Computers & Operations Research, 2016).
+%@ prov source :: 10.1016/j.cor.2016.02.008
+%@ prov reference :: A variable neighbourhood search for fast train scheduling and routing during disturbed railway traffic situations
+%@ prov author :: Marcella Samà; Andrea D’Ariano; Francesco Corman; Dario Pacciarelli
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize the maximum consecutive delay (makespan)
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Start time of a node in the alternative graph
+%@ param w shape=- kind=scalar domain=- :: Weight of an arc in the alternative graph
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs in the alternative graph
+%@ index krj ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ index krp ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ index A ordered=0 cyclic=0 :: Set of alternative pairs in the alternative graph
+%@ index krz ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ index umi ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ index ump ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ index umv ordered=0 cyclic=0 :: Node representing a train event (e.g., start of an operation)
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Precedence and disjunctive constraints of the alternative graph formulation
+\begin{align}
+  \min\quad & t_{n} \tag{eq\_0001\_a} \\
+  & t_{\mathit{krj}} - t_{\mathit{krp}} \geq w_{\mathit{krp} \underline \mathit{krj}}^{F} \left(\mathit{krp} , \mathit{krj}\right) \in F \cdot t_{\mathit{krz}} - t_{\mathit{umv}} \geq w_{\mathit{umv} \underline \mathit{krz}}^{F} \left(\mathit{umv} , \mathit{krz}\right) \in F \left(t_{\mathit{ump}} - t_{\mathit{krj}} \geq w_{\mathit{krj} \underline \mathit{ump}}^{A}\right) \lor \left(t_{\mathit{krp}} - t_{\mathit{umi}} \geq w_{\mathit{umi} \underline \mathit{krp}}^{A}\right) \left(\left(\mathit{krj} , \mathit{ump}\right) , \left(\mathit{umi} , \mathit{krp}\right)\right) \in A \tag{eq\_0001\_b} \\
+\end{align}

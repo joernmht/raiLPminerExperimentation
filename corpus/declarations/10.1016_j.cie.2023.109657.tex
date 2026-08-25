@@ -1,0 +1,153 @@
+% Declaration sidecar for 10.1016_j.cie.2023.109657
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2023.109657
+% Optimization of system resilience in urban rail systems: Train rescheduling considering congestions of stations
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2023.109657.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Resilience-oriented evaluation index minimizing maximum passenger waiting ratio over stations
+
+% t: classified as index during review
+%@ index t ordered=1 cyclic=0 :: Time index in discrete time horizon
+
+% T: classified as index during review
+%@ index T ordered=1 cyclic=0 :: Set of discrete time units
+
+% S: classified as index during review
+%@ index S ordered=1 cyclic=0 :: Set of stations along the line
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar :: Train capacity
+
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar :: Number of trains or doors (context-dependent)
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of event connections
+
+% W: classified as variable during review
+%@ var W shape=S,t domain=non_negative role=primary :: Number of waiting passengers at station i and time t
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of service events
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Event index
+
+% t̄: classified as index during review
+%@ index t_orig ordered=1 cyclic=0 :: Original scheduled time of event e (t̄)
+
+% c: classified as variable during review
+%@ var c shape=e domain=binary role=primary :: Binary cancellation indicator for event e
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Big-M value for linearization
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Set of following events for headway
+
+% s: classified as parameter during review
+%@ param s shape=e kind=vector :: Station index for event origin/destination
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Set of depots
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: γ
+% M̂: classified as parameter during review
+%@ param M_hat shape=- kind=big_m :: Big-M value larger than M
+
+% B: classified as variable during review
+%@ var B shape=- domain=non_negative role=primary :: Boarding passengers per door
+
+% PA: classified as index during review
+%@ index PA ordered=0 cyclic=0 :: Set of passenger paths
+
+% x: classified as variable during review
+%@ var x shape=t domain=binary role=primary :: Binary train departure indicator at time t
+
+% OD: classified as parameter during review
+%@ param OD shape=PA,t kind=matrix :: Origin-destination demand per path and time
+
+% K: classified as parameter during review
+%@ param K shape=- kind=scalar :: Number of physical trains
+
+% A: classified as variable during review
+%@ var A shape=- domain=non_negative role=primary :: Alighting passengers per door
+
+% unusable as an identifier, rename or drop: Ψ
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar :: Lower bound of time difference in valid inequality
+
+% unusable as an identifier, rename or drop: ε
+% Bound by a quantifier or big operator, so no declaration of their own: a, d, ē, i, p, τ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear :: Minimum running time for event e
+%@ con eq_0005 kind=linear :: No cancellation of service events before disruption start
+%@ con eq_0006 kind=linear :: Cancel or delay disrupted services until disruption ends
+%@ con eq_0007 kind=linear :: Minimum dwell time with big-M cancellation logic
+%@ con eq_0008 kind=linear :: Minimum headway between successive events with big-M
+%@ con eq_0010 kind=linear :: At most one turnaround predecessor per event
+%@ con eq_0011 kind=linear :: Minimum turnaround time with big-M
+%@ con eq_0013 kind=linear :: Short-turn cancellation rule for predecessor events
+%@ con eq_0014 kind=linear :: Minimal upstream tracing time at turn-out track
+%@ con eq_0015 kind=linear :: Minimal downstream tracing time at turn-out track
+%@ con eq_0016 kind=linear :: Depot return and connection exclusivity for terminal events
+%@ con eq_0018 kind=linear :: Train sourcing from depot or connection for service event
+%@ con eq_0019 kind=linear :: Train return to depot or connection for service event
+%@ con eq_0020 kind=linear :: No cancellation for events connected by same rolling stock
+%@ con eq_0022 kind=linear :: Logical implication for recirculation indicator gamma
+%@ con eq_0023 kind=linear :: Linearized recirculation inequality with big-M hat
+%@ con eq_0025 kind=linear :: Passenger flow balance at station over time
+%@ con eq_0029 kind=linear :: Rolling stock circulation limit: at most K departures per cycle
+%@ con eq_0031 kind=linear :: Passenger boarding capacity with on-vehicle load
+%@ con eq_0032 kind=linear :: Boarding passengers per door calculation
+%@ con eq_0034 kind=linear :: On-vehicle standees per door calculation
+%@ con eq_0035 kind=linear :: Dwelling time model as function of passenger flows per door
+%@ con eq_0036 kind=linear :: Constraint related to dwelling time model (see text)
+%@ con eq_0038 kind=linear :: Valid inequality: canceled event cannot have connections
+%@ con eq_0039 kind=linear :: Valid inequality for turnaround time with binary indicator
+%@ con eq_0040 kind=linear :: Valid inequality for no overtaking at station
+%@ con eq_0041 kind=linear :: Valid inequality: turnaround time lower bound
+%@ con eq_0043 kind=linear :: Additional constraint from the model (see text)
+%@ con eq_0050 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0052 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0053 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0054 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0056 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0057 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0058 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0062 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0064 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0065 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0070 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0071 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0080 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0082 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0083 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0084 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0085 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0086 kind=linear :: Linear constraint from the model (see text)

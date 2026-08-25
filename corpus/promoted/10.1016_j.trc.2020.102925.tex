@@ -1,0 +1,145 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2020.102925
+%@ meta id=10.1016_j.trc.2020.102925 family=milp schema=0.1.0
+%@ name :: A schedule-based timetable model for congested transit networks
+%@ desc :: Mined from A schedule-based timetable model for congested transit networks (Transportation Research Part C Emerging Technologies, 2020).
+%@ prov source :: 10.1016/j.trc.2020.102925
+%@ prov reference :: A schedule-based timetable model for congested transit networks
+%@ prov author :: Jiemin Xie; Shuguang Zhan; S.C. Wong; Siuming Lo
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total running time and passenger cost.
+%@ var t shape=n,s domain=non_negative role=primary drole=- lo=- hi=- :: Arrival/departure times at stations.
+%@ param T shape=- kind=scalar domain=- :: Various time parameters (running, headway, dwell, etc.).
+%@ var ifb shape=n,n,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for departure order.
+%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variables for order, track, line, path.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index P ordered=0 cyclic=0 :: Set of platforms.
+%@ index s ordered=0 cyclic=0 :: Station index.
+%@ var c shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Path costs and extra costs.
+%@ index N ordered=0 cyclic=0 :: Set of trains.
+%@ param i shape=- kind=scalar domain=- :: Indicator for wait time.
+%@ index n ordered=0 cyclic=0 :: Train index.
+%@ index L ordered=0 cyclic=0 :: Set of lines.
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization.
+%@ var Objective shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+%@ param a shape=- kind=scalar domain=- :: Coefficient in path cost.
+%@ param o shape=- kind=scalar domain=- :: Origin/destination indicator.
+%@ param v shape=- kind=scalar domain=- :: Variable matrix in matrix form.
+%@ index Q ordered=0 cyclic=0 :: Set of paths.
+%@ index R ordered=0 cyclic=0 :: Set of OD pairs.
+%@ var A shape=Q domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on path q.
+%@ param D shape=R kind=vector domain=- :: Total passenger demand for OD pair r.
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function of LPPA.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum running time between consecutive stations.
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Operating time-window: departure from origin not before the line departure time.
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Operating time-window: arrival at destination not after the line arrival time.
+%@ con eq_0006 kind=headway domain=- indicator=- :: Safety headway between arrivals at a station.
+%@ con eq_0007 kind=headway domain=- indicator=- :: Safety headway between departures from a station.
+%@ con eq_0008 kind=ordering domain=- indicator=- :: Arrival-order binary variables sum to one for each train pair at a station.
+%@ con eq_0009 kind=ordering domain=- indicator=- :: Departure-order binary variables sum to one for each train pair at a station.
+%@ con eq_0010 kind=headway domain=- indicator=- :: Headway separation between trains using the same platform at a station.
+%@ con eq_0011 kind=ordering domain=- indicator=- :: Each train allocated exactly one platform at each station.
+%@ con eq_0012 kind=ordering domain=- indicator=- :: Overtaking restriction: no overtaking between stations.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Station dwell time between minimum and maximum values.
+%@ con eq_0014 kind=headway domain=- indicator=- :: Minimum departure headway between trains on the same line.
+%@ con eq_0015 kind=ordering domain=- indicator=- :: Line-order binary variables sum to one for each train pair on a line.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Path cost component: total in-vehicle travel time.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Path cost component: total waiting time.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Path cost component: initial waiting time before preferred departure.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Path cost component: walking time for transfers/access/egress.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Transfer walking time between platforms.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Path feasibility: non-negative waiting times on path segments.
+%@ con eq_0024 kind=big_m domain=- indicator=- :: Big-M linearization of logical headway and order constraints.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Matrix form: equality linking variable and constant matrices.
+%@ con eq_0028 kind=linear domain=- indicator=- :: Matrix form: linear inequality in the variable matrix.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Matrix form: non-negativity of the variable matrix.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Line set of timetabling model equals all lines.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Decomposition: fix variables of previously scheduled lines.
+%@ con eq_0033 kind=flow_balance domain=- indicator=- :: User equilibrium condition for passenger assignment.
+%@ con eq_0034 kind=flow_balance domain=- indicator=- :: User equilibrium: used paths have equal and minimal cost.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Extra path cost equals sum of train-segment extra costs.
+%@ con eq_0039 kind=capacity domain=- indicator=- :: Vehicle capacity constraint on each train segment.
+%@ con eq_0041 kind=linear domain=- indicator=- :: LPPA objective: minimize total uncongested passenger cost.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Non-negativity of passenger path flows.
+%@ con eq_0044 kind=linear domain=- indicator=- :: Optimality condition (stationarity) for the passenger assignment model.
+%@ con eq_0050_a kind=linear domain=- indicator=- :: Complementary slackness for used paths (part a).
+%@ con eq_0050_b kind=linear domain=- indicator=- :: Complementary slackness for unused paths (part b).
+%@ con eq_0050_c kind=linear domain=- indicator=- :: Equilibrium cost relation (part c).
+%@ con eq_0051_a kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part a).
+%@ con eq_0051_b kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part b).
+%@ con eq_0051_c kind=linear domain=- indicator=- :: Dual feasibility for capacity constraints (part c).
+%@ con eq_0052_a kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part a).
+%@ con eq_0052_b kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part b).
+%@ con eq_0052_c kind=linear domain=- indicator=- :: Primal feasibility for flow conservation (part c).
+%@ con eq_0053 kind=linear domain=- indicator=- :: Strong duality / zero optimality gap for LPPA.
+%@ con eq_0054 kind=linear domain=- indicator=- :: Dual objective value equals primal objective value.
+%@ con eq_0055_a kind=linear domain=- indicator=- :: Path-choice optimality condition (part a).
+%@ con eq_0055_b kind=linear domain=- indicator=- :: Path-choice optimality condition (part b).
+%@ con eq_0055_c kind=linear domain=- indicator=- :: Path-choice optimality condition (part c).
+%@ con eq_0056_a kind=linear domain=- indicator=- :: Capacity-related complementarity (part a).
+%@ con eq_0056_b kind=linear domain=- indicator=- :: Capacity-related complementarity (part b).
+%@ con eq_0056_c kind=linear domain=- indicator=- :: Capacity-related complementarity (part c).
+%@ con eq_0057_a kind=linear domain=- indicator=- :: Flow-conservation complementarity (part a).
+%@ con eq_0057_b kind=linear domain=- indicator=- :: Flow-conservation complementarity (part b).
+%@ con eq_0057_c kind=linear domain=- indicator=- :: Flow-conservation complementarity (part c).
+%@ con eq_0058_a kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part a).
+%@ con eq_0058_b kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part b).
+%@ con eq_0058_c kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part c).
+\begin{align}
+  & T_{\mathit{ls} s^{'}}^{R u n} \leq t_{n s^{'}}^{A r r i v a l} - t_{\mathit{ns}}^{D e p a r t u r e} ; \tag{eq\_0004} \\
+  & T_{l}^{D e p a r t} \leq t_{\mathit{ns}}^{D e p a r t u r e} \tag{eq\_0005\_a} \\
+  & t_{\mathit{ns}}^{A r r i v a l} \leq T_{l}^{A r r i v a l} \tag{eq\_0005\_b} \\
+  & t_{\mathit{ns}}^{A r r i v a l} + T^{H} \leq t_{n^{'} s}^{A r r i v a l} , \mathit{ifb}_{n n^{'} s} = 1 ; \tag{eq\_0006} \\
+  & t_{\mathit{ns}}^{D e p a r t u r e} + T^{H} \leq t_{n^{'} s}^{D e p a r t u r e} \tag{eq\_0007} \\
+  & b_{n n^{'} s} + b_{n^{'} n s} = 1 ; \tag{eq\_0008} \\
+  & \left(b '\right)_{n n^{'} s} + \left(b '\right)_{n^{'} n s} = 1 ; \tag{eq\_0009} \\
+  & t_{\mathit{ns}}^{D e p a r t u r e} + T^{H} \leq t_{n^{'} s}^{A r r i v a l} , \mathit{ifb}_{\mathit{np}}^{T r a c k} = b_{n^{'} p}^{T r a c k} = b_{n n^{'} s} = 1 ; \forall p \in \mathbf{\mathit{P}}_{\mathit{ns}} ; \forall s \in \mathbf{\mathit{S}}_{l} \cap \mathbf{\mathit{S}}_{l^{'}} ; \tag{eq\_0010} \\
+  & \underset{p \in \mathbf{\mathit{P}}_{\mathit{ns}}}{\sum} b_{\mathit{np}}^{T r a c k} = 1 ; \forall s \in \mathbf{\mathit{S}}_{l} ; \tag{eq\_0011} \\
+  & \left(b '\right)_{n^{'} n s} - b_{n^{'} n s^{'}} = 0 ; \tag{eq\_0012} \\
+  & T_{\mathit{sl}}^{D m i n} \leq t_{\mathit{ns}}^{D e p a r t u r e} - t_{\mathit{ns}}^{A r r i v a l} \leq T_{\mathit{sl}}^{D m a x} ; \tag{eq\_0013} \\
+  & t_{\mathit{ns}}^{D e p a r t u r e} + T_{l}^{L m i n} \leq t_{n^{'} s}^{D e p a r t u r e} , \mathit{ifb}_{n n^{'}}^{L i n e} = 1 ; \tag{eq\_0014} \\
+  & b_{n n^{'}}^{L i n e} + b_{n^{'} n}^{L i n e} = 1 ; \tag{eq\_0015} \\
+  & c_{q 1} = \sum_{n \in \mathbf{\mathit{N}}_{q}^{P a t h} , s = s_{\mathit{qn}}^{A l i g h t} ,\textrm{ } s^{'} = s_{\mathit{qn}}^{B o a r d}} \left(t_{\mathit{ns}}^{A r r i v a l} - t_{n s^{'}}^{D e p a r t u r e}\right) ; \tag{eq\_0016} \\
+  & c_{q 2} = \sum_{n \in \mathbf{\mathit{N}}_{q}^{P a t h}} t_{\mathit{qn}}^{W a i t} ; \tag{eq\_0017} \\
+  & c_{q 3} = T^{W a i t} \cdot i_{q}^{W a i t} ; \tag{eq\_0018} \\
+  & c_{q 4} = \sum_{n \in \left(\mathbf{\mathit{N}}_{q}^{P a t h} - n_{q}^{O r i g i n}\right) , n^{'} = \mathit{Lambda}_{\mathit{qn}}^{T r a n s f e r}} t_{q n^{'} n}^{W a l k} ; \tag{eq\_0019} \\
+  & t_{q n^{'} n}^{W a l k} = \underset{p \in \mathbf{\mathit{P}}_{\mathit{ns}}}{\sum} \underset{p^{'} \in \mathbf{\mathit{P}}_{n^{'} s^{'}}}{\sum} \left(T_{p^{'} p}^{P l a t f o r m} \cdot b_{n^{'} p^{'}}^{T r a c k} \cdot b_{\mathit{np}}^{T r a c k}\right) ; s = s_{\mathit{qn}}^{B o a r d} ; s^{'} = s_{q n^{'}}^{A l i g h t} ; \forall n \in \left(\mathbf{\mathit{N}}_{q}^{P a t h} - n_{q}^{O r i g i n}\right) ; n^{'} = \mathit{Lambda}_{\mathit{qn}}^{T r a n s f e r} ; \tag{eq\_0021} \\
+  & t_{\mathit{qn}}^{W a i t} \geq 0 ; \forall n \in \mathbf{\mathit{N}}_{q}^{P a t h} \tag{eq\_0022} \\
+  \min\quad & \sum_{l \in \mathbf{\mathit{L}}} \underset{n \in \mathbf{\mathit{N}}_{l} , s = s_{l}^{O r i g i n} , s^{'} = s_{l}^{D e s t i n a t i o n}}{\sum} \left(t_{n s^{'}}^{A r r i v a l} - t_{\mathit{ns}}^{D e p a r t u r e}\right) \tag{eq\_0023} \\
+  & t_{\mathit{ns}}^{A r r i v a l} + T^{H} \leq t_{n^{'} s}^{A r r i v a l} + \left(1 - b_{n n^{'} s}\right) \cdot M \tag{eq\_0024} \\
+  & s . t . \mathit{Objective} = \sum_{l \in \mathbf{\mathit{L}}^{T M}} \sum_{l^{'} \in \mathbf{\mathit{L}}^{T M}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{n^{'} \in \mathbf{\mathit{N}}_{l^{'}}} \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{1} \left(\mathbf{v} \mathbf{a} \mathbf{r}\right)_{n n^{'}} \tag{eq\_0027} \\
+  & \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{2} \left(\mathbf{v} \mathbf{a} \mathbf{r}\right)_{n n^{'}} = \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{3} ; \forall l , l^{'} \in \mathbf{\mathit{L}}^{T M} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall n^{'} \in \mathbf{\mathit{N}}_{l^{'}} ; \tag{eq\_0028} \\
+  & \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{4} \left(\mathbf{v} \mathbf{a} \mathbf{r}\right)_{n n^{'}} + \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{5} \geq 0 ; \forall l , l^{'} \in \mathbf{\mathit{L}}^{T M} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall n^{'} \in \mathbf{\mathit{N}}_{l^{'}} ; \tag{eq\_0029} \\
+  & \left(\mathbf{v} \mathbf{a} \mathbf{r}\right)_{n n^{'}} \geq 0 ; \forall l , l^{'} \in \mathbf{\mathit{L}}^{T M} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall n^{'} \in \mathbf{\mathit{N}}_{l^{'}} ; \tag{eq\_0030} \\
+  & \mathbf{\mathit{L}}^{T M} = \mathbf{\mathit{L}} \tag{eq\_0031} \\
+  & \left(\mathbf{v} \mathbf{a} \mathbf{r}\right)_{n n^{'}} = \left(\mathbf{c} \mathbf{o} \mathbf{n}\right)_{n n^{'}}^{6} ; \forall l , l^{'} \in \left(\mathbf{\mathit{L}}^{T M} - l_{j}\right) ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall n^{'} \in \mathbf{\mathit{N}}_{l^{'}} ; \tag{eq\_0033} \\
+  & \mathbf{\mathit{L}}^{T M} = \mathbf{\mathit{L}}_{j}^{F i x e d} \cup l_{j} \tag{eq\_0034} \\
+  & c_{q} = c_{q}^{U n c} + c_{q}^{E x t r a} \tag{eq\_0037} \\
+  & c_{q}^{E x t r a} = \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} \left(b_{\mathit{qns} s^{'}}^{P a t h} \cdot c_{\mathit{ns} s^{'}}^{E x t r a}\right) ; \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0039} \\
+  & \mathit{Pi}_{n}^{C a p a c i t y} - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q} \geq 0 \tag{eq\_0041} \\
+  & \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r} = 0 \tag{eq\_0042} \\
+  & A_{q} \geq 0 \tag{eq\_0044} \\
+  & A_{q} \cdot \left(c_{q} - \left({c}\right)_{r}\right) = 0 \tag{eq\_0050\_a} \\
+  & A_{q} \geq 0 \tag{eq\_0050\_b} \\
+  & c_{q} - \left({c}\right)_{r} \geq 0 \tag{eq\_0050\_c} \\
+  & c_{\mathit{ns} s^{'}}^{E x t r a} \cdot \left(\mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q}\right) = 0 \tag{eq\_0051\_a} \\
+  & c_{\mathit{ns} s^{'}}^{E x t r a} \geq 0 \tag{eq\_0051\_b} \\
+  & \mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q} \geq 0 \tag{eq\_0051\_c} \\
+  & \left({c}\right)_{r} \cdot \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) = 0 \tag{eq\_0052\_a} \\
+  & \left({c}\right)_{r} \geq 0 \tag{eq\_0052\_b} \\
+  & \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r} \geq 0 \tag{eq\_0052\_c} \\
+  & F = \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \cdot c_{q}^{U n c} - \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} \mathit{lambda}_{\mathit{ns} s^{'}} \left(\mathit{Pi}_{n}^{C a p a c i t y} - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \mathit{lambda}_{r} \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \mathit{lambda}_{q} \tag{eq\_0053} \\
+  & c_{q}^{U n c} + \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} s^{'}}^{P a t h} \mathit{lambda}_{\mathit{ns} s^{'}} - \mathit{lambda}_{r} - \mathit{lambda}_{q} = 0 ; \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0054} \\
+  & \mathit{lambda}_{\mathit{ns} s^{'}} \left(\mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q}\right) = 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_a} \\
+  & \mathit{lambda}_{\mathit{ns} s^{'}} \geq 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_b} \\
+  & \mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} s^{'}}^{P a t h} \cdot A_{q} \geq 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_c} \\
+  & \mathit{lambda}_{r} \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) = 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_a} \\
+  & \mathit{lambda}_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_b} \\
+  & \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_c} \\
+  & A_{q} \mathit{lambda}_{q} = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_a} \\
+  & A_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_b} \\
+  & \mathit{lambda}_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_c} \\
+  & A_{q} \left(c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} s^{'}}^{P a t h} \mathit{lambda}_{\mathit{ns} s^{'}} - \mathit{lambda}_{r}\right) = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_a} \\
+  & A_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_b} \\
+  & c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , s^{'} \in \mathbf{\mathit{S}}_{l} : s^{'} = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} s^{'}}^{P a t h} \mathit{lambda}_{\mathit{ns} s^{'}} - \mathit{lambda}_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_c} \\
+\end{align}

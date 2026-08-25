@@ -1,0 +1,136 @@
+% Declaration sidecar for 10.1016_j.cie.2025.111794
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2025.111794
+% From railway disruptions to recovery: An improved Benders decomposition for the dynamic train timetable rescheduling and rolling stock reassignment
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.cie.2025.111794.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total operational costs, penalties, and schedule deviations
+
+% d: classified as variable during review
+%@ var d shape=V,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train service v at station s
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of train services
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway time between successive trains
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Station index
+
+% a: classified as variable during review
+%@ var a shape=V,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service v at station s
+
+% r: classified as parameter during review
+%@ param r shape=S,S kind=matrix domain=- :: Running time between stations s and s+1
+
+% l: classified as parameter during review
+%@ param l shape=S kind=vector domain=- :: Dwell time at station s
+
+% unusable as an identifier, rename or drop: σ
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs or connections
+
+% I: classified as parameter during review
+%@ param I shape=- kind=scalar domain=- :: Flexible time interval for delay absorption
+
+% D: classified as parameter during review
+%@ param D shape=V,S kind=matrix domain=- :: Original departure time from pre-planned schedule
+
+% unusable as an identifier, rename or drop: Θ
+% unusable as an identifier, rename or drop: β
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of directions (up/down)
+
+% x: classified as variable during review
+%@ var x shape=V,C,F domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train c operates service v in direction f
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of rolling stock units
+
+% unusable as an identifier, rename or drop: α
+% V̄: classified as index during review
+%@ index Vopp ordered=0 cyclic=0 :: Set of train services in opposite direction
+
+% unusable as an identifier, rename or drop: π
+% unusable as an identifier, rename or drop: η
+% Z: classified as variable during review
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+
+% unusable as an identifier, rename or drop: ω
+% p: classified as parameter during review
+%@ param p shape=- kind=scalar domain=- :: Passenger demand or capacity
+
+% unusable as an identifier, rename or drop: δ
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+
+% unusable as an identifier, rename or drop: ρ
+% y: classified as parameter during review
+%@ param y shape=- kind=scalar domain=- :: Dual variable placeholder
+
+% z: classified as parameter during review
+%@ param z shape=- kind=scalar domain=- :: Dual variable placeholder
+
+% unusable as an identifier, rename or drop: φ
+% unusable as an identifier, rename or drop: ξ
+% Bound by a quantifier or big operator, so no declaration of their own: c, f, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0003 kind=linear domain=- indicator=- :: Running time constraint between consecutive stations
+%@ con eq_0004 kind=linear domain=- indicator=- :: Minimum dwell time at non-skipped stations
+%@ con eq_0005 kind=linear domain=- indicator=- :: Minimum arrival delay threshold that can be absorbed before rescheduling
+%@ con eq_0006 kind=linear domain=- indicator=- :: Minimum departure delay threshold that can be absorbed before rescheduling
+%@ con eq_0008 kind=linear domain=- indicator=- :: Short-turning turnaround time at non-terminal stations
+%@ con eq_0009 kind=linear domain=- indicator=- :: Each pre-planned train service operated by at most one rolling stock unit per direction
+%@ con eq_0010 kind=linear domain=- indicator=- :: Directional balance for rolling stock assignment of pre-planned services
+%@ con eq_0011 kind=linear domain=- indicator=- :: Directional balance for rolling stock connections between successive services
+%@ con eq_0012 kind=linear domain=- indicator=- :: Minimum number of operational tasks per rolling stock unit
+%@ con eq_0013 kind=linear domain=- indicator=- :: Task ordering prevents consecutive same-direction service assignment
+%@ con eq_0014 kind=linear domain=- indicator=- :: End-of-period depot fleet balance
+%@ con eq_0015 kind=linear domain=- indicator=- :: Capacity limit for inserted train services per direction
+%@ con eq_0016 kind=linear domain=- indicator=- :: Timing and positioning constraints for newly inserted train services
+%@ con eq_0017 kind=linear domain=- indicator=- :: Operational cost component Z1
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Penalty for cancelled services and unsatisfied demand (component a)
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Penalty for cancelled services and unsatisfied demand (component b)
+%@ con eq_0018_c kind=linear domain=- indicator=- :: Penalty for cancelled services and unsatisfied demand (component c)
+%@ con eq_0018_d kind=linear domain=- indicator=- :: Penalty for unscheduled insertion slots (component d)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Total deviation from pre-planned arrival and departure times (Z3)
+%@ con eq_0020 kind=big_m domain=- indicator=- :: Big-M linearization of conditional timing constraints for inserted services
+%@ con eq_0022 kind=linear domain=- indicator=- :: Integrated MILP objective and variable domain definitions
+%@ con eq_0024 kind=linear domain=- indicator=- :: Rescheduling subproblem objective in two-stage algorithm
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Feasibility cut for infeasible insertion slots (part a)
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Feasibility cut for infeasible insertion slots (part b)
+%@ con eq_0025_c kind=linear domain=- indicator=- :: Feasibility cut for infeasible insertion slots (part c)
+%@ con eq_0025_d kind=linear domain=- indicator=- :: Feasibility cut for infeasible insertion slots (part d)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Reduced master problem objective in Benders decomposition
+%@ con eq_0031 kind=linear domain=- indicator=- :: Multi-optimality Benders cut
+%@ con eq_0034 kind=linear domain=- indicator=- :: Benders optimality cut for objective lower bound
+%@ con eq_0035 kind=linear domain=- indicator=- :: Benders cut with dual variables
+%@ con eq_0038 kind=linear domain=- indicator=- :: Subproblem dual constraint (part 1)
+%@ con eq_0039 kind=linear domain=- indicator=- :: Subproblem dual constraint (part 2)
+%@ con eq_0040 kind=linear domain=- indicator=- :: Algorithm convergence or termination condition

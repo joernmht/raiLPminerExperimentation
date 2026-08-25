@@ -1,0 +1,67 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2014.01.009
+%@ meta id=10.1016_j.trb.2014.01.009 family=milp schema=0.1.0
+%@ name :: An overview of recovery models and algorithms for real-time railway rescheduling
+%@ desc :: Mined from An overview of recovery models and algorithms for real-time railway rescheduling (Transportation Research Part B Methodological, 2014).
+%@ prov source :: 10.1016/j.trb.2014.01.009
+%@ prov reference :: An overview of recovery models and algorithms for real-time railway rescheduling
+%@ prov author :: Valentina Cacchiani; Dennis Huisman; Martin Philip Kidd; Leo Kroon; Paolo Toth; Lucas P. Veelenturf; Joris Wagenaar
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize delays, rescheduling costs, and cancellation costs across the considered recovery models.
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Starting time of operation i.
+%@ index F ordered=0 cyclic=0 :: Set of fixed arcs in alternative graph.
+%@ param f shape=- kind=scalar domain=- :: Processing time of operation i or setup time between conflicting operations i and j.
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs in alternative graph.
+%@ index h ordered=0 cyclic=0 :: Successor operation of operation j in a pair of conflicting operations.
+%@ index k ordered=0 cyclic=0 :: Index for operations, completions, or train unit types.
+%@ param M shape=- kind=scalar domain=- :: Large positive number used for linearizing disjunctive constraints.
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of conflicting operations or assignment of composition/completion.
+%@ param Mx shape=- kind=scalar domain=- :: Product of M and binary variable x used in linearization.
+%@ index R ordered=0 cyclic=0 :: Set of trips.
+%@ index C ordered=0 cyclic=0 :: Set of compositions.
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating that composition c is changed to composition c' at the end of trip r.
+%@ param I shape=- kind=scalar domain=- :: Initial inventory of train unit type m in station s.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ param a shape=- kind=scalar domain=- :: Coefficient indicating task coverage or inventory change.
+%@ index m ordered=0 cyclic=0 :: Train unit type.
+%@ index s ordered=0 cyclic=0 :: Station.
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Non-negative off-balance of train unit type m in station s at the end of the day.
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether task i is canceled (1) or covered (0).
+%@ index D ordered=0 cyclic=0 :: Set of crew members.
+%@ index K ordered=0 cyclic=0 :: Set of possible completions for crew member j.
+%@ index T ordered=0 cyclic=0 :: Set of tasks.
+%@ con eq_0002 kind=linear domain=- indicator=- :: Processing time constraints for fixed arcs: t_sigma(i) >= t_i + f_i for all (i,sigma(i)) in F.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Disjunctive alternative arc constraints: for each ((i,j),(h,k)) in A, either t_k >= t_h + f_hk or t_j >= t_i + f_ij.
+%@ con eq_0004 kind=linear domain=- indicator=- :: Linearized first alternative arc constraint with binary x_jk: t_k >= t_h + f_hk - M(1-x_jk).
+%@ con eq_0005 kind=linear domain=- indicator=- :: Linearized second alternative arc constraint: t_j >= t_i + f_ij - M x_jk.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Exactly one composition is assigned to each trip: sum_{c in C} x_{r,c}=1 for all r in R.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Composition assigned to a trip is changed to some composition at the end of the trip: x_{r,c}=sum_{c'} z_{r,c,c'}.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Composition at the start of a consecutive trip equals the changed composition from the previous trip: x_{r',c'}=sum_c z_{r,c,c'}.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Inventory non-negativity at station s at departure time of trip r: I^0_{s,m}+sum_{r' in R_{s,r}} sum_c a_{s,r',c,m} x_{r',c} >= 0.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Definition of realized end-of-day inventory: I^0_{s,m}+sum_r sum_c a_{s,r,c,m} x_{r,c}=i^∞_{s,m}.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Relates realized inventory to final inventory and off-balance: i^∞_{s,m}=I^∞_{s,m}+d^+_{s,m}-d^-_{s,m}.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Rolling stock assignments of trips already started at rescheduling time τ are fixed: x_{r,c}=x^0_{r,c} for r in R_τ.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Binary character of composition assignment variables: x_{r,c} in {0,1}.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Every task is either covered by at least one crew completion or canceled: sum_{j in D} sum_{k in K_j} a_{ijk} x_{jk} + y_i >= 1 for all i in T.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Each crew member is assigned exactly one completion: sum_{k in K_j} x_{jk}=1 for all j in D.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Binary character of crew assignment variables: x_{jk} in {0,1}.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Binary character of task cancellation variables: y_i in {0,1}.
+\begin{align}
+  & subject to t_{\mathit{sigma} \left(i\right)} \geq t_{i} + f_{i} \left(i , \mathit{sigma} \left(i\right)\right) \in F \tag{eq\_0002} \\
+  & \left(t_{k} \geq t_{h} + f_{\mathit{hk}}\right) \vee \left(t_{j} \geq t_{i} + f_{\mathit{ij}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0003} \\
+  & t_{k} \geq t_{h} + f_{\mathit{hk}} - M \left(1 - x_{\mathit{jk}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0004} \\
+  & t_{j} \geq t_{i} + f_{\mathit{ij}} - \mathit{Mx}_{\mathit{jk}} \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0005} \\
+  & subject to \sum_{c \in C} x_{r , c} = 1 r \in R \tag{eq\_0007} \\
+  & x_{r , c} = \sum_{c^{'} \in C} z_{r , c , c^{'}} r \in \mathcal{R} , c \in C \tag{eq\_0008} \\
+  & x_{r^{'} , c^{'}} = \sum_{c \in C} z_{r , c , c^{'}} \left(r , r^{'}\right) \in \mathcal{R} , c^{'} \in C \tag{eq\_0009} \\
+  & I_{s , m}^{0} + \sum_{r^{'} \in R_{s , r}} \sum_{c \in C} a_{s , r^{'} , c , m} \cdot x_{r^{'} , c} \geq 0 \cdot s \in S , r \in R , m \in M \tag{eq\_0010} \\
+  & I_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} a_{s , r , c , m} \cdot x_{r , c} = i_{s , m}^{\infty} s \in S , m \in M \tag{eq\_0011} \\
+  & i_{s , m}^{\infty} = I_{s , m}^{\infty} + d_{s , m}^{+} - d_{s , m}^{-} \cdot s \in S , m \in M \tag{eq\_0012} \\
+  & x_{r , c} = x_{r , c}^{0} r \in R_{\mathit{tau}} , c \in C \tag{eq\_0013} \\
+  & x_{r , c} \in \left\{0 , 1\right\} r \in R , c \in C \tag{eq\_0014} \\
+  \min\quad & \sum_{j \in D} \sum_{k \in K_{j}} c_{j}^{k} x_{j}^{k} + \sum_{i \in T} f_{i} \cdot y_{i} \tag{eq\_0015} \\
+  & subject to \sum_{j \in D} \sum_{k \in K_{j}} a_{\mathit{ij}}^{k} \cdot x_{j}^{k} + y_{i} \geq 1 , \forall i \in T \tag{eq\_0016} \\
+  & \sum_{k \in K_{j}} x_{j}^{k} = 1 \forall j \in D \tag{eq\_0017} \\
+  & x_{j}^{k} \in \left\{0 , 1\right\} \forall j \in D \forall k \in K_{j} \tag{eq\_0018} \\
+  & y_{i} \in \left\{0 , 1\right\} \forall i \in T \tag{eq\_0019} \\
+\end{align}

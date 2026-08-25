@@ -1,0 +1,111 @@
+% Declaration sidecar for 10.1016_j.ijdrr.2022.103361
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ijdrr.2022.103361
+% Earthquake resilience assessment and improving method of high-speed railway based on train timetable rescheduling
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ijdrr.2022.103361.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize total penalty for cancellations and deviations, minus excitation reward for special trains
+
+% y: classified as variable during review
+%@ var y shape=T domain=binary role=primary :: Binary variable indicating whether train t is canceled (1) or not (0)
+
+% P: classified as parameter during review
+%@ param P shape=- kind=scalar :: Penalty cost for train cancellation or deviation
+
+% unusable as an identifier, rename or drop: η
+% d: classified as variable during review
+%@ var d shape=E domain=non_negative role=primary :: Positive deviation from original timetable for event e
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events in the event-activity network
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m :: Large positive constant (M1, M2) for linearization
+
+% t: classified as index during review
+%@ index t ordered=0 cyclic=0 :: Train index
+
+% time: classified as index during review
+%@ index time ordered=0 cyclic=0 :: Function returning original time of event
+
+% x: classified as variable during review
+%@ var x shape=E domain=non_negative role=primary :: Rescheduled time of event e
+
+% D: classified as index during review
+%@ index D ordered=0 cyclic=0 :: Allowable maximum delay time
+
+% H: classified as index during review
+%@ index H ordered=0 cyclic=0 :: Time when target station returns to service
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Event index
+
+% f: classified as index during review
+%@ index f ordered=0 cyclic=0 :: Event index
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities in the event-activity network
+
+% L: classified as parameter during review
+%@ param L shape=- kind=scalar :: Minimum duration or interval time
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Activity index
+
+% ifeventeisarrangedbeforeeventf: classified as parameter during review
+%@ param ifeventeisarrangedbeforeeventf shape=- kind=scalar :: Indicator for event ordering (1 if e before f, 0 otherwise)
+
+% unusable as an identifier, rename or drop: λ
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of stations
+
+% ifdepartureeventeisarrangedbeforearrivaleventfatthesamestations: classified as parameter during review
+%@ param ifdepartureeventeisarrangedbeforearrivaleventfatthesamestations shape=- kind=scalar :: Indicator for departure-arrival ordering at same station
+
+% unusable as an identifier, rename or drop: φ
+% C: classified as parameter during review
+%@ param C shape=S kind=vector :: Capacity of station s (number of tracks)
+
+% Bound by a quantifier or big operator, so no declaration of their own: s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0006 kind=linear :: Events of a non-canceled train cannot be earlier than original timetable (Eq. 4)
+%@ con eq_0007 kind=linear :: Maximum deviation from original timetable is bounded by D unless train canceled (Eq. 5)
+%@ con eq_0008 kind=linear :: Binary cancellation decision for trains whose departure plus D is at or after recovery time (Eq. 6)
+%@ con eq_0009 kind=linear :: Mandatory cancellation when original departure plus D is before recovery time (Eq. 7)
+%@ con eq_0010 kind=linear :: Events can only happen after target station returns to service (Eq. 8)
+%@ con eq_0011 kind=linear :: Non-negativity of event times and deviation variables (Eq. 9)
+%@ con eq_0012 kind=linear :: Minimum running time in each section (Eq. 10)
+%@ con eq_0013 kind=linear :: Minimum dwell time at stations (Eq. 11)
+%@ con eq_0014 kind=linear :: Definition of event ordering variable lambda_a (Eq. 12)
+%@ con eq_0015 kind=linear :: One of two ordering directions must hold for every activity pair (Eq. 13)
+%@ con eq_0016 kind=linear :: Departure order equals arrival order, preventing overtaking on segments (Eq. 14)
+%@ con eq_0017 kind=linear :: Definition of station headway sequence variable phi_a (Eq. 15)
+%@ con eq_0018 kind=linear :: Minimum interval between an arriving and a departing train at the same station (Eq. 16)
+%@ con eq_0019 kind=linear :: Minimum departure interval between two trains at the same station (Eq. 17)
+%@ con eq_0020 kind=linear :: Minimum arrival interval between two trains at the same station (Eq. 18)
+%@ con eq_0021 kind=linear :: Station capacity: at least one free arrival-departure track must be available on entry (Eq. 19)

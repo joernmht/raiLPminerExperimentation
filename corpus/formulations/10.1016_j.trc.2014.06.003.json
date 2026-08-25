@@ -1,0 +1,502 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2014.06.003",
+  "name": "Demand-driven timetable design for metro services",
+  "family": "milp",
+  "description": "Mined from Demand-driven timetable design for metro services (Transportation Research Part C Emerging Technologies, 2014).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2014.06.003",
+    "reference": "Demand-driven timetable design for metro services",
+    "author": "Lijun Sun; Jian Gang Jin; Der‐Horng Lee; Kay W. Axhausen; Alexander Erath",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "P",
+      "description": "Set of possible waiting profiles",
+      "ordered": true,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of equivalent time intervals",
+      "ordered": true,
+      "cyclic": false
+    },
+    {
+      "name": "t",
+      "description": "Index for equivalent time intervals",
+      "ordered": true,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Index for stations",
+      "ordered": true,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations",
+      "ordered": true,
+      "cyclic": false
+    },
+    {
+      "name": "u",
+      "description": "Time index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Tmin",
+      "description": "t1 in T with t1+Nmin-1 in T",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Tmax",
+      "description": "t1 in T with t1+Nmax-1 in T",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Tpeak",
+      "description": "t1 in T with t1+Npeak-1 in T",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Tpo",
+      "description": "t in T with t+Npeak and t+Noff in T",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "B",
+      "description": "Passenger demand: total demand in interval u (B^u), or disaggregated origin-destination demand B_{o,d}^u",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "K",
+      "description": "Total number of train services to be operated",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "CAP",
+      "description": "Train capacity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "a",
+      "description": "indicator for t in window [t1, t1+Nmin-1]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b",
+      "description": "indicator for t in window [t1, t1+Nmax-1]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "indicator for t in window [t1, t1+Npeak-1]",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "w",
+      "description": "Average waiting time for passengers entering at interval u (or at station s in interval u)",
+      "shape": [
+        "T"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Proportion of passengers entering at interval u choosing waiting profile p (or at station s)",
+      "shape": [
+        "T",
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating whether a train departs at the end of interval t",
+      "shape": [
+        "t"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "q",
+      "description": "Occupancy of train services departing at the end of interval t at station s",
+      "shape": [
+        "t",
+        "s"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0007",
+      "description": "Final interval T_n must have a train departure (x_{T_n}=1)",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "T_{n}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008_a",
+      "description": "",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008_b",
+      "description": "",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Consistency: a train departs if passengers are assigned to board at that interval",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "u+p-1",
+              "offset": -1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0024",
+      "description": "Peak/off-peak headway selection: x_t forces either N_Peak or N_Off headway",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t+N_{\\mathit{Peak}}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t+N_{\\mathit{Off}}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "headway",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0026",
+      "description": "Peak and off-peak headways are not selected simultaneously when N_Off != 2*N_Peak",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t+N_{Peak}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t+N_{Off}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total passenger waiting time",
+    "terms": [
+      {
+        "ref": "y",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "u",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "P",
+            "expr": "p",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -1,0 +1,115 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2019.06.010
+%@ meta id=10.1016_j.trb.2019.06.010 family=milp schema=0.1.0
+%@ name :: Combined line planning and train timetabling for strongly heterogeneous railway lines with direct connections
+%@ desc :: Mined from Combined line planning and train timetabling for strongly heterogeneous railway lines with direct connections (Transportation Research Part B Methodological, 2019).
+%@ prov source :: 10.1016/j.trb.2019.06.010
+%@ prov reference :: Combined line planning and train timetabling for strongly heterogeneous railway lines with direct connections
+%@ prov author :: Fei Yan; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of empty-seat-hours, passenger travel time and number of lines
+%@ index L ordered=0 cyclic=0 :: Set of train lines
+%@ var q shape=L,i,j domain=integer role=primary :: Number of passengers assigned to line L between stations i and j
+%@ param t shape=i,j,L kind=matrix :: Travel time between stations
+%@ param C shape=- kind=scalar :: Train capacity
+%@ var f shape=L domain=integer role=primary :: Frequency of line L
+%@ var x shape=L domain=binary role=primary :: Binary variable indicating if line L is selected
+%@ index N ordered=0 cyclic=0 :: Number of stations on a line
+%@ index m ordered=0 cyclic=0 :: Index for stations
+%@ index s ordered=0 cyclic=0 :: Station index
+%@ param P shape=i,j kind=matrix :: Passenger demand between stations
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ param v shape=s,L kind=matrix :: Binary parameter indicating if line L stops at station s
+%@ param M shape=- kind=big_m :: Large positive number
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ param T shape=- kind=scalar :: Period length
+%@ index i ordered=0 cyclic=0 :: Event index
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ index j ordered=0 cyclic=0 :: Event index
+%@ var z shape=i,j domain=binary role=primary :: Binary modulo variable for event order
+%@ param h shape=i,j kind=matrix :: Minimum headway time
+%@ param r shape=i,j kind=matrix :: Minimum running time
+%@ var c shape=i,j domain=integer role=primary :: Integer variable for non-collision constraints
+%@ param u shape=i,j kind=matrix :: Upper bound of dwell time
+%@ param d shape=i,j kind=matrix :: Minimum dwell time
+%@ var y shape=i,j domain=binary role=primary :: Binary variable for dwell time stretch
+%@ param O shape=L kind=vector :: Maximum number of overtakings per line
+%@ index F ordered=0 cyclic=0 :: Service frequency function
+%@ param I_avg shape=i,j kind=matrix :: Average service interval
+%@ param I shape=i,j kind=matrix :: Departure interval between successive trains
+%@ param R shape=i,j kind=matrix :: Regularity deviation
+%@ param V shape=- kind=scalar :: Objective value
+%@ param b shape=i,j kind=matrix :: Distance between stations
+%@ param Av shape=- kind=scalar :: Average seat occupancy
+%@ param occup shape=- kind=scalar :: Seat occupancy
+%@ con eq_0005 kind=flow_balance :: Passenger OD demand satisfaction
+%@ con eq_0006 kind=big_m :: Passenger flow only on service arcs
+%@ con eq_0007 kind=linear :: Passenger flow integrality
+%@ con eq_0008 kind=capacity :: Seat capacity on each section
+%@ con eq_0009 kind=linear :: Line frequency upper bound
+%@ con eq_0010 kind=linear :: Line frequency integrality
+%@ con eq_0011 kind=linear :: Line selection binary
+%@ con eq_0012 kind=linear :: Linearization of line selection by frequency
+%@ con eq_0014 kind=linear :: Periodic event time bounds
+%@ con eq_0015 kind=linear :: Modulo parameter binary
+%@ con eq_0016 kind=headway :: Headway time bounds
+%@ con eq_0017 kind=linear :: Running time bounds
+%@ con eq_0018 kind=modulo :: Non-collision modulo relation
+%@ con eq_0019 kind=linear :: Non-collision variable bounds
+%@ con eq_0020 kind=linear :: Non-collision variable integrality
+%@ con eq_0021 kind=linear :: Regularity tolerance bounds
+%@ con eq_0022 kind=linear :: Same running and dwell times along a line
+%@ con eq_0023 kind=linear :: Robustness deviation bounds
+%@ con eq_0024 kind=linear :: Middle of headway bounds
+%@ con eq_0025 kind=linear :: Robustness deviation definition
+%@ con eq_0026 kind=linear :: Dwell time bounds with stretch variable
+%@ con eq_0027 kind=capacity :: Maximum number of overtakings per line
+%@ con eq_0028 kind=linear :: Upper dwell time with stretch supplement
+%@ con eq_0031 kind=linear :: Service frequency from s_i to s_j
+%@ con eq_0032 kind=linear :: Average service interval
+%@ con eq_0033 kind=linear :: Regularity deviation for an OD pair
+%@ con eq_0034 kind=linear :: Average regularity condition
+%@ con eq_0035 kind=linear :: Combined objective for iterative evaluation
+%@ con eq_0037 kind=linear :: Scaled passenger travel time objective
+%@ con eq_0038 kind=linear :: Scaled timetable robustness objective
+%@ con eq_0039 kind=linear :: Number of dwell time stretches objective
+%@ con eq_0040 kind=linear :: Segment seat occupancy rate
+%@ con eq_0041 kind=linear :: Average seat occupancy of a line
+%@ con eq_0042 kind=linear :: Average seat occupancy of line plan
+\begin{align}
+  \min\quad & \mathit{alpha} \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} \sum_{m = 1}^{N_{l} - 1} \left(C \cdot f_{l} - \sum_{i = 1}^{m} \sum_{j = m + 1}^{N_{l}} q_{s_{i} , s_{j}}^{l}\right) \cdot t_{s_{m} , s_{m + 1}}^{l} + \left(1 - \mathit{alpha}\right) \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} \sum_{i = 1}^{N_{l} - 1} \sum_{j = i + 1}^{N_{l}} t_{s_{i} , s_{j}}^{l} \cdot q_{s_{i} , s_{j}}^{l} + \mathit{beta} \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} x_{l} \tag{eq\_0001} \\
+  & \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} q_{s_{i} , s_{j}}^{l} = P_{s_{i} , s_{j}} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}} \tag{eq\_0005} \\
+  & q_{s_{i} , s_{j}}^{l} \leq M \cdot v_{s_{i}}^{l} \cdot v_{s_{j}}^{l} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0006} \\
+  & q_{s_{i} , s_{j}}^{l} \in \mathcal{N} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0007} \\
+  & \sum_{i = 1}^{m} \sum_{j = m + 1}^{N_{l}} q_{s_{i} , s_{j}}^{l} \leq \mathit{mu} \cdot C \cdot f_{l} \forall s_{m} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0008} \\
+  & f_{l} \leq f_{max} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0009} \\
+  & f_{l} \in \mathcal{N} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0010} \\
+  & x_{l} \in \left\{0 , 1\right\} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0011} \\
+  & f_{l} / f_{max} \leq x_{l} \leq f_{l} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0012} \\
+  & 0 \leq \mathit{pi}_{i} < T \forall i \in \mathbf{\mathcal{E}} \tag{eq\_0014} \\
+  & z_{i j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0015} \\
+  & h_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq T - h_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0016} \\
+  & r_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \mathit{theta} \cdot r_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \tag{eq\_0017} \\
+  & z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}} + z_{j j^{'}} = 2 \cdot c_{i i^{'} j j^{'}} \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0018} \\
+  & 0 \leq c_{i i^{'} j j^{'}} \leq 2 \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0019} \\
+  & c_{i i^{'} j j^{'}} \in \mathcal{N} \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0020} \\
+  & \lfloor \frac{T}{f_{l}} \rfloor - \mathit{xi} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \lceil \frac{T}{f_{l}} \rceil + \mathit{xi} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , l \in L \tag{eq\_0021} \\
+  & \mathit{pi}_{n} - \mathit{pi}_{m} + z_{m n} \cdot T = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \forall \left(m , n\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{k}^{l}\right) , \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , k \in \left[2 , N\right] , l \in L \tag{eq\_0022} \\
+  & - \mathit{delta}_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T - \mathit{phi}_{i j} \leq \mathit{delta}_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0023} \\
+  & \mathit{phi}_{i j} = \frac{u_{i j} + l_{i j}}{2} \tag{eq\_0024} \\
+  & \mathit{delta}_{i j} = \left|\mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T - \mathit{phi}_{i j}\right| \tag{eq\_0025} \\
+  & d_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq d_{i j} + \mathit{eta}_{i j} \cdot y_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{dwell} \tag{eq\_0026} \\
+  & \underset{\left(i , j\right) \in \mathbf{\mathcal{P}}_{l} , \left(i , j\right) \in \mathbf{\mathcal{A}}_{dwell}}{\sum} y_{i j} \leq O_{l}^{m a x} \forall l \in \mathbf{\mathcal{L}} \tag{eq\_0027} \\
+  & u_{i j} = d_{i j} + \mathit{eta}_{i j} \cdot y_{i j} \tag{eq\_0028} \\
+  & F \left(s_{i} , s_{j}\right) = \underset{l \in \mathbf{\mathcal{L}}}{\sum} f_{l} \cdot v_{s_{i}}^{l} \cdot v_{s_{j}}^{l} \tag{eq\_0031} \\
+  & \left(\bar{I}\right)_{s_{i} , s_{j}} = \frac{T}{F \left(s_{i} , s_{j}\right)} \tag{eq\_0032} \\
+  & R \left(s_{i} , s_{j}\right) = \frac{1}{F \left(s_{i} , s_{j}\right)} \sum_{\mathit{tau} = 1}^{F \left(s_{i} , s_{j}\right)} \frac{\left|\right. I_{s_{i} , s_{j}}^{\mathit{tau} , \mathit{tau}^{'}} - \left(\bar{I}\right)_{s_{i} , s_{j}} \left|\right.}{\left(\bar{I}\right)_{s_{i} , s_{j}}} \tag{eq\_0033} \\
+  & R = \frac{1}{N_{O D}} \underset{s_{i} \in \mathbf{\mathcal{S}}}{\sum} \underset{s_{j} \in \mathbf{\mathcal{S}} : i < j}{\sum} R \left(s_{i} , s_{j}\right) \tag{eq\_0034} \\
+  & M_{V R} = \frac{V^{n} - V^{\star}}{V^{\star}} + \frac{R^{n} - R^{\star}}{R^{\star}} \tag{eq\_0035} \\
+  & V_{1} = \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \cup \mathbf{\mathcal{A}}_{dwell}}{\sum} \frac{\mathit{lambda}_{i j} \cdot \left(\mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T\right)}{N_{run} + N_{dwell}} \tag{eq\_0037} \\
+  & V_{2} = \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{infra}}{\sum} \frac{\mathit{delta}_{i j}}{N_{infra}} \tag{eq\_0038} \\
+  & V_{3} = \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{dwell}}{\sum} y_{i j} \tag{eq\_0039} \\
+  & \mathit{gamma}_{l}^{s_{m} , s_{m + 1}} = \frac{\sum_{i = 1}^{m} \sum_{j = m + 1}^{N_{l}} q_{s_{i} , s_{j}}^{l}}{C \cdot f_{l}} \tag{eq\_0040} \\
+  & \mathit{gamma}_{l} = \frac{\sum_{s_{i} , s_{j} \in \mathbf{\mathcal{S}}_{l} : i < j} q_{s_{i} , s_{j}}^{l} \cdot b_{s_{i} , s_{j}}}{C \cdot f_{l} \cdot b_{l}} \tag{eq\_0041} \\
+  & \mathit{Av} \cdot \mathit{occup} = \frac{\sum_{l \in \mathbf{\mathcal{L}}} \mathit{gamma}_{l} \cdot f_{l}}{\sum_{l \in \mathbf{\mathcal{L}}} f_{l}} \tag{eq\_0042} \\
+\end{align}

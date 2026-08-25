@@ -1,0 +1,164 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2018.10.006
+%@ meta id=10.1016_j.trb.2018.10.006 family=milp schema=0.1.0
+%@ name :: Passenger demand oriented train scheduling and rolling stock circulation planning for an urban rail transit line
+%@ desc :: Mined from Passenger demand oriented train scheduling and rolling stock circulation planning for an urban rail transit line (Transportation Research Part B Methodological, 2018).
+%@ prov source :: 10.1016/j.trb.2018.10.006
+%@ prov reference :: Passenger demand oriented train scheduling and rolling stock circulation planning for an urban rail transit line
+%@ prov author :: Yihui Wang; Andrea D’Ariano; Jiateng Yin; Lingyun Meng; Tao Tang; Bin Ning
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of load factor variation, headway variation, and number of depot entering operations
+%@ var a shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service i at station j in direction up/dn
+%@ var d shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train service i at station j in direction up/dn
+%@ var r shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train service i from station j to next in direction up/dn
+%@ param h shape=- kind=scalar domain=- :: Headway between consecutive trains, with min and max bounds
+%@ index I ordered=0 cyclic=0 :: Set of train services
+%@ index i ordered=0 cyclic=0 :: Index for train services
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive number for big-M constraints
+%@ param t shape=K kind=vector domain=- :: Time instants splitting operating period into K intervals
+%@ index K ordered=0 cyclic=0 :: Set of time intervals for passenger demand
+%@ index k ordered=0 cyclic=0 :: Index for time intervals
+%@ index J ordered=0 cyclic=0 :: Set of stations
+%@ param C shape=- kind=scalar domain=- :: Train capacity
+%@ var p shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on board train service i between stations j and j+1
+%@ param N shape=- kind=scalar domain=- :: Number of available rolling stocks
+%@ var y shape=I,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable for depot operations or time interval indicators
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
+%@ param constraints shape=- kind=scalar domain=- :: Set of constraints in the optimization problem
+%@ param s shape=- kind=scalar domain=- :: Abbreviation for subject to in optimization formulation
+%@ var q shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for headway variation in objective
+%@ var x shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating departure time interval for train service
+%@ var z shape=I,J,K domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for products of binary and real variables
+%@ con eq_0001_a kind=linear domain=- indicator=- :: Up-direction departure time equals arrival time plus dwell time at station j
+%@ con eq_0001_b kind=linear domain=- indicator=- :: Up-direction arrival at station j+1 equals departure plus running time
+%@ con eq_0002_a kind=linear domain=- indicator=- :: Down-direction departure time equals arrival time plus dwell time at station j
+%@ con eq_0002_b kind=linear domain=- indicator=- :: Down-direction arrival at station j-1 equals departure plus running time
+%@ con eq_0003_a kind=linear domain=- indicator=- :: Running time bounds for train services in both directions
+%@ con eq_0003_b kind=linear domain=- indicator=- :: Dwell time bounds for train services at stations in both directions
+%@ con eq_0004_a kind=linear domain=- indicator=- :: Minimum and maximum headway between consecutive trains in up direction
+%@ con eq_0004_b kind=linear domain=- indicator=- :: Minimum and maximum headway between consecutive trains in down direction
+%@ con eq_0005 kind=linear domain=- indicator=- :: Turnaround time bounds at terminal station J
+%@ con eq_0006 kind=linear domain=- indicator=- :: Turnaround ordering at station J: next up service starts only after previous down arrival
+%@ con eq_0007_a kind=linear domain=- indicator=- :: Lower bound on connection turnaround time at station 1 when services are connected
+%@ con eq_0007_b kind=linear domain=- indicator=- :: Upper bound on connection turnaround time at station 1 when services are connected
+%@ con eq_0009 kind=linear domain=- indicator=- :: Passenger traveling rate on section j in interval k equals counted demand divided by interval length
+%@ con eq_0010_a kind=linear domain=- indicator=- :: Maximum allowable load factor in up direction
+%@ con eq_0010_b kind=linear domain=- indicator=- :: Maximum allowable load factor in down direction
+%@ con eq_0011 kind=linear domain=- indicator=- :: Load factor equals onboard passenger count divided by train capacity
+%@ con eq_0014 kind=linear domain=- indicator=- :: Service i' draws rolling stock from depot if no predecessor service is connected to it
+%@ con eq_0015 kind=linear domain=- indicator=- :: At most one predecessor service connects to service i'
+%@ con eq_0016 kind=linear domain=- indicator=- :: Rolling stock enters depot after service i if no successor service is connected from it
+%@ con eq_0017 kind=linear domain=- indicator=- :: At most one successor service connects from service i
+%@ con eq_0018_a kind=linear domain=- indicator=- :: Upper big-M constraint preventing simultaneous connection and depot exit/entry
+%@ con eq_0018_b kind=linear domain=- indicator=- :: Lower big-M constraint preventing simultaneous connection and depot exit/entry
+%@ con eq_0019 kind=linear domain=- indicator=- :: Limited fleet: cumulative depot exits minus reusable entries does not exceed N
+%@ con eq_0020 kind=linear domain=- indicator=- :: Linear definition of y_{m,i}: returning stock from m can serve i only if arrival is early enough
+%@ con eq_0021 kind=linear domain=- indicator=- :: Load factor variation objective component
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Mean of maximal up-direction load factors
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Mean of maximal down-direction load factors
+%@ con eq_0023 kind=linear domain=- indicator=- :: Up-direction headway variation objective component
+%@ con eq_0024 kind=linear domain=- indicator=- :: Simplified up-direction headway variation using neighboring train headways
+%@ con eq_0025 kind=linear domain=- indicator=- :: Total headway variation objective component
+%@ con eq_0026 kind=linear domain=- indicator=- :: Number of depot entering operations objective component
+%@ con eq_0027 kind=linear domain=- indicator=- :: Weighted-sum objective of load, headway and depot components
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Auxiliary ω lower bound for positive up-direction load deviation
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Auxiliary ω lower bound for negative up-direction load deviation
+%@ con eq_0031_c kind=linear domain=- indicator=- :: Auxiliary ω lower bound for positive down-direction load deviation
+%@ con eq_0031_d kind=linear domain=- indicator=- :: Auxiliary ω lower bound for negative down-direction load deviation
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Auxiliary q lower bound for positive up-direction headway deviation
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Auxiliary q lower bound for negative up-direction headway deviation
+%@ con eq_0032_c kind=linear domain=- indicator=- :: Auxiliary q lower bound for positive down-direction headway deviation
+%@ con eq_0032_d kind=linear domain=- indicator=- :: Auxiliary q lower bound for negative down-direction headway deviation
+%@ con eq_0033 kind=linear domain=- indicator=- :: Linear objective with auxiliary absolute-value variables
+%@ con eq_0035_a kind=linear domain=- indicator=- :: Departure time not later than interval end selected by x
+%@ con eq_0035_b kind=linear domain=- indicator=- :: Departure time not earlier than interval start selected by x
+%@ con eq_0035_c kind=linear domain=- indicator=- :: Departure time assigned to exactly one time interval
+%@ con eq_0036 kind=linear domain=- indicator=- :: Onboard passenger count when departures lie in the same time interval
+%@ con eq_0037 kind=linear domain=- indicator=- :: Onboard passenger count when departures lie in consecutive time intervals
+%@ con eq_0038 kind=linear domain=- indicator=- :: General onboard passenger count for any interval combination
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearized load factor constraint using passenger count expression
+%@ con eq_0040_a kind=linear domain=- indicator=- :: Sum of auxiliary z variables equals departure time
+%@ con eq_0040_b kind=linear domain=- indicator=- :: Auxiliary z is forced to zero when interval indicator is zero
+%@ con eq_0040_c kind=linear domain=- indicator=- :: Nonnegativity of auxiliary z variables
+%@ con eq_0041 kind=linear domain=- indicator=- :: Approximate onboard passengers using passenger rate at departure time
+%@ con eq_0043_a kind=linear domain=- indicator=- :: Indicator y upper-bound inequality for departure-time ordering
+%@ con eq_0043_b kind=linear domain=- indicator=- :: Indicator y lower-bound inequality for departure-time ordering
+%@ con eq_0044 kind=linear domain=- indicator=- :: Interval indicator x defined as difference of cumulative y indicators
+%@ con eq_0045 kind=linear domain=- indicator=- :: Passenger rate at departure time expressed via y indicators
+%@ con eq_0046_a kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 1
+%@ con eq_0046_b kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 2
+%@ con eq_0046_c kind=linear domain=- indicator=- :: Linearization of product of y indicators: inequality 3
+%@ con eq_0047 kind=linear domain=- indicator=- :: Linear passenger rate expression with auxiliary ytilde variables
+%@ con eq_0048 kind=linear domain=- indicator=- :: Linearized onboard passenger approximation using z variables
+%@ con eq_0049_a kind=linear domain=- indicator=- :: Product z = y·d: upper bound using maximum time
+%@ con eq_0049_b kind=linear domain=- indicator=- :: Product z = y·d: lower bound using minimum time
+%@ con eq_0049_c kind=linear domain=- indicator=- :: Product z = y·d: upper bound using departure time
+%@ con eq_0049_d kind=linear domain=- indicator=- :: Product z = y·d: lower bound using departure time
+\begin{align}
+  & d_{i , j}^{up} = a_{i , j}^{up} + \mathit{tau}_{i , j}^{up} \tag{eq\_0001\_a} \\
+  & a_{i , j + 1}^{up} = d_{i , j}^{up} + r_{i , j}^{up} \tag{eq\_0001\_b} \\
+  & d_{i , j}^{dn} = a_{i , j}^{dn} + \mathit{tau}_{i , j}^{dn} \tag{eq\_0002\_a} \\
+  & a_{i , j - 1}^{dn} = d_{i , j}^{dn} + r_{i , j}^{dn} \tag{eq\_0002\_b} \\
+  & r_{j , min}^{up} \leq r_{i , j}^{up} \leq r_{j , max}^{up} , r_{j , min}^{dn} \leq r_{i , j}^{dn} \leq r_{j , max}^{dn} \tag{eq\_0003\_a} \\
+  & \mathit{tau}_{j , min} \leq \mathit{tau}_{i , j}^{up} \leq \mathit{tau}_{j , max} , \mathit{tau}_{j , min} \leq \mathit{tau}_{i , j}^{dn} \leq \mathit{tau}_{j , max} \tag{eq\_0003\_b} \\
+  & h_{min} \leq d_{i + 1 , j}^{up} - d_{i , j}^{up} \leq h_{max} \tag{eq\_0004\_a} \\
+  & h_{min} \leq d_{i + 1 , j}^{dn} - d_{i , j}^{dn} \leq h_{max} \tag{eq\_0004\_b} \\
+  & r_{J , min}^{turn} \leq a_{i , J}^{dn} - d_{i , J}^{up} \leq r_{J , max}^{turn} , \tag{eq\_0005} \\
+  & d_{i + 1 , J}^{up} - a_{i , J}^{dn} \geq 0 , \forall i \in \mathbf{I} / \left\{I\right\} , \tag{eq\_0006} \\
+  & a_{i^{'} , 1}^{up} - d_{i , 1}^{dn} \geq r_{1 , min}^{turn} - M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0007\_a} \\
+  & a_{i^{'} , 1}^{up} - d_{i , 1}^{dn} \leq r_{1 , max}^{turn} + M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0007\_b} \\
+  & \mathit{lambda}_{j , k}^{up} = \mathit{kappa}_{j , k}^{up} / \left(t_{k} - t_{k - 1}\right) , \forall k \in \left\{1 , 2 , \hdots , K\right\} , \tag{eq\_0009} \\
+  & \mathit{sigma}_{i , j}^{up} \leq \mathit{sigma}_{max} \tag{eq\_0010\_a} \\
+  & \mathit{sigma}_{i , j}^{dn} \leq \mathit{sigma}_{max} , \forall i \in \mathbf{I} , j \in \mathbf{J} \tag{eq\_0010\_b} \\
+  & \mathit{sigma}_{i , j}^{up} = \frac{p_{i , j}^{up}}{C_{train}} , \forall i \in \mathbf{I} , j \in \mathbf{J} , \tag{eq\_0011} \\
+  & \mathit{xi}_{i^{'}} = 1 - \sum_{i \in \mathbf{I}} \mathit{beta}_{i , i^{'}} , \tag{eq\_0014} \\
+  & \sum_{i \in \mathbf{I}} \mathit{beta}_{i , i^{'}} \leq 1 . \tag{eq\_0015} \\
+  & \begin{matrix}\mathit{delta}_{i} = 1 - \sum_{i^{'} \in \mathbf{I}} \mathit{beta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0016} \\
+  & \sum_{i^{'} \in \mathbf{I}} \mathit{beta}_{i , i^{'}} \leq 1 . \tag{eq\_0017} \\
+  & \mathit{delta}_{i} + \mathit{xi}_{i^{'}} \leq M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0018\_a} \\
+  & \mathit{delta}_{i} + \mathit{xi}_{i^{'}} \geq - M \left(1 - \mathit{beta}_{i , i^{'}}\right) . \tag{eq\_0018\_b} \\
+  & \sum_{m = 1}^{i} \mathit{xi}_{m} - \sum_{m = 1}^{i - 1} \mathit{delta}_{m} y_{m , i} \leq N_{rs} , \tag{eq\_0019} \\
+  & d_{m , 1}^{dn} - d_{i , 1}^{up} + t_{enter} + t_{exit} \leq M \left(1 - y_{m , i}\right) . \tag{eq\_0020} \\
+  & f_{load} = \sum_{i \in \mathbf{I}} \left(\left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{up} - \mathit{sigma}_{mean}^{up}\right| + \left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{dn} - \mathit{sigma}_{mean}^{dn}\right|\right) , \tag{eq\_0021} \\
+  & \mathit{sigma}_{mean}^{up} = \frac{\sum_{i \in \mathbf{I}} max_{j \in \mathbf{J}} \mathit{sigma}_{i , j}^{up}}{I} \tag{eq\_0022\_a} \\
+  & \mathit{sigma}_{mean}^{dn} = \frac{\sum_{i \in \mathbf{I}} max_{j \in \mathbf{J}} \mathit{sigma}_{i , j}^{dn}}{I} . \tag{eq\_0022\_b} \\
+  & \begin{matrix} & f_{headway}^{up} = \sum_{i \in \mathbf{I} / \left\{1\right\} , j \in \mathbf{J}} \left|\left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{\sum_{m = max \left(i - i_{1} , 2\right)}^{min \left(i + i_{2} , I\right)} \left(d_{m , j}^{up} - d_{m - 1 , j}^{up}\right)}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)}\right| ,\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix} & f_{headway}^{up} = \sum_{i \in \mathbf{I} / \left\{1\right\} , j \in \mathbf{J}} \left|\left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)}\right| .\end{matrix} \tag{eq\_0024} \\
+  & f_{headway} = f_{headway}^{up} + f_{headway}^{dn} . \tag{eq\_0025} \\
+  & f_{depot} = \sum_{i \in \mathbf{I}} \mathit{delta}_{i} . \tag{eq\_0026} \\
+  & f = \mathit{gamma}_{1} \frac{f_{load}}{f_{load , \text{nom}}} + \mathit{gamma}_{2} \frac{f_{headway}}{f_{headway , \text{nom}}} + \mathit{gamma}_{3} \frac{f_{depot}}{f_{depot , \text{nom}}} , \tag{eq\_0027} \\
+  \begin{matrix}\begin{cases}\quad & min f = \mathit{gamma}_{1} \frac{f_{load}}{f_{load , \text{nom}}} + \mathit{gamma}_{2} \frac{f_{headway}}{f_{headway , \text{nom}}} + \mathit{gamma}_{3} \frac{f_{depot}}{f_{depot , \text{nom}}} , \\ \text{s}.\text{t}. \text{constraints} (\text{1})-(\text{7}), (\text{10})-(\text{26}) . \end{cases}\end{matrix} \tag{eq\_0028} \\
+  & \mathit{omega}_{i}^{up} \geq \underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{up} - \mathit{sigma}_{mean}^{up} \tag{eq\_0031\_a} \\
+  & \mathit{omega}_{i}^{up} \geq - \underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{up} + \mathit{sigma}_{mean}^{up} \tag{eq\_0031\_b} \\
+  & \mathit{omega}_{i}^{dn} \geq \underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{dn} - \mathit{sigma}_{mean}^{dn} \tag{eq\_0031\_c} \\
+  & \mathit{omega}_{i}^{dn} \geq - \underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{dn} + \mathit{sigma}_{mean}^{dn} \tag{eq\_0031\_d} \\
+  & q_{i , j}^{up} \geq \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)} \tag{eq\_0032\_a} \\
+  & q_{i , j}^{up} \geq - \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) + \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)} \tag{eq\_0032\_b} \\
+  & q_{i , j}^{dn} \geq \left(d_{i , j}^{dn} - d_{i - 1 , j}^{dn}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{dn} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{dn}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)} \tag{eq\_0032\_c} \\
+  & q_{i , j}^{dn} \geq - \left(d_{i , j}^{dn} - d_{i - 1 , j}^{dn}\right) + \frac{d_{min \left(i + i_{2} , I\right) , j}^{dn} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{dn}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right)} . \tag{eq\_0032\_d} \\
+  & f = \mathit{gamma}_{1} \frac{\left(\mathit{omega}_{i}^{up} + \mathit{omega}_{i}^{dn}\right)}{f_{load , \text{nom}}} + \mathit{gamma}_{2} \frac{\left(q_{i , j}^{up} + q_{i , j}^{dn}\right)}{f_{headway , \text{nom}}} + \mathit{gamma}_{3} \frac{f_{depot}}{f_{depot , \text{nom}}} . \tag{eq\_0033} \\
+  & d_{i , j}^{up} \leq \sum_{k = 1}^{K} x_{i , j , k}^{up} \cdot t_{k} , \forall i , j \tag{eq\_0035\_a} \\
+  & d_{i , j}^{up} \geq \sum_{k = 1}^{K} x_{i , j , k}^{up} \cdot t_{k - 1} , \forall i , j \tag{eq\_0035\_b} \\
+  & \sum_{k = 1}^{K} x_{i , j , k}^{up} = 1 , \forall i , j . \tag{eq\_0035\_c} \\
+  & p_{i , j}^{up} = \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(x_{i , j , k}^{up} \cdot d_{i , j}^{up} - x_{i - 1 , j , k}^{up} \cdot d_{i - 1 , j}^{up}\right) . \tag{eq\_0036} \\
+  & p_{i , j}^{up} = \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(t_{k} - d_{i - 1 , j}^{up}\right) x_{i - 1 , j , k}^{up} + \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(d_{i , j}^{up} - t_{k - 1}\right) x_{i , j , k}^{up} . \tag{eq\_0037} \\
+  & \begin{aligned}p_{i , j}^{up} = & \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(t_{k} - d_{i - 1 , j}^{up}\right) x_{i - 1 , j , k}^{up} + \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(d_{i , j}^{up} - t_{k - 1}\right) x_{i , j , k}^{up} \\ & + \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(\sum_{\mathit{ell} = 1}^{k - 1} x_{i - 1 , j , \mathit{ell}}^{up} - \sum_{\mathit{ell}_{1}}^{k} x_{i , j , \mathit{ell}}^{up}\right) \left(t_{k} - t_{k - 1}\right) .\end{aligned} \tag{eq\_0038} \\
+  & \begin{matrix} & \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(t_{k} - d_{i - 1 , j}^{up}\right) x_{i - 1 , j , k}^{up} + \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(d_{i , j}^{up} - t_{k - 1}\right) x_{i , j , k}^{up} \\ & + \sum_{k = 1}^{K} \mathit{lambda}_{j , k}^{up} \left(\sum_{\mathit{ell} = 1}^{k - 1} x_{i - 1 , j , \mathit{ell}}^{up} - \sum_{\mathit{ell}_{1}}^{k} x_{i , j , \mathit{ell}}^{up}\right) \left(t_{k} - t_{k - 1}\right) \leq \mathit{sigma}_{max} C_{train} ,\end{matrix} \tag{eq\_0039} \\
+  & \sum_{k = 1}^{K} z_{i , j , k}^{up} = d_{i , j}^{up} \tag{eq\_0040\_a} \\
+  & z_{i , j , k}^{up} \leq x_{i , j , k}^{up} \cdot M \tag{eq\_0040\_b} \\
+  & z_{i , j , k}^{up} \geq 0 . \tag{eq\_0040\_c} \\
+  & p_{i , j}^{up} \approx \left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) \cdot \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) , \tag{eq\_0041} \\
+  & \left(t_{K} - t_{k}\right) y_{i , j , k}^{up} \leq t_{K} - d_{i , j}^{up} \tag{eq\_0043\_a} \\
+  & \left(t_{0} - t_{k} - \mathit{epsilon}\right) y_{i , j , k}^{up} \leq d_{i , j}^{up} - t_{k} - \mathit{epsilon} \tag{eq\_0043\_b} \\
+  & x_{i , j , k}^{up} = y_{i , j , k}^{up} - y_{i , j , k - 1}^{up} , \forall i \in \mathbf{I} , j \in \mathbf{J} , k \in \left\{1 , 2 , \hdots , K\right\} . \tag{eq\_0044} \\
+  & \begin{aligned}\left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(1 - y_{i , j , 1}^{up}\right) y_{i , j , 2}^{up} \mathit{lambda}_{j , 2}^{up} + \hdots + \left(1 - y_{i , j , k - 1}^{up}\right) y_{i , j , k}^{up} \mathit{lambda}_{j , k}^{up} + \hdots \\ & + \left(1 - y_{i , j , K - 1}^{up}\right) y_{i , j , K}^{up} \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0045} \\
+  & - y_{i , j , k - 1}^{up} + \left({y}\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_a} \\
+  & - y_{i , j , k}^{up} + \left({y}\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_b} \\
+  & y_{i , j , k - 1}^{up} + y_{i , j , k}^{up} - \left({y}\right)_{i , j , k - 1}^{up} \leq 1 . \tag{eq\_0046\_c} \\
+  & \begin{aligned}\left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(y_{i , j , 2}^{up} - \left({y}\right)_{i , j , 1}^{up}\right) \mathit{lambda}_{j , 2}^{up} + \hdots + \left(y_{i , j , k}^{up} - \left({y}\right)_{i , j , k - 1}^{up}\right) \mathit{lambda}_{j , k}^{up} + \hdots + \left(y_{i , j , K}^{up} - \left({y}\right)_{i , j , K - 1}^{up}\right) \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0047} \\
+  & \begin{aligned}p_{i , j}^{up} \approx & z_{i , j , 1}^{up , 1} \mathit{lambda}_{j , 1}^{up} + \left(z_{i , j , 2}^{up , 1} - z_{i , j , 1}^{up , 2}\right) \mathit{lambda}_{j , 2}^{up} + \hdots + \left(z_{i , j , k}^{up , 1} - z_{i , j , k - 1}^{up , 2}\right) \mathit{lambda}_{j , k}^{up} + \hdots + \left(z_{i , j , K}^{up , 1} - z_{i , j , K - 1}^{up , 2}\right) \mathit{lambda}_{j , K}^{up} \\ & - z_{i , j , 1}^{up , 3} \mathit{lambda}_{j , 1}^{up} - \left(z_{i , j , 2}^{up , 3} - z_{i , j , 1}^{up , 4}\right) \mathit{lambda}_{j , 2}^{up} - \hdots - \left(z_{i , j , k}^{up , 3} - z_{i , j , k - 1}^{up , 4}\right) \mathit{lambda}_{j , k}^{up} - \hdots - \left(z_{i , j , K}^{up , 3} - z_{i , j , K - 1}^{up , 4}\right) \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0048} \\
+  & z_{i , j , k}^{up , 1} \leq t_{K} \cdot y_{i , j , k}^{up} \tag{eq\_0049\_a} \\
+  & z_{i , j , k}^{up , 1} \geq t_{0} \cdot y_{i , j , k}^{up} \tag{eq\_0049\_b} \\
+  & z_{i , j , k}^{up , 1} \leq d_{i , j}^{up} - t_{0} \left(1 - y_{i , j , k}^{up}\right) \tag{eq\_0049\_c} \\
+  & z_{i , j , k}^{up , 1} \geq d_{i , j}^{up} - t_{K} \left(1 - y_{i , j , k}^{up}\right) \tag{eq\_0049\_d} \\
+\end{align}

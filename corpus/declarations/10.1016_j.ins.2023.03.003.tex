@@ -1,0 +1,148 @@
+% Declaration sidecar for 10.1016_j.ins.2023.03.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.ins.2023.03.003
+% A dynamic rescheduling and speed management approach for high-speed trains with uncertain time-delay
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.ins.2023.03.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total train traveling time and speed grade changes
+
+% a: classified as variable during review
+%@ var a shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at block section k
+
+% B: classified as index during review
+%@ index B ordered=0 cyclic=0 :: Set of block sections
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant used in big-M linearizations
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trains
+
+% q: classified as variable during review
+%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i has passed block section k by time t(delta)
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Function giving the start time of time horizon delta
+
+% unusable as an identifier, rename or drop: Δ
+% unusable as an identifier, rename or drop: β
+% unusable as an identifier, rename or drop: η
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of speed grades
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of stations
+
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Station index
+
+% A: classified as parameter during review
+%@ param A shape=- kind=scalar domain=- :: Planned arrival time of train i at block section k from previous time horizon
+
+% p: classified as variable during review
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i occupies block section k at time t(delta)
+
+% G: classified as parameter during review
+%@ param G shape=- kind=scalar domain=- :: Planned speed grade of train i at block section k from previous time horizon
+
+% g: classified as variable during review
+%@ var g shape=- domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
+
+% D: classified as variable during review
+%@ var D shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i stops at station n
+
+% d: classified as variable during review
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i uses track c at block section k
+
+% Tr: classified as index during review
+%@ index Tr ordered=0 cyclic=0 :: Set of tracks at a station
+
+% y: classified as parameter during review
+%@ param y shape=- kind=scalar domain=- :: Planned departure time of train i from station n
+
+% fori: classified as index during review
+%@ index fori ordered=0 cyclic=0 :: Loop index over trains
+
+% unusable as an identifier, rename or drop: δ
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for temporary speed restriction constraints
+
+% H: classified as parameter during review
+%@ param H shape=- kind=scalar domain=- :: Length of each rolling time horizon
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway times (departure, arrival, departure-arrival)
+
+% unusable as an identifier, rename or drop: λ
+% F: classified as variable during review
+%@ var F shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (F1 total travel time, F2 speed grade changes)
+
+% unusable as an identifier, rename or drop: μ
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar domain=- :: Weights for the two objective terms
+
+% imize: classified as parameter during review
+%@ param imize shape=- kind=scalar domain=- :: Parsed fragment of the keyword 'minimize' (not a real model parameter)
+
+% Bound by a quantifier or big operator, so no declaration of their own: c, i, j, k, ξ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0006 kind=linear domain=- indicator=- :: Lower bound on block-section running time depending on speed grade and pass status
+%@ con eq_0007 kind=linear domain=- indicator=- :: Upper bound on open-track running time for speed grades greater than grade 1
+%@ con eq_0008 kind=linear domain=- indicator=- :: Upper bound on open-track running time for speed grade 1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Continuity of arrival times with the previous rolling time horizon
+%@ con eq_0011_a kind=linear domain=- indicator=- :: Lower bound on speed grade change from previous time horizon when train occupies section
+%@ con eq_0011_b kind=linear domain=- indicator=- :: Upper bound on speed grade change from previous time horizon when train occupies section
+%@ con eq_0012 kind=linear domain=- indicator=- :: Lower bound of dwelling time at a station for stopping trains
+%@ con eq_0013 kind=linear domain=- indicator=- :: Upper bound of platform-section running time for non-stopping trains
+%@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound of dwelling time at a station for stopping trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Forces track 0 to be used by trains passing through without dwelling
+%@ con eq_0016 kind=linear domain=- indicator=- :: Forces dwelling trains to use a track other than track 0
+%@ con eq_0018_a kind=linear domain=- indicator=- :: At least one station track must be selected for a train not yet passed
+%@ con eq_0018_b kind=linear domain=- indicator=- :: At most one station track is selected for a train not yet passed
+%@ con eq_0019 kind=linear domain=- indicator=- :: Planned stops in the timetable cannot be skipped
+%@ con eq_0020 kind=linear domain=- indicator=- :: Trains cannot depart from a station earlier than the planned departure time
+%@ con eq_0022_a kind=linear domain=- indicator=- :: Speed grade forced to grade 1 in inbound/outbound sections when stopping (lower side)
+%@ con eq_0022_b kind=linear domain=- indicator=- :: Speed grade forced to grade 1 in inbound/outbound sections when stopping (upper side)
+%@ con eq_0023 kind=linear domain=- indicator=- :: Exactly one speed grade is selected for each train at each block section
+%@ con eq_0024 kind=linear domain=- indicator=- :: Integer speed grade defined as the weighted sum of binary speed-grade indicators
+%@ con eq_0025_a kind=linear domain=- indicator=- :: Speed grade can change by at most one level between consecutive block sections
+%@ con eq_0025_b kind=linear domain=- indicator=- :: Speed grade change between consecutive block sections bounded above by one
+%@ con eq_0026_a kind=linear domain=- indicator=- :: Lower bound on speed grade difference between consecutive sections with big-M
+%@ con eq_0026_b kind=linear domain=- indicator=- :: Upper bound on speed grade difference between consecutive sections with big-M
+%@ con eq_0027 kind=linear domain=- indicator=- :: Defines x_{i,k,1} for a train arriving in a TSR section during the current horizon
+%@ con eq_0028 kind=linear domain=- indicator=- :: Defines x_{i,k,2} for a train traveling in a TSR section during the current horizon
+%@ con eq_0029 kind=linear domain=- indicator=- :: Limits speed grade in temporary-speed-restriction sections during the active horizon
+%@ con eq_0030_a kind=linear domain=- indicator=- :: Minimum departure headway between consecutive train departures (alternative 1)
+%@ con eq_0030_b kind=linear domain=- indicator=- :: Minimum departure headway between consecutive train departures (alternative 2)
+%@ con eq_0031_a kind=linear domain=- indicator=- :: Minimum arrival headway between consecutive train arrivals (alternative 1)
+%@ con eq_0031_b kind=linear domain=- indicator=- :: Minimum arrival headway between consecutive train arrivals (alternative 2)
+%@ con eq_0032_a kind=linear domain=- indicator=- :: Minimum departure-arrival headway for trains using the same station track (alternative 1)
+%@ con eq_0032_b kind=linear domain=- indicator=- :: Minimum departure-arrival headway for trains using the same station track (alternative 2)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Safety distance constraint keeping enough free block sections between consecutive trains
+%@ con eq_0036 kind=linear domain=- indicator=- :: Objective term F2: total number of speed grade changes
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearized constraints defining the speed-grade-change indicator μ
+%@ con eq_0039 kind=linear domain=- indicator=- :: Weighted-sum objective Q1*F1 + Q2*F2 to be minimized
+%@ con eq_0041_a kind=linear domain=- indicator=- :: Update planned arrival times from the current horizon solution for use in the next horizon
+%@ con eq_0041_b kind=linear domain=- indicator=- :: Update planned speed grades from the current horizon solution for use in the next horizon

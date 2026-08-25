@@ -1,0 +1,89 @@
+% Declaration sidecar for 10.1016_j.trc.2017.04.012
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2017.04.012
+% Passenger oriented railway disruption management by adapting timetables and rolling stock schedules
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2017.04.012.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total costs of rolling stock rescheduling, passenger delays, and timetable rescheduling
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Rolling stock rescheduling cost function
+
+% d: classified as parameter during review
+%@ param d shape=- kind=scalar domain=- :: Service related cost function of passenger flows
+
+% e: classified as parameter during review
+%@ param e shape=- kind=scalar domain=- :: Timetable rescheduling cost function
+
+% x: classified as variable during review
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Rolling stock schedule decision variable
+
+% y: classified as variable during review
+%@ var y shape=P,K domain=binary role=primary drole=- lo=- hi=- :: Passenger path choice binary variable
+
+% z: classified as variable during review
+%@ var z shape=J domain=binary role=primary drole=- lo=- hi=- :: Stopping pattern selection binary variable
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of all possible timetables
+
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: Set of feasible rolling stock schedules for a given timetable
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Abbreviation for subject to
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Set of trips
+
+% J: classified as index during review
+%@ index J ordered=0 cyclic=0 :: Set of stopping patterns
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of passengers
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of paths for a passenger
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of paths incompatible with a stopping pattern
+
+% Cap: classified as parameter during review
+%@ param Cap shape=G kind=vector domain=- :: Capacity of a rolling stock unit
+
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of rolling stock types
+
+% Bound by a quantifier or big operator, so no declaration of their own: g, j, k, p, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Feasible timetable domain: z ∈ Z
+%@ con eq_0003 kind=linear domain=- indicator=- :: Feasible rolling stock schedule for a given timetable: x ∈ X_z
+%@ con eq_0006 kind=linear domain=- indicator=- :: Rolling stock rescheduling constraints for a given timetable
+%@ con eq_0007 kind=linear domain=- indicator=- :: Exactly one stopping pattern must be selected for each trip
+%@ con eq_0008 kind=linear domain=- indicator=- :: Every passenger must choose exactly one path
+%@ con eq_0009 kind=linear domain=- indicator=- :: Only compatible stopping patterns and passenger paths can be selected
+%@ con eq_0010 kind=linear domain=- indicator=- :: Capacity constraint on passenger flows versus total seat capacity
+%@ con eq_0011 kind=linear domain=- indicator=- :: Binary variable y_k^p is 0 or 1 for all passengers and paths
+%@ con eq_0012 kind=linear domain=- indicator=- :: Binary variable z_j is 0 or 1 for all stopping patterns

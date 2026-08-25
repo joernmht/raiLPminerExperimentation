@@ -1,0 +1,160 @@
+% Declaration sidecar for 10.1016_j.trb.2021.08.003
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2021.08.003
+% Real-time integrated train rescheduling and rolling stock circulation planning for a metro line under disruptions
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2021.08.003.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of normalized timetable deviation, cancellation, and headway deviation.
+
+% I: classified as index during review
+%@ index I ordered=1 cyclic=0 :: Set of all stations on the metro line.
+
+% P: classified as index during review
+%@ index P ordered=1 cyclic=0 :: Set of turnaround stations.
+
+% F: classified as index during review
+%@ index F ordered=1 cyclic=0 :: Set of train services in the up direction.
+
+% i: classified as index during review
+%@ index i ordered=1 cyclic=0 :: Station index.
+
+% p: classified as index during review
+%@ index p ordered=1 cyclic=0 :: Turnaround station index.
+
+% x: classified as variable during review
+%@ var x shape=F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between turnaround stations.
+
+% y: classified as variable during review
+%@ var y shape=F,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between consecutive stations.
+
+% G: classified as index during review
+%@ index G ordered=1 cyclic=0 :: Set of train services in the down direction.
+
+% a: classified as variable during review
+%@ var a shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service at station.
+
+% d: classified as variable during review
+%@ var d shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train service from station.
+
+% r: classified as variable during review
+%@ var r shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train service between stations.
+
+% w: classified as variable during review
+%@ var w shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train service at station.
+
+% t: classified as variable during review
+%@ var t shape=G,P domain=non_negative role=primary drole=- lo=- hi=- :: Turnaround time of train service at turnaround station.
+
+% unusable as an identifier, rename or drop: β
+% o: classified as parameter during review
+%@ param o shape=F,P kind=matrix domain=- :: Time when rolling stock comes out from depot.
+
+% unusable as an identifier, rename or drop: θ
+% unusable as an identifier, rename or drop: α
+% c: classified as variable during review
+%@ var c shape=F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating train service operates at turnaround station.
+
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between trains.
+
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: ε
+% N: classified as parameter during review
+%@ param N shape=- kind=scalar domain=- :: Number of rolling stocks in depot at disruption.
+
+% unusable as an identifier, rename or drop: ζ
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: π
+% Z: classified as variable during review
+%@ var Z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value.
+
+% unusable as an identifier, rename or drop: β̂
+% z: classified as variable during review
+%@ var z shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for linearization.
+
+% L: classified as index during review
+%@ index L ordered=1 cyclic=0 :: Set of predecessor train services.
+
+% Bound by a quantifier or big operator, so no declaration of their own: f, g, ℓ
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0002 kind=linear domain=- indicator=- :: Relates up-direction segment operation y to turnaround-station operation x.
+%@ con eq_0003 kind=linear domain=- indicator=- :: Relates down-direction segment operation y to turnaround-station operation x.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Defines arrival time at normal station in up direction.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Defines arrival time at normal station in down direction.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Bounds running time between consecutive stations in up direction.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Bounds running time between consecutive stations in down direction.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Defines departure time from normal station in up direction.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Defines departure time from normal station in down direction.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds dwell time at normal station in up direction.
+%@ con eq_0015 kind=linear domain=- indicator=- :: Bounds dwell time at normal station in down direction.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Defines arrival time at turnaround station when service operates the preceding segment.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Defines arrival time at turnaround station when service is connected from down direction.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Bounds turnaround time at turnaround station.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Defines arrival time at depot-connected station when rolling stock comes from depot.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Defines arrival time at depot-connected station for all three rolling-stock origins.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Defines arrival time at non-depot turnaround station for the two rolling-stock origins.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Defines departure time from turnaround station when service continues to next segment.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Defines departure time from non-depot turnaround station when service turns around.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Defines departure time from depot-connected station when rolling stock returns to depot.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Defines departure time from depot-connected station for all three destinations.
+%@ con eq_0028 kind=headway domain=- indicator=- :: Enforces minimum headway between a service and its predecessors.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Ensures each up-direction service is connected to at most one down-direction successor.
+%@ con eq_0030 kind=linear domain=- indicator=- :: Balances operation and down-direction connection at non-depot turnaround station.
+%@ con eq_0031 kind=linear domain=- indicator=- :: Balances operation, connection, and depot return at depot-connected turnaround station.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Balances arriving predecessor and preceding segment at non-depot turnaround station.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Balances arriving predecessor, preceding segment, and depot origin at depot-connected station.
+%@ con eq_0035 kind=big_m domain=- indicator=- :: Big-M linearization of arrival-order indicator at depot station (upper bound).
+%@ con eq_0036 kind=big_m domain=- indicator=- :: Big-M linearization of arrival-order indicator at depot station (lower bound).
+%@ con eq_0037 kind=linear domain=- indicator=- :: Limits depot departures by available rolling stock inventory.
+%@ con eq_0039 kind=linear domain=- indicator=- :: Computes total timetable deviation component of objective.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Allow only cancellation of planned train services (no extra services).
+%@ con eq_0041 kind=linear domain=- indicator=- :: Computes cancellation component of objective.
+%@ con eq_0043 kind=linear domain=- indicator=- :: Computes headway deviation component of objective.
+%@ con eq_0050 kind=big_m domain=- indicator=- :: Filtering constraint preventing short-turning at intermediate turnaround stations after blockage clearance.
+%@ con eq_0054_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0054_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0056 kind=big_m domain=- indicator=- :: Linearization of product of binary variables (Appendix A).
+%@ con eq_0057_a kind=big_m domain=- indicator=- :: Linearization of order-indicator constraints (Appendix A).
+%@ con eq_0057_b kind=big_m domain=- indicator=- :: Linearization of order-indicator constraints (Appendix A).
+%@ con eq_0058_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0058_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0058_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0059_d kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_a kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_b kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0060_c kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ con eq_0062 kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_c kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0063_d kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_a kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_b kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_c kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0064_d kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
+%@ con eq_0066 kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).

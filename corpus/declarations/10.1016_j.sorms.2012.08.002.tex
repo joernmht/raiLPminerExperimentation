@@ -1,0 +1,98 @@
+% Declaration sidecar for 10.1016_j.sorms.2012.08.002
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.sorms.2012.08.002
+% A tutorial on fundamental model structures for railway timetable optimization
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.sorms.2012.08.002.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize weighted delays/cost in the timetable models
+%@ var a shape=R,B domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train r at control point i
+%@ var d shape=R,B domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train r at control point i
+%@ index B ordered=0 cyclic=0 :: Set of control points (stations, sidings, etc.)
+%@ index R ordered=0 cyclic=0 :: Set of trains
+%@ index i ordered=0 cyclic=0 :: Index for control points
+%@ param pt shape=- kind=scalar :: Possibly a typo; not used in formulas
+%@ index r ordered=0 cyclic=0 :: Index for trains
+% unusable as an identifier, rename or drop: α
+% unusable as an identifier, rename or drop: β
+%@ var F shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train order at control points
+%@ var G shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train order at control points
+%@ var I shape=R,R,B,B domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for meet/pass interaction
+%@ param f shape=R,R,B,B kind=matrix :: Additional time for meet/pass between trains
+%@ param s shape=R,B,B kind=matrix :: Minimum travel time between control points
+%@ param M shape=- kind=big_m :: Large constant for big-M constraints
+%@ param c shape=R,B,T kind=matrix :: Cost coefficient for occupancy or hypergraph
+%@ var x shape=R,B,T domain=integer role=primary drole=- lo=- hi=- :: Binary decision variable for occupancy or hypergraph
+%@ index o ordered=0 cyclic=0 :: Origin station of train r
+% unusable as an identifier, rename or drop: Φ
+%@ index m ordered=0 cyclic=0 :: Index for trains in multicommodity flow
+% unusable as an identifier, rename or drop: Ω
+%@ index p ordered=0 cyclic=0 :: Index for path or event
+% unusable as an identifier, rename or drop: Ψ
+%@ index T ordered=0 cyclic=0 :: Set of time periods
+%@ param b shape=B,T kind=matrix :: Capacity of track segment at time t
+% unusable as an identifier, rename or drop: δ
+% unusable as an identifier, rename or drop: ε
+%@ index Y ordered=0 cyclic=0 :: Set of track segments and time points for headway constraints
+% unusable as an identifier, rename or drop: υ
+%@ param h shape=R kind=vector :: Headway time for train r
+% unusable as an identifier, rename or drop: τ
+%@ param mod shape=- kind=scalar :: Modulo operator in periodic constraints
+%@ param w shape=A kind=vector :: Weight for arc in periodic tension formulation
+%@ index A ordered=0 cyclic=0 :: Set of arcs in event graph
+%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer vector of cycle tensions
+% unusable as an identifier, rename or drop: Γ
+%@ index Z ordered=0 cyclic=0 :: Set of integers (domain for z)
+% Bound by a quantifier or big operator, so no declaration of their own: e, j, k, l, t, u, v
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: MISLP (1) objective: weighted sum of arrival/departure delays
+%@ con eq_0002 kind=linear domain=- indicator=- :: MISLP (2) chronological constraint: departure cannot precede arrival
+%@ con eq_0004 kind=linear domain=- indicator=- :: MISLP (3) sequencing indicator constraint for meet/pass and order
+%@ con eq_0005 kind=linear domain=- indicator=- :: MISLP (4) minimum travel time constraint between control points
+%@ con eq_0006 kind=linear domain=- indicator=- :: MISLP big-M ordering constraint for F
+%@ con eq_0007 kind=linear domain=- indicator=- :: MISLP big-M ordering constraint for G
+%@ con eq_0008 kind=linear domain=- indicator=- :: MISLP big-M meet/pass constraint for I
+%@ con eq_0009 kind=linear domain=- indicator=- :: MISLP big-M meet/pass constraint for I at the paired control point
+%@ con eq_0010 kind=linear domain=- indicator=- :: MISLP (5) arrival/departure constraints for the selected interaction
+%@ con eq_0011 kind=linear domain=- indicator=- :: MISLP nonnegativity and binary restrictions on event times and indicators
+%@ con eq_0012 kind=linear domain=- indicator=- :: BIOP (6) objective: minimize occupation cost
+%@ con eq_0014 kind=linear domain=- indicator=- :: BIOP (7) single departure from origin
+%@ con eq_0015 kind=linear domain=- indicator=- :: BIOP (8) flow conservation at intermediate blocks
+%@ con eq_0016 kind=linear domain=- indicator=- :: BIOP (9) single arrival at destination
+%@ con eq_0017 kind=linear domain=- indicator=- :: BIOP (10) capacity/side constraint for multicommodity flow
+%@ con eq_0018 kind=linear domain=- indicator=- :: BIOP binary variable restriction
+%@ con eq_0020 kind=linear domain=- indicator=- :: BIOP integrality/domain restriction for occupancy variables
+%@ con eq_0022 kind=linear domain=- indicator=- :: Hypergraph (11b) single departure per train
+%@ con eq_0023 kind=linear domain=- indicator=- :: Hypergraph (11c) flow conservation at nodes
+%@ con eq_0024 kind=linear domain=- indicator=- :: Hypergraph (11d) single arrival per train
+%@ con eq_0025 kind=linear domain=- indicator=- :: Hypergraph (12a) track capacity side constraint
+%@ con eq_0027 kind=linear domain=- indicator=- :: Hypergraph (12b) headway capacity constraint
+%@ con eq_0028 kind=linear domain=- indicator=- :: Hypergraph (12c) northbound headway capacity constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Hypergraph (12d) southbound headway capacity constraint
+%@ con eq_0030 kind=linear domain=- indicator=- :: PESP (13) span constraint for periodically repeating events
+%@ con eq_0031 kind=linear domain=- indicator=- :: PESP (14) definition of periodic tension
+%@ con eq_0033 kind=linear domain=- indicator=- :: IP-PESP (16) cycle constraint Γᵀx=Tz
+%@ con eq_0035 kind=linear domain=- indicator=- :: IP-PESP (17) lower and upper bounds on tensions
+%@ con eq_0036 kind=linear domain=- indicator=- :: IP-PESP (18) integrality of cycle tensions z
+%@ con eq_0037 kind=linear domain=- indicator=- :: IP-PESP (19) integrality of arc tensions x

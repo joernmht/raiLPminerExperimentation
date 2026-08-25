@@ -1,0 +1,166 @@
+% Declaration sidecar for 10.1016_j.jrtpm.2025.100548
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.jrtpm.2025.100548
+% Optimization method for maximizing capacity utilization of high-speed railway train timetable based on node routing model
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.jrtpm.2025.100548.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+%
+%@ obj sense=max name=objective combination=sum :: Objective (6): maximize the number of trains accommodated on the timetable, z1 = sum_{v in V} x_{f(v)}
+%
+% x: classified as variable during review
+%@ var x shape=L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether node l is selected in the route
+%
+% z: classified as variable during review
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (maximize number of trains, minimize time-space resources, etc.)
+%
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of trains
+%
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of stations
+%
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Time bounds of the timetable (T1 start, T2 end)
+%
+% a: classified as variable during review
+%@ var a shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train v at station k
+%
+% d: classified as variable during review
+%@ var d shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train v at station k
+%
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of nodes (train paths or overtaking combinations)
+%
+% c: classified as variable during review
+%@ var c shape=L,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
+%
+% y: classified as variable during review
+%@ var y shape=L domain=integer role=primary drole=- lo=- hi=- :: Routing sequence number of node l
+%
+% λ: classified as variable during review; renamed to lambda because λ is not a usable identifier
+%@ var lambda shape=L,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node l is assigned sequence number i
+%
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of possible routing sequence numbers
+%
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Index for subsets of nodes (locally connected network)
+%
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of subsets of nodes
+%
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
+%
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway times between trains (e.g., h_pp, h_dp, etc.)
+%
+% θ: classified as variable during review; renamed to theta because θ is not a usable identifier
+%@ var theta shape=V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train v stops at station k
+%
+% n: classified as index during review
+%@ index n ordered=0 cyclic=0 :: Number of stations (last station index)
+%
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Dwelling times (t_k^1, t_k^2) and running times (t_{k,k+1}^v)
+%
+% α: classified as variable during review; renamed to alpha because α is not a usable identifier
+%@ var alpha shape=V,V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
+%
+% m: classified as parameter during review
+%@ param m shape=- kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
+%
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar domain=- :: Time-space resources occupied between nodes or boundaries
+%
+% O: classified as parameter during review
+%@ param O shape=- kind=scalar domain=- :: Total amount of time-space resources available on the timetable
+%
+% b: classified as parameter during review
+%@ param b shape=- kind=scalar domain=- :: Threshold for difference in number of stops
+%
+% χ: classified as parameter during review; renamed to chi because χ is not a usable identifier
+%@ param chi shape=V,V,K kind=matrix domain=- :: Departure interval time between trains in overtaking combination
+%
+% ψ: classified as parameter during review; renamed to psi because ψ is not a usable identifier
+%@ param psi shape=V,V,K kind=matrix domain=- :: Arrival interval time between trains in overtaking combination
+%
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Time-space resource savings or internal resources (s1, s2, s3, s4)
+%
+% β: classified as parameter during review; renamed to beta because β is not a usable identifier
+%@ param beta shape=- kind=scalar domain=- :: Penalty weight for unmapped train paths in objective
+%
+% Bound by a quantifier or big operator, so no declaration of their own: f, i, k, l, v
+% (If one of these is really an index family, add a %@ index line for it.)
+%
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0006 kind=linear domain=- indicator=- :: Objective (6): maximize the number of trains accommodated on the timetable, z1 = sum_{v in V} x_{f(v)}
+%@ con eq_0007 kind=linear domain=- indicator=- :: Constraint (7): arrival time of train v at station k must not exceed timetable end time T2
+%@ con eq_0008 kind=linear domain=- indicator=- :: Constraint (8): departure time of train v at station k must be no earlier than timetable start time T1
+%@ con eq_0009 kind=linear domain=- indicator=- :: Constraint (9): flow balance for outgoing arcs; selected non-terminal node has one outgoing selected arc, terminal node has none
+%@ con eq_0010 kind=linear domain=- indicator=- :: Constraint (10): flow balance for incoming arcs; selected non-starting node has one incoming selected arc, starting node has none
+%@ con eq_0011 kind=linear domain=- indicator=- :: Constraint (11): if arc from l' to l is selected then node l is routed immediately after node l'
+%@ con eq_0012 kind=linear domain=- indicator=- :: Constraint (12): routing sequence number y_l equals assigned index i when lambda_{l,i}=1
+%@ con eq_0013 kind=linear domain=- indicator=- :: Constraint (13): each selected node is assigned at most one routing sequence number
+%@ con eq_0014 kind=linear domain=- indicator=- :: Constraint (14): locally connected network; no selected arcs from subset L_r to nodes outside L_r and L_{r+1}
+%@ con eq_0015 kind=linear domain=- indicator=- :: Constraint (15): locally connected network; no selected arcs from nodes outside L_{r-1} and L_r into L_r
+%@ con eq_0016 kind=linear domain=- indicator=- :: Constraint (16): at most one selected arc between adjacent subsets L_r and L_{r+1}, and none if L_r contains the terminal node
+%@ con eq_0017 kind=linear domain=- indicator=- :: Constraint (17): if any node in subset L_{r+1} is routed then all nodes in L_r are routed
+%@ con eq_0018 kind=linear domain=- indicator=- :: Constraint (18): running time from station k to k+1: a_{v,k+1} = d_{v,k} + h1_k*theta_{v,k} + t_{k,k+1}^v + h2_{k+1}*theta_{v,k+1}
+%@ con eq_0019_a kind=linear domain=- indicator=- :: Constraint (19a): departure headway between trains v and v' when v departs before or at v'
+%@ con eq_0019_b kind=linear domain=- indicator=- :: Constraint (19b): departure headway between trains v and v' when v' departs before v
+%@ con eq_0020_a kind=linear domain=- indicator=- :: Constraint (20a): arrival headway between trains v and v' when v arrives before or at v'
+%@ con eq_0020_b kind=linear domain=- indicator=- :: Constraint (20b): arrival headway between trains v and v' when v' arrives before v
+%@ con eq_0021 kind=linear domain=- indicator=- :: Constraint (21): dwelling time at station k; stopping train departs after arrival plus regular dwell, extended dwell when yielding to overtaking train
+%@ con eq_0022 kind=linear domain=- indicator=- :: Constraint (22): auxiliary overtaking indicator alpha'(v,v',k) is 1 if v' arrives after v
+%@ con eq_0023 kind=linear domain=- indicator=- :: Constraint (23): auxiliary overtaking indicator alpha'(v,v',k) is 0 if v' arrives no later than v
+%@ con eq_0024 kind=linear domain=- indicator=- :: Constraint (24): auxiliary overtaking indicator alpha''(v,v',k) is 1 if v departs after v'
+%@ con eq_0025 kind=linear domain=- indicator=- :: Constraint (25): auxiliary overtaking indicator alpha''(v,v',k) is 0 if v departs no later than v'
+%@ con eq_0026 kind=linear domain=- indicator=- :: Constraint (26): overtaking indicator alpha(v,v',k) is 1 when both alpha' and alpha'' are 1
+%@ con eq_0027 kind=linear domain=- indicator=- :: Constraint (27): overtaking indicator alpha(v,v',k) does not exceed alpha'(v,v',k)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Constraint (28): overtaking indicator alpha(v,v',k) does not exceed alpha''(v,v',k)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Constraint (29): time-space resources o1(f(v)) between a train path and the left timetable boundary without overtaking
+%@ con eq_0030 kind=linear domain=- indicator=- :: Constraint (30): time-space resources o2(f(v)) between a train path and the right timetable boundary without overtaking
+%@ con eq_0031 kind=linear domain=- indicator=- :: Constraint (31): time-space resources o(f(v),f(v')) between two consecutive train paths without overtaking
+%@ con eq_0032 kind=linear domain=- indicator=- :: Constraint (32): time-space resources o1(l) between an overtaking combination and the left timetable boundary
+%@ con eq_0033 kind=linear domain=- indicator=- :: Constraint (33): time-space resources o2(l) between an overtaking combination and the right timetable boundary
+%@ con eq_0034 kind=linear domain=- indicator=- :: Constraint (34): time-space resources o(f(v'),l) between a normal train path and a following overtaking combination
+%@ con eq_0035 kind=linear domain=- indicator=- :: Constraint (35): time-space resources o(l,f(v')) between an overtaking combination and a following normal train path
+%@ con eq_0036 kind=linear domain=- indicator=- :: Constraint (36): time-space resources o(l,l') between two train overtaking combinations
+%@ con eq_0037 kind=linear domain=- indicator=- :: Constraint (37): internal time-space resources o3(l) occupied by train paths within an overtaking combination
+%@ con eq_0038 kind=linear domain=- indicator=- :: Constraint (38): total time-space resources occupied by selected arcs and nodes must not exceed total available resources O
+%@ con eq_0039 kind=linear domain=- indicator=- :: Formula (39): difference in number of stops between two trains must be at least b for an overtaking combination
+%@ con eq_0040 kind=linear domain=- indicator=- :: Constraint (40): yielding train v departs no later than overtaking train v' at every station
+%@ con eq_0041 kind=linear domain=- indicator=- :: Constraint (41): starting time of train v at the first station equals T1
+%@ con eq_0042 kind=linear domain=- indicator=- :: Constraint (42): arrival time of overtaking train v' at the last station is no later than that of yielding train v
+%@ con eq_0043 kind=linear domain=- indicator=- :: Constraint (43): departure interval chi_{v,v',k} between trains in an overtaking combination at station k
+%@ con eq_0044 kind=linear domain=- indicator=- :: Constraint (44): arrival interval psi_{v,v',k} between trains in an overtaking combination at station k
+%@ con eq_0045 kind=linear domain=- indicator=- :: Formula (45): internal resources o3(l) of the chosen overtaking combination l equals the maximum saving s4(v,v') in its subset
+%@ con eq_0046 kind=linear domain=- indicator=- :: Constraint (46): no-overtaking order: train v arrives at station k no later than train v'
+%@ con eq_0047 kind=linear domain=- indicator=- :: Constraint (47): linearized lower bound for sequence order: if c(l',l)=1 then y_l - y_l' >= 1
+%@ con eq_0048 kind=linear domain=- indicator=- :: Constraint (48): linearized upper bound for sequence order: if c(l',l)=1 then y_l - y_l' - 1 <= 0
+%@ con eq_0050 kind=linear domain=- indicator=- :: Constraint (50): all nodes are selected (x_l=1), so all train paths are drawn on the timetable
+%@ con eq_0051 kind=linear domain=- indicator=- :: Objective (51): minimize sum of final arrival times plus penalty beta for unmapped train paths
+%@ con eq_0052 kind=linear domain=- indicator=- :: Constraint (52): if arc (f(v'),f(v)) is selected then train v arrives no earlier than v' at every station
+%@ con eq_0053 kind=linear domain=- indicator=- :: Constraint (53): if final arrival time of train v exceeds T2 then its path is not accommodated (x_{f(v)}=0)
+%@ con eq_0054 kind=linear domain=- indicator=- :: Constraint (54): if final arrival time of train v is within T2 then its path is accommodated (x_{f(v)}=1)

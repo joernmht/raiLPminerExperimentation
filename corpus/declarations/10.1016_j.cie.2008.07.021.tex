@@ -1,0 +1,32 @@
+% Declaration sidecar for 10.1016_j.cie.2008.07.021
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.cie.2008.07.021
+% An effective hybrid particle swarm optimization algorithm for multi-objective flexible job-shop scheduling problem
+
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize the weighted sum of the three objectives f1, f2, f3
+
+%@ index i ordered=0 cyclic=0 :: Index of jobs, i = 1, ..., n
+%@ index j ordered=0 cyclic=0 :: Index of operation sequence, j = 1, ..., n_i
+%@ index k ordered=0 cyclic=0 :: Index of machines, k = 1, ..., m
+
+%@ var C shape=i,j domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of operation O_ij
+%@ param P shape=i,j,k kind=scalar domain=- :: Processing time of operation O_ij on machine k
+%@ param n shape=- kind=scalar domain=- :: Total number of jobs
+%@ param s shape=i,j,k kind=scalar domain=- :: Start time of operation O_ij on machine k (alternative notation)
+%@ param t shape=i,j,k kind=scalar domain=- :: Start time of operation O_ij on machine k
+%@ var x shape=i,j,k domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if machine k is selected for operation O_ij, 0 otherwise
+%@ index M ordered=0 cyclic=0 :: Set of available machines for operation O_ij
+%@ var f shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective functions f1 (makespan), f2 (maximum workload), f3 (total workload)
+%@ param w shape=- kind=scalar domain=- :: Weights for the objectives
+%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Weighted sum objective F = w1*f1 + w2*f2 + w3*f3
+
+%@ con eq_0006 kind=linear domain=- indicator=- :: Operation precedence constraint: C_ij - C_i(j-1) >= P_ijk x_ijk
+%@ con eq_0007 kind=linear domain=- indicator=- :: Disjunctive machine capacity constraint: no two operations overlap on a machine
+%@ con eq_0008 kind=linear domain=- indicator=- :: Machine selection constraint: sum_{k in M_ij} x_ijk = 1
+%@ con eq_0012_a kind=linear domain=- indicator=- :: Makespan objective constraint: f1 >= C_k for all machines k
+%@ con eq_0012_b kind=linear domain=- indicator=- :: Maximum workload objective constraint: f2 >= W_k for all machines k
+%@ con eq_0012_c kind=linear domain=- indicator=- :: Total workload objective constraint: f3 = sum_k W_k
+%@ con eq_0012_d kind=linear domain=- indicator=- :: Weighted-sum objective constraint: F = sum_l w_l f_l

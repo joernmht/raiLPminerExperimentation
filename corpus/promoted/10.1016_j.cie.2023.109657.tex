@@ -1,0 +1,128 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.cie.2023.109657
+%@ meta id=10.1016_j.cie.2023.109657 family=milp schema=0.1.0
+%@ name :: Optimization of system resilience in urban rail systems: Train rescheduling considering congestions of stations
+%@ desc :: Mined from Optimization of system resilience in urban rail systems: Train rescheduling considering congestions of stations (Computers & Industrial Engineering, 2023).
+%@ prov source :: 10.1016/j.cie.2023.109657
+%@ prov reference :: Optimization of system resilience in urban rail systems: Train rescheduling considering congestions of stations
+%@ prov author :: Zhixian Li; Jiateng Yin; Simin Chai; Tao Tang; Lixing Yang
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Resilience-oriented evaluation index minimizing maximum passenger waiting ratio over stations
+%@ index t ordered=1 cyclic=0 :: Time index in discrete time horizon
+%@ index T ordered=1 cyclic=0 :: Set of discrete time units
+%@ index S ordered=1 cyclic=0 :: Set of stations along the line
+%@ param C shape=- kind=scalar :: Train capacity
+%@ param N shape=- kind=scalar :: Number of trains or doors (context-dependent)
+%@ index P ordered=0 cyclic=0 :: Set of event connections
+%@ var W shape=S,t domain=non_negative role=primary :: Number of waiting passengers at station i and time t
+%@ index E ordered=0 cyclic=0 :: Set of service events
+%@ index e ordered=0 cyclic=0 :: Event index
+%@ index t_orig ordered=1 cyclic=0 :: Original scheduled time of event e (t̄)
+%@ var c shape=e domain=binary role=primary :: Binary cancellation indicator for event e
+%@ param M shape=- kind=big_m :: Big-M value for linearization
+%@ index H ordered=0 cyclic=0 :: Set of following events for headway
+%@ param s shape=e kind=vector :: Station index for event origin/destination
+%@ index D ordered=0 cyclic=0 :: Set of depots
+%@ param M_hat shape=- kind=big_m :: Big-M value larger than M
+%@ var B shape=- domain=non_negative role=primary :: Boarding passengers per door
+%@ index PA ordered=0 cyclic=0 :: Set of passenger paths
+%@ var x shape=t domain=binary role=primary :: Binary train departure indicator at time t
+%@ param OD shape=PA,t kind=matrix :: Origin-destination demand per path and time
+%@ param K shape=- kind=scalar :: Number of physical trains
+%@ var A shape=- domain=non_negative role=primary :: Alighting passengers per door
+%@ param m shape=- kind=scalar :: Lower bound of time difference in valid inequality
+%@ con eq_0003 kind=linear :: Minimum running time for event e
+%@ con eq_0005 kind=linear :: No cancellation of service events before disruption start
+%@ con eq_0006 kind=linear :: Cancel or delay disrupted services until disruption ends
+%@ con eq_0007 kind=linear :: Minimum dwell time with big-M cancellation logic
+%@ con eq_0008 kind=linear :: Minimum headway between successive events with big-M
+%@ con eq_0010 kind=linear :: At most one turnaround predecessor per event
+%@ con eq_0011 kind=linear :: Minimum turnaround time with big-M
+%@ con eq_0013 kind=linear :: Short-turn cancellation rule for predecessor events
+%@ con eq_0014 kind=linear :: Minimal upstream tracing time at turn-out track
+%@ con eq_0015 kind=linear :: Minimal downstream tracing time at turn-out track
+%@ con eq_0016 kind=linear :: Depot return and connection exclusivity for terminal events
+%@ con eq_0018 kind=linear :: Train sourcing from depot or connection for service event
+%@ con eq_0019 kind=linear :: Train return to depot or connection for service event
+%@ con eq_0020 kind=linear :: No cancellation for events connected by same rolling stock
+%@ con eq_0022 kind=linear :: Logical implication for recirculation indicator gamma
+%@ con eq_0023 kind=linear :: Linearized recirculation inequality with big-M hat
+%@ con eq_0025 kind=linear :: Passenger flow balance at station over time
+%@ con eq_0029 kind=linear :: Rolling stock circulation limit: at most K departures per cycle
+%@ con eq_0031 kind=linear :: Passenger boarding capacity with on-vehicle load
+%@ con eq_0032 kind=linear :: Boarding passengers per door calculation
+%@ con eq_0034 kind=linear :: On-vehicle standees per door calculation
+%@ con eq_0035 kind=linear :: Dwelling time model as function of passenger flows per door
+%@ con eq_0036 kind=linear :: Constraint related to dwelling time model (see text)
+%@ con eq_0038 kind=linear :: Valid inequality: canceled event cannot have connections
+%@ con eq_0039 kind=linear :: Valid inequality for turnaround time with binary indicator
+%@ con eq_0040 kind=linear :: Valid inequality for no overtaking at station
+%@ con eq_0041 kind=linear :: Valid inequality: turnaround time lower bound
+%@ con eq_0043 kind=linear :: Additional constraint from the model (see text)
+%@ con eq_0050 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0052 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0053 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0054 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0056 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0057 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0058 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0062 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0064 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0065 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0070 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0071 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0080 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0082 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0083 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0084 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0085 kind=linear :: Linear constraint from the model (see text)
+%@ con eq_0086 kind=linear :: Linear constraint from the model (see text)
+\begin{align}
+  \min\quad & \left(\underset{i}{max} \frac{\sum_{\mathit{tau} \in \mathcal{T}_{d i s r u p t}} P \cdot W_{i}^{\mathit{tau}}}{N \cdot T \cdot S \cdot C_{i}}\right) , \forall i \in \mathcal{S} , \mathcal{T}_{d i s r u p t} = \left\{t \in \mathcal{T} \mid t_{s t a r t} \leq t \leq t_{e n d}\right\} \tag{eq\_0002} \\
+  & t_{e}^{a} - t_{e}^{d} \geq T_{e}^{R} , \forall e \in \mathcal{E} \tag{eq\_0003} \\
+  & t_{e}^{d} - \bar{t}_{e}^{d} \geq 0 , \forall e \in \mathcal{E} : \bar{t}_{e}^{d} \leq t_{s t a r t} \tag{eq\_0005} \\
+  & c_{e} \leq 0 , \forall e \in \mathcal{E} : \bar{t}_{e}^{d} \leq t_{s t a r t} \tag{eq\_0006} \\
+  & t_{e}^{d} \geq \left(1 - c_{e}\right) t_{e n d} , \forall e \in \mathcal{E}^{\mathcal{D}} \tag{eq\_0007} \\
+  & t_{\bar{e}}^{d} - t_{e}^{a} + \left(c_{e} + c_{\bar{e}}\right) \cdot M \geq T_{e , \bar{e}}^{D} , \forall e \in \mathcal{E} : \left(e , \bar{e}\right) \in \mathcal{P} \tag{eq\_0008} \\
+  & \left(c_{e} + c_{e^{'}}\right) \cdot M + t_{e^{'}}^{d} \geq t_{e}^{d} + T_{e , e^{'}}^{H} , \forall e \in \mathcal{E} , e^{'} \in H^{+} \left(e\right) \tag{eq\_0010} \\
+  & \mathcal{E}^{S} = \mathcal{E}^{S^{+}} \cup \mathcal{E}^{S^{-}} \tag{eq\_0011} \\
+  & \mathcal{E}^{T} = \mathcal{E}^{T^{+}} \cup \mathcal{E}^{T^{-}} \tag{eq\_0013} \\
+  & \mathcal{D}^{+} \left(e\right) = \left\{e^{'} \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} \mid s_{e}^{d} = s_{e^{'}}^{o}\right\} \tag{eq\_0014} \\
+  & \mathcal{D}^{-} \left(e\right) = \left\{e^{'} \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} \mid s_{e}^{o} = s_{e^{'}}^{d}\right\} \tag{eq\_0015} \\
+  & \sum_{e^{'} \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , e^{'}} \leq 1 , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} \tag{eq\_0016} \\
+  & \sum_{e^{'} \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{e^{'} , e} \leq 1 , \forall e \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} \tag{eq\_0018} \\
+  & \left(1 - \mathit{lambda}_{e , e^{'}}\right) \cdot M + t_{e^{'}}^{d} \geq t_{e}^{a} + T_{e , e^{'}}^{T} , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} , e^{'} \in \mathcal{D}^{+} \left(e\right) \tag{eq\_0019} \\
+  & \sum_{e^{'} \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , e^{'}} + c_{e} \leq c_{\bar{e}} , \forall e \in \mathcal{E}^{S^{+}} : \left(e , \bar{e}\right) \in \mathcal{P} \tag{eq\_0020} \\
+  & \sum_{e^{'} \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{e^{'} , e} + c_{e} \leq c_{\underset{̲}{e}} , \forall e \in \mathcal{E}^{S^{-}} : \left(\underset{̲}{e} , e\right) \in \mathcal{P} \tag{eq\_0022} \\
+  & \left(1 - \mathit{lambda}_{e , e^{'}} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{a} \geq t_{e^{'}}^{d} + T_{e^{'} , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , e^{'} \in \mathcal{D}^{+} \left(e\right) , e^{' '} \in H^{+} \left(e\right) \tag{eq\_0023} \\
+  & \left(1 - \mathit{lambda}_{e , e^{'}} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{d} \geq t_{e}^{a} + T_{e , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , e^{'} \in \mathcal{D}^{+} \left(e\right) , e^{' '} \in H^{+} \left(e^{'}\right) \tag{eq\_0025} \\
+  & \sum_{e^{'} \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , e^{'}} + \mathit{beta}_{e} \leq 1 , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0029} \\
+  & \sum_{e^{'} \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{e^{'} , e} + \mathit{alpha}_{e} \leq 1 , \forall e \in \mathcal{E}^{T^{-}} \tag{eq\_0031} \\
+  & \mathit{alpha}_{e} + \sum_{e^{'} \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{e^{'} , e} \geq 1 - c_{e} , \forall e \in \mathcal{E}^{T^{-}} \tag{eq\_0032} \\
+  & \mathit{beta}_{e} + \sum_{e^{'} \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , e^{'}} \geq 1 - c_{e} , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0034} \\
+  & c_{e} + c_{e^{'}} \leq 2 \cdot \left(1 - \mathit{lambda}_{e , e^{'}}\right) , \forall e \in \mathcal{E}^{T^{+}} , e^{'} \in \mathcal{D}^{+} \left(e\right) \tag{eq\_0035} \\
+  & \underset{e^{'} \in \mathcal{E}^{T^{+}} : t_{e^{'}}^{d} < t_{e}^{d}}{\sum} \mathit{alpha}_{e^{'}} - \underset{e^{' '} \in \mathcal{E}^{T^{-}} : t_{e^{' '}}^{a} + T_{d e p o t} < t_{e}^{d}}{\sum} \mathit{beta}_{e^{' '}} \leq N_{t r a i n} + \sum_{d \in D} N_{a d d}^{d} , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0036} \\
+  & \mathit{gamma}_{e , e^{'}} = 0 \Rightarrow t_{e^{'}}^{a} + \left(1 - \mathit{beta}_{e^{'}}\right) \cdot M + T_{d e p o t} \geq t_{e}^{d} \tag{eq\_0038} \\
+  & t_{e^{'}}^{a} + \left(1 - \mathit{beta}_{e^{'}}\right) \cdot M + T_{d e p o t} - t_{e}^{d} \leq \hat{M} \cdot \left(1 - \mathit{gamma}_{e , e^{'}}\right) \tag{eq\_0039} \\
+  & \underset{e^{'} \in \mathcal{E}^{T^{+}} : t_{e^{'}}^{d} < t_{e}^{d}}{\sum} \mathit{alpha}_{e^{'}} - \underset{e^{' '} \in \mathcal{E}^{T^{-}}}{\sum} \mathit{gamma}_{e , e^{' '}} \leq N_{t r a i n} + \sum_{d \in D} N_{a d d}^{d} , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0040} \\
+  & \mathcal{T}_{t} = \left\{t^{'} \in \mathcal{T} \mid t^{'} \leq t\right\} \tag{eq\_0041} \\
+  & \mathcal{T}_{p a , i} = \left\{t \in \mathcal{T} \mid t \geq t_{i}^{p a}\right\} \tag{eq\_0043} \\
+  & P \cdot W_{i}^{t} = \sum_{\mathit{tau} \in \mathcal{T}_{t}} P \cdot E_{i}^{\mathit{tau}} - \sum_{\mathit{tau} \in \mathcal{T}_{t}} \sum_{p a \in \mathcal{PA}_{i}^{o}} P \cdot B_{p a , i}^{\mathit{tau}} , \forall i \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0050} \\
+  & \sum_{p a \in \mathcal{PA}_{i}} P \cdot B_{p a , i}^{t} \leq C \cdot x_{t - t_{i}} , \forall i \in \mathcal{S} , t \in \mathcal{T} : t \geq t_{i} \tag{eq\_0052} \\
+  & \sum_{\mathit{tau} \in \mathcal{T}_{t}} P \cdot B_{p a , i}^{\mathit{tau}} \leq \sum_{\mathit{tau} \in \mathcal{T}_{t}} \mathcal{OD}_{p a}^{\mathit{tau}} , \forall i \in \mathcal{S} , p a \in \mathcal{PA}_{i}^{o} , t \in \mathcal{T}_{p a , i} \tag{eq\_0053} \\
+  & \sum_{t \leq t^{'} \leq t + T_{m i n}} x_{t^{'}} \leq 1 , \forall t \in \mathcal{T} \tag{eq\_0054} \\
+  & \sum_{t \leq t^{'} \leq t + T_{c y c l e}} x_{t^{'}} \leq K , \forall t \in \mathcal{T} \tag{eq\_0056} \\
+  & \mathcal{PA}_{i^{'} , i} = \mathcal{PA}_{i^{'}}^{o} \cap \left(\mathcal{PA}_{i + 1}^{d} \cup \mathcal{PA}_{i + 2}^{d} \cup \hdots \cup \mathcal{PA}_{\left|\mathcal{S}\right|}^{d}\right) \tag{eq\_0057} \\
+  & \sum_{p a \in \mathcal{PA}_{i}} P \cdot B_{p a , i}^{t} \leq C - \sum_{i^{'} \in \mathcal{S}_{i}} \underset{p a \in \mathcal{PA}_{i^{'} , i}}{\sum} P \cdot B_{p a , i^{'}}^{t \left(i^{'} , i\right)} , \forall i \in \mathcal{S} , t \in \mathcal{T}_{p a , i} \tag{eq\_0058} \\
+  & B_{d} = \left(\sum_{\mathit{tau} \in \mathcal{T}_{t}} \sum_{p a \in \mathcal{PA}_{i}^{o}} P \cdot B_{p a , i}^{\mathit{tau}}\right) / N_{d o o r} , \forall i \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0062} \\
+  & A_{d} = \left(\sum_{i^{'} \in \mathcal{S}_{i}} \underset{p a \in \mathcal{PA}_{i^{'} , i}}{\sum} P \cdot B_{p a , i^{'}}^{t \left(i^{'} , i\right)}\right) / N_{d o o r} , \forall i \in \mathcal{S} , t \in \mathcal{T}_{p a , i} \tag{eq\_0064} \\
+  & T \cdot S_{d} = \left(C - \sum_{i^{'} \in \mathcal{S}_{i}} \underset{p a \in \mathcal{PA}_{i^{'} , i}}{\sum} P \cdot B_{p a , i^{'}}^{t \left(i^{'} , i\right)}\right) / N_{d o o r} , \forall i \in \mathcal{S} , t \in \mathcal{T}_{p a , i} \tag{eq\_0065} \\
+  & \text{s}.\text{t}. t_{e}^{a} - \bar{t}_{e}^{a} \geq 0 , \forall e \in \mathcal{E} \tag{eq\_0070} \\
+  & t_{e}^{a} - \bar{t}_{e}^{a} \leq \left(1 - c_{e}\right) \cdot M , \forall e \in \mathcal{E} \tag{eq\_0071} \\
+  & \sum_{e^{'} \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , e^{'}} \leq 1 - c_{e} , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} , \tag{eq\_0080} \\
+  & \sum_{e^{'} \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{e^{'} , e} \leq 1 - c_{e} , \forall e \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} . \tag{eq\_0082} \\
+  & t_{e}^{a} + T_{e , e^{'}}^{T} - t_{e^{'}}^{d} \geq m \cdot \mathit{Psi} + \mathit{epsilon} \cdot \left(1 - \mathit{Psi} \left(e\right)\right) , \forall e \in \mathcal{E}^{S^{+}} \tag{eq\_0083} \\
+  & t_{e}^{a} \geq t_{e^{'}}^{d} + T_{e^{'} , e}^{P} \tag{eq\_0084} \\
+  & t_{e}^{a} + T_{e , e^{'}}^{T} - t_{e^{'}}^{d} > T_{d e p o t} > 0 , \tag{eq\_0085} \\
+  & t_{e}^{l a t e s t} \geq t_{e n d} - t_{s t a r t} + \underset{e , e^{'} \in \mathcal{E}}{max} \left\{\left|t_{e}^{a} - t_{e^{'}}^{d}\right|\right\} \tag{eq\_0086} \\
+\end{align}

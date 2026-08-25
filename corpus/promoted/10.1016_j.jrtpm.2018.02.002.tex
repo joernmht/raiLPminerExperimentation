@@ -1,0 +1,40 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.jrtpm.2018.02.002
+%@ meta id=10.1016_j.jrtpm.2018.02.002 family=milp schema=0.1.0
+%@ name :: Impact of railway disruption predictions and rescheduling on passenger delays
+%@ desc :: Mined from Impact of railway disruption predictions and rescheduling on passenger delays (Journal of Rail Transport Planning & Management, 2018).
+%@ prov source :: 10.1016/j.jrtpm.2018.02.002
+%@ prov reference :: Impact of railway disruption predictions and rescheduling on passenger delays
+%@ prov author :: Nadjla Ghaemi; A.A. Zilko; Fei Yan; Oded Cats; Dorota Kurowicka; Rob M.P. Goverde
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: minimize weighted departure and arrival delays and cancelled services
+%@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Delay variable for arrival or departure of a service
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of a service
+%@ index V ordered=0 cyclic=0 :: Set of all train services
+%@ index Out ordered=0 cyclic=0 :: Set of outgoing short-turning pairs from a service
+%@ index L ordered=0 cyclic=0 :: Set of lines or directions
+%@ index S ordered=0 cyclic=0 :: Set of stations or scenarios
+%@ index I ordered=0 cyclic=0 :: Set of incoming short-turning pairs
+%@ index n ordered=0 cyclic=0 :: Index for service number in a line
+%@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival or departure time of a service
+%@ param M shape=- kind=scalar :: Large constant for linearization
+%@ index P ordered=0 cyclic=0 :: Set of platform tracks available for a service
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for platform assignment
+%@ index q ordered=0 cyclic=0 :: Index for platform track
+%@ con eq_0004 kind=linear domain=- indicator=- :: Every approaching service either short-turns at a station prior to the disruption area, leading to cancellation of one service, or continues after the end of disruption
+%@ con eq_0005 kind=linear domain=- indicator=- :: For every scheduled departure in the opposite direction, there is exactly one matching approaching service in case of short-turning
+%@ con eq_0006 kind=linear domain=- indicator=- :: If a short-turning pair is selected for a service, the next service is cancelled
+%@ con eq_0007 kind=linear domain=- indicator=- :: If a short-turning pair is selected for an opposite-direction service, the previous service is cancelled
+%@ con eq_0008 kind=linear domain=- indicator=- :: If a service is cancelled, no short-turning pair can be selected for it
+%@ con eq_0009 kind=big_m domain=- indicator=- :: If a short-turning pair is selected, the departure time of the returning service is at least the arrival time of the incoming service plus the minimum turnaround time
+%@ con eq_0010 kind=linear domain=- indicator=- :: If a service is not cancelled, exactly one platform is assigned to it
+\begin{align}
+  \min\quad & \sum_{v_{l , n}^{i} \in V} \left(\mathit{omega}_{v_{l , n}^{i}}^{d^{d}} \cdot d_{v_{l , n}^{i}}^{d} + \mathit{omega}_{v_{l , n}^{i}}^{d^{a}} \cdot d_{v_{l , n}^{i}}^{a} + \mathit{omega}_{v_{l , n}^{i}}^{c} \cdot c_{v_{l , n}^{i}}\right) . \tag{eq\_0003} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i}} \cup \mathit{Out}_{v_{l , n}^{i + 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} = c_{l , n}^{i + 2} , \forall v_{l , n}^{i} \in \left(V^{'}\right)_{s , l} , s \in S_{2} , l \in L_{D i s t} , \tag{eq\_0004} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in I \cdot n_{v_{l , m}^{j}} \cup I \cdot n_{v_{l , m}^{j - 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , m}^{j} = c_{l , m}^{j - 2} , \forall v_{l , m}^{j} \in \left(V^{'''}\right)_{s , l} , s \in S_{2} , l \in L_{D i s t} , \tag{eq\_0005} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} = c_{l , n}^{i + 1} , \forall v_{l , n}^{i} \in \left(V^{'}\right)_{s , l} , s \in S_{2} , l \in L_{D i s t} , \tag{eq\_0006} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in I \cdot n_{v_{l , m}^{j}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , m}^{j} = c_{l , m}^{j - 1} , \forall v_{l , m}^{j} \in \left(V^{'''}\right)_{s , l} , s \in S_{2} , l \in L_{D i s t} , \tag{eq\_0007} \\
+  & \underset{\left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v_{l , n}^{i + 1}}}{\sum} \mathit{lambda}_{v^{'} , v^{'''}} + c_{l , n}^{i + 1} \leq 1 , \forall v_{l , n}^{i} \in \left(V^{'}\right)_{s , l} , s \in S_{2} , l \in L_{D i s t} , \tag{eq\_0008} \\
+  & \left(1 - \mathit{lambda}_{v^{'} , v^{'''}}\right) \cdot M + t_{v^{'''}}^{d} \geq t_{v^{'}}^{a} + \mathit{theta}_{v^{'}}^{m i n} , \forall \left(v^{'} , v^{'''}\right) \in \mathit{Out}_{v '} , \tag{eq\_0009} \\
+  & \underset{q \in P_{s , v_{l , n}^{i}}}{\sum} p_{v_{l , n}^{i} , q} + c_{l , n}^{i} = 1 \forall v_{l , n}^{i} \in \left(V^{'}\right)_{s , l} \cup \left(V^{'''}\right)_{s , l} , s \in S_{1} \cup S_{2} , l \in L_{D i s t} , \tag{eq\_0010} \\
+\end{align}
