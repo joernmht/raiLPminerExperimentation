@@ -718,6 +718,10 @@ class Outcome:
     counts: dict[str, int] = field(default_factory=dict)
     rows: int = 0
     written: tuple[str, ...] = ()
+    #: Partial promotion: rows the canonical subset kept / excluded (with the
+    #: per-row parser message), empty for full promotions.
+    rows_included: int = 0
+    rows_excluded: tuple[dict, ...] = ()
 
     @property
     def category(self) -> str | None:
@@ -737,6 +741,12 @@ class Outcome:
             out["remedy"] = CAUSES[self.cause][1]
             if self.detail:
                 out["detail"] = self.detail
+        if self.rows_excluded:
+            out["partial"] = {
+                "rows_included": self.rows_included,
+                "rows_excluded": len(self.rows_excluded),
+                "excluded": list(self.rows_excluded),
+            }
         if self.written:
             out["written"] = list(self.written)
         return out
@@ -761,6 +771,7 @@ def promote_paper(
     write: bool = True,
     out_dirs: dict[str, Path] | None = None,
     symbols: dict[str, str] | None = None,
+    partial: bool = False,
 ) -> Outcome:
     """Promote one paper, or explain in one cause why it could not be promoted.
 
@@ -836,6 +847,47 @@ def promote_paper(
         written_paths.append(_rel(tex_path))
 
     result = ingest_latex(document, source=f"corpus/promoted/{entry_id}.tex")
+    excluded: tuple[dict, ...] = ()
+    if not result.ok and partial:
+        # Partial promotion: whole-paper canonicalization is a conjunction
+        # over every row, and one stubborn row vetoes the paper. The honest
+        # alternative to all-or-nothing is the canonical SUBSET: keep the
+        # objective plus every constraint row that parses in isolation,
+        # re-assemble, and record precisely which rows were dropped and what
+        # the parser said about each — coverage becomes a measured number,
+        # never a silent omission. A model missing rows is weaker, not wrong;
+        # the provenance carries ``partial`` so no reader can mistake it.
+        objective_rows = [r for r in rows if r.is_objective]
+
+        def _row_ok(row: Row) -> tuple[bool, str]:
+            doc = assemble(dossier, [*objective_rows, row], declarations, entry_id=entry_id)
+            probe = ingest_latex(doc, source=f"probe/{entry_id}")
+            if probe.ok:
+                return True, ""
+            return False, _oneline("; ".join(f.message for f in probe.failures))[:200]
+
+        obj_doc = assemble(dossier, objective_rows, declarations, entry_id=entry_id)
+        if ingest_latex(obj_doc, source=f"probe/{entry_id}").ok:
+            kept: list[Row] = list(objective_rows)
+            dropped: list[dict] = []
+            for row in rows:
+                if row.is_objective:
+                    continue
+                ok, why = _row_ok(row)
+                if ok:
+                    kept.append(row)
+                else:
+                    dropped.append({"name": row.name, "formula_id": row.formula_id, "error": why})
+            if len(kept) > len(objective_rows):
+                subset_doc = assemble(dossier, kept, declarations, entry_id=entry_id)
+                subset = ingest_latex(subset_doc, source=f"corpus/promoted/{entry_id}.tex")
+                if subset.ok:
+                    result = subset
+                    document = subset_doc
+                    excluded = tuple(dropped)
+                    if write:
+                        tex_path = dirs["promoted"] / f"{entry_id}.tex"
+                        tex_path.write_text(document, encoding="utf-8")
     if not result.ok:
         stage = result.failures[0].stage
         cause = {
@@ -858,6 +910,12 @@ def promote_paper(
     load_formulation(payload, source=entry_id)
 
     record = provenance_record(dossier, cell, entry_id=entry_id)
+    if excluded:
+        record["partial"] = {
+            "rows_total": len(rows),
+            "rows_included": len(rows) - len(excluded),
+            "excluded": list(excluded),
+        }
     if write:
         conflict = _existing_source_conflict(dirs["provenance"] / f"{entry_id}.json", record)
         if conflict:
@@ -886,6 +944,8 @@ def promote_paper(
         counts=counts,
         rows=len(rows),
         written=tuple(written_paths),
+        rows_included=len(rows) - len(excluded),
+        rows_excluded=excluded,
     )
 
 
@@ -1043,6 +1103,7 @@ def promote_all(
     out_dirs: dict[str, Path] | None = None,
     write: bool = True,
     only: set[str] | None = None,
+    partial: bool = False,
 ) -> dict:
     """Promote every paper that has decisions, and return the report."""
     paths = sorted(decisions_dir.glob("*.json")) if decisions_dir.exists() else []
@@ -1073,6 +1134,7 @@ def promote_all(
                 out_dirs=out_dirs,
                 write=write,
                 symbols=symbol_tables.get(key),
+                partial=partial,
             )
         )
     return build_report(outcomes, unrecognised)
@@ -1094,6 +1156,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--dry-run", action="store_true", help="report only; write no corpus artifacts"
     )
+    parser.add_argument(
+        "--partial",
+        action="store_true",
+        help="when the full document is outside the grammar, promote the canonical "
+        "row subset (objective required) and record the excluded rows per paper",
+    )
     args = parser.parse_args(argv)
 
     if not args.decisions.exists():
@@ -1110,6 +1178,7 @@ def main(argv: list[str] | None = None) -> int:
         declarations_dir=args.declarations,
         write=not args.dry_run,
         only=set(args.only) or None,
+        partial=args.partial,
     )
 
     if not args.dry_run:
