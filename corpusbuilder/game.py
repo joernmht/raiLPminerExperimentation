@@ -977,9 +977,10 @@ def normalize_objective_head(latex: str) -> str:
     # MathML sometimes spaces the word itself: "min i m i z e (...)"
     s = re.sub(
         r"\b(m\s*i\s*n\s*i\s*m\s*i\s*[sz]\s*e|m\s*a\s*x\s*i\s*m\s*i\s*[sz]\s*e|m\s*i\s*n|m\s*a\s*x)\b(?=\s*[\\(A-Za-z0-9])",
-        lambda m: m.group(1).replace(" ", ""),
+        lambda m: m.group(1).replace(" ", "").lower(),
         s,
         count=1,
+        flags=re.IGNORECASE,
     )
     return _lead_minmax_word(s)
 
