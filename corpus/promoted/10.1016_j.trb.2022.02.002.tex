@@ -1,0 +1,88 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2022.02.002
+%@ meta id=10.1016_j.trb.2022.02.002 family=milp schema=0.1.0
+%@ name :: A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions
+%@ desc :: Mined from A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions (Transportation Research Part B Methodological, 2022).
+%@ prov source :: 10.1016/j.trb.2022.02.002
+%@ prov reference :: A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions
+%@ prov author :: Qin Zhang; Richard Martin Lusby; Pan Shang; Xiaoning Zhu
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total weighted train running cost plus weighted penalty for maintenance start time deviations.
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value.
+%@ param c shape=F,A kind=matrix domain=- :: Weighted running cost of space-time arc g for train f.
+%@ var x shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train f uses space-time arc g.
+%@ index A ordered=0 cyclic=0 :: Set of space-time arcs.
+%@ index F ordered=0 cyclic=0 :: Set of trains.
+%@ index delta ordered=0 cyclic=0 :: Set of arcs incident to a node (incoming/outgoing).
+%@ index sigma ordered=0 cyclic=0 :: Origin space-time node of train f.
+%@ index V ordered=0 cyclic=0 :: Set of space-time nodes.
+%@ index v ordered=0 cyclic=0 :: Space-time node index.
+%@ index gamma ordered=0 cyclic=0 :: Destination space-time node of train f.
+%@ param D shape=F,K kind=matrix domain=- :: Minimum dwell time at station k for train f.
+%@ index K ordered=0 cyclic=0 :: Set of stations.
+%@ param Dmax shape=F,K kind=matrix domain=- :: Maximum dwell time at station k for train f.
+%@ index psi ordered=0 cyclic=0 :: Set of incompatible arrival/departure nodes for headway constraints.
+%@ index t ordered=0 cyclic=0 :: Time instant.
+%@ param T shape=- kind=scalar domain=- :: Headway time or time shift parameter.
+%@ index d ordered=0 cyclic=0 :: Destination node or end time index.
+%@ index o ordered=0 cyclic=0 :: Origin node or start time index.
+%@ index N ordered=0 cyclic=0 :: Set of nodes.
+%@ index Pi ordered=0 cyclic=0 :: Set of incompatible space-time arcs for station route conflicts.
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for implicit siding-track occupation (y_g^f) or maintenance start time (y_t^m).
+%@ index M ordered=0 cyclic=0 :: Set of maintenance tasks.
+%@ index phi ordered=0 cyclic=0 :: Set of incompatible physical arcs for station route conflicts.
+%@ index E ordered=0 cyclic=0 :: Set of physical arcs.
+%@ index Abar ordered=0 cyclic=0 :: Set of available space-time arcs for a train.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Train flow balance: each train is assigned exactly one departure arc from its origin.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Train flow balance: flow conservation at intermediate space-time nodes.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Minimum dwell time at each visited station.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Maximum dwell time at each visited station.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Node occupation variable x_v^f defined from incoming segment running arcs.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Node occupation variable x_v^f defined from outgoing segment running arcs.
+%@ con eq_0014 kind=linear domain=- indicator=- :: Arrival headway: at most one train can occupy any incompatible arrival node set.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Departure headway: at most one train can occupy any incompatible departure node set.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Siding-route AA/DD headway: at most one train among incompatible siding-route arcs in a time window.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Defines incompatible space-time arrival arc set for mainline vs siding routes in hub stations.
+%@ con eq_0026 kind=linear domain=- indicator=- :: Defines incompatible space-time departure arc set for mainline vs siding routes in hub stations.
+%@ con eq_0027 kind=linear domain=- indicator=- :: Prevents simultaneous occupation of a mainline arrival arc and its incompatible siding arrival arcs.
+%@ con eq_0029 kind=linear domain=- indicator=- :: Prevents simultaneous occupation of a mainline departure arc and its incompatible siding departure arcs.
+%@ con eq_0030 kind=linear domain=- indicator=- :: AD headway between incompatible siding-route movements at stations.
+%@ con eq_0032 kind=linear domain=- indicator=- :: Defines incompatible space-time AD arc set for mainline vs siding routes.
+%@ con eq_0033 kind=linear domain=- indicator=- :: Prevents arrival-departure conflicts between mainline and siding route space-time arcs.
+%@ con eq_0034 kind=linear domain=- indicator=- :: Links implicit siding occupation y_g^f to prior departure arcs on the same siding waiting arc.
+%@ con eq_0035 kind=linear domain=- indicator=- :: Siding track headway: total implicit plus explicit occupation of a siding waiting arc does not exceed one.
+%@ con eq_0037 kind=linear domain=- indicator=- :: Maintenance demand: every maintenance task is assigned exactly one start time in its window.
+%@ con eq_0038 kind=linear domain=- indicator=- :: Coupling: trains cannot use space-time arcs blocked by a maintenance task.
+%@ con eq_0040 kind=linear domain=- indicator=- :: Coupling for non-siding arcs: aggregate train usage over a maintenance blocking interval is limited.
+%@ con eq_0041 kind=linear domain=- indicator=- :: Coupling for siding arcs: blocked siding space-time arcs cannot be used by trains.
+%@ con eq_0042 kind=linear domain=- indicator=- :: Binary domain for train path variables x_g^f.
+%@ con eq_0043_a kind=linear domain=- indicator=- :: Binary domain for implicit siding occupation variables y_g^f.
+%@ con eq_0043_b kind=linear domain=- indicator=- :: Binary domain for maintenance start variables y_t^m.
+\begin{align}
+  \min\quad & \sum_{f \in F} \sum_{g \in A_{f}} c_{g}^{f} \cdot x_{g}^{f} \tag{eq\_0001} \\
+  & \sum_{g \in \mathit{delta}_{f}^{+} \left(\mathit{sigma}_{f}\right)} x_{g}^{f} = 1 \forall f \in F \tag{eq\_0005} \\
+  & \sum_{g \in \mathit{delta}_{f}^{-} \left(v\right)} x_{g}^{f} - \sum_{g \in \mathit{delta}_{f}^{+} \left(v\right)} x_{g}^{f} = 0 \forall v \in V_{f} \backslash \left\{\mathit{sigma}_{f} , \mathit{gamma}_{f}\right\} , \forall f \in F \tag{eq\_0007} \\
+  & \sum_{g \in A_{k}^{s} \cap A_{f}} x_{g}^{f} \geq \left(1 - \sum_{g \in A_{f}^{v i}} x_{g}^{f}\right) \cdot \underset{̲}{D}_{k}^{f} \forall f \in F , \forall k \in K_{f} \tag{eq\_0008} \\
+  & \sum_{g \in A_{k}^{s} \cap A_{f}} x_{g}^{f} \leq \left(1 - \sum_{g \in A_{f}^{v i}} x_{g}^{f}\right) \cdot \bar{D}_{k}^{f} \forall f \in F , \forall k \in K_{f} \tag{eq\_0010} \\
+  & x_{v}^{f} = \sum_{g \in \mathit{delta}_{f}^{-} \left(v\right) \backslash A_{f}^{e}} x_{g}^{f} \forall v \in V_{f}^{d} \cup V_{f}^{s e} , \forall f \in F \tag{eq\_0011} \\
+  & x_{v}^{f} = \sum_{g \in \mathit{delta}_{f}^{+} \left(v\right) \backslash A_{f}^{o}} x_{g}^{f} \forall v \in V_{f}^{a} , \forall f \in F \tag{eq\_0013} \\
+  & \sum_{v^{'} \in \mathit{psi}_{v}^{a}} \sum_{f : v^{'} \in V_{f}} x_{v^{'}}^{f} \leq 1 \forall v \in V^{s e} \cup V^{a} \tag{eq\_0014} \\
+  & \sum_{v^{'} \in \mathit{psi}_{v}^{d}} \sum_{f : v^{'} \in V_{f}} x_{v^{'}}^{f} \leq 1 \forall v \in V^{d} \cup V^{s e} \tag{eq\_0016} \\
+  & \underset{g : \left\{\left(o_{g} , d_{g}\right) \in \mathit{xi} , \hat{o}_{g} \in \left[t , t + T_{k}^{s r} + T^{r}\right)\right\}}{\sum} \sum_{f : g \in A_{f}} x_{g}^{f} \leq 1 , \forall t , \forall \mathit{xi} \in \mathit{psi}_{k}^{a a} \cup \mathit{psi}_{k}^{d d} , \forall k \left|\right. n_{k}^{l} > 1 \tag{eq\_0020} \\
+  & \frac{1}{\left|\mathit{Pi}_{g}^{a a}\right|} \sum_{g^{'} \in \mathit{Pi}_{g}^{a a}} \sum_{f : g^{'} \in A_{f}} x_{g^{'}}^{f} + \sum_{f : g \in A_{f}} x_{g}^{f} \leq 1 , \forall g : \left(d_{g} \in N_{s m}^{k}\right) , \forall k : n_{k}^{l} > 1 \tag{eq\_0024} \\
+  & \frac{1}{\left|\mathit{Pi}_{g}^{d d}\right|} \sum_{g^{'} \in \mathit{Pi}_{g}^{d d}} \sum_{f : g^{'} \in A_{f}} x_{g^{'}}^{f} + \sum_{f : g \in A_{f}} x_{g}^{f} \leq 1 , \forall g : \left(o_{g} \in N_{s m}^{k}\right) , \forall k : n_{k}^{l} > 1 \tag{eq\_0026} \\
+  & \underset{g : \left\{\left(o_{g} , d_{g}\right) \in \mathit{xi} , \hat{o}_{g} \in \left[t , t + T_{k}^{s r} + T^{r}\right)\right\}}{\sum} \sum_{f : g \in A_{f}} x_{g}^{f} \leq 1 , \forall t , \forall \mathit{xi} \in \mathit{psi}_{k s}^{a d} , \forall k \in K \tag{eq\_0027} \\
+  & \frac{1}{\left|\mathit{Pi}_{g}^{a d}\right|} \sum_{g^{'} \in \mathit{Pi}_{g}^{a d}} \sum_{f : g^{'} \in A_{f}} x_{g^{'}}^{f} + \sum_{f : g \in A_{f}} x_{g}^{f} \leq 1 , \forall g \left|\right. \left(d_{g} \in N_{s m}^{k}\right) \cup \left(o_{g} \in N_{s m}^{k}\right) , \forall k \in K \tag{eq\_0029} \\
+  & \underset{g^{'} \in A_{f}^{d} \left|\right. o_{g^{'}} = o_{g} , \hat{o}_{g^{'}} \in \left(\hat{o}_{g} - T^{s} , \hat{o}_{g}\right]}{\sum} x_{g^{'}}^{f} = y_{g}^{f} \forall g \in A_{f}^{s t} , \forall f \in F \tag{eq\_0030} \\
+  & \sum_{f : g \in A_{f}} \left(x_{g}^{f} + y_{g}^{f}\right) \leq 1 \forall g \in A^{s t} \tag{eq\_0032} \\
+  & \sum_{t \in \left[o^{m} , d^{m}\right]} y_{t}^{m} = 1 , \forall m \in M \tag{eq\_0033} \\
+  & x_{g}^{f} \leq 1 - y_{t}^{m} , \forall f \left|\right. g \in A_{f} , \forall g \in \mathit{phi}_{t}^{m} , \forall t \in \left[o^{m} , d^{m}\right] , \forall m \in M \tag{eq\_0034} \\
+  & \sum_{g \left|\right. \hat{o}_{g} \in \left[t , t + T_{d}^{m}\right] , e_{g} = e} \sum_{f \left|\right. g \in A_{f}} x_{g}^{f} \leq 1 - y_{t}^{m} \forall f \left|\right. e \in E_{f} , \forall e \in E^{m} \backslash \left(o_{e} = d_{e}\right) , \forall t \in \left[o^{m} , d^{m}\right] , \forall m \in M \tag{eq\_0035} \\
+  & x_{g}^{f} \leq 1 - y_{t}^{m} \forall f \left|\right. g \in A_{f} , \forall g \in \mathit{phi}_{t}^{m} \cap A^{s t} , \forall t \in \left[o^{m} , d^{m}\right] , \forall m \in M \tag{eq\_0037} \\
+  & x_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A_{f} \tag{eq\_0038} \\
+  & y_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A_{f}^{s t} \tag{eq\_0040} \\
+  & y_{t}^{m} \in \left\{0 , 1\right\} \forall t \in \left[o^{m} , d^{m}\right] , \forall m \in M \tag{eq\_0041} \\
+  & x_{v}^{f} \in \left\{0 , 1\right\} \forall v \in V_{f}^{d} \cup V_{f}^{s e} \cup V_{f}^{a} , \forall f \in F \tag{eq\_0042} \\
+  & x_{g}^{f} \in \left\{0 , 1\right\} , \forall f \in F , \forall g \in \bar{A}_{f} \cap A_{f p} \tag{eq\_0043\_a} \\
+  & x_{g}^{f} = 0 , \forall f \in F , \forall g \in \bar{A}_{f} \backslash A_{f p} \tag{eq\_0043\_b} \\
+\end{align}

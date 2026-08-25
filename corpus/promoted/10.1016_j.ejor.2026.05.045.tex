@@ -1,0 +1,87 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.ejor.2026.05.045
+%@ meta id=10.1016_j.ejor.2026.05.045 family=milp schema=0.1.0
+%@ name :: Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty
+%@ desc :: Mined from Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty (European Journal of Operational Research, 2026).
+%@ prov source :: 10.1016/j.ejor.2026.05.045
+%@ prov reference :: Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty
+%@ prov author :: Joris Wagenaar; Evelien van der Hurk; Richard Lusby; Marie Schmidt
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total cost of trip compositions, composition changes, and end-of-day carriage imbalances
+%@ param c shape=- kind=scalar :: Cost coefficients for trips, composition changes, and balance
+%@ var E shape=L,W domain=non_negative role=primary :: End-of-day carriage inventory imbalance for line l and carriage type w
+%@ var X shape=T,P domain=binary role=primary :: 1 if composition p is assigned to trip t
+%@ var Z shape=T,Q domain=binary role=primary :: 1 if composition change q is performed at the end of trip t
+%@ index L ordered=0 cyclic=0 :: Set of lines
+%@ index P ordered=0 cyclic=0 :: Set of compositions
+%@ index Q ordered=0 cyclic=0 :: Set of composition changes
+%@ index T ordered=0 cyclic=0 :: Set of trips
+%@ index W ordered=0 cyclic=0 :: Set of carriage types
+%@ index t ordered=0 cyclic=0 :: Index for trips
+%@ index p ordered=0 cyclic=0 :: Index for compositions
+%@ index o ordered=0 cyclic=0 :: Origin composition of a composition change
+%@ var U shape=T,W domain=non_negative role=primary :: Number of carriages of type w arriving at the end of trip t
+%@ var C shape=T,W,D domain=non_negative role=primary :: Number of carriages of type w departing at the start of trip t under disruption scenario i
+%@ index A ordered=0 cyclic=0 :: Set of trips arriving before trip t
+%@ index B ordered=0 cyclic=0 :: Set of trips departing after trip t
+%@ param pt shape=T kind=vector :: Composition assigned to trip t in the original schedule
+%@ var Y shape=T domain=binary role=primary :: 1 if trip t is not robust
+%@ index R ordered=0 cyclic=0 :: Set of rolling stock schedules, one for each disruption scenario
+%@ index D ordered=0 cyclic=0 :: Set of disruption duration scenarios
+%@ con eq_0003 kind=linear :: Exactly one composition is assigned to each trip
+%@ con eq_0004 kind=linear :: Fix compositions of trips that already departed before rescheduling
+%@ con eq_0005 kind=linear :: Set incoming composition of each trip equal to the composition of the chosen composition change
+%@ con eq_0006 kind=linear :: Set outgoing composition of the composition change to the composition of the affected trip
+%@ con eq_0007 kind=linear :: Compute arriving carriages from composition changes
+%@ con eq_0008 kind=linear :: Compute departing carriages from composition changes
+%@ con eq_0009 kind=linear :: Ensure carriage availability along a trip for each line and carriage type
+%@ con eq_0010 kind=linear :: Compute end-of-day carriage imbalance per line and carriage type
+%@ con eq_0011 kind=linear :: Link non-robust trips to differing compositions under disruption scenarios
+%@ con eq_0012 kind=linear :: Require at least the target number of robust trips
+%@ con eq_0013 kind=linear :: Y variables are binary
+%@ con eq_0014 kind=linear :: X variables are binary
+%@ con eq_0015 kind=linear :: C and U variables are non-negative
+%@ con eq_0016 kind=linear :: E variables are non-negative
+%@ con eq_0017 kind=linear :: Z variables are binary
+%@ con eq_0020 kind=linear :: Exactly one composition is assigned to each trip in the strict robust schedule
+%@ con eq_0021 kind=linear :: Fix compositions of pre-disruption trips in the strict robust schedule
+%@ con eq_0022 kind=linear :: Set incoming composition of each trip from the composition change in the strict robust schedule
+%@ con eq_0023 kind=linear :: Ensure successor trip composition matches the outgoing composition of the composition change
+%@ con eq_0024 kind=linear :: Compute arriving carriages from composition changes in the strict robust schedule
+%@ con eq_0025 kind=linear :: Compute departing carriages per disruption scenario in the strict robust schedule
+%@ con eq_0026 kind=linear :: Ensure carriage availability per disruption scenario in the strict robust schedule
+%@ con eq_0027 kind=linear :: Compute end-of-day carriage imbalance per line, carriage type, and disruption scenario
+%@ con eq_0028 kind=linear :: X variables are binary in the strict robust schedule
+%@ con eq_0029 kind=linear :: C and U variables are non-negative in the strict robust schedule
+%@ con eq_0030 kind=linear :: E variables are non-negative in the strict robust schedule
+%@ con eq_0031 kind=linear :: Z variables are binary in the strict robust schedule
+\begin{align}
+  \min\quad & \sum_{t \in T} \sum_{p \in P} c_{t , p}^{t r i p} \cdot X_{t , p} + \sum_{t \in T} \sum_{q \in Q_{t}} c_{t , q}^{c c} \cdot Z_{t , q} + \sum_{l \in L} \sum_{w \in W} c^{b a l} \cdot E_{l , w} \tag{eq\_0001} \\
+  & \mathit{subject} \mathit{to :} \sum_{p \in P} X_{t , p} = 1 \forall t \in T \tag{eq\_0003} \\
+  & X_{t , p \left(t\right)} = 1 \forall t \in T \left|\right. \mathit{tau}_{t}^{\text{dep}} < \mathit{tau}^{'} \tag{eq\_0004} \\
+  & X_{t , p} = \sum_{q \in Q_{t} : p_{q} = p} Z_{t , q} \forall t \in T , p \in P \tag{eq\_0005} \\
+  & X_{t , p} = \sum_{q \in Q_{\mathit{psi} \left(t\right)} : o_{q} = p} Z_{\mathit{psi} \left(t\right) , q} \forall t \in T , p \in P \tag{eq\_0006} \\
+  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} Z_{t , q} \forall t \in T , w \in W \tag{eq\_0007} \\
+  & C_{t , w} = \sum_{q \in Q_{\mathit{psi} \left(t\right)}} \mathit{beta}_{q , w} Z_{\mathit{psi} \left(t\right) , q} \forall t \in T , w \in W \tag{eq\_0008} \\
+  & \mathit{zeta}_{l , w}^{0} - \sum_{t^{'} \in A_{t}} C_{t^{'} , w} + \sum_{t^{'} \in B_{t}} U_{t^{'} , w} \geq 0 \forall l \in L , w \in W \tag{eq\_0009} \\
+  & \mathit{zeta}_{l , w}^{\infty} + E_{l , w} \geq \mathit{zeta}_{l , w}^{0} - \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{d e p} = l}}{\sum} C_{t , w} + \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{a r r} = l}}{\sum} U_{t , w} \forall l \in L , w \in W \tag{eq\_0010} \\
+  & 1 - Y_{t} \geq X_{t^{'} , p} - X_{t^{' '} , p} \forall t \in T^{d i s} , t^{'} , t^{' '} \in \mathit{Psi} \left(t\right) , t^{'} \neq t^{' '} , p \in P \tag{eq\_0011} \\
+  & \sum_{t \in T^{d i s}} Y_{t} \geq \lceil \left|T^{d i s}\right| \cdot \mathit{alpha} \rceil \tag{eq\_0012} \\
+  & Y_{t} \in \left\{0 , 1\right\} \forall t \in T^{d i s} \tag{eq\_0013} \\
+  & X_{t , p} \in \left\{0 , 1\right\} \forall t \in T , p \in P \tag{eq\_0014} \\
+  & C_{t , w} , U_{t , w} \in \mathcal{R}_{+} \forall t \in T , w \in W \tag{eq\_0015} \\
+  & E_{l , w} \in \mathcal{R}_{+} \forall l \in L , w \in W \tag{eq\_0016} \\
+  & Z_{t , q} \in \left\{0 , 1\right\} \forall t \in T , q \in Q_{t} \tag{eq\_0017} \\
+  & \mathit{subject} \mathit{to :} \sum_{p \in P} X_{t , p} = 1 \forall t \in T \tag{eq\_0020} \\
+  & X_{t , p \left(t\right)} = 1 \forall t \in T : \mathit{tau}_{t}^{\text{dep}} < \mathit{tau}^{'} \tag{eq\_0021} \\
+  & X_{t , p} = \sum_{q \in Q_{t} : p_{q} = p} Z_{t , q} \forall t \in T , p \in P \tag{eq\_0022} \\
+  & X_{t^{'} , p} = \sum_{q \in Q_{t} : o_{q} = p} Z_{t , q} \forall t \in T , t^{'} \in \mathit{Omega} \left(t\right) , p \in P \tag{eq\_0023} \\
+  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} Z_{t , q} \forall t \in T , w \in W \tag{eq\_0024} \\
+  & C_{t , w , i} = \underset{q \in Q_{\mathit{psi}_{i} \left(t\right)}}{\sum} \mathit{beta}_{q , w} Z_{\mathit{psi}_{i} \left(t\right) , q} \forall t \in T , w \in W , i \in D \tag{eq\_0025} \\
+  & \mathit{zeta}_{l_{t}^{d e p} , w}^{0} - \sum_{t^{'} \in A_{t}} C_{t^{'} , w , i} + \sum_{t^{'} \in B_{t}} U_{t^{'} , w} \geq 0 \forall t \in T , w \in W , i \in D \tag{eq\_0026} \\
+  & \mathit{zeta}_{l , w}^{\infty} + E_{l , w} \geq \mathit{zeta}_{l , w}^{0} - \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{d e p} = l}}{\sum} C_{t , w , i} + \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{a r r} = l}}{\sum} U_{t , w} \forall l \in L , w \in W , i \in D \tag{eq\_0027} \\
+  & X_{t , p} \in \left\{0 , 1\right\} \forall t \in T , p \in P \tag{eq\_0028} \\
+  & C_{t , w , i} , U_{t , w} \in \mathcal{R}_{+} \forall t \in T , w \in W , i \in D \tag{eq\_0029} \\
+  & E_{l , w} \in \mathcal{R}_{+} \forall l \in L , w \in W \tag{eq\_0030} \\
+  & Z_{t , q} \in \left\{0 , 1\right\} \forall t \in T , q \in Q_{t} \tag{eq\_0031} \\
+\end{align}

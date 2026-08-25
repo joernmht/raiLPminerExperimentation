@@ -1,0 +1,115 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2025.103189
+%@ meta id=10.1016_j.trb.2025.103189 family=milp schema=0.1.0
+%@ name :: An exact and heuristic framework for rolling stock rescheduling with railway infrastructure availability constraints
+%@ desc :: Mined from An exact and heuristic framework for rolling stock rescheduling with railway infrastructure availability constraints (Transportation Research Part B Methodological, 2025).
+%@ prov source :: 10.1016/j.trb.2025.103189
+%@ prov reference :: An exact and heuristic framework for rolling stock rescheduling with railway infrastructure availability constraints
+%@ prov author :: Jia Hui Zhu; Twan Dollevoet; Dennis Huisman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted sum of carriage kilometers, seat-shortage hours, cancellations, off-balances, additional (un)coupled units, and composition differences
+%@ param w shape=- kind=scalar :: Weight for objective function components
+%@ var x shape=T,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition c is chosen for trip t
+%@ var n shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
+%@ var I shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
+%@ var c shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
+%@ param carr shape=C kind=vector :: Carriage kilometers for composition c
+%@ param h shape=A kind=vector :: Headway time for activity
+%@ param l shape=A kind=vector :: Lower bound for activity duration
+%@ var p shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating different composition than planned
+%@ param seat shape=T,C kind=matrix :: Seat capacity for composition c on trip t
+%@ var u shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of uncoupled units
+%@ index C ordered=0 cyclic=0 :: Set of compositions
+%@ index M ordered=0 cyclic=0 :: Set of rolling stock unit types
+%@ index S ordered=0 cyclic=0 :: Set of stations
+%@ index T ordered=0 cyclic=0 :: Set of trips
+%@ index Cprime ordered=0 cyclic=0 :: Set of successor compositions
+%@ var z shape=T,C,Cprime domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
+%@ param pt shape=T kind=vector :: Original planned composition for trip t
+%@ param o shape=T kind=vector :: Original number of coupled/uncoupled units
+%@ param R shape=- kind=scalar :: Set of real numbers (domain indicator)
+%@ param D shape=- kind=scalar :: End of time horizon in minutes
+%@ index E ordered=0 cyclic=0 :: Set of events
+%@ index N ordered=0 cyclic=0 :: Set of trains (including shunting movements)
+%@ var X shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if shunting movement is canceled
+%@ var v shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Time of event
+%@ index A ordered=0 cyclic=0 :: Set of activities
+%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
+%@ index P ordered=0 cyclic=0 :: Set of infrastructure points
+%@ var d shape=E domain=continuous role=primary drole=- lo=- hi=- :: Deviation from original event time
+%@ var a shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Absolute deviation of event time
+%@ con eq_0003 kind=linear domain=- indicator=- :: One composition per trip (eq. 2)
+%@ con eq_0004 kind=linear domain=- indicator=- :: Linking x and z for successor trips (eq. 3)
+%@ con eq_0005 kind=linear domain=- indicator=- :: Linking x and z for predecessor trips (eq. 4)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Coupling units in composition change (eq. 5)
+%@ con eq_0007 kind=linear domain=- indicator=- :: Uncoupling units in composition change (eq. 6)
+%@ con eq_0008 kind=linear domain=- indicator=- :: Inventory balance after departure (eq. 7)
+%@ con eq_0009 kind=linear domain=- indicator=- :: Ending inventory per station and type (eq. 8)
+%@ con eq_0010 kind=linear domain=- indicator=- :: Different composition indicator (eq. 9)
+%@ con eq_0011 kind=linear domain=- indicator=- :: Additional coupled units (eq. 10)
+%@ con eq_0012 kind=linear domain=- indicator=- :: Additional uncoupled units (eq. 11)
+%@ con eq_0013 kind=linear domain=- indicator=- :: Positive off-balance (eq. 12)
+%@ con eq_0014 kind=linear domain=- indicator=- :: Negative off-balance (eq. 13)
+%@ con eq_0015 kind=linear domain=- indicator=- :: Initial inventory fixed (eq. 14)
+%@ con eq_0016 kind=linear domain=- indicator=- :: Pre-disruption compositions fixed (eq. 15)
+%@ con eq_0017 kind=linear domain=- indicator=- :: Domain of coupling and inventory variables (eq. 16)
+%@ con eq_0018 kind=linear domain=- indicator=- :: Domain of initial and ending inventory variables (eq. 17)
+%@ con eq_0019 kind=linear domain=- indicator=- :: Domain of additional coupled/uncoupled variables (eq. 18)
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain of composition variables (eq. 19)
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain of composition change variables (eq. 20)
+%@ con eq_0022 kind=linear domain=- indicator=- :: Domain of difference indicator (eq. 21)
+%@ con eq_0025 kind=linear domain=- indicator=- :: Second objective function (eq. 22)
+%@ con eq_0026 kind=linear domain=- indicator=- :: Shunting movement timing with big-M (eq. 25)
+%@ con eq_0027 kind=linear domain=- indicator=- :: Headway constraints on infrastructure points (eq. 26)
+%@ con eq_0028 kind=linear domain=- indicator=- :: Deviation from original time (eq. 27)
+%@ con eq_0029 kind=linear domain=- indicator=- :: Maximum deviation for passenger trains (eq. 28)
+%@ con eq_0030 kind=linear domain=- indicator=- :: Maximum deviation for shunting movements (eq. 29)
+%@ con eq_0031 kind=linear domain=- indicator=- :: Absolute deviation lower bound (eq. 30)
+%@ con eq_0032 kind=linear domain=- indicator=- :: Absolute deviation upper bound (eq. 31)
+%@ con eq_0033 kind=linear domain=- indicator=- :: Passenger trains cannot be canceled (eq. 32)
+%@ con eq_0034 kind=linear domain=- indicator=- :: Domain of event time and absolute deviation (eq. 33)
+%@ con eq_0035 kind=linear domain=- indicator=- :: Domain of deviation (eq. 34)
+%@ con eq_0036 kind=linear domain=- indicator=- :: Domain of order binary variable (eq. 35)
+%@ con eq_0037 kind=linear domain=- indicator=- :: Domain of cancellation binary variable (eq. 36)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+%@ con eq_0039 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+%@ con eq_0040 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} \sum_{c \in \mathcal{C}_{t}} w_{1} \cdot \mathit{carr}_{c} \cdot l_{t} \cdot x_{c}^{t} + \sum_{t \in \mathcal{T}} \sum_{c \in \mathcal{C}_{t}} w_{2} \cdot \mathit{seat}_{c}^{t} \cdot h_{t} \cdot x_{c}^{t} + \sum_{t \in \mathcal{T}} w_{3} \cdot x_{0}^{t} + \sum_{s \in \mathcal{S}} \sum_{m \in M} w_{4} \cdot I_{m , \text{off}}^{s} + \sum_{t \in \mathcal{T}} w_{5} \cdot n \cdot c_{t} + \sum_{t \in \mathcal{T}} w_{6} \cdot n \cdot u_{t} + \sum_{t \in \mathcal{T}} w_{7} \cdot p_{\text{diff}}^{t} \tag{eq\_0001} \\
+  & \text{s}.\text{t}. \sum_{c \in \mathcal{C}_{t}} x_{c}^{t} = 1 \forall t \in \mathcal{T} \tag{eq\_0003} \\
+  & x_{c}^{t} = \sum_{c^{'} \in \mathcal{C}_{v \left(t\right)} : \left(c , c^{'}\right) \in \mathit{Gamma}_{t}} z_{c , c^{'}}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , c \in \mathcal{C}_{t} \tag{eq\_0004} \\
+  & x_{c^{'}}^{v \left(t\right)} = \sum_{c \in \mathcal{C}_{t} : \left(c , c^{'}\right) \in \mathit{Gamma}_{t}} z_{c , c^{'}}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , c^{'} \in \mathcal{C}_{v \left(t\right)} \tag{eq\_0005} \\
+  & c_{m}^{v \left(t\right)} = \sum_{\left(c , c^{'}\right) \in \mathit{Gamma}_{t}} \mathit{beta}_{c , c^{'}}^{m} z_{c , c^{'}}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0006} \\
+  & u_{m}^{t} = \sum_{\left(c , c^{'}\right) \in \mathit{Gamma}_{t}} \mathit{alpha}_{c , c^{'}}^{m} z_{c , c^{'}}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0007} \\
+  & I_{m}^{t} = I_{m , 0}^{s_{d} \left(t\right)} - \underset{\genfrac{}{}{0pt}{}{t^{'} \in \mathcal{T} : s_{\text{d}} \left(t^{'}\right) = s_{\text{d}} \left(t\right) ,}{\mathit{tau}_{\text{d}} \left(t^{'}\right) \leq \mathit{tau}_{\text{d}} \left(t\right)}}{\sum} c_{m}^{t^{'}} + \underset{\genfrac{}{}{0pt}{}{t^{'} \in \mathcal{T} : s_{\text{a}} \left(t^{'}\right) = s_{\text{d}} \left(t\right) ,}{\mathit{tau}_{\text{a}} \left(t^{'}\right) \leq \mathit{tau}_{\text{d}} \left(t\right) - \mathit{rho} \left(s_{\text{d}} \left(t\right)\right)}}{\sum} u_{m}^{t^{'}} \forall t \in \mathcal{T} , m \in M \tag{eq\_0008} \\
+  & I_{m , \text{end}}^{s} = I_{m , 0}^{s} - \underset{t \in \mathcal{T} : s_{\text{d}} \left(t\right) = s}{\sum} c_{m}^{t} + \underset{t \in \mathcal{T} : s_{\text{a}} \left(t\right) = s}{\sum} u_{m}^{t} \forall s \in \mathcal{S} , m \in M \tag{eq\_0009} \\
+  & p_{\text{diff}}^{t} \geq \sum_{c \in \mathcal{C} : c \neq p_{0}^{t}} x_{c}^{t} \forall t \in \mathcal{T} \tag{eq\_0010} \\
+  & n \cdot c_{t} \geq \sum_{m \in M} c_{m}^{t} - o \cdot c_{t} \forall t \in \mathcal{T} \tag{eq\_0011} \\
+  & n \cdot u_{t} \geq \sum_{m \in M} u_{m}^{t} - o \cdot u_{t} \forall t \in \mathcal{T} \tag{eq\_0012} \\
+  & I_{m , \text{off}}^{s} \geq I_{m , \text{end}}^{s} - i_{m , \text{end}}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0013} \\
+  & I_{m , \text{off}}^{s} \geq i_{m , \text{end}}^{s} - I_{m , \text{end}}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0014} \\
+  & I_{m , 0}^{s} = i_{m , 0}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0015} \\
+  & x_{p_{0}^{t}}^{t} = 1 \forall t \in \mathcal{T} : \mathit{tau}_{\text{d}} \left(t\right) \leq \mathit{tau}_{\text{disr}} \tag{eq\_0016} \\
+  & c_{m}^{t} , u_{m}^{t} , I_{m}^{t} \in \mathcal{R}^{+} \forall t \in \mathcal{T} , m \in M \tag{eq\_0017} \\
+  & I_{m , 0}^{s} , I_{m , \text{end}}^{s} , I_{m , \text{off}}^{s} \in \mathcal{R}^{+} \forall s \in \mathcal{S} , m \in M \tag{eq\_0018} \\
+  & n \cdot c_{t} , n \cdot u_{t} \in \mathcal{R}^{+} \forall t \in \mathcal{T} \tag{eq\_0019} \\
+  & x_{c}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} , c \in \mathcal{C}_{t} \tag{eq\_0020} \\
+  & z_{c , c^{'}}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} , \left(c , c^{'}\right) \in \mathit{Gamma}_{t} \tag{eq\_0021} \\
+  & p_{\text{diff}}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} \tag{eq\_0022} \\
+  & s.t. 0 \leq v_{j} \leq D \left(1 - X_{n}\right) \forall n \in N , \forall j \in E_{n} \tag{eq\_0025} \\
+  & l_{i , j} \left(1 - X_{n}\right) \leq v_{j} - v_{i} \leq u_{i , j} \left(1 - X_{n}\right) \forall n \in N , \forall \left(i , j\right) \in A_{\text{drive}}^{n} \cup A_{\text{dwell}}^{n} \tag{eq\_0026} \\
+  & l_{i , j} \left(1 - X_{m} - X_{n}\right) \leq v_{j} - v_{i} + q_{i , j} \cdot D \leq u_{i , j} \left(1 - X_{m} - X_{n}\right) + D \left(X_{m} + X_{n}\right) \tag{eq\_0027} \\
+  & \forall \left(i , j\right) \in A_{\text{shunt}} , i \in E_{m} , j \in E_{n} , m , n \in N \tag{eq\_0028} \\
+  & h_{i , j} \left(1 - X_{m} - X_{n}\right) \leq v_{j} - v_{i} + q_{i , j} \cdot D \leq \left(D - h_{i , j}\right) \left(1 - X_{m} - X_{n}\right) + D \left(X_{m} + X_{n}\right) \tag{eq\_0029} \\
+  & \forall p \in P , \forall \left(i , j\right) \in A_{\text{headway}}^{p} , i \in E_{m} , j \in E_{n} , m , n \in N \tag{eq\_0030} \\
+  & d_{j} = v_{j} - \mathit{pi}_{j} \left(1 - X_{n}\right) \forall n \in N , \forall j \in E_{n} \tag{eq\_0031} \\
+  & 0 \leq d_{j} \leq d_{max}^{+} \forall n \in N^{T} , \forall j \in E_{n} \tag{eq\_0032} \\
+  & - d_{max}^{+} \leq d_{j} \leq d_{max}^{+} \forall n \in N^{S} , \forall j \in E_{n} \tag{eq\_0033} \\
+  & a_{j} \geq d_{j} \forall j \in E \tag{eq\_0034} \\
+  & a_{j} \geq - d_{j} \forall j \in E \tag{eq\_0035} \\
+  & X_{n} = 0 \forall n \in N^{T} \tag{eq\_0036} \\
+  & v_{j} , a_{j} \in \mathcal{R}^{+} \forall j \in E \tag{eq\_0037} \\
+  & d_{j} \in \mathcal{R} \forall j \in E \tag{eq\_0038} \\
+  & q_{i , j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in A \tag{eq\_0039} \\
+  & X_{n} \in \left\{0 , 1\right\} \forall n \in N \tag{eq\_0040} \\
+\end{align}

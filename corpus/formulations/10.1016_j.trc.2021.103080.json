@@ -1,0 +1,893 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2021.103080",
+  "name": "Dynamic railway timetable rescheduling for multiple connected disruptions",
+  "family": "milp",
+  "description": "Mined from Dynamic railway timetable rescheduling for multiple connected disruptions (Transportation Research Part C Emerging Technologies, 2021).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2021.103080",
+    "reference": "Dynamic railway timetable rescheduling for multiple connected disruptions",
+    "author": "Yongqiu Zhu; Rob M.P. Goverde",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "E",
+      "description": "Set of events (arrival or departure).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of activities (run, station, turn, odturn).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "a",
+      "description": "Activity index (e.g., short-turn activity).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Number of platform or pass-through tracks at a station.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "ep",
+      "description": "primed event index",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "w",
+      "description": "Fixed penalty for each cancelled service.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large positive number (M1, M2) used in big-M constraints.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Original scheduled time of event e.",
+      "shape": [
+        "E"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D",
+      "description": "Maximum allowed delay for events not in E_NMdelay.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s",
+      "description": "Binary parameter indicating if a station activity is a true stop (0) or not (1).",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "n",
+      "description": "Number of disruptions (current disruption index).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R",
+      "description": "Required recovery time length after disruptions.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Time-related parameters (t_start, t_end).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "S",
+      "description": "Station-related parameters (s_t, s_t_en, s_t_ex).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "pt",
+      "description": "Platform track index (i) or pass-through track index (j).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tail",
+      "description": "Function returning the tail event of an activity.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "head",
+      "description": "Function returning the head event of an activity.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "L",
+      "description": "Minimum duration required for short-turn activity a.",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum time interval between events e and e' on same track.",
+      "shape": [
+        "E",
+        "E"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "st",
+      "description": "Scheduled time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tr",
+      "description": "Train of event",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_start",
+      "description": "earliest allowed time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_end",
+      "description": "latest allowed time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "c",
+      "description": "Binary decision variable indicating whether event e is cancelled (1) or not (0).",
+      "shape": [
+        "E"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Delay of event e relative to original schedule.",
+      "shape": [
+        "E"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Rescheduled time of event e.",
+      "shape": [
+        "E"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating if station of event e is chosen as short-turn station.",
+      "shape": [
+        "E"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "m",
+      "description": "Binary variable indicating if short-turn activity a is selected.",
+      "shape": [
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u",
+      "description": "Binary variable indicating if train occupies platform track i at station.",
+      "shape": [
+        "E",
+        "N"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "v",
+      "description": "Binary variable indicating if train occupies pass-through track j at station.",
+      "shape": [
+        "E",
+        "N"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "q",
+      "description": "Binary variable indicating if event e occurs before event e'.",
+      "shape": [
+        "E",
+        "E"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0010",
+      "description": "Station activity consistency with arrival short-turn option: c_e' <= c_e + y_e.",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Station activity consistency with arrival short-turn option: c_e' >= y_e.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "D",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013",
+      "description": "Station activity consistency with departure short-turn option: c_e >= y_e'.",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014",
+      "description": "Both events have short-turn options: c_e - c_e' = y_e' - y_e.",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "At most one of both short-turn options selected: y_e + y_e' <= 1.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017",
+      "description": "If arrival is short-turn station, departure is cancelled: c_e' >= y_e.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018",
+      "description": "If arrival is short-turn station, arrival is kept: c_e <= 1 - y_e.",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019",
+      "description": "If departure is short-turn station, arrival is cancelled: c_e >= y_e'.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0020",
+      "description": "If departure is short-turn station, departure is kept: c_e' <= 1 - y_e'.",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0021",
+      "description": "At entry side, at least one short-turn station chosen if cancelled: sum y_e >= c_e'.",
+      "quantifiers": [],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0022",
+      "description": "At exit side, at least one short-turn station chosen if cancelled: sum y_e' >= c_e.",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "ep",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total weighted cancellations and delays: sum_{e in E_ar} w c_e + sum_{e in E_ar union E_de} d_e.",
+    "terms": [
+      {
+        "ref": "c",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "E",
+            "expr": "e",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "w",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": []
+      },
+      {
+        "ref": "d",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "E",
+            "expr": "e",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

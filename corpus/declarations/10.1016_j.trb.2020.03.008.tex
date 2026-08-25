@@ -1,0 +1,152 @@
+% Declaration sidecar for 10.1016_j.trb.2020.03.008
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2020.03.008
+% Passenger-centered vulnerability assessment of railway networks
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2020.03.008.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=max name=objective combination=weighted_sum :: Maximize adverse impact of disruptions via weighted disconnection, rerouting, and cancellation costs
+
+% node: classified as index during review
+%@ index node ordered=0 cyclic=0 :: Node in the railway network
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the infrastructure network
+
+% T: classified as variable during review
+%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of a train
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Arc in the network
+
+% d: classified as variable during review
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an end node for train t
+
+% end: classified as index during review
+%@ index end ordered=0 cyclic=0 :: End node of a train route
+
+% o: classified as variable during review
+%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
+
+% starting: classified as index during review
+%@ index starting ordered=0 cyclic=0 :: Starting node of a train route
+
+% O: classified as parameter during review
+%@ param O shape=- kind=scalar domain=- :: Origin node of a train service
+
+% D: classified as parameter during review
+%@ param D shape=- kind=scalar domain=- :: Destination node of a train service
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the infrastructure network
+
+% v: classified as variable during review
+%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
+
+% CAP: classified as parameter during review
+%@ param CAP shape=- kind=scalar domain=- :: Capacity of arc (i,j)
+
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large constant for linearization
+
+% unusable as an identifier, rename or drop: τ
+% h: classified as parameter during review
+%@ param h shape=- kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
+
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of OD pairs
+
+% y: classified as variable during review
+%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
+
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of paths for OD pair k
+
+% unusable as an identifier, rename or drop: δ
+% f: classified as variable during review
+%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Capacity of train t
+
+% C: classified as parameter during review
+%@ param C shape=- kind=scalar domain=- :: Cost coefficient
+
+% c: classified as parameter during review
+%@ param c shape=- kind=scalar domain=- :: Cost factor or travel cost
+
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=- :: Detour factor for cancellation cost
+
+% unusable as an identifier, rename or drop: λ
+% unusable as an identifier, rename or drop: ω
+
+% P̄: classified as index during review
+%@ index P_bar ordered=0 cyclic=0 :: Subset of paths considered in restricted master problem
+
+% unusable as an identifier, rename or drop: π
+% unusable as an identifier, rename or drop: σ
+
+% Bound by a quantifier or big operator, so no declaration of their own: i, j, k, m, n, p, t
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Flow conservation for trains at nodes
+%@ con eq_0002 kind=linear domain=- indicator=- :: Equal number of origins and destinations for each train
+%@ con eq_0003 kind=linear domain=- indicator=- :: Fixed origin for originally scheduled train
+%@ con eq_0004 kind=linear domain=- indicator=- :: Fixed destination for originally scheduled train
+%@ con eq_0005 kind=linear domain=- indicator=- :: No short-turn origin for rerouted trains
+%@ con eq_0006 kind=linear domain=- indicator=- :: No short-turn destination for rerouted trains
+%@ con eq_0007 kind=linear domain=- indicator=- :: Short-turn origin forced when incident link disrupted
+%@ con eq_0008 kind=linear domain=- indicator=- :: Short-turn destination forced when incident link disrupted
+%@ con eq_0009 kind=linear domain=- indicator=- :: Origin count limited by number of disrupted links plus one
+%@ con eq_0010 kind=linear domain=- indicator=- :: Destination count limited by number of disrupted links plus one
+%@ con eq_0011 kind=linear domain=- indicator=- :: Link capacity bound by disruption status
+%@ con eq_0012 kind=linear domain=- indicator=- :: Maximum number of simultaneous disruptions
+%@ con eq_0013 kind=linear domain=- indicator=- :: Binary nature of train flow and disruption variables
+%@ con eq_0014 kind=linear domain=- indicator=- :: Minimal running time for rerouted trains
+%@ con eq_0015 kind=linear domain=- indicator=- :: Minimal running time for short-turned trains
+%@ con eq_0016 kind=linear domain=- indicator=- :: No early departure from originally scheduled time
+%@ con eq_0017 kind=linear domain=- indicator=- :: Minimal dwell time for rerouted trains
+%@ con eq_0018 kind=linear domain=- indicator=- :: Minimal dwell time for short-turned trains
+%@ con eq_0019 kind=linear domain=- indicator=- :: Minimal headway between trains on same link
+%@ con eq_0020 kind=linear domain=- indicator=- :: Non-negativity of time variables
+%@ con eq_0021 kind=linear domain=- indicator=- :: At least one path or disconnection per OD pair
+%@ con eq_0022 kind=linear domain=- indicator=- :: Disconnection implies no path used
+%@ con eq_0023 kind=linear domain=- indicator=- :: Path unavailable if any of its arcs disrupted
+%@ con eq_0024 kind=linear domain=- indicator=- :: Path flow limited by train service on arcs
+%@ con eq_0025 kind=linear domain=- indicator=- :: Zero passenger flow for disconnected OD pairs
+%@ con eq_0026 kind=linear domain=- indicator=- :: Arc capacity limits cumulative passenger flow
+%@ con eq_0027 kind=linear domain=- indicator=- :: Binary nature of disconnection and path choice variables
+%@ con eq_0028 kind=linear domain=- indicator=- :: Continuous passenger flow shares between zero and one
+%@ con eq_0029 kind=linear domain=- indicator=- :: Disconnection cost calculation
+%@ con eq_0031 kind=linear domain=- indicator=- :: Generalized routing cost coefficient
+%@ con eq_0032 kind=linear domain=- indicator=- :: Generalized train rerouting cost coefficient
+%@ con eq_0033 kind=linear domain=- indicator=- :: Generalized train cancellation cost coefficient
+%@ con eq_0035 kind=linear domain=- indicator=- :: Relaxation of binary variables to continuous in [0,1]
+%@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost condition for adding new passenger paths

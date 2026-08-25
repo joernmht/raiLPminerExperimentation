@@ -1,0 +1,67 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.omega.2022.102798
+%@ meta id=10.1016_j.omega.2022.102798 family=milp schema=0.1.0
+%@ name :: A MILP model for quasi-periodic strategic train timetabling
+%@ desc :: Mined from A MILP model for quasi-periodic strategic train timetabling (Omega, 2022).
+%@ prov source :: 10.1016/j.omega.2022.102798
+%@ prov reference :: A MILP model for quasi-periodic strategic train timetabling
+%@ prov author :: Giorgio Sartor; Carlo Mannino; Thomas Nygreen; Lukas Bach
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize total penalty for extra running time, extra dwell time, separation violations, and periodicity deviations
+%@ index t ordered=0 cyclic=0 :: Train index
+%@ index S ordered=1 cyclic=0 :: Ordered set of stations on a train's path
+%@ index T ordered=0 cyclic=0 :: Set of trains
+%@ var a shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train t at station s
+%@ var d shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
+%@ param f shape=t kind=vector domain=- :: Final station for train t
+%@ index s ordered=1 cyclic=0 :: Station index
+%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for ordered pair of trains on shared track or station
+%@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
+%@ var m shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary meet variable for unordered pair of trains at a station
+%@ index K ordered=0 cyclic=0 :: Index over infeasible train-pair subsets for station
+%@ var l shape=- domain=non_negative role=slack drole=- lo=- hi=- :: Slack variable for intra-hour separation violation
+%@ index h ordered=1 cyclic=0 :: Hour index
+%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Base time for periodic pattern
+%@ con eq_0001 kind=linear domain=- indicator=- :: Minimum running time between consecutive stations
+%@ con eq_0002 kind=linear domain=- indicator=- :: Minimum dwell time at station
+%@ con eq_0003 kind=ordering domain=- indicator=- :: Precedence complementarity for ordered train pairs on a shared track
+%@ con eq_0004 kind=big_m domain=- indicator=- :: Track conflict timing: preceding train exits before the following train enters
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Station precedence complementarity for ordered train pairs at a station
+%@ con eq_0005_b kind=big_m domain=- indicator=- :: Station conflict disjunction: when q and r meet at s, r departs after q arrives
+%@ con eq_0005_c kind=big_m domain=- indicator=- :: Station conflict disjunction: when q and r meet at s, q departs after r arrives
+%@ con eq_0005_d kind=big_m domain=- indicator=- :: Station conflict disjunction: if q precedes r at s, r arrives after q departs
+%@ con eq_0005_e kind=big_m domain=- indicator=- :: Station conflict disjunction: if r precedes q at s, q arrives after r departs
+%@ con eq_0006 kind=linear domain=- indicator=- :: Infeasible subset constraint: not all pairs in a forbidden set can meet at a station
+%@ con eq_0007_a kind=big_m domain=- indicator=- :: Safety margin when q precedes r into a station
+%@ con eq_0007_b kind=big_m domain=- indicator=- :: Safety margin when r precedes q into a station
+%@ con eq_0009 kind=big_m domain=- indicator=- :: Intra-hour separation between local trains at a station
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Intra-hour separation between local and non-local trains at a station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Inter-hour separation between local trains in adjacent hours
+%@ con eq_0012 kind=linear domain=- indicator=- :: Inter-hour separation between local and non-local trains in adjacent hours
+%@ con eq_0013_a kind=linear domain=- indicator=- :: Quasi-periodicity lower bound on departure time relative to base time
+%@ con eq_0013_b kind=linear domain=- indicator=- :: Quasi-periodicity upper bound on departure time relative to base time plus slack
+%@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound on extra running time over minimum running time
+%@ con eq_0015 kind=linear domain=- indicator=- :: Upper bound on extra dwell time over minimum dwell time
+\begin{align}
+  & a_{t}^{s + 1} - d_{t}^{s} \geq \mathit{Delta}_{t}^{s} , t \in T , s \in S \left(t\right) \backslash \left\{f_{t}\right\} , \tag{eq\_0001} \\
+  & d_{t}^{s} - a_{t}^{s} \geq \mathit{Omega}_{t}^{s} , t \in T , s \in S \left(t\right) . \tag{eq\_0002} \\
+  & p_{q , r}^{e} + p_{r , q}^{e} = 1 . \tag{eq\_0003} \\
+  & d_{r}^{v} - a_{q}^{u + 1} \geq - M \cdot p_{r , q}^{e} . \tag{eq\_0004} \\
+  & p_{q , r}^{s} + p_{r , q}^{s} = 1 \tag{eq\_0005\_a} \\
+  & d_{r}^{s} - a_{q}^{s} \geq - M \left(1 - m_{\left\{q , r\right\}}^{s}\right) \tag{eq\_0005\_b} \\
+  & d_{q}^{s} - a_{r}^{s} \geq - M \left(1 - m_{\left\{q , r\right\}}^{s}\right) \tag{eq\_0005\_c} \\
+  & a_{r}^{s} - d_{q}^{s} \geq - M \left(m_{\left\{q , r\right\}}^{s} + p_{r , q}^{s}\right) \tag{eq\_0005\_d} \\
+  & a_{q}^{s} - d_{r}^{s} \geq - M \left(m_{\left\{q , r\right\}}^{s} + p_{q , r}^{s}\right) \tag{eq\_0005\_e} \\
+  & \sum_{\left\{q , r\right\} \in K} m_{\left\{q , r\right\}}^{s} \leq \left|K\right| - 1 \tag{eq\_0006} \\
+  & a_{r}^{s} - a_{q}^{s} \geq \mathit{Gamma}_{q}^{s} - M \cdot p_{r , q}^{s} \tag{eq\_0007\_a} \\
+  & a_{q}^{s} - a_{r}^{s} \geq \mathit{Gamma}_{r}^{s} - M \cdot p_{q , r}^{s} \tag{eq\_0007\_b} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \mathit{Lambda}_{h}^{s} - l_{q , r} - M \cdot p_{r , q}^{s} \tag{eq\_0009} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \frac{\mathit{Lambda}_{h}^{s}}{2} - l_{q , r} - M \cdot p_{r , q}^{s} . \tag{eq\_0010} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \mathit{Psi}_{h , h + 1}^{s} - l_{q , r}^{'} \tag{eq\_0011} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \mathit{Theta}_{h , h + 1}^{s} - l_{q , r}^{'} . \tag{eq\_0012} \\
+  & z_{c}^{s} \leq d_{t}^{s} - h_{t} \tag{eq\_0013\_a} \\
+  & z_{c}^{s} \geq d_{t}^{s} - h_{t} - \mathit{rho}_{c , t}^{s} \tag{eq\_0013\_b} \\
+  & a_{t}^{s + 1} - d_{t}^{s} \leq \mathit{Delta}_{t}^{s} + \mathit{delta}_{t}^{s} , t \in T , s \in S \left(t\right) \backslash \left\{f_{t}\right\} ; \tag{eq\_0014} \\
+  & d_{t}^{s} - a_{t}^{s} \leq \mathit{Omega}_{t}^{s} + \mathit{omega}_{t}^{s} , t \in T , s \in S \left(t\right) ; \tag{eq\_0015} \\
+  \min\quad & \sum \mathit{delta}_{t}^{s} + \sum \mathit{omega}_{t}^{s} + \sum l_{q , r} + \sum l_{q , r}^{'} + \sum \mathit{rho}_{c , t}^{s} \tag{eq\_0016} \\
+\end{align}

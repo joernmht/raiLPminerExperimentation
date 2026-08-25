@@ -1,0 +1,165 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trc.2025.105076
+%@ meta id=10.1016_j.trc.2025.105076 family=milp schema=0.1.0
+%@ name :: Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers
+%@ desc :: Mined from Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers (Transportation Research Part C Emerging Technologies, 2025).
+%@ prov source :: 10.1016/j.trc.2025.105076
+%@ prov reference :: Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers
+%@ prov author :: Cong Xiu; Jinyi Pan; Andrea D’Ariano; Shuguang Zhan; Tao Feng; Qiyuan Peng
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of passenger delay cost and train energy consumption
+%@ index q ordered=0 cyclic=0 :: Node in the space-time-state network
+%@ var y shape=k,a domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k uses arc a
+%@ index K ordered=0 cyclic=0 :: Set of trains
+%@ index Q ordered=0 cyclic=0 :: Set of nodes in the space-time-state network
+%@ param d shape=k,W kind=matrix :: Passenger demand for getting off at station
+%@ param e shape=k,a kind=matrix :: Energy consumption cost of arc
+%@ index k ordered=0 cyclic=0 :: Train index
+%@ param l shape=k kind=vector :: End location of train
+%@ param o shape=k kind=vector :: Origin of train
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the space-time-state network
+%@ index i ordered=0 cyclic=0 :: Station index
+%@ param P shape=r,T kind=matrix :: Power supply capacity
+%@ index R ordered=0 cyclic=0 :: Set of power supply districts
+%@ index T ordered=0 cyclic=0 :: Set of time instants
+%@ param p shape=k,a,T kind=matrix :: Power consumption of train on arc at a time instant
+%@ index r ordered=0 cyclic=0 :: Power supply district index
+%@ index W ordered=0 cyclic=0 :: Set of stations
+%@ var f shape=k,L,s domain=non_negative role=primary drole=- lo=- hi=- :: Traction force of train
+%@ index s ordered=0 cyclic=0 :: Position along track
+%@ param S shape=- kind=scalar :: Total length of track
+%@ var b shape=k,L,s domain=non_negative role=primary drole=- lo=- hi=- :: Braking force of train
+%@ var x shape=k,L,s domain=continuous role=primary drole=- lo=- hi=- :: State variable (speed and time) of train
+%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value
+%@ param c shape=k,a kind=matrix :: Delay cost of arc
+%@ index W_hat ordered=0 cyclic=0 :: Set of visited stations for train
+%@ param C shape=- kind=scalar :: Cancellation penalty cost
+%@ param M shape=- kind=scalar :: Model index
+%@ index L ordered=0 cyclic=0 :: Set of track sections
+%@ param u_max shape=- kind=scalar :: Upper bound of control variable
+%@ param x_max shape=- kind=scalar :: Upper bound of state variable
+%@ param G shape=- kind=scalar :: Train dynamic function
+%@ index a ordered=0 cyclic=0 :: Arc index
+%@ var re shape=i domain=non_negative role=primary drole=- lo=- hi=- :: Primary residual for ADMM penalty update
+%@ var res shape=i domain=non_negative role=primary drole=- lo=- hi=- :: Primary residual (alternative notation)
+%@ con eq_0002 kind=linear :: STS network definition constraint
+%@ con eq_0004 kind=linear :: STS network arc definition constraint
+%@ con eq_0006 kind=linear :: Train-specific arc availability definition
+%@ con eq_0008 kind=linear :: Source and sink node definition for each train
+%@ con eq_0010 kind=linear :: STS flow balance constraint for each train
+%@ con eq_0012 kind=linear :: Flow balance at source node
+%@ con eq_0013 kind=linear :: Flow balance at sink node
+%@ con eq_0014 kind=linear :: Flow balance at intermediate nodes
+%@ con eq_0017 kind=linear :: Definition of departure headway incompatible arcs
+%@ con eq_0018 kind=linear :: Definition of arrival headway incompatible arcs
+%@ con eq_0019 kind=linear :: Definition of track headway incompatible arcs
+%@ con eq_0020 kind=linear :: Headway constraint on incompatible arc sets
+%@ con eq_0022_a kind=linear :: Boundary condition for initial speed
+%@ con eq_0022_b kind=linear :: Boundary condition for final speed
+%@ con eq_0022_c kind=linear :: Boundary condition for initial time
+%@ con eq_0022_d kind=linear :: Boundary condition for final time
+%@ con eq_0025 kind=linear :: Station capacity incompatible arc set definition
+%@ con eq_0027 kind=linear :: Station capacity conflicting tracks definition
+%@ con eq_0028_a kind=linear :: Station capacity constraint for entering arcs
+%@ con eq_0028_b kind=linear :: Station capacity constraint for passing arcs
+%@ con eq_0028_c kind=linear :: Station capacity constraint for dwelling arcs
+%@ con eq_0028_d kind=linear :: Station capacity constraint for exit arcs
+%@ con eq_0029 kind=linear :: Station capacity constraint limiting one train per incompatible set
+%@ con eq_0030 kind=linear :: Station capacity constraints over compact track set
+%@ con eq_0031_a kind=linear :: Combined incompatible set for drive arcs
+%@ con eq_0031_b kind=linear :: Combined incompatible set for track arcs
+%@ con eq_0032 kind=linear :: Unified conflict-free constraint over combined incompatible sets
+%@ con eq_0034 kind=linear :: Energy conflict arc set definition
+%@ con eq_0036 kind=linear :: Energy conflict arc membership condition
+%@ con eq_0037 kind=linear :: Power supply capacity constraint for energy conflicting arcs
+%@ con eq_0038_a kind=linear :: Power supply constraint for drive arcs
+%@ con eq_0038_b kind=linear :: Power supply constraint for track arcs
+%@ con eq_0040 kind=linear :: Unified conflict-free constraints for headway and capacity
+%@ con eq_0041 kind=linear :: Conflict-free constraint for selected arcs
+%@ con eq_0043 kind=linear :: Energy conflict arc set Ω(r,t) definition
+%@ con eq_0045 kind=linear :: Energy conflict arc set definition for power supply
+%@ con eq_0046 kind=linear :: Power supply constraint ensuring energy use does not exceed capacity
+%@ con eq_0047 kind=linear :: Power consumption calculation at a time instant
+%@ con eq_0048 kind=linear :: Power consumption integral for an arc
+%@ con eq_0049 kind=linear :: Power consumption relation to traction force
+%@ con eq_0050 kind=linear :: Power supply constraints over all conflicting arcs and trains
+%@ con eq_0052 kind=linear :: Departure time constraint prohibiting early departure
+%@ con eq_0053 kind=linear :: Stop plan constraint maintaining planned stops
+%@ con eq_0055 kind=linear :: Power consumption integral over position
+%@ con eq_0056 kind=linear :: Departure time constraint at visited stations
+%@ con eq_0057 kind=linear :: Stop plan constraint at planned stops
+%@ con eq_0058 kind=linear :: Disruption constraint forbidding use of disrupted arcs
+%@ con eq_0059 kind=linear :: Departure time constraint ensuring actual departure not earlier than planned
+%@ con eq_0063 kind=linear :: Train dynamics constraint for speed and time propagation
+%@ con eq_0064 kind=linear :: Train dynamics constraint on state derivative
+%@ con eq_0065 kind=linear :: Stop plan constraint selecting dwell arc at planned stop
+%@ con eq_0067 kind=linear :: Train system constraint on traction force bounds
+%@ con eq_0068 kind=linear :: Train system constraint on braking force bounds
+%@ con eq_0070 kind=linear :: Disruption constraint preventing entry into disrupted area
+%@ con eq_0071 kind=linear :: Train system constraint on speed limits
+%@ con eq_0072 kind=linear :: Train system constraint on traction power boundary
+%@ con eq_0074 kind=linear :: Train system constraint on acceleration and deceleration comfort bounds
+%@ con eq_0075 kind=linear :: Boundary constraint between STS arc and speed profile
+%@ con eq_0076 kind=linear :: Initial boundary condition for shooting interval
+\begin{align}
+  & \sum_{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k}^{q , +}} y_{i , j , t , t^{'} , v , v^{'}}^{k} - \sum_{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k}^{q , -}} y_{i , j , t , t^{'} , v , v^{'}}^{k} = \left\{\begin{matrix} 1 , q = \left(o^{k} , e^{k} , 0\right) \\ - 1 , q = \left(d^{k} , l^{k} , 0\right) \\ 0 , q \in Q_{k} : \text{otherwise} , \forall \end{matrix}\right k \in K \tag{eq\_0002} \\
+  & \sum_{k \in K} \sum_{\left(i , j , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}\right) \in \mathit{Phi}_{h} \left(i , j , t , t^{'} , v , v^{'}\right)} y_{i , j , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}}^{k} \leq 1 , \forall \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{\mathit{drive}} \tag{eq\_0004} \\
+  & \sum_{k \in K} \sum_{\left(i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}\right) \in \mathit{Phi}_{s} \left(i , j , t , t^{'} , v , v^{'}\right)} y_{i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}}^{k} \leq 1 , \forall \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{\mathit{track}} \tag{eq\_0006} \\
+  & \sum_{k \in K} \sum_{\left(i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}\right) \in \mathit{Phi} \left(i , j , t , t^{'} , v , v^{'}\right)} y_{i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'} , u , u^{'}}^{k} \leq 1 , \forall \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0008} \\
+  & \sum_{k \in K} \sum_{\left(i , j , t^{'} , t^{''} , v , v^{'}\right) \in \mathit{Omega} \left(r , t\right)} p_{i , j , t^{'} , t^{''} , v , v^{'}}^{k , t} \cdot y_{i , j , t^{'} , t^{''} , v , v^{'}}^{k} \leq P_{r}^{t} , \forall t \in T , r \in R \tag{eq\_0010} \\
+  & \underset{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{w}^{\mathit{drive}} : t < T_{k . w}^{\mathit{dep}}}{\sum} y_{i , j , t , t^{'} , v , v^{'}}^{k} = 0 , \forall k \in K , w \in \left({W}\right)_{k} \tag{eq\_0012} \\
+  & \underset{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{w}^{\mathit{dwell}}}{\sum} y_{i , j , t , t^{'} , v , v^{'}}^{k} = 1 , \forall k \in K , w \in \left({W}\right)_{k}^{\mathit{stop}} \tag{eq\_0013} \\
+  & y_{i , j , t , t^{'} , v , v^{'}}^{k} = 0 , \forall k \in K , \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{\mathit{diruption}} and \left(i , j , t , t^{'} , v , v^{'}\right) \notin A_{\mathit{drive}}^{\mathit{abnormal}} \tag{eq\_0014} \\
+  & 0 \leq f_{i , j}^{k} \left(s\right) \leq f_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0017} \\
+  & 0 \leq b_{i , j}^{k} \left(s\right) \leq b_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0018} \\
+  & 0 \leq v_{i , j}^{k} \left(s\right) \leq v^{\mathit{max}} \left(s\right) , \forall s \in \left[0 , S\right] \tag{eq\_0019} \\
+  & 0 \leq f_{i , j}^{k} \left(s\right) \cdot v_{i , j}^{k} \left(s\right) \leq p_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0020} \\
+  & v_{i , j}^{k} \left(0\right) = v \tag{eq\_0022\_a} \\
+  & v_{i , j}^{k} \left(S\right) = v^{'} \tag{eq\_0022\_b} \\
+  & t_{i , j}^{k} \left(0\right) = t \tag{eq\_0022\_c} \\
+  & t_{i , j}^{k} \left(S\right) = t^{'} \tag{eq\_0022\_d} \\
+  & \underset{̲}{\mathit{chi}} \leq \mathit{chi} \left(x_{i , j}^{k} \left(s\right) , u_{i , j}^{k} \left(s\right)\right) \leq \bar{\mathit{chi}} , \forall s \in \left[0 , S\right] \tag{eq\_0025} \\
+  \min\quad & \mathit{theta}_{\text{1}} \cdot \sum_{k \in K} \sum_{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k}} c_{i , j , t , t^{'} , v , v^{'}}^{k} \cdot y_{i , j , t , t^{'} , v , v^{'}}^{k} + \mathit{theta}_{2} \cdot \sum_{k \in K} \sum_{\left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k}} e_{i , j , t , t^{'} , v , v^{'}}^{k} \cdot y_{i , j , t , t^{'} , v , v^{'}}^{k} \tag{eq\_0026} \\
+  & c_{i , j , t , t^{'} , v , v^{'}}^{k} = \left\{\begin{matrix} \left|\right. t^{'} - T_{k , w}^{\mathit{arr}} \left|\right. \cdot d_{k , w}^{\mathit{off}} , & if \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{w}^{\mathit{off}} , w \in \left(\hat{W}\right)_{k}^{\mathit{stop}} \\ \left(t - T_{k , w}^{\mathit{dep}}\right) \cdot d_{k , w}^{\mathit{on}} , & if \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{w}^{\mathit{on}} , w \in \left(\hat{W}\right)_{k}^{\mathit{stop}} \\ C_{0} \cdot \sum_{w \in \left(\hat{W}\right)_{k}^{\mathit{stop}}} \left(d_{k . w}^{\mathit{off}} + d_{k , w}^{\mathit{on}}\right) , & if \left(i , j , t , t^{'} , v , v^{'}\right) \in {A} \\ 0 , & \text{otherwise} \end{matrix}\right \tag{eq\_0027} \\
+  & \left(\text{M0}\right) min Z \tag{eq\_0028\_a} \\
+  & (\text{2}),\text{ }(\text{8}),\text{ }(\text{10}),\text{ }(\text{12})-(\text{14}) and (\text{23})-(\text{25}) y_{i , j , t , t^{'} , v , v^{'}}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k} \tag{eq\_0028\_b} \\
+  & \bar{u} \leq u_{i , j}^{k} \left(s\right) \leq \underset{̲}{u} , \forall k \in K , \left(i , j\right) \in L \tag{eq\_0028\_c} \\
+  & \bar{x} \leq x_{i , j}^{k} \left(s\right) \leq \underset{̲}{x} , \forall k \in K , \left(i , j\right) \in L \tag{eq\_0028\_d} \\
+  & u \left(s\right) = \mathit{alpha}_{n} , \forall s \in \left[s_{n} , s_{n + 1}\right) , n = 1 , . . . , N - 1 \tag{eq\_0029} \\
+  & x_{n} \left(s_{n}\right) = \mathit{beta}_{n} , \forall s \in \left[s_{n} , s_{n + 1}\right) , n = 1 , . . . , N - 1 \tag{eq\_0030} \\
+  & \left({x}\right)_{n} \left(s\right) = \mathcal{G} \left(x_{n} \left(s\right) , \mathit{alpha}_{n} , s\right) , \forall s \in \left[s_{n} , s_{n + 1}\right) , n = 0 , . . . , N - 1 \tag{eq\_0031\_a} \\
+  & x_{n} \left(s_{n}\right) = \mathit{beta}_{n} , \forall s \in \left[s_{n} , s_{n + 1}\right) , n = 0 , . . . , N - 1 \tag{eq\_0031\_b} \\
+  & \mathit{beta}_{n + 1} - x_{n} \left(s_{n + 1} ; \mathit{alpha}_{n} , \mathit{beta}_{n}\right) = 0 , \forall n = 0 , . . . , N - 1 \tag{eq\_0032} \\
+  & \mathit{beta}_{0} - x_{0} \left(0\right) = 0 \tag{eq\_0034} \\
+  & \mathit{chi}^{\mathit{min}} \leq \mathit{chi} \left(\mathit{beta}_{n} , \mathit{alpha}_{n}\right) \leq \mathit{chi}^{\mathit{max}} , \forall n = 0 , . . . , N - 1 \tag{eq\_0036} \\
+  & t_{i , j , n + 1}^{k} = t_{i , j , n}^{k} + 2 \frac{s_{n + 1} - s_{n}}{v_{i , j , n}^{k} + v_{i , j , n + 1}^{k}} \tag{eq\_0037} \\
+  & \left(\text{M} 1\right) min Z \tag{eq\_0038\_a} \\
+  & (\text{2}),(\text{8}),(\text{10}),(\text{12})-(\text{15}) y_{i , j , t , t^{'} , v , v^{'}}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \left(i , j , t , t^{'} , v , v^{'}\right) \in A_{k} \tag{eq\_0038\_b} \\
+  & \mathit{lambda}_{a} \geq 0 , \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0040} \\
+  & \mathit{xi}_{r , t} \geq 0 , \forall t \in T , r \in R \tag{eq\_0041} \\
+  & \left({c}\right)_{a}^{k} = \left\{\begin{matrix} \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} + \mathit{xi}_{r , t} \cdot p_{a}^{k , t} , & if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \in \mathit{Omega} \left(r , t\right) \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} , & if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \notin \mathit{Omega} \left(r , t\right) \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} , & otherwise \end{matrix}\right \tag{eq\_0043} \\
+  & 0 \leq \mathit{delta}_{a} \leq 1 , \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0045} \\
+  & 0 \leq \mathit{zeta}_{r , t} \leq P_{r}^{t} , \forall t \in T , r \in R \tag{eq\_0046} \\
+  & \mathit{delta}_{a} = 1 - \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} \tag{eq\_0047} \\
+  & \mathit{zeta}_{r , t} = P_{r}^{t} - \sum_{k \in K} \sum_{a \in \mathit{varphi} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0048} \\
+  & \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} = \sum_{k^{'} \in K : k^{'} \neq k} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k^{'}} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} = \mathit{mu}_{a}^{k} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} \tag{eq\_0049} \\
+  & \sum_{k \in K} \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \sum_{k \in K : k^{'} \neq k} \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k^{'} , t} \cdot y_{a}^{k^{'}} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \mathit{pi}_{r , t}^{k} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0050} \\
+  & \begin{matrix}\left\|\sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left\{\begin{matrix} \begin{matrix}\left(2 \mathit{mu}_{a}^{k} - 1\right) \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} , if \mathit{mu}_{a}^{k} \geq 1 \\ 0 , if \mathit{mu}_{a}^{k} = 0\end{matrix} \end{matrix}\right\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix}\left\|\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{pi}_{r , t}^{k} - P_{r}^{t} + \mathit{zeta}_{r , t}\right\|^{2} \\ = \left\{\begin{matrix} \begin{matrix}\sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left(\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right) + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} , & if \mathit{pi}_{r , t}^{k} \geq P_{r}^{t} \\ 0 , & if \text{0} \leq \mathit{pi}_{r , t}^{k} < P_{r}^{t}\end{matrix} \end{matrix}\right\end{matrix} \tag{eq\_0053} \\
+  & \left({c}\right)_{a}^{k} = \left\{\begin{matrix} \begin{matrix}\mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) + \mathit{xi}_{r , t} \cdot p_{a}^{k , t} \\ + \mathit{rho}_{2} \left(\mathit{pi}_{r , t}^{k} p_{a}^{k , t} + 1 / 2 \cdot \left(p_{a}^{k , t}\right)^{2} - P_{r}^{t} \cdot p_{a}^{k , t}\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \in \mathit{Omega} \left(r , t\right)\end{matrix} \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{a^{'}} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \notin \mathit{Omega} \left(r , t\right) \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} , otherwise \end{matrix}\right \tag{eq\_0055} \\
+  & \mathit{lambda}_{a}^{\mathit{theta} + 1} = \mathit{lambda}_{a}^{\mathit{theta}} + \mathit{rho}_{1} \left(\sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} - 1\right) \tag{eq\_0056} \\
+  & \mathit{xi}_{r , t}^{\mathit{theta} + 1} = \mathit{xi}_{r , t}^{\mathit{theta} + 1} + \mathit{rho}_{2} \left(\sum_{k \in K} \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} - P_{r}^{t}\right) \tag{eq\_0057} \\
+  & \mathit{re} \cdot s_{i} = \left\{\begin{matrix} \mathit{max} \left\{0 , \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} - 1\right\} , i = 1 \\ \mathit{max} \left\{0 , \sum_{k \in K} \sum_{a \in \mathit{varphi} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} - P_{r}^{t}\right\} , i = 2 \end{matrix}\right \tag{eq\_0058} \\
+  & \mathit{rho}_{i}^{\mathit{theta} + 1} = \left\{\begin{matrix} \mathit{eta} \cdot \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} > \mathit{gamma} \mathit{res}_{i}^{\mathit{theta} - 1} \\ \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} \leq \mathit{gamma} \mathit{res}_{i}^{\mathit{theta} - 1} \end{matrix}\right , i = 1 , 2 \tag{eq\_0059} \\
+  & \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k}\right)^{2} = \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} \tag{eq\_0063} \\
+  & \begin{matrix}\left\|\sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k}\right)^{2} + 2 \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right) \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2} \\ = \left(2 \mathit{mu}_{a}^{k} + 2 \mathit{delta}_{a} - 1\right) \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2}\end{matrix} \tag{eq\_0064} \\
+  & \mathit{Psi}_{1} \left(\mathit{delta}_{a}\right) = \left(\mathit{delta}_{a}\right)^{2} + 2 \mathit{delta}_{a} \left(\sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \mathit{mu}_{a}^{k} - 1\right) + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} + \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} \left(2 \mathit{mu}_{a}^{k} - 1\right) \tag{eq\_0065} \\
+  & \mathit{delta}_{a}^{ \cdot } = 1 - \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} - \mathit{mu}_{a}^{k} \tag{eq\_0067} \\
+  & \left\|\sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(2 \mathit{mu}_{a}^{k} - 1\right) \sum_{a^{'} \in \mathit{Phi} \left(a\right)} y_{a^{'}}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} \tag{eq\_0068} \\
+  & \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k}\right)^{2} = \sum_{a \in \mathit{Omega} \left(r , t\right)} \left(p_{a}^{k , t}\right)^{2} \cdot y_{a}^{k} \tag{eq\_0070} \\
+  & \begin{matrix}\left\|\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{pi}_{r , t}^{k} - P_{r}^{t} + \mathit{zeta}_{r , t}\right\|_{2}^{2} = \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k}\right)^{2} + 2 \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right) \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2} \\ = \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)\right] + \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2}\end{matrix} \tag{eq\_0071} \\
+  & \mathit{Psi}_{2} \left(\mathit{zeta}_{r , t}\right) = \left(\mathit{zeta}_{r , t}\right)^{2} + 2 \mathit{zeta}_{r , t} \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} + \mathit{pi}_{r , t}^{k} - P_{r}^{t}\right) + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} + \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right] \tag{eq\_0072} \\
+  & \mathit{zeta}_{r , t}^{ \cdot } = P_{r}^{t} - \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} - \mathit{pi}_{r , t}^{k} \tag{eq\_0074} \\
+  & \left(\sum_{k \in K} \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \left(\mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2}\right)^{2} = \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right] + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} \tag{eq\_0075} \\
+  & \left(\sum_{k \in K} \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2} = 0 \tag{eq\_0076} \\
+\end{align}

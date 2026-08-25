@@ -1,0 +1,120 @@
+% Declaration sidecar for 10.1016_j.tre.2023.103339
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.tre.2023.103339
+% Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles
+%
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger travel time and energy consumption in bi-level MPC
+%@ index k ordered=0 cyclic=0 :: Time phase index for the higher-level model
+%@ index S ordered=0 cyclic=0 :: Set of all stations in the network
+%@ index p ordered=0 cyclic=0 :: Line platform index
+%@ index q ordered=0 cyclic=0 :: Line platform index for transfers and shared-platform interactions
+%@ index e ordered=0 cyclic=0 :: Destination station index
+%@ index i ordered=0 cyclic=0 :: Train index
+%@ index j ordered=0 cyclic=0 :: Train index for depot departures and ordering
+%@ index b ordered=0 cyclic=0 :: Train speed profile option index
+%@ index l ordered=0 cyclic=0 :: Line index
+%@ index cop ordered=0 cyclic=0 :: Line platforms at the same station as p
+%@ index P ordered=0 cyclic=0 :: Set of all line platforms
+%@ index phy ordered=0 cyclic=0 :: Line platforms using same physical platform as p
+%@ index Z ordered=0 cyclic=0 :: Set of depots
+%@ index z ordered=0 cyclic=0 :: Depot index
+%@ index in ordered=0 cyclic=0 :: Line platforms corresponding to entering link of depot
+%@ index out ordered=0 cyclic=0 :: Lines corresponding to output link of depot
+%@ index N ordered=0 cyclic=0 :: Number of phases in prediction horizon
+%@ index I ordered=0 cyclic=0 :: Set of trains
+%@ index J ordered=0 cyclic=0 :: Set of trains departing from output link of depot
+%@ index B ordered=0 cyclic=0 :: Set of speed profile options for train i at line platform p
+%@ index V ordered=0 cyclic=0 :: Set of line platforms that train i will visit
+%@ param rho shape=p,e,k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
+%@ param lambda shape=p,e,k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
+%@ param T shape=- kind=scalar domain=- :: Length of time step for the absorption model
+%@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
+%@ param chi shape=p,q,e kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
+%@ param sta shape=p kind=vector domain=- :: Station corresponding to line platform p
+%@ param t shape=q,p kind=matrix domain=- :: Mean transfer time from line platform q to p
+%@ param gamma shape=p,k kind=matrix domain=- :: Mean time of trains from depot to line platform
+%@ param h shape=p kind=vector domain=- :: Minimum departure-arrival headway at line platform
+%@ param sigma shape=p,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
+%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive value
+%@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
+%@ param eta shape=- kind=scalar domain=- :: Weight for energy consumption in objective
+%@ param epsilon shape=- kind=tolerance domain=- :: Sufficiently small number
+%@ param m shape=- kind=scalar domain=- :: Minimum value of a variable
+%@ param pt shape=i,l kind=matrix domain=- :: Preceding train of train i at line
+%@ param A shape=- kind=scalar domain=- :: State matrix in MLD model
+%@ param D shape=- kind=scalar domain=- :: Matrix in MLD inequality constraints
+%@ param zeta shape=- kind=scalar domain=- :: Weighting factor for departure time deviation
+%@ param s shape=p kind=vector domain=- :: Station corresponding to line platform
+%@ var n shape=p,e,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
+%@ var C shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
+%@ var f shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
+%@ var r shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train from line platform to succeeding
+%@ var u shape=l,k domain=non_negative role=primary drole=- lo=- hi=- :: Departure frequency from depot for line
+%@ var beta shape=p,k domain=integer role=primary drole=- lo=- hi=- :: Number of phases for trains from depot to line platform
+%@ var phi shape=p,k domain=continuous role=primary drole=- lo=- hi=- :: Remainder of gamma/T
+%@ var tau shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train at line platform
+%@ var a shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at line platform
+%@ var d shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train at line platform
+%@ var y shape=i,j,l,p domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j departs before train i
+%@ var x shape=i,p,b domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating speed profile selection
+%@ var xi shape=i,j,p,q domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of trains from different lines
+%@ var E shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Vector of optimized control inputs over horizon
+%@ var w shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
+%@ var delta shape=k,p domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for absorption transformation
+%@ con eq_0001 kind=linear domain=- indicator=- :: Passenger arrival rate at line platform
+%@ con eq_0002 kind=linear domain=- indicator=- :: Passenger flow balance at line platform
+%@ con eq_0003 kind=linear domain=- indicator=- :: Passengers absorbed by trains at platform
+%@ con eq_0004 kind=linear domain=- indicator=- :: Total boardings as minimum of remaining capacity and waiting passengers
+%@ con eq_0005 kind=linear domain=- indicator=- :: Total passengers wanting to board at platform
+%@ con eq_0006_a kind=linear domain=- indicator=- :: Total stranded passengers per line platform
+%@ con eq_0006_b kind=linear domain=- indicator=- :: Total passenger arrival rate per line platform
+%@ con eq_0006_c kind=linear domain=- indicator=- :: Total transfer arrivals per line platform
+%@ con eq_0007 kind=linear domain=- indicator=- :: Remaining train capacity at line platform
+%@ con eq_0008 kind=linear domain=- indicator=- :: On-board passengers arriving from preceding platform
+%@ con eq_0009 kind=linear domain=- indicator=- :: Transfer passengers from line platform p to q
+%@ con eq_0010 kind=linear domain=- indicator=- :: Alighting passengers at platform or destination station
+%@ con eq_0011 kind=linear domain=- indicator=- :: Departing passengers after boarding and alighting
+%@ con eq_0012 kind=linear domain=- indicator=- :: Transfer passengers arriving at platform from other platforms
+%@ con eq_0013 kind=linear domain=- indicator=- :: Integer part of depot-to-platform travel time in phases
+%@ con eq_0015 kind=linear domain=- indicator=- :: Departure frequency at platform from depot frequency
+%@ con eq_0016 kind=linear domain=- indicator=- :: Minimum departure frequency at platform
+%@ con eq_0017 kind=linear domain=- indicator=- :: Physical platform headway and dwell capacity constraint
+%@ con eq_0018 kind=linear domain=- indicator=- :: Depot rolling stock balance
+%@ con eq_0019 kind=linear domain=- indicator=- :: Nonnegativity of trains available at depot
+%@ con eq_0021 kind=linear domain=- indicator=- :: Dwell time bounds at platform
+%@ con eq_0022 kind=linear domain=- indicator=- :: Arrival time from preceding departure and running time
+%@ con eq_0023 kind=linear domain=- indicator=- :: Definition of train order binary variable y
+%@ con eq_0024 kind=linear domain=- indicator=- :: Lower-level rolling stock circulation constraint
+%@ con eq_0025 kind=linear domain=- indicator=- :: Running time bounds between platforms
+%@ con eq_0026 kind=linear domain=- indicator=- :: Running time as weighted sum of speed profile options
+%@ con eq_0027 kind=linear domain=- indicator=- :: Exactly one speed profile selected per train and platform
+%@ con eq_0028 kind=linear domain=- indicator=- :: Same-line headway constraint
+%@ con eq_0029 kind=linear domain=- indicator=- :: Definition of cross-line train order binary variable xi
+%@ con eq_0030 kind=linear domain=- indicator=- :: Cross-line headway constraint for shared physical platforms
+%@ con eq_0031 kind=linear domain=- indicator=- :: Train order consistency constraint
+%@ con eq_0032 kind=linear domain=- indicator=- :: Passenger travel time cost term
+%@ con eq_0033 kind=linear domain=- indicator=- :: Higher-level MPC objective with passenger cost and energy penalty
+%@ con eq_0034 kind=linear domain=- indicator=- :: Big-M reformulation of absorption min condition
+%@ con eq_0035 kind=linear domain=- indicator=- :: Linearized passenger boarding count
+%@ con eq_0036_a kind=linear domain=- indicator=- :: Linearization of binary-continuous product, part a
+%@ con eq_0036_b kind=linear domain=- indicator=- :: Linearization of binary-continuous product, part b
+%@ con eq_0037 kind=linear domain=- indicator=- :: Higher-level MPC reformulated as MILP state and inequality constraints
+%@ con eq_0038_a kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part a
+%@ con eq_0038_b kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part b
+%@ con eq_0038_c kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part c
+%@ con eq_0038_d kind=linear domain=- indicator=- :: Big-M linearization inequality for product term, part d
+%@ con eq_0039_a kind=linear domain=- indicator=- :: MILP reformulation component a
+%@ con eq_0039_b kind=linear domain=- indicator=- :: MILP reformulation component b
+%@ con eq_0039_c kind=linear domain=- indicator=- :: MILP reformulation component c
+%@ con eq_0040 kind=linear domain=- indicator=- :: Optimized control sequence over the prediction horizon
+%@ con eq_0041 kind=linear domain=- indicator=- :: Energy consumption of train from selected speed profile
+%@ con eq_0042 kind=linear domain=- indicator=- :: Lower-level objective with energy consumption and departure headway deviation
+%@ con eq_0043 kind=linear domain=- indicator=- :: Lower-level MPC optimization problem
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linear reformulation of cross-line train order binary
+%@ con eq_0046_a kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint a
+%@ con eq_0046_b kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint b
+%@ con eq_0066 kind=linear domain=- indicator=- :: Constraint 66 from the paper

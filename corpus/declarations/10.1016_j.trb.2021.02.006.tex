@@ -1,0 +1,133 @@
+% Declaration sidecar for 10.1016_j.trb.2021.02.006
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trb.2021.02.006
+% Timetabling for Strategic Passenger Railway Planning
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trb.2021.02.006.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize weighted perceived travel and waiting time over all OD-pairs
+
+% L: classified as variable during review
+%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
+
+% T: classified as index during review
+%@ index T ordered=0 cyclic=0 :: Time period (cycle length) of the periodic timetable
+
+% W: classified as variable during review
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
+
+% Y: classified as variable during review
+%@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
+
+% unusable as an identifier, rename or drop: γ
+% OD: classified as index during review
+%@ index OD ordered=0 cyclic=0 :: Set of origin-destination pairs
+
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of events (departure times) for each OD-pair
+
+% unusable as an identifier, rename or drop: π
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in the network
+
+% p: classified as variable during review
+%@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
+
+% s: classified as parameter during review
+%@ param s shape=- kind=scalar domain=- :: Possibly a parameter for start time or station, not defined in given text
+
+% t: classified as parameter during review
+%@ param t shape=- kind=scalar domain=- :: Possibly a parameter for transfer time or type, not defined in given text
+
+% y: classified as variable during review
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
+
+% u: classified as parameter during review
+%@ param u shape=- kind=scalar domain=- :: Upper bound on activity duration
+
+% unusable as an identifier, rename or drop: ℓ
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of routes
+
+% r: classified as index during review
+%@ index r ordered=0 cyclic=0 :: Route index
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Event index
+
+% unusable as an identifier, rename or drop: α
+% Z: classified as parameter during review
+%@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
+
+% Q: classified as parameter during review
+%@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
+
+% x: classified as variable during review
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
+
+% l: classified as parameter during review
+%@ param l shape=- kind=scalar domain=- :: Lower bound for linearization of Y_v^k
+
+% M: classified as parameter during review
+%@ param M shape=- kind=scalar domain=- :: Big-M constant for linearization
+
+% z: classified as variable during review
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
+
+% Ȳ: classified as parameter during review
+%@ param Ybar shape=- kind=scalar domain=- :: Upper bound on perceived travel time for route
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, d, i, j, k
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0012 kind=linear domain=- indicator=- :: Objective function
+%@ con eq_0013 kind=linear domain=- indicator=- :: Activity duration from periodic event times and modulo integer
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds on activity duration
+%@ con eq_0015 kind=linear domain=- indicator=- :: Route perceived travel time
+%@ con eq_0016 kind=linear domain=- indicator=- :: Time slice length as minimum periodic difference
+%@ con eq_0017 kind=linear domain=- indicator=- :: Ordering of events via binary alpha
+%@ con eq_0018 kind=linear domain=- indicator=- :: Average waiting time as half time slice length
+%@ con eq_0019 kind=linear domain=- indicator=- :: Perceived travel time from end of time slice
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain bound for time slice length
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain bound for average waiting time
+%@ con eq_0022 kind=linear domain=- indicator=- :: Nonnegativity of route and slice travel times
+%@ con eq_0023 kind=linear domain=- indicator=- :: Domain bound for periodic event times
+%@ con eq_0024 kind=linear domain=- indicator=- :: Domain bound for modulo integer variables
+%@ con eq_0025 kind=linear domain=- indicator=- :: Binary domain for ordering variables
+%@ con eq_0026 kind=linear domain=- indicator=- :: Define periodic time difference Q
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization relation for Q
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized bound on time slice length
+%@ con eq_0037_a kind=linear domain=- indicator=- :: Linearization of travel time choice (a)
+%@ con eq_0037_b kind=linear domain=- indicator=- :: Linearization of travel time choice (b)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of time slice length sum
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization linking L and Q
+%@ con eq_0040 kind=linear domain=- indicator=- :: Linearization of perceived travel time
+%@ con eq_0041 kind=linear domain=- indicator=- :: Linearization of route selection
+%@ con eq_0042 kind=linear domain=- indicator=- :: Linearization of event selection
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization of travel time upper bound
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linearization of travel time lower bound
+%@ con eq_0045 kind=linear domain=- indicator=- :: Linearization of waiting time objective
+%@ con eq_0046 kind=linear domain=- indicator=- :: Linearization of time slice length objective
+%@ con eq_0047 kind=linear domain=- indicator=- :: Linearization of binary route/event selection
+%@ con eq_0049 kind=linear domain=- indicator=- :: Linearization auxiliary constraint
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linearization auxiliary constraint

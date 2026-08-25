@@ -1,0 +1,97 @@
+% lp2graph canonical LaTeX — assembled by corpusbuilder.promote
+% Source dossier: 10.1016_j.trb.2021.02.006
+%@ meta id=10.1016_j.trb.2021.02.006 family=milp schema=0.1.0
+%@ name :: Timetabling for Strategic Passenger Railway Planning
+%@ desc :: Mined from Timetabling for Strategic Passenger Railway Planning (Transportation Research Part B Methodological, 2020).
+%@ prov source :: 10.1016/j.trb.2021.02.006
+%@ prov reference :: Timetabling for Strategic Passenger Railway Planning
+%@ prov author :: Gert-Jaap Polinder; Marie Schmidt; Dennis Huisman
+%@ prov date :: 2026-06-21
+%@ obj sense=min name=objective combination=sum :: Minimize weighted perceived travel and waiting time over all OD-pairs
+%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
+%@ index T ordered=0 cyclic=0 :: Time period (cycle length) of the periodic timetable
+%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
+%@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
+%@ index OD ordered=0 cyclic=0 :: Set of origin-destination pairs
+%@ index V ordered=0 cyclic=0 :: Set of events (departure times) for each OD-pair
+%@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in the network
+%@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
+%@ param s shape=- kind=scalar domain=- :: Possibly a parameter for start time or station, not defined in given text
+%@ param t shape=- kind=scalar domain=- :: Possibly a parameter for transfer time or type, not defined in given text
+%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
+%@ param u shape=- kind=scalar domain=- :: Upper bound on activity duration
+%@ index R ordered=0 cyclic=0 :: Set of routes
+%@ index r ordered=0 cyclic=0 :: Route index
+%@ index v ordered=0 cyclic=0 :: Event index
+%@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
+%@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
+%@ param l shape=- kind=scalar domain=- :: Lower bound for linearization of Y_v^k
+%@ param M shape=- kind=scalar domain=- :: Big-M constant for linearization
+%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
+%@ param Ybar shape=- kind=scalar domain=- :: Upper bound on perceived travel time for route
+%@ con eq_0012 kind=linear domain=- indicator=- :: Objective function
+%@ con eq_0013 kind=linear domain=- indicator=- :: Activity duration from periodic event times and modulo integer
+%@ con eq_0014 kind=linear domain=- indicator=- :: Bounds on activity duration
+%@ con eq_0015 kind=linear domain=- indicator=- :: Route perceived travel time
+%@ con eq_0016 kind=linear domain=- indicator=- :: Time slice length as minimum periodic difference
+%@ con eq_0017 kind=linear domain=- indicator=- :: Ordering of events via binary alpha
+%@ con eq_0018 kind=linear domain=- indicator=- :: Average waiting time as half time slice length
+%@ con eq_0019 kind=linear domain=- indicator=- :: Perceived travel time from end of time slice
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain bound for time slice length
+%@ con eq_0021 kind=linear domain=- indicator=- :: Domain bound for average waiting time
+%@ con eq_0022 kind=linear domain=- indicator=- :: Nonnegativity of route and slice travel times
+%@ con eq_0023 kind=linear domain=- indicator=- :: Domain bound for periodic event times
+%@ con eq_0024 kind=linear domain=- indicator=- :: Domain bound for modulo integer variables
+%@ con eq_0025 kind=linear domain=- indicator=- :: Binary domain for ordering variables
+%@ con eq_0026 kind=linear domain=- indicator=- :: Define periodic time difference Q
+%@ con eq_0027 kind=linear domain=- indicator=- :: Linearization relation for Q
+%@ con eq_0036 kind=linear domain=- indicator=- :: Linearized bound on time slice length
+%@ con eq_0037_a kind=linear domain=- indicator=- :: Linearization of travel time choice (a)
+%@ con eq_0037_b kind=linear domain=- indicator=- :: Linearization of travel time choice (b)
+%@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of time slice length sum
+%@ con eq_0039 kind=linear domain=- indicator=- :: Linearization linking L and Q
+%@ con eq_0040 kind=linear domain=- indicator=- :: Linearization of perceived travel time
+%@ con eq_0041 kind=linear domain=- indicator=- :: Linearization of route selection
+%@ con eq_0042 kind=linear domain=- indicator=- :: Linearization of event selection
+%@ con eq_0043 kind=linear domain=- indicator=- :: Linearization of travel time upper bound
+%@ con eq_0044 kind=linear domain=- indicator=- :: Linearization of travel time lower bound
+%@ con eq_0045 kind=linear domain=- indicator=- :: Linearization of waiting time objective
+%@ con eq_0046 kind=linear domain=- indicator=- :: Linearization of time slice length objective
+%@ con eq_0047 kind=linear domain=- indicator=- :: Linearization of binary route/event selection
+%@ con eq_0049 kind=linear domain=- indicator=- :: Linearization auxiliary constraint
+%@ con eq_0050 kind=linear domain=- indicator=- :: Linearization auxiliary constraint
+\begin{align}
+  \min\quad & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}} L_{v}^{k} \cdot \left(\mathit{gamma}_{w} \cdot W_{v}^{k} + Y_{v}^{k}\right) \tag{eq\_0011} \\
+  & \text{s}.\text{t}. y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \forall \left(i , j\right) \in A \tag{eq\_0012} \\
+  & \mathit{ell}_{i j} \leq y_{i j} \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0013} \\
+  & Y_{r} = \sum_{a \in r} \left(y_{a} + \mathit{gamma}_{t} \cdot 1_{t} \left(a\right)\right) \forall r \in \mathcal{R} \tag{eq\_0014} \\
+  & L_{v}^{k} = \underset{v^{'} \in V^{k} \backslash \left\{v\right\}}{min} \left\{\mathit{pi}_{v} - \mathit{pi}_{v^{'}} + T \mathit{alpha}_{v^{'} , v}\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0015} \\
+  & \mathit{alpha}_{v , v^{'}} + \mathit{alpha}_{v^{'} , v} = 1 \forall k \in \mathcal{OD} , v \in V^{k} , v^{'} \in V^{k} \backslash \left\{v\right\} \tag{eq\_0016} \\
+  & W_{v}^{k} = \frac{1}{2} L_{v}^{k} \forall k \in \mathcal{OD} , \forall v \in V^{k} \tag{eq\_0017} \\
+  & Y_{v}^{k} = \underset{v^{'} \in V^{k}}{min} \underset{r \in \mathcal{R}_{v^{'}}^{k}}{min} \left\{Y_{r} + \mathit{gamma}_{w} \cdot \left(\mathit{pi}_{v^{'}} - \mathit{pi}_{v} + T \mathit{alpha}_{v , v^{'}}\right)\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0018} \\
+  & L_{v}^{k} \in \left[0 , T\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0019} \\
+  & W_{v}^{k} \in \left[0 , T / 2\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0020} \\
+  & Y_{r} , Y_{v}^{k} \in \mathcal{R}_{\geq 0} \forall r \in \mathcal{R} , k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0021} \\
+  & \mathit{pi}_{v} \in \left\{0 , \ldots , T - 1\right\} \forall v \in V \tag{eq\_0022} \\
+  & p_{i j} \in \mathcal{Z}_{\geq 0} \forall \left(i , j\right) \in A \tag{eq\_0023} \\
+  & \mathit{alpha}_{v , v^{'}} \in \left\{0 , 1\right\} \forall k \in \mathcal{OD} , v \in V^{k} , v^{'} \in V^{k} \backslash \left\{v\right\} . \tag{eq\_0024} \\
+  & Q_{v , v^{'}} = \mathit{pi}_{v^{'}} - \mathit{pi}_{v} + T \mathit{alpha}_{v , v^{'}} . \tag{eq\_0025} \\
+  & L_{v}^{k} \leq Q_{v^{'} , v} \forall k \in \mathcal{OD} , v^{'} \in V^{k} \backslash \left\{v\right\} \tag{eq\_0026} \\
+  & \sum_{v \in V^{k}} L_{v}^{k} = T . \forall k \in \mathcal{OD} \tag{eq\_0027} \\
+  & x_{v , d}^{k} \leq x_{v , d - 1}^{k} \forall k \in \mathcal{OD} , v \in V^{k} , d \in \left\{2 , \ldots , T\right\} . \tag{eq\_0036} \\
+  & L_{v}^{k} = \sum_{d = 1}^{T} x_{v , d}^{k} \tag{eq\_0037\_a} \\
+  & \left(L_{v}^{k}\right)^{2} = \sum_{d = 1}^{T} \left(2 d - 1\right) \cdot x_{v , d}^{k} \tag{eq\_0037\_b} \\
+  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}} \sum_{d = 1}^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
+  & R_{v , d}^{k} \leq u_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0039} \\
+  & R_{v , d}^{k} \geq l_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0040} \\
+  & R_{v , d}^{k} \leq Y_{v}^{k} - l_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) \tag{eq\_0041} \\
+  & R_{v , d}^{k} \geq Y_{v}^{k} - u_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) , \tag{eq\_0042} \\
+  & Y_{v}^{k} \leq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , v^{'}} \forall v^{'} \in V^{k} , r \in \mathcal{R}_{v^{'}}^{k} \tag{eq\_0043} \\
+  & Y_{v}^{k} \geq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , v^{'}} - M_{v}^{k} \cdot \left(1 - z_{v , v^{'} , r}^{k}\right) \forall v^{'} \in V^{k} , r \in \mathcal{R}_{v^{'}}^{k} \tag{eq\_0044} \\
+  & \sum_{v^{'} \in V^{k}} \underset{r \in \mathcal{R}_{v^{'}}^{k}}{\sum} z_{v , v^{'} , r}^{k} = 1 . \tag{eq\_0045} \\
+  & M_{v}^{k} = \mathit{gamma}_{w} \cdot T + \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(\bar{Y}\right)_{r}\right\} - \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(\underset{̲}{Y}\right)_{r}\right\} , \tag{eq\_0046} \\
+  & \sum_{v \in V^{k}} \frac{d_{k}}{T} \cdot L_{v}^{k} \cdot W_{v}^{k} \geq d_{k} \cdot \frac{T}{2 \left|\right. V^{k} \left|\right.} . \tag{eq\_0047} \\
+  & \text{s}.\text{t}. \sum_{v \in V^{k}} L_{v}^{k} = T \tag{eq\_0049} \\
+  & L_{v}^{k} \geq 0 \forall v \in V^{k} . \tag{eq\_0050} \\
+\end{align}

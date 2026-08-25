@@ -1,0 +1,138 @@
+% Declaration sidecar for 10.1016_j.trc.2022.103805
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.trc.2022.103805
+% Enhancing the interaction of railway timetabling and line planning with infrastructure awareness
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.trc.2022.103805.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total passenger travel time in the line planning problem and weighted activity duration in the timetabling problem.
+
+% X: classified as index during review
+%@ index X ordered=0 cyclic=0 :: Set of line pool candidates (l,f,r) and their conflict subsets.
+
+% p: classified as variable during review
+%@ var p shape=S,OD domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on edge s for relation od.
+
+% t: classified as variable during review
+%@ var t shape=A,E domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity a or timestamp of event e in the periodic timetable.
+
+% OD: classified as index during review
+%@ index OD ordered=0 cyclic=0 :: Set of origin-destination passenger relations.
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of directed edges in the space-time / route graph.
+
+% L: classified as index during review
+%@ index L ordered=0 cyclic=0 :: Set of railway lines.
+
+% mandatory: classified as parameter during review
+%@ param mandatory shape=L kind=vector domain=- :: Indicator whether line l is mandatory (1) or optional (0).
+
+% x: classified as variable during review
+%@ var x shape=L,F,R domain=binary role=primary drole=- lo=- hi=- :: Binary selection of line pool candidate (l,f,r).
+
+% F: classified as index during review
+%@ index F ordered=0 cyclic=0 :: Set of possible service frequencies.
+
+% R: classified as index during review
+%@ index R ordered=0 cyclic=0 :: Set of possible vehicle compositions.
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Node of the railway network used in passenger flow conservation.
+
+% unusable as an identifier, rename or drop: γ
+% V: classified as index during review
+%@ index V ordered=0 cyclic=0 :: Set of nodes in the railway network.
+
+% unusable as an identifier, rename or drop: δ
+% I: classified as index during review
+%@ index I ordered=0 cyclic=0 :: Set of track sections in the infrastructure-aware route constraints.
+
+% cap: classified as parameter during review
+%@ param cap shape=R kind=vector domain=- :: Passenger capacity of vehicle composition r.
+
+% G: classified as index during review
+%@ index G ordered=0 cyclic=0 :: Set of rolling stock types.
+
+% mix: classified as parameter during review
+%@ param mix shape=G,R kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+
+% C: classified as index during review
+%@ index C ordered=0 cyclic=0 :: Set of conflicts among line pool candidates.
+
+% variables: classified as variable during review
+%@ var variables shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for selecting an event in the timetable.
+
+% u: classified as parameter during review
+%@ param u shape=A kind=vector domain=- :: Upper bound on the duration of activity a.
+
+% y: classified as variable during review
+%@ var y shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selectable activity a (0=active duration bounds, 1=relaxed).
+
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Period length of the periodic timetable.
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of activities in the event-activity network.
+
+% z: classified as variable during review
+%@ var z shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether selectable event e is part of the chosen itinerary.
+
+% Y: classified as index during review
+%@ index Y ordered=0 cyclic=0 :: Set of selectable activities (route itinerary edges).
+
+% Z: classified as index during review
+%@ index Z ordered=0 cyclic=0 :: Set of selectable events (route itinerary nodes).
+
+% e: classified as index during review
+%@ index e ordered=0 cyclic=0 :: Event in the event-activity network.
+
+% k: classified as variable during review
+%@ var k shape=A domain=integer role=primary drole=- lo=- hi=- :: Integer period adjustment for the duration of activity a.
+
+% E: classified as index during review
+%@ index E ordered=0 cyclic=0 :: Set of events in the event-activity network.
+
+% Bound by a quantifier or big operator, so no declaration of their own: a, d, f, g, i, l, o, r, s
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Conflict elimination inequality: a conflicting set of line pool candidates cannot be fully selected.
+%@ con eq_0005 kind=linear domain=- indicator=- :: Duration computation for edges: wait edges use T/(2f) and running edges use scaled minimal time.
+%@ con eq_0006 kind=linear domain=- indicator=- :: Line configuration selection: exactly one for mandatory lines, at most one for optional lines.
+%@ con eq_0007 kind=linear domain=- indicator=- :: Passenger flow conservation at every node for every origin-destination relation.
+%@ con eq_0008 kind=linear domain=- indicator=- :: Track-section capacity: total passenger flow cannot exceed the capacity of selected line configurations.
+%@ con eq_0009 kind=linear domain=- indicator=- :: Rolling stock type availability: total used units per type cannot exceed the available fleet.
+%@ con eq_0010 kind=linear domain=- indicator=- :: Track-section frequency capacity: selected frequencies must respect the maximum frequency per section.
+%@ con eq_0011 kind=linear domain=- indicator=- :: Conflict constraint: at most |X_conflict|-1 candidates of each conflict set may be selected.
+%@ con eq_0012 kind=linear domain=- indicator=- :: Selectable activity upper bound: duration does not exceed u_a plus the relaxation term.
+%@ con eq_0013 kind=linear domain=- indicator=- :: Selectable activity lower bound: duration is at least l_a minus the relaxation term.
+%@ con eq_0016 kind=linear domain=- indicator=- :: Linking activity selection: a selected activity requires its origin and destination events to be selected.
+%@ con eq_0017 kind=linear domain=- indicator=- :: Flow conservation for selected events and activities in the route-itinerary network.
+%@ con eq_0018 kind=linear domain=- indicator=- :: Exactly one source event per line must be selected in the route-itinerary.
+%@ con eq_0019 kind=linear domain=- indicator=- :: Periodic duration relation: t_a = t_{e^-} - t_{e^+} + k_a T.
+%@ con eq_0020 kind=linear domain=- indicator=- :: Domain constraint for event timestamps in discrete time steps.
+%@ con eq_0021 kind=linear domain=- indicator=- :: Non-negativity of activity durations.
+%@ con eq_0022 kind=linear domain=- indicator=- :: Binary restrictions on selectable event and activity variables.
+%@ con eq_0023 kind=linear domain=- indicator=- :: Integrality of the period adjustment variables k_a.
+%@ con eq_0024 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
+%@ con eq_0025 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.

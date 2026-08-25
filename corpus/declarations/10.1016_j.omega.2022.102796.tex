@@ -1,0 +1,145 @@
+% Declaration sidecar for 10.1016_j.omega.2022.102796
+% ASSISTED RESOLUTION — rung (c) of staged symbol resolution (sec:resolution).
+% Written by corpusbuilder.assist, model deepseek-v4-flash, 2026-08-24.
+% Non-deterministically sourced; pending human confirmation.
+%
+% Declaration sidecar for 10.1016_j.omega.2022.102796
+% Optimal Train Rescheduling in Oslo Central Station
+%
+% STUB — written by corpusbuilder.promote because no sidecar existed.
+% Fill in the ? placeholders, delete the lines that do not apply, then save
+% this file as corpus/declarations/10.1016_j.omega.2022.102796.tex and re-run promote.
+%
+% Every symbol below was read out of the accepted formulas. Where a line
+% already carries a kind, the algebra or the reviewer settled it and the
+% comment above it says which; check it, do not assume it. Where three lines
+% appear, decide whether the symbol is an index family, a parameter or a
+% variable and delete the two that are wrong. Bibliographic lines
+% (meta/name/desc/prov) are generated from the dossier — do not add them here.
+%
+% index NAME  ordered=0|1 cyclic=0|1
+% param NAME  shape=I,J|- kind=scalar|vector|matrix|big_m|tolerance
+% var   NAME  shape=I,J|- domain=continuous|non_negative|integer|binary
+%              role=primary|auxiliary|slack|indicator
+% obj         sense=min|max name=IDENT combination=sum|weighted_sum|lexicographic
+% con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
+
+%@ obj sense=min name=objective combination=sum :: Minimize total path cost plus delay penalties
+
+% t: classified as variable during review
+%@ var t shape=N domain=non_negative role=primary drole=- lo=- hi=- :: Schedule time for each route node
+
+% N: classified as index during review
+%@ index N ordered=0 cyclic=0 :: Set of route nodes
+
+% u: classified as index during review
+%@ index u ordered=0 cyclic=0 :: Route node index
+
+% L: classified as parameter during review
+%@ param L shape=N kind=vector domain=- :: Traversal time of interlocking route
+
+% unusable as an identifier, rename or drop: Γ
+% T: classified as parameter during review
+%@ param T shape=- kind=scalar domain=- :: Timetable target time at timing nodes
+
+% unusable as an identifier, rename or drop: η
+% unusable as an identifier, rename or drop: δ
+% K: classified as index during review
+%@ index K ordered=0 cyclic=0 :: Set of pairs of route nodes in potential conflict
+
+% v: classified as index during review
+%@ index v ordered=0 cyclic=0 :: Route node index
+
+% A: classified as index during review
+%@ index A ordered=0 cyclic=0 :: Set of trains
+
+% a: classified as index during review
+%@ index a ordered=0 cyclic=0 :: Train index
+
+% w: classified as variable during review
+%@ var w shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary path selection variable
+
+% P: classified as index during review
+%@ index P ordered=0 cyclic=0 :: Set of all paths
+
+% o: classified as parameter during review
+%@ param o shape=- kind=scalar domain=- :: Origin node
+
+% z: classified as variable during review
+%@ var z shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary node active variable
+
+% unusable as an identifier, rename or drop: ρ
+% M: classified as parameter during review
+%@ param M shape=- kind=big_m domain=- :: Large positive constant
+
+% S: classified as index during review
+%@ index S ordered=0 cyclic=0 :: Set of potential successors of a node
+
+% i: classified as index during review
+%@ index i ordered=0 cyclic=0 :: Index for partition of timing nodes
+
+% r: classified as parameter during review
+%@ param r shape=A kind=vector domain=- :: Number of timing node partitions for a train
+
+% y: classified as variable during review
+%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for conflict pairs
+
+% b: classified as index during review
+%@ index b ordered=0 cyclic=0 :: Train index (used in examples)
+
+% s: classified as index during review
+%@ index s ordered=0 cyclic=0 :: Route node index (used in examples)
+
+% c: classified as parameter during review
+%@ param c shape=P kind=vector domain=- :: Cost of selecting a path
+
+% iia: classified as parameter during review
+%@ param iia shape=- kind=scalar domain=- :: Label for constraint (iia) in formulation
+
+% iib: classified as parameter during review
+%@ param iib shape=- kind=scalar domain=- :: Label for constraint (iib) in formulation
+
+% iic: classified as parameter during review
+%@ param iic shape=- kind=scalar domain=- :: Label for constraint (iic) in formulation
+
+% iid: classified as parameter during review
+%@ param iid shape=- kind=scalar domain=- :: Label for constraint (iid) in formulation
+
+% iii: classified as parameter during review
+%@ param iii shape=- kind=scalar domain=- :: Label for constraint (iii) in formulation
+
+% k: classified as parameter during review
+%@ param k shape=A kind=vector domain=- :: Cost of delay per unit for a train
+
+% Bound by a quantifier or big operator, so no declaration of their own: p, q
+% (If one of these is really an index family, add a %@ index line for it.)
+
+% Constraint rows (optional — they default to kind=linear):
+%@ con eq_0001 kind=linear domain=- indicator=- :: Planning horizon start: t_u >= t_o
+%@ con eq_0002 kind=linear domain=- indicator=- :: Traversal time: t_{u+1} - t_u >= L_u
+%@ con eq_0003 kind=linear domain=- indicator=- :: Earliest release time: t_u - t_o >= Γ_u
+%@ con eq_0004 kind=linear domain=- indicator=- :: Delay definition: η_u = max(0, t_u - T_u)
+%@ con eq_0005_a kind=linear domain=- indicator=- :: Disjunctive conflict precedence, first alternative
+%@ con eq_0005_b kind=linear domain=- indicator=- :: Disjunctive conflict precedence, second alternative
+%@ con eq_0005_c kind=linear domain=- indicator=- :: Disjunctive conflict precedence (pair membership)
+%@ con eq_0006 kind=linear domain=- indicator=- :: Each train selects exactly one path
+%@ con eq_0007 kind=linear domain=- indicator=- :: Node active iff a selected path uses it
+%@ con eq_0008 kind=big_m domain=- indicator=- :: Big-M traversal time when path selected
+%@ con eq_0009 kind=linear domain=- indicator=- :: Strengthened path-dependent traversal time
+%@ con eq_0010 kind=big_m domain=- indicator=- :: Big-M release time when node active
+%@ con eq_0011 kind=linear domain=- indicator=- :: Strengthened release time by node activity
+%@ con eq_0014_a kind=big_m domain=- indicator=- :: Delay lower bound when node active
+%@ con eq_0014_b kind=linear domain=- indicator=- :: Nonnegative delay
+%@ con eq_0015_a kind=linear domain=- indicator=- :: Exactly one timing node active in each partition
+%@ con eq_0015_b kind=linear domain=- indicator=- :: Equal target times within a partition
+%@ con eq_0016_a kind=linear domain=- indicator=- :: Delay bound for each partition using active nodes
+%@ con eq_0016_b kind=linear domain=- indicator=- :: Nonnegative partition delay
+%@ con eq_0019_a kind=linear domain=- indicator=- :: Precedence variable bounded by activity of u (first)
+%@ con eq_0019_b kind=linear domain=- indicator=- :: Precedence variable bounded by activity of u (second)
+%@ con eq_0019_c kind=linear domain=- indicator=- :: Precedence variable bounded by activity of v (first)
+%@ con eq_0019_d kind=linear domain=- indicator=- :: Precedence variable bounded by activity of v (second)
+%@ con eq_0020 kind=linear domain=- indicator=- :: At most one direction of precedence is selected
+%@ con eq_0021 kind=linear domain=- indicator=- :: Both active nodes require a precedence direction
+%@ con eq_0022_a kind=big_m domain=- indicator=- :: Big-M conflict constraint for u before v
+%@ con eq_0022_b kind=big_m domain=- indicator=- :: Big-M conflict constraint for v before u
+%@ con eq_0022_c kind=big_m domain=- indicator=- :: Big-M conflict constraint parameterized by path selections
