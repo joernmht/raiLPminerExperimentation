@@ -89,7 +89,7 @@ matplotlib.use("Agg")  # headless + deterministic; must precede pyplot
 
 import matplotlib.pyplot as plt
 from matplotlib import colors as mcolors
-from matplotlib.patches import Patch, Rectangle
+from matplotlib.patches import FancyArrowPatch, Patch, Rectangle
 
 from corpusbuilder.fingerprint import cluster_label
 from corpusbuilder.game import (
@@ -177,14 +177,20 @@ def _despine(ax, left: bool = True) -> None:
         ax.spines["left"].set_visible(False)
 
 
-def _save(fig, outdir: Path, name: str) -> Path:
-    """Write ``figures/<name>.png`` (300 dpi) and ``.svg``; return the PNG path."""
+def _save(fig, outdir: Path, name: str, *, tight: bool = True) -> Path:
+    """Write ``figures/<name>.png`` (300 dpi) and ``.svg``; return the PNG path.
+
+    ``tight=False`` keeps the figure's declared canvas exactly as drawn — used by
+    the full-bleed 16:9 flow figure, whose whole point is that it drops onto a
+    widescreen slide without a crop changing its aspect ratio.
+    """
     figdir = Path(outdir) / "figures"
     figdir.mkdir(parents=True, exist_ok=True)
+    bbox = "tight" if tight else None
     png = figdir / f"{name}.png"
-    fig.savefig(png, dpi=300, bbox_inches="tight")
+    fig.savefig(png, dpi=300, bbox_inches=bbox)
     # Strip the date so a rerun over unchanged inputs is byte-identical.
-    fig.savefig(figdir / f"{name}.svg", bbox_inches="tight", metadata={"Date": None})
+    fig.savefig(figdir / f"{name}.svg", bbox_inches=bbox, metadata={"Date": None})
     plt.close(fig)
     return png
 
@@ -326,6 +332,40 @@ def data_promotion(promotion_path: Path = PROMOTION) -> dict | None:
     }
 
 
+def data_prisma_flow(prisma_path: Path = PRISMA) -> dict | None:
+    """Flatten ``prisma.json`` into exactly the boxes the flow figure draws."""
+    path = Path(prisma_path)
+    if not path.exists():
+        return None
+    flow = (json.loads(path.read_text(encoding="utf-8")) or {}).get("flow") or {}
+    ident = flow.get("identification") or {}
+    elig = flow.get("retrieval_eligibility") or {}
+    inc = flow.get("included") or {}
+    hitl = inc.get("hitl_review") or {}
+    excluded = elig.get("reports_excluded") or {}
+    verdicts = [
+        {"label": name, "count": int(hitl.get(name, 0) or 0)}
+        for name in ("accepted", "corrected", "duplicate", "rejected", "unreviewed")
+    ]
+    return {
+        "freeze_date": flow.get("freeze_date"),
+        "db_records": int(ident.get("database_search_records", 0) or 0),
+        "db_queries": int(ident.get("database_queries", 0) or 0),
+        "db_duplicates": int(ident.get("duplicates_removed", 0) or 0),
+        "db_unique": int(ident.get("database_unique_records", 0) or 0),
+        "citation_records": int(ident.get("citation_search_records_identified", 0) or 0),
+        "citation_recommended": int(ident.get("citation_search_recommended", 0) or 0),
+        "citation_retrieved": int(elig.get("from_citation_arm", 0) or 0),
+        "retrieved": int(elig.get("reports_retrieved", 0) or 0),
+        "from_database_arm": int(elig.get("from_database_arm", 0) or 0),
+        "excluded_total": int(elig.get("reports_excluded_total", 0) or 0),
+        "excluded": {k: int(v or 0) for k, v in sorted(excluded.items())},
+        "papers_included": int(inc.get("source_papers", 0) or 0),
+        "formulas_total": int(inc.get("candidate_formulations", 0) or 0),
+        "verdicts": verdicts,
+    }
+
+
 def _real_formulations(
     formulations_dir: Path, dossier_dir: Path
 ) -> tuple[list, dict[str, str], dict[str, int]] | None:
@@ -463,7 +503,11 @@ def data_vdemo(vdemo_dir: Path = VDEMO) -> dict | None:
         else:
             continue
         rounds = raw.get("mean_rounds_to_valid")
-        if rounds is None and isinstance(raw.get("rounds_to_valid"), list) and raw["rounds_to_valid"]:
+        if (
+            rounds is None
+            and isinstance(raw.get("rounds_to_valid"), list)
+            and raw["rounds_to_valid"]
+        ):
             rounds = statistics.mean(raw["rounds_to_valid"])
         scenarios.setdefault(scenario, {})[arm] = {
             "runs": runs,
@@ -473,7 +517,6 @@ def data_vdemo(vdemo_dir: Path = VDEMO) -> dict | None:
     if not scenarios:
         return None
     return {"scenarios": {k: scenarios[k] for k in sorted(scenarios)}}
-
 
 
 def _fingerprint_inputs(fingerprint_dir: Path, dossier_dir: Path) -> tuple[dict, dict, dict] | None:
@@ -747,7 +790,9 @@ _YIELD_LEGEND = {
 }
 
 
-def fig_structural_yield(outdir: Path, resolution_path: Path = RESOLUTION, data: dict | None = None):
+def fig_structural_yield(
+    outdir: Path, resolution_path: Path = RESOLUTION, data: dict | None = None
+):
     """Horizontal funnel over the deterministic axes down to beta = 1."""
     data = data or data_structural_yield(resolution_path)
     if not data:
@@ -769,8 +814,13 @@ def fig_structural_yield(outdir: Path, resolution_path: Path = RESOLUTION, data:
         pct = 100.0 * r["value"] / total if total else 0.0
         label = _fmt(r["value"]) if r["class"] == "volume" else f"{_fmt(r['value'])}  ({pct:.1f}%)"
         ax.annotate(
-            label, (r["value"], y), textcoords="offset points", xytext=(6, 0), va="center",
-            fontsize=14, color=INK,
+            label,
+            (r["value"], y),
+            textcoords="offset points",
+            xytext=(6, 0),
+            va="center",
+            fontsize=14,
+            color=INK,
         )
     ax.set_xlim(0, total * 1.22)
     ax.set_title(f"Deterministic structural yield over {_fmt(total)} extracted formulas")
@@ -844,6 +894,288 @@ def fig_objective_status(
     return _save(fig, outdir, "fig_objective_status")
 
 
+_VERDICT_COLOR = {
+    "accepted": CD["tuerkis"],
+    "corrected": CD["midblau"],
+    "duplicate": CD["violett"],
+    "rejected": CD["rot"],
+    # Not a verdict but a remainder: neutral grey so it never reads as an outcome.
+    "unreviewed": "#c2c9d1",
+}
+# Verdict labels alternate between two rows so the narrow segments never collide.
+_VERDICT_ROW = {"accepted": 0, "corrected": 1, "duplicate": 0, "rejected": 1, "unreviewed": 0}
+
+# Flow-figure geometry, in canvas units (1920 x 1080 = the 16:9 slide, y grows down).
+_FW, _FH = 1920.0, 1080.0
+_FMARGIN = 50.0
+_FCOL_W = 413.0
+_FCOL_X = (50.0, 519.0, 988.0, 1457.0)
+_FBOX_H = 205.0
+_FROW_Y = (205.0, 440.0)
+_FARROW = "#9aa4af"
+
+
+def _flow_box(ax, x, y, w, h, *, stage, number, details, color, fill="white", edge=GRID):
+    """One flow box: a muted stage caption, the count, then at most three details."""
+    ax.add_patch(Rectangle((x, y), w, h, facecolor=fill, edgecolor=edge, lw=1.4, zorder=2))
+    ax.text(x + 26, y + 38, stage.upper(), fontsize=13, fontweight="bold", color=MUTED, zorder=3)
+    ax.text(x + 26, y + 102, number, fontsize=40, fontweight="bold", color=color, zorder=3)
+    for i, line in enumerate(details):
+        ax.text(x + 26, y + 138 + 27 * i, line, fontsize=14, color=INK, zorder=3)
+
+
+def _flow_arrow(ax, pts, *, color=_FARROW, dashed=False):
+    """An orthogonal connector through ``pts`` with a single head at the end."""
+    ax.plot(
+        [p[0] for p in pts],
+        [p[1] for p in pts],
+        color=color,
+        lw=2.0,
+        solid_capstyle="round",
+        linestyle=(0, (5, 4)) if dashed else "-",
+        zorder=1,
+    )
+    ax.add_patch(
+        FancyArrowPatch(
+            pts[-2],
+            pts[-1],
+            arrowstyle="-|>",
+            mutation_scale=20,
+            color=color,
+            lw=0.1,
+            shrinkA=0,
+            shrinkB=0,
+            zorder=1,
+        )
+    )
+
+
+def fig_prisma_flow(outdir: Path, prisma_path: Path = PRISMA, data: dict | None = None):
+    """The whole corpus pipeline on one widescreen slide: PRISMA arms across the
+    top, the review verdicts on the extracted formulas as one proportional bar
+    below. Full-bleed 16:9 on white, every count read from ``prisma.json``."""
+    d = data or data_prisma_flow(prisma_path)
+    if not d:
+        return _skip("fig_prisma_flow", f"{Path(prisma_path).name} not found")
+    _style()
+    fig = plt.figure(figsize=(16, 9))
+    ax = fig.add_axes((0, 0, 1, 1))
+    ax.set_xlim(0, _FW)
+    ax.set_ylim(_FH, 0)  # y grows downward: the figure is laid out like a page
+    ax.set_axis_off()
+    # A drawn white ground keeps the saved canvas at exactly 16:9.
+    ax.add_patch(Rectangle((0, 0), _FW, _FH, facecolor="white", edgecolor="none", zorder=0))
+
+    right = _FW - _FMARGIN
+    ax.text(
+        _FMARGIN,
+        88,
+        "Corpus construction: the PRISMA flow",
+        fontsize=30,
+        fontweight="bold",
+        color=CD["dunkelblau"],
+    )
+    ax.text(
+        _FMARGIN,
+        124,
+        "Published railway rescheduling optimization models, two identification arms. "
+        f"Database arm frozen {d.get('freeze_date') or 'n/a'}.",
+        fontsize=16,
+        color=MUTED,
+    )
+
+    stages = ("1 · Identification", "2 · Retrieval & eligibility", "3 · Included", "4 · Extraction")
+    for x, stage in zip(_FCOL_X, stages, strict=True):
+        ax.text(x, 172, stage.upper(), fontsize=14, fontweight="bold", color=CD["dunkelblau"])
+        ax.plot([x, x + _FCOL_W], [186, 186], color=GRID, lw=1.6, zorder=1)
+
+    top, bottom = _FROW_Y
+    mid = top + _FBOX_H / 2
+    c1, c2, c3, c4 = _FCOL_X
+
+    _flow_box(
+        ax,
+        c1,
+        top,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Database search",
+        number=_fmt(d["db_records"]),
+        details=[
+            f"{d['db_queries']} frozen keyword queries",
+            f"−{d['db_duplicates']} duplicates, {d['db_unique']} unique",
+            "all screened on abstract",
+        ],
+        color=CD["midblau"],
+    )
+    _flow_box(
+        ax,
+        c1,
+        bottom,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Citation search",
+        number=_fmt(d["citation_records"]),
+        details=[
+            "backward + forward sweep",
+            f"{_fmt(d['citation_recommended'])} recommended",
+            f"{d['citation_retrieved']} retrieved for mining",
+        ],
+        color=CD["midblau"],
+    )
+    _flow_box(
+        ax,
+        c2,
+        top,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Reports retrieved",
+        number=_fmt(d["retrieved"]),
+        details=[
+            "dossiers with full text",
+            f"{d['from_database_arm']} database + {d['citation_retrieved']} cited",
+        ],
+        color=CD["tuerkis"],
+    )
+    _EXCL_LABEL = {
+        "not_entitled": "no full-text access",
+        "no_machine_readable_formulas": "no MathML formulas",
+        "awaiting_tier3_pdf": "await Tier-3 PDF pass",
+    }
+    excl = d["excluded"]
+    _flow_box(
+        ax,
+        c2,
+        bottom,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Excluded at eligibility",
+        number=_fmt(d["excluded_total"]),
+        details=[f"{excl[k]} {_EXCL_LABEL[k]}" for k in _EXCL_LABEL if k in excl],
+        color=CD["rot"],
+        fill="#fdf3f5",
+        edge="#f0ced8",
+    )
+    _flow_box(
+        ax,
+        c3,
+        top,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Source papers included",
+        number=_fmt(d["papers_included"]),
+        details=[
+            "at least one recoverable",
+            "optimization formulation",
+        ],
+        color=CD["tuerkis"],
+    )
+    _flow_box(
+        ax,
+        c4,
+        top,
+        _FCOL_W,
+        _FBOX_H,
+        stage="Candidate formulations",
+        number=_fmt(d["formulas_total"]),
+        details=[
+            "MathML → LaTeX records",
+            "one per displayed equation",
+        ],
+        color=CD["tuerkis"],
+    )
+
+    junction = c2 - 28
+    _flow_arrow(ax, [(c1 + _FCOL_W, mid), (c2, mid)])
+    _flow_arrow(
+        ax,
+        [
+            (c1 + _FCOL_W, bottom + _FBOX_H / 2),
+            (junction, bottom + _FBOX_H / 2),
+            (junction, mid),
+            (c2, mid),
+        ],
+    )
+    _flow_arrow(ax, [(c2 + _FCOL_W, mid), (c3, mid)])
+    _flow_arrow(ax, [(c3 + _FCOL_W, mid), (c4, mid)])
+    _flow_arrow(ax, [(c2 + _FCOL_W / 2, top + _FBOX_H), (c2 + _FCOL_W / 2, bottom)])
+
+    # ---- the review band -------------------------------------------------
+    band_y, bar_y, bar_h = 720.0, 762.0, 70.0
+    total = d["formulas_total"] or 1
+    ax.text(
+        _FMARGIN,
+        band_y - 12,
+        f"5 · HUMAN REVIEW — ONE VERDICT PER EXTRACTED FORMULATION ({_fmt(total)})",
+        fontsize=14,
+        fontweight="bold",
+        color=CD["dunkelblau"],
+    )
+    ax.plot([_FMARGIN, right], [band_y, band_y], color=GRID, lw=1.6, zorder=1)
+    _flow_arrow(
+        ax,
+        [(c4 + _FCOL_W / 2, top + _FBOX_H), (c4 + _FCOL_W / 2, band_y - 44)],
+        dashed=True,
+    )
+
+    span = right - _FMARGIN
+    cursor = _FMARGIN
+    rows = (866.0, 912.0)
+    for v in d["verdicts"]:
+        name, count = v["label"], v["count"]
+        w = span * count / total
+        colour = _VERDICT_COLOR[name]
+        ax.add_patch(
+            Rectangle(
+                (cursor, bar_y), w, bar_h, facecolor=colour, edgecolor="white", lw=1.0, zorder=2
+            )
+        )
+        centre = cursor + w / 2
+        if w > 44:
+            ax.text(
+                centre,
+                bar_y + bar_h / 2 + 8,
+                _fmt(count),
+                fontsize=20,
+                fontweight="bold",
+                ha="center",
+                color="white" if name != "unreviewed" else INK,
+                zorder=3,
+            )
+        row = rows[_VERDICT_ROW[name]]
+        last = name == d["verdicts"][-1]["label"]
+        tick_x = min(centre, right - 6) if not last else cursor + w / 2
+        ax.plot([tick_x, tick_x], [bar_y + bar_h, row - 18], color="#c7ced6", lw=1.2, zorder=1)
+        ax.text(
+            right if last else centre,
+            row,
+            f"{name}  {100 * count / total:.1f}%",
+            fontsize=17,
+            color=INK,
+            ha="right" if last else "center",
+            zorder=3,
+        )
+        cursor += w
+
+    ax.text(
+        _FMARGIN,
+        972,
+        "“Corrected” formulations enter the corpus with the reviewer's LaTeX; "
+        "“duplicate” marks a re-print of a formulation already held.",
+        fontsize=14,
+        color=MUTED,
+    )
+    ax.text(
+        _FMARGIN,
+        1024,
+        "Derived from corpus/prisma.json (corpusbuilder.prisma) — the single source of "
+        "truth for every count in the paper's PRISMA diagram.",
+        fontsize=13,
+        color=MUTED,
+    )
+    return _save(fig, outdir, "fig_prisma_flow", tight=False)
+
+
 def fig_promotion(outdir: Path, promotion_path: Path = PROMOTION, data: dict | None = None):
     """Promotion outcomes: promoted papers vs failures by cause and category."""
     data = data or data_promotion(promotion_path)
@@ -865,8 +1197,13 @@ def fig_promotion(outdir: Path, promotion_path: Path = PROMOTION, data: dict | N
     ax.invert_yaxis()
     for y, v in zip(ypos, values, strict=True):
         ax.annotate(
-            str(v), (v, y), textcoords="offset points", xytext=(6, 0), va="center",
-            fontsize=14, color=INK,
+            str(v),
+            (v, y),
+            textcoords="offset points",
+            xytext=(6, 0),
+            va="center",
+            fontsize=14,
+            color=INK,
         )
     seen = sorted({info["category"] for _, info in causes})
     handles = [Patch(color=CD["tuerkis"], label="promoted")] + [
@@ -908,12 +1245,15 @@ def fig_architectures(
     labels = []
     for row, fam in enumerate(families):
         years = fam["years"]
-        ax.plot(
-            [min(years), max(years)], [row, row], color=GRID, linewidth=1.5, zorder=1
-        )
+        ax.plot([min(years), max(years)], [row, row], color=GRID, linewidth=1.5, zorder=1)
         ax.scatter(
-            years, [row] * len(years), s=110, color=CD["tuerkis"], zorder=2,
-            edgecolors="white", linewidths=1.5,
+            years,
+            [row] * len(years),
+            s=110,
+            color=CD["tuerkis"],
+            zorder=2,
+            edgecolors="white",
+            linewidths=1.5,
         )
         tick = " (iso verified)" if fam["iso_verified"] else ""
         labels.append(f"{fam['hash'][:8]} · {len(fam['papers'])} papers{tick}")
@@ -994,7 +1334,10 @@ def fig_vdemo(outdir: Path, vdemo_dir: Path = VDEMO, data: dict | None = None):
         return _skip("fig_vdemo", f"no summary.json under {vdemo_dir}")
     _style()
     scenarios = sorted(data["scenarios"])
-    arms = [("feedback", "with verifier feedback", CD["tuerkis"]), ("single", "without", CD["midblau"])]
+    arms = [
+        ("feedback", "with verifier feedback", CD["tuerkis"]),
+        ("single", "without", CD["midblau"]),
+    ]
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.6), constrained_layout=True)
     width = 0.38
     xs = list(range(len(scenarios)))
@@ -1011,8 +1354,13 @@ def fig_vdemo(outdir: Path, vdemo_dir: Path = VDEMO, data: dict | None = None):
         for x, r in zip(offs, rates, strict=True):
             if r is not None:
                 ax1.annotate(
-                    f"{100 * r:.0f}%", (x, r), textcoords="offset points", xytext=(0, 3),
-                    ha="center", fontsize=13, color=INK,
+                    f"{100 * r:.0f}%",
+                    (x, r),
+                    textcoords="offset points",
+                    xytext=(0, 3),
+                    ha="center",
+                    fontsize=13,
+                    color=INK,
                 )
         rounds = [data["scenarios"][s].get(arm, {}).get("mean_rounds_to_valid") for s in scenarios]
         ax2.bar(
@@ -1024,8 +1372,13 @@ def fig_vdemo(outdir: Path, vdemo_dir: Path = VDEMO, data: dict | None = None):
         for x, r in zip(offs, rounds, strict=True):
             if r is not None:
                 ax2.annotate(
-                    f"{r:.1f}", (x, r), textcoords="offset points", xytext=(0, 3),
-                    ha="center", fontsize=13, color=INK,
+                    f"{r:.1f}",
+                    (x, r),
+                    textcoords="offset points",
+                    xytext=(0, 3),
+                    ha="center",
+                    fontsize=13,
+                    color=INK,
                 )
     ax1.set_ylim(0, 1.12)
     ax1.set_ylabel("valid rate")
@@ -1039,7 +1392,6 @@ def fig_vdemo(outdir: Path, vdemo_dir: Path = VDEMO, data: dict | None = None):
         ax.set_axisbelow(True)
     ax1.legend(loc="upper right")
     return _save(fig, outdir, "fig_vdemo")
-
 
 
 def _fp_colors(k: int) -> list:
@@ -1081,9 +1433,7 @@ def fig_fingerprint_families(
     _style()
     fams = data["clusters"]
     colors = _fp_colors(len(fams))
-    fig, ax = plt.subplots(
-        figsize=(11, 1.9 + 0.62 * len(fams)), constrained_layout=True
-    )
+    fig, ax = plt.subplots(figsize=(11, 1.9 + 0.62 * len(fams)), constrained_layout=True)
     labels = []
     all_years: list[int] = []
     for row, (fam, color) in enumerate(zip(fams, colors, strict=True)):
@@ -1091,9 +1441,7 @@ def fig_fingerprint_families(
         years = [m["year"] for m in pts]
         all_years += years
         if years:
-            ax.plot(
-                [min(years), max(years)], [row, row], color=GRID, linewidth=1.5, zorder=1
-            )
+            ax.plot([min(years), max(years)], [row, row], color=GRID, linewidth=1.5, zorder=1)
         ax.scatter(
             years,
             [row] * len(pts),
@@ -1179,6 +1527,7 @@ def fig_fingerprint_timeline(
 # ---------------------------------------------------------------------------
 
 _ALIASES = {
+    "fig0": ("prisma_flow",),
     "fig1": ("timeline",),
     "fig2": ("formulas_by_year",),
     "fig3": ("structural_yield",),
@@ -1189,6 +1538,7 @@ _ALIASES = {
     "fig8": ("fingerprint_families", "fingerprint_timeline"),
 }
 _ORDER = [
+    "prisma_flow",
     "timeline",
     "formulas_by_year",
     "structural_yield",
@@ -1217,13 +1567,24 @@ def _select(only: str | None) -> list[str]:
         elif token.removeprefix("fig_") in _ORDER:
             picked.add(token.removeprefix("fig_"))
         else:
-            raise SystemExit(f"unknown figure selector: {token!r} (use fig1..fig8 or names)")
+            raise SystemExit(f"unknown figure selector: {token!r} (use fig0..fig8 or names)")
     return [name for name in _ORDER if name in picked]
 
 
 def _caption(name: str, numbers: dict) -> str:
     """A paste-ready slide caption per figure, from the figure's own numbers."""
     n = numbers.get(name) or {}
+    if name == "prisma_flow":
+        verdicts = {v["label"]: v["count"] for v in n.get("verdicts", [])}
+        return (
+            f"PRISMA flow of the corpus: {_fmt(n.get('db_records', 0))} database records and "
+            f"{_fmt(n.get('citation_records', 0))} citation-search neighbours yield "
+            f"{n.get('retrieved', 0)} retrieved reports, {n.get('excluded_total', 0)} excluded at "
+            f"eligibility, {n.get('papers_included', 0)} papers included and "
+            f"{_fmt(n.get('formulas_total', 0))} candidate formulations, of which "
+            f"{_fmt(verdicts.get('accepted', 0))} are accepted and "
+            f"{_fmt(verdicts.get('corrected', 0))} corrected in review."
+        )
     if name == "timeline":
         span = n.get("span") or ["?", "?"]
         return (
@@ -1309,6 +1670,8 @@ def run(
     papers = load_papers(dossier_dir)
 
     numbers: dict[str, dict | None] = {}
+    if "prisma_flow" in selected:
+        numbers["prisma_flow"] = data_prisma_flow(prisma_path)
     if "timeline" in selected:
         numbers["timeline"] = data_timeline(papers)
     if "formulas_by_year" in selected:
@@ -1331,6 +1694,7 @@ def run(
         numbers["fingerprint_timeline"] = data_fingerprint_timeline(fingerprint_dir, dossier_dir)
 
     figures = {
+        "prisma_flow": lambda: fig_prisma_flow(out, prisma_path, data=numbers.get("prisma_flow")),
         "timeline": lambda: fig_timeline(out, dossier_dir, data=numbers.get("timeline")),
         "formulas_by_year": lambda: fig_formulas_by_year(
             out, dossier_dir, data=numbers.get("formulas_by_year")

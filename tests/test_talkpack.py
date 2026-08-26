@@ -102,10 +102,32 @@ def corpus(tmp_path: Path) -> dict:
         json.dumps(
             {
                 "flow": {
-                    "identification": {"citation_search_records_identified": 40},
+                    "freeze_date": "2020-01-01",
+                    "identification": {
+                        "database_search_records": 6,
+                        "database_queries": 2,
+                        "duplicates_removed": 1,
+                        "database_unique_records": 5,
+                        "citation_search_records_identified": 40,
+                        "citation_search_recommended": 12,
+                    },
                     "retrieval_eligibility": {
                         "reports_retrieved": 4,
+                        "from_database_arm": 3,
+                        "from_citation_arm": 1,
+                        "reports_excluded": {"not_entitled": 1},
                         "reports_excluded_total": 1,
+                    },
+                    "included": {
+                        "source_papers": 3,
+                        "candidate_formulations": 9,
+                        "hitl_review": {
+                            "accepted": 4,
+                            "corrected": 1,
+                            "duplicate": 1,
+                            "rejected": 2,
+                            "unreviewed": 1,
+                        },
                     },
                 }
             }
@@ -163,6 +185,49 @@ def test_load_papers_included_and_sorted(corpus: dict) -> None:
     inc = talkpack._included(papers)
     assert len(inc) == 3  # the empty dossier is metadata-only
     assert all(p["n_formulas"] > 0 for p in inc)
+
+
+def test_data_prisma_flow(corpus: dict) -> None:
+    data = talkpack.data_prisma_flow(corpus["prisma"])
+    assert data["freeze_date"] == "2020-01-01"
+    assert (data["db_records"], data["db_queries"], data["db_unique"]) == (6, 2, 5)
+    assert (data["citation_records"], data["citation_recommended"]) == (40, 12)
+    assert (data["retrieved"], data["from_database_arm"], data["citation_retrieved"]) == (4, 3, 1)
+    assert data["excluded"] == {"not_entitled": 1}
+    assert (data["papers_included"], data["formulas_total"]) == (3, 9)
+    # Verdict order is the pipeline's own order, not the JSON's key order.
+    assert [v["label"] for v in data["verdicts"]] == [
+        "accepted",
+        "corrected",
+        "duplicate",
+        "rejected",
+        "unreviewed",
+    ]
+    # Every extracted formulation carries exactly one verdict.
+    assert sum(v["count"] for v in data["verdicts"]) == data["formulas_total"]
+
+
+def test_data_prisma_flow_missing_artifact(tmp_path) -> None:
+    assert talkpack.data_prisma_flow(tmp_path / "nope.json") is None
+
+
+def _png_size(path) -> tuple[int, int]:
+    """Width/height straight out of the PNG IHDR chunk (no image library)."""
+    head = Path(path).read_bytes()[16:24]
+    return int.from_bytes(head[:4], "big"), int.from_bytes(head[4:], "big")
+
+
+def test_fig_prisma_flow_is_uncropped_widescreen(corpus: dict) -> None:
+    png = talkpack.fig_prisma_flow(corpus["out"], corpus["prisma"])
+    assert png is not None and png.exists()
+    assert png.with_suffix(".svg").exists()
+    # The whole point of tight=False: the canvas stays exactly 16:9 for a slide.
+    w, h = _png_size(png)
+    assert w / h == pytest.approx(16 / 9, abs=1e-3)
+
+
+def test_fig_prisma_flow_skips_without_artifact(corpus: dict, tmp_path) -> None:
+    assert talkpack.fig_prisma_flow(corpus["out"], tmp_path / "nope.json") is None
 
 
 def test_data_timeline(corpus: dict) -> None:
@@ -275,9 +340,7 @@ def test_fig_architectures_gate_skips(corpus: dict, capsys) -> None:
 
 
 def test_fig_taxonomy_gate_skips(corpus: dict, capsys) -> None:
-    assert (
-        talkpack.fig_taxonomy(corpus["out"], corpus["formulations"], corpus["dossiers"]) is None
-    )
+    assert talkpack.fig_taxonomy(corpus["out"], corpus["formulations"], corpus["dossiers"]) is None
     assert "skip fig_taxonomy" in capsys.readouterr().out
 
 
@@ -317,6 +380,7 @@ def _run_all(corpus: dict, only: str | None = None) -> dict:
 def test_run_full_pack(corpus: dict) -> None:
     summary = _run_all(corpus)
     assert summary["rendered"] == [
+        "prisma_flow",
         "timeline",
         "formulas_by_year",
         "structural_yield",
