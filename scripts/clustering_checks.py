@@ -43,9 +43,10 @@ def m3_taxonomy() -> dict:
     tax = induce(models)
     part = tax.level_m.named_partition()
     clusters = []
-    for members, label in sorted(part.items(), key=lambda kv: (-len(kv[0]), kv[1])):
-        ids = sorted(m.split("::", 1)[0] for m in members)
-        clusters.append({"label": label, "size": len(ids), "members": ids})
+    # named_partition() maps cluster label -> tuple of member entity keys
+    for label, members in sorted(part.items(), key=lambda kv: (-len(kv[1]), str(kv[0]))):
+        ids = sorted(str(m).split("::", 1)[0] for m in members)
+        clusters.append({"label": str(label), "size": len(ids), "members": ids})
     return {"models": len(models), "m_clusters": len(clusters), "clusters": clusters}
 
 
