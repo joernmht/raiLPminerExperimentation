@@ -180,5 +180,99 @@ def main() -> None:
     ef._save(fig, "fig_graph_wl_twins")
 
 
+def figure_similar() -> None:
+    """Similarity without identity: crew pairing ~ vehicle scheduling.
+
+    Two independent code repositories; both models minimize a binary
+    selection under exactly-one cover constraints (rosters covering flights,
+    connections covering trips). Core-WL similarity by depth: 0.51 at
+    iteration 0 (shared anatomy), 0.31 at <=1, 0.21 at <=3 (diverging fine
+    wiring) — measured live below, the figure refuses to render stale numbers.
+    """
+    from collections import Counter
+
+    from corpusbuilder.wlcluster import cosine, wl_features
+
+    a = load("corpus/repo_formulations/"
+             "Yinwenxu-1212__crewScheduling__crew-pairing-set-covering-master.json")
+    b = load("corpus/repo_formulations/lintim__openlintim__vehicle-scheduling-ip.json")
+    fa, fb = wl_features(a), wl_features(b)
+
+    def at_depth(c, dmax):
+        return Counter({k: v for k, v in c.items() if int(k.split(":")[0]) <= dmax})
+
+    sims = [cosine(at_depth(fa, d), at_depth(fb, d)) for d in (0, 1, 3)]
+
+    ga, gb = schema_nx(a), schema_nx(b)
+
+    def core(g):
+        und = g.to_undirected()
+        return g.subgraph([n for n in und if und.degree(n) > 0])
+
+    ga, gb = core(ga), core(gb)
+    ef._style()
+    W, H = 12.5, 8.4
+    fig = plt.figure(figsize=(W, H))
+    fig.patch.set_facecolor("white")
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.set_xlim(0, W)
+    ax.set_ylim(H, 0)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.text(0.35, 0.42,
+            "Similarity without identity: crew pairing ~ vehicle scheduling",
+            fontsize=21, fontweight="bold", color=ef.INK, ha="left", va="top")
+    ax.text(0.35, 0.90,
+            "two independent code repositories; both minimize a binary selection "
+            "under exactly-one cover constraints — connected cores, WL similarity "
+            "by depth",
+            fontsize=13.5, style="italic", color=ef.MUTED, ha="left", va="top")
+    half = (W - 1.4) / 2
+    for gx, x0, head, sub1, sub2 in (
+        (ga, 0.5, "crew-pairing set-covering master",
+         "crewScheduling repo · rosters cover flights and duties",
+         f"{ga.number_of_nodes()} nodes, {ga.number_of_edges()} edges"),
+        (gb, 0.9 + half, "vehicle-scheduling IP",
+         "LinTim · connections cover trips (in/out degree = 1)",
+         f"{gb.number_of_nodes()} nodes, {gb.number_of_edges()} edges"),
+    ):
+        ax.text(x0 + half / 2, 1.30, head, fontsize=13.5,
+                fontweight="bold", color=ef.INK, ha="center", va="top")
+        ax.text(x0 + half / 2, 1.62, sub1, fontsize=12,
+                color=ef.MUTED, ha="center", va="top")
+        ax.text(x0 + half / 2, 1.90, sub2, fontsize=12,
+                color=ef.MUTED, ha="center", va="top")
+        ef.draw_schema_graph(fig, x0, 2.2, half, H - 4.35, gx, W, H,
+                             node_size=190)
+    # depth-similarity strip
+    y0 = H - 1.95
+    ax.text(0.5, y0, "core-WL similarity by depth:", fontsize=13.5,
+            fontweight="bold", color=ef.INK, ha="left", va="center")
+    labels = ["iteration 0 (anatomy)", "depth <= 1", "depth <= 3 (fine wiring)"]
+    x = 4.1
+    for lab, s in zip(labels, sims, strict=True):
+        bw = 2.4
+        ax.add_patch(plt.Rectangle((x, y0 - 0.14), bw, 0.28, facecolor="#e7ecef",
+                                   edgecolor="none", zorder=1))
+        ax.add_patch(plt.Rectangle((x, y0 - 0.14), bw * s, 0.28,
+                                   facecolor=ef.CD["tuerkis"], edgecolor="none",
+                                   zorder=2))
+        ax.text(x + bw / 2, y0 + 0.36, lab, fontsize=11.5, color=ef.MUTED,
+                ha="center", va="center")
+        ax.text(x + bw + 0.12, y0, f"{s:.2f}", fontsize=13, fontweight="bold",
+                color=ef.INK, ha="left", va="center")
+        x += bw + 0.62
+    from collections import Counter as C2
+
+    both = C2()
+    for gx in (ga, gb):
+        for _, dat in gx.nodes(data=True):
+            both[dat.get("cls")] += 1
+    ef.graph_legend(ax, 0.5, H - 1.15, W - 1.0,
+                    {k: both.get(k, 0) for k in ef.CLS_ORDER if both.get(k)})
+    ef._save(fig, "fig_graph_wl_similar")
+
+
 if __name__ == "__main__":
     main()
+    figure_similar()
