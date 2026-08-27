@@ -95,6 +95,7 @@ def _style() -> None:
             "figure.facecolor": "white",
             "axes.facecolor": "white",
             "savefig.facecolor": "white",
+            "pdf.fonttype": 42,  # embed TrueType: what publishers want, not Type 3
             "font.family": "DejaVu Sans",
             "font.size": 14,
             "text.color": INK,
@@ -109,6 +110,8 @@ def _save(fig, name: str) -> Path:
     png = OUTDIR / f"{name}.png"
     fig.savefig(png, dpi=300, bbox_inches="tight")
     fig.savefig(OUTDIR / f"{name}.svg", bbox_inches="tight", metadata={"Date": None})
+    # PDF twin for LaTeX: vector with fonts embedded (the SVG keeps text as text).
+    fig.savefig(OUTDIR / f"{name}.pdf", bbox_inches="tight", metadata={"CreationDate": None})
     plt.close(fig)
     return png
 

@@ -166,6 +166,7 @@ def _style() -> None:
             "axes.linewidth": 1.0,
             "svg.hashsalt": "talkpack",  # stable SVG ids across runs
             "svg.fonttype": "none",  # text stays text: small + deterministic
+            "pdf.fonttype": 42,  # embed TrueType: what publishers want, not Type 3
         }
     )
 
@@ -191,6 +192,9 @@ def _save(fig, outdir: Path, name: str, *, tight: bool = True) -> Path:
     fig.savefig(png, dpi=300, bbox_inches=bbox)
     # Strip the date so a rerun over unchanged inputs is byte-identical.
     fig.savefig(figdir / f"{name}.svg", bbox_inches=bbox, metadata={"Date": None})
+    # PDF is the LaTeX twin: vector, fonts embedded, and the only format the
+    # paper repository takes (the SVG keeps text as text and needs the fonts).
+    fig.savefig(figdir / f"{name}.pdf", bbox_inches=bbox, metadata={"CreationDate": None})
     plt.close(fig)
     return png
 

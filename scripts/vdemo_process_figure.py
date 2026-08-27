@@ -601,6 +601,8 @@ def figure(d: dict) -> Path:
     fig.savefig(png, dpi=300, bbox_inches="tight")
     fig.savefig(ef.OUTDIR / "fig_vdemo_process.svg", bbox_inches="tight",
                 metadata={"Date": None})
+    fig.savefig(ef.OUTDIR / "fig_vdemo_process.pdf", bbox_inches="tight",
+                metadata={"CreationDate": None})
     plt.close(fig)
     return png
 
