@@ -1,0 +1,964 @@
+{
+  "schema_version": "0.1.0",
+  "id": "gurobi__railway-dispatching-mip",
+  "name": "Railway dispatching on shared resources",
+  "family": "milp",
+  "description": "Dispatching MILP: every train follows an ordered route over shared resources (tracks and stations); continuous timing variables are coupled by big-M disjunctions that decide, for each pair of trains sharing a resource, whether one precedes the other or the two meet there.",
+  "tags": [],
+  "provenance": {
+    "source": "https://github.com/Gurobi/modeling-examples",
+    "reference": "railway_dispatching/railway_dispatching.ipynb (Apache-2.0)",
+    "author": "Gurobi modeling-examples",
+    "date": ""
+  },
+  "indices": [
+    {
+      "name": "I",
+      "description": "Trains requiring scheduling.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Resources (tracks and stations), ordered along a train route, so that r+1 is the next resource of the route under consideration.",
+      "ordered": true,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "dur",
+      "description": "Duration for which a train occupies resource r.",
+      "shape": [
+        "R"
+      ],
+      "kind": "vector",
+      "domain_class": "time_duration"
+    },
+    {
+      "name": "first",
+      "description": "1 if r is the first resource of the route.",
+      "shape": [
+        "R"
+      ],
+      "kind": "vector",
+      "domain_class": "network_structure"
+    },
+    {
+      "name": "last",
+      "description": "1 if r is the final resource of the route.",
+      "shape": [
+        "R"
+      ],
+      "kind": "vector",
+      "domain_class": "network_structure"
+    },
+    {
+      "name": "single",
+      "description": "1 if resource r has unit capacity.",
+      "shape": [
+        "R"
+      ],
+      "kind": "vector",
+      "domain_class": "capacity"
+    },
+    {
+      "name": "M",
+      "description": "Big-M constant, the sum of all durations times the number of trains.",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": "penalty_bigM"
+    }
+  ],
+  "variables": [
+    {
+      "name": "t",
+      "description": "Time at which train i starts occupying resource r.",
+      "shape": [
+        "I",
+        "R"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": "timing"
+    },
+    {
+      "name": "tF",
+      "description": "Finish time of train i at its endpoint.",
+      "shape": [
+        "I"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": "timing"
+    },
+    {
+      "name": "y",
+      "description": "1 if train i precedes train j at resource r.",
+      "shape": [
+        "I",
+        "I",
+        "R"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "indicator",
+      "domain_role": "ordering_precedence"
+    },
+    {
+      "name": "x",
+      "description": "1 if trains i and j meet at resource r.",
+      "shape": [
+        "I",
+        "I",
+        "R"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "indicator",
+      "domain_role": "ordering_precedence"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "route_precedence",
+      "description": "A train reaches the next resource of its route only after it has occupied the current one.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r+1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "dur",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "ordering",
+      "domain_class": "precedence_ordering",
+      "indicator": null
+    },
+    {
+      "name": "finish_time_link",
+      "description": "The finish time of a train is its entry into the final resource plus that resource's duration.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": {
+            "parameter": "last",
+            "equals": 1
+          }
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "tF",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "dur",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": "coupling_linking_definition",
+      "indicator": null
+    },
+    {
+      "name": "start_position",
+      "description": "Trains are already in the network, so entry into the first resource is at time zero.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": {
+            "parameter": "first",
+            "equals": 1
+          }
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": "variable_bound_fix",
+      "indicator": null
+    },
+    {
+      "name": "conflict_i_before_j",
+      "description": "If train i precedes train j at r, then j does not enter r before i has moved on.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "I",
+          "restriction": "ne_other",
+          "restriction_other": "i",
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r+1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "big_m",
+      "domain_class": "headway_separation",
+      "indicator": null
+    },
+    {
+      "name": "conflict_j_before_i",
+      "description": "If train j precedes train i at r, then i does not enter r before j has moved on.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "I",
+          "restriction": "ne_other",
+          "restriction_other": "i",
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r+1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "big_m",
+      "domain_class": "headway_separation",
+      "indicator": null
+    },
+    {
+      "name": "conflict_meet",
+      "description": "If the two trains meet at r, then j is still there when i arrives.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "I",
+          "restriction": "ne_other",
+          "restriction_other": "i",
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r+1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "big_m",
+      "domain_class": "headway_separation",
+      "indicator": null
+    },
+    {
+      "name": "situation_exclusive",
+      "description": "Exactly one of the three situations holds for each pair of trains at a shared resource.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "I",
+          "restriction": "ne_other",
+          "restriction_other": "i",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "set_packing",
+      "domain_class": "assignment_covering",
+      "indicator": null
+    },
+    {
+      "name": "unit_capacity",
+      "description": "On a unit-capacity resource no two trains may meet.",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": {
+            "parameter": "single",
+            "equals": 1
+          }
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "I",
+          "restriction": "ne_other",
+          "restriction_other": "i",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "capacity",
+      "domain_class": "capacity_resource",
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "total_delay",
+    "description": "Total delay: the finish times minus the unavoidable minimum running time of each route.",
+    "terms": [
+      {
+        "ref": "tF",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "I",
+            "expr": "i",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "I"
+        ]
+      },
+      {
+        "ref": "dur",
+        "ref_kind": "parameter",
+        "bindings": [
+          {
+            "index": "R",
+            "expr": "r",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": -1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "I",
+          "R"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}
