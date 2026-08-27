@@ -1,0 +1,38 @@
+% lp2graph canonical LaTeX
+%@ meta id=gurobi__railway-dispatching-mip family=milp schema=0.1.0
+%@ name :: Railway dispatching on shared resources
+%@ desc :: Dispatching MILP: every train follows an ordered route over shared resources (tracks and stations); continuous timing variables are coupled by big-M disjunctions that decide, for each pair of trains sharing a resource, whether one precedes the other or the two meet there.
+%@ prov source :: https://github.com/Gurobi/modeling-examples
+%@ prov reference :: railway_dispatching/railway_dispatching.ipynb (Apache-2.0)
+%@ prov author :: Gurobi modeling-examples
+%@ index I ordered=0 cyclic=0 :: Trains requiring scheduling.
+%@ index R ordered=1 cyclic=0 :: Resources (tracks and stations), ordered along a train route, so that r+1 is the next resource of the route under consideration.
+%@ param dur shape=R kind=vector domain=time_duration :: Duration for which a train occupies resource r.
+%@ param first shape=R kind=vector domain=network_structure :: 1 if r is the first resource of the route.
+%@ param last shape=R kind=vector domain=network_structure :: 1 if r is the final resource of the route.
+%@ param single shape=R kind=vector domain=capacity :: 1 if resource r has unit capacity.
+%@ param M shape=- kind=big_m domain=penalty_bigM :: Big-M constant, the sum of all durations times the number of trains.
+%@ var t shape=I,R domain=non_negative role=primary drole=timing lo=- hi=- :: Time at which train i starts occupying resource r.
+%@ var tF shape=I domain=non_negative role=primary drole=timing lo=- hi=- :: Finish time of train i at its endpoint.
+%@ var y shape=I,I,R domain=binary role=indicator drole=ordering_precedence lo=- hi=- :: 1 if train i precedes train j at resource r.
+%@ var x shape=I,I,R domain=binary role=indicator drole=ordering_precedence lo=- hi=- :: 1 if trains i and j meet at resource r.
+%@ obj sense=min name=total_delay combination=sum :: Total delay: the finish times minus the unavoidable minimum running time of each route.
+%@ con route_precedence kind=ordering domain=precedence_ordering indicator=- :: A train reaches the next resource of its route only after it has occupied the current one.
+%@ con finish_time_link kind=linear domain=coupling_linking_definition indicator=- :: The finish time of a train is its entry into the final resource plus that resource's duration.
+%@ con start_position kind=linear domain=variable_bound_fix indicator=- :: Trains are already in the network, so entry into the first resource is at time zero.
+%@ con conflict_i_before_j kind=big_m domain=headway_separation indicator=- :: If train i precedes train j at r, then j does not enter r before i has moved on.
+%@ con conflict_j_before_i kind=big_m domain=headway_separation indicator=- :: If train j precedes train i at r, then i does not enter r before j has moved on.
+%@ con conflict_meet kind=big_m domain=headway_separation indicator=- :: If the two trains meet at r, then j is still there when i arrives.
+%@ con situation_exclusive kind=set_packing domain=assignment_covering indicator=- :: Exactly one of the three situations holds for each pair of trains at a shared resource.
+%@ con unit_capacity kind=capacity domain=capacity_resource indicator=- :: On a unit-capacity resource no two trains may meet.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{I}} \mathit{tF}_{i} - \sum_{i \in \mathcal{I}, r \in \mathcal{R}} \mathit{dur}_{r} \tag{total\_delay} \\
+  & t_{i,r+1} - t_{i,r} \ge \mathit{dur}_{r} \qquad \forall i \in \mathcal{I},\; \forall r \in \mathcal{R} \tag{route\_precedence} \\
+  & \mathit{tF}_{i} - t_{i,r} = \mathit{dur}_{r} \qquad \forall i \in \mathcal{I},\; \forall r \in \mathcal{R},\; \mathit{last}_{r} = 1 \tag{finish\_time\_link} \\
+  & t_{i,r} \le 0 \qquad \forall i \in \mathcal{I},\; \forall r \in \mathcal{R},\; \mathit{first}_{r} = 1 \tag{start\_position} \\
+  & t_{j,r} - t_{i,r+1} + \mathit{M} - \mathit{M} \cdot y_{i,j,r} \ge 0 \qquad \forall r \in \mathcal{R},\; \forall i \in \mathcal{I},\; \forall j \in \mathcal{I},\; j \neq i \tag{conflict\_i\_before\_j} \\
+  & t_{i,r} - t_{j,r+1} + \mathit{M} - \mathit{M} \cdot y_{j,i,r} \ge 0 \qquad \forall r \in \mathcal{R},\; \forall i \in \mathcal{I},\; \forall j \in \mathcal{I},\; j \neq i \tag{conflict\_j\_before\_i} \\
+  & t_{j,r+1} - t_{i,r} + \mathit{M} - \mathit{M} \cdot x_{i,j,r} \ge 0 \qquad \forall r \in \mathcal{R},\; \forall i \in \mathcal{I},\; \forall j \in \mathcal{I},\; j \neq i \tag{conflict\_meet} \\
+  & y_{i,j,r} + y_{j,i,r} + x_{i,j,r} = 1 \qquad \forall r \in \mathcal{R},\; \forall i \in \mathcal{I},\; \forall j \in \mathcal{I},\; j \neq i \tag{situation\_exclusive} \\
+  & x_{i,j,r} = 0 \qquad \forall r \in \mathcal{R},\; \mathit{single}_{r} = 1,\; \forall i \in \mathcal{I},\; \forall j \in \mathcal{I},\; j \neq i \tag{unit\_capacity} \\
+\end{align}

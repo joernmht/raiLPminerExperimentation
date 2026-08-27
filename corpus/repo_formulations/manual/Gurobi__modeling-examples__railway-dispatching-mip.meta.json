@@ -1,0 +1,22 @@
+{
+  "area": "railway-rescheduling (dispatching on shared tracks)",
+  "conversion": "manual",
+  "excluded_rows": [
+    "resource_capacity_hotspot"
+  ],
+  "extraction_confidence": "high",
+  "license": "Apache-2.0",
+  "model_id": "railway-dispatching-mip",
+  "notes": [
+    "Hand-canonicalised from the structured extraction in lp2graph/corpus/Gurobi__modeling-examples.json; the automatic converter refuses this model (see _report.json: 'sum binder \\{i,j\\} \\subseteq S maps to no declared index family').",
+    "Excluded row 'resource_capacity_hotspot': the hotspot cut sum_{{i,j} subset S} x_{i,j,r} <= C(c_r+1,2)-1 binds a sum over subsets of a set and is outside the canonical grammar. The capacity parameter c_r is therefore not declared here; unit-capacity resources are covered by 'unit_capacity'.",
+    "Index family R is declared ordered so that r+1 denotes the next resource of the route under consideration; 'first', 'last' and 'single' are 0/1 attributes read by quantifier where-predicates, matching the source's per-route first/last resource and its capacity-1 resources.",
+    "Source model row 'conflict_meet_pair' is a conjunction of two inequalities; only the first is carried here, as 'conflict_meet'.",
+    "Used as the worked example of the Paper-1 figure fig:anatomy; every claim in that figure is checked by scripts/checks/anatomy_figure_check.py.",
+    "Grounds and solves: cardinalities I=2, R=3, dur=[2,3,2], first=[1,0,0], last=[0,0,1], single=[0,1,0], M=1000 -> status optimal under both CBC and HiGHS, schedule t[1]=(0,2,5) tF[1]=7 (leader), t[0]=(0,5,8) tF[0]=10 (follower waits for the unit-capacity middle resource); Sum tF = 17 is the true minimum.",
+    "KNOWN LIBRARY DEFECT hit by this model's objective: the grounder derives a sum's loop variables from the term's bindings only (solve/grounder.py::_sum_scopes) and ignores Term.operator_over, so 'sum_{i in I, r in R} dur_r' grounds to sum_r dur_r instead of |I| * sum_r dur_r. The term is a constant, so the argmin (the schedule) is unaffected, but the reported objective is 10.0 where the algebra says 3.0. Do not plant an expected_optimum for this model until that is fixed."
+  ],
+  "repo": "Gurobi/modeling-examples",
+  "solver": "Gurobi",
+  "url": "https://github.com/Gurobi/modeling-examples"
+}
