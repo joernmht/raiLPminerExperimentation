@@ -206,9 +206,7 @@ def stratified_50(fams: list[dict], total: int = 50) -> list[dict]:
     grand = sum(sizes)
     quotas = [s * total / grand for s in sizes]
     alloc = [max(1, int(q)) for q in quotas]
-    remainders = sorted(
-        range(len(fams)), key=lambda i: (-(quotas[i] - int(quotas[i])), i)
-    )
+    remainders = sorted(range(len(fams)), key=lambda i: (-(quotas[i] - int(quotas[i])), i))
     i = 0
     while sum(alloc) < total:
         alloc[remainders[i % len(fams)]] += 1
@@ -337,9 +335,7 @@ def render_wallpaper(
         for key in fam["papers"]:
             g, year = tile_graph(key)
             row, col = divmod(idx, cols)
-            ax = fig.add_axes(
-                [col * cell_w, 1.0 - (row + 1) * cell_h, cell_w, cell_h]
-            )
+            ax = fig.add_axes([col * cell_w, 1.0 - (row + 1) * cell_h, cell_w, cell_h])
             _draw_tile(ax, key, g, year, tint)
             counts[fam["id"]] = counts.get(fam["id"], 0) + 1
             idx += 1

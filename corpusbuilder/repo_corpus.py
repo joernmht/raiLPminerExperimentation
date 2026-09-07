@@ -266,7 +266,9 @@ def _binder_map(model: dict, families: list[str]) -> tuple[dict[str, str], list[
             mapped = fam_by_lower.get(binder.lower())
             out[binder] = mapped or fam
             if mapped is None:
-                notes.append(f"binder {binder!r} mapped to tuple family {fam!r} (component family unstated)")
+                notes.append(
+                    f"binder {binder!r} mapped to tuple family {fam!r} (component family unstated)"
+                )
     for low, fam in sorted(fam_by_lower.items()):
         out.setdefault(low, fam)
     return out, sorted(set(notes))
@@ -1110,7 +1112,11 @@ def render_document(stem: str, doc: dict, model: dict) -> tuple[str, list[str]]:
     tab = build_table(model)
     notes = list(tab.notes)
     entry_id = f"{stem}__{model['model_id']}".lower()
-    family = "milp" if any(s.domain in ("binary", "integer") for s in tab.symbols if s.kind == "var") else "lp"
+    family = (
+        "milp"
+        if any(s.domain in ("binary", "integer") for s in tab.symbols if s.kind == "var")
+        else "lp"
+    )
 
     lines = [
         "% lp2graph canonical LaTeX — assembled by corpusbuilder.repo_corpus",

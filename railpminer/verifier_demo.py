@@ -977,9 +977,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             print(f"summary: {args.out / 'summary.json'}")
         else:
-            scenario = load_scenario(
-                paper_key=args.paper_key, scenario_file=args.scenario_file
-            )
+            scenario = load_scenario(paper_key=args.paper_key, scenario_file=args.scenario_file)
             result = run_scenario(
                 scenario,
                 client.chat,

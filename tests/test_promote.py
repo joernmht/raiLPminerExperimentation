@@ -320,9 +320,7 @@ def test_the_stub_declares_the_index_families_the_binders_name(workspace):
     _promote(workspace)
     stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text()
 
-    families = {
-        line.split()[2] for line in stub.splitlines() if line.startswith("%@ index ")
-    }
+    families = {line.split()[2] for line in stub.splitlines() if line.startswith("%@ index ")}
     assert "I" in families
 
     # A bound letter is not a family: offering "%@ index i" invites the reviewer
@@ -332,13 +330,16 @@ def test_the_stub_declares_the_index_families_the_binders_name(workspace):
 
 
 def test_the_stub_fills_in_domains_it_can_read_off_a_domain_row():
-    """"y \\in {0,1}" is an explicit statement; the reviewer confirms, not guesses."""
+    """ "y \\in {0,1}" is an explicit statement; the reviewer confirms, not guesses."""
     dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
     rows = [
-        Row(formula_id="eq-0001", name="eq_0001", latex=r"\min \sum_{i \in I} c_i y_i",
-            is_objective=True),
-        Row(formula_id="eq-0002", name="eq_0002", latex=r"y_{i} \in \{0,1\}",
-            is_objective=False),
+        Row(
+            formula_id="eq-0001",
+            name="eq_0001",
+            latex=r"\min \sum_{i \in I} c_i y_i",
+            is_objective=True,
+        ),
+        Row(formula_id="eq-0002", name="eq_0002", latex=r"y_{i} \in \{0,1\}", is_objective=False),
     ]
     stub = declaration_stub(dossier, rows)
 
@@ -352,8 +353,9 @@ def test_the_stub_fills_in_domains_it_can_read_off_a_domain_row():
 
 def test_a_reviewer_verdict_outranks_the_algebra_in_the_stub():
     dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
-    rows = [Row(formula_id="eq-0001", name="eq_0001", latex=r"\sum_{t = 1}^{T} x_t",
-                is_objective=False)]
+    rows = [
+        Row(formula_id="eq-0001", name="eq_0001", latex=r"\sum_{t = 1}^{T} x_t", is_objective=False)
+    ]
 
     assert "%@ index T " in declaration_stub(dossier, rows)
     reviewed = declaration_stub(dossier, rows, {"T": "parameter"})

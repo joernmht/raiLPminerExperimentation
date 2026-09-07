@@ -15,6 +15,7 @@ from __future__ import annotations
 import collections
 import re
 import sys
+from pathlib import Path
 
 from lp2graph.codec.latex import from_canonical_latex, to_canonical_latex
 from lp2graph.metrics import model_coherence, model_completeness
@@ -64,8 +65,8 @@ def _strip_once(s: str) -> str:
 
 
 def main(fig_path: str, model_path: str) -> int:
-    fig = open(fig_path, encoding="utf-8").read()
-    src = open(model_path, encoding="utf-8").read()
+    fig = Path(fig_path).read_text(encoding="utf-8")
+    src = Path(model_path).read_text(encoding="utf-8")
     f = from_canonical_latex(src)
     g = schema(f)
 
@@ -95,17 +96,22 @@ def main(fig_path: str, model_path: str) -> int:
 
     # -- (b) the facet sub-counts --------------------------------------
     m = re.search(r"\\lpn\{ne\\_other\}\}, (\d+) of (\d+)\)", fig)
-    check("restricted quantifiers",
-          sum(1 for q in quants if q.restriction != "none"), int(m.group(1)))
+    check(
+        "restricted quantifiers", sum(1 for q in quants if q.restriction != "none"), int(m.group(1))
+    )
     m = re.search(r"\((\d+) of 21, on \\lpn\{first\}, \\lpn\{last\}, \\lpn\{single\}\)", fig)
     where = [q for q in quants if q.where is not None]
     check("where quantifiers", len(where), int(m.group(1)))
-    check("where parameters", sorted({q.where.parameter for q in where}),
-          ["first", "last", "single"])
+    check(
+        "where parameters", sorted({q.where.parameter for q in where}), ["first", "last", "single"]
+    )
     m = re.search(r"\\emph\{(\d+) variable, (\d+) parameter, (\d+) literal\}", fig)
     kinds = collections.Counter(t.ref_kind for t in terms)
-    check("term ref kinds", (kinds["variable"], kinds["parameter"], kinds["literal"]),
-          tuple(int(x) for x in m.groups()))
+    check(
+        "term ref kinds",
+        (kinds["variable"], kinds["parameter"], kinds["literal"]),
+        tuple(int(x) for x in m.groups()),
+    )
     m = re.search(r"\\textbf\{\\lpn\{offset\}\} on the ordered family \((\d+) of (\d+)\)", fig)
     check("offset bindings", sum(1 for b in binds if b.offset), int(m.group(1)))
     check("bindings total (offset claim)", len(binds), int(m.group(2)))
@@ -115,36 +121,83 @@ def main(fig_path: str, model_path: str) -> int:
     check("graph nodes", len(g.nodes), int(m.group(1)))
     check("graph edges", len(g.edges), int(m.group(2)))
     et = collections.Counter(e.type for e in g.edges)
-    for key in ("var_in_constraint", "var_in_objective", "uses_index",
-                "uses_parameter", "operator_input"):
+    for key in (
+        "var_in_constraint",
+        "var_in_objective",
+        "uses_index",
+        "uses_parameter",
+        "operator_input",
+    ):
         tex = "\\lpn{" + key.replace("_", "\\_") + "}"
         m = re.search(re.escape(tex) + r" \((\d+)\)", fig)
         assert m, f"edge-count claim for {key} not found in figure"
         check(f"edge {key}", et[key], int(m.group(1)))
 
     # -- every declared name is a real name ----------------------------
-    declared = ({i.name for i in f.indices} | {p.name for p in f.parameters}
-                | {v.name for v in f.variables} | {c.name for c in f.constraints})
+    declared = (
+        {i.name for i in f.indices}
+        | {p.name for p in f.parameters}
+        | {v.name for v in f.variables}
+        | {c.name for c in f.constraints}
+    )
     facets = {
-        "ordered", "cyclic", "kind", "domain", "role", "sense", "combination",
-        "modulo", "offset", "restriction", "where", "ref\\_kind", "sum", "min",
-        "lhs", "rhs", "objective", "primary", "indicator", "binary", "linear",
-        "capacity", "ordering", "big\\_m", "set\\_packing", "timing", "1",
-        "non\\_negative", "time\\_duration", "penalty\\_bigM", "domain\\_class",
-        "domain\\_role", "network\\_structure", "ordering\\_precedence",
-        "ne\\_other", "var\\_in\\_constraint", "var\\_in\\_objective",
-        "uses\\_index", "uses\\_parameter", "operator\\_input",
-        "(R, r, 0)", "(R, r+1, +1)", "(I, j, 0)",
-        "i", "j", "r", "operator", "coef.", "0",
+        "ordered",
+        "cyclic",
+        "kind",
+        "domain",
+        "role",
+        "sense",
+        "combination",
+        "modulo",
+        "offset",
+        "restriction",
+        "where",
+        "ref\\_kind",
+        "sum",
+        "min",
+        "lhs",
+        "rhs",
+        "objective",
+        "primary",
+        "indicator",
+        "binary",
+        "linear",
+        "capacity",
+        "ordering",
+        "big\\_m",
+        "set\\_packing",
+        "timing",
+        "1",
+        "non\\_negative",
+        "time\\_duration",
+        "penalty\\_bigM",
+        "domain\\_class",
+        "domain\\_role",
+        "network\\_structure",
+        "ordering\\_precedence",
+        "ne\\_other",
+        "var\\_in\\_constraint",
+        "var\\_in\\_objective",
+        "uses\\_index",
+        "uses\\_parameter",
+        "operator\\_input",
+        "(R, r, 0)",
+        "(R, r+1, +1)",
+        "(I, j, 0)",
+        "i",
+        "j",
+        "r",
+        "operator",
+        "coef.",
+        "0",
     }
     unknown = []
     for tok in re.findall(r"\\lpn\{([^{}]*)\}", fig):
         bare = tok.replace("\\_", "_").split("[")[0]
         if tok in facets or bare in declared:
             continue
-        if re.fullmatch(r"[a-zA-Z]+\[[a-zA-Z,]+\]", tok.replace("\\_", "_")):
-            if bare in declared:
-                continue
+        if re.fullmatch(r"[a-zA-Z]+\[[a-zA-Z,]+\]", tok.replace("\\_", "_")) and bare in declared:
+            continue
         unknown.append(tok)
     check("unknown \\lpn tokens", unknown, [])
 
@@ -166,18 +219,21 @@ def main(fig_path: str, model_path: str) -> int:
         if name == f.objective.name:
             container, tail = f.objective, ""
             expr = next(c for c in cells if "\\sum" in c)
-            check("[objective] sense in row", f.objective.sense,
-                  "min" if "\\min" in row else "max" if "\\max" in row else "?")
-            check("[objective] aggregations", len(f.objective.terms),
-                  expr.count("\\sum"))
+            check(
+                "[objective] sense in row",
+                f.objective.sense,
+                "min" if "\\min" in row else "max" if "\\max" in row else "?",
+            )
+            check("[objective] aggregations", len(f.objective.terms), expr.count("\\sum"))
         else:
             container = cmap.get(name)
             if container is None:
                 FAILS.append(f"algebra row {name!r} is not a constraint of the model")
                 continue
             tail = next((c for c in cells if "\\forall" in c), "")
-            cmp_seen = ("ge" if r"\ge" in expr else "le" if r"\le" in expr
-                        else "eq" if "=" in expr else "?")
+            cmp_seen = (
+                "ge" if r"\ge" in expr else "le" if r"\le" in expr else "eq" if "=" in expr else "?"
+            )
             check(f"[{name}] comparator", container.comparator, cmp_seen)
 
         # symbols printed in the row vs. referents and symbolic coefficients
@@ -186,11 +242,18 @@ def main(fig_path: str, model_path: str) -> int:
         expr = re.sub(r"\\mathcal\{[A-Za-z_]+\}", " ", expr)
         got = set()
         for m in sym_re.finditer(expr):
-            got.add(m.group("mathit") or ("tF" if m.group("tf") else None)
-                    or m.group("sub") or m.group("bare"))
+            got.add(
+                m.group("mathit")
+                or ("tF" if m.group("tf") else None)
+                or m.group("sub")
+                or m.group("bare")
+            )
         got.discard(None)
-        cterms = (list(container.lhs) + list(container.rhs)
-                  if not isinstance(container, type(f.objective)) else list(container.terms))
+        cterms = (
+            list(container.lhs) + list(container.rhs)
+            if not isinstance(container, type(f.objective))
+            else list(container.terms)
+        )
         want = {t.ref for t in cterms if t.ref_kind != "literal"}
         want |= {t.coefficient for t in cterms if isinstance(t.coefficient, str)}
         check(f"[{name}] symbols", sorted(want), sorted(got))
@@ -198,20 +261,30 @@ def main(fig_path: str, model_path: str) -> int:
         # a literal term on the right must be printed as that number
         lits = [t for t in cterms if t.ref_kind == "literal"]
         if lits:
-            check(f"[{name}] literal", str(int(lits[0].coefficient)),
-                  (re.search(r"=\s*(\d+)\s*$", expr.strip()) or
-                   re.search(r"(\d+)\s*$", expr.strip())).group(1))
+            check(
+                f"[{name}] literal",
+                str(int(lits[0].coefficient)),
+                (
+                    re.search(r"=\s*(\d+)\s*$", expr.strip())
+                    or re.search(r"(\d+)\s*$", expr.strip())
+                ).group(1),
+            )
 
         if tail:
             seen_q = re.findall(r"([a-z])\\in\\mathcal\{([A-Za-z_]+)\}", tail)
-            check(f"[{name}] quantifiers",
-                  [(q.index, q.over) for q in container.quantifiers], seen_q)
-            check(f"[{name}] restriction",
-                  any(q.restriction != "none" for q in container.quantifiers),
-                  r"\neq" in tail)
-            check(f"[{name}] where",
-                  any(q.where is not None for q in container.quantifiers),
-                  "{=}1" in row)
+            check(
+                f"[{name}] quantifiers", [(q.index, q.over) for q in container.quantifiers], seen_q
+            )
+            check(
+                f"[{name}] restriction",
+                any(q.restriction != "none" for q in container.quantifiers),
+                r"\neq" in tail,
+            )
+            check(
+                f"[{name}] where",
+                any(q.where is not None for q in container.quantifiers),
+                "{=}1" in row,
+            )
 
     print(f"{OKS} checks passed, {len(FAILS)} failed")
     for x in FAILS:

@@ -73,8 +73,12 @@ def fetch_all(sleep_s: float = 0.7, refetch: bool = False) -> dict:
         if not is_elsevier_doi(doi):
             log["skipped"].append(key)
             continue
-        if target.exists() and not refetch and ElsevierClient.has_full_text(
-            target.read_text(encoding="utf-8", errors="replace")[:200_000]
+        if (
+            target.exists()
+            and not refetch
+            and ElsevierClient.has_full_text(
+                target.read_text(encoding="utf-8", errors="replace")[:200_000]
+            )
         ):
             log["cached"].append(key)
             continue
@@ -209,7 +213,9 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.extract:
         log = extract_all()
-        print(f"extract: {len(log['ok'])} ok, {len(log['empty'])} empty, {len(log['failed'])} failed")
+        print(
+            f"extract: {len(log['ok'])} ok, {len(log['empty'])} empty, {len(log['failed'])} failed"
+        )
     return 0
 
 

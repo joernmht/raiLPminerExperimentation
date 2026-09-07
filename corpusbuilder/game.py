@@ -424,9 +424,7 @@ def _group_end(s: str, i: int) -> int:
     return len(s)
 
 
-def extract_symbols(
-    latex: str, *, limit: int | None = 12
-) -> tuple[list[list], list[list], str]:
+def extract_symbols(latex: str, *, limit: int | None = 12) -> tuple[list[list], list[list], str]:
     """Deterministically extract (symbols, operators, relation) from LaTeX.
 
     Returns ``(syms, ops, rel)`` where ``syms``/``ops`` are
