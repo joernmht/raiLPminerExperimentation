@@ -81,8 +81,21 @@ _MINMAX = re.compile(r"(?<![a-zA-Z\\])\\?(?:min|max|minimi[zs]e|maximi[zs]e|Min|
 # --------------------------------------------------------------------------
 
 _SPLITTABLE_ENVS = frozenset(
-    {"matrix", "aligned", "align", "align*", "gathered", "gather", "gather*",
-     "split", "eqnarray", "eqnarray*", "array", "cases", "Bmatrix"}
+    {
+        "matrix",
+        "aligned",
+        "align",
+        "align*",
+        "gathered",
+        "gather",
+        "gather*",
+        "split",
+        "eqnarray",
+        "eqnarray*",
+        "array",
+        "cases",
+        "Bmatrix",
+    }
 )
 _ENV_TOKEN = re.compile(r"\\(begin|end)\s*\{([a-zA-Z*]+)\}")
 _LR = re.compile(
@@ -180,9 +193,7 @@ _QUANT_LEAD = re.compile(
     r"otherwise\b|where\b|and\b|else\b|with\b|\\mid\b|\|)",
     re.IGNORECASE,
 )
-_REL_LEAD = re.compile(
-    r"^\s*(?:[=<>≤≥≠∈←]|\\leq?\b|\\geq?\b|\\neq?\b|\\in\b|\\subseteq\b|\\sim\b)"
-)
+_REL_LEAD = re.compile(r"^\s*(?:[=<>≤≥≠∈←]|\\leq?\b|\\geq?\b|\\neq?\b|\\in\b|\\subseteq\b|\\sim\b)")
 _BINOP_LEAD = re.compile(r"^\s*(?:[+\-*/·×]|\\times\b|\\cdot\b|\\pm\b|\\cup\b|\\cap\b)")
 # a "bare" index LHS: 1-3 short symbols (letter or \command, optional numeric
 # subscript / primes), comma-or-space separated — as in "t , p", "w_1", "i".
@@ -208,9 +219,7 @@ _IDX_LHS = re.compile(
     r"\s*(?:\\right\s*)?\)?\s*$"
 )
 # index arithmetic RHS: only symbols/numbers/basic ops, no structure
-_IDX_EXPR = re.compile(
-    r"^[\sA-Za-z0-9α-ωΑ-Ω_^'′{}+\-·×*/()\\,.]{1,40}$"
-)
+_IDX_EXPR = re.compile(r"^[\sA-Za-z0-9α-ωΑ-Ω_^'′{}+\-·×*/()\\,.]{1,40}$")
 _STRUCTURE = re.compile(r"\\(?:sum|prod|frac|int|underset|overset|min|max|begin)\b")
 _FUNC_LHS = re.compile(r"^\s*\\?[A-Za-zΔδ][A-Za-z]*\s*(?:\\left\s*)?\\?\(.*\)\s*$")
 _NUMERIC = re.compile(r"^[\s\d.,…]*(?:\\[lh]?dots\b|\.\.\.)?[\s\d.,…]*$")
@@ -278,14 +287,14 @@ def _is_condition_seg(
     if (
         tok in _MEMBER_TOKS
         and (_IDX_LHS.match(lhs) or _IDX_LHS.match(nlhs))
-        and not _DOMAIN_RHS.search(seg[rels[0][0]:])
+        and not _DOMAIN_RHS.search(seg[rels[0][0] :])
     ):
         return True  # "s_k \in S", "tr_{e'} \in TR": subscripted index member
     # numeric range chain "1 <= u < |S|": number, then a bare index symbol
     if (
         len(rels) >= 2
         and re.fullmatch(r"[\s\d.]+", lhs)
-        and _IDX_LHS.match(seg[rels[0][0] + len(tok): rels[1][0]] or " ")
+        and _IDX_LHS.match(seg[rels[0][0] + len(tok) : rels[1][0]] or " ")
     ):
         return True
     if _FUNC_LHS.match(lhs) and not re.search(r"\\sum|\\prod|\\frac|\\int", seg):
@@ -295,7 +304,7 @@ def _is_condition_seg(
     # symbol family matches the unit's main LHS ("IP_j^m = 0" after
     # "IP_j^s = ..."), an index guard otherwise ("r_{st_e} = 1")
     if tail_engaged and tok == "=" and (_IDX_LHS.match(lhs) or _IDX_LHS.match(nlhs)):
-        rhs = _strip_seps(seg[rels[0][0] + len(tok):])
+        rhs = _strip_seps(seg[rels[0][0] + len(tok) :])
         if _IDX_EXPR.match(rhs) and not _STRUCTURE.search(seg):
             if not re.fullmatch(r"[\d\s.]+", rhs):
                 return True
@@ -309,7 +318,7 @@ def _is_condition_seg(
         and len(rels) == 1
         and _is_compare_tok(tok)
         and (_IDX_LHS.match(lhs) or _IDX_LHS.match(nlhs))
-        and _IDX_EXPR.match(_strip_seps(seg[rels[0][0] + len(tok):]) or "?")
+        and _IDX_EXPR.match(_strip_seps(seg[rels[0][0] + len(tok) :]) or "?")
         and not _STRUCTURE.search(seg)
     ):
         return True
@@ -334,7 +343,12 @@ def _is_statement_seg(
 
 def _is_compare_tok(tok: str) -> bool:
     return (len(tok) == 1 and tok in _COMPARE_CHARS) or tok in (
-        "\\leq", "\\le", "\\geq", "\\ge", "\\neq", "\\ne"
+        "\\leq",
+        "\\le",
+        "\\geq",
+        "\\ge",
+        "\\neq",
+        "\\ne",
     )
 
 
@@ -399,7 +413,7 @@ def _clean_part(p: str) -> str:
         while len(pat_e.findall(p)) > len(pat_b.findall(p)):
             # drop from the right: an \end without its \begin
             idx = [m.start() for m in pat_e.finditer(p)]
-            p = p[: idx[-1]] + " " + p[idx[-1]:].replace("\\end{" + name + "}", " ", 1)
+            p = p[: idx[-1]] + " " + p[idx[-1] :].replace("\\end{" + name + "}", " ", 1)
     # drop unpaired \left / \right tokens the cut left behind (FIRST — a
     # dangling \left\{ would hide the alignment chars at depth 1)
     events = []  # (start, end, which)
@@ -488,7 +502,9 @@ def _finalize(original: str, parts: list[str], kind: str, confident: bool) -> Sp
         return SplitResult([original], "single", confident)
     if not all(_balanced(p) for p in parts):
         return SplitResult(
-            [original], "suspect_blob", False,
+            [original],
+            "suspect_blob",
+            False,
             ["split produced unbalanced parts — needs manual cut"],
         )
     return SplitResult(parts, kind, confident)
@@ -595,9 +611,11 @@ def _units_from_flat(s: str, *, in_model_tail: bool = False) -> tuple[list[str],
             engaged = False
         rels0 = _seg_relations(seg)
         unit_base = _base_of(seg[: rels0[0][0]]) if rels0 else ""
-        if re.search(r"\\forall|∀", seg) or re.search(
-            r"\\text[a-z]*\{\s*(?:for|if)", seg, re.I
-        ) or re.search(r"(?<![a-zA-Z])(?:for\s?all|if)(?![a-zA-Z])", nseg, re.I):
+        if (
+            re.search(r"\\forall|∀", seg)
+            or re.search(r"\\text[a-z]*\{\s*(?:for|if)", seg, re.I)
+            or re.search(r"(?<![a-zA-Z])(?:for\s?all|if)(?![a-zA-Z])", nseg, re.I)
+        ):
             locked = True
     if preamble and units:
         units[0] = preamble + units[0]
@@ -666,8 +684,9 @@ def _guard_cell(cell: str) -> bool:
         return False
     if re.match(r"^(?:iff?\b|otherwise\b|for\b|else\b)", ncell, re.I):
         return True
-    if re.match(r"^\\?text", cell.strip()) and re.search(r"\b(?:if|otherwise|for|else)\b",
-                                                         ncell, re.I):
+    if re.match(r"^\\?text", cell.strip()) and re.search(
+        r"\b(?:if|otherwise|for|else)\b", ncell, re.I
+    ):
         return True
     rels = _seg_relations(cell)
     if rels and _is_condition_seg(cell, ncell) and not _QUANT_LEAD.match(ncell):
@@ -724,8 +743,7 @@ def _split_env_rows(rows: list[str], *, in_model_tail: bool = False) -> tuple[li
         nrow = _norm_of(stripped).strip()
         rels = _seg_relations(row)
         has_main_rel = any(
-            _is_compare_tok(t) or t in ("=", "←", "\\leftarrow", "\\gets")
-            for _, t in rels
+            _is_compare_tok(t) or t in ("=", "←", "\\leftarrow", "\\gets") for _, t in rels
         )
         # leading "-" is a sign, not glue: only a continuation when the row
         # carries no main relation of its own (wrapped RHS overflow lines)
@@ -765,8 +783,10 @@ def _split_env_rows(rows: list[str], *, in_model_tail: bool = False) -> tuple[li
             continue
         if in_model_tail and _is_reference(row):
             continue  # drop pure reference rows in model tails
-        if units and not _seg_relations(" ".join(units[-1])) and not _MINMAX.match(
-            _strip_row_noise(" ".join(units[-1])).lstrip("\\ ")
+        if (
+            units
+            and not _seg_relations(" ".join(units[-1]))
+            and not _MINMAX.match(_strip_row_noise(" ".join(units[-1])).lstrip("\\ "))
         ):
             # previous "unit" never got a relation: it was a dangling head
             # (mid-expression line break), not a formula of its own
@@ -793,8 +813,10 @@ def _has_guarded_rows(rows: list[str]) -> bool:
             continue
         n_stmt += 1
         cells = _row_cells(row)
-        guarded = len(cells) >= 2 and any(_guard_cell(c) for c in cells[1:]) and any(
-            _seg_relations(c) for c in cells[:1]
+        guarded = (
+            len(cells) >= 2
+            and any(_guard_cell(c) for c in cells[1:])
+            and any(_seg_relations(c) for c in cells[:1])
         )
         nrow = _norm_of(row)
         if re.search(r"(?<![a-zA-Z])(?:if|otherwise)(?![a-zA-Z])", nrow, re.I):
@@ -833,13 +855,13 @@ def _unwrap_envelope(s: str) -> tuple[str, str]:
             else:
                 depth -= 1
                 if depth == 0:
-                    inner = s[m.end():lm.start()]
-                    return inner, s[lm.end():]
+                    inner = s[m.end() : lm.start()]
+                    return inner, s[lm.end() :]
             i = lm.end()
             continue
         i += 1
     # no matching \right (truncated) — drop the opener
-    return s[m.end():], ""
+    return s[m.end() :], ""
 
 
 def _outer_env(s: str):
@@ -855,7 +877,7 @@ def _outer_env(s: str):
             em = None
             for em2 in m_end.finditer(s, body_start, end):
                 em = em2
-            body = s[body_start:em.start()] if em else inner
+            body = s[body_start : em.start()] if em else inner
             return s[:i], name, body, s[end:]
     return None
 
@@ -913,13 +935,16 @@ def split_latex(latex: str) -> SplitResult:
                 return SplitResult([latex], "piecewise")
             # converter sometimes emits the guards as a SIBLING matrix
             # ("{expr \\ expr} {if c \\ otherwise}") — that is one piecewise
-            if re.search(
-                r"(?<![a-zA-Z])(?:if|otherwise)(?![a-zA-Z])", _norm_of(post), re.I
-            ):
+            if re.search(r"(?<![a-zA-Z])(?:if|otherwise)(?![a-zA-Z])", _norm_of(post), re.I):
                 return SplitResult([latex], "piecewise")
             units, conf = _split_env_rows(rows)
-            n_real_rows = len([r for r in rows if not _NOISE_ROW.match(
-                re.sub(r"\\begin\{[a-z]*\}|\\end\{[a-z]*\}", "", r))])
+            n_real_rows = len(
+                [
+                    r
+                    for r in rows
+                    if not _NOISE_ROW.match(re.sub(r"\\begin\{[a-z]*\}|\\end\{[a-z]*\}", "", r))
+                ]
+            )
             # a lone row may still hide structure — recurse into it once;
             # multi-row envs merged to one unit stay merged (the row logic
             # already decided those rows belong together)
@@ -984,8 +1009,10 @@ def _split_model(full: str, head: str, tail: str) -> SplitResult:
     guard_piecewise = False
     if env and env[1] in _SPLITTABLE_ENVS and not _top_relations(env[0]):
         rows = _rows_of(env[2])
-        if _has_guarded_rows(rows) and env[1] == "cases" and not any(
-            _MINMAX.search(_norm_of(r) or r) for r in rows
+        if (
+            _has_guarded_rows(rows)
+            and env[1] == "cases"
+            and not any(_MINMAX.search(_norm_of(r) or r) for r in rows)
         ):
             guard_piecewise = True
         else:

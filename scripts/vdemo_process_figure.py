@@ -89,8 +89,9 @@ def fail(msg: str) -> None:
     raise SystemExit(f"vdemo_process_figure: {msg}")
 
 
-def tw(text: str, fs: float, family: str = SANS, weight: str = "normal",
-       style: str = "normal") -> float:
+def tw(
+    text: str, fs: float, family: str = SANS, weight: str = "normal", style: str = "normal"
+) -> float:
     """Exact rendered text width in inches (deterministic, renderer-free)."""
     fp = FontProperties(family=family, weight=weight, style=style)
     return TextPath((0, 0), text, size=fs, prop=fp).get_extents().width / 72.0
@@ -212,11 +213,7 @@ def data() -> dict:
     d["temp_fb"] = tr[0]["temperature"]
 
     final_tex = (fdir / "final.tex").read_text()
-    align = [
-        ln.strip()
-        for ln in final_tex.splitlines()
-        if ln.strip().startswith(("\\min", "&"))
-    ]
+    align = [ln.strip() for ln in final_tex.splitlines() if ln.strip().startswith(("\\min", "&"))]
     if len(align) != 3:
         fail(f"expected 3 align rows in final.tex, got {len(align)}")
     d["rows"] = [_pretty_row(ln) for ln in align]
@@ -258,9 +255,7 @@ def data() -> dict:
         fail("expected all-parsers-failed in the ablation findings")
     d["temp_nf"] = ntr[0]["temperature"]
     d["bad_line"] = next(
-        ln
-        for ln in samples[0]["output"].splitlines()
-        if ln.startswith("%@ con") and "kind=-" in ln
+        ln for ln in samples[0]["output"].splitlines() if ln.startswith("%@ con") and "kind=-" in ln
     )
     return d
 
@@ -281,18 +276,35 @@ def tag_pill(ax, x, y, tag: str, llm: bool, fs: float = 10.0) -> float:
     w = tw(tag, fs) + 0.26
     ax.add_patch(
         FancyBboxPatch(
-            (x, y), w, 0.30,
+            (x, y),
+            w,
+            0.30,
             boxstyle="round,pad=0,rounding_size=0.12",
-            linewidth=1.0, edgecolor=col, facecolor=fill, zorder=3,
+            linewidth=1.0,
+            edgecolor=col,
+            facecolor=fill,
+            zorder=3,
         )
     )
-    ax.text(x + w / 2, y + 0.155, tag, fontsize=fs, color=col,
-            ha="center", va="center", zorder=4)
+    ax.text(x + w / 2, y + 0.155, tag, fontsize=fs, color=col, ha="center", va="center", zorder=4)
     return w
 
 
-def card(ax, x, y, w, title, lines, tag=None, llm=False, extra=0.0,
-         edge=GRID, face="white", tcolor=INK, dashed=False) -> float:
+def card(
+    ax,
+    x,
+    y,
+    w,
+    title,
+    lines,
+    tag=None,
+    llm=False,
+    extra=0.0,
+    edge=GRID,
+    face="white",
+    tcolor=INK,
+    dashed=False,
+) -> float:
     """Compact stage card, top-left at (x, y); returns its bottom y.
 
     Every body line and the title are measured against the card width and
@@ -308,24 +320,52 @@ def card(ax, x, y, w, title, lines, tag=None, llm=False, extra=0.0,
     h = card_height(lines, tag is not None, extra)
     ax.add_patch(
         FancyBboxPatch(
-            (x, y), w, h,
+            (x, y),
+            w,
+            h,
             boxstyle="round,pad=0,rounding_size=0.10",
             linewidth=1.6 if edge != GRID else 1.4,
-            edgecolor=edge, facecolor=face,
-            linestyle=(0, (4, 3)) if dashed else "solid", zorder=2,
+            edgecolor=edge,
+            facecolor=face,
+            linestyle=(0, (4, 3)) if dashed else "solid",
+            zorder=2,
         )
     )
-    ax.text(x + PAD_X, y + HEAD_H / 2 + 0.02, title, fontsize=13.5,
-            fontweight="bold", color=tcolor, ha="left", va="center", zorder=4)
-    ax.plot([x + PAD_X * 0.7, x + w - PAD_X * 0.7], [y + HEAD_H, y + HEAD_H],
-            color=edge if edge != GRID else GRID, linewidth=1.0, zorder=3)
+    ax.text(
+        x + PAD_X,
+        y + HEAD_H / 2 + 0.02,
+        title,
+        fontsize=13.5,
+        fontweight="bold",
+        color=tcolor,
+        ha="left",
+        va="center",
+        zorder=4,
+    )
+    ax.plot(
+        [x + PAD_X * 0.7, x + w - PAD_X * 0.7],
+        [y + HEAD_H, y + HEAD_H],
+        color=edge if edge != GRID else GRID,
+        linewidth=1.0,
+        zorder=3,
+    )
     cy = y + HEAD_H + 0.06 + extra
     for kind, text in lines:
         fs, lh, fam, col, wt, st = LN[kind]
         if text:
-            ax.text(x + PAD_X, cy + lh / 2, text, fontsize=fs, family=fam,
-                    color=col, fontweight=wt, fontstyle=st,
-                    ha="left", va="center", zorder=4)
+            ax.text(
+                x + PAD_X,
+                cy + lh / 2,
+                text,
+                fontsize=fs,
+                family=fam,
+                color=col,
+                fontweight=wt,
+                fontstyle=st,
+                ha="left",
+                va="center",
+                zorder=4,
+            )
         cy += lh
     if tag:
         tag_pill(ax, x + PAD_X, y + h - 0.38, tag, llm)
@@ -335,9 +375,13 @@ def card(ax, x, y, w, title, lines, tag=None, llm=False, extra=0.0,
 def harrow(ax, x0, x1, y, color, lw=1.8) -> None:
     ax.add_patch(
         FancyArrowPatch(
-            (x0 + 0.03, y), (x1 - 0.03, y),
-            arrowstyle="-|>", mutation_scale=15, linewidth=lw,
-            color=color, zorder=1,
+            (x0 + 0.03, y),
+            (x1 - 0.03, y),
+            arrowstyle="-|>",
+            mutation_scale=15,
+            linewidth=lw,
+            color=color,
+            zorder=1,
         )
     )
 
@@ -345,9 +389,13 @@ def harrow(ax, x0, x1, y, color, lw=1.8) -> None:
 def varrow(ax, x, y0, y1, color, lw=1.8) -> None:
     ax.add_patch(
         FancyArrowPatch(
-            (x, y0 + 0.03), (x, y1 - 0.03),
-            arrowstyle="-|>", mutation_scale=15, linewidth=lw,
-            color=color, zorder=1,
+            (x, y0 + 0.03),
+            (x, y1 - 0.03),
+            arrowstyle="-|>",
+            mutation_scale=15,
+            linewidth=lw,
+            color=color,
+            zorder=1,
         )
     )
 
@@ -358,15 +406,28 @@ def stat_pill(ax, xr, y, plain: str, strong: str, color, fill) -> None:
     px = xr - pw
     ax.add_patch(
         FancyBboxPatch(
-            (px, y - 0.19), pw, 0.38,
+            (px, y - 0.19),
+            pw,
+            0.38,
             boxstyle="round,pad=0,rounding_size=0.16",
-            linewidth=1.4, edgecolor=color, facecolor=fill, zorder=3,
+            linewidth=1.4,
+            edgecolor=color,
+            facecolor=fill,
+            zorder=3,
         )
     )
-    ax.text(px + pw / 2, y, strong, fontsize=12.5, fontweight="bold",
-            color=color, ha="center", va="center", zorder=4)
-    ax.text(px - 0.16, y, plain, fontsize=11.5, color=MUTED,
-            ha="right", va="center", zorder=4)
+    ax.text(
+        px + pw / 2,
+        y,
+        strong,
+        fontsize=12.5,
+        fontweight="bold",
+        color=color,
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+    ax.text(px - 0.16, y, plain, fontsize=11.5, color=MUTED, ha="right", va="center", zorder=4)
 
 
 # ---------------------------------------------------------------------------
@@ -384,57 +445,134 @@ def figure(d: dict) -> Path:
     ax.set_aspect("equal")
     ax.axis("off")
 
-    ax.text(0.4, 0.32, "One scenario, two processes: the verifier makes the difference",
-            fontsize=19, fontweight="bold", color=INK, ha="left", va="center")
+    ax.text(
+        0.4,
+        0.32,
+        "One scenario, two processes: the verifier makes the difference",
+        fontsize=19,
+        fontweight="bold",
+        color=INK,
+        ha="left",
+        va="center",
+    )
 
     # -- scenario strip (shared input of both lanes) ------------------------
     sx, sy, sw = 0.4, 0.60, 14.2
     ax.add_patch(
         FancyBboxPatch(
-            (sx, sy), sw, 1.06,
+            (sx, sy),
+            sw,
+            1.06,
             boxstyle="round,pad=0,rounding_size=0.10",
-            linewidth=1.4, edgecolor=GRID, facecolor="white", zorder=2,
+            linewidth=1.4,
+            edgecolor=GRID,
+            facecolor="white",
+            zorder=2,
         )
     )
-    ax.text(sx + PAD_X, sy + 0.26, "Scenario", fontsize=12.5, fontweight="bold",
-            color=CD["dunkelblau"], ha="left", va="center", zorder=4)
-    ax.text(sx + 1.30, sy + 0.26,
-            f"“{d['title']}” ({d['year']}) — the paper's abstract, verbatim:",
-            fontsize=12, color=INK, ha="left", va="center", zorder=4)
+    ax.text(
+        sx + PAD_X,
+        sy + 0.26,
+        "Scenario",
+        fontsize=12.5,
+        fontweight="bold",
+        color=CD["dunkelblau"],
+        ha="left",
+        va="center",
+        zorder=4,
+    )
+    ax.text(
+        sx + 1.30,
+        sy + 0.26,
+        f"“{d['title']}” ({d['year']}) — the paper's abstract, verbatim:",
+        fontsize=12,
+        color=INK,
+        ha="left",
+        va="center",
+        zorder=4,
+    )
     for k, line in enumerate(ef._wrap(d["abstract"], 168, maxlines=2, indent="")):
-        ax.text(sx + PAD_X, sy + 0.55 + 0.26 * k, line, fontsize=11.5,
-                color=MUTED, style="italic", ha="left", va="center", zorder=4)
+        ax.text(
+            sx + PAD_X,
+            sy + 0.55 + 0.26 * k,
+            line,
+            fontsize=11.5,
+            color=MUTED,
+            style="italic",
+            ha="left",
+            va="center",
+            zorder=4,
+        )
 
     # -- lane bands ---------------------------------------------------------
     bx, bw = 0.6, 14.0
-    t0, t1 = 2.00, 4.10   # top band (without verifier)
-    b0, b1 = 4.52, 7.88   # bottom band (with verifier)
+    t0, t1 = 2.00, 4.10  # top band (without verifier)
+    b0, b1 = 4.52, 7.88  # bottom band (with verifier)
     for y0, y1, fill in ((t0, t1, "#FBF4F1"), (b0, b1, "#EFF6F5")):
         ax.add_patch(
             FancyBboxPatch(
-                (bx, y0), bw, y1 - y0,
+                (bx, y0),
+                bw,
+                y1 - y0,
                 boxstyle="round,pad=0,rounding_size=0.14",
-                linewidth=0, facecolor=fill, zorder=0,
+                linewidth=0,
+                facecolor=fill,
+                zorder=0,
             )
         )
-    ax.text(bx + 0.25, t0 + 0.27, "WITHOUT the verifier — one shot",
-            fontsize=13.5, fontweight="bold", color=CD["rot"],
-            ha="left", va="center", zorder=4)
-    stat_pill(ax, bx + bw - 0.18, t0 + 0.27,
-              "3 samples × 10 scenarios · both models:",
-              "single shot  0 / 30 valid", CD["rot"], "#FDF0F3")
-    ax.text(bx + 0.25, b0 + 0.27, "WITH the deterministic verifier in the loop",
-            fontsize=13.5, fontweight="bold", color=CD["tuerkis"],
-            ha="left", va="center", zorder=4)
-    stat_pill(ax, bx + bw - 0.18, b0 + 0.27,
-              f"{d['model_short']} @ ScaDS · mean {d['mean_rounds']:.1f} rounds to valid:",
-              f"{d['n_valid']} / {d['n_scen']} valid", CD["tuerkis"], "#E4F1F0")
+    ax.text(
+        bx + 0.25,
+        t0 + 0.27,
+        "WITHOUT the verifier — one shot",
+        fontsize=13.5,
+        fontweight="bold",
+        color=CD["rot"],
+        ha="left",
+        va="center",
+        zorder=4,
+    )
+    stat_pill(
+        ax,
+        bx + bw - 0.18,
+        t0 + 0.27,
+        "3 samples × 10 scenarios · both models:",
+        "single shot  0 / 30 valid",
+        CD["rot"],
+        "#FDF0F3",
+    )
+    ax.text(
+        bx + 0.25,
+        b0 + 0.27,
+        "WITH the deterministic verifier in the loop",
+        fontsize=13.5,
+        fontweight="bold",
+        color=CD["tuerkis"],
+        ha="left",
+        va="center",
+        zorder=4,
+    )
+    stat_pill(
+        ax,
+        bx + bw - 0.18,
+        b0 + 0.27,
+        f"{d['model_short']} @ ScaDS · mean {d['mean_rounds']:.1f} rounds to valid:",
+        f"{d['n_valid']} / {d['n_scen']} valid",
+        CD["tuerkis"],
+        "#E4F1F0",
+    )
 
     # contrast between the lanes
-    ax.text(W / 2, (t1 + b0) / 2,
-            "same scenario, same LLM — the only change: a deterministic verifier in the loop  ▼",
-            fontsize=13, fontweight="bold", color=CD["dunkelblau"],
-            ha="center", va="center", zorder=4)
+    ax.text(
+        W / 2,
+        (t1 + b0) / 2,
+        "same scenario, same LLM — the only change: a deterministic verifier in the loop  ▼",
+        fontsize=13,
+        fontweight="bold",
+        color=CD["dunkelblau"],
+        ha="center",
+        va="center",
+        zorder=4,
+    )
 
     llm_tag = f"LLM ({d['model_short']})"
 
@@ -464,15 +602,24 @@ def figure(d: dict) -> Path:
         ("bad", "✗ all-parsers-failed  (3/3 samples)"),
     ]
     h = card_height(lines, True)
-    card(ax, x, tm - h / 2, vw, "verdict: invalid", lines,
-         tag="deterministic", edge="#E8B9C6")
+    card(ax, x, tm - h / 2, vw, "verdict: invalid", lines, tag="deterministic", edge="#E8B9C6")
     harrow(ax, x + vw, x + vw + 0.30, tm, DEAD)
 
     x = x + vw + 0.30
     lines = [("bold", "incomplete model"), ("body", "citation unknown")]
     h = card_height(lines, False)
-    card(ax, x, tm - h / 2, 2.45, "dead end", lines, edge=CD["rot"],
-         face="#FDF2F4", tcolor=CD["rot"], dashed=True)
+    card(
+        ax,
+        x,
+        tm - h / 2,
+        2.45,
+        "dead end",
+        lines,
+        edge=CD["rot"],
+        face="#FDF2F4",
+        tcolor=CD["rot"],
+        dashed=True,
+    )
 
     # -- BOTTOM lane --------------------------------------------------------
     ly0 = b0 + 0.50  # content top
@@ -487,20 +634,38 @@ def figure(d: dict) -> Path:
     y_ver = y_llm + h_llm + 0.34
     card(ax, lx, y_ver, lw_, "lp2graph verifier", lines_ver, tag="deterministic")
     varrow(ax, lx + 0.55, y_llm + h_llm, y_ver, CD["tuerkis"])
-    ax.text(lx + 0.66, y_llm + h_llm + 0.17, "draft", fontsize=10.5,
-            color=MUTED, style="italic", ha="left", va="center", zorder=4)
+    ax.text(
+        lx + 0.66,
+        y_llm + h_llm + 0.17,
+        "draft",
+        fontsize=10.5,
+        color=MUTED,
+        style="italic",
+        ha="left",
+        va="center",
+        zorder=4,
+    )
     bot_llm_mid = y_llm + h_llm / 2  # scenario feed target
 
     # channel: findings fed back (verifier -> LLM), drawn orange
     chx = lx + lw_ + 0.21
     y_or = y_ver + 0.16
-    ax.plot([lx + lw_, chx, chx], [y_or, y_or, y_llm + h_llm - 0.25],
-            color=CD["orange"], linewidth=1.6, zorder=1)
+    ax.plot(
+        [lx + lw_, chx, chx],
+        [y_or, y_or, y_llm + h_llm - 0.25],
+        color=CD["orange"],
+        linewidth=1.6,
+        zorder=1,
+    )
     ax.add_patch(
         FancyArrowPatch(
-            (chx, y_llm + h_llm - 0.25), (lx + lw_ + 0.03, y_llm + h_llm - 0.25),
-            arrowstyle="-|>", mutation_scale=13, linewidth=1.6,
-            color=CD["orange"], zorder=1,
+            (chx, y_llm + h_llm - 0.25),
+            (lx + lw_ + 0.03, y_llm + h_llm - 0.25),
+            arrowstyle="-|>",
+            mutation_scale=13,
+            linewidth=1.6,
+            color=CD["orange"],
+            zorder=1,
         )
     )
 
@@ -511,43 +676,95 @@ def figure(d: dict) -> Path:
     ry = ly0 + 0.24
     ax.add_patch(
         FancyBboxPatch(
-            (rx, ry), rw, r_h,
+            (rx, ry),
+            rw,
+            r_h,
             boxstyle="round,pad=0,rounding_size=0.10",
-            linewidth=1.4, edgecolor=GRID, facecolor="white", zorder=2,
+            linewidth=1.4,
+            edgecolor=GRID,
+            facecolor="white",
+            zorder=2,
         )
     )
-    ax.text(rx + PAD_X, ry + HEAD_H / 2 + 0.02, "repair rounds", fontsize=13.5,
-            fontweight="bold", color=INK, ha="left", va="center", zorder=4)
-    ax.plot([rx + PAD_X * 0.7, rx + rw - PAD_X * 0.7],
-            [ry + HEAD_H, ry + HEAD_H], color=GRID, linewidth=1.0, zorder=3)
+    ax.text(
+        rx + PAD_X,
+        ry + HEAD_H / 2 + 0.02,
+        "repair rounds",
+        fontsize=13.5,
+        fontweight="bold",
+        color=INK,
+        ha="left",
+        va="center",
+        zorder=4,
+    )
+    ax.plot(
+        [rx + PAD_X * 0.7, rx + rw - PAD_X * 0.7],
+        [ry + HEAD_H, ry + HEAD_H],
+        color=GRID,
+        linewidth=1.0,
+        zorder=3,
+    )
     for k, (label, ok) in enumerate(d["round_chips"]):
         if tw(label, 10.5, MONO) > rw - 0.58 - 0.10:
             fail(f"round chip label too wide: {label!r}")
         cy = ry + HEAD_H + 0.10 + k * chip_h + chip_h / 2
         col = CD["tuerkis"] if ok else CD["rot"]
-        ax.add_patch(Circle((rx + PAD_X + 0.12, cy), 0.12, facecolor=col,
-                            edgecolor="none", zorder=3))
-        ax.text(rx + PAD_X + 0.12, cy, str(k + 1), color="white", fontsize=10,
-                fontweight="bold", ha="center", va="center", zorder=4)
-        ax.text(rx + PAD_X + 0.36, cy, label, fontsize=10.5, family=MONO,
-                color=col, ha="left", va="center", zorder=4)
+        ax.add_patch(
+            Circle((rx + PAD_X + 0.12, cy), 0.12, facecolor=col, edgecolor="none", zorder=3)
+        )
+        ax.text(
+            rx + PAD_X + 0.12,
+            cy,
+            str(k + 1),
+            color="white",
+            fontsize=10,
+            fontweight="bold",
+            ha="center",
+            va="center",
+            zorder=4,
+        )
+        ax.text(
+            rx + PAD_X + 0.36,
+            cy,
+            label,
+            fontsize=10.5,
+            family=MONO,
+            color=col,
+            ha="left",
+            va="center",
+            zorder=4,
+        )
     # verifier -> rounds (the loop's ticker), rounds -> canonical model
     harrow(ax, lx + lw_, rx, ry + r_h - 0.30, CD["tuerkis"])
-    ax.text(rx + rw / 2, ry + r_h + 0.17, "↺ findings fed back each round",
-            fontsize=10.5, color=CD["orange"], style="italic",
-            ha="center", va="center", zorder=4)
+    ax.text(
+        rx + rw / 2,
+        ry + r_h + 0.17,
+        "↺ findings fed back each round",
+        fontsize=10.5,
+        color=CD["orange"],
+        style="italic",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
 
     bm = ry + r_h / 2  # station mid line of the rest of the lane
     harrow(ax, rx + rw, rx + rw + 0.30, bm, CD["tuerkis"])
 
     # canonical model (the 3 real align rows of final.tex)
     cx, cw = rx + rw + 0.28, 3.00
-    lines_can = [("good", r) for r in d["rows"]] + [
-        ("muted", "+ full %@ declaration block")
-    ]
+    lines_can = [("good", r) for r in d["rows"]] + [("muted", "+ full %@ declaration block")]
     h_can = card_height(lines_can, True)
-    card(ax, cx, bm - h_can / 2, cw, "canonical model", lines_can,
-         tag="valid (round 4)", edge=CD["tuerkis"])
+    card(
+        ax,
+        cx,
+        bm - h_can / 2,
+        cw,
+        "canonical model",
+        lines_can,
+        tag="valid (round 4)",
+        edge=CD["tuerkis"],
+    )
     harrow(ax, cx + cw, cx + cw + 0.20, bm, CD["tuerkis"])
 
     # typed graph (real ingest of final.tex)
@@ -557,8 +774,17 @@ def figure(d: dict) -> Path:
     h_g = card_height(lines_g, False, extra=g_extra)
     gy = bm - h_g / 2
     card(ax, gx, gy, gw, "typed graph", lines_g, extra=g_extra)
-    ef.draw_schema_graph(fig, gx + 0.10, gy + HEAD_H + 0.05, gw - 0.20,
-                         g_extra - 0.02, d["graph"], W, H, node_size=40)
+    ef.draw_schema_graph(
+        fig,
+        gx + 0.10,
+        gy + HEAD_H + 0.05,
+        gw - 0.20,
+        g_extra - 0.02,
+        d["graph"],
+        W,
+        H,
+        node_size=40,
+    )
     harrow(ax, gx + gw, gx + gw + 0.34, bm, CD["tuerkis"])
 
     # citation box
@@ -570,16 +796,39 @@ def figure(d: dict) -> Path:
         ("muted", "isomorphic: none"),
     ]
     h_cite = card_height(lines_cite, True)
-    card(ax, zx, bm - h_cite / 2, zw, "citation", lines_cite,
-         tag="deterministic", edge=CD["tuerkis"], face="#F4FAF9")
-    ax.text((gx + gw + zx) / 2, bm + (h_cite / 2) + 0.20,
-            "structural matching (Level-M features)", fontsize=10, color=MUTED, style="italic",
-            ha="center", va="center", zorder=4)
+    card(
+        ax,
+        zx,
+        bm - h_cite / 2,
+        zw,
+        "citation",
+        lines_cite,
+        tag="deterministic",
+        edge=CD["tuerkis"],
+        face="#F4FAF9",
+    )
+    ax.text(
+        (gx + gw + zx) / 2,
+        bm + (h_cite / 2) + 0.20,
+        "structural matching (Level-M features)",
+        fontsize=10,
+        color=MUTED,
+        style="italic",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
 
     # scenario feeds both lanes down the left margin (grey fork)
     mx = 0.42
-    ax.plot([mx, mx], [sy + 1.08, bot_llm_mid], color=DEAD,
-            linewidth=1.8, solid_capstyle="round", zorder=1)
+    ax.plot(
+        [mx, mx],
+        [sy + 1.08, bot_llm_mid],
+        color=DEAD,
+        linewidth=1.8,
+        solid_capstyle="round",
+        zorder=1,
+    )
     harrow(ax, mx, 0.82, top_llm_mid, DEAD)
     harrow(ax, mx, lx, bot_llm_mid, DEAD)
 
@@ -593,16 +842,15 @@ def figure(d: dict) -> Path:
     for k, line in enumerate(cap_lines):
         if tw(line, 10.5) > W - 0.8:
             fail(f"caption line too wide: {line[:60]!r}")
-        ax.text(0.4, H - 0.34 + 0.18 * k, line, fontsize=10.5, color=MUTED,
-                ha="left", va="center")
+        ax.text(0.4, H - 0.34 + 0.18 * k, line, fontsize=10.5, color=MUTED, ha="left", va="center")
 
     ef.OUTDIR.mkdir(parents=True, exist_ok=True)
     png = ef.OUTDIR / "fig_vdemo_process.png"
     fig.savefig(png, dpi=300, bbox_inches="tight")
-    fig.savefig(ef.OUTDIR / "fig_vdemo_process.svg", bbox_inches="tight",
-                metadata={"Date": None})
-    fig.savefig(ef.OUTDIR / "fig_vdemo_process.pdf", bbox_inches="tight",
-                metadata={"CreationDate": None})
+    fig.savefig(ef.OUTDIR / "fig_vdemo_process.svg", bbox_inches="tight", metadata={"Date": None})
+    fig.savefig(
+        ef.OUTDIR / "fig_vdemo_process.pdf", bbox_inches="tight", metadata={"CreationDate": None}
+    )
     plt.close(fig)
     return png
 

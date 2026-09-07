@@ -1247,7 +1247,8 @@ def annotate_paper(
                 run.usage,
                 retries=1,
                 force=("r" in force and round_no == 0),
-                feedback=feedback.get("r", []) + (
+                feedback=feedback.get("r", [])
+                + (
                     [f"repair round {round_no + 1}: the rows listed are the ones STILL failing"]
                     if round_no
                     else []
@@ -1417,18 +1418,14 @@ def rowfix_input(
 ) -> dict:
     payload: dict = {
         "paper": {"key": dossier.key, "title": dossier.source.title},
-        "symbol_table": {
-            name: entry.get("kind", "?") for name, entry in sorted(table.items())
-        },
+        "symbol_table": {name: entry.get("kind", "?") for name, entry in sorted(table.items())},
         "failing_rows": [
             {"id": f.formula_id, "latex": f.latex, "parser_error": f.error}
             for f in failures[:ROWFIX_BATCH]
         ],
     }
     if len(failures) > ROWFIX_BATCH:
-        payload["note"] = (
-            f"{len(failures) - ROWFIX_BATCH} more failing rows follow in later rounds"
-        )
+        payload["note"] = f"{len(failures) - ROWFIX_BATCH} more failing rows follow in later rounds"
     if feedback:
         payload["feedback"] = feedback
     return payload
@@ -1495,8 +1492,10 @@ def validate_rowfix(reply: dict, failures: list[RowFailure], declarations: str =
         if fid not in wanted and not doc_mode:
             errors.append(f"unknown failing id {fid!r}")
             continue
-        ok = isinstance(parts, list) and parts and all(
-            isinstance(p, str) and p.strip() for p in parts
+        ok = (
+            isinstance(parts, list)
+            and parts
+            and all(isinstance(p, str) and p.strip() for p in parts)
         )
         if not ok:
             errors.append(f"{fid}: needs a non-empty list of LaTeX strings")

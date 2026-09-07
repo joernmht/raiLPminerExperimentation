@@ -68,7 +68,9 @@ def rematch(runs_dir: str, match_dirs: list[str], top: int = 3) -> dict:
         g = res.formulation
         gf = model_feature_document(g)
         iso = sorted(k for k, f in match.items() if are_isomorphic(g, f))
-        sims = sorted(((v, k) for k, v in ((k, _cosine(gf, mf)) for k, mf in feats.items())), reverse=True)
+        sims = sorted(
+            ((v, k) for k, v in ((k, _cosine(gf, mf)) for k, mf in feats.items())), reverse=True
+        )
         results[Path(d).name.replace("--feedback", "")] = {
             "schema_hash": schema_graph_hash(g),
             "isomorphic": iso,
@@ -89,7 +91,9 @@ def main(argv: list[str] | None = None) -> int:
     report = rematch(args.runs, args.match, args.top)
     out = Path(args.out) if args.out else Path(args.runs) / "rematch.json"
     out.write_text(json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    print(f"{report['match_set_size']} match candidates · {len(report['runs'])} runs rematched -> {out}")
+    print(
+        f"{report['match_set_size']} match candidates · {len(report['runs'])} runs rematched -> {out}"
+    )
     for key, r in report["runs"].items():
         head = ", ".join(f"{s['id']} {s['similarity']:.2f}" for s in r["similar"][:2])
         print(f"  {key}: iso={r['isomorphic'] or 'none'} · {head}")

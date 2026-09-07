@@ -242,9 +242,7 @@ def test_cluster_features_deterministic() -> None:
 
 def test_cluster_features_identical_points_pick_smallest_k() -> None:
     papers = {f"p{i}": {"fa": 1.0, "fb": 2.0} for i in range(6)}
-    out = fingerprint.cluster_features(
-        {"features": ["fa", "fb"], "papers": papers}, k_range=(2, 4)
-    )
+    out = fingerprint.cluster_features({"features": ["fa", "fb"], "papers": papers}, k_range=(2, 4))
     # Constant columns z-score to zero vectors: every distance ties at 1.0
     # (zero-norm convention), every silhouette is 0, the smallest k must win.
     assert out["k"] == 2

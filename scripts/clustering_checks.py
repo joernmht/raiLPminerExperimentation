@@ -52,7 +52,7 @@ def m3_taxonomy() -> dict:
 
 def kmeans_ari(seeds: int = 5, k: int = 8) -> dict:
     feats = json.loads((ROOT / "corpus/fingerprint/features.json").read_text())
-    papers = feats["papers"] if "papers" in feats else feats
+    papers = feats.get("papers", feats)
     if isinstance(papers, list):
         papers = {p["paper_key"]: p["features"] for p in papers}
     frozen = {}
@@ -96,8 +96,13 @@ def kmeans_ari(seeds: int = 5, k: int = 8) -> dict:
         return (idx - exp) / ((ea + eb) / 2 - exp)
 
     scores = [round(ari(kmeans(s), frozen), 4) for s in range(seeds)]
-    return {"papers": len(keys), "k": k, "seeds": seeds, "ari": scores,
-            "ari_mean": round(sum(scores) / len(scores), 4)}
+    return {
+        "papers": len(keys),
+        "k": k,
+        "seeds": seeds,
+        "ari": scores,
+        "ari_mean": round(sum(scores) / len(scores), 4),
+    }
 
 
 def main() -> None:
