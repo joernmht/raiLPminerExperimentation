@@ -1749,9 +1749,10 @@ def run(
     (out / "numbers.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     (out / "RESULTS.md").write_text(
-        _results_md(headline, selected, rendered, skipped, numbers), encoding="utf-8"
+        _results_md(headline, selected, rendered, skipped, numbers), encoding="utf-8", newline="\n"
     )
     print(f"wrote {out / 'numbers.json'}")
     print(f"wrote {out / 'RESULTS.md'}")

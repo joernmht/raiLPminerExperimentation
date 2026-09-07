@@ -51,12 +51,14 @@ def m3_taxonomy() -> dict:
 
 
 def kmeans_ari(seeds: int = 5, k: int = 8) -> dict:
-    feats = json.loads((ROOT / "corpus/fingerprint/features.json").read_text())
+    feats = json.loads((ROOT / "corpus/fingerprint/features.json").read_text(encoding="utf-8"))
     papers = feats.get("papers", feats)
     if isinstance(papers, list):
         papers = {p["paper_key"]: p["features"] for p in papers}
     frozen = {}
-    for cl in json.loads((ROOT / "corpus/fingerprint/clusters.json").read_text())["clusters"]:
+    for cl in json.loads((ROOT / "corpus/fingerprint/clusters.json").read_text(encoding="utf-8"))[
+        "clusters"
+    ]:
         for key in cl["papers"]:
             frozen[key] = cl["id"]
     keys = sorted(set(papers) & set(frozen))
@@ -109,7 +111,9 @@ def main() -> None:
     out = {"m3_taxonomy": m3_taxonomy(), "kmeans_vs_agglomerative": kmeans_ari()}
     path = ROOT / "corpus/talkpack/clustering_checks.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(out, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     t = out["m3_taxonomy"]
     multi = [c for c in t["clusters"] if c["size"] > 1]
     print(f"M3: {t['models']} models -> {t['m_clusters']} M-clusters, {len(multi)} multi-member:")

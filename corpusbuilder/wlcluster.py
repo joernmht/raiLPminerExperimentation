@@ -149,7 +149,7 @@ def main(argv: list[str] | None = None) -> int:
     report = similarity_report(args.include_generated)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "similarity.json").write_text(
-        json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
     )
     print(f"{len(report['models'])} models -> {args.out / 'similarity.json'}")
     for p in report["top_pairs"][:6]:

@@ -447,7 +447,7 @@ def draw_schema_graph(
 
 def real_data() -> dict:
     d = {}
-    dossier = json.loads((CORPUS / "dossiers" / f"{KEY}.json").read_text())
+    dossier = json.loads((CORPUS / "dossiers" / f"{KEY}.json").read_text(encoding="utf-8"))
     d["title"] = dossier["source"]["title"]
     d["year"] = dossier["source"]["year"]
     d["doi"] = dossier["source"]["doi"]
@@ -458,7 +458,7 @@ def real_data() -> dict:
     d["raw_eq1"] = raw["eq-0001"]
     d["raw_eq3"] = raw["eq-0003"]
 
-    dec = json.loads((CORPUS / "decisions" / f"assist_{KEY}.json").read_text())
+    dec = json.loads((CORPUS / "decisions" / f"assist_{KEY}.json").read_text(encoding="utf-8"))
     decisions = dec["formula_decisions"][0]["decisions"]
     counts: dict[str, int] = {}
     for row in decisions:
@@ -467,20 +467,20 @@ def real_data() -> dict:
     d["corr_eq3"] = next(r for r in decisions if r["id"] == "eq-0003")["parts"][0]
     d["symbols"] = dec["symbol_tables"][0]["symbols"]
 
-    cache = json.loads((CORPUS / "assist" / "cache" / f"{KEY}.a.json").read_text())
+    cache = json.loads((CORPUS / "assist" / "cache" / f"{KEY}.a.json").read_text(encoding="utf-8"))
     inner = json.loads(cache["records"][-1]["content"])
     rej = next(r for r in inner["decisions"] if r["status"] == "rejected")
     d["rej_id"], d["rej_reason"] = rej["id"], rej["reason"]
 
-    decl_lines = (CORPUS / "declarations" / f"{KEY}.tex").read_text().splitlines()
+    decl_lines = (CORPUS / "declarations" / f"{KEY}.tex").read_text(encoding="utf-8").splitlines()
     picks = ("%@ index T ", "%@ param p ", "%@ var x ", "%@ obj ")
     d["decls"] = [next(ln for ln in decl_lines if ln.startswith(p)) for p in picks]
 
-    promoted = (CORPUS / "promoted" / f"{KEY}.tex").read_text().splitlines()
+    promoted = (CORPUS / "promoted" / f"{KEY}.tex").read_text(encoding="utf-8").splitlines()
     d["can_obj"] = next(ln.strip() for ln in promoted if "\\max\\quad" in ln)
     d["can_con"] = next(ln.strip() for ln in promoted if "eq\\_0003" in ln)
 
-    promo = json.loads((CORPUS / "promotion.json").read_text())
+    promo = json.loads((CORPUS / "promotion.json").read_text(encoding="utf-8"))
     entry = next(p for p in promo["papers"] if p["paper_key"] == KEY)
     d["rows"] = entry["rows"]
     d["rows_in"] = entry["partial"]["rows_included"]
@@ -488,13 +488,13 @@ def real_data() -> dict:
 
     d["graph"] = schema_nx(load(CORPUS / "formulations" / f"{KEY}.json"))
 
-    wl = json.loads((CORPUS / "wl" / "similarity.json").read_text())
+    wl = json.loads((CORPUS / "wl" / "similarity.json").read_text(encoding="utf-8"))
     row = wl["matrix"][KEY]
     sim, nb = max((s, m) for m, s in row.items() if m != KEY)
-    nbd = json.loads((CORPUS / "dossiers" / f"{nb}.json").read_text())["source"]
+    nbd = json.loads((CORPUS / "dossiers" / f"{nb}.json").read_text(encoding="utf-8"))["source"]
     d["wl_sim"], d["wl_title"], d["wl_year"] = sim, nbd["title"], nbd["year"]
 
-    clusters = json.loads((CORPUS / "fingerprint" / "clusters.json").read_text())
+    clusters = json.loads((CORPUS / "fingerprint" / "clusters.json").read_text(encoding="utf-8"))
     from corpusbuilder.fingerprint import cluster_label
 
     cl = next(c for c in clusters["clusters"] if KEY in c["papers"])

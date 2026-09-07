@@ -96,7 +96,9 @@ def main() -> None:
         "min_cites_for_relevant": MIN_CITES,
         "candidates": cands,
     }
-    OUT_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+    OUT_JSON.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n"
+    )
 
     rec = [c for c in cands if c["recommended"]][:60]
     lines = [
@@ -118,7 +120,7 @@ def main() -> None:
             f"| {c['seed_connections']} | {c['backward']}/{c['forward']} | "
             f"{c['cited_by_count']} | {c['year'] or '—'} | {rel} | {doi} | {title} |"
         )
-    OUT_MD.write_text("\n".join(lines) + "\n")
+    OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
     print(
         f"{len(cands)} neighbours, {payload['n_recommended']} recommended -> "

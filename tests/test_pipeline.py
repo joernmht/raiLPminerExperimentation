@@ -42,8 +42,8 @@ def test_run_writes_all_artifacts(tmp_path, config) -> None:
     written = {p.name for p in tmp_path.iterdir()}
     assert expected <= written
     # Artifacts are valid JSON where claimed.
-    json.loads((tmp_path / "dataset.json").read_text())
-    json.loads((tmp_path / "run_summary.json").read_text())
+    json.loads((tmp_path / "dataset.json").read_text(encoding="utf-8"))
+    json.loads((tmp_path / "run_summary.json").read_text(encoding="utf-8"))
 
 
 def test_summary_reports_versions(config) -> None:

@@ -425,6 +425,7 @@ def _cached_chat(
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     usage.add(call_usage, cached=False)
     return content
@@ -1032,7 +1033,9 @@ def export_payload(
 def _write_export(ws: Workspace, dossier: Dossier, payload: dict) -> Path:
     path = ws.decisions / f"assist_{dossier.key}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     return path
 
 
@@ -1218,7 +1221,7 @@ def annotate_paper(
         return run
     sidecar = sidecar_header(dossier, today) + "\n" + str(reply["sidecar"]).strip() + "\n"
     ws.declarations.mkdir(parents=True, exist_ok=True)
-    (ws.declarations / f"{dossier.key}.tex").write_text(sidecar, encoding="utf-8")
+    (ws.declarations / f"{dossier.key}.tex").write_text(sidecar, encoding="utf-8", newline="\n")
     run.stages["c"] = "done"
     if upto == "c":
         return run
@@ -1267,7 +1270,9 @@ def annotate_paper(
         fixed, _still = apply_rowfixes(dossier, triage, sidecar, fixes)
         total_fixed += fixed
         if fixed and additions:
-            (ws.declarations / f"{dossier.key}.tex").write_text(sidecar, encoding="utf-8")
+            (ws.declarations / f"{dossier.key}.tex").write_text(
+                sidecar, encoding="utf-8", newline="\n"
+            )
         failures, objective_failed = probe_row_failures(dossier, triage, sidecar)
         if not failures:
             break
@@ -1762,9 +1767,9 @@ def write_report(ws: Workspace, report: dict, *, suffix: str | None = None) -> N
     ws.assist.mkdir(parents=True, exist_ok=True)
     stem = f"report.{suffix}" if suffix else "report"
     (ws.assist / f"{stem}.json").write_text(
-        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
     )
-    (ws.assist / f"{stem}.md").write_text(render_report_md(report), encoding="utf-8")
+    (ws.assist / f"{stem}.md").write_text(render_report_md(report), encoding="utf-8", newline="\n")
 
 
 # --------------------------------------------------------------------------- #
