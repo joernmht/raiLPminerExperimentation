@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import replace
 
+import railpminer
 from railpminer import run
 
 
@@ -49,3 +50,14 @@ def test_run_writes_all_artifacts(tmp_path, config) -> None:
 def test_summary_reports_versions(config) -> None:
     summary = run(config, write=False).summary()
     assert summary["versions"]["clustering"].startswith("cluster-")
+
+
+def test_summary_reports_the_software_that_produced_it(config) -> None:
+    """Resource versions pin the method's inputs; these pin its implementation."""
+    software = run(config, write=False).summary()["software"]
+    assert set(software) == {"railpminer", "lp2graph", "python"}
+    assert software["railpminer"] == railpminer.__version__
+    # A sibling source checkout has no distribution metadata, so the module
+    # attribute is the fallback — either way it must resolve to a real version.
+    assert software["lp2graph"] != "unknown"
+    assert software["python"].startswith("3.")
