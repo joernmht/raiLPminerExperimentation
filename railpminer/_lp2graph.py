@@ -10,6 +10,14 @@ module adds a sibling ``lp2graph/src`` to ``sys.path`` *only* when the package
 cannot already be imported. An installed ``lp2graph`` always wins; the fallback
 never shadows it.
 
+The search walks *up* from the repository root rather than probing two fixed
+relative levels, because the checkout is not always a direct sibling of
+``lp2graph``: a ``git worktree`` (the nightly quality loop uses
+``~/.claude/loops/worktrees/<repo>``) or a CI layout that nests the checkout
+puts several directories between the two. Ancestors are searched nearest-first
+and the walk is bounded (:data:`_MAX_ANCESTORS`) so it cannot wander up to
+``/`` and pick up an unrelated tree.
+
 Set ``LP2GRAPH_SRC`` to point at a specific ``lp2graph/src`` directory to
 override the search.
 """
@@ -26,6 +34,12 @@ def _already_importable() -> bool:
     return importlib.util.find_spec("lp2graph") is not None
 
 
+#: How far above the repository root to look for a ``lp2graph`` checkout.
+#: 5 covers a direct sibling (``../lp2graph``) through a worktree nested four
+#: deep, without reaching into unrelated parts of the filesystem.
+_MAX_ANCESTORS = 5
+
+
 def _candidate_src_dirs() -> list[Path]:
     """Plausible ``lp2graph/src`` locations, most specific first."""
     candidates: list[Path] = []
@@ -35,9 +49,9 @@ def _candidate_src_dirs() -> list[Path]:
     here = Path(__file__).resolve()
     # repo root is the parent of the ``railpminer`` package directory
     repo_root = here.parent.parent
-    # common sibling layouts: ../lp2graph/src and ../../lp2graph/src
-    candidates.append(repo_root.parent / "lp2graph" / "src")
-    candidates.append(repo_root.parent.parent / "lp2graph" / "src")
+    # Nearest ancestor first: a direct sibling wins over a distant namesake.
+    for ancestor in list(repo_root.parents)[:_MAX_ANCESTORS]:
+        candidates.append(ancestor / "lp2graph" / "src")
     return candidates
 
 
