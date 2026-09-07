@@ -833,7 +833,9 @@ def promote_paper(
         if write:
             stub = dirs["declarations"] / f"{dossier.key}.stub.tex"
             stub.parent.mkdir(parents=True, exist_ok=True)
-            stub.write_text(declaration_stub(dossier, rows, symbols), encoding="utf-8")
+            stub.write_text(
+                declaration_stub(dossier, rows, symbols), encoding="utf-8", newline="\n"
+            )
             written = (_rel(stub),)
         return fail("missing_declarations", _rel(decl_path), written)
 
@@ -843,7 +845,7 @@ def promote_paper(
     if write:
         dirs["promoted"].mkdir(parents=True, exist_ok=True)
         tex_path = dirs["promoted"] / f"{entry_id}.tex"
-        tex_path.write_text(document, encoding="utf-8")
+        tex_path.write_text(document, encoding="utf-8", newline="\n")
         written_paths.append(_rel(tex_path))
 
     result = ingest_latex(document, source=f"corpus/promoted/{entry_id}.tex")
@@ -887,7 +889,7 @@ def promote_paper(
                     excluded = tuple(dropped)
                     if write:
                         tex_path = dirs["promoted"] / f"{entry_id}.tex"
-                        tex_path.write_text(document, encoding="utf-8")
+                        tex_path.write_text(document, encoding="utf-8", newline="\n")
     if not result.ok:
         stage = result.failures[0].stage
         cause = {
@@ -934,7 +936,7 @@ def promote_paper(
             ),
         ):
             directory.mkdir(parents=True, exist_ok=True)
-            (directory / name).write_text(text, encoding="utf-8")
+            (directory / name).write_text(text, encoding="utf-8", newline="\n")
             written_paths.append(_rel(directory / name))
 
     return Outcome(
@@ -1183,9 +1185,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.dry_run:
         (CORPUS / "promotion.json").write_text(
-            json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
         )
-        (CORPUS / "promotion.md").write_text(render_report_md(report), encoding="utf-8")
+        (CORPUS / "promotion.md").write_text(
+            render_report_md(report), encoding="utf-8", newline="\n"
+        )
 
     print(
         f"papers with decisions: {report['papers_with_decisions']} · "

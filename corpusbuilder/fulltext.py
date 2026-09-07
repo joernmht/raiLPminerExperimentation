@@ -92,11 +92,13 @@ def fetch_all(sleep_s: float = 0.7, refetch: bool = False) -> dict:
         if not ElsevierClient.has_full_text(xml):
             log["no_body"].append(key)  # metadata-only: not entitled via this route
         else:
-            target.write_text(xml, encoding="utf-8")
+            target.write_text(xml, encoding="utf-8", newline="\n")
             log["fetched"].append(key)
         print(f"[{i}/{len(dossiers)}] {'ok  ' if key in log['fetched'] else 'meta'} {key}")
         time.sleep(sleep_s)
-    (FULLTEXT / "_fetch_log.json").write_text(json.dumps(log, indent=1), encoding="utf-8")
+    (FULLTEXT / "_fetch_log.json").write_text(
+        json.dumps(log, indent=1), encoding="utf-8", newline="\n"
+    )
     return log
 
 
@@ -190,10 +192,12 @@ def extract_all() -> dict:
             log["failed"].append({"key": d.key, "error": str(e)[:200]})
             continue
         (PROSE / f"{d.key}.json").write_text(
-            json.dumps(digest, ensure_ascii=False, indent=1), encoding="utf-8"
+            json.dumps(digest, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n"
         )
         (log["ok"] if digest["paras"] else log["empty"]).append(d.key)
-    (PROSE / "_extract_log.json").write_text(json.dumps(log, indent=1), encoding="utf-8")
+    (PROSE / "_extract_log.json").write_text(
+        json.dumps(log, indent=1), encoding="utf-8", newline="\n"
+    )
     return log
 
 

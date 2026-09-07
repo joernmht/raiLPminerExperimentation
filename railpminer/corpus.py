@@ -82,7 +82,7 @@ class LoadedCorpus:
 
 
 def _load_manifest(path: Path) -> CorpusManifest:
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     # Construct directly from the regeneration fields; we deliberately do not
     # couple this repo's manifest file to lp2graph's internal schema version.
     return CorpusManifest(
@@ -93,7 +93,7 @@ def _load_manifest(path: Path) -> CorpusManifest:
 
 
 def _load_provenance(path: Path) -> ProvenanceRecord:
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     kwargs = {k: data[k] for k in _PROV_FIELDS if k in data}
     return ProvenanceRecord(**kwargs)
 

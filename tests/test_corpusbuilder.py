@@ -248,7 +248,7 @@ def test_elsevier_parser_does_not_disclose_local_files(tmp_path) -> None:
     from corpusbuilder.elsevier import _XML_PARSER
 
     secret = tmp_path / "secret.txt"
-    secret.write_text("TOPSECRET")
+    secret.write_text("TOPSECRET", encoding="utf-8")
     xml = f'<?xml version="1.0"?><!DOCTYPE r [<!ENTITY x SYSTEM "file://{secret}">]><r>&x;</r>'
     try:
         root = etree.fromstring(xml.encode(), parser=_XML_PARSER)

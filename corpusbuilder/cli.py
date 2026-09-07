@@ -101,6 +101,7 @@ def cmd_seeds(args: argparse.Namespace) -> int:
             json.dumps([s.model_dump(mode="json") for s in seeds], indent=2, ensure_ascii=False)
             + "\n",
             encoding="utf-8",
+            newline="\n",
         )
         print(f"\nwrote {out}")
     return 0

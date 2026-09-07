@@ -1300,8 +1300,8 @@ def convert_all(src: Path = DEFAULT_SRC, out: Path = DEFAULT_OUT) -> dict:
             )
             # Round-trip guard: an entry that cannot re-load is not a corpus entry.
             load_formulation(payload, source=entry)
-            (out / f"{entry}.json").write_text(payload + "\n", encoding="utf-8")
-            (out / f"{entry}.tex").write_text(document, encoding="utf-8")
+            (out / f"{entry}.json").write_text(payload + "\n", encoding="utf-8", newline="\n")
+            (out / f"{entry}.tex").write_text(document, encoding="utf-8", newline="\n")
             meta = {
                 "repo": repo,
                 "url": doc.get("url"),
@@ -1317,6 +1317,7 @@ def convert_all(src: Path = DEFAULT_SRC, out: Path = DEFAULT_OUT) -> dict:
             (out / f"{entry}.meta.json").write_text(
                 json.dumps(meta, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
                 encoding="utf-8",
+                newline="\n",
             )
             converted.append(entry)
 
@@ -1331,6 +1332,7 @@ def convert_all(src: Path = DEFAULT_SRC, out: Path = DEFAULT_OUT) -> dict:
     (out / "_report.json").write_text(
         json.dumps(report, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return report
 

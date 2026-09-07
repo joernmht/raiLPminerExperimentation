@@ -105,13 +105,13 @@ def tw(
 def _jread(p: Path):
     if not p.is_file():
         fail(f"missing artifact {p}")
-    return json.loads(p.read_text())
+    return json.loads(p.read_text(encoding="utf-8"))
 
 
 def _transcript(p: Path) -> list[dict]:
     if not p.is_file():
         fail(f"missing transcript {p}")
-    return [json.loads(line) for line in p.read_text().splitlines() if line.strip()]
+    return [json.loads(line) for line in p.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
 #: (pydantic model, field) -> 3-6 word finding class shown on a round chip.
@@ -212,7 +212,7 @@ def data() -> dict:
         fail("round verdicts are not invalid,invalid,invalid,valid")
     d["temp_fb"] = tr[0]["temperature"]
 
-    final_tex = (fdir / "final.tex").read_text()
+    final_tex = (fdir / "final.tex").read_text(encoding="utf-8")
     align = [ln.strip() for ln in final_tex.splitlines() if ln.strip().startswith(("\\min", "&"))]
     if len(align) != 3:
         fail(f"expected 3 align rows in final.tex, got {len(align)}")

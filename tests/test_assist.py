@@ -170,7 +170,7 @@ def test_export_round_trips_through_promote_loaders(workspace, monkeypatch):
     assert run.stages == {"a": "done", "b": "done"}
 
     path = ws.decisions / f"assist_{dossier.key}.json"
-    payload = json.loads(path.read_text())
+    payload = json.loads(path.read_text(encoding="utf-8"))
     assert payload["schema_version"] == "game-decisions-3"
     assert payload["source"].startswith("corpusbuilder.assist ")
 
@@ -212,7 +212,7 @@ def test_corrected_parts_follow_the_game_contract(workspace, monkeypatch):
     annotate_paper(ws, dossier.key, upto="a", today=TODAY)
 
     path = ws.decisions / f"assist_{dossier.key}.json"
-    exported = json.loads(path.read_text())["formula_decisions"][0]["decisions"]
+    exported = json.loads(path.read_text(encoding="utf-8"))["formula_decisions"][0]["decisions"]
     corrected = next(d for d in exported if d["id"] == "eq-0001")
     assert corrected["note"] == parts[0]
     assert corrected["parts"] == parts
@@ -298,7 +298,7 @@ def test_annotated_sidecar_is_validated_and_marked_non_deterministic(workspace, 
     run = annotate_paper(ws, dossier.key, upto="c", today=TODAY)
     assert run.stages["c"] == "done"
 
-    text = (ws.declarations / f"{dossier.key}.tex").read_text()
+    text = (ws.declarations / f"{dossier.key}.tex").read_text(encoding="utf-8")
     assert "Non-deterministically sourced; pending human confirmation." in text
     assert "rung (c)" in text
     assert assist.model_id() in text
@@ -327,7 +327,10 @@ def test_stage_c_retries_with_the_validation_errors_fed_back(workspace, monkeypa
     assert "Your previous reply was rejected" in c_prompts[1]
     assert "kind must be one of" in c_prompts[1]
     assert (
-        validate_sidecar((ws.declarations / f"{dossier.key}.tex").read_text(), _rows(dossier)) == []
+        validate_sidecar(
+            (ws.declarations / f"{dossier.key}.tex").read_text(encoding="utf-8"), _rows(dossier)
+        )
+        == []
     )
 
 
@@ -535,7 +538,7 @@ def test_report_records_tokens_and_cost_at_both_rates(workspace, monkeypatch):
     report = assist.build_report([run], today=TODAY)
     assist.write_report(ws, report)
 
-    data = json.loads((ws.assist / "report.json").read_text())
+    data = json.loads((ws.assist / "report.json").read_text(encoding="utf-8"))
     tokens = data["totals"]["tokens"]
     assert tokens["calls"] == 3
     assert tokens["prompt_miss_tokens"] == 240 and tokens["prompt_hit_tokens"] == 60
@@ -543,7 +546,11 @@ def test_report_records_tokens_and_cost_at_both_rates(workspace, monkeypatch):
     assert tokens["cost_usd"]["off_peak"] == pytest.approx(
         tokens["cost_usd"]["standard"] * assist.OFF_PEAK_FACTOR
     )
-    assert (ws.assist / "report.md").read_text().startswith("# Assisted resolution report")
+    assert (
+        (ws.assist / "report.md")
+        .read_text(encoding="utf-8")
+        .startswith("# Assisted resolution report")
+    )
 
 
 def test_cost_model_applies_the_published_rates():

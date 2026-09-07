@@ -293,13 +293,14 @@ def write_features(payload: dict, out: Path) -> tuple[Path, Path]:
     json_path.write_text(
         json.dumps(rounded, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     names = payload["features"]
     lines = ["paper_key," + ",".join(names)]
     for key, vec in sorted(payload["papers"].items()):
         lines.append(key + "," + ",".join(f"{_round(vec[n]):g}" for n in names))
     csv_path = out / "features.csv"
-    csv_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    csv_path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return json_path, csv_path
 
 
@@ -534,6 +535,7 @@ def run(
     clusters_path.write_text(
         json.dumps(clusters, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return {
         "papers": len(payload["papers"]),

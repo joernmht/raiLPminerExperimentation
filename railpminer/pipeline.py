@@ -84,7 +84,7 @@ def _versioned_resources() -> dict[str, str]:
 
 
 def _write_json(path: Path, obj: Any) -> None:
-    path.write_text(json.dumps(obj, indent=2, default=str) + "\n")
+    path.write_text(json.dumps(obj, indent=2, default=str) + "\n", encoding="utf-8", newline="\n")
 
 
 def run(config: PipelineConfig | None = None, *, write: bool = True) -> MiningResult:
@@ -127,8 +127,12 @@ def run(config: PipelineConfig | None = None, *, write: bool = True) -> MiningRe
         out.mkdir(parents=True, exist_ok=True)
         _write_json(out / "dataset.json", ds)
         _write_json(out / "taxonomy.json", tax_artifact)
-        (out / "taxonomy.csv").write_text(taxonomy_export.to_csv(tax_artifact["axes"]))
-        (out / "taxonomy_axes.tex").write_text(taxonomy_export.to_latex(tax_artifact["axes"]))
+        (out / "taxonomy.csv").write_text(
+            taxonomy_export.to_csv(tax_artifact["axes"]), encoding="utf-8", newline="\n"
+        )
+        (out / "taxonomy_axes.tex").write_text(
+            taxonomy_export.to_latex(tax_artifact["axes"]), encoding="utf-8", newline="\n"
+        )
         _write_json(
             out / "clustering_report.json",
             {

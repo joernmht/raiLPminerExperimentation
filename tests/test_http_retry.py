@@ -479,7 +479,7 @@ def test_discover_checkpoint_roundtrip_and_corruption_tolerance(tmp_path, monkey
     _discover._save_checkpoint({"q1": [{"title": "A"}]})
     assert _discover._load_checkpoint() == {"q1": [{"title": "A"}]}
 
-    (tmp_path / "partial.json").write_text("{not json")
+    (tmp_path / "partial.json").write_text("{not json", encoding="utf-8")
     assert _discover._load_checkpoint() == {}  # corrupt -> start over, never crash
 
 
@@ -489,7 +489,7 @@ def test_discover_partial_sweep_refuses_to_write_the_corpus_artifact(tmp_path, m
     from corpusbuilder._http import AcquisitionError
 
     manifest = tmp_path / "manifest.json"
-    manifest.write_text('{"queries": ["q1", "q2"]}')
+    manifest.write_text('{"queries": ["q1", "q2"]}', encoding="utf-8")
     monkeypatch.setattr(_discover, "MANIFEST", manifest)
     monkeypatch.setattr(_discover, "OUT_JSON", tmp_path / "candidates.json")
     monkeypatch.setattr(_discover, "OUT_MD", tmp_path / "candidates.md")
@@ -522,7 +522,7 @@ def test_discover_resume_reuses_checkpoint_and_completes(tmp_path, monkeypatch) 
     from corpusbuilder import _discover
 
     manifest = tmp_path / "manifest.json"
-    manifest.write_text('{"queries": ["q1", "q2"]}')
+    manifest.write_text('{"queries": ["q1", "q2"]}', encoding="utf-8")
     monkeypatch.setattr(_discover, "MANIFEST", manifest)
     monkeypatch.setattr(_discover, "OUT_JSON", tmp_path / "candidates.json")
     monkeypatch.setattr(_discover, "OUT_MD", tmp_path / "candidates.md")
@@ -564,7 +564,7 @@ def test_discover_resume_reuses_checkpoint_and_completes(tmp_path, monkeypatch) 
 
     assert rc == 0
     search.assert_called_once()  # q1 came from the checkpoint; only q2 re-ran
-    payload = json.loads((tmp_path / "candidates.json").read_text())
+    payload = json.loads((tmp_path / "candidates.json").read_text(encoding="utf-8"))
     assert payload["queries"] == ["q1", "q2"]  # full PRISMA denominator
     assert payload["n_candidates"] == 2
     assert not (tmp_path / "partial.json").exists()  # checkpoint cleared on success

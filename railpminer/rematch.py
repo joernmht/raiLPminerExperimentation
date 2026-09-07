@@ -90,7 +90,9 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     report = rematch(args.runs, args.match, args.top)
     out = Path(args.out) if args.out else Path(args.runs) / "rematch.json"
-    out.write_text(json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    out.write_text(
+        json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+    )
     print(
         f"{report['match_set_size']} match candidates · {len(report['runs'])} runs rematched -> {out}"
     )

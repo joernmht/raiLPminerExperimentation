@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def data() -> tuple[list, list, int, int]:
-    r = json.loads((ROOT / "corpus/resolution.json").read_text())
+    r = json.loads((ROOT / "corpus/resolution.json").read_text(encoding="utf-8"))
     total = r["formulas"]
     parses = r["structural_axes"]["parses"]
     clean = r["structurally_clean"]
@@ -36,7 +36,7 @@ def data() -> tuple[list, list, int, int]:
     if sum(n for _, n, _ in pie1) != total:
         raise SystemExit("pie 1 does not sum to the formula total")
 
-    p = json.loads((ROOT / "corpus/promotion.json").read_text())
+    p = json.loads((ROOT / "corpus/promotion.json").read_text(encoding="utf-8"))
     canon = excl = grammar = other = 0
     for e in p["papers"]:
         rows = e.get("rows") or 0
