@@ -6,7 +6,7 @@ mining pipeline) and **`corpusbuilder/`** (corpus acquisition: OpenAlex / arXiv 
 Elsevier ingest → per-paper dossiers → PRISMA tally). The *method* lives in
 `lp2graph`; this repo is corpus management + orchestration + artifact generation.
 
-_Last verified: 2026-07-10 (nightly quality pass — Reliability)._
+_Last verified: 2026-09-07 (nightly quality pass — Compatibility)._
 
 ## Languages & runtime
 
@@ -59,7 +59,7 @@ the only deferred work is network I/O (clients) and the Node subprocess (mathml)
   never dropped.
 - `cli.py` — `python -m railpminer {run|corpus|cluster|label|validate|taxonomy}`.
 
-### `corpusbuilder/` — corpus acquisition (1.9k LOC, the active 2026-06/07 work)
+### `corpusbuilder/` — corpus acquisition + HITL review (14.6k LOC, 26 modules)
 Clean DAG, no import cycles. `dossier.py` (Pydantic models) is the leaf data
 contract; `config.py` is dependency-light credential loading; `_http.py` is the
 shared transient-fault layer (retry/backoff + `AcquisitionError`) that every
@@ -70,6 +70,18 @@ Extraction is a **tiered ladder** (ADR-0002): Tier-1 arXiv `.tex` → Tier-2
 Elsevier MathML → Tier-3 OCR (future). A clear **determinism boundary**
 (ADR-0001) separates acquisition (records a real retrieval date, network) from
 the forward pipeline (frozen files, no `Date.now`).
+
+Since the 2026-07 refresh the package has grown well past acquisition; the
+five largest modules are now the review/promotion machinery, not the clients:
+`game.py` (3.2k — the browser HITL review app), `talkpack.py` (1.9k — figure
+and numbers pack), `assist.py` (1.9k — parser-gated assisted resolution,
+ADR-0011), `repo_corpus.py` (1.4k — exact-or-refused repo conversion,
+ADR-0015), `promote.py` (1.2k — declaration-gated promotion, ADR-0010/0013).
+`split.py`, `fingerprint.py`, `resolution.py`, `symbols.py` and `wlcluster.py`
+(ADR-0014) round out the corpus-shaping side.
+
+Sizes (2026-09-07): `railpminer` 2.8k LOC / 14 files · `corpusbuilder` 14.6k /
+26 · `scripts` 3.3k / 7 · `tests` 4.3k / 17.
 
 ## Entry points
 
@@ -91,7 +103,7 @@ drivers should retry on 2 and escalate on 1.
 
 | Task | Command |
 |---|---|
-| Tests | `PYTHONPATH=../lp2graph/src python3 -m pytest` (68 tests; offline, no sleeps) |
+| Tests | `python3 -m pytest` (285 tests; offline, no sleeps — the sibling lp2graph checkout is auto-detected, or set `LP2GRAPH_SRC`) |
 | Lint | `ruff check .` |
 | Format | `ruff format --check .` (apply: `ruff format .`) |
 | Types | `mypy railpminer corpusbuilder` (**not** `--strict` yet — relaxing |
@@ -103,10 +115,18 @@ Run order before declaring done (STYLE.md §1): `ruff check` → `ruff format
 
 ## CI
 
-`.github/workflows/ci.yml` runs `ruff check` + `ruff format --check` + `pytest`
-on py3.11–3.13 (mirrors lp2graph; `mypy` deferred until the corpusbuilder type
-debt is paid down). `lp2graph` is installed in CI from the sibling checkout /
-PyPI per the workflow. *(Added 2026-06-22; previously no CI.)*
+`.github/workflows/ci.yml` has two jobs. **`test`** runs `ruff check` +
+`ruff format --check` + `pytest` on py3.11–3.13 (mirrors lp2graph; `mypy`
+deferred until the corpusbuilder type debt is paid down). **`c-locale`** runs
+the suite once with `PYTHONUTF8=0 PYTHONCOERCECLOCALE=0 LC_ALL=C`, which drives
+Python's preferred encoding to ASCII — the compatibility gate for ADR-0016.
+`lp2graph` is installed in CI from the sibling checkout per the workflow.
+*(CI added 2026-06-22; `c-locale` added 2026-09-07.)*
+
+> The lint step gates the rest of the job. CI on `main` was **red at `Lint`
+> for three consecutive runs (2026-08-14 → 2026-09-06)**, so `pytest` did not
+> run in CI at all for ~3.5 weeks. If `ruff check` fails, assume there is *no*
+> test signal, not a passing one.
 
 ## Known drift / watch items
 
@@ -118,7 +138,21 @@ PyPI per the workflow. *(Added 2026-06-22; previously no CI.)*
   in lp2graph, not here.
 - **Corpus status:** the shipped `corpus/` is an illustrative SEED (10 structural
   templates), *not* the paper-grade dataset. See `README.md` and the home
-  `CLAUDE.md` corpus ground-truth note.
+  `CLAUDE.md` corpus ground-truth note. (`corpus/formulations/` now holds 18
+  entries — the 10 seed templates plus 8 hand-canonicalised extractions.)
+- **The `lp2graph` requirement is unbounded** (`lp2graph[mining,solver]>=0.3`)
+  and lp2graph is a *source* sibling here, not an installed distribution, so
+  the method implementation in play is whatever `../lp2graph/src` currently
+  contains. ADR-0017 makes that visible in `run_summary.json.software`; it does
+  not constrain it. Capping at `<0.4` would make a breaking bump loud but would
+  also break the cross-repo dev loop — a deliberate open question, not an
+  oversight.
+- **`schema_version` is written but almost never verified.** Seven schema
+  families ship in `corpus/` (`dossier-1` ×286, `game-decisions-3` ×228,
+  `0.1.0` ×25, `fingerprint-1`, `promotion-1`, `prisma-1`, plain `"1"`), and
+  the only reader that checks one is `railpminer/verifier_demo.py:416`. A
+  version tag no consumer validates buys nothing; naming is ad hoc too
+  (`name-N` vs semver vs bare integer).
 
 ## Security posture (acquisition boundary)
 
@@ -171,4 +205,38 @@ refuse to write the corpus record it would have produced.
   absorb 429s reactively). `SourceInfo` cannot distinguish "Scopus: not indexed"
   from "Scopus lookup failed" — both serialize as `null`; fixing needs a
   `dossier-2` schema bump.
-</invoke>
+
+## Compatibility posture (interchange boundary)
+
+Assessed in the 2026-09-07 compatibility pass (**ADR-0016**, **ADR-0017**). The
+corpus is an interchange artifact — public GitHub, Zenodo-bound, read by third
+parties on their own machines — so its encoding and line endings are part of
+the contract, not of the environment.
+
+- **UTF-8 everywhere, declared.** Every text-mode `open()` / `read_text()` /
+  `write_text()` passes `encoding="utf-8"` (78 call sites converted). 487
+  corpus JSON files carry non-ASCII; 472 contain at least one character cp1252
+  cannot represent. Under a Windows default a read *silently mojibakes* and a
+  write raises `UnicodeEncodeError`.
+- **LF everywhere, declared.** Every text write in the producing packages
+  passes `newline="\n"` (55 call sites). Without it `os.linesep` turns the
+  emitted artifacts into CRLF on Windows, which breaks the repo's
+  byte-identical-artifact claim by every line. Reads keep universal-newline
+  translation, so CRLF input still parses.
+- **Enforced, not asserted.** `tests/test_text_io_encoding.py` walks the AST of
+  `railpminer`, `corpusbuilder`, `scripts` and `tests`, and carries
+  planted-violation tests so a green run proves the guard can still fail. The
+  CI `c-locale` job runs the whole suite under an ASCII default.
+- **Provenance of the code, not just the data.** `run_summary.json` now carries
+  a `software` block (`railpminer`, `lp2graph`, `python`) alongside the frozen
+  lp2graph *resource* versions, so an artifact set is traceable to the
+  implementation that emitted it (ADR-0017).
+- **Interpreter range is claimed but only partly gated.** `requires-python =
+  ">=3.11"` and CI covers 3.11–3.13 on ubuntu only. No Windows or macOS runner
+  exists, which is exactly why the encoding drift went unnoticed; the
+  `c-locale` job is the affordable proxy, not a substitute.
+- **Node bridge.** `corpusbuilder/mathml.py` shells out to a vendored
+  `mathml-to-latex` under `corpusbuilder/_mathml2latex` (needs `node` +
+  `npm install`). Pure-Python paths never touch it, and it is invoked with an
+  argv list over stdin/JSON, so it is a compatibility dependency rather than a
+  security one.
