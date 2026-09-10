@@ -69,6 +69,7 @@ import json
 import re
 import sys
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -1106,16 +1107,24 @@ def promote_all(
     write: bool = True,
     only: set[str] | None = None,
     partial: bool = False,
+    progress: Callable[[int, int, str], None] | None = None,
 ) -> dict:
-    """Promote every paper that has decisions, and return the report."""
+    """Promote every paper that has decisions, and return the report.
+
+    ``progress(done, total, paper_key)`` is called before each paper (a
+    heartbeat hook for the factory floor, ADR-0018); it never changes the
+    result.
+    """
     paths = sorted(decisions_dir.glob("*.json")) if decisions_dir.exists() else []
     papers, unrecognised = load_decisions(paths)
     symbol_tables = load_symbol_tables(paths)
 
     outcomes: list[Outcome] = []
-    for key, decisions in papers.items():
-        if only and key not in only:
-            continue
+    selected = [key for key in papers if not only or key in only]
+    for key in selected:
+        decisions = papers[key]
+        if progress is not None:
+            progress(len(outcomes), len(selected), key)
         dossier_path = dossiers_dir / f"{key}.json"
         if not dossier_path.exists():
             outcomes.append(
@@ -1174,14 +1183,18 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    report = promote_all(
-        decisions_dir=args.decisions,
-        dossiers_dir=args.dossiers,
-        declarations_dir=args.declarations,
-        write=not args.dry_run,
-        only=set(args.only) or None,
-        partial=args.partial,
-    )
+    from corpusbuilder import factory  # heartbeat only (ADR-0018); library calls stay silent
+
+    with factory.running("promote") as tick:
+        report = promote_all(
+            decisions_dir=args.decisions,
+            dossiers_dir=args.dossiers,
+            declarations_dir=args.declarations,
+            write=not args.dry_run,
+            only=set(args.only) or None,
+            partial=args.partial,
+            progress=lambda done, total, key: tick(done, note=key, total=total),
+        )
 
     if not args.dry_run:
         (CORPUS / "promotion.json").write_text(
