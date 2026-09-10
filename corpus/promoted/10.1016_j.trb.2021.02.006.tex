@@ -66,31 +66,31 @@
   & \text{s}.\text{t}. y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \forall \left(i , j\right) \in A \tag{eq\_0012} \\
   & \mathit{ell}_{i j} \leq y_{i j} \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0013} \\
   & Y_{r} = \sum_{a \in r} \left(y_{a} + \mathit{gamma}_{t} \cdot 1_{t} \left(a\right)\right) \forall r \in \mathcal{R} \tag{eq\_0014} \\
-  & L_{v}^{k} = \underset{v^{'} \in V^{k} \backslash \left\{v\right\}}{min} \left\{\mathit{pi}_{v} - \mathit{pi}_{v^{'}} + T \mathit{alpha}_{v^{'} , v}\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0015} \\
-  & \mathit{alpha}_{v , v^{'}} + \mathit{alpha}_{v^{'} , v} = 1 \forall k \in \mathcal{OD} , v \in V^{k} , v^{'} \in V^{k} \backslash \left\{v\right\} \tag{eq\_0016} \\
+  & L_{v}^{k} = \underset{vp \in V^{k} \backslash \left\{v\right\}}{min} \left\{\mathit{pi}_{v} - \mathit{pi}_{vp} + T \mathit{alpha}_{vp , v}\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0015} \\
+  & \mathit{alpha}_{v , vp} + \mathit{alpha}_{vp , v} = 1 \forall k \in \mathcal{OD} , v \in V^{k} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0016} \\
   & W_{v}^{k} = \frac{1}{2} L_{v}^{k} \forall k \in \mathcal{OD} , \forall v \in V^{k} \tag{eq\_0017} \\
-  & Y_{v}^{k} = \underset{v^{'} \in V^{k}}{min} \underset{r \in \mathcal{R}_{v^{'}}^{k}}{min} \left\{Y_{r} + \mathit{gamma}_{w} \cdot \left(\mathit{pi}_{v^{'}} - \mathit{pi}_{v} + T \mathit{alpha}_{v , v^{'}}\right)\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0018} \\
+  & Y_{v}^{k} = \underset{vp \in V^{k}}{min} \underset{r \in \mathcal{R}_{vp}^{k}}{min} \left\{Y_{r} + \mathit{gamma}_{w} \cdot \left(\mathit{pi}_{vp} - \mathit{pi}_{v} + T \mathit{alpha}_{v , vp}\right)\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0018} \\
   & L_{v}^{k} \in \left[0 , T\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0019} \\
   & W_{v}^{k} \in \left[0 , T / 2\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0020} \\
   & Y_{r} , Y_{v}^{k} \in \mathcal{R}_{\geq 0} \forall r \in \mathcal{R} , k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0021} \\
   & \mathit{pi}_{v} \in \left\{0 , \ldots , T - 1\right\} \forall v \in V \tag{eq\_0022} \\
   & p_{i j} \in \mathcal{Z}_{\geq 0} \forall \left(i , j\right) \in A \tag{eq\_0023} \\
-  & \mathit{alpha}_{v , v^{'}} \in \left\{0 , 1\right\} \forall k \in \mathcal{OD} , v \in V^{k} , v^{'} \in V^{k} \backslash \left\{v\right\} . \tag{eq\_0024} \\
-  & Q_{v , v^{'}} = \mathit{pi}_{v^{'}} - \mathit{pi}_{v} + T \mathit{alpha}_{v , v^{'}} . \tag{eq\_0025} \\
-  & L_{v}^{k} \leq Q_{v^{'} , v} \forall k \in \mathcal{OD} , v^{'} \in V^{k} \backslash \left\{v\right\} \tag{eq\_0026} \\
+  & \mathit{alpha}_{v , vp} \in \left\{0 , 1\right\} \forall k \in \mathcal{OD} , v \in V^{k} , vp \in V^{k} \backslash \left\{v\right\} . \tag{eq\_0024} \\
+  & Q_{v , vp} = \mathit{pi}_{vp} - \mathit{pi}_{v} + T \mathit{alpha}_{v , vp} . \tag{eq\_0025} \\
+  & L_{v}^{k} \leq Q_{vp , v} \forall k \in \mathcal{OD} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0026} \\
   & \sum_{v \in V^{k}} L_{v}^{k} = T . \forall k \in \mathcal{OD} \tag{eq\_0027} \\
   & x_{v , d}^{k} \leq x_{v , d - 1}^{k} \forall k \in \mathcal{OD} , v \in V^{k} , d \in \left\{2 , \ldots , T\right\} . \tag{eq\_0036} \\
   & L_{v}^{k} = \sum_{d = 1}^{T} x_{v , d}^{k} \tag{eq\_0037\_a} \\
   & \left(L_{v}^{k}\right)^{2} = \sum_{d = 1}^{T} \left(2 d - 1\right) \cdot x_{v , d}^{k} \tag{eq\_0037\_b} \\
-  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}} \sum_{d = 1}^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
+  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}, d = 1} ^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
   & R_{v , d}^{k} \leq u_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0039} \\
   & R_{v , d}^{k} \geq l_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0040} \\
   & R_{v , d}^{k} \leq Y_{v}^{k} - l_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) \tag{eq\_0041} \\
   & R_{v , d}^{k} \geq Y_{v}^{k} - u_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) , \tag{eq\_0042} \\
-  & Y_{v}^{k} \leq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , v^{'}} \forall v^{'} \in V^{k} , r \in \mathcal{R}_{v^{'}}^{k} \tag{eq\_0043} \\
-  & Y_{v}^{k} \geq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , v^{'}} - M_{v}^{k} \cdot \left(1 - z_{v , v^{'} , r}^{k}\right) \forall v^{'} \in V^{k} , r \in \mathcal{R}_{v^{'}}^{k} \tag{eq\_0044} \\
-  & \sum_{v^{'} \in V^{k}} \underset{r \in \mathcal{R}_{v^{'}}^{k}}{\sum} z_{v , v^{'} , r}^{k} = 1 . \tag{eq\_0045} \\
-  & M_{v}^{k} = \mathit{gamma}_{w} \cdot T + \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(\bar{Y}\right)_{r}\right\} - \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(\underset{̲}{Y}\right)_{r}\right\} , \tag{eq\_0046} \\
+  & Y_{v}^{k} \leq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , vp} \forall vp \in V^{k} , r \in \mathcal{R}_{vp}^{k} \tag{eq\_0043} \\
+  & Y_{v}^{k} \geq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , vp} - M_{v}^{k} \cdot \left(1 - z_{v , vp , r}^{k}\right) \forall vp \in V^{k} , r \in \mathcal{R}_{vp}^{k} \tag{eq\_0044} \\
+  & \sum_{vp \in V^{k}} \underset{r \in \mathcal{R}_{vp}^{k}}{\sum} z_{v , vp , r}^{k} = 1 . \tag{eq\_0045} \\
+  & M_{v}^{k} = \mathit{gamma}_{w} \cdot T + \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_bar\right)_{r}\right\} - \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_underline\right)_{r}\right\} , \tag{eq\_0046} \\
   & \sum_{v \in V^{k}} \frac{d_{k}}{T} \cdot L_{v}^{k} \cdot W_{v}^{k} \geq d_{k} \cdot \frac{T}{2 \left|\right. V^{k} \left|\right.} . \tag{eq\_0047} \\
   & \text{s}.\text{t}. \sum_{v \in V^{k}} L_{v}^{k} = T \tag{eq\_0049} \\
   & L_{v}^{k} \geq 0 \forall v \in V^{k} . \tag{eq\_0050} \\

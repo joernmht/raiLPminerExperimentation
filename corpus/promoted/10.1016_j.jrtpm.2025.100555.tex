@@ -59,25 +59,25 @@
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{COM}} . \tag{eq\_0004} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{VEH}} . \tag{eq\_0005} \\
   & z_{p} \geq \sum_{w \in \mathcal{W}_{p}} x_{w} - \left|\mathcal{W}_{p}\right| + 1 , \tag{eq\_0006} \\
-  & y_{p p^{'}} + y_{p^{'} p} \leq 1 , \tag{eq\_0007} \\
-  & y_{p p^{'}} + y_{p^{'} p} \geq z_{p} + z_{p^{'}} - 1 , \tag{eq\_0008} \\
-  & t_{p^{'}}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p p^{'}}\right) , \tag{eq\_0009} \\
-  & t_{p}^{\text{entry}} - t_{p^{'}}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p^{'} p}\right) , \tag{eq\_0011} \\
-  & k \cdot T \leq t_{e} \leq \left(k + 1\right) \cdot T , \forall e \in \mathcal{E}_{k}^{\text{origin}} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} \tag{eq\_0012} \\
-  & \hat{k} = \left⌈\frac{\mathit{Delta}}{T}\right⌉ + 1 . \tag{eq\_0013} \\
-  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot T , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0014} \\
-  & x_{w}^{\left(k\right)} = x_{w}^{\left(0\right)} , \forall w \in \mathcal{W} , \forall k \in \left\{1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0015} \\
+  & y_{p pp} + y_{pp p} \leq 1 , \tag{eq\_0007} \\
+  & y_{p pp} + y_{pp p} \geq z_{p} + z_{pp} - 1 , \tag{eq\_0008} \\
+  & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p pp}\right) , \tag{eq\_0009} \\
+  & t_{p}^{\text{entry}} - t_{pp}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{pp p}\right) , \tag{eq\_0011} \\
+  & k \cdot T \leq t_{e} \leq \left(k + 1\right) \cdot T , \forall e \in \mathcal{E}_{k}^{\text{origin}} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} \tag{eq\_0012} \\
+  & k_hat = \left⌈\frac{\mathit{Delta}}{T}\right⌉ + 1 . \tag{eq\_0013} \\
+  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot T , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0014} \\
+  & x_{w}^{\left(k\right)} = x_{w}^{\left(0\right)} , \forall w \in \mathcal{W} , \forall k \in \left\{1 , \ldots , k_hat - 1\right\} . \tag{eq\_0015} \\
   \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) , \tag{eq\_0016} \\
   & t_{e} \in \mathcal{R}^{+} , \forall e \in \mathcal{E} , \tag{eq\_0030} \\
   & t_{p}^{\text{entry}} , t_{p}^{\text{exit}} \in \mathcal{R}^{+} \tag{eq\_0031\_a} \\
   & z_{p} \in \left\{0 , 1\right\} , \forall p \in \mathcal{P} \tag{eq\_0031\_b} \\
-  & y_{p p^{'}} , y_{p^{'} p} \in \left\{0 , 1\right\} , \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0032} \\
+  & y_{p pp} , y_{pp p} \in \left\{0 , 1\right\} , \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0032} \\
   & x_{w} \in \left\{0 , 1\right\} , \forall w \in \mathcal{W} . \tag{eq\_0033} \\
-  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0034} \\
-  & k \cdot \mathit{omega} \leq t_{e} \leq \left(k + 1\right) \cdot \mathit{omega} , \forall e \in \mathcal{E}_{k}^{\text{origin}} \forall k \in \left\{0 , 1 , \ldots \hat{k} - 1\right\} \tag{eq\_0035} \\
-  & t_{e^{\left(k\right)}} \leq t_{e^{\left(0\right)}} + k \bar{T} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0036} \\
-  & t_{e^{\left(k\right)}} \geq t_{e^{\left(0\right)}} + k \underset{̲}{T} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , \hat{k} - 1\right\} . \tag{eq\_0037} \\
-  & t_{p^{'}}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p p^{'}} + \mathit{lambda}_{p p^{'}}\right) \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0040} \\
-  & t_{p}^{\text{entry}} - t_{p^{'}}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p^{'} p} + \mathit{lambda}_{p p^{'}}\right) \forall \left\{p , p^{'}\right\} \in \mathcal{K} , \tag{eq\_0041} \\
-  & \mathit{lambda}_{p p^{'}} \in \left\{0 , 1\right\} \forall \left\{p , p^{'}\right\} \in \mathcal{K} . \tag{eq\_0042} \\
+  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0034} \\
+  & k \cdot \mathit{omega} \leq t_{e} \leq \left(k + 1\right) \cdot \mathit{omega} , \forall e \in \mathcal{E}_{k}^{\text{origin}} \forall k \in \left\{0 , 1 , \ldots k_hat - 1\right\} \tag{eq\_0035} \\
+  & t_{e^{\left(k\right)}} \leq t_{e^{\left(0\right)}} + k \cdot T_bar , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0036} \\
+  & t_{e^{\left(k\right)}} \geq t_{e^{\left(0\right)}} + k \cdot T_underline , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0037} \\
+  & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p pp} + \mathit{lambda}_{p pp}\right) \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0040} \\
+  & t_{p}^{\text{entry}} - t_{pp}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{pp p} + \mathit{lambda}_{p pp}\right) \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0041} \\
+  & \mathit{lambda}_{p pp} \in \left\{0 , 1\right\} \forall \left\{p , pp\right\} \in \mathcal{K} . \tag{eq\_0042} \\
 \end{align}
