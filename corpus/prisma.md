@@ -21,5 +21,5 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: 202
 ## Included
 - Source papers with ≥1 recoverable formulation (**M**): **238**
 - Candidate formulations extracted (**N**, pre-review): **8957**
-- HITL review: accepted 0 · corrected 0 · rejected 0 · unreviewed 8957
+- HITL review: accepted 5270 · corrected 654 · duplicate 719 · rejected 1931 · unreviewed 383
 - Per-cell P1–P5 distribution: _pending domain/activity classification step_
