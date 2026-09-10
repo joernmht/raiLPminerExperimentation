@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import threading
 from collections.abc import Callable, Iterator
@@ -47,6 +48,21 @@ PAPER_DIR = Path.home() / "67531d7506c81a8c34f5794e"
 
 HTML_NAME = "factory.html"
 DATA_NAME = "factory_data.json"
+DOCS = ROOT / "docs"
+
+#: The public demo site this page is a navigator of, and the pages it points at.
+#: Every external URL below answered 200 on 2026-09-10; the Zenodo DOI is
+#: verified through its resolver (doi.org 302 -> zenodo.org, which refuses
+#: scripted clients with 403).
+SITE_URL = "https://railpmining.joernmaurischat.de/"
+LP2GRAPH_URL = "https://lp2graph.joernmaurischat.de/"
+REPO_URL = "https://github.com/joernmht/raiLPminerExperimentation"
+LIB_URL = "https://github.com/joernmht/lp2graph"
+ARXIV_URL = "https://arxiv.org/abs/2607.11980"
+ZENODO_URL = "https://doi.org/10.5281/zenodo.19165428"
+#: A public page must never carry a corpus paper key (Elsevier TDM material is
+#: never published; the keys are the DOIs of the mined papers).
+_PAPER_KEY_RE = re.compile(r"10\.1016|10\.\d{4,9}_j\.")
 STATUS_NAME = "factory_status.json"
 SCHEMA_VERSION = "factory-1"
 STATUS_SCHEMA_VERSION = "factory-status-1"
@@ -222,6 +238,52 @@ def running(
 # ---------------------------------------------------------------------------
 
 
+def site_links(public: bool) -> tuple[dict[str, list[dict[str, str]]], dict[str, str]]:
+    """The subpage buttons of every swimlane and the link of every station
+    that has a fitting public page.
+
+    The public build lives next to ``prisma.html`` and ``game.html`` and links
+    them relatively; the local page uses the absolute site URLs. Lanes without
+    a fitting public page (none today: even the LLM lane has the verifier's
+    engine docs) simply carry fewer buttons.
+    """
+    own = "" if public else SITE_URL
+    lanes = {
+        "det": [
+            {"label": "📊 PRISMA yield", "href": own + "prisma.html"},
+            {"label": "🕸 lp2graph", "href": LP2GRAPH_URL},
+            {"label": "pipeline code ↗", "href": REPO_URL},
+            {"label": "library code ↗", "href": LIB_URL},
+        ],
+        "hitl": [
+            {"label": "🚆 Formula Express", "href": own + "game.html#run"},
+            {"label": "⏱️ Blitz", "href": own + "game.html#blitz"},
+            {"label": "🧭 Shell Sorter", "href": own + "game.html#sort"},
+            {"label": "📚 Papers", "href": own + "game.html#papers"},
+        ],
+        "llm": [
+            {"label": "📔 Journal", "href": own + "game.html#journal"},
+            {"label": "✅ validate docs", "href": LP2GRAPH_URL + "docs/validation/"},
+        ],
+        "val": [
+            {"label": "🔍 explore", "href": LP2GRAPH_URL + "explore.html"},
+            {"label": "🧩 configurator", "href": LP2GRAPH_URL + "configurator.html"},
+            {"label": "📄 paper (arXiv)", "href": ARXIV_URL},
+            {"label": "🗄 data (Zenodo)", "href": ZENODO_URL},
+        ],
+    }
+    stations = {
+        "prisma": own + "prisma.html",
+        "review": own + "game.html#run",
+        "codec": LP2GRAPH_URL,
+        "verifier": LP2GRAPH_URL + "docs/validation/",
+        "validation": LP2GRAPH_URL + "docs/validation/",
+        "wlcluster": LP2GRAPH_URL + "explore.html",
+        "paper": ARXIV_URL,
+    }
+    return lanes, stations
+
+
 def _load_json(path: Path) -> Any | None:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -362,8 +424,13 @@ def snapshot(
     *,
     outputs: Path | None = OUTPUTS,
     paper_dir: Path | None = PAPER_DIR,
+    public: bool = False,
 ) -> dict:
-    """Read every artifact the floor shows and return the page's data model."""
+    """Read every artifact the floor shows and return the page's data model.
+
+    ``public`` selects the navigator build for the demo site: relative links
+    to its sibling pages and no live polling (the data is the same).
+    """
     inputs = [
         corpus / "candidates.json",
         corpus / "snowball_candidates.json",
@@ -849,11 +916,19 @@ def snapshot(
         else "Taxonomy run (railpminer run): no outputs yet.",
     ]
 
+    lane_links, station_links = site_links(public)
+    lanes = [dict(lane, links=lane_links.get(lane["id"], [])) for lane in LANES]
+    for station in stations:
+        href = station_links.get(station["id"])
+        if href:
+            station["href"] = href
+
     return {
         "schema_version": SCHEMA_VERSION,
+        "public": public,
         "derived_from": "corpus/* + outputs/*",
         "snapshot_of": _newest(inputs),
-        "lanes": list(LANES),
+        "lanes": lanes,
         "stations": stations,
         "edges": edges,
         "kpis": kpis,
@@ -978,7 +1053,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .floorwrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--shadow);position:relative}
   .floor{display:flex;align-items:flex-start;min-width:max-content}
   .lanes{position:sticky;left:0;z-index:3;background:var(--card);border-right:1px solid var(--line);flex:none}
-  .lane{display:flex;flex-direction:column;justify-content:center;padding:0 10px;width:118px;border-bottom:1px solid var(--line)}
+  .lane{display:flex;flex-direction:column;justify-content:center;padding:0 10px;width:150px;border-bottom:1px solid var(--line)}
   .lane:last-child{border-bottom:0}
   .lane b{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);line-height:1.25}
   .lane span{font-size:9.5px;color:var(--muted);line-height:1.3;margin-top:3px}
@@ -1026,6 +1101,22 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .jcount{font:800 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;fill:var(--ink)}
   @media (prefers-reduced-motion: reduce){.edge.flow,.st.active .box,.pill.live .dot,.st.active.indet .prog{animation:none}}
 
+  /* vertical orientation: lanes are columns, the flow runs top to bottom */
+  .floor.v{flex-direction:column;align-items:stretch}
+  .lanes.v{position:static;display:flex;flex-direction:row;border-right:0;border-bottom:1px solid var(--line)}
+  .lanes.v .lane{border-bottom:0;border-right:1px solid var(--line);justify-content:flex-start;padding:10px 10px 8px;width:auto;flex:none}
+  .lanes.v .lane:last-child{border-right:0}
+  .floorwrap.fit .lanes.v{display:none}
+  /* subpage buttons on the swimlane headers (the landing's .quick chips) */
+  .lbtns{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .lbtn{font:700 10.5px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--accent);
+    background:var(--card);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:999px;padding:3px 8px;
+    text-decoration:none;box-shadow:var(--shadow);white-space:nowrap;line-height:1.4}
+  .lbtn:active{transform:scale(.97)}
+  /* a station with a fitting subpage is a link */
+  a.stl{cursor:pointer} a.stl .title{fill:var(--accent)} a.stl:hover .box,a.stl:focus .box{stroke:var(--accent)}
+  footer a{color:var(--accent);font-weight:700;text-decoration:none}
+
   /* ---- status strip ---- */
   .strip{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;box-shadow:var(--shadow)}
   .strip .sh{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
@@ -1065,7 +1156,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
 </style>
 </head>
 <body>
-<header>
+__BANNER__<header>
   <div class="brandlogo" aria-label="TUD — Chair of Railway Operations">__LOGO__</div>
   <div class="eyebrow">raiLPminer · Paper 1 corpus pipeline</div>
   <h1>Factory floor</h1>
@@ -1075,7 +1166,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
 
 <section><div class="kpis" id="kpis"></div></section>
 
-<h2>Floor plan <span class="ctl"><button class="tg" id="fitBtn" aria-pressed="false" type="button">fit to width</button></span></h2>
+<h2>Floor plan <span class="ctl"><button class="tg" id="rotBtn" aria-pressed="false" type="button">↻ horizontal</button><button class="tg" id="fitBtn" aria-pressed="false" type="button">fit to width</button></span></h2>
 <div class="floorwrap" id="floorwrap"><div class="floor" id="floor"></div></div>
 <div class="strip" id="strip" hidden>
   <div class="sh"><span class="sn" id="s-stage"></span><span class="se" id="s-elapsed"></span></div>
@@ -1094,8 +1185,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
 <div class="lcard"><ul id="notes"></ul></div>
 
 <footer>
-  <span id="footer"></span>
-  <div class="modenote">Build: <code>PYTHONPATH=. python3 -m corpusbuilder.factory</code> · live: <code>… --serve 8765</code> then open <code>http://127.0.0.1:8765/factory.html</code>. Türkis accent on light · TUD dark-blue field in dark mode.</div>
+__FOOTER__
 </footer>
 
 <script type="application/json" id="data">__DATA__</script>
@@ -1103,52 +1193,78 @@ _TEMPLATE = r"""<!DOCTYPE html>
 (function(){
   "use strict";
   var DATA = JSON.parse(document.getElementById("data").textContent);
-  var G = {pitch:184, w:156, stH:84, cmpH:52, artH:40, gapArt:8, padTop:14, padBot:14, bus:10, left:16};
+  var G = {pitch:184, w:156, stH:84, cmpH:52, cmpW:118, artH:40, gapArt:8, gapRow:26, padTop:14, padBot:14, padSide:12, bus:10, left:16, top:12};
+  // Orientation: "v" = swimlanes are columns and the flow runs top-down (default, scrolls like a
+  // page); "h" = lanes are horizontal bands and the flow runs left-right. Same data, same boxes.
+  var ORIENT = "v";
+  try { var savedO = localStorage.getItem("factory:orient"); if (savedO === "h" || savedO === "v") ORIENT = savedO; } catch (e) {}
+  var DATA_CUR = null;
   var $ = function(id){ return document.getElementById(id); };
   var esc = function(s){ return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); };
   var trunc = function(s, n){ s = String(s == null ? "" : s); return s.length > n ? s.slice(0, n - 1) + "…" : s; };
+  var isExt = function(h){ return /^https?:/.test(String(h || "")); };
 
+  function pitchV(){ return G.stH + G.gapArt + G.artH + G.gapRow; }
   function laneGeometry(data){
+    // One band per lane: rows (top/height) when horizontal, columns (left/width) when vertical.
     var tops = {}, heights = {}, y = 0;
     data.lanes.forEach(function(l){
       var twoRows = data.stations.some(function(s){ return s.lane === l.id && s.row === 1; });
-      var h = G.padTop + G.stH + G.gapArt + G.artH + G.bus + G.padBot + (twoRows ? 6 : 0);
+      var h = ORIENT === "h"
+        ? G.padTop + G.stH + G.gapArt + G.artH + G.bus + G.padBot + (twoRows ? 6 : 0)
+        : G.padSide + G.w + (twoRows ? G.gapArt + G.cmpW : 0) + G.padSide;
       tops[l.id] = y; heights[l.id] = h; y += h;
     });
     return {tops:tops, heights:heights, total:y};
   }
   function place(data){
-    var lg = laneGeometry(data), pos = {};
-    var maxCol = 0;
+    var lg = laneGeometry(data), pos = {}, maxCol = 0;
     data.stations.forEach(function(s){
       maxCol = Math.max(maxCol, s.col);
-      var x = G.left + s.col * G.pitch;
-      var top = lg.tops[s.lane] + G.padTop;
-      var h = G.stH;
-      if (s.row === 1) { top = lg.tops[s.lane] + G.padTop + G.stH + G.gapArt; h = G.cmpH; }
-      pos[s.id] = {x:x, y:top, w:G.w, h:h, cy: top + h/2, lane:s.lane, col:s.col, kind:s.kind, laneBottom: lg.tops[s.lane] + lg.heights[s.lane]};
+      var p;
+      if (ORIENT === "h") {
+        var x = G.left + s.col * G.pitch, top = lg.tops[s.lane] + G.padTop, h = G.stH, compact = false;
+        if (s.row === 1) { top = lg.tops[s.lane] + G.padTop + G.stH + G.gapArt; h = G.cmpH; compact = true; }
+        p = {x:x, y:top, w:G.w, h:h, compact:compact};
+      } else {
+        var lx = lg.tops[s.lane] + G.padSide, ty = G.top + s.col * pitchV(), w = G.w, compact2 = false;
+        if (s.row === 1) { lx = lg.tops[s.lane] + G.padSide + G.w + G.gapArt; w = G.cmpW; compact2 = true; }
+        p = {x:lx, y:ty, w:w, h:G.stH, compact:compact2};
+      }
+      p.cx = p.x + p.w/2; p.cy = p.y + p.h/2; p.lane = s.lane; p.col = s.col; p.kind = s.kind;
+      p.laneEnd = lg.tops[s.lane] + lg.heights[s.lane];
+      p.hasArt = !!(s.artifact && !p.compact);
+      p.bottom = p.y + p.h + (p.hasArt ? G.gapArt + G.artH : 0);
+      pos[s.id] = p;
     });
-    var width = G.left + maxCol * G.pitch + G.w + G.left;
-    return {pos:pos, lg:lg, width:width, height:lg.total};
+    var width, height;
+    if (ORIENT === "h") { width = G.left + maxCol * G.pitch + G.w + G.left; height = lg.total; }
+    else { width = lg.total; height = G.top + maxCol * pitchV() + G.stH + G.gapArt + G.artH + G.top; }
+    return {pos:pos, lg:lg, width:width, height:height};
   }
-  function anchorOut(p){ return [p.x + p.w, p.cy]; }
-  function anchorIn(p){ return [p.x, p.cy]; }
   function route(data, L, e){
     var a = L.pos[e.from], b = L.pos[e.to];
     if (!a || !b) return "";
-    if (b.kind === "join") { var bx = b.x + G.w/2 - 4; return "M" + (a.x + a.w) + "," + a.cy + " H" + bx; }
-    if (a.kind === "join") { var jx = a.x + G.w/2 + 4; return "M" + jx + "," + b.cy + " H" + b.x; }
-    var sx = a.x + a.w, sy = a.cy, tx = b.x, ty = b.cy;
-    var midX = tx - 13;
     var blocked = data.stations.some(function(s){ return s.lane === a.lane && s.col > a.col && s.col < b.col && s.row === 0; });
-    if (blocked) {
-      var busY = a.laneBottom - G.bus/2;
-      return "M" + sx + "," + sy + " H" + (sx + 12) + " V" + busY + " H" + midX + " V" + ty + " H" + tx;
+    if (ORIENT === "h") {
+      if (b.kind === "join") { var bx = b.x + G.w/2 - 4; return "M" + (a.x + a.w) + "," + a.cy + " H" + bx; }
+      if (a.kind === "join") { var jx = a.x + G.w/2 + 4; return "M" + jx + "," + b.cy + " H" + b.x; }
+      var sx = a.x + a.w, sy = a.cy, tx = b.x, ty = b.cy, midX = tx - 13;
+      if (blocked) { var busY = a.laneEnd - G.bus/2; return "M" + sx + "," + sy + " H" + (sx + 12) + " V" + busY + " H" + midX + " V" + ty + " H" + tx; }
+      return "M" + sx + "," + sy + " H" + midX + " V" + ty + " H" + tx;
     }
-    return "M" + sx + "," + sy + " H" + midX + " V" + ty + " H" + tx;
+    // vertical: a conveyor leaves below a station's artifact box and enters the top of the next station
+    if (b.kind === "join") { return "M" + a.cx + "," + a.bottom + " V" + (b.cy - 4); }
+    if (a.kind === "join") { return "M" + b.cx + "," + (a.cy + 4) + " V" + b.y; }
+    var vx = a.cx, vy = a.bottom, ux = b.cx, uy = b.y, midY = uy - 13;
+    if (Math.abs(vx - ux) < 1) {
+      if (blocked) { var busX = a.laneEnd - G.bus/2; return "M" + vx + "," + vy + " V" + (vy + 10) + " H" + busX + " V" + midY + " H" + ux + " V" + uy; }
+      return "M" + vx + "," + vy + " V" + uy;
+    }
+    return "M" + vx + "," + vy + " V" + midY + " H" + ux + " V" + uy;
   }
   function stationSvg(s, p){
-    var cls = "st kind-" + s.kind;
+    var cls = "st kind-" + s.kind + (s.href ? " linked" : "");
     var o = ['<g class="' + cls + '" data-id="' + esc(s.id) + '" data-stage="' + esc(s.stage || "") + '">'];
     var x = p.x, y = p.y, w = p.w, h = p.h;
     if (s.kind === "join") {
@@ -1168,54 +1284,80 @@ _TEMPLATE = r"""<!DOCTYPE html>
     if (s.kind === "planned") {
       o.push('<text class="badge" x="' + (x + w - 12) + '" y="' + (y + 14) + '" text-anchor="end">PLANNED</text>');
     }
-    if (p.h === G.cmpH) {
-      o.push('<text class="stereo" x="' + (x + 12) + '" y="' + (y + 14) + '">' + esc(trunc(s.stereo, 26)) + '</text>');
-      o.push('<text class="title" x="' + (x + 12) + '" y="' + (y + 30) + '">' + esc(trunc(s.title, 19)) + '</text>');
-      o.push('<text class="count" x="' + (x + 12) + '" y="' + (y + 46) + '" style="font-size:12px">' + esc(s.count) + '</text>');
-      o.push('<text class="clabel" x="' + (x + 12 + 7 * String(s.count).length + 6) + '" y="' + (y + 46) + '">' + esc(trunc(s.count_label, 22)) + '</text>');
+    var title = s.title + (s.href ? " ›" : "");
+    if (p.compact) {
+      var narrow = w < G.w;
+      o.push('<text class="stereo" x="' + (x + 12) + '" y="' + (y + 14) + '">' + esc(trunc(s.stereo, narrow ? 17 : 26)) + '</text>');
+      o.push('<text class="title" x="' + (x + 12) + '" y="' + (y + 30) + '">' + esc(trunc(title, narrow ? 13 : 19)) + '</text>');
+      o.push('<text class="count" x="' + (x + 12) + '" y="' + (y + 46) + '" style="font-size:12px">' + esc(trunc(s.count, narrow ? 9 : 18)) + '</text>');
+      if (narrow) o.push('<text class="clabel" x="' + (x + 12) + '" y="' + (y + 60) + '">' + esc(trunc(s.count_label, 16)) + '</text>');
+      else o.push('<text class="clabel" x="' + (x + 12 + 7 * String(s.count).length + 6) + '" y="' + (y + 46) + '">' + esc(trunc(s.count_label, 22)) + '</text>');
     } else {
       o.push('<text class="stereo" x="' + (x + 12) + '" y="' + (y + 15) + '">' + esc(trunc(s.stereo, 26)) + '</text>');
-      o.push('<text class="title" x="' + (x + 12) + '" y="' + (y + 32) + '">' + esc(trunc(s.title, 19)) + '</text>');
+      o.push('<text class="title" x="' + (x + 12) + '" y="' + (y + 32) + '">' + esc(trunc(title, 19)) + '</text>');
       o.push('<text class="role" x="' + (x + 12) + '" y="' + (y + 46) + '">' + esc(trunc(s.role, 30)) + '</text>');
       o.push('<text class="count" x="' + (x + 12) + '" y="' + (y + 66) + '">' + esc(trunc(s.count, 18)) + '</text>');
       o.push('<text class="clabel" x="' + (x + 12) + '" y="' + (y + 78) + '">' + esc(trunc(s.count_label, 31)) + '</text>');
       o.push('<rect class="prog-bg" x="' + (x + 1) + '" y="' + (y + h - 4) + '" width="' + (w - 2) + '" height="3" rx="1.5"/>');
       o.push('<rect class="prog" x="' + (x + 1) + '" y="' + (y + h - 4) + '" width="0" height="3" rx="1.5"/>');
     }
-    o.push('<title>' + esc(s.title + " — " + (s.role || "") + " · " + s.count + " " + (s.count_label || "")) + '</title>');
+    o.push('<title>' + esc(s.title + " — " + (s.role || "") + " · " + s.count + " " + (s.count_label || "") + (s.href ? " · opens " + s.href : "")) + '</title>');
     o.push('</g>');
-    if (s.artifact && p.h !== G.cmpH) {
+    var g = o.join("");
+    if (s.href) g = '<a class="stl" href="' + esc(s.href) + '"' + (isExt(s.href) ? ' target="_blank" rel="noopener"' : '') + '>' + g + '</a>';
+    if (s.artifact && !p.compact) {
       var ay = y + h + G.gapArt;
       var acls = "art" + (s.artifact.present ? "" : " absent");
-      o.push('<g class="' + acls + '"><rect x="' + x + '" y="' + ay + '" width="' + w + '" height="' + G.artH + '" rx="6"/>');
-      o.push('<text class="an" x="' + (x + 10) + '" y="' + (ay + 15) + '">' + esc(trunc(s.artifact.name, 25)) + '</text>');
-      o.push('<text class="ac" x="' + (x + 10) + '" y="' + (ay + 30) + '">' + esc(trunc(s.artifact.count, 27)) + '</text>');
-      o.push('<title>' + esc(s.artifact.name + " · " + s.artifact.count) + '</title></g>');
+      g += '<g class="' + acls + '"><rect x="' + x + '" y="' + ay + '" width="' + w + '" height="' + G.artH + '" rx="6"/>';
+      g += '<text class="an" x="' + (x + 10) + '" y="' + (ay + 15) + '">' + esc(trunc(s.artifact.name, 25)) + '</text>';
+      g += '<text class="ac" x="' + (x + 10) + '" y="' + (ay + 30) + '">' + esc(trunc(s.artifact.count, 27)) + '</text>';
+      g += '<title>' + esc(s.artifact.name + " · " + s.artifact.count) + '</title></g>';
     }
-    return o.join("");
+    return g;
   }
   function joinSvg(s, L){
     var p = L.pos[s.id]; if (!p) return "";
-    var ys = L.pos.discover ? L.pos.discover.cy : p.cy - 40;
-    var ye = L.pos.snowball ? L.pos.snowball.cy : p.cy + 40;
-    var bx = p.x + G.w/2 - 4;
     var out = '<g class="st kind-join" data-id="join">';
-    out += '<rect class="join" x="' + bx + '" y="' + (ys - 10) + '" width="8" height="' + (ye - ys + 20) + '" rx="2"/>';
-    out += '<text class="jtxt" x="' + (bx + 4) + '" y="' + (ys - 16) + '" text-anchor="middle">' + esc(s.title) + '</text>';
-    out += '<text class="jcount" x="' + (bx + 4) + '" y="' + (ye + 28) + '" text-anchor="middle">' + esc(s.count) + '</text>';
-    out += '<text class="jtxt" x="' + (bx + 4) + '" y="' + (ye + 40) + '" text-anchor="middle">' + esc(s.count_label) + '</text>';
+    if (ORIENT === "h") {
+      var ys = L.pos.discover ? L.pos.discover.cy : p.cy - 40;
+      var ye = L.pos.snowball ? L.pos.snowball.cy : p.cy + 40;
+      var bx = p.x + G.w/2 - 4;
+      out += '<rect class="join" x="' + bx + '" y="' + (ys - 10) + '" width="8" height="' + (ye - ys + 20) + '" rx="2"/>';
+      out += '<text class="jtxt" x="' + (bx + 4) + '" y="' + (ys - 16) + '" text-anchor="middle">' + esc(s.title) + '</text>';
+      out += '<text class="jcount" x="' + (bx + 4) + '" y="' + (ye + 28) + '" text-anchor="middle">' + esc(s.count) + '</text>';
+      out += '<text class="jtxt" x="' + (bx + 4) + '" y="' + (ye + 40) + '" text-anchor="middle">' + esc(s.count_label) + '</text>';
+    } else {
+      var xs = L.pos.discover ? L.pos.discover.cx : p.cx - 40;
+      var xe = L.pos.snowball ? L.pos.snowball.cx : p.cx + 40;
+      var by = p.cy - 4;
+      out += '<rect class="join" x="' + (xs - 10) + '" y="' + by + '" width="' + (xe - xs + 20) + '" height="8" rx="2"/>';
+      out += '<text class="jcount" x="' + (xs + 14) + '" y="' + (by + 26) + '">' + esc(s.count) + '</text>';
+      out += '<text class="jtxt" x="' + (xs + 14) + '" y="' + (by + 38) + '">' + esc(s.count_label) + ' · ' + esc(s.title) + '</text>';
+    }
     return out + '</g>';
   }
+  function laneButtons(l){
+    var btns = (l.links || []).map(function(k){
+      return '<a class="lbtn" href="' + esc(k.href) + '"' + (isExt(k.href) ? ' target="_blank" rel="noopener"' : '') + '>' + esc(k.label) + '</a>';
+    }).join("");
+    return btns ? '<div class="lbtns">' + btns + '</div>' : "";
+  }
   function renderFloor(data){
-    var L = place(data);
+    var L = place(data), vert = ORIENT === "v";
     var svg = ['<svg class="fl" xmlns="http://www.w3.org/2000/svg" width="' + L.width + '" height="' + L.height + '" viewBox="0 0 ' + L.width + ' ' + L.height + '" role="img" aria-label="Pipeline factory floor">'];
     svg.push('<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--conv)"/></marker>' +
              '<marker id="arrA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--accent)"/></marker></defs>');
     data.lanes.forEach(function(l, i){
-      var t = L.lg.tops[l.id], h = L.lg.heights[l.id];
-      svg.push('<rect class="band' + (i % 2 ? " alt" : "") + '" x="0" y="' + t + '" width="' + L.width + '" height="' + h + '"/>');
-      if (i) svg.push('<line class="bandline" x1="0" x2="' + L.width + '" y1="' + t + '" y2="' + t + '"/>');
-      svg.push('<text class="lanetag" x="8" y="' + (t + 12) + '">' + esc(l.name) + '</text>');
+      var t = L.lg.tops[l.id], h = L.lg.heights[l.id], alt = i % 2 ? " alt" : "";
+      if (vert) {
+        svg.push('<rect class="band' + alt + '" x="' + t + '" y="0" width="' + h + '" height="' + L.height + '"/>');
+        if (i) svg.push('<line class="bandline" x1="' + t + '" x2="' + t + '" y1="0" y2="' + L.height + '"/>');
+        svg.push('<text class="lanetag" x="' + (t + 8) + '" y="12">' + esc(l.name) + '</text>');
+      } else {
+        svg.push('<rect class="band' + alt + '" x="0" y="' + t + '" width="' + L.width + '" height="' + h + '"/>');
+        if (i) svg.push('<line class="bandline" x1="0" x2="' + L.width + '" y1="' + t + '" y2="' + t + '"/>');
+        svg.push('<text class="lanetag" x="8" y="' + (t + 12) + '">' + esc(l.name) + '</text>');
+      }
     });
     data.edges.forEach(function(e){
       var d = route(data, L, e); if (!d) return;
@@ -1226,9 +1368,14 @@ _TEMPLATE = r"""<!DOCTYPE html>
     });
     svg.push('</svg>');
     var lanes = data.lanes.map(function(l){
-      return '<div class="lane" style="height:' + L.lg.heights[l.id] + 'px"><b>' + esc(l.name) + '</b><span>' + esc(l.sub) + '</span></div>';
+      var size = vert ? 'width:' + L.lg.heights[l.id] + 'px' : 'height:' + L.lg.heights[l.id] + 'px';
+      return '<div class="lane" data-lane="' + esc(l.id) + '" style="' + size + '"><b>' + esc(l.name) + '</b><span>' + esc(l.sub) + '</span>' + laneButtons(l) + '</div>';
     }).join("");
-    $("floor").innerHTML = '<div class="lanes">' + lanes + '</div>' + svg.join("");
+    $("floor").className = "floor" + (vert ? " v" : "");
+    $("floor").innerHTML = '<div class="lanes' + (vert ? ' v' : '') + '">' + lanes + '</div>' + svg.join("");
+    $("floorwrap").setAttribute("data-orient", ORIENT);
+    var rb = $("rotBtn");
+    if (rb) { rb.setAttribute("aria-pressed", vert ? "false" : "true"); rb.textContent = vert ? "↻ horizontal" : "↻ vertical"; }
   }
   function renderKpis(data){
     $("kpis").innerHTML = data.kpis.map(function(k){
@@ -1264,9 +1411,9 @@ _TEMPLATE = r"""<!DOCTYPE html>
   }
   function renderNotes(data){
     $("notes").innerHTML = (data.notes || []).map(function(n){ return "<li>" + esc(n) + "</li>"; }).join("");
-    $("footer").textContent = "Snapshot of the newest input artifact: " + (data.snapshot_of || "no artifacts yet") + " · derived from " + data.derived_from + " · schema " + data.schema_version + ". Counts, keys, stage names and rule versions only — no publisher text on this page.";
+    $("footer").textContent = "Snapshot of the newest input artifact: " + (data.snapshot_of || "no artifacts yet") + " · derived from " + data.derived_from + " · schema " + data.schema_version + ". Counts, stage names and rule versions only, no publisher text on this page.";
   }
-  function renderAll(data){ renderKpis(data); renderFloor(data); renderBins(data); renderLegend(data); renderNotes(data); }
+  function renderAll(data){ DATA_CUR = data; renderKpis(data); renderFloor(data); renderBins(data); renderLegend(data); renderNotes(data); }
 
   // ---- live status ----
   var lastStatusText = null, lastDataText = null, misses = 0, timer = null;
@@ -1300,7 +1447,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
     $("status").innerHTML = "<b>live</b> · " + esc(st.stage) + " " + esc(st.state);
   }
   function poll(){
-    if (!/^https?:$/.test(location.protocol)) return;
+    if (!/^https?:$/.test(location.protocol) || typeof fetch !== "function") return;
     var hit = false;
     fetch("factory_status.json", {cache:"no-store"}).then(function(r){ if (!r.ok) throw 0; return r.text(); }).then(function(t){
       hit = true; misses = 0; $("pill").classList.add("live");
@@ -1321,8 +1468,15 @@ _TEMPLATE = r"""<!DOCTYPE html>
     this.setAttribute("aria-pressed", on ? "true" : "false");
     $("floorwrap").classList.toggle("fit", on);
   });
-  $("status").textContent = "snapshot" + (DATA.snapshot_of ? " · inputs as of " + DATA.snapshot_of : "");
-  if (/^https?:$/.test(location.protocol)) { poll(); timer = setInterval(poll, 2000); }
+  $("rotBtn").addEventListener("click", function(){
+    ORIENT = ORIENT === "v" ? "h" : "v";
+    try { localStorage.setItem("factory:orient", ORIENT); } catch (e) {}
+    renderFloor(DATA_CUR || DATA);
+    if (lastStatusText) { try { applyStatus(JSON.parse(lastStatusText)); } catch (e) {} }
+  });
+  $("status").textContent = (DATA.public ? "public snapshot" : "snapshot") + (DATA.snapshot_of ? " · inputs as of " + DATA.snapshot_of : "");
+  // The public navigator never polls: it is a static page on the demo site.
+  if (!DATA.public && /^https?:$/.test(location.protocol)) { poll(); timer = setInterval(poll, 2000); }
 })();
 </script>
 </body>
@@ -1330,10 +1484,51 @@ _TEMPLATE = r"""<!DOCTYPE html>
 """
 
 
+_BANNER = (
+    '<div class="proto" style="background:color-mix(in srgb,var(--warn) 12%,transparent);'
+    "color:var(--warn);border:1.5px solid var(--warn);border-radius:10px;padding:5px 10px;"
+    'font-size:12px;font-weight:650;text-align:center;line-height:1.45;margin-bottom:12px">'
+    "⚠️ working prototype — results are not fully verified yet · "
+    '<a href="https://github.com/joernmht/lp2graph" target="_blank" rel="noopener" '
+    'style="color:var(--warn);font-weight:800">lp2graph repo ↗</a></div>\n'
+)
+
+_FOOTER_LOCAL = (
+    '  <span id="footer"></span>\n'
+    '  <div class="modenote">Build: <code>PYTHONPATH=. python3 -m corpusbuilder.factory</code>'
+    " · live: <code>… --serve 8765</code> then open <code>http://127.0.0.1:8765/factory.html</code>"
+    " · public navigator: <code>… --public</code>. Türkis accent on light · TUD dark-blue field in"
+    " dark mode.</div>"
+)
+
+_FOOTER_PUBLIC = (
+    '  <span id="footer"></span>\n'
+    '  <div style="margin-top:8px"><a href="./">‹ demo hub</a> · <a href="prisma.html">PRISMA yield</a>'
+    ' · <a href="game.html#run">Formula Express</a> · <a href="' + LP2GRAPH_URL + '">sister demo:'
+    " lp2graph — typed graphs &amp; configurator</a></div>\n"
+    '  <div class="modenote">Part of the LP2Graph paper series — <i>LP Mining with LP2Graph: A Use'
+    " Case for Railway Rescheduling</i> (TU Dresden, Chair of Railway Operations). Pipeline &amp;"
+    ' code: <a href="' + REPO_URL + '">joernmht/raiLPminerExperimentation</a> · library:'
+    ' <a href="' + LIB_URL + '">lp2graph</a>. Generated by <code>corpusbuilder.factory</code> from'
+    " the corpus artifacts: counts, stage names and rule versions only, never publisher text."
+    " Türkis accent on light · TUD dark-blue field in dark mode.</div>"
+)
+
+
 def build_html(data: dict) -> str:
-    """Render the page for a snapshot. Pure: same data -> same bytes."""
+    """Render the page for a snapshot. Pure: same data -> same bytes.
+
+    ``data["public"]`` selects the demo-site chrome: the prototype banner every
+    public page carries, the hub/sister footer, and no live polling.
+    """
     payload = json.dumps(data, ensure_ascii=False, sort_keys=True, indent=1).replace("</", "<\\/")
-    return _TEMPLATE.replace("__LOGO__", _LOGO).replace("__DATA__", payload)
+    public = bool(data.get("public"))
+    return (
+        _TEMPLATE.replace("__LOGO__", _LOGO)
+        .replace("__BANNER__", _BANNER if public else "")
+        .replace("__FOOTER__", _FOOTER_PUBLIC if public else _FOOTER_LOCAL)
+        .replace("__DATA__", payload)
+    )
 
 
 def build(
@@ -1342,10 +1537,25 @@ def build(
     out: Path | None = None,
     outputs: Path | None = OUTPUTS,
     paper_dir: Path | None = PAPER_DIR,
-) -> tuple[Path, Path]:
+    public: bool = False,
+) -> tuple[Path, Path | None]:
     """Write ``factory.html`` and ``factory_data.json`` (next to each other, so
-    the page can poll the JSON when served). Returns both paths."""
-    data = snapshot(corpus, outputs=outputs, paper_dir=paper_dir)
+    the page can poll the JSON when served). Returns both paths.
+
+    ``public=True`` writes the navigator page for the demo site (default
+    ``docs/factory.html``) and nothing else: no data file to poll, and the
+    page is refused if it would carry a corpus paper key.
+    """
+    data = snapshot(corpus, outputs=outputs, paper_dir=paper_dir, public=public)
+    if public:
+        html_path = out or (DOCS / HTML_NAME)
+        html = build_html(data)
+        leak = _PAPER_KEY_RE.search(html)
+        if leak is not None:
+            raise ValueError(f"public page would carry a corpus paper key: {leak.group(0)!r}")
+        html_path.parent.mkdir(parents=True, exist_ok=True)
+        html_path.write_text(html, encoding="utf-8", newline="\n")
+        return html_path, None
     html_path = out or (corpus / HTML_NAME)
     data_path = html_path.parent / DATA_NAME
     html_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1466,6 +1676,12 @@ def main(argv: list[str] | None = None) -> int:
         "--no-paper", action="store_true", help="do not compare the macro files with the paper copy"
     )
     parser.add_argument(
+        "--public",
+        action="store_true",
+        help="navigator page for the demo site (default --out docs/factory.html): prototype "
+        "banner, relative links to prisma.html / game.html, no live polling, no data file",
+    )
+    parser.add_argument(
         "--serve",
         nargs="?",
         const=8765,
@@ -1479,8 +1695,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.serve is not None:
         serve(args.corpus, args.serve, outputs=args.outputs, paper_dir=paper)
         return 0
-    html_path, data_path = build(args.corpus, out=args.out, outputs=args.outputs, paper_dir=paper)
-    print(f"wrote {html_path} ({html_path.stat().st_size:,} bytes) + {data_path.name}")
+    html_path, data_path = build(
+        args.corpus, out=args.out, outputs=args.outputs, paper_dir=paper, public=args.public
+    )
+    extra = f" + {data_path.name}" if data_path is not None else " (public navigator)"
+    print(f"wrote {html_path} ({html_path.stat().st_size:,} bytes){extra}")
     return 0
 
 

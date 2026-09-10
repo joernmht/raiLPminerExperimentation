@@ -493,3 +493,75 @@ def test_classifier_names_the_vocabulary_bins() -> None:
         )
         == "undeclared coefficient (vocabulary)"
     )
+
+
+# ---------------------------------------------------------------------------
+# Public navigator build (docs/factory.html) + swimlane buttons
+# ---------------------------------------------------------------------------
+
+
+def test_public_build_is_deterministic_relative_and_silent(floor, tmp_path) -> None:
+    out1 = tmp_path / "one" / "factory.html"
+    out2 = tmp_path / "two" / "factory.html"
+    p1, d1 = factory.build(
+        floor["corpus"], out=out1, outputs=floor["outputs"], paper_dir=None, public=True
+    )
+    p2, d2 = factory.build(
+        floor["corpus"], out=out2, outputs=floor["outputs"], paper_dir=None, public=True
+    )
+    assert d1 is None and d2 is None  # nothing to poll on the demo site
+    assert not (out1.parent / factory.DATA_NAME).exists()
+    assert p1.read_bytes() == p2.read_bytes()
+    html = p1.read_text(encoding="utf-8")
+    assert 'class="proto"' in html and "working prototype" in html
+    assert html.index('class="proto"') < html.index("<header>")
+    assert '"public": true' in html and "!DATA.public" in html  # polling is gated off
+    for href in ('href="prisma.html"', 'href="game.html#run"', 'href="./"', factory.LP2GRAPH_URL):
+        assert href in html, href
+    assert factory.ARXIV_URL in html and factory.REPO_URL in html
+    assert factory.SITE_URL not in html.split('id="data"')[1]  # own links are relative in the data
+    assert 'id="rotBtn"' in html and "factory:orient" in html
+
+
+def test_local_build_links_the_site_absolutely(floor, tmp_path) -> None:
+    out = tmp_path / "factory.html"
+    factory.build(floor["corpus"], out=out, outputs=floor["outputs"], paper_dir=None)
+    html = out.read_text(encoding="utf-8")
+    assert '"public": false' in html and 'class="proto"' not in html
+    assert factory.SITE_URL + "prisma.html" in html and factory.SITE_URL + "game.html#run" in html
+
+
+def test_every_lane_has_buttons_and_stations_link_to_subpages(floor) -> None:
+    data = factory.snapshot(floor["corpus"], outputs=floor["outputs"], paper_dir=None, public=True)
+    assert [lane["id"] for lane in data["lanes"]] == [lane["id"] for lane in factory.LANES]
+    for lane in data["lanes"]:
+        assert lane["links"], lane["id"]
+        for link in lane["links"]:
+            assert link["label"] and link["href"]
+    linked = {s["id"]: s["href"] for s in data["stations"] if s.get("href")}
+    assert linked["prisma"] == "prisma.html" and linked["review"] == "game.html#run"
+    assert linked["paper"] == factory.ARXIV_URL
+    assert "join" not in linked and "vocab" not in linked
+    for s in data["stations"]:
+        if s.get("href") and not s["href"].startswith("https://"):
+            assert s["href"].split("#")[0] in ("prisma.html", "game.html")
+
+
+def test_public_build_refuses_a_leaked_paper_key(floor, tmp_path, monkeypatch) -> None:
+    real = factory.snapshot
+
+    def leaky(*args, **kwargs):
+        data = real(*args, **kwargs)
+        data["notes"] = [*data["notes"], "assist retried 10.1016_j.trc.2020.102823"]
+        return data
+
+    monkeypatch.setattr(factory, "snapshot", leaky)
+    with pytest.raises(ValueError, match="paper key"):
+        factory.build(
+            floor["corpus"],
+            out=tmp_path / "f.html",
+            outputs=floor["outputs"],
+            paper_dir=None,
+            public=True,
+        )
+    assert not (tmp_path / "f.html").exists()
