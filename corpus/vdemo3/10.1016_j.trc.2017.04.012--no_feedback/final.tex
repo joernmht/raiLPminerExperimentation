@@ -1,0 +1,28 @@
+% lp2graph canonical LaTeX
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Real-time railway disruption management MILP
+%@ desc :: Model decides additional stops and capacity increases for trains to satisfy passenger demand while minimizing resource usage.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param cap0 shape=T kind=vector domain=seats :: Baseline seat capacity of each train.
+%@ param d shape=S kind=vector domain=passengers :: Passenger demand at each station.
+%@ param orig shape=T,S kind=matrix domain=binary :: Indicator if train originally stops at station (1) or not (0).
+%@ param base_cap shape=T,S kind=matrix domain=seats :: Baseline capacity contributed by train t at station s (cap0_t if orig_{t,s}=1, else 0).
+%@ param Kmax shape=T kind=scalar domain=integer :: Maximum number of additional stops allowed per train.
+%@ param Zmax shape=T kind=scalar domain=integer :: Maximum extra capacity units that can be added to a train.
+%@ param c_cap shape=- kind=scalar domain=cost :: Cost per unit of capacity increase.
+%@ param c_stop shape=- kind=scalar domain=cost :: Cost per additional stop.
+%@ var y shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Additional stop decision (1 if train t adds stop at station s).
+%@ var z shape=T domain=integer role=primary drole=- lo=0 hi=- :: Extra capacity units added to train t.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total cost of capacity increases and additional stops.
+%@ con demand_sat kind=- domain=- indicator=- :: Ensure served capacity meets demand at each station.
+%@ con add_stop_limit kind=- domain=- indicator=- :: Limit number of additional stops per train.
+%@ con cap_inc_limit kind=- domain=- indicator=- :: Limit capacity increase per train.
+%@ con no_dup_stop kind=- domain=- indicator=- :: Prevent adding stop where already present.
+\begin{align}
+  \min\quad & \mathit{c\_cap} \sum_{t \in \mathcal{T}} z_{t} \;+\; \mathit{c\_stop} \sum_{t \in \mathcal{T}, s \in \mathcal{S}} y_{t,s} \tag{total\_cost} \\
+  & \sum_{t \in \mathcal{T}} \bigl( \mathit{base\_cap}_{t,s} \;+\; \mathit{cap0}_{t} \cdot y_{t,s} \;+\; \mathit{orig}_{t,s} \cdot z_{t} \bigr) \ge d_{s} \qquad \forall s \in \mathcal{S} \tag{demand\_sat} \\
+  & \sum_{s \in \mathcal{S}} y_{t,s} \le Kmax_{t} \qquad \forall t \in \mathcal{T} \tag{add\_stop\_limit} \\
+  & z_{t} \le Zmax_{t} \qquad \forall t \in \mathcal{T} \tag{cap\_inc\_limit} \\
+  & y_{t,s} \le 1 - \mathit{orig}_{t,s} \qquad \forall t \in \mathcal{T}, s \in \mathcal{S} \tag{no\_dup\_stop} \\
+\end{align}

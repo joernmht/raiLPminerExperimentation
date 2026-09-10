@@ -1,0 +1,33 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_reschedule family=milp schema=0.1.0
+%@ name :: Service-oriented railway timetable rescheduling with seat reservation
+%@ desc :: MILP model for train retiming, reordering and local rerouting under a disruption. Variables include departure times, binary movement selection, and binary ordering for headway. Objective minimizes total passenger delay.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ param travel_time shape=T,S,S kind=matrix domain=time_duration :: Nominal travel time of train on arc (i,j).
+%@ param original shape=T,S kind=matrix domain=time_duration :: Planned departure time of train at station before disruption.
+%@ param demand shape=T,S kind=matrix domain=demand :: Number of passengers of train at station.
+%@ param capacity shape=S kind=scalar domain=capacity :: Platform capacity at station.
+%@ param min_headway shape=- kind=scalar domain=time_duration :: Minimum headway between any two trains at a station.
+%@ param bigM shape=- kind=scalar domain=penalty_bigM :: Large constant for big‑M formulations.
+%@ var dep shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train at station.
+%@ var delay shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Delay of train at station (departure minus original).
+%@ var order shape=T,T,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: 1 if first train precedes second train at station.
+%@ var move shape=T,S,S domain=binary role=primary drole=- lo=0 hi=1 :: 1 if train moves from station i to station j.
+%@ obj sense=min name=total_delay combination=sum :: Minimize total passenger delay.
+%@ con flow_link kind=big_m domain=- indicator=- :: Link departure times with selected movements using big‑M.
+%@ con move_choice kind=linear domain=- indicator=- :: Exactly one outgoing movement is selected for each train at each station.
+%@ con headway_precede kind=big_m domain=- indicator=- :: Headway constraint when train p precedes q.
+%@ con headway_follow kind=big_m domain=- indicator=- :: Headway constraint when train q precedes p.
+%@ con capacity_constr kind=linear domain=- indicator=- :: Station platform capacity constraint.
+%@ con delay_def kind=linear domain=- indicator=- :: Definition of delay.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} delay_{t,s} \tag{total\_delay} \\
+  & dep_{t,j} - dep_{t,i} \ge travel_time_{t,i,j} - bigM + bigM \cdot move_{t,i,j} \qquad \forall t \in \mathcal{T},\; \forall i \in \mathcal{S},\; \forall j \in \mathcal{S} \tag{flow\_link} \\
+  & \sum_{j \in \mathcal{S}} move_{t,i,j} = 1 \qquad \forall t \in \mathcal{T},\; \forall i \in \mathcal{S} \tag{move\_choice} \\
+  & dep_{q,s} \ge dep_{p,s} + min_headway - bigM + bigM \cdot order_{p,q,s} \qquad \forall p,q \in \mathcal{T},\; p\neq q,\; \forall s \in \mathcal{S} \tag{headway\_precede} \\
+  & dep_{p,s} \ge dep_{q,s} + min_headway - bigM \cdot order_{p,q,s} \qquad \forall p,q \in \mathcal{T},\; p\neq q,\; \forall s \in \mathcal{S} \tag{headway\_follow} \\
+  & \sum_{t \in \mathcal{T}} demand_{t,s} \le capacity_{s} \qquad \forall s \in \mathcal{S} \tag{capacity\_constr} \\
+  & delay_{t,s} \ge dep_{t,s} - original_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{delay\_def}
+\end{align}

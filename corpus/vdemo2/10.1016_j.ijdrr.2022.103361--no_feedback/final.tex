@@ -1,0 +1,33 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=hsr_timetable_resilience family=milp schema=0.1.0
+%@ name :: High-Speed Railway Timetable Resilience Optimization
+%@ desc :: Mixed-integer linear programming model for timetable rescheduling after earthquakes, considering main track outage, track recovery, station recovery, and dynamic traffic demand.
+%@ index T ordered=0 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index R ordered=0 cyclic=0 :: Rail tracks.
+%@ param d shape=T,S kind=matrix domain=passenger_demand :: Dynamic traffic demand.
+%@ param c shape=R kind=scalar domain=recovery_time :: Track recovery time.
+%@ param b shape=S kind=scalar domain=recovery_time :: Station recovery time.
+%@ param M shape=- kind=scalar domain=large_number :: Large number for big-M formulation.
+%@ var x shape=T,R domain=binary role=primary drole=track_usage lo=- hi=- :: Track usage indicator.
+%@ var y shape=T,S domain=binary role=primary drole=station_usage lo=- hi=- :: Station usage indicator.
+%@ var z shape=T,R domain=integer role=auxiliary drole=track_recovery lo=0 hi=- :: Track recovery time indicator.
+%@ var w shape=T,S domain=integer role=auxiliary drole=station_recovery lo=0 hi=- :: Station recovery time indicator.
+%@ var t shape=T,R domain=continuous role=primary drole=timetable lo=- hi=- :: Timetable for each track.
+%@ obj sense=min name=resilience_optimization combination=sum :: Minimize the total recovery time and maximize the traffic demand satisfaction.
+%@ con track_outage kind=- domain=- indicator=- :: Track outage constraint.
+%@ con station_outage kind=- domain=- indicator=- :: Station outage constraint.
+%@ con track_recovery kind=- domain=- indicator=- :: Track recovery constraint.
+%@ con station_recovery kind=- domain=- indicator=- :: Station recovery constraint.
+%@ con timetable kind=- domain=- indicator=- :: Timetable constraint.
+%@ con demand kind=- domain=- indicator=- :: Traffic demand satisfaction constraint.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} \sum_{r \in \mathcal{R}} z_{t,r} + \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}} w_{t,s} - \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}} d_{t,s} \tag{resilience\_optimization} \\
+  & \sum_{r \in \mathcal{R}} x_{t,r} \le M \cdot (1 - z_{t,r}) \qquad \forall t \in \mathcal{T},\; \forall r \in \mathcal{R} \tag{track\_outage} \\
+  & \sum_{s \in \mathcal{S}} y_{t,s} \le M \cdot (1 - w_{t,s}) \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{station\_outage} \\
+  & z_{t,r} \ge z_{t-1,r} + c \cdot x_{t,r} \qquad \forall t \in \mathcal{T},\; \forall r \in \mathcal{R} \tag{track\_recovery} \\
+  & w_{t,s} \ge w_{t-1,s} + b \cdot y_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{station\_recovery} \\
+  & t_{t,r} \ge t_{t-1,r} + z_{t,r} \qquad \forall t \in \mathcal{T},\; \forall r \in \mathcal{R} \tag{timetable} \\
+  & \sum_{r \in \mathcal{R}} x_{t,r} \cdot d_{t,s} \ge d_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{demand} \\
+\end{align}

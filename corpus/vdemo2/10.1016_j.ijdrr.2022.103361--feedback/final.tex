@@ -1,0 +1,33 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=hsr_timetable_resilience family=milp schema=0.1.0
+%@ name :: HSR Timetable Resilience after Earthquakes
+%@ desc :: Mixed-integer linear programming model for the Timetable Rescheduling Problem (TRP) on High-Speed Railways (HSR) after earthquakes, considering main track outage, track recovery, station recovery, and dynamic traffic demand.
+%@ index T ordered=0 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index TR ordered=0 cyclic=0 :: Trains.
+%@ param d shape=T,S kind=matrix domain=passenger_demand :: Dynamic traffic demand.
+%@ param r shape=T,TR kind=matrix domain=recovery_status :: Recovery status of trains.
+%@ param c shape=TR kind=scalar domain=capacity :: Capacity of each train.
+%@ param travel_time shape=TR kind=scalar domain=travel_time :: Travel time of each train.
+%@ param M shape=- kind=scalar domain=large_number :: Large number for big-M formulation.
+%@ var x shape=T,TR domain=binary role=primary drole=scheduling lo=- hi=- :: Binary variable indicating if a train is scheduled at a given time period.
+%@ var y shape=T,S,TR domain=integer role=auxiliary drole=auxiliary_linearization lo=0 hi=- :: Auxiliary variable for linearizing the product of binary variables.
+%@ var z shape=T kind=scalar domain=continuous role=auxiliary drole=auxiliary_linearization lo=0 hi=- :: Auxiliary variable for modeling the recovery process.
+%@ obj sense=min name=resilience combination=sum :: Minimize the negative impact of the earthquake on the HSR network.
+%@ con train_capacity kind=- domain=- indicator=- :: Constraint ensuring that the number of passengers does not exceed the train capacity.
+%@ con train_recovery kind=- domain=- indicator=- :: Constraint modeling the recovery process of trains.
+%@ con station_recovery kind=- domain=- indicator=- :: Constraint ensuring that stations are recovered before trains can operate.
+%@ con timetable_rescheduling kind=- domain=- indicator=- :: Constraint rescheduling the timetable to minimize the negative impact of the earthquake.
+%@ con initial_condition kind=- domain=- indicator=- :: Initial condition for the scheduling variables.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} d_{t,s} \cdot (1 - z_{t}) \tag{resilience} \\
+  & \sum_{tr \in \mathcal{TR}} c_{tr} \cdot x_{t,tr} \le \sum_{s \in \mathcal{S}} d_{t,s} \qquad \forall t \in \mathcal{T} \tag{train\_capacity} \\
+  & x_{t,tr} \le r_{t,tr} \qquad \forall t \in \mathcal{T},\; \forall tr \in \mathcal{TR} \tag{train\_recovery} \\
+  & z_{t} \le \sum_{tr \in \mathcal{TR}} x_{t,tr} \qquad \forall t \in \mathcal{T} \tag{station\_recovery} \\
+  & x_{t,tr} \le x_{t-1,tr} + y_{t,s,tr} \qquad \forall t \in \mathcal{T},\; t > 1,\; \forall tr \in \mathcal{TR},\; \forall s \in \mathcal{S} \tag{timetable\_rescheduling} \\
+  & y_{t,s,tr} \le M \cdot x_{t,tr} \qquad \forall t \in \mathcal{T},\; \forall tr \in \mathcal{TR},\; \forall s \in \mathcal{S} \tag{timetable\_rescheduling} \\
+  & y_{t,s,tr} \ge x_{t,tr} - M \cdot (1 - x_{t,tr}) \qquad \forall t \in \mathcal{T},\; \forall tr \in \mathcal{TR},\; \forall s \in \mathcal{S} \tag{timetable\_rescheduling} \\
+  & x_{1,tr} \le y_{1,s,tr} \qquad \forall tr \in \mathcal{TR},\; \forall s \in \mathcal{S} \tag{initial\_condition} \\
+  & x_{1,tr} \le 1 \qquad \forall tr \in \mathcal{TR} \tag{initial\_condition} \\
+\end{align}

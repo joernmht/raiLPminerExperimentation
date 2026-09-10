@@ -1,0 +1,41 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Real-time railway disruption management MILP
+%@ desc :: MILP to decide additional stops, capacity increase and frequency increase for trains under changed passenger demand.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ param base_cap shape=T kind=vector domain=capacity :: Original capacity (in seat units) of each train.
+%@ param cost_cap shape=- kind=scalar domain=cost_weight :: Cost per unit of additional capacity.
+%@ param cost_freq shape=- kind=scalar domain=cost_weight :: Cost per additional train trip.
+%@ param cost_stop shape=- kind=scalar domain=cost_weight :: Cost per additional stop.
+%@ param demand shape=T,S kind=matrix domain=demand :: Additional passenger demand at station s if train i stops there.
+%@ param max_extra_stops shape=T kind=vector domain=count_limit :: Upper bound on number of extra stops a train may add.
+%@ param max_extra_trips shape=- kind=scalar domain=count_limit :: Global limit on total additional trips.
+%@ param orig_stop shape=T,S kind=matrix domain=unclassified :: Indicator of whether train i already serves station s (1 if original stop).
+%@ var y shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable, 1 if train i makes an additional stop at station s.
+%@ var cap_inc shape=T domain=integer role=primary drole=- lo=0 hi=- :: Additional capacity units added to train i.
+%@ var freq_inc shape=T domain=integer role=primary drole=- lo=0 hi=- :: Additional trips scheduled for train i.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total disruption cost.
+%@ con stop_limit kind=linear domain=- indicator=- :: Limit on number of extra stops per train.
+%@ con capacity_demand kind=linear domain=- indicator=- :: Capacity must cover additional demand at extra stops.
+%@ con freq_limit kind=linear domain=- indicator=- :: Global limit on extra trips.
+%@ con no_orig_stop kind=linear domain=- indicator=- :: Cannot add stop where train already stops.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{T}} \mathit{cost\_cap} \cdot \mathit{cap\_inc}_{i}
+            + \sum_{i \in \mathcal{T}} \mathit{cost\_freq} \cdot \mathit{freq\_inc}_{i}
+            + \sum_{i \in \mathcal{T},\, s \in \mathcal{S}} \mathit{cost\_stop} \cdot y_{i,s}
+            \tag{total\_cost} \\
+  & \sum_{s \in \mathcal{S}} y_{i,s} \le \mathit{max\_extra\_stops}_{i}
+    \qquad \forall i \in \mathcal{T}
+    \tag{stop\_limit} \\
+  & \sum_{s \in \mathcal{S}} \mathit{demand} \cdot y_{i,s}
+    \le \mathit{base\_cap}_{i} + \mathit{cap\_inc}_{i}
+    \qquad \forall i \in \mathcal{T}
+    \tag{capacity\_demand} \\
+  & \sum_{i \in \mathcal{T}} \mathit{freq\_inc}_{i} \le \mathit{max\_extra\_trips}
+    \tag{freq\_limit} \\
+  & y_{i,s} \le 1 - \mathit{orig\_stop}_{i,s}
+    \qquad \forall i \in \mathcal{T},\, s \in \mathcal{S}
+    \tag{no\_orig\_stop}
+\end{align}

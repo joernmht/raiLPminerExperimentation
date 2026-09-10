@@ -1,0 +1,162 @@
+{
+  "citations": [],
+  "converged": false,
+  "endpoint": {
+    "base_url": "https://llm.scads.ai/v1",
+    "model": "openai/gpt-oss-120b",
+    "provider": "scads"
+  },
+  "final_verdict": "invalid",
+  "mode": "feedback",
+  "rounds": [
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for ConstraintTemplate\nkind\n  Input should be 'linear', 'big_m', 'indicator', 'ordering', 'headway', 'capacity', 'flow_balance', 'modulo', 'soft', 'robust', 'set_packing', 'block_occupation', 'moving_block' or 'dwell' [type=literal_error, input_value='-', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 1,
+      "usage": {
+        "completion_tokens": 4150,
+        "prompt_tokens": 1691,
+        "total_tokens": 5841
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Binding\nindex\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='t \\\\in \\\\mathcal{T}', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 2,
+      "usage": {
+        "completion_tokens": 2894,
+        "prompt_tokens": 3927,
+        "total_tokens": 6821
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Parameter\ndomain_class\n  Input should be 'cost_weight', 'time_duration', 'capacity', 'demand', 'network_structure', 'penalty_bigM', 'count_limit' or 'unclassified' [type=literal_error, input_value='passengers', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 3,
+      "usage": {
+        "completion_tokens": 3392,
+        "prompt_tokens": 6149,
+        "total_tokens": 9541
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for VariableTemplate\ndomain_role\n  Input should be 'selection_assignment', 'ordering_precedence', 'routing_path_column', 'timing', 'flow_quantity', 'auxiliary_linearization' or 'unclassified' [type=literal_error, input_value='short_turn', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 4,
+      "usage": {
+        "completion_tokens": 1615,
+        "prompt_tokens": 8379,
+        "total_tokens": 9994
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "semantic",
+          "detail": "constraint 'station_capacity_con' lhs: term coefficient 'train_station}_{t,s' is not a declared parameter | constraint 'path_feasibility' rhs: term coefficient 'demand}_{o' is not a declared parameter | objective 'total_delay': term coefficient 'travel_time}_{a' is not a declared parameter",
+          "level": "error",
+          "message": "parsed formulation failed semantic validation: 3 validation error(s) in formulation 'disruption_shortturn'",
+          "stage": "semantics"
+        }
+      ],
+      "round": 5,
+      "usage": {
+        "completion_tokens": 1050,
+        "prompt_tokens": 11087,
+        "total_tokens": 12137
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "semantic",
+          "detail": "constraint 'station_capacity_con' lhs: term coefficient 'train_station}_{t,s' is not a declared parameter | constraint 'path_feasibility' rhs: term coefficient 'demand}_{o' is not a declared parameter | objective 'total_delay': term coefficient 'travel_time}_{a' is not a declared parameter",
+          "level": "error",
+          "message": "parsed formulation failed semantic validation: 3 validation error(s) in formulation 'disruption_shortturn'",
+          "stage": "semantics"
+        }
+      ],
+      "round": 6,
+      "usage": {
+        "completion_tokens": 1050,
+        "prompt_tokens": 13382,
+        "total_tokens": 14432
+      },
+      "verdict": "invalid"
+    }
+  ],
+  "rounds_cap": 6,
+  "rounds_to_valid": null,
+  "run_id": "10.1016_j.jrtpm.2018.02.002--feedback",
+  "samples": null,
+  "scenario": {
+    "chars": 1326,
+    "id": "10.1016_j.jrtpm.2018.02.002",
+    "paper_key": "10.1016_j.jrtpm.2018.02.002"
+  },
+  "schema_version": "vdemo-1",
+  "temperature": 0.0,
+  "tokens": {
+    "completion_tokens": 14151,
+    "prompt_tokens": 44615,
+    "total_tokens": 58766
+  },
+  "valid_rate": null
+}

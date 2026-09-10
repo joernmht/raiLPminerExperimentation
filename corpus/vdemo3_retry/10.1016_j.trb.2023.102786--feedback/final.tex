@@ -1,0 +1,55 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Large‑scale railway disruption rescheduling with reordering, retiming and rerouting
+%@ desc :: MILP on a space–time network minimizing total passenger delay and train cancellations. Variables decide arc usage (routing), node times (retiming) and ordering on shared arcs (reordering). Cancellation is allowed with a penalty.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index N ordered=0 cyclic=0 :: Set of network nodes (stations).
+%@ index TT ordered=0 cyclic=0 :: Ordered train pairs (t1,t2) for ordering constraints.
+%@ param travel shape=N,N kind=matrix domain=time_duration :: Travel time on arc (i,j).
+%@ param cap shape=N,N kind=matrix domain=integer :: Maximum number of trains that may occupy arc (i,j) simultaneously.
+%@ param arr shape=T kind=vector domain=time_duration :: Scheduled arrival time of train t at its destination.
+%@ param pen_delay kind=scalar domain=penalty_per_time :: Penalty per passenger per unit of delay.
+%@ param pen_cancel kind=scalar domain=penalty_per_train :: Penalty for cancelling a train.
+%@ param M kind=scalar domain=bigM :: Large constant.
+%@ param orig shape=T,N kind=matrix domain=bool :: Origin indicator: orig_{i,t}=1 if node i is the origin of train t.
+%@ param dest shape=T,N kind=matrix domain=bool :: Destination indicator: dest_{i,t}=1 if node i is the destination of train t.
+%@ var x shape=T,N,N domain=binary role=primary drole=- lo=- hi=- :: Arc‑usage binary variable (train t traverses arc (i,j)).
+%@ var z shape=T,N domain=non_negative role=primary drole=- lo=- hi=- :: Time at which train t departs/arrives node i.
+%@ var o shape=TT,N,N domain=binary role=auxiliary drole=- lo=- hi=- :: Ordering binary: o_{t1,t2,i,j}=1 if t1 precedes t2 on arc (i,j).
+%@ var u shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Cancellation indicator for train t.
+%@ var delay shape=T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Total passenger delay for train t.
+%@ obj sense=min name=total_cost combination=sum :: Minimize weighted passenger delay plus cancellation penalties.
+%@ con flow_up kind=- domain=- indicator=- :: Upper bound of flow balance with cancellation.
+%@ con flow_low kind=- domain=- indicator=- :: Lower bound of flow balance with cancellation.
+%@ con cancel_link kind=- domain=- indicator=- :: Linking cancellation indicator to arc usage.
+%@ con timing kind=- domain=- indicator=- :: Temporal feasibility on used arcs.
+%@ con capacity kind=- domain=- indicator=- :: Arc capacity.
+%@ con order_link kind=- domain=- indicator=- :: Linking ordering binary to arc usage.
+%@ con order_time kind=- domain=- indicator=- :: Temporal precedence for ordered trains on a shared arc.
+%@ con delay_low kind=- domain=- indicator=- :: Lower bound definition of delay.
+%@ con delay_up kind=- domain=- indicator=- :: Upper bound (zero when cancelled) of delay.
+\begin{align}
+  \min\quad & \sum_{t \in T} \bigl( \mathit{pen\_delay} \cdot \mathit{delay}_{t} \;+\; \mathit{pen\_cancel} \cdot \mathit{u}_{t} \bigr) \tag{total\_cost} \\
+  & \sum_{j \in N} x_{t,i,j} \;-\; \sum_{j \in N} x_{t,j,i}
+      \le \mathit{orig}_{i,t} \;-\; \mathit{dest}_{i,t} \;+\; \mathit{M} \cdot \mathit{u}_{t}
+      \qquad \forall t \in T,\; \forall i \in N \tag{flow\_up} \\
+  & \sum_{j \in N} x_{t,i,j} \;-\; \sum_{j \in N} x_{t,j,i}
+      \ge \mathit{orig}_{i,t} \;-\; \mathit{dest}_{i,t} \;-\; \mathit{M} \cdot \mathit{u}_{t}
+      \qquad \forall t \in T,\; \forall i \in N \tag{flow\_low} \\
+  & x_{t,i,j} \;+\; \mathit{u}_{t} \;\le\; 1
+      \qquad \forall t \in T,\; \forall i \in N,\; \forall j \in N \tag{cancel\_link} \\
+  & \mathit{z}_{t,j} \;\ge\; \mathit{z}_{t,i} \;+\; \mathit{travel}_{i,j} \;-\; \mathit{M} \;+\; \mathit{M} \cdot x_{t,i,j}
+      \qquad \forall t \in T,\; \forall i \in N,\; \forall j \in N \tag{timing} \\
+  & \sum_{t \in T} x_{t,i,j} \;\le\; \mathit{cap}_{i,j}
+      \qquad \forall i \in N,\; \forall j \in N \tag{capacity} \\
+  & \mathit{o}_{t1,t2,i,j} \;+\; \mathit{o}_{t2,t1,i,j}
+      \;\ge\; x_{t1,i,j} \;+\; x_{t2,i,j} \;-\; 1
+      \qquad \forall (t1,t2) \in TT,\; \forall i \in N,\; \forall j \in N \tag{order\_link} \\
+  & \mathit{z}_{t2,i} \;\ge\; \mathit{z}_{t1,i} \;+\; \mathit{travel}_{i,j} \;-\; \mathit{M} \;+\; \mathit{M} \cdot \mathit{o}_{t1,t2,i,j}
+      \qquad \forall (t1,t2) \in TT,\; \forall i \in N,\; \forall j \in N \tag{order\_time} \\
+  & \mathit{delay}_{t} \;\ge\; \sum_{i \in N} \mathit{dest}_{i,t} \cdot \mathit{z}_{t,i} \;-\; \mathit{arr}_{t} \;-\; \mathit{M} \cdot \mathit{u}_{t}
+      \qquad \forall t \in T \tag{delay\_low} \\
+  & \mathit{delay}_{t} \;+\; \mathit{M} \cdot \mathit{u}_{t} \;\le\; \mathit{M}
+      \qquad \forall t \in T \tag{delay\_up} \\
+\end{align}

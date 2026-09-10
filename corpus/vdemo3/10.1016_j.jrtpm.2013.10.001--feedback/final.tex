@@ -1,0 +1,19 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=weighted_train_delay family=milp schema=0.1.0
+%@ name :: Weighted passenger-delay minimization for railway rescheduling
+%@ desc :: Binary MILP that selects one alternative arc for each train so as to minimise the total weighted passenger delay. Each train is assigned exactly one feasible arc and arc capacities are respected.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs.
+%@ param w shape=T,A kind=matrix domain=cost_weight :: Weighted passenger-delay coefficient for train t on arc a.
+%@ param cap shape=A kind=vector domain=capacity :: Capacity of arc a (maximum number of trains that may use the arc).
+%@ param allowed shape=T,A kind=matrix domain=unclassified :: Feasibility indicator: 1 if arc a can be assigned to train t, 0 otherwise.
+%@ var x shape=T,A domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable, 1 if train t uses alternative arc a.
+%@ obj sense=min name=total_delay combination=sum :: Minimise total weighted passenger delay.
+%@ con assign kind=linear domain=- indicator=- :: Each train must be assigned exactly one feasible alternative arc.
+%@ con capacity kind=linear domain=- indicator=- :: Arc capacity must not be exceeded.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, a \in \mathcal{A}} w \cdot x_{t,a} \tag{total_delay} \\
+  & \sum_{a \in \mathcal{A}} allowed \cdot x_{t,a} = 1 \qquad \forall t \in \mathcal{T} \tag{assign} \\
+  & \sum_{t \in \mathcal{T}} x_{t,a} \le cap_a \qquad \forall a \in \mathcal{A} \tag{capacity}
+\end{align}

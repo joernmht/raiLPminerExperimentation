@@ -1,0 +1,23 @@
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Weighted Passenger Delay
+%@ desc :: A MILP formulation for rescheduling passenger train services to minimize total weighted passenger delay at destinations. The model uses an alternative graph concept where trains are assigned to arcs to avoid knock-on delays.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index A ordered=0 cyclic=0 :: Set of alternative arcs (tasks/slots) in the alternative graph.
+%@ index D ordered=0 cyclic=0 :: Set of destinations.
+%@ param demand shape=T,D kind=matrix domain=non_negative :: Number of passengers for train t arriving at destination d.
+%@ param duration shape=A kind=scalar domain=non_negative :: Duration of arc a.
+%@ param weight shape=T,D kind=scalar domain=non_negative :: Importance weight for train t at destination d.
+%@ param arrival_target shape=T,D kind=scalar domain=non_negative :: Scheduled arrival time of train t at destination d.
+%@ var x shape=T,A domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable: 1 if train t is assigned to arc a.
+%@ var start_time shape=A domain=non_negative role=primary drole=- lo=0 hi=- :: Start time of arc a.
+%@ var delay shape=T,D domain=non_negative role=primary drole=- lo=0 hi=- :: Delay experienced by train t at destination d.
+%@ obj sense=min name=total_weighted_delay combination=sum :: Minimize the total weighted passenger delay.
+%@ con assign_train kind=- domain=- indicator=- :: Each train must be assigned to exactly one arc.
+%@ con arc_precedence kind=- domain=- indicator=- :: Precedence constraints between arcs to prevent overlap.
+%@ con delay_calc kind=- domain=- indicator=- :: Relates arc end time to train delay.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, d \in \mathcal{D}} \mathit{demand}_{t,d} \cdot \mathit{weight}_{t,d} \cdot \mathit{delay}_{t,d} \tag{total\_weighted\_delay} \\
+  & \sum_{a \in \mathcal{A}} x_{t,a} = 1 \qquad \forall t \in \mathcal{T} \tag{assign\_train} \\
+  & \mathit{start\_time}_{a} + \mathit{duration}_{a} \le \mathit{start\_time}_{b} + \mathcal{M} \cdot (2 - x_{t,a} - x_{t,b}) \qquad \forall a, b \in \mathcal{A}, a \neq b \tag{arc\_precedence} \\
+  & \mathit{delay}_{t,d} \ge \sum_{a \in \mathcal{A}} (x_{t,a} \cdot (\mathit{start\_time}_{a} + \mathit{duration}_{a} - \mathit{arrival\_target}_{t,d})) \qquad \forall t \in \mathcal{T}, \forall d \in \mathcal{D} \tag{delay\_calc} \\
+\end{align}

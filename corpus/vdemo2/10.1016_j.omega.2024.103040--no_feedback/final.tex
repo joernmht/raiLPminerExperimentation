@@ -1,0 +1,33 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_reschedule family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Seat Reservation
+%@ desc :: Service-oriented timetable rescheduling approach to minimize passenger inconvenience due to disruptions in a railway system with seat reservation mechanism.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Platforms.
+%@ param d shape=T kind=scalar domain=time_duration :: Original departure time of each train.
+%@ param a shape=T kind=scalar domain=time_duration :: Original arrival time of each train.
+%@ param h shape=T,T kind=matrix domain=time_duration :: Minimum headway time between trains.
+%@ param c shape=S,P kind=matrix domain=passenger_capacity :: Capacity of each platform at each station.
+%@ param w shape=T kind=scalar domain=passenger_inconvenience :: Weighted inconvenience of each train's passengers.
+%@ var x shape=T,S,P domain=binary role=primary drole=assignment lo=- hi=- :: Assignment of trains to platforms at stations.
+%@ var y shape=T,T,S,P domain=binary role=primary drole=ordering lo=- hi=- :: Ordering of trains at each platform.
+%@ var z shape=T domain=integer role=primary drole=retiming lo=- hi=- :: Retiming of each train.
+%@ var u shape=T,S,P domain=integer role=auxiliary drole=local_rerouting lo=- hi=- :: Local rerouting of trains at each station.
+%@ obj sense=min name=passenger_inconvenience combination=sum :: Minimize weighted passenger inconvenience.
+%@ con train_assignment kind=assignment domain=station_platform :: Each train is assigned to one platform at each station.
+%@ con train_ordering kind=ordering domain=platform :: Trains are ordered at each platform.
+%@ con headway_constraint kind=headway domain=train_headway :: Minimum headway time between trains.
+%@ con platform_capacity kind=capacity domain=platform :: Platform capacity constraint.
+%@ con retiming_constraint kind=retiming domain=train_retiming :: Retiming of each train.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} w_{t} \cdot z_{t} \tag{passenger\_inconvenience} \\
+  & \sum_{s \in \mathcal{S}} \sum_{p \in \mathcal{P}} x_{t,s,p} = 1 \qquad \forall t \in \mathcal{T} \tag{train\_assignment} \\
+  & \sum_{t' \in \mathcal{T}} y_{t,t',s,p} = 1 \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall p \in \mathcal{P} \tag{train\_ordering} \\
+  & y_{t,t',s,p} + y_{t',t,s,p} \le 1 \qquad \forall t \in \mathcal{T},\; \forall t' \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall p \in \mathcal{P} \tag{train\_ordering} \\
+  & a_{t} - d_{t'} \ge h_{t,t'} \qquad \forall t \in \mathcal{T},\; \forall t' \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall p \in \mathcal{P} \tag{headway\_constraint} \\
+  & \sum_{t \in \mathcal{T}} x_{t,s,p} \le c_{s,p} \qquad \forall s \in \mathcal{S},\; \forall p \in \mathcal{P} \tag{platform\_capacity} \\
+  & z_{t} \ge a_{t} - d_{t} \qquad \forall t \in \mathcal{T} \tag{retiming\_constraint} \\
+  & u_{t,s,p} \ge x_{t,s,p} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall p \in \mathcal{P} \tag{local\_rerouting} \\
+\end{align}

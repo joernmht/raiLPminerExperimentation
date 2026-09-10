@@ -1,0 +1,32 @@
+% lp2graph canonical LaTeX
+% Disruption length estimation and short‑turning MILP (simplified)
+%@ meta id=disruption_shortturn family=milp schema=0.1.0
+%@ name :: Disruption length selection with short‑turning decisions
+%@ desc :: Choose a disruption‑length scenario and short‑turn trains to minimise total passenger delay. Parameters describe baseline travel times, passenger demands and binary incidence of passenger groups to trains. Linearisation uses big‑M.
+%@ index I ordered=0 cyclic=0 :: Trains.
+%@ index G ordered=0 cyclic=0 :: Passenger groups (origin‑destination pairs).
+%@ index D ordered=0 cyclic=0 :: Disruption‑length scenarios.
+%@ param L shape=D kind=scalar domain=time :: Disruption length for scenario d.
+%@ param base_delay shape=G kind=scalar domain=time :: Baseline travel time for passenger group g without disruption.
+%@ param demand shape=G kind=scalar domain=passenger :: Number of passengers in group g.
+%@ param a shape=G,I kind=matrix domain=boolean :: Incidence: 1 if group g is served by train i, 0 otherwise.
+%@ param bigM shape=- kind=scalar domain=big :: Large constant for big‑M linearisation.
+%@ var u shape=D domain=binary role=primary drole=- lo=- hi=- :: Scenario selection binary variable.
+%@ var s shape=I domain=binary role=primary drole=- lo=- hi=- :: Short‑turn decision for train i.
+%@ var y shape=G domain=binary role=auxiliary drole=- lo=- hi=- :: Indicator that group g is affected by a short‑turned train.
+%@ var l shape=- domain=continuous role=primary drole=- lo=0 hi=- :: Selected disruption length.
+%@ var delay shape=G domain=non_negative role=primary drole=- lo=0 hi=- :: Passenger delay for group g.
+%@ obj sense=min name=total_delay combination=sum :: Minimise total passenger delay.
+%@ con length_selection kind=- domain=- indicator=- :: Link l to selected scenario.
+%@ con scenario_sum kind=- domain=- indicator=- :: Exactly one scenario is chosen.
+%@ con affect_def1 kind=- domain=- indicator=- :: y_g ≥ a_{g,i}·s_i for all g,i.
+%@ con affect_def2 kind=- domain=- indicator=- :: y_g ≤ Σ_i a_{g,i}·s_i for each g.
+%@ con delay_def kind=- domain=- indicator=- :: Delay definition with big‑M.
+\begin{align}
+  \min\quad & \sum_{g \in \mathcal{G}} \mathit{demand}_{g} \cdot \text{delay}_{g} \tag{total\_delay} \\
+  & \text{l} - \sum_{d \in \mathcal{D}} \mathit{L}_{d} \cdot \text{u}_{d} = 0 \qquad \forall  \tag{length\_selection} \\
+  & \sum_{d \in \mathcal{D}} \text{u}_{d} = 1 \qquad \forall  \tag{scenario\_sum} \\
+  & \text{y}_{g} - \mathit{a}_{g,i} \cdot \text{s}_{i} \ge 0 \qquad \forall g \in \mathcal{G},\; i \in \mathcal{I} \tag{affect\_def1} \\
+  & \text{y}_{g} - \sum_{i \in \mathcal{I}} \mathit{a}_{g,i} \cdot \text{s}_{i} \le 0 \qquad \forall g \in \mathcal{G} \tag{affect\_def2} \\
+  & \text{delay}_{g} - \mathit{base\_delay}_{g} - \text{l} + \mathit{bigM} - \mathit{bigM} \cdot \text{y}_{g} \ge 0 \qquad \forall g \in \mathcal{G} \tag{delay\_def}
+\end{align}

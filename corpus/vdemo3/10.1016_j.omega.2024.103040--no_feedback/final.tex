@@ -1,0 +1,39 @@
+% lp2graph canonical LaTeX
+% Service-oriented train rescheduling with passenger inconvenience (MILP)
+%@ meta id=train_reschedule family=milp schema=0.1.0
+%@ name :: Service-oriented train rescheduling under disruptions
+%@ desc :: MILP model for train retiming, reordering and local rerouting that minimizes weighted passenger delay while respecting headway and station capacity constraints. The model uses a space‑time network with binary assignment of trains to discrete departure slots and ordering variables for incompatible train pairs.
+%@ tags :: milp | railway | timetable | passenger_inconvenience | headway | capacity
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index K ordered=0 cyclic=0 :: Discrete time slots.
+%@ index I ordered=0 cyclic=0 :: Incompatible triples (t1,t2,s) where trains t1 and t2 cannot occupy station s within the required headway.
+%@ param cost shape=T,K kind=matrix domain=cost :: Penalty coefficient for assigning train t to time slot k (includes passenger delay cost).
+%@ param H shape=T,T,S kind=matrix domain=time :: Minimum headway (in time units) required between train t1 and train t2 at station s.
+%@ param M shape=- kind=scalar domain=bigM :: Large constant for big‑M formulation.
+%@ param a shape=T,S kind=matrix domain=bool :: Indicator =1 if train t visits station s, 0 otherwise.
+%@ param cap shape=S kind=vector domain=integer :: Maximum number of trains that can occupy station s simultaneously.
+%@ param time shape=K kind=vector domain=time :: Physical time value of slot k.
+%@ var y shape=T,K domain=binary role=primary drole=- lo=- hi=- :: Binary assignment of train t to departure time slot k.
+%@ var z shape=I domain=binary role=auxiliary drole=- lo=- hi=- :: Ordering variable: 1 if train t1 departs before train t2 at station s.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total weighted passenger inconvenience.
+%@ con assign kind=- domain=- indicator=- :: Each train is assigned to exactly one time slot.
+%@ con headway1 kind=- domain=- indicator=- :: Headway constraint (t1 before t2) for incompatible triples.
+%@ con headway2 kind=- domain=- indicator=- :: Headway constraint (t2 before t1) for incompatible triples.
+%@ con capacity kind=- domain=- indicator=- :: Station capacity constraint.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T},\, k \in \mathcal{K}} \mathit{cost}_{t,k} \cdot y_{t,k} \tag{total\_cost} \\
+  & \sum_{k \in \mathcal{K}} y_{t,k} = 1 \qquad \forall t \in \mathcal{T} \tag{assign} \\
+  & \sum_{k \in \mathcal{K}} \mathit{time}_{k} \cdot y_{t1,k}
+      + \mathit{H}_{t1,t2,s}
+      \le \sum_{k \in \mathcal{K}} \mathit{time}_{k} \cdot y_{t2,k}
+      + \mathit{M} \cdot (1 - z_{t1,t2,s})
+      \qquad \forall (t1,t2,s) \in \mathcal{I} \tag{headway1} \\
+  & \sum_{k \in \mathcal{K}} \mathit{time}_{k} \cdot y_{t2,k}
+      + \mathit{H}_{t1,t2,s}
+      \le \sum_{k \in \mathcal{K}} \mathit{time}_{k} \cdot y_{t1,k}
+      + \mathit{M} \cdot z_{t1,t2,s}
+      \qquad \forall (t1,t2,s) \in \mathcal{I} \tag{headway2} \\
+  & \sum_{t \in \mathcal{T}} a_{t,s} \cdot y_{t,k} \le \mathit{cap}_{s}
+      \qquad \forall s \in \mathcal{S},\; \forall k \in \mathcal{K} \tag{capacity}
+\end{align}

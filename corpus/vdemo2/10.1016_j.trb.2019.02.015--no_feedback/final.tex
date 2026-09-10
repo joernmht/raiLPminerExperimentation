@@ -1,0 +1,31 @@
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Timetable Rescheduling with Flexible Stopping and Short-Turning
+%@ desc :: A Mixed Integer Linear Programming model to minimize passenger delays by integrating flexible stopping, flexible short-turning, retiming, reordering, and cancelling.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Platforms.
+%@ param d shape=T,S kind=matrix domain=time_duration :: Scheduled arrival time of train at station.
+%@ param p shape=T,S kind=matrix domain=passenger_demand :: Time-dependent passenger demand for train at station.
+%@ param c shape=T,S kind=matrix domain=delay_cost :: Cost of delay for train at station.
+%@ param M shape=- kind=scalar domain=large_number :: Large number for big-M formulation.
+%@ var x shape=T,S domain=binary role=primary drole=stopping lo=- hi=- :: 1 if train stops at station, 0 otherwise.
+%@ var y shape=T,S domain=binary role=primary drole=short_turning lo=- hi=- :: 1 if train short-turns at station, 0 otherwise.
+%@ var z shape=T domain=binary role=primary drole=cancelling lo=- hi=- :: 1 if train is cancelled, 0 otherwise.
+%@ var t shape=T,S domain=continuous role=primary drole=retiming lo=- hi=- :: Actual arrival time of train at station.
+%@ var u shape=S,P domain=binary role=auxiliary drole=platform_assignment lo=- hi=- :: 1 if platform is assigned to station, 0 otherwise.
+%@ obj sense=min name=passenger_delays combination=sum :: Minimize passenger delays.
+%@ con stopping kind=- domain=- indicator=- :: Ensure train stops or short-turns at each station.
+%@ con short_turning kind=- domain=- indicator=- :: Ensure short-turning train does not stop at subsequent stations.
+%@ con cancelling kind=- domain=- indicator=- :: Ensure cancelled train does not stop at any station.
+%@ con retiming kind=- domain=- indicator=- :: Ensure actual arrival time is within scheduled time window.
+%@ con platform kind=- domain=- indicator=- :: Ensure each train serving a station is assigned a platform.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} c_{t,s} \cdot (t_{t,s} - d_{t,s}) \cdot x_{t,s} \tag{passenger\_delays} \\
+  & x_{t,s} + y_{t,s} \le 1 \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{stopping} \\
+  & y_{t,s} + \sum_{s' \in \mathcal{S}, s' > s} x_{t,s'} \le 1 \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{short\_turning} \\
+  & z_{t} + \sum_{s \in \mathcal{S}} x_{t,s} \le 1 \qquad \forall t \in \mathcal{T} \tag{cancelling} \\
+  & t_{t,s} \ge d_{t,s} - M \cdot (1 - x_{t,s}) \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{retiming} \\
+  & t_{t,s} \le d_{t,s} + M \cdot (1 - x_{t,s}) \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{retiming} \\
+  & \sum_{p \in \mathcal{P}} u_{s,p} \ge \sum_{t \in \mathcal{T}} x_{t,s} \qquad \forall s \in \mathcal{S} \tag{platform} \\
+  & \sum_{s \in \mathcal{S}} u_{s,p} \le 1 \qquad \forall p \in \mathcal{P} \tag{platform} \\
+\end{align}

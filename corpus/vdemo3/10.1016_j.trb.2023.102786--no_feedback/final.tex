@@ -1,0 +1,34 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Railway train rescheduling with routing, delay and cancellation
+%@ desc :: MILP model for rescheduling trains after a disruption. Decisions: select a route (or cancel) for each train, compute travel time, passenger delay, and respect arc capacities. Objective minimizes total passenger delay and penalty for cancelled trains.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index P ordered=0 cyclic=0 :: Set of candidate routes (paths) per train.
+%@ index A ordered=0 cyclic=0 :: Set of arcs (track segments) in the space‑time network.
+%@ param travelTime shape=T,P kind=matrix domain=time :: Travel time of train t on route p.
+%@ param passenger shape=T kind=scalar domain=passengers :: Number of passengers on train t.
+%@ param origArrival shape=T kind=scalar domain=time :: Scheduled arrival time of train t (baseline).
+%@ param maxDelay shape=T kind=scalar domain=time :: Maximum acceptable delay for train t before cancellation.
+%@ param bigPenalty shape=- kind=scalar domain=penalty :: Penalty weight for cancelling a train.
+%@ param M shape=- kind=scalar domain=bigM :: Large constant for big‑M constraints.
+%@ param cap shape=A kind=vector domain=capacity :: Capacity of arc a (max number of trains simultaneously).
+%@ param use shape=T,P,A kind=matrix domain=bool :: Indicator if route p of train t uses arc a (1) or not (0).
+%@ var r shape=T,P domain=binary role=primary drole=- lo=- hi=- :: Route selection binary variable.
+%@ var unsat shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Cancellation indicator binary variable.
+%@ var delay shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Passenger delay for train t.
+%@ var travel shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Travel time incurred by train t.
+%@ obj sense=min name=obj combination=sum :: Minimize weighted passenger delay plus cancellation penalty.
+%@ con select_or_cancel kind=- domain=- indicator=- :: Choose exactly one route or cancel.
+%@ con travel_def kind=- domain=- indicator=- :: Define travel time as selected route's travel time.
+%@ con delay_def kind=- domain=- indicator=- :: Delay is excess over scheduled arrival.
+%@ con max_delay kind=- domain=- indicator=- :: Enforce max delay or allow cancellation.
+%@ con capacity kind=- domain=- indicator=- :: Arc capacity constraints.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} \mathit{passenger}_{t} \cdot \mathit{delay}_{t} + \mathit{bigPenalty} \cdot \mathit{unsat}_{t} \tag{obj} \\
+  & \sum_{p \in \mathcal{P}} r_{t,p} + \mathit{unsat}_{t} = 1 \qquad \forall t \in \mathcal{T} \tag{select\_or\_cancel} \\
+  & \mathit{travel}_{t} = \sum_{p \in \mathcal{P}} \mathit{travelTime}_{t,p} \cdot r_{t,p} \qquad \forall t \in \mathcal{T} \tag{travel\_def} \\
+  & \mathit{delay}_{t} \ge \mathit{travel}_{t} - \mathit{origArrival}_{t} \qquad \forall t \in \mathcal{T} \tag{delay\_def} \\
+  & \mathit{travel}_{t} \le \mathit{origArrival}_{t} + \mathit{maxDelay}_{t} + \mathit{M} \cdot \mathit{unsat}_{t} \qquad \forall t \in \mathcal{T} \tag{max\_delay} \\
+  & \sum_{t \in \mathcal{T}} \sum_{p \in \mathcal{P}} \mathit{use}_{t,p,a} \cdot r_{t,p} \le \mathit{cap}_{a} \qquad \forall a \in \mathcal{A} \tag{capacity} \\
+\end{align}

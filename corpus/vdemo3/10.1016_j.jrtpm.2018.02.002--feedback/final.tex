@@ -1,0 +1,38 @@
+% lp2graph canonical LaTeX
+% Disruption length estimation and short‑turning MILP.
+%@ meta id=disruption_shortturn family=milp schema=0.1.0
+%@ name :: Disruption length estimation with short‑turning decisions
+%@ desc :: MILP model estimating disruption length, deciding short‑turning of trains, and assigning passengers to arcs. Minimizes total passenger travel time plus disruption penalty.
+%@ index T ordered=0 cyclic=0 :: Trains that may be short‑turned.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index A ordered=0 cyclic=0 :: Directed arcs between stations.
+%@ index O ordered=0 cyclic=0 :: Passenger origin‑destination pairs.
+%@ param travel_time shape=A kind=vector domain=time_duration :: Nominal travel time on arc a.
+%@ param capacity shape=A kind=vector domain=capacity :: Capacity of arc a.
+%@ param demand shape=O kind=vector domain=demand :: Passenger demand for OD pair o.
+%@ param path shape=O,A kind=matrix domain=network_structure :: 1 if arc a belongs to the nominal path of OD o.
+%@ param L_min shape=- kind=scalar domain=time_duration :: Minimum possible disruption length.
+%@ param L_max shape=- kind=scalar domain=time_duration :: Maximum possible disruption length.
+%@ param reduction shape=- kind=scalar domain=time_duration :: Disruption reduction per short‑turned train.
+%@ param D_total shape=- kind=scalar domain=demand :: Total passenger demand (sum of demand_o).
+%@ param train_station shape=T,S kind=matrix domain=network_structure :: 1 if train t passes station s.
+%@ param station_capacity shape=S kind=vector domain=capacity :: Maximum number of short‑turned trains allowed at station s.
+%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Estimated disruption length.
+%@ var y shape=T domain=binary role=primary drole=selection_assignment lo=- hi=- :: 1 if train t is short‑turned.
+%@ var f shape=O,A domain=continuous role=primary drole=flow_quantity lo=0 hi=- :: Passenger flow of OD o on arc a.
+%@ obj sense=min name=total_delay combination=sum :: Minimize total passenger travel time plus disruption penalty.
+%@ con len_lower kind=linear domain=- indicator=- :: Lower bound on disruption length.
+%@ con len_upper kind=linear domain=- indicator=- :: Upper bound on disruption length (reduction by short‑turns).
+%@ con station_capacity_con kind=linear domain=- indicator=- :: Station capacity for short‑turned trains.
+%@ con arc_capacity kind=linear domain=- indicator=- :: Arc capacity constraint.
+%@ con demand_satisfaction kind=linear domain=- indicator=- :: Demand satisfaction for each OD.
+%@ con path_feasibility kind=linear domain=- indicator=- :: Flow only on allowed arcs.
+\begin{align}
+  \min\quad & \sum_{o \in \mathcal{O}, a \in \mathcal{A}} \mathit{travel\_time}_{a} \cdot f_{o,a} + \mathit{D\_total} \cdot L \tag{total\_delay} \\
+  & L \ge \mathit{L\_min} \tag{len\_lower} \\
+  & L + \sum_{t \in \mathcal{T}} \mathit{reduction} \cdot y_{t} \le \mathit{L\_max} \tag{len\_upper} \\
+  & \sum_{t \in \mathcal{T}} \mathit{train\_station}_{t,s} \cdot y_{t} \le \mathit{station\_capacity}_{s} \qquad \forall s \in \mathcal{S} \tag{station\_capacity\_con} \\
+  & \sum_{o \in \mathcal{O}} f_{o,a} \le \mathit{capacity}_{a} \qquad \forall a \in \mathcal{A} \tag{arc\_capacity} \\
+  & \sum_{a \in \mathcal{A}} f_{o,a} = \mathit{demand}_{o} \qquad \forall o \in \mathcal{O} \tag{demand\_satisfaction} \\
+  & f_{o,a} \le \mathit{demand}_{o} \cdot \mathit{path}_{o,a} \qquad \forall o \in \mathcal{O},\; \forall a \in \mathcal{A} \tag{path\_feasibility} \\
+\end{align}

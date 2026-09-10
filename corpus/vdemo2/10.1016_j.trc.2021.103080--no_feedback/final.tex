@@ -1,0 +1,32 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Multiple Disruptions
+%@ desc :: A Mixed Integer Linear Programming (MILP) model to reschedule the timetable in case of multiple disruptions at different geographic locations with overlapping periods and connected by at least one train line.
+%@ index T ordered=0 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index L ordered=0 cyclic=0 :: Train lines.
+%@ index D ordered=0 cyclic=0 :: Disruptions.
+%@ param d shape=D kind=scalar domain=time_duration :: Duration of each disruption.
+%@ param c shape=T,L,S kind=scalar domain=capacity :: Platform capacity at each station.
+%@ param r shape=L kind=scalar domain=rolling_stock :: Rolling stock available for each train line.
+%@ param a shape=T,L,S kind=scalar domain=arrival_time :: Original arrival time at each station.
+%@ param b shape=T,L,S kind=scalar domain=departure_time :: Original departure time at each station.
+%@ var x shape=T,L,S domain=binary role=primary drole=dispatching lo=- hi=- :: 1 if the train is dispatched at the original time, 0 otherwise.
+%@ var y shape=T,L,S domain=binary role=primary drole=dispatching lo=- hi=- :: 1 if the train is cancelled, 0 otherwise.
+%@ var z shape=T,L,S domain=integer role=auxiliary drole=auxiliary_linearization lo=0 hi=- :: Number of added stops for each train.
+%@ var w shape=T,L,S domain=integer role=auxiliary drole=auxiliary_linearization lo=0 hi=- :: Flexible short-turning for each train.
+%@ var t shape=T,L,S domain=continuous role=primary drole=timing lo=- hi=- :: Rescheduled arrival time at each station.
+%@ obj sense=min name=total_delays combination=sum :: Minimize the total delays and cancelled train services.
+%@ con capacity kind=- domain=- indicator=- :: Platform capacity constraint at each station.
+%@ con rolling_stock kind=- domain=- indicator=- :: Rolling stock circulation constraint at terminal stations.
+%@ con dispatching kind=- domain=- indicator=- :: Dispatching measures (retiming, reordering, cancelling, adding stops, flexible short-turning) for each train.
+%@ con timing kind=- domain=- indicator=- :: Rescheduled arrival and departure times for each train.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, l \in \mathcal{L}, s \in \mathcal{S}} (t_{t,l,s} - a_{t,l,s}) + \sum_{t \in \mathcal{T}, l \in \mathcal{L}, s \in \mathcal{S}} y_{t,l,s} \tag{total\_delays} \\
+  & \sum_{l \in \mathcal{L}} x_{t,l,s} \le c_{t,l,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{capacity} \\
+  & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} x_{t,l,s} \le r_{l} \qquad \forall l \in \mathcal{L} \tag{rolling\_stock} \\
+  & x_{t,l,s} + y_{t,l,s} \le 1 \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L},\; \forall s \in \mathcal{S} \tag{dispatching} \\
+  & t_{t,l,s} \ge a_{t,l,s} - d_{d} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L},\; \forall s \in \mathcal{S},\; \forall d \in \mathcal{D} \tag{timing} \\
+  & t_{t,l,s} \le b_{t,l,s} + d_{d} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L},\; \forall s \in \mathcal{S},\; \forall d \in \mathcal{D} \tag{timing} \\
+\end{align}

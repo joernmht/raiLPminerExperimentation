@@ -1,0 +1,29 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Rerouting
+%@ desc :: Minimize total passenger delay and number of passengers that could not reach their destination after a disruption in a large-scale railway network.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Paths.
+%@ param d shape=T kind=scalar domain=time_duration :: Original departure time of each train.
+%@ param a shape=T kind=scalar domain=time_duration :: Original arrival time of each train.
+%@ param c shape=T,S kind=matrix domain=demand :: Number of passengers traveling from each station on each train.
+%@ param p shape=P kind=scalar domain=time_duration :: Travel time of each path.
+%@ param r shape=T,P kind=matrix domain=network_structure :: Rerouting option for each train on each path (1 if possible, 0 otherwise).
+%@ var x shape=T,P domain=binary role=primary drole=selection_assignment lo=- hi=- :: Rerouting decision for each train on each path.
+%@ var y shape=T,S domain=binary role=primary drole=selection_assignment lo=- hi=- :: Boarding decision for each passenger on each train at each station.
+%@ var z shape=T domain=continuous role=primary drole=timing lo=- hi=- :: Delay of each train.
+%@ var w shape=T domain=binary role=primary drole=auxiliary_linearization lo=- hi=- :: Cancellation decision for each train.
+%@ obj sense=min name=total_delay combination=sum :: Minimize total passenger delay and number of cancelled trains.
+%@ con delay kind=linear domain=- indicator=- :: Calculate delay for each train.
+%@ con boarding kind=linear domain=- indicator=- :: Ensure passengers board the correct train.
+%@ con rerouting kind=linear domain=- indicator=- :: Ensure rerouting decisions are valid.
+%@ con cancellation kind=linear domain=- indicator=- :: Ensure cancellation decisions are valid.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}} c_{t,s} \cdot z_{t} + \sum_{t \in \mathcal{T}} w_{t} \tag{total\_delay} \\
+  & z_{t} \ge a_{t} - d_{t} \qquad \forall t \in \mathcal{T} \tag{delay} \\
+  & y_{t,s} \le \sum_{p \in \mathcal{P}} r_{t,p} \cdot x_{t,p} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{boarding} \\
+  & \sum_{p \in \mathcal{P}} x_{t,p} \le 1 \qquad \forall t \in \mathcal{T} \tag{rerouting} \\
+  & w_{t} \le 1 - \sum_{p \in \mathcal{P}} x_{t,p} \qquad \forall t \in \mathcal{T} \tag{cancellation} \\
+\end{align}

@@ -1,0 +1,43 @@
+% lp2graph canonical LaTeX
+% Railway timetable rescheduling with flexible stopping, short‑turning, retiming, reordering and cancellation.
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Railway disruption recovery model
+%@ desc :: MILP that decides for each train whether to stop at a station, to short‑turn, to shift its schedule, to reorder with other trains or to cancel, while respecting platform capacities and minimizing passenger delay costs.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index S ordered=0 cyclic=0 :: Set of stations ordered along the line.
+%@ param demand shape=T,S kind=matrix domain=- :: Passenger demand (weight) of train i at station j.
+%@ param arr0 shape=T,S kind=matrix domain=- :: Scheduled arrival time of train i at station j.
+%@ param travel shape=T,S kind=matrix domain=- :: Travel time of train i from station j to the next station.
+%@ param stop_time shape=- kind=scalar domain=- :: Additional dwell time when a train stops at a station.
+%@ param cap shape=S kind=vector domain=- :: Number of platform tracks available at station j.
+%@ param bigM shape=- kind=scalar domain=- :: Large constant for big‑M formulations.
+%@ param penalty_cancel shape=- kind=scalar domain=- :: Cost of cancelling a train.
+%@ param penalty_delay shape=- kind=scalar domain=- :: Cost per passenger‑minute of delay.
+%@ var x shape=T,S domain=binary role=primary drole=stop lo=- hi=- :: 1 if train i stops at station j, 0 otherwise.
+%@ var y shape=T,S domain=binary role=primary drole=shortturn lo=- hi=- :: 1 if train i short‑turns (terminates) at station j, 0 otherwise.
+%@ var shift shape=T domain=continuous role=primary drole=retiming lo=0 hi=- :: Time shift applied to the whole schedule of train i.
+%@ var arrival shape=T,S domain=continuous role=primary drole=arrival lo=0 hi=- :: Actual arrival time of train i at station j.
+%@ var delay shape=T,S domain=continuous role=primary drole=delay lo=0 hi=- :: Passenger delay of train i at station j.
+%@ var cancel shape=T domain=binary role=primary drole=cancel lo=- hi=- :: 1 if train i is cancelled, 0 otherwise.
+%@ obj sense=min name=obj_total_delay combination=sum :: Minimize weighted passenger delay plus cancellation penalties.
+%@ con canc_stop kind=- domain=- indicator=- :: If a train is cancelled it cannot stop.
+%@ con canc_shortturn kind=- domain=- indicator=- :: If a train is cancelled it cannot short‑turn.
+%@ con platform_cap kind=- domain=- indicator=- :: Platform capacity at each station.
+%@ con shortturn_consistency kind=- domain=- indicator=- :: Short‑turn decision forces no stops beyond the turn point.
+%@ con arrival_start kind=- domain=- indicator=- :: Arrival time at the first station after retiming.
+%@ con arrival_propagation kind=- domain=- indicator=- :: Arrival time propagation along the line.
+%@ con delay_def kind=- domain=- indicator=- :: Definition of passenger delay.
+%@ con delay_nonneg kind=- domain=- indicator=- :: Non‑negativity of delay.
+%@ con cancel_delay kind=- domain=- indicator=- :: Zero delay when a train is cancelled.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{T}, j \in \mathcal{S}} \mathit{demand}_{i,j} \cdot \mathit{delay}_{i,j} \;+\; \mathit{penalty\_cancel} \cdot \sum_{i \in \mathcal{T}} \mathit{cancel}_{i} \tag{obj\_total\_delay} \\
+  & \mathit{x}_{i,j} \le 1 - \mathit{cancel}_{i} \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{canc\_stop} \\
+  & \mathit{y}_{i,j} \le 1 - \mathit{cancel}_{i} \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{canc\_shortturn} \\
+  & \sum_{i \in \mathcal{T}} \mathit{x}_{i,j} \le \mathit{cap}_{j} \qquad \forall j \in \mathcal{S} \tag{platform\_cap} \\
+  & \mathit{x}_{i,k} + \mathit{y}_{i,j} \le 1 \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S},\; \forall k \in \mathcal{S},\; j < k \tag{shortturn\_consistency} \\
+  & \mathit{arrival}_{i,1} = \mathit{arr0}_{i,1} + \mathit{shift}_{i} \qquad \forall i \in \mathcal{T} \tag{arrival\_start} \\
+  & \mathit{arrival}_{i,j} = \mathit{arrival}_{i,j-1} + \mathit{travel}_{i,j-1} + \mathit{stop\_time} \cdot \mathit{x}_{i,j} \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S},\; j \neq 1 \tag{arrival\_propagation} \\
+  & \mathit{delay}_{i,j} \ge \mathit{arrival}_{i,j} - \mathit{arr0}_{i,j} - \mathit{bigM} \cdot (1 - \mathit{x}_{i,j}) \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{delay\_def} \\
+  & \mathit{delay}_{i,j} \ge 0 \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{delay\_nonneg} \\
+  & \mathit{delay}_{i,j} \le \mathit{bigM} \cdot (1 - \mathit{cancel}_{i}) \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{cancel\_delay} \\
+\end{align}

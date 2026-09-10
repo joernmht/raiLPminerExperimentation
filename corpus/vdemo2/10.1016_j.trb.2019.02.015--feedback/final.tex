@@ -1,0 +1,41 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Timetable Rescheduling with Flexible Stopping and Short Turning
+%@ desc :: A Mixed Integer Linear Programming model for efficient and passenger-friendly railway timetable rescheduling, integrating flexible stopping, flexible short turning, retiming, reordering, and cancelling, with consideration of time-dependent passenger demand and platform track allocation.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Platforms.
+%@ param d shape=T,S kind=matrix domain=time_duration :: Scheduled departure time from station.
+%@ param a shape=T,S kind=matrix domain=time_duration :: Scheduled arrival time at station.
+%@ param pdemand shape=T,S kind=matrix domain=passenger_demand :: Time-dependent passenger demand.
+%@ param ccancel shape=T kind=vector domain=cost :: Cost of cancelling a train.
+%@ param cretime shape=T kind=vector domain=cost :: Cost of retiming a train.
+%@ param creorder shape=T kind=vector domain=cost :: Cost of reordering a train.
+%@ param cshortturn shape=T,S kind=matrix domain=cost :: Cost of short-turning a train at a station.
+%@ param cskipstop shape=T,S kind=matrix domain=cost :: Cost of skipping a stop.
+%@ param caddstop shape=T,S kind=matrix domain=cost :: Cost of adding a stop.
+%@ var xskip shape=T,S domain=binary role=primary drole=stop_skipping lo=- hi=- :: Whether to skip a stop.
+%@ var xadd shape=T,S domain=binary role=primary drole=stop_adding lo=- hi=- :: Whether to add a stop.
+%@ var xshortturn shape=T,S domain=binary role=primary drole=short_turning lo=- hi=- :: Whether to short-turn a train at a station.
+%@ var xcancel shape=T domain=binary role=primary drole=train_cancelling lo=- hi=- :: Whether to cancel a train.
+%@ var xretime shape=T domain=continuous role=primary drole=retiming lo=- hi=- :: Retiming of a train.
+%@ var xreorder shape=T domain=continuous role=primary drole=reordering lo=- hi=- :: Reordering of a train.
+%@ var yplatform shape=T,S,P domain=binary role=auxiliary drole=platform_allocation lo=- hi=- :: Allocation of a platform to a train at a station.
+%@ obj sense=min name=passengerdelays combination=sum :: Minimize passenger delays.
+%@ con traincancelling kind=- domain=- indicator=- :: Constraint for train cancelling.
+%@ con stopskipping kind=- domain=- indicator=- :: Constraint for stop skipping.
+%@ con stopadding kind=- domain=- indicator=- :: Constraint for stop adding.
+%@ con shortturning kind=- domain=- indicator=- :: Constraint for short-turning.
+%@ con retiming kind=- domain=- indicator=- :: Constraint for retiming.
+%@ con reordering kind=- domain=- indicator=- :: Constraint for reordering.
+%@ con platformallocation kind=- domain=- indicator=- :: Constraint for platform allocation.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} pdemand_{t,s} \cdot (xskip_{t,s} + xadd_{t,s} + xshortturn_{t,s} + xcancel_{t,s}) \tag{passengerdelays} \\
+  & xcancel_t + \sum_{s \in \mathcal{S}} xskip_{t,s} \le 1 \qquad \forall t \in \mathcal{T} \tag{traincancelling} \\
+  & xskip_{t,s} + xadd_{t,s} \le 1 \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{stopskipping} \\
+  & \sum_{p \in \mathcal{P}} yplatform_{t,s,p} = 1 \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{platformallocation} \\
+  & xshortturn_{t,s} \le \sum_{p \in \mathcal{P}} yplatform_{t,s,p} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{shortturning} \\
+  & xretime_{t} \ge d_{t,s} - a_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{retiming} \\
+  & xreorder_{t} \ge xretime_{t} \qquad \forall t \in \mathcal{T} \tag{reordering} \\
+\end{align}

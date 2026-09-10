@@ -1,0 +1,25 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management
+%@ desc :: A MILP formulation for managing railway disruptions by short-turning trains and estimating disruption lengths.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index D ordered=0 cyclic=0 :: Disruption scenarios.
+%@ param d shape=D kind=scalar domain=disruption_length :: Disruption length for each scenario.
+%@ param p shape=T,S kind=matrix domain=passenger_demand :: Passenger demand for each train and station.
+%@ param c shape=T,S kind=matrix domain=travel_time :: Travel time for each train and station.
+%@ param a shape=D,T kind=matrix domain=disruption_impact :: Disruption impact on each train for each scenario.
+%@ var x shape=T,S domain=binary role=primary drole=short_turning lo=- hi=- :: Short-turning decision for each train and station.
+%@ var y shape=T,S domain=integer role=auxiliary drole=passenger_routing lo=0 hi=- :: Number of passengers rerouting and transferring for each train and station.
+%@ var z shape=D kind=scalar domain=non_negative role=auxiliary drole=disruption_length_estimation lo=- hi=- :: Estimated disruption length for each scenario.
+%@ obj sense=min name=total_delay combination=sum :: Minimize the total passenger delay.
+%@ con short_turning kind=- domain=- indicator=- :: Short-turning constraint for each train and station.
+%@ con passenger_routing kind=- domain=- indicator=- :: Passenger routing and transferring constraint for each train and station.
+%@ con disruption_length kind=- domain=- indicator=- :: Disruption length estimation constraint for each scenario.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} c_{t,s} \cdot p_{t,s} \cdot x_{t,s} + \sum_{t \in \mathcal{T}, s \in \mathcal{S}} y_{t,s} \tag{total\_delay} \\
+  & \sum_{s \in \mathcal{S}} x_{t,s} \le 1 \qquad \forall t \in \mathcal{T} \tag{short\_turning} \\
+  & y_{t,s} \ge p_{t,s} \cdot x_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{passenger\_routing} \\
+  & z_{d} \ge d \cdot \sum_{t \in \mathcal{T}} a_{d,t} \qquad \forall d \in \mathcal{D} \tag{disruption\_length} \\
+\end{align}

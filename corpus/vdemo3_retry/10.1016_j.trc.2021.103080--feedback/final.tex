@@ -1,0 +1,78 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Multi‑disruption railway timetable rescheduling
+%@ desc :: MILP model for retiming, cancelling, short‑turning and platform capacity under overlapping disruptions. Variables include new departure times, delays, cancellation and short‑turn decisions, occupancy indicators and ordering binaries for conflicting trains.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index H ordered=0 cyclic=0 :: Set of discrete time slots.
+%@ param orig shape=T kind=vector domain=time :: Original scheduled departure time of each train.
+%@ param offset shape=T,S kind=matrix domain=time :: Travel time from a train's origin to each visited station.
+%@ param cap shape=S,H kind=matrix domain=integer :: Platform capacity at station s during slot h.
+%@ param disrupt shape=S,H kind=matrix domain=binary :: Disruption indicator at station s during slot h.
+%@ param seq shape=T,T kind=matrix domain=binary :: Conflict indicator for train pairs sharing a line segment.
+%@ param bigM shape=- kind=scalar domain=continuous :: Large constant for big‑M formulations.
+%@ param min_gap shape=- kind=scalar domain=time :: Minimum temporal separation for conflicting trains.
+%@ param penalty_delay shape=- kind=scalar domain=cost :: Cost per unit of train delay.
+%@ param penalty_cancel shape=- kind=scalar domain=cost :: Cost per cancelled train.
+%@ param penalty_shortturn shape=- kind=scalar domain=cost :: Cost per short‑turned train.
+%@ param slot_start shape=H kind=vector domain=time :: Start time of time slot h.
+%@ param slot_end shape=H kind=vector domain=time :: End time of time slot h.
+%@ var dep shape=T domain=continuous role=primary drole=- lo=0 hi=- :: New departure time of each train.
+%@ var delay shape=T domain=continuous role=primary drole=- lo=0 hi=- :: Delay of each train (departure minus original).
+%@ var cancel shape=T domain=binary role=primary drole=- lo=- hi=- :: Cancellation indicator (1 if train is cancelled).
+%@ var short shape=T domain=binary role=primary drole=- lo=- hi=- :: Short‑turn indicator (1 if train is short‑turned).
+%@ var arr shape=T,S domain=continuous role=auxiliary drole=- lo=0 hi=- :: Arrival time of train t at station s.
+%@ var occ shape=T,S,H domain=binary role=auxiliary drole=- lo=- hi=- :: Occupancy indicator (1 if train t occupies station s during slot h).
+%@ var order shape=T,T domain=binary role=auxiliary drole=- lo=- hi=- :: Ordering binary (1 if train t1 is scheduled before train t2 on a shared segment).
+%@ obj sense=min name=total_cost combination=sum :: Minimize weighted sum of delays, cancellations and short‑turns.
+%@ con delay_def kind=- domain=- indicator=- :: Definition of delay.
+%@ con dep_cancel kind=- domain=- indicator=- :: Departure time limited by cancellation.
+%@ con arrival_def kind=- domain=- indicator=- :: Arrival time definition.
+%@ con occ_lower kind=- domain=- indicator=- :: Lower bound linking arrival time to occupancy.
+%@ con occ_upper kind=- domain=- indicator=- :: Upper bound linking arrival time to occupancy.
+%@ con disrupt_occ kind=- domain=- indicator=- :: Occupancy prohibited by active disruptions.
+%@ con platform_cap kind=- domain=- indicator=- :: Platform capacity constraints.
+%@ con short_cancel kind=- domain=- indicator=- :: Short‑turn possible only if not cancelled.
+%@ con order_seq kind=- domain=- indicator=- :: Ordering binary respects conflict set.
+%@ con order_sym kind=- domain=- indicator=- :: Symmetry of ordering binaries.
+%@ con order_time kind=- domain=- indicator=- :: Minimum time gap between ordered conflicting trains.
+\begin{align}
+  \min\quad & \mathit{penalty\_delay} \cdot \sum_{t \in \mathcal{T}} delay_{t}
+            + \mathit{penalty\_cancel} \cdot \sum_{t \in \mathcal{T}} cancel_{t}
+            + \mathit{penalty\_shortturn} \cdot \sum_{t \in \mathcal{T}} short_{t}
+            \tag{total\_cost} \\
+  & delay_{t} \ge dep_{t} - \mathit{orig}_{t}
+            \qquad \forall t \in \mathcal{T},
+            \tag{delay\_def} \\
+  & dep_{t} \le \mathit{bigM} \cdot (1 - cancel_{t})
+            \qquad \forall t \in \mathcal{T},
+            \tag{dep\_cancel} \\
+  & arr_{t,s} = dep_{t} + \mathit{offset}_{t,s}
+            \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},
+            \tag{arrival\_def} \\
+  & arr_{t,s} \ge \mathit{slot\_start}_{h} - \mathit{bigM} \cdot (1 - occ_{t,s,h})
+            \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall h \in \mathcal{H},
+            \tag{occ\_lower} \\
+  & arr_{t,s} \le \mathit{slot\_end}_{h} + \mathit{bigM} \cdot (1 - occ_{t,s,h})
+            \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall h \in \mathcal{H},
+            \tag{occ\_upper} \\
+  & occ_{t,s,h} \le 1 - \mathit{disrupt}_{s,h} + cancel_{t} + short_{t}
+            \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S},\; \forall h \in \mathcal{H},
+            \tag{disrupt\_occ} \\
+  & \sum_{t \in \mathcal{T}} occ_{t,s,h} \le \mathit{cap}_{s,h}
+            \qquad \forall s \in \mathcal{S},\; \forall h \in \mathcal{H},
+            \tag{platform\_cap} \\
+  & short_{t} \le 1 - cancel_{t}
+            \qquad \forall t \in \mathcal{T},
+            \tag{short\_cancel} \\
+  & order_{t1,t2} \le \mathit{seq}_{t1,t2}
+            \qquad \forall t1 \in \mathcal{T},\; \forall t2 \in \mathcal{T},
+            \tag{order\_seq} \\
+  & order_{t1,t2} + order_{t2,t1} = \mathit{seq}_{t1,t2} - cancel_{t1} - cancel_{t2}
+            \qquad \forall t1 \in \mathcal{T},\; \forall t2 \in \mathcal{T},
+            \tag{order\_sym} \\
+  & dep_{t2} \ge dep_{t1} + \mathit{min\_gap} - \mathit{bigM} \cdot (1 - order_{t1,t2})
+            \qquad \forall t1 \in \mathcal{T},\; \forall t2 \in \mathcal{T},
+            \tag{order\_time}
+\end{align}

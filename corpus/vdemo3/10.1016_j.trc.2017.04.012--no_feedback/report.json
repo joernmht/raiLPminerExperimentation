@@ -1,0 +1,103 @@
+{
+  "citations": [],
+  "converged": false,
+  "endpoint": {
+    "base_url": "https://llm.scads.ai/v1",
+    "model": "openai/gpt-oss-120b",
+    "provider": "scads"
+  },
+  "final_verdict": "invalid",
+  "mode": "no_feedback",
+  "note": "ablation samples were drawn at temperature 0.7 because at temperature 0 the k independent single-shot samples would be identical",
+  "rounds": [
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Term\nref\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='addc_i \\\\;', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "sample": 1,
+      "usage": {
+        "completion_tokens": 3322,
+        "prompt_tokens": 1666,
+        "total_tokens": 4988
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Binding\nindex\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='t \\\\in \\\\mathcal{T}', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "sample": 2,
+      "usage": {
+        "completion_tokens": 2358,
+        "prompt_tokens": 1666,
+        "total_tokens": 4024
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Binding\nindex\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='t \\\\in \\\\mathcal{T}', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "sample": 3,
+      "usage": {
+        "completion_tokens": 4276,
+        "prompt_tokens": 1666,
+        "total_tokens": 5942
+      },
+      "verdict": "invalid"
+    }
+  ],
+  "rounds_cap": null,
+  "rounds_to_valid": null,
+  "run_id": "10.1016_j.trc.2017.04.012--no_feedback",
+  "samples": 3,
+  "scenario": {
+    "chars": 1255,
+    "id": "10.1016_j.trc.2017.04.012",
+    "paper_key": "10.1016_j.trc.2017.04.012"
+  },
+  "schema_version": "vdemo-1",
+  "temperature": 0.7,
+  "tokens": {
+    "completion_tokens": 9956,
+    "prompt_tokens": 4998,
+    "total_tokens": 14954
+  },
+  "valid_rate": 0.0
+}

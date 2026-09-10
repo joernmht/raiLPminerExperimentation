@@ -1,0 +1,29 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management with Rolling-Horizon Optimization
+%@ desc :: A mixed-integer linear programming model for managing railway operations under uncertain disruption durations, integrating dynamic train timetable rescheduling and rolling stock reassignment.
+%@ index T ordered=1 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Train services.
+%@ index R ordered=0 cyclic=0 :: Rolling stock.
+%@ param d shape=T kind=vector domain=time_duration :: Disruption duration at each time period.
+%@ param c_op shape=- kind=scalar domain=monetary_unit :: Operational cost per unit of delay.
+%@ param c_can shape=- kind=scalar domain=monetary_unit :: Penalty cost per cancelled service.
+%@ param c_slot shape=- kind=scalar domain=monetary_unit :: Cost per additional train service slot.
+%@ param M shape=- kind=scalar domain=time_duration :: Maximum allowed delay.
+%@ var x shape=S,T domain=binary role=primary drole=service_status lo=- hi=- :: Service status (1 if operating, 0 if cancelled).
+%@ var y shape=R,T domain=binary role=primary drole=rolling_stock_assignment lo=- hi=- :: Rolling stock assignment (1 if assigned, 0 if not).
+%@ var z shape=S,T domain=integer role=auxiliary drole=delay lo=0 hi=M :: Delay of each service at each time period.
+%@ var w shape=T domain=integer role=auxiliary drole=additional_slots lo=0 hi=- :: Number of additional train service slots at each time period.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total delay, operational costs, penalties for cancellations, and costs related to slot planning.
+%@ con fleet_feasibility kind=- domain=- indicator=- :: Ensure fleet feasibility and service continuity.
+%@ con service_continuity kind=- domain=- indicator=- :: Maintain service continuity despite disruptions.
+%@ con rolling_stock_assignment kind=- domain=- indicator=- :: Assign rolling stock to services efficiently.
+\begin{align}
+  \min\quad & \sum_{s \in \mathcal{S}, t \in \mathcal{T}} c_{op} \cdot z_{s,t} + \sum_{s \in \mathcal{S}, t \in \mathcal{T}} c_{can} \cdot (1 - x_{s,t}) + \sum_{t \in \mathcal{T}} c_{slot} \cdot w_{t} \tag{total\_cost} \\
+  & \sum_{r \in \mathcal{R}} y_{r,t} \le \sum_{s \in \mathcal{S}} x_{s,t} \qquad \forall t \in \mathcal{T} \tag{fleet\_feasibility} \\
+  & x_{s,t} \le x_{s,t-1} \qquad \forall s \in \mathcal{S},\; \forall t \in \mathcal{T} \setminus \{1\} \tag{service\_continuity} \\
+  & \sum_{s \in \mathcal{S}} y_{r,t} \le 1 \qquad \forall r \in \mathcal{R},\; \forall t \in \mathcal{T} \tag{rolling\_stock\_assignment} \\
+  & z_{s,t} \ge d_{t} - M \cdot (1 - x_{s,t}) \qquad \forall s \in \mathcal{S},\; \forall t \in \mathcal{T} \tag{delay\_constraint} \\
+  & w_{t} \ge \sum_{s \in \mathcal{S}} x_{s,t} - \sum_{r \in \mathcal{R}} y_{r,t} \qquad \forall t \in \mathcal{T} \tag{additional\_slots\_constraint} \\
+\end{align}

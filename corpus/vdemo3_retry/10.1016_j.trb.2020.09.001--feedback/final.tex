@@ -1,0 +1,36 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=passenger_reschedule family=milp schema=0.1.0
+%@ name :: Passenger-oriented timetable rescheduling with passenger reassignment
+%@ desc :: MILP integrating train departure time adjustments and passenger route assignment to minimize generalized travel time while respecting capacities and station limits.
+%@ index O ordered=0 cyclic=0 :: Passenger origin‑destination requests.
+%@ index R ordered=0 cyclic=0 :: Feasible passenger routes.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param orig_tau shape=T,S kind=matrix domain=time :: Original scheduled departure time of train t at station s.
+%@ param max_delay shape=- kind=scalar domain=time :: Maximum allowed delay for any train departure.
+%@ param cap shape=T,S kind=matrix domain=passenger :: Seating capacity of train t at station s.
+%@ param wait_origin shape=O kind=vector domain=time :: Desired departure time of passenger request o at its origin.
+%@ param transfers shape=R kind=vector domain=weight :: Number of transfers (weighted) in route r.
+%@ param delta shape=R,T,S,S kind=matrix domain=binary :: Indicator that route r rides on train t from station s to station s'.
+%@ param origin_stop shape=R,T,S kind=matrix domain=binary :: Indicator that route r boards train t at station s.
+%@ param P shape=- kind=scalar domain=weight :: Penalty for cancelling a passenger request.
+%@ param M shape=- kind=scalar domain=time :: Big‑M constant for cancelled trains.
+%@ var tau shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: Adjusted departure time of train t at station s.
+%@ var y shape=O,R domain=binary role=primary drole=- lo=- hi=- :: Assignment of passenger request o to route r.
+%@ var c shape=O domain=binary role=auxiliary drole=- lo=- hi=- :: Cancellation indicator for passenger request o.
+%@ var z shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Cancellation indicator for train t.
+%@ obj sense=min name=gen_travel_time combination=sum :: Minimize total generalized travel time and cancellation penalties.
+%@ con assign kind=linear domain=- indicator=- :: Each passenger request is assigned to exactly one route or cancelled.
+%@ con capacity kind=capacity domain=- indicator=- :: Train capacity on each station must not be exceeded.
+%@ con delay_bound kind=linear domain=- indicator=- :: Departure time adjustments respect maximum delay.
+%@ con cancel_time kind=big_m domain=- indicator=- :: Cancelled trains have zero departure times.
+%@ con boarding_one kind=linear domain=- indicator=- :: Each route has exactly one boarding train‑station pair.
+\begin{align}
+  \min\quad & \sum_{o \in \mathcal{O}} \sum_{r \in \mathcal{R}} \mathit{transfers}_{r} \cdot y_{o,r} \;+\; \sum_{o \in \mathcal{O}} P \cdot c_{o} \;+\; \sum_{o \in \mathcal{O}} \mathit{wait\_origin}_{o} \tag{gen\_travel\_time} \\
+  & \sum_{r \in \mathcal{R}} y_{o,r} + c_{o} = 1 \qquad \forall o \in \mathcal{O} \tag{assign} \\
+  & \sum_{o \in \mathcal{O}} \sum_{r \in \mathcal{R}} \sum_{s' \in \mathcal{S}} \delta_{r,t,s,s'} \cdot y_{o,r} \le \mathit{cap}_{t,s} \cdot (1 - z_{t}) \qquad \forall t \in \mathcal{T}, \forall s \in \mathcal{S} \tag{capacity} \\
+  & \tau_{t,s} - \mathit{orig\_tau}_{t,s} \le \mathit{max\_delay} \qquad \forall t \in \mathcal{T}, \forall s \in \mathcal{S} \tag{delay\_bound} \\
+  & \tau_{t,s} \le M \cdot (1 - z_{t}) \qquad \forall t \in \mathcal{T}, \forall s \in \mathcal{S} \tag{cancel\_time} \\
+  & \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}} \mathit{origin\_stop}_{r,t,s} = 1 \qquad \forall r \in \mathcal{R} \tag{boarding\_one}
+\end{align}

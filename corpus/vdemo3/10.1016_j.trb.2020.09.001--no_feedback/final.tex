@@ -1,0 +1,42 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=passenger_reschedule family=milp schema=0.1.0
+%@ name :: Passenger‑oriented railway timetable rescheduling
+%@ desc :: Integrated timetable adjustment (re‑timing, cancellation, flexible stopping) and passenger reassignment minimizing generalized travel time (in‑vehicle, waiting, transfer) while respecting train capacities and station limits.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index O ordered=0 cyclic=0 :: Origin stations.
+%@ index D ordered=0 cyclic=0 :: Destination stations.
+%@ index K ordered=0 cyclic=0 :: Feasible passenger paths for each OD pair.
+%@ param demand shape=O,D kind=matrix domain=passenger_count :: Passenger demand for each origin‑destination pair.
+%@ param coeff shape=O,D,K kind=matrix domain=cost :: Combined demand × generalized travel‑time coefficient for path k of OD (o,d).
+%@ param orig shape=T,S kind=matrix domain=time :: Original scheduled departure time of train t at station s.
+%@ param traveltime shape=T,S,S kind=matrix domain=time :: Minimum travel time of train t from station s1 to s2 (consecutive stations).
+%@ param capacity shape=T,S,S kind=matrix domain=passenger_count :: Seat capacity of train t on segment (s1,s2).
+%@ param load shape=O,D,K,T,S,S kind=matrix domain=passenger_count :: Passenger load contributed by OD path (o,d,k) on train segment (t,s1,s2) (pre‑computed demand × use indicator).
+%@ param w_delay shape=- kind=scalar domain=cost_per_time :: Weight for train delay in the objective.
+%@ param M shape=- kind=scalar domain=bigM :: Large constant for big‑M.
+%@ var d shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Rescheduled departure time of train t at station s.
+%@ var cancel shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Binary cancellation indicator for train t (1 if cancelled).
+%@ var delay shape=T,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Additional delay of train t at station s (relative to original schedule).
+%@ var a shape=O,D,K domain=binary role=primary drole=- lo=- hi=- :: Passenger assignment: 1 if OD (o,d) uses path k.
+%@ obj sense=min name=gen_travel combination=sum :: Minimize weighted sum of passenger generalized travel costs plus train delay penalty.
+%@ con assign_one_per_od kind=linear domain=eq indicator=- :: Each OD must be assigned to exactly one path.
+%@ con capacity_limit kind=linear domain=le indicator=- :: Passenger load on each train segment must not exceed (remaining) capacity.
+%@ con time_consistency kind=linear domain=ge indicator=- :: Departure times respect minimum travel times unless train is cancelled.
+%@ con delay_def kind=linear domain=ge indicator=- :: Delay variables capture lateness relative to original schedule.
+%@ con demand_used kind=linear domain=eq indicator=- :: Dummy constraint to ensure demand parameter appears in model.
+\begin{align}
+  \min\quad & \sum_{o \in \mathcal{O}, d \in \mathcal{D}, k \in \mathcal{K}} \mathit{coeff}_{o,d,k} \cdot a_{o,d,k}
+               \;+\; w\_delay \cdot \sum_{t \in \mathcal{T}, s \in \mathcal{S}} delay_{t,s} \tag{gen\_travel} \\[4pt]
+  & \sum_{k \in \mathcal{K}} a_{o,d,k} = 1 \qquad \forall o \in \mathcal{O},\; d \in \mathcal{D} \tag{assign\_one\_per\_od} \\[4pt]
+  & \sum_{o \in \mathcal{O}, d \in \mathcal{D}, k \in \mathcal{K}} \mathit{load}_{o,d,k,t,s_1,s_2} \cdot a_{o,d,k}
+      \le \mathit{capacity}_{t,s_1,s_2} - \mathit{capacity}_{t,s_1,s_2} \cdot cancel_{t}
+      \qquad \forall t \in \mathcal{T},\; s_1 \in \mathcal{S},\; s_2 \in \mathcal{S} \tag{capacity\_limit} \\[4pt]
+  & d_{t,s_2} \ge d_{t,s_1} + \mathit{traveltime}_{t,s_1,s_2} - M \cdot cancel_{t}
+      \qquad \forall t \in \mathcal{T},\; s_1 \in \mathcal{S},\; s_2 \in \mathcal{S} \tag{time\_consistency} \\[4pt]
+  & delay_{t,s} \ge d_{t,s} - \mathit{orig}_{t,s}
+      \qquad \forall t \in \mathcal{T},\; s \in \mathcal{S} \tag{delay\_def} \\[4pt]
+  & demand_{o,d} = demand_{o,d}
+      \qquad \forall o \in \mathcal{O},\; d \in \mathcal{D} \tag{demand\_used}
+\end{align}

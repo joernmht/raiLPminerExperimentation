@@ -1,0 +1,195 @@
+{
+  "citations": [
+    {
+      "doi": null,
+      "id": "mip_2_4_time_indexed",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.2673,
+      "title": "2.4 Time-indexed assignment MIP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "mip_2_1_big_m",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.2255,
+      "title": "2.1 Big-M ordering MIP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "mip_2_8_pesp",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.1457,
+      "title": "2.8 PESP cyclic timetabling",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "lp_1_1_fixed_sequence",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.1443,
+      "title": "1.1 Fixed-sequence LP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "pesp_solvable",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.143,
+      "title": "PESP cyclic timetabling (solvable instance form)",
+      "year": null
+    }
+  ],
+  "converged": true,
+  "endpoint": {
+    "base_url": "https://llm.scads.ai/v1",
+    "model": "openai/gpt-oss-120b",
+    "provider": "scads"
+  },
+  "final_verdict": "valid_with_warnings",
+  "mode": "feedback",
+  "rounds": [
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Term\nref\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='travel\\\\_time', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 1,
+      "usage": {
+        "completion_tokens": 5048,
+        "prompt_tokens": 1810,
+        "total_tokens": 6858
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Term\nref\n  String should match pattern '^[A-Za-z_][A-Za-z0-9_]*$' [type=string_pattern_mismatch, input_value='(1', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/string_pattern_mismatch (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 2,
+      "usage": {
+        "completion_tokens": 2387,
+        "prompt_tokens": 4100,
+        "total_tokens": 6487
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for ConstraintTemplate\nkind\n  Input should be 'linear', 'big_m', 'indicator', 'ordering', 'headway', 'capacity', 'flow_balance', 'modulo', 'soft', 'robust', 'set_packing', 'block_occupation', 'moving_block' or 'dwell' [type=literal_error, input_value='-', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 3,
+      "usage": {
+        "completion_tokens": 2108,
+        "prompt_tokens": 6386,
+        "total_tokens": 8494
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Parameter\ndomain_class\n  Input should be 'cost_weight', 'time_duration', 'capacity', 'demand', 'network_structure', 'penalty_bigM', 'count_limit' or 'unclassified' [type=literal_error, input_value='passenger_count', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 4,
+      "usage": {
+        "completion_tokens": 1736,
+        "prompt_tokens": 8618,
+        "total_tokens": 10354
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "constant-constraint",
+          "level": "warn",
+          "message": "constraint 'capacity_constr' references no decision variable.",
+          "stage": "structure"
+        },
+        {
+          "code": "infeasible",
+          "level": "warn",
+          "message": "model is infeasible on the synthesized smoke instance (may be the placeholder data, may be a modeling error).",
+          "stage": "solve"
+        }
+      ],
+      "round": 5,
+      "usage": {
+        "completion_tokens": 1765,
+        "prompt_tokens": 10861,
+        "total_tokens": 12626
+      },
+      "verdict": "valid_with_warnings"
+    }
+  ],
+  "rounds_cap": 6,
+  "rounds_to_valid": 5,
+  "run_id": "10.1016_j.omega.2024.103040--feedback",
+  "samples": null,
+  "scenario": {
+    "chars": 2010,
+    "id": "10.1016_j.omega.2024.103040",
+    "paper_key": "10.1016_j.omega.2024.103040"
+  },
+  "schema_version": "vdemo-1",
+  "temperature": 0.0,
+  "tokens": {
+    "completion_tokens": 13044,
+    "prompt_tokens": 31775,
+    "total_tokens": 44819
+  },
+  "valid_rate": null
+}

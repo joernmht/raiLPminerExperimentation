@@ -1,0 +1,25 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management
+%@ desc :: Determine new timetable and rolling stock schedule considering changed passenger demand after unforeseen events.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param d shape=S kind=scalar domain=passenger_demand :: Additional passenger demand at each station.
+%@ param c shape=T kind=scalar domain=capacity :: Current capacity of each train.
+%@ param f shape=T kind=scalar domain=frequency :: Current frequency of each train.
+%@ param p shape=T,S kind=matrix domain=stop_indicator :: Indicator if train normally stops at station (1 if yes, 0 if no).
+%@ var x shape=T,S domain=binary role=primary drole=additional_stop lo=- hi=- :: Additional stop of train at station.
+%@ var y shape=T kind=integer domain=non_negative role=auxiliary drole=capacity_increase lo=- hi=- :: Increase in capacity of each train.
+%@ var z shape=T kind=integer domain=non_negative role=auxiliary drole=frequency_increase lo=- hi=- :: Increase in frequency of each train.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total cost of additional stops, capacity increases, and frequency increases.
+%@ con capacity kind=knapsack domain=capacity_limit indicator=- :: Ensure capacity increase does not exceed maximum allowed.
+%@ con frequency kind=knapsack domain=frequency_limit indicator=- :: Ensure frequency increase does not exceed maximum allowed.
+%@ con demand kind=coverage domain=demand_coverage indicator=- :: Ensure additional demand is covered by additional stops or capacity increases.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} x_{t,s} + \sum_{t \in \mathcal{T}} y_{t} + \sum_{t \in \mathcal{T}} z_{t} \tag{total\_cost} \\
+  & \sum_{s \in \mathcal{S}} x_{t,s} \le 5 \qquad \forall t \in \mathcal{T} \tag{capacity} \\
+  & z_{t} \le 2 \qquad \forall t \in \mathcal{T} \tag{frequency} \\
+  & \sum_{t \in \mathcal{T}} (p_{t,s} + x_{t,s}) \ge 1 \qquad \forall s \in \mathcal{S} \tag{demand} \\
+  & y_{t} \ge \sum_{s \in \mathcal{S}} d_{s} \cdot x_{t,s} \qquad \forall t \in \mathcal{T} \tag{capacity} \\
+\end{align}

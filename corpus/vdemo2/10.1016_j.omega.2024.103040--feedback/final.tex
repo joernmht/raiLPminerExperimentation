@@ -1,0 +1,30 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Seat Reservation
+%@ desc :: Service-oriented timetable rescheduling approach to manage major disruptions in a railway system with a seat reservation mechanism.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Platforms.
+%@ param d shape=T,T kind=matrix domain=time_duration :: Minimum headway between trains.
+%@ param c shape=S,P kind=matrix domain=capacity :: Station platform capacity.
+%@ param w shape=T kind=vector domain=weight :: Weight of passenger inconvenience for each train.
+%@ param M shape=- kind=scalar domain=time_duration :: Large time constant.
+%@ var x shape=T,S,P domain=binary role=primary drole=assignment lo=- hi=- :: Assignment of train to station platform.
+%@ var y shape=T,T,S,P domain=binary role=primary drole=ordering lo=- hi=- :: Ordering of trains at each station platform.
+%@ var z shape=T kind=integer domain=non_negative role=auxiliary drole=retiming lo=- hi=- :: Retiming of trains.
+%@ var u shape=T,S kind=integer domain=non_negative role=auxiliary drole=rerouting lo=- hi=- :: Rerouting of trains.
+%@ obj sense=min name=passenger_inconvenience combination=sum :: Minimize weighted passenger inconvenience.
+%@ con train_assignment kind=assignment domain=station_platform indicator=- :: Each train is assigned to at most one platform at each station.
+%@ con platform_capacity kind=capacity domain=station_platform indicator=- :: Station platform capacity is not exceeded.
+%@ con train_ordering kind=ordering domain=station_platform indicator=- :: Trains are ordered at each station platform.
+%@ con headway kind=headway domain=train_headway indicator=- :: Minimum headway between trains is respected.
+%@ con retiming kind=retiming domain=train_retiming indicator=- :: Retiming of trains is consistent with ordering and assignment.
+\begin{align}
+  \min\quad & \sum_{t \in T} w_{t} \cdot z_{t} \tag{passenger_inconvenience} \\
+  & \sum_{s \in S} \sum_{p \in P} x_{t,s,p} \le 1 \qquad \forall t \in T \tag{train_assignment} \\
+  & \sum_{t \in T} x_{t,s,p} \le c_{s,p} \qquad \forall s \in S, \forall p \in P \tag{platform_capacity} \\
+  & y_{t1,t2,s,p} + y_{t2,t1,s,p} \le 1 \qquad \forall t1 \in T, \forall t2 \in T, t1 \neq t2, \forall s \in S, \forall p \in P \tag{train_ordering} \\
+  & y_{t1,t2,s,p} + M \cdot (1 - x_{t1,s,p}) \ge d_{t1,t2} \qquad \forall t1 \in T, \forall t2 \in T, t1 \neq t2, \forall s \in S, \forall p \in P \tag{headway} \\
+  & z_{t} \ge u_{t,s} \qquad \forall t \in T, \forall s \in S \tag{retiming} \\
+\end{align}

@@ -1,0 +1,22 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management
+%@ desc :: Minimizing passenger delays by short-turning trains in response to disruptions on the railway network.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index D ordered=0 cyclic=0 :: Disruption scenarios.
+%@ param d shape=D kind=scalar domain=time_duration :: Disruption length for each scenario.
+%@ param p shape=T,S kind=matrix domain=demand :: Passenger demand for each train and station.
+%@ param c shape=T,S kind=matrix domain=time_duration :: Travel time for each train and station.
+%@ param a shape=D,T,S kind=matrix domain=unclassified :: Impact of disruption on each train and station.
+%@ var x shape=T,S domain=binary role=primary drole=selection_assignment lo=- hi=- :: Short-turning decision for each train and station.
+%@ var y shape=T,S domain=non_negative role=auxiliary drole=flow_quantity lo=- hi=- :: Passenger delay for each train and station.
+%@ obj sense=min name=total_delay combination=sum :: Minimize total passenger delay.
+%@ con delay kind=linear domain=unclassified indicator=- :: Passenger delay constraint.
+%@ con short_turn kind=linear domain=unclassified indicator=- :: Short-turning constraint.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} y_{t,s} \tag{total_delay} \\
+  & y_{t,s} \ge \sum_{d \in \mathcal{D}} a_{d,t,s} \cdot d - \sum_{d \in \mathcal{D}} d \cdot a_{d,t,s} \cdot x_{t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{delay} \\
+  & x_{t,s} \le \sum_{d \in \mathcal{D}} a_{d,t,s} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{short_turn} \\
+\end{align}

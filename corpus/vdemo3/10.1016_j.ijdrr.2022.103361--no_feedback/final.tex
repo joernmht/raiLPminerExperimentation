@@ -1,0 +1,34 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=hsr_resilience family=milp schema=0.1.0
+%@ name :: High-speed railway post-disruption timetable rescheduling with recovery and dynamic demand
+%@ desc :: MILP model for assigning train start times after an earthquake, considering edge outage, recovery decisions, and serving time‑varying passenger demand. Objective maximizes kept original schedule and served demand.
+%@ tags :: milp | railway | resilience | recovery | dynamic_demand
+%@ index L ordered=0 cyclic=0 :: Trains.
+%@ index T ordered=0 cyclic=0 :: Discrete time periods.
+%@ index E ordered=0 cyclic=0 :: Track edges.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param a shape=L,T kind=matrix domain=bool :: Original timetable indicator (1 if train l originally scheduled at period t).
+%@ param out shape=E,T kind=matrix domain=bool :: Edge outage indicator (1 if edge e unavailable at period t).
+%@ param travel shape=L,E kind=matrix domain=bool :: Train‑edge incidence (1 if train l traverses edge e).
+%@ param capserve shape=L,S,S kind=matrix domain=capacity :: Train capacity contributed to OD pair (i,j) when train l runs (0 if not serving that pair).
+%@ param demand shape=S,S,T kind=matrix domain=passenger :: Dynamic passenger demand between stations i and j at period t.
+%@ param alpha shape=- kind=scalar domain=weight :: Weight for preserving original schedule.
+%@ var y shape=L,T domain=binary role=primary drole=- lo=- hi=- :: Decision variable, 1 if train l starts at period t in the recovered timetable.
+%@ var w shape=E,T domain=binary role=auxiliary drole=- lo=- hi=- :: Edge recovery activation at period t (1 if recovery of edge e is initiated at t).
+%@ var r shape=E,T domain=binary role=auxiliary drole=- lo=- hi=- :: Edge operational status at period t (1 if edge e is usable at t).
+%@ var served shape=S,S,T domain=continuous role=primary drole=- lo=0 hi=- :: Amount of passenger demand between stations i and j served at period t.
+%@ obj sense=max name=total_resilience combination=sum :: Maximize weighted kept schedule plus served demand.
+%@ con train_one_time kind=- domain=- indicator=- :: Each train assigned exactly one start period.
+%@ con edge_cumulative kind=- domain=- indicator=- :: Cumulative definition of edge operational status.
+%@ con edge_availability kind=- domain=- indicator=- :: Train can run only if traversed edges are operational.
+%@ con demand_capacity kind=- domain=- indicator=- :: Served demand cannot exceed capacity offered by scheduled trains.
+%@ con demand_limit kind=- domain=- indicator=- :: Served demand limited by actual demand.
+\begin{align}
+  \max\quad & \mathit{alpha} \cdot \sum_{l \in \mathcal{L}, t \in \mathcal{T}} a_{l,t} \, y_{l,t} \; + \; \sum_{i \in \mathcal{S}, j \in \mathcal{S}, t \in \mathcal{T}} served_{i,j,t} \tag{total\_resilience} \\
+  & \sum_{t \in \mathcal{T}} y_{l,t} = 1 \qquad \forall l \in \mathcal{L} \tag{train\_one\_time} \\
+  & r_{e,t} - r_{e,t-1} - w_{e,t} = 0 \qquad \forall e \in \mathcal{E},\; t \in \mathcal{T} \tag{edge\_cumulative} \\
+  & y_{l,t} + travel_{l,e} \cdot out_{e,t} - r_{e,t} \le 1 \qquad \forall l \in \mathcal{L},\; t \in \mathcal{T},\; e \in \mathcal{E} \tag{edge\_availability} \\
+  & served_{i,j,t} \le \sum_{l \in \mathcal{L}} capserve_{l,i,j} \cdot y_{l,t} \qquad \forall i \in \mathcal{S},\; j \in \mathcal{S},\; t \in \mathcal{T} \tag{demand\_capacity} \\
+  & served_{i,j,t} \le demand_{i,j,t} \qquad \forall i \in \mathcal{S},\; j \in \mathcal{S},\; t \in \mathcal{T} \tag{demand\_limit}
+\end{align}

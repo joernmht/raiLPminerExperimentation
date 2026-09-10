@@ -1,0 +1,31 @@
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Passenger-Oriented Railway Timetable Rescheduling
+%@ desc :: A Mixed Integer Linear Programming model for railway timetable rescheduling, integrating timetable rescheduling and passenger reassignment to minimize generalized travel times.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Passengers.
+%@ param d shape=T kind=scalar domain=time_duration :: Original departure time of each train.
+%@ param a shape=T kind=scalar domain=time_duration :: Original arrival time of each train.
+%@ param c shape=S kind=scalar domain=capacity :: Capacity of each station.
+%@ param t_in_vehicle shape=T kind=scalar domain=time_duration :: In-vehicle time of each train.
+%@ param t_wait shape=S kind=scalar domain=time_duration :: Waiting time at each station.
+%@ param t_transfer shape=S kind=scalar domain=time_duration :: Transfer time at each station.
+%@ param M shape=- kind=scalar domain=- :: Big-M value for constraints.
+%@ var x shape=T domain=binary role=primary drole=dispatching lo=- hi=- :: 1 if train is dispatched, 0 otherwise.
+%@ var y shape=T,S domain=binary role=primary drole=stopping lo=- hi=- :: 1 if train stops at station, 0 otherwise.
+%@ var z shape=T,S domain=integer role=primary drole=short_turning lo=0 hi=- :: Number of short-turning trains at each station.
+%@ var w shape=P,T domain=binary role=primary drole=reassignment lo=- hi=- :: 1 if passenger is reassigned to train, 0 otherwise.
+%@ var dt shape=T domain=continuous role=primary drole=timing lo=- hi=- :: Departure time delay of each train.
+%@ obj sense=min name=generalized_travel_time combination=sum :: Minimize generalized travel times.
+%@ con train_dispatching kind=- domain=- indicator=- :: Train dispatching constraints.
+%@ con station_capacity kind=- domain=- indicator=- :: Station capacity constraints.
+%@ con passenger_reassignment kind=- domain=- indicator=- :: Passenger reassignment constraints.
+%@ con train_timing kind=- domain=- indicator=- :: Train timing constraints.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} t_in_vehicle \cdot x_t + \sum_{s \in \mathcal{S}} t_wait \cdot \sum_{t \in \mathcal{T}} y_{t,s} + \sum_{s \in \mathcal{S}} t_transfer \cdot \sum_{t \in \mathcal{T}} z_{t,s} + \sum_{p \in \mathcal{P}} \sum_{t \in \mathcal{T}} dt_t \cdot w_{p,t} \tag{generalized\_travel\_time} \\
+  & \sum_{t \in \mathcal{T}} x_t \le \sum_{t \in \mathcal{T}} 1 \qquad \forall t \in \mathcal{T} \tag{train\_dispatching} \\
+  & \sum_{t \in \mathcal{T}} y_{t,s} \le c_s \qquad \forall s \in \mathcal{S} \tag{station\_capacity} \\
+  & \sum_{t \in \mathcal{T}} w_{p,t} = 1 \qquad \forall p \in \mathcal{P} \tag{passenger\_reassignment} \\
+  & dt_t \ge d_t - M \cdot (1 - x_t) \qquad \forall t \in \mathcal{T} \tag{train\_timing} \\
+  & dt_t \le a_t + M \cdot (1 - x_t) \qquad \forall t \in \mathcal{T} \tag{train\_timing} \\
+\end{align}

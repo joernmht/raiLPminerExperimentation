@@ -1,0 +1,152 @@
+{
+  "citations": [
+    {
+      "doi": null,
+      "id": "mip_2_4_time_indexed",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.3611,
+      "title": "2.4 Time-indexed assignment MIP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "mip_2_1_big_m",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.2175,
+      "title": "2.1 Big-M ordering MIP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "multi_obj_lateness_energy",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.2151,
+      "title": "Multi-objective lateness vs energy",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "lp_1_1_fixed_sequence",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.214,
+      "title": "1.1 Fixed-sequence LP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "lp_1_5_soft_regularity",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.1792,
+      "title": "1.5 Soft-regularity LP",
+      "year": null
+    }
+  ],
+  "converged": true,
+  "endpoint": {
+    "base_url": "https://llm.scads.ai/v1",
+    "model": "openai/gpt-oss-120b",
+    "provider": "scads"
+  },
+  "final_verdict": "valid",
+  "mode": "feedback",
+  "rounds": [
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for ConstraintTemplate\nkind\n  Input should be 'linear', 'big_m', 'indicator', 'ordering', 'headway', 'capacity', 'flow_balance', 'modulo', 'soft', 'robust', 'set_packing', 'block_occupation', 'moving_block' or 'dwell' [type=literal_error, input_value='-', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 1,
+      "usage": {
+        "completion_tokens": 2803,
+        "prompt_tokens": 1666,
+        "total_tokens": 4469
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Parameter\ndomain_class\n  Input should be 'cost_weight', 'time_duration', 'capacity', 'demand', 'network_structure', 'penalty_bigM', 'count_limit' or 'unclassified' [type=literal_error, input_value='cost', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 2,
+      "usage": {
+        "completion_tokens": 1780,
+        "prompt_tokens": 3671,
+        "total_tokens": 5451
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "semantic",
+          "detail": "constraint 'capacity_demand' lhs: term coefficient 'demand}_{i,s' is not a declared parameter",
+          "level": "error",
+          "message": "parsed formulation failed semantic validation: 1 validation error(s) in formulation 'rail_reschedule'",
+          "stage": "semantics"
+        }
+      ],
+      "round": 3,
+      "usage": {
+        "completion_tokens": 1367,
+        "prompt_tokens": 5665,
+        "total_tokens": 7032
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [],
+      "round": 4,
+      "usage": {
+        "completion_tokens": 1876,
+        "prompt_tokens": 7576,
+        "total_tokens": 9452
+      },
+      "verdict": "valid"
+    }
+  ],
+  "rounds_cap": 6,
+  "rounds_to_valid": 4,
+  "run_id": "10.1016_j.trc.2017.04.012--feedback",
+  "samples": null,
+  "scenario": {
+    "chars": 1255,
+    "id": "10.1016_j.trc.2017.04.012",
+    "paper_key": "10.1016_j.trc.2017.04.012"
+  },
+  "schema_version": "vdemo-1",
+  "temperature": 0.0,
+  "tokens": {
+    "completion_tokens": 7826,
+    "prompt_tokens": 18578,
+    "total_tokens": 26404
+  },
+  "valid_rate": null
+}

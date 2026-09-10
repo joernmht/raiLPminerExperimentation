@@ -1,0 +1,36 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=hsr_resilience family=milp schema=0.1.0
+%@ name :: High-speed railway timetable rescheduling with track outage and dynamic demand
+%@ desc :: MILP model for post‑earthquake timetable rescheduling, considering track outages, recovery decisions, and dynamic passenger demand. The original timetable guides the solution.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index L ordered=0 cyclic=0 :: Track segments.
+%@ index P ordered=0 cyclic=0 :: Planning periods.
+%@ param orig_dep shape=T kind=vector domain=time_duration :: Original departure time of train t.
+%@ param orig_arr shape=T kind=vector domain=time_duration :: Original arrival time of train t.
+%@ param total_travel shape=T kind=vector domain=time_duration :: Total travel time of train t.
+%@ param cap shape=L,P kind=matrix domain=capacity :: Capacity of track l in period p.
+%@ param route shape=T,L kind=matrix domain=unclassified :: 1 if train t traverses track l.
+%@ param penalty_delay shape=- kind=scalar domain=cost_weight :: Penalty per unit time of delay.
+%@ param penalty_recovery shape=- kind=scalar domain=cost_weight :: Penalty per period a track remains out of service.
+%@ var dep shape=T domain=continuous role=primary drole=- lo=0 hi=- :: Rescheduled departure time of train t.
+%@ var arr shape=T domain=continuous role=primary drole=- lo=0 hi=- :: Rescheduled arrival time of train t.
+%@ var use shape=T,L,P domain=binary role=primary drole=- lo=0 hi=1 :: Binary if train t occupies track l during period p.
+%@ var rec shape=L,P domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary if track l is recovered (available) in period p.
+%@ var out shape=L,P domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary if track l is still out of service in period p.
+%@ obj sense=min name=obj combination=sum :: Minimize weighted sum of delays and track‑out penalties.
+%@ con dep_orig kind=linear domain=- indicator=- :: Departure not earlier than original.
+%@ con arr_travel kind=linear domain=- indicator=- :: Arrival respects travel time.
+%@ con route_assign kind=linear domain=- indicator=- :: Route assignment per train.
+%@ con cap kind=linear domain=- indicator=- :: Track capacity.
+%@ con use_rec kind=linear domain=- indicator=- :: Usage only if recovered.
+%@ con out_rec kind=linear domain=- indicator=- :: Out and recovered are complementary.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} penalty_delay \cdot dep_{t} + \sum_{t \in \mathcal{T}} penalty_delay \cdot arr_{t} + \sum_{l \in \mathcal{L}, p \in \mathcal{P}} penalty_recovery \cdot out_{l,p} \tag{obj} \\
+  & dep_{t} \ge orig_dep_{t} \qquad \forall t \in \mathcal{T} \tag{dep\_orig} \\
+  & arr_{t} \ge dep_{t} + total_travel_{t} \qquad \forall t \in \mathcal{T} \tag{arr\_travel} \\
+  & \sum_{p \in \mathcal{P}} use_{t,l,p} = route_{t,l} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L} \tag{route\_assign} \\
+  & \sum_{t \in \mathcal{T}} use_{t,l,p} \le cap_{l,p} \qquad \forall l \in \mathcal{L},\; \forall p \in \mathcal{P} \tag{cap} \\
+  & use_{t,l,p} \le rec_{l,p} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L},\; \forall p \in \mathcal{P} \tag{use\_rec} \\
+  & out_{l,p} + rec_{l,p} = 1 \qquad \forall l \in \mathcal{L},\; \forall p \in \mathcal{P} \tag{out\_rec} \\
+\end{align}

@@ -1,0 +1,23 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_rescheduling family=milp schema=0.1.0
+%@ name :: Rail Rescheduling Problem
+%@ desc :: Maximize consumer satisfaction by minimizing total passenger delay at destinations.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param d shape=T,S kind=matrix domain=passenger_demand :: Passenger demand for train t at station s.
+%@ param a shape=T,T kind=matrix domain=delay :: Delay caused by train t1 on train t2.
+%@ param c shape=T kind=vector domain=time :: Original scheduled time for train t.
+%@ param p shape=T kind=vector domain=time :: Maximum allowed delay for train t.
+%@ var x shape=T,T domain=binary role=primary drole=rescheduling lo=- hi=- :: Binary variable indicating if train t1 is rescheduled before train t2.
+%@ var y shape=T domain=non_negative role=auxiliary drole=delay lo=- hi=- :: Delay of train t.
+%@ obj sense=max name=consumer_satisfaction combination=sum :: Maximize consumer satisfaction by minimizing total passenger delay at destinations.
+%@ con delay_constraint kind=- domain=- indicator=- :: Constraint on delay of each train.
+%@ con rescheduling_constraint kind=- domain=- indicator=- :: Constraint on rescheduling of trains.
+\begin{align}
+  \max\quad & \sum_{t \in \mathcal{T}, s \in \mathcal{S}} d_{t,s} \cdot (c_t - y_t) \tag{consumer\_satisfaction} \\
+  & y_t \le p_t \qquad \forall t \in \mathcal{T} \tag{delay\_constraint} \\
+  & y_{t2} \ge y_{t1} + a_{t1,t2} - \mathit{M} \cdot (1 - x_{t1,t2}) \qquad \forall t1 \in \mathcal{T},\; \forall t2 \in \mathcal{T},\; t1 \neq t2 \tag{rescheduling\_constraint} \\
+  & \sum_{t1 \in \mathcal{T}} x_{t1,t2} \le 1 \qquad \forall t2 \in \mathcal{T} \tag{rescheduling\_constraint} \\
+  & \sum_{t2 \in \mathcal{T}} x_{t1,t2} \le 1 \qquad \forall t1 \in \mathcal{T} \tag{rescheduling\_constraint} \\
+\end{align}

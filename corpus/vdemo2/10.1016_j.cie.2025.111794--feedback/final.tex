@@ -1,0 +1,35 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management
+%@ desc :: A mixed-integer linear programming model for managing railway operations under uncertain disruption durations, integrating dynamic train timetable rescheduling and rolling stock reassignment.
+%@ index T ordered=0 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Train services.
+%@ index R ordered=0 cyclic=0 :: Rolling stock.
+%@ param d shape=T kind=scalar domain=time_duration :: Disruption duration.
+%@ param c_op shape=- kind=scalar domain=cost :: Operational cost per unit time.
+%@ param c_can shape=- kind=scalar domain=cost :: Penalty cost per cancelled service.
+%@ param c_slot shape=- kind=scalar domain=cost :: Cost per additional train service slot.
+%@ param M shape=- kind=scalar domain=time_duration :: Maximum allowed delay.
+%@ param num_S shape=- kind=scalar domain=integer :: Number of train services.
+%@ var t shape=S,T domain=non_negative role=primary drole=timing lo=- hi=- :: Service departure time at each period.
+%@ var x shape=S,T domain=binary role=primary drole=service_cancellation lo=- hi=- :: Service cancellation indicator.
+%@ var y shape=R,T domain=binary role=primary drole=rolling_stock_reassignment lo=- hi=- :: Rolling stock reassignment indicator.
+%@ var z shape=S,T domain=binary role=primary drole=additional_service lo=- hi=- :: Additional train service insertion indicator.
+%@ var w shape=S,T domain=non_negative role=auxiliary drole=delay lo=0 hi=- :: Delay at each service and period.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total delay, operational costs, penalties for cancellations, and costs related to slot planning.
+%@ con service_continuity kind=linear domain=- indicator=- :: Ensure service continuity.
+%@ con fleet_feasibility kind=linear domain=- indicator=- :: Ensure fleet feasibility.
+%@ con delay_limit kind=linear domain=- indicator=- :: Limit delay at each service and period.
+%@ con cancellation_limit kind=linear domain=- indicator=- :: Limit service cancellations.
+%@ con slot_limit kind=linear domain=- indicator=- :: Limit additional train service slots.
+%@ con disruption_duration kind=linear domain=- indicator=- :: Disruption duration constraint.
+\begin{align}
+  \min\quad & \sum_{s \in S, t \in T} w_{s,t} + c_op \cdot t_{s,t} + c_can \cdot x_{s,t} + c_slot \cdot z_{s,t} \tag{total\_cost} \\
+  & w_{s,t} \ge t_{s,t} - t_{s,t-1} \qquad \forall s \in S,\; \forall t \in T \tag{service\_continuity} \\
+  & \sum_{r \in R} y_{r,t} \le num_S - \sum_{s \in S} x_{s,t} \qquad \forall t \in T \tag{fleet\_feasibility} \\
+  & w_{s,t} \le M \qquad \forall s \in S,\; \forall t \in T \tag{delay\_limit} \\
+  & \sum_{t \in T} x_{s,t} \le 1 \qquad \forall s \in S \tag{cancellation\_limit} \\
+  & \sum_{s \in S} z_{s,t} \le 1 \qquad \forall t \in T \tag{slot\_limit} \\
+  & t_{s,t} \ge d_t \cdot (1 - x_{s,t}) \qquad \forall s \in S,\; \forall t \in T \tag{disruption\_duration} \\
+\end{align}

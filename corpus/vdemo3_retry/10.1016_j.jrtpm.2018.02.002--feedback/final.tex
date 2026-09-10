@@ -1,0 +1,31 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=disruption_shortturn family=milp schema=0.1.0
+%@ name :: Disruption length estimation with short‑turning and passenger reassignment
+%@ desc :: MILP model that selects a disruption length, decides which trains are short‑turned, and assigns passengers to either stay on delayed trains or be reassigned, minimizing total passenger delay and short‑turn penalties.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index P ordered=0 cyclic=0 :: Set of passenger trips (origin‑destination requests).
+%@ param r shape=P,T kind=matrix domain=binary :: Indicator =1 if passenger p rides train t in the original schedule.
+%@ param c shape=- kind=scalar domain=non_negative :: Uniform weight per passenger for delay.
+%@ param alpha shape=- kind=scalar domain=non_negative :: Penalty cost per short‑turned train.
+%@ param M shape=- kind=scalar domain=non_negative :: Big‑M constant.
+%@ param K shape=- kind=scalar domain=non_negative :: Upper bound on number of short‑turned trains.
+%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Estimated disruption length (time units).
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Short‑turn decision for train t (1 if short‑turned).
+%@ var w shape=T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Delay incurred by train t due to disruption.
+%@ var d shape=P domain=non_negative role=auxiliary drole=- lo=- hi=- :: Delay experienced by passenger trip p.
+%@ var z shape=P domain=binary role=auxiliary drole=- lo=- hi=- :: Reassignment indicator for passenger trip p (1 if reassigned).
+%@ obj sense=min name=total_cost combination=sum :: Minimize weighted passenger delay plus short‑turn penalties.
+%@ con delay_lower kind=- domain=- indicator=- :: Ensure train delay respects disruption length unless short‑turned.
+%@ con delay_upper kind=- domain=- indicator=- :: Upper bound to force zero delay when short‑turned.
+%@ con passenger_delay_lin kind=- domain=- indicator=- :: Linearized passenger delay linking to train delay.
+%@ con reassignment_lin kind=- domain=- indicator=- :: Linearized reassignment linking to short‑turn decision.
+%@ con short_turn_limit kind=- domain=- indicator=- :: Limit on total number of short‑turned trains.
+\begin{align}
+  \min\quad & c \cdot \sum_{p \in P} d_{p} + \alpha \cdot \sum_{t \in T} y_{t} \tag{total_cost} \\
+  & w_{t} + M \cdot y_{t} \ge L \qquad \forall t \in T \tag{delay_lower} \\
+  & w_{t} \le M \cdot (1 - y_{t}) \qquad \forall t \in T \tag{delay_upper} \\
+  & d_{p} - w_{t} + M \cdot (1 - r_{p,t}) \ge 0 \qquad \forall p \in P,\; \forall t \in T \tag{passenger_delay_lin} \\
+  & z_{p} - y_{t} - r_{p,t} + 1 \ge 0 \qquad \forall p \in P,\; \forall t \in T \tag{reassignment_lin} \\
+  & \sum_{t \in T} y_{t} \le K \tag{short_turn_limit} \\
+\end{align}

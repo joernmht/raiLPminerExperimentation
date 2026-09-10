@@ -1,0 +1,31 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Rerouting
+%@ desc :: Minimize total passenger delay and number of passengers that could not reach their destination after a disruption in a large-scale railway network.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Paths in the railway network.
+%@ param d shape=T kind=scalar domain=time_duration :: Original departure time of each train.
+%@ param a shape=T kind=scalar domain=time_duration :: Original arrival time of each train.
+%@ param c shape=T,T kind=matrix domain=passengers :: Number of passengers traveling from one train to another.
+%@ param p shape=P kind=scalar domain=time_duration :: Travel time along each path.
+%@ param M shape=- kind=scalar domain=- :: Big-M value for constraints.
+%@ var x shape=T,P domain=integer role=primary drole=routing lo=0 hi=1 :: Binary variable indicating if a train takes a certain path.
+%@ var y shape=T,T domain=integer role=primary drole=ordering lo=0 hi=1 :: Binary variable indicating if a train departs before another.
+%@ var z shape=T kind=scalar domain=non_negative role=primary drole=timing lo=0 hi=- :: Departure time of each train after rescheduling.
+%@ var w shape=T kind=scalar domain=non_negative role=primary drole=delay lo=0 hi=- :: Delay of each train after rescheduling.
+%@ obj sense=min name=total_delay combination=sum :: Minimize total passenger delay.
+%@ con departure kind=- domain=- indicator=- :: Ensure trains depart after their original departure time.
+%@ con arrival kind=- domain=- indicator=- :: Ensure trains arrive after their original arrival time.
+%@ con routing kind=- domain=- indicator=- :: Ensure each train takes exactly one path.
+%@ con ordering kind=- domain=- indicator=- :: Ensure trains depart in a feasible order.
+%@ con delay kind=- domain=- indicator=- :: Calculate delay of each train.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} w_{t} \tag{total\_delay} \\
+  & z_{t} \ge d_{t} \qquad \forall t \in \mathcal{T} \tag{departure} \\
+  & z_{t} + p_{p} \ge a_{t} \qquad \forall t \in \mathcal{T},\; \forall p \in \mathcal{P} \tag{arrival} \\
+  & \sum_{p \in \mathcal{P}} x_{t,p} = 1 \qquad \forall t \in \mathcal{T} \tag{routing} \\
+  & z_{t} - z_{t'} + M \cdot (1 - y_{t,t'}) \ge 0 \qquad \forall t \in \mathcal{T},\; \forall t' \in \mathcal{T},\; t \neq t' \tag{ordering} \\
+  & w_{t} \ge z_{t} - d_{t} \qquad \forall t \in \mathcal{T} \tag{delay} \\
+\end{align}

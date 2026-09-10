@@ -1,0 +1,24 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_disruption family=milp schema=0.1.0
+%@ name :: Railway Disruption Management
+%@ desc :: Determine new timetable and rolling stock schedule considering changed passenger demand after unforeseen events.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param d shape=S kind=scalar domain=demand :: Additional demand at each station.
+%@ param c shape=T kind=scalar domain=capacity :: Initial capacity of each train.
+%@ param f shape=T kind=scalar domain=unclassified :: Initial frequency of each train.
+%@ param p shape=T,S kind=matrix domain=unclassified :: Indicator if train normally stops at station.
+%@ var x shape=T,S domain=binary role=primary drole=selection_assignment lo=- hi=- :: Additional stop decision for each train at each station.
+%@ var y shape=T kind=integer domain=non_negative role=auxiliary drole=auxiliary_linearization lo=- hi=- :: Capacity increase for each train.
+%@ var z shape=T kind=integer domain=non_negative role=auxiliary drole=auxiliary_linearization lo=- hi=- :: Frequency increase for each train.
+%@ obj sense=min name=total_adjustments combination=sum :: Minimize total adjustments to train capacity and frequency.
+%@ con capacity_limit kind=linear domain=- indicator=- :: Ensure capacity increase does not exceed maximum allowed.
+%@ con frequency_limit kind=linear domain=- indicator=- :: Ensure frequency increase does not exceed maximum allowed.
+%@ con demand_coverage kind=linear domain=- indicator=- :: Ensure additional demand is covered by capacity and frequency adjustments.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} y_{t} + \sum_{t \in \mathcal{T}} z_{t} \tag{total\_adjustments} \\
+  & y_{t} \le 10 \cdot c_{t} \qquad \forall t \in \mathcal{T} \tag{capacity\_limit} \\
+  & z_{t} \le 5 \qquad \forall t \in \mathcal{T} \tag{frequency\_limit} \\
+  & \sum_{t \in \mathcal{T}} c_{t} \cdot (p_{t,s} + x_{t,s}) + \sum_{t \in \mathcal{T}} y_{t} \cdot (p_{t,s} + x_{t,s}) \ge d_{s} \qquad \forall s \in \mathcal{S} \tag{demand\_coverage} \\
+\end{align}

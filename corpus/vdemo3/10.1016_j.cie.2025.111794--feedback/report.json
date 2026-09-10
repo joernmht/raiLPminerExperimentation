@@ -1,0 +1,128 @@
+{
+  "citations": [
+    {
+      "doi": null,
+      "id": "mip_2_1_big_m",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.5175,
+      "title": "2.1 Big-M ordering MIP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "multi_obj_lateness_energy",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.5032,
+      "title": "Multi-objective lateness vs energy",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "lp_1_1_fixed_sequence",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.4765,
+      "title": "1.1 Fixed-sequence LP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "lp_1_5_soft_regularity",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.4522,
+      "title": "1.5 Soft-regularity LP",
+      "year": null
+    },
+    {
+      "doi": null,
+      "id": "mip_2_4_time_indexed",
+      "relation": "similar",
+      "same_schema_hash": false,
+      "similarity": 0.3073,
+      "title": "2.4 Time-indexed assignment MIP",
+      "year": null
+    }
+  ],
+  "converged": true,
+  "endpoint": {
+    "base_url": "https://llm.scads.ai/v1",
+    "model": "openai/gpt-oss-120b",
+    "provider": "scads"
+  },
+  "final_verdict": "valid",
+  "mode": "feedback",
+  "rounds": [
+    {
+      "findings": [
+        {
+          "code": "parse-failed",
+          "detail": "[parse] normalized LaTeX is not in the canonical grammar: 1 validation error for Parameter\ndomain_class\n  Input should be 'cost_weight', 'time_duration', 'capacity', 'demand', 'network_structure', 'penalty_bigM', 'count_limit' or 'unclassified' [type=literal_error, input_value='time', input_type=str]\n    For further information visit https://errors.pydantic.dev/2.13/v/literal_error (ValidationError)",
+          "level": "error",
+          "message": "not parseable as latex.",
+          "stage": "parse"
+        },
+        {
+          "code": "all-parsers-failed",
+          "level": "error",
+          "message": "no supported parser accepted the input (tried: latex).",
+          "stage": "parse"
+        }
+      ],
+      "round": 1,
+      "usage": {
+        "completion_tokens": 5077,
+        "prompt_tokens": 1740,
+        "total_tokens": 6817
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [
+        {
+          "code": "semantic",
+          "detail": "constraint 'arrival_lower' lhs: term coefficient 'delta\\\\_short' is not a declared parameter | constraint 'arrival_lower' lhs: term coefficient 'delta\\\\_skip' is not a declared parameter | constraint 'arrival_upper' lhs: term coefficient 'delta\\\\_short' is not a declared parameter | constraint 'arrival_upper' lhs: term coefficient 'delta\\\\_skip' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_delay' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_cancel' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_short' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_skip' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_add' is not a declared parameter | objective 'total_cost': term coefficient 'c\\\\_assign' is not a declared parameter",
+          "level": "error",
+          "message": "parsed formulation failed semantic validation: 10 validation error(s) in formulation 'rail_reschedule'",
+          "stage": "semantics"
+        }
+      ],
+      "round": 2,
+      "usage": {
+        "completion_tokens": 2585,
+        "prompt_tokens": 4831,
+        "total_tokens": 7416
+      },
+      "verdict": "invalid"
+    },
+    {
+      "findings": [],
+      "round": 3,
+      "usage": {
+        "completion_tokens": 2632,
+        "prompt_tokens": 7910,
+        "total_tokens": 10542
+      },
+      "verdict": "valid"
+    }
+  ],
+  "rounds_cap": 6,
+  "rounds_to_valid": 3,
+  "run_id": "10.1016_j.cie.2025.111794--feedback",
+  "samples": null,
+  "scenario": {
+    "chars": 1755,
+    "id": "10.1016_j.cie.2025.111794",
+    "paper_key": "10.1016_j.cie.2025.111794"
+  },
+  "schema_version": "vdemo-1",
+  "temperature": 0.0,
+  "tokens": {
+    "completion_tokens": 10294,
+    "prompt_tokens": 14481,
+    "total_tokens": 24775
+  },
+  "valid_rate": null
+}

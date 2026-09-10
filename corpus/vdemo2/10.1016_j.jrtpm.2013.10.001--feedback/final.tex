@@ -1,0 +1,24 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_rescheduling family=milp schema=0.1.0
+%@ name :: Rail Rescheduling for Minimizing Passenger Delay
+%@ desc :: A binary integer linear programming formulation to reschedule passenger train services and minimize total passenger delay at destinations.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ param d shape=T,S kind=matrix domain=demand :: Passenger demand for each train at each station.
+%@ param t shape=T,S kind=matrix domain=time_duration :: Scheduled arrival time for each train at each station.
+%@ param D shape=T,S kind=matrix domain=time_duration :: Delay for each train at each station.
+%@ param c shape=T,S kind=matrix domain=cost_weight :: Cost of delay for each train at each station.
+%@ param M shape=- kind=scalar domain=penalty_bigM :: Big M value.
+%@ var x shape=T,S domain=binary role=primary drole=rescheduling lo=- hi=- :: Binary variable indicating if a train is rescheduled to arrive at a station.
+%@ var y shape=T,S domain=integer role=auxiliary drole=unclassified lo=0 hi=- :: Delay of a train at a station after rescheduling.
+%@ obj sense=min name=total_delay combination=sum :: Minimize the total passenger delay at destinations.
+%@ con delay_calc_lower kind=linear domain=unclassified indicator=- :: Calculate the lower bound of delay for each train at each station.
+%@ con delay_calc_upper kind=linear domain=unclassified indicator=- :: Calculate the upper bound of delay for each train at each station.
+%@ con reschedule kind=linear domain=assignment_covering indicator=- :: Ensure that each train is rescheduled to arrive at each station.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{T}, j \in \mathcal{S}} d_{i,j} \cdot c_{i,j} \cdot y_{i,j} \tag{total_delay} \\
+  & y_{i,j} \ge D_{i,j} - M + M \cdot x_{i,j} \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{delay_calc_lower} \\
+  & y_{i,j} \le D_{i,j} + M - M \cdot x_{i,j} \qquad \forall i \in \mathcal{T},\; \forall j \in \mathcal{S} \tag{delay_calc_upper} \\
+  & \sum_{j \in \mathcal{S}} x_{i,j} = 1 \qquad \forall i \in \mathcal{T} \tag{reschedule} \\
+\end{align}

@@ -1,0 +1,31 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Timetable Rescheduling with Passenger Reassignment
+%@ desc :: A Mixed Integer Linear Programming model to minimize generalized travel times by integrating timetable rescheduling and passenger reassignment.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Passengers.
+%@ param d shape=T kind=scalar domain=time_duration :: Original departure time of each train.
+%@ param a shape=T kind=scalar domain=time_duration :: Original arrival time of each train.
+%@ param c shape=S kind=scalar domain=capacity :: Station capacity.
+%@ param tinvehicle shape=P kind=scalar domain=time_duration :: In-vehicle time for each passenger.
+%@ param twait shape=P kind=scalar domain=time_duration :: Waiting time at origin/transfer stations for each passenger.
+%@ param ntransfers shape=P kind=scalar domain=number :: Number of transfers for each passenger.
+%@ param M shape=- kind=scalar domain=- :: A large number for big-M formulation.
+%@ var x shape=T domain=integer role=primary drole=dispatching lo=0 hi=1 :: 1 if train is dispatched, 0 otherwise.
+%@ var y shape=T,S domain=integer role=primary drole=stopping lo=0 hi=1 :: 1 if train stops at station, 0 otherwise.
+%@ var z shape=P,T domain=integer role=primary drole=reassignment lo=0 hi=1 :: 1 if passenger is reassigned to train, 0 otherwise.
+%@ var w shape=T domain=continuous role=primary drole=timing lo=0 hi=- :: Departure time of each train after rescheduling.
+%@ obj sense=min name=generalized_travel_time combination=sum :: Minimize generalized travel times.
+%@ con train_dispatching kind=linear domain=unclassified indicator=- :: Ensure feasible train dispatching.
+%@ con station_capacity kind=linear domain=unclassified indicator=- :: Ensure station capacity is not exceeded.
+%@ con passenger_reassignment kind=linear domain=unclassified indicator=- :: Ensure feasible passenger reassignment.
+\begin{align}
+  \min\quad & \sum_{p \in \mathcal{P}} tinvehicle_{p} + twait_{p} + ntransfers_{p} \cdot M + \sum_{t \in \mathcal{T}} \sum_{s \in \mathcal{S}} y_{t,s} \cdot c_{s} \tag{generalized\_travel\_time} \\
+  & w_{t} \ge d_{t} \qquad \forall t \in \mathcal{T} \tag{train\_dispatching} \\
+  & \sum_{t \in \mathcal{T}} y_{t,s} \le c_{s} \qquad \forall s \in \mathcal{S} \tag{station\_capacity} \\
+  & \sum_{t \in \mathcal{T}} z_{p,t} = 1 \qquad \forall p \in \mathcal{P} \tag{passenger\_reassignment} \\
+  & w_{t} - a_{t} \le M \cdot (1 - x_{t}) \qquad \forall t \in \mathcal{T} \tag{train\_dispatching} \\
+  & y_{t,s} \le x_{t} \qquad \forall t \in \mathcal{T},\; \forall s \in \mathcal{S} \tag{train\_dispatching} \\
+\end{align}

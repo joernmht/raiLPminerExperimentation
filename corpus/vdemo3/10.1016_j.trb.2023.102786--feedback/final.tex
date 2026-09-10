@@ -1,0 +1,23 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=train_reschedule family=milp schema=0.1.0
+%@ name :: Train rescheduling with reordering, retiming, and rerouting (simplified)
+%@ desc :: Simplified integer linear model on a space–time network that minimizes total delay (measured by arrival time) and the number of cancelled trains. Decision variables choose a single arc for each train, its start time, and a cancellation indicator. Capacity constraints limit the number of trains on each arc.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index A ordered=0 cyclic=0 :: Set of directed space‑time arcs.
+%@ param travel shape=A kind=vector domain=time_duration :: Travel time of arc a.
+%@ param capacity shape=A kind=vector domain=capacity :: Capacity (max number of trains) of arc a.
+%@ var x shape=T,A domain=binary role=primary drole=- :: Arc‑usage variable: 1 if train t traverses arc a.
+%@ var s shape=T domain=non_negative role=primary drole=- :: Start time of train t at its origin.
+%@ var u shape=T domain=non_negative role=primary drole=- :: Arrival time of train t at its destination.
+%@ var z shape=T domain=binary role=primary drole=- :: Cancellation indicator: 1 if train t is not served.
+%@ obj sense=min name=total_cost combination=sum :: Minimize total delay plus cancellation count.
+%@ con assign_flow kind=flow_balance domain=- indicator=- :: Each train uses exactly one arc if not cancelled.
+%@ con capacity kind=capacity domain=- indicator=- :: Arc capacity limits.
+%@ con timing kind=linear domain=- indicator=- :: Relation between start, travel, and arrival times.
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}} u_{t} + \sum_{t \in \mathcal{T}} z_{t} \tag{total\_cost} \\
+  & \sum_{a \in \mathcal{A}} x_{t,a} = 1 - z_{t} \qquad \forall t \in \mathcal{T} \tag{assign\_flow} \\
+  & \sum_{t \in \mathcal{T}} x_{t,a} \le capacity_{a} \qquad \forall a \in \mathcal{A} \tag{capacity} \\
+  & u_{t} - s_{t} = \sum_{a \in \mathcal{A}} travel_{a} \cdot x_{t,a} \qquad \forall t \in \mathcal{T} \tag{timing} \\
+\end{align}

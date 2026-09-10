@@ -1,0 +1,54 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rolling_horizon_railway family=milp schema=0.1.0
+%@ name :: Rolling‑horizon railway rescheduling and stock reassignment
+%@ desc :: MILP model integrating timetable adjustments, cancellations, short‑turning, stop‑skipping and insertion of additional services under uncertain disruption durations.
+%@ index R ordered=0 cyclic=0 :: Rolling‑stock units (trains).
+%@ index I ordered=0 cyclic=0 :: Service trips (original and potential additional).
+%@ param d shape=I kind=vector domain=time_duration :: Nominal duration of trip i.
+%@ param a shape=I kind=vector domain=time :: Earliest feasible start time of trip i.
+%@ param b shape=I kind=vector domain=time :: Latest feasible finish time of trip i.
+%@ param p shape=I kind=vector domain=cost :: Penalty cost for cancelling original trip i.
+%@ param c shape=I kind=vector domain=cost :: Operational cost coefficient for trip i.
+%@ param st_red shape=I kind=vector domain=time :: Time reduction if short‑turning is applied to trip i.
+%@ param ss_red shape=I kind=vector domain=time :: Time reduction if stop‑skipping is applied to trip i.
+%@ param orig shape=I kind=vector domain=bool :: Indicator =1 if i is an original scheduled trip, 0 if i is a potential additional service.
+%@ param bigM shape=- kind=scalar domain=bigM :: Big‑M constant.
+%@ param alpha shape=- kind=scalar domain=cost :: Weight for total delay.
+%@ param beta shape=- kind=scalar domain=cost :: Cost per short‑turn.
+%@ param gamma shape=- kind=scalar domain=cost :: Cost per stop‑skip.
+%@ param delta shape=- kind=scalar domain=cost :: Cost per inserted additional service.
+%@ var x shape=I,R domain=binary role=primary drole=- lo=- hi=- :: Assignment of trip i to train r (if not cancelled).
+%@ var y shape=I domain=binary role=primary drole=- lo=- hi=- :: Cancellation indicator for original trips.
+%@ var s shape=I domain=continuous role=primary drole=- lo=0 hi=- :: Start time of trip i.
+%@ var delay shape=I domain=non_negative role=primary drole=- lo=0 hi=- :: Delay of trip i relative to earliest start.
+%@ var w shape=I domain=binary role=primary drole=- lo=- hi=- :: Short‑turn indicator for trip i.
+%@ var u shape=I domain=binary role=primary drole=- lo=- hi=- :: Stop‑skip indicator for trip i.
+%@ var z shape=I domain=binary role=primary drole=- lo=- hi=- :: Activation indicator for additional service i.
+%@ var o shape=I,I,R domain=binary role=auxiliary drole=- lo=- hi=- :: Ordering binary: 1 if i precedes j on train r.
+%@ obj sense=min name=total_cost combination=sum :: Minimize weighted sum of delay, penalties, and operational costs.
+%@ con assign_cancel kind=- domain=- indicator=- :: Assignment vs cancellation / activation linking.
+%@ con cancel_link kind=- domain=- indicator=- :: Cancellation allowed only for original trips.
+%@ con extra_link kind=- domain=- indicator=- :: Additional service activation only for non‑original trips.
+%@ con time_low kind=- domain=- indicator=- :: Lower bound on start time with big‑M.
+%@ con time_up kind=- domain=- indicator=- :: Upper bound on start time with big‑M.
+%@ con delay_def kind=- domain=- indicator=- :: Definition of delay.
+%@ con order_link1 kind=- domain=- indicator=- :: Ordering variable ≤ assignment (i).
+%@ con order_link2 kind=- domain=- indicator=- :: Ordering variable ≤ assignment (j).
+%@ con order_link3 kind=- domain=- indicator=- :: Ordering variable ≥ sum of assignments − 1.
+%@ con precede1 kind=- domain=- indicator=- :: Precedence when i precedes j on same train.
+%@ con precede2 kind=- domain=- indicator=- :: Precedence when j precedes i on same train.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{I}} \big( \mathit{alpha} \cdot \mathit{delay}_{i} + \mathit{p}_{i} \cdot \mathit{y}_{i} + \mathit{beta} \cdot \mathit{w}_{i} + \mathit{gamma} \cdot \mathit{u}_{i} + \mathit{delta} \cdot \mathit{z}_{i} \big) + \sum_{i \in \mathcal{I},\, r \in \mathcal{R}} \mathit{c}_{i} \cdot \mathit{x}_{i,r} \tag{total\_cost} \\
+  & \sum_{r \in \mathcal{R}} \mathit{x}_{i,r} + \mathit{y}_{i} = \mathit{orig}_{i} + \mathit{z}_{i} - \mathit{orig}_{i} \cdot \mathit{z}_{i} \qquad \forall i \in \mathcal{I} \tag{assign\_cancel} \\
+  & \mathit{y}_{i} \le \mathit{orig}_{i} \qquad \forall i \in \mathcal{I} \tag{cancel\_link} \\
+  & \mathit{z}_{i} \le 1 - \mathit{orig}_{i} \qquad \forall i \in \mathcal{I} \tag{extra\_link} \\
+  & \mathit{a}_{i} - \mathit{bigM} \cdot \mathit{y}_{i} \le \mathit{s}_{i} \qquad \forall i \in \mathcal{I} \tag{time\_low} \\
+  & \mathit{s}_{i} \le \mathit{b}_{i} + \mathit{bigM} \cdot \mathit{y}_{i} \qquad \forall i \in \mathcal{I} \tag{time\_up} \\
+  & \mathit{delay}_{i} \ge \mathit{s}_{i} - \mathit{a}_{i} \qquad \forall i \in \mathcal{I} \tag{delay\_def} \\
+  & \mathit{o}_{i,j,r} \le \mathit{x}_{i,r} \qquad \forall i \in \mathcal{I},\, j \in \mathcal{I},\, r \in \mathcal{R} \tag{order\_link1} \\
+  & \mathit{o}_{i,j,r} \le \mathit{x}_{j,r} \qquad \forall i \in \mathcal{I},\, j \in \mathcal{I},\, r \in \mathcal{R} \tag{order\_link2} \\
+  & \mathit{o}_{i,j,r} \ge \mathit{x}_{i,r} + \mathit{x}_{j,r} - 1 \qquad \forall i \in \mathcal{I},\, j \in \mathcal{I},\, r \in \mathcal{R} \tag{order\_link3} \\
+  & \mathit{s}_{j} \ge \mathit{s}_{i} + \mathit{d}_{i} - \mathit{st\_red}_{i} \cdot \mathit{w}_{i} - \mathit{ss\_red}_{i} \cdot \mathit{u}_{i} - \mathit{bigM} + \mathit{bigM} \cdot \mathit{o}_{i,j,r} \qquad \forall i \in \mathcal{I},\, j \in \mathcal{I},\, r \in \mathcal{R} \tag{precede1} \\
+  & \mathit{s}_{i} \ge \mathit{s}_{j} + \mathit{d}_{j} - \mathit{st\_red}_{j} \cdot \mathit{w}_{j} - \mathit{ss\_red}_{j} \cdot \mathit{u}_{j} - \mathit{bigM} \cdot \mathit{o}_{i,j,r} \qquad \forall i \in \mathcal{I},\, j \in \mathcal{I},\, r \in \mathcal{R} \tag{precede2}
+\end{align}

@@ -1,0 +1,45 @@
+% lp2graph canonical LaTeX
+% Railway timetable rescheduling with flexible stopping, short‑turning, retiming, reordering and cancellation.
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Railway disruption recovery MILP
+%@ desc :: MILP model integrating flexible stopping, flexible short‑turning, retiming, reordering (via slot assignment), cancellation and platform capacity. Passenger‑delay weighted objective.
+%@ index T ordered=0 cyclic=0 :: Trains.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index P ordered=0 cyclic=0 :: Discrete time slots within the planning horizon.
+%@ param demand shape=- kind=scalar domain=cost_weight :: Global passenger‑delay weight.
+%@ param a shape=T,S kind=matrix domain=time_duration :: Original scheduled arrival time of train t at station s.
+%@ param cap shape=S kind=vector domain=capacity :: Number of platform tracks available at station s.
+%@ param start shape=P kind=vector domain=time_duration :: Start time of time slot p.
+%@ param M_big shape=- kind=scalar domain=penalty_bigM :: Large constant for big‑M formulations.
+%@ param penalty_c shape=- kind=scalar domain=cost_weight :: Penalty cost for cancelling a train.
+%@ var x shape=T,S domain=binary role=primary drole=- lo=- hi=- :: 1 if train t stops at station s, 0 otherwise.
+%@ var y shape=T,S domain=binary role=primary drole=- lo=- hi=- :: 1 if train t short‑turns (terminates) at station s, 0 otherwise.
+%@ var c shape=T domain=binary role=primary drole=- lo=- hi=- :: 1 if train t is cancelled, 0 otherwise.
+%@ var r shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: Revised arrival time of train t at station s.
+%@ var w shape=T,S,P domain=binary role=primary drole=- lo=- hi=- :: 1 if train t is assigned to time slot p at station s.
+%@ var d shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: Passenger delay incurred by train t at station s.
+%@ obj sense=min name=obj combination=sum :: Minimize total passenger delay plus cancellation penalties.
+%@ con cancel_stop kind=linear domain=- indicator=- :: Stopping prohibited for cancelled trains.
+%@ con cancel_shortturn kind=linear domain=- indicator=- :: Short‑turning prohibited for cancelled trains.
+%@ con shortturn_one kind=linear domain=- indicator=- :: At most one short‑turn point per train.
+%@ con shortturn_stop kind=linear domain=- indicator=- :: Short‑turn implies stopping.
+%@ con slot_assign kind=linear domain=- indicator=- :: Slot assignment links binary stop variable.
+%@ con time_link kind=linear domain=- indicator=- :: Revised arrival time equals slot start time.
+%@ con capacity kind=capacity domain=- indicator=- :: Platform capacity per station and slot.
+%@ con delay_low kind=big_m domain=- indicator=- :: Lower bound for delay variable.
+%@ con delay_up kind=big_m domain=- indicator=- :: Upper bound for delay variable.
+%@ con delay_nonneg kind=linear domain=- indicator=- :: Non‑negativity of delay.
+\begin{align}
+  \min\quad & \mathit{demand} \cdot \sum_{t \in T,\, s \in S} d_{t,s}
+            + \sum_{t \in T} \mathit{penalty\_c} \cdot c_{t} \tag{obj} \\
+  & x_{t,s} \le 1 - c_{t} \qquad \forall t \in T,\; s \in S \tag{cancel\_stop} \\
+  & y_{t,s} \le 1 - c_{t} \qquad \forall t \in T,\; s \in S \tag{cancel\_shortturn} \\
+  & \sum_{s \in S} y_{t,s} \le 1 \qquad \forall t \in T \tag{shortturn\_one} \\
+  & x_{t,s} \ge y_{t,s} \qquad \forall t \in T,\; s \in S \tag{shortturn\_stop} \\
+  & \sum_{p \in P} w_{t,s,p} = x_{t,s} \qquad \forall t \in T,\; s \in S \tag{slot\_assign} \\
+  & r_{t,s} = \sum_{p \in P} \mathit{start}_{p} \cdot w_{t,s,p} \qquad \forall t \in T,\; s \in S \tag{time\_link} \\
+  & \sum_{t \in T} w_{t,s,p} \le \mathit{cap}_{s} \qquad \forall s \in S,\; p \in P \tag{capacity} \\
+  & d_{t,s} + \mathit{M\_big} - \mathit{M\_big} \cdot x_{t,s} \ge r_{t,s} - \mathit{a}_{t,s} \qquad \forall t \in T,\; s \in S \tag{delay\_low} \\
+  & d_{t,s} - r_{t,s} + \mathit{a}_{t,s} + \mathit{M\_big} \cdot x_{t,s} \le \mathit{M\_big} \qquad \forall t \in T,\; s \in S \tag{delay\_up} \\
+  & d_{t,s} \ge 0 \qquad \forall t \in T,\; s \in S \tag{delay\_nonneg}
+\end{align}
