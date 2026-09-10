@@ -474,3 +474,22 @@ def test_serve_once_answers_with_no_store_headers(floor) -> None:
     t.join(10)
     assert not t.is_alive()
     assert (floor["corpus"] / "factory_data.json").exists()
+
+
+def test_classifier_names_the_vocabulary_bins() -> None:
+    # rewrite-2026.09.0 refuses undeclared symbols by name; those are the
+    # sidecar's fill-in list, not a parser hole.
+    assert (
+        factory.classify_detail(
+            "normalized LaTeX is not in the canonical grammar: referent 'v_c' is not a "
+            "declared variable or parameter (declare it in the %@ header)"
+        )
+        == "undeclared symbol (vocabulary)"
+    )
+    assert (
+        factory.classify_detail(
+            "normalized LaTeX is not in the canonical grammar: coefficient 'B_u' is not a "
+            "declared parameter (declare 'B_u' in the %@ header)"
+        )
+        == "undeclared coefficient (vocabulary)"
+    )
