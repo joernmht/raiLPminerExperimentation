@@ -75,7 +75,7 @@ from corpusbuilder.symbols import Evidence, binder_roles, paper_evidence
 
 # ``promote`` above already ran the railpminer._lp2graph path shim as an import
 # side effect, so lp2graph resolves here without repeating it.
-from lp2graph.mining.ingest import ingest_latex
+from lp2graph.mining.ingest import ingest_latex, normalize_latex
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
@@ -93,6 +93,9 @@ SYMBOL_KINDS = ("index", "parameter", "variable")
 PROMPT_CHAR_BUDGET = 60_000
 DESC_MAX = 100
 STAGES = ("a", "b", "c", "r")
+#: Stage V (vocabulary fill) runs as its own mode (``--vocab``), not in the
+#: a/b/c/r ladder: it declares exactly the names corpusbuilder.vocab lists.
+VOCAB_STAGE = "v"
 
 # --------------------------------------------------------------------------- #
 # LLM client — plain requests against an OpenAI-compatible endpoint
@@ -147,6 +150,13 @@ def _endpoint() -> str:
 
 
 def _api_key() -> str:
+    if os.environ.get("ASSIST_BASE_URL"):
+        # A foreign endpoint (e.g. ScaDS) gets its own key only: the DeepSeek
+        # key must never travel to another host.
+        key = os.environ.get("ASSIST_API_KEY")
+        if not key:
+            raise AssistError("ASSIST_BASE_URL is set: ASSIST_API_KEY is required for it")
+        return key
     key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("ASSIST_API_KEY")
     if not key:
         raise AssistError(
@@ -154,6 +164,11 @@ def _api_key() -> str:
             "or ~/.config/raiLP/secrets.env"
         )
     return key
+
+
+def _deepseek_endpoint() -> bool:
+    base = os.environ.get("ASSIST_BASE_URL") or DEFAULT_BASE_URL
+    return "deepseek" in base
 
 
 #: Injectable sleep so tests (and impatient callers) can neutralize backoff.
@@ -242,12 +257,14 @@ _NO_THINKING = {"thinking": {"type": "disabled"}}
 
 
 def _stage_extras(stage: str) -> dict:
+    if not _deepseek_endpoint():
+        return {}  # the thinking switch is a DeepSeek field; other hosts reject it
     override = os.environ.get("ASSIST_THINKING", "").strip().lower()
     if override == "on":
         return {}
     if override == "off":
         return dict(_NO_THINKING)
-    return dict(_NO_THINKING) if stage in ("a", "b") else {}
+    return dict(_NO_THINKING) if stage in ("a", "b", VOCAB_STAGE) else {}
 
 
 def _payload(system: str, user: str, *, stage: str) -> dict:
@@ -356,6 +373,8 @@ class Workspace:
     decisions: Path = CORPUS / "decisions"
     declarations: Path = CORPUS / "declarations"
     assist: Path = CORPUS / "assist"
+    #: The candidate documents promote assembles (stage V reads their bodies).
+    promoted: Path = CORPUS / "promoted"
     #: Redirect targets for the promote feedback loop (tests promote into a
     #: staging tree; the CLI promotes into the live corpus).
     promote_out_dirs: dict[str, Path] | None = None
@@ -1582,6 +1601,274 @@ def paper_symbol_count(dossier: Dossier) -> int:
     return len(names)
 
 
+# --------------------------------------------------------------------------- #
+# Stage V — vocabulary fill: declare exactly the names the fill-in list names
+# --------------------------------------------------------------------------- #
+
+VOCAB_SYSTEM = """Stage V (vocabulary fill) of the raiLPminer corpus pipeline.
+You receive a paper's title and abstract, the symbols its declaration sidecar already
+declares, and a FILL-IN LIST: symbol names its formulas use (after deterministic
+normalization) that the sidecar does not declare, each with evidence (how it is used, how
+many indices it is written with, example rows).
+Reply with JSON only: {"declarations_add": ["%@ ...", ...], "unsure": ["name", ...]}.
+Rules:
+- One %@ line per listed name, spelled EXACTLY as listed. The spellings are canonical:
+  t_arr is one symbol named t_arr, Y_1 is one symbol named Y_1. Never rename, merge,
+  split or "correct" them.
+- Records:
+  %@ index NAME ordered=0|1 cyclic=0|1 :: meaning            (a set / index family)
+  %@ param NAME shape=<S> kind=scalar|vector|matrix|big_m|tolerance domain=- :: meaning
+  %@ var NAME shape=<S> domain=binary|integer|non_negative|continuous role=primary|auxiliary|slack|indicator drole=- lo=- hi=- :: meaning
+  where <S> is - for no index or a comma list of index families, one per written index,
+  in the written order; use only families already declared or added in this reply.
+- param = given data (costs, times, capacities, big-M, weights); var = decided by the
+  model; index = a set the formulas sum or quantify over.
+- A listed name that is not a symbol (an operator word, a unit, junk from extraction)
+  goes to "unsure" and gets no line.
+- No prose outside the JSON."""
+
+VOCAB_MARK = "% --- vocabulary fill"
+
+
+def _doc_with_sidecar(promoted_text: str, sidecar_text: str) -> str:
+    """The assembled document with its header replaced by the CURRENT sidecar.
+
+    promote embeds the sidecar at assembly time, so after a fill the promoted
+    file is stale until promote runs again; the audit must see today's sidecar.
+    """
+    body_at = promoted_text.find("\\begin{align}")
+    head, body = (
+        (promoted_text[:body_at], promoted_text[body_at:]) if body_at >= 0 else ("", promoted_text)
+    )
+    kept = [
+        ln for ln in head.splitlines() if not re.match(r"\s*%@\s*(index|param|var|obj|con)\b", ln)
+    ]
+    decl = [ln for ln in sidecar_text.splitlines() if ln.strip().startswith("%@")]
+    return "\n".join(kept + decl) + "\n" + body
+
+
+def vocab_input(
+    dossier: Dossier | None,
+    prose: dict | None,
+    audit: dict,
+    sidecar_text: str,
+    rows: dict[str, str],
+    feedback: list[str],
+) -> dict:
+    declared = [
+        ln.strip()
+        for ln in sidecar_text.splitlines()
+        if re.match(r"\s*%@\s*(index|param|var)\b", ln)
+    ]
+    families = [ln for ln in declared if ln.startswith("%@ index")]
+    entries = []
+    for name, rec in audit["missing"].items():
+        entries.append(
+            {
+                "name": name,
+                "kind_guess": rec["kind"],
+                "evidence": rec["evidence"],
+                "written_with_indices": rec["arities"],
+                "rows": [rows[r][:300] for r in rec["rows"][:3] if r in rows],
+            }
+        )
+    abstract = str((prose or {}).get("abstract") or "")[:2500]
+    return {
+        "paper": {
+            "title": dossier.source.title if dossier else "",
+            "doi": dossier.source.doi if dossier else "",
+        },
+        "abstract": abstract,
+        "index_families_declared": families,
+        "already_declared_names": sorted(
+            n for n in (_parse_decl_line(ln)[1] for ln in declared) if n
+        ),
+        "missing_index_families": list(audit["missing_index"]),
+        "fill_in": entries,
+        "feedback": feedback,
+    }
+
+
+def validate_vocab(reply: dict, allowed: set[str], index_names: set[str]) -> list[str]:
+    lines = reply.get("declarations_add")
+    if not isinstance(lines, list):
+        return ["declarations_add must be a list of %@ lines"]
+    errors = validate_decl_additions(lines, "")
+    seen: set[str] = set()
+    added_idx: set[str] = set()
+    parsed = []
+    for i, raw in enumerate(lines, 1):
+        record, name, kv, _errs = _parse_decl_line(str(raw).strip())
+        parsed.append((i, record, name, kv))
+        if not name:
+            continue
+        if name not in allowed:
+            errors.append(f"declarations_add {i}: {name!r} is not on the fill-in list")
+        if name in seen:
+            errors.append(f"declarations_add {i}: {name!r} declared twice")
+        seen.add(name)
+        if record == "index":
+            added_idx.add(name)
+    known_idx = index_names | added_idx
+    for i, record, _name, kv in parsed:
+        where = f"declarations_add {i}"
+        if record == "index":
+            for key in ("ordered", "cyclic"):
+                if kv.get(key) not in ("0", "1"):
+                    errors.append(f"{where}: {key} must be 0 or 1")
+        elif record == "param":
+            if kv.get("kind") not in PARAM_KINDS:
+                errors.append(f"{where}: kind must be one of {sorted(PARAM_KINDS)}")
+            shape_error = _check_shape(kv, known_idx)
+            if shape_error:
+                errors.append(f"{where}: {shape_error}")
+        elif record == "var":
+            if kv.get("domain") not in VAR_DOMAINS:
+                errors.append(f"{where}: domain must be one of {sorted(VAR_DOMAINS)}")
+            if kv.get("role") not in VAR_ROLES:
+                errors.append(f"{where}: role must be one of {sorted(VAR_ROLES)}")
+            shape_error = _check_shape(kv, known_idx)
+            if shape_error:
+                errors.append(f"{where}: {shape_error}")
+    unsure = reply.get("unsure", [])
+    if not isinstance(unsure, list) or any(not isinstance(u, str) for u in unsure):
+        errors.append("unsure must be a list of names")
+        return errors
+    errors.extend(f"unsure: {u!r} is not on the fill-in list" for u in unsure if u not in allowed)
+    # Completeness: every listed name is either declared or explicitly unsure;
+    # a silent omission would be an undeclared symbol again after the fill.
+    unanswered = sorted(allowed - seen - set(unsure))
+    if unanswered:
+        errors.append(
+            "every name on the fill-in list needs a %@ line or an 'unsure' entry; "
+            f"missing: {', '.join(unanswered)}"
+        )
+    return errors
+
+
+def fill_vocab_paper(
+    ws: Workspace,
+    key: str,
+    *,
+    today: str,
+    force: bool = False,
+    retries: int = 2,
+    write: bool = True,
+    probe: bool = True,
+) -> PaperRun:
+    """Declare the names ``corpusbuilder.vocab`` lists for one paper.
+
+    Deterministic list in, parser-gated ``%@`` lines out: the additions are
+    appended to the sidecar under a marked block (never edited in place),
+    re-runs replay from the cache, and a promote probe (write=False) records
+    whether the paper passes the gate afterwards.
+    """
+    from corpusbuilder import vocab as vocab_mod
+
+    run = PaperRun(key=key)
+    doc_path = ws.promoted / f"{key}.tex"
+    sidecar_path = ws.declarations / f"{key}.tex"
+    if not doc_path.exists():
+        run.stages[VOCAB_STAGE] = "skipped: no assembled document (run promote first)"
+        return run
+    if not sidecar_path.exists():
+        run.stages[VOCAB_STAGE] = "skipped: no sidecar (stage c first)"
+        return run
+    sidecar = sidecar_path.read_text(encoding="utf-8")
+    doc = _doc_with_sidecar(doc_path.read_text(encoding="utf-8"), sidecar)
+    audit = vocab_mod.scan_document(doc)
+    allowed = set(audit["missing"]) | set(audit["missing_index"])
+    if not allowed:
+        run.stages[VOCAB_STAGE] = "skipped: vocabulary complete"
+        return run
+    normalized, _prov = normalize_latex(doc, source="corpusbuilder.assist.vocab")
+    bm = vocab_mod._BODY_RE.search(normalized)
+    rows = {
+        name: vocab_mod._TAG_RE.sub("", text).strip(" &\\\n")
+        for name, text in vocab_mod._rows(bm.group(1) if bm else normalized)
+    }
+    dossier_path = ws.dossiers / f"{key}.json"
+    dossier = Dossier.load(dossier_path) if dossier_path.exists() else None
+    prose = load_prose(ws, key)
+    index_names = set(audit["declared"]["index"])
+
+    def build(feedback: list[str]) -> dict:
+        return vocab_input(dossier, prose, audit, sidecar, rows, feedback)
+
+    try:
+        reply = _ask(
+            ws,
+            key,
+            VOCAB_STAGE,
+            VOCAB_SYSTEM,
+            build,
+            lambda r: validate_vocab(r, allowed, index_names),
+            run.usage,
+            retries=retries,
+            force=force,
+            feedback=[],
+        )
+    except (AssistError, StageError) as exc:
+        run.errors.append(str(exc))
+        run.stages[VOCAB_STAGE] = "failed: reply never validated"
+        return run
+    additions = filter_decl_additions([str(x) for x in reply["declarations_add"]], sidecar)
+    unsure = [u for u in reply.get("unsure", []) if u in allowed]
+    if write and additions:
+        block = [
+            f"{VOCAB_MARK} (stage v, corpusbuilder.assist --vocab, model "
+            f"{model_id(VOCAB_STAGE)}, {today}) ---",
+            "% Non-deterministically sourced; the names come from corpus/vocab/"
+            f"{key}.json (deterministic fill-in list); pending human confirmation.",
+            *additions,
+        ]
+        sidecar_path.write_text(
+            sidecar.rstrip() + "\n" + "\n".join(block) + "\n", encoding="utf-8", newline="\n"
+        )
+    note = f"done: +{len(additions)} declared, {len(unsure)} unsure of {len(allowed)} listed"
+    if probe and write:
+        report = promote.promote_all(
+            decisions_dir=ws.decisions,
+            dossiers_dir=ws.dossiers,
+            declarations_dir=ws.declarations,
+            out_dirs=ws.promote_out_dirs,
+            write=False,
+            only={key},
+            partial=True,
+        )
+        outcome = next((o for o in report["papers"] if o["paper_key"] == key), None)
+        if outcome is None:
+            note += "; probe: no decisions"
+        elif outcome.get("promoted"):
+            partial = outcome.get("partial")
+            if partial:
+                included = int(partial.get("rows_included", 0))
+                total = included + int(partial.get("rows_excluded", 0))
+                note += f"; probe: PROMOTED partial {included}/{total} rows"
+            else:
+                note += "; probe: PROMOTED in full"
+        else:
+            note += f"; probe: {outcome.get('cause')}"
+    run.stages[VOCAB_STAGE] = note
+    return run
+
+
+def vocab_keys(ws: Workspace, limit: int | None = None) -> list[str]:
+    """Papers with a fill-in list, least missing names first (from corpus/vocab.json)."""
+    path = ws.promoted.parent / "vocab.json"
+    keys: list[str] = []
+    if path.exists():
+        report = json.loads(path.read_text(encoding="utf-8"))
+        keys = [
+            p["paper_key"]
+            for p in report.get("per_paper", [])
+            if p.get("missing") or p.get("missing_index")
+        ]
+    else:
+        keys = sorted(p.stem for p in ws.promoted.glob("*.tex"))
+    return keys[:limit] if limit is not None else keys
+
+
 def order_keys(ws: Workspace, keys: list[str] | None = None) -> list[str]:
     """Paper keys ordered by ascending symbol-table size (ties by key).
 
@@ -1798,7 +2085,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--force-stage",
         action="append",
-        choices=list(STAGES),
+        choices=[*STAGES, VOCAB_STAGE],
         default=[],
         metavar="X",
         help="recompute stage X even on a cache hit (repeatable)",
@@ -1811,6 +2098,17 @@ def main(argv: list[str] | None = None) -> int:
         help="after annotating, promote and re-ask failing stages, up to N rounds",
     )
     parser.add_argument("--report", action="store_true", help="print the markdown report")
+    parser.add_argument(
+        "--vocab",
+        action="store_true",
+        help="stage V: declare exactly the names corpusbuilder.vocab lists per paper "
+        "(needs a prior promote run and a sidecar; --all orders least missing first)",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="with --vocab: ask (cached) but write no sidecar and run no probe",
+    )
     parser.add_argument(
         "--shard",
         metavar="I/N",
@@ -1832,6 +2130,8 @@ def main(argv: list[str] | None = None) -> int:
 
     ws = Workspace()
     today = date.today().isoformat()
+    if args.vocab:
+        return _main_vocab(ws, args, today)
     if args.all:
         keys = order_keys(ws)
         if shard is not None:
@@ -1873,6 +2173,37 @@ def main(argv: list[str] | None = None) -> int:
     if args.report:
         print()
         print(render_report_md(report))
+    return 0
+
+
+def _main_vocab(ws: Workspace, args: argparse.Namespace, today: str) -> int:
+    keys = vocab_keys(ws, args.limit) if args.all else list(args.keys)
+    force = VOCAB_STAGE in args.force_stage
+    runs: dict[str, PaperRun] = {}
+    from corpusbuilder import factory  # heartbeat only (ADR-0018)
+
+    with factory.running("vocab", total=len(keys)) as tick:
+        for i, key in enumerate(keys):
+            tick(i, note=key)
+            try:
+                run = fill_vocab_paper(
+                    ws, key, today=today, force=force, write=not args.dry_run, probe=True
+                )
+            except AssistError as exc:
+                # A refused call (wallet empty, key rejected) ends the run: every
+                # paper done so far is in the cache and the sidecars.
+                print(f"{key}  stopped: {exc}")
+                break
+            runs[key] = run
+            print(f"{key}  v:{run.stages.get(VOCAB_STAGE, '?')}")
+    report = build_report(list(runs.values()), today=today)
+    write_report(ws, report, suffix="vocab")
+    tokens = report["totals"]["tokens"]
+    print(
+        f"papers: {report['totals']['papers']} · calls: {tokens['calls']} "
+        f"(+{tokens['cache_hits']} cached) · est ${tokens['cost_usd']['standard']:.4f} std / "
+        f"${tokens['cost_usd']['off_peak']:.4f} off-peak · wrote corpus/assist/report.vocab.{{json,md}}"
+    )
     return 0
 
 
