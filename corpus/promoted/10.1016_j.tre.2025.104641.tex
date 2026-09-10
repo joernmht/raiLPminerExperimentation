@@ -125,71 +125,71 @@
   & \begin{matrix} & \left(T \cdot A_{i + 1 , l , f} - T \cdot A_{i , l , f}\right) \geq \left(1 - p_{i , l , f}\right) \cdot t_{min} , \forall i \in I \backslash \left\{n\right\} , l \in L , f \in G .\end{matrix} \tag{eq\_0007} \\
   & \begin{matrix} & \left(T \cdot A_{i + 1 , l , f} - T \cdot A_{i , l , f}\right) \leq \left(1 - p_{i , l , f}\right) \cdot t_{max} , \forall i \in I \backslash \left\{n\right\} , l \in L , f \in G .\end{matrix} \tag{eq\_0008} \\
   & \begin{matrix} & \left(1 - p_{i , l , f}\right) \cdot \left(T \cdot A_{i + 1 , l , f} - T \cdot D_{i , l , f}\right) \geq 0 , \forall i \in I \backslash \left\{n\right\} , l \in L , f \in G .\end{matrix} \tag{eq\_0009} \\
-  & \begin{matrix} & \mathit{alpha}_{i^{'} , f} = \sum_{i \in I} y_{i , i^{'} , f} , \forall i^{'} \in I , f \in G .\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix} & \mathit{beta}_{i , f} = \sum_{i^{'} \in I} y_{i , i^{'} , f} , \forall i \in I , f \in G .\end{matrix} \tag{eq\_0014} \\
-  & \begin{matrix} & \mathit{alpha}_{i^{'} , f} + \mathit{beta}_{i , f} \leq 2 + {M} \left(1 - y_{i , i^{'} , f}\right) , \forall i , i^{'} \in I , f \in G .\end{matrix} \tag{eq\_0015} \\
-  & \begin{matrix} & \mathit{alpha}_{i^{'} , f} + \mathit{beta}_{i , f} \geq 2 - {M} \left(1 - y_{i , i^{'} , f}\right) , \forall i , i^{'} \in I , f \in G .\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix} & T \cdot A_{i^{'} , 1 , f^{'}} - T \cdot D_{i , z , f} \geq r_{t u r n}^{min} + \left(y_{i , i^{'} , f^{'}} - 1\right) {M} , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix} & T \cdot A_{i^{'} , 1 , f^{'}} - T \cdot D_{i , z , f} \leq r_{t u r n}^{max} + \left(1 - y_{i , i^{'} , f^{'}}\right) {M} , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0018} \\
+  & \begin{matrix} & \mathit{alpha}_{ip , f} = \sum_{i \in I} y_{i , ip , f} , \forall ip \in I , f \in G .\end{matrix} \tag{eq\_0013} \\
+  & \begin{matrix} & \mathit{beta}_{i , f} = \sum_{ip \in I} y_{i , ip , f} , \forall i \in I , f \in G .\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & \mathit{alpha}_{ip , f} + \mathit{beta}_{i , f} \leq 2 + M_tilde \left(1 - y_{i , ip , f}\right) , \forall i , ip \in I , f \in G .\end{matrix} \tag{eq\_0015} \\
+  & \begin{matrix} & \mathit{alpha}_{ip , f} + \mathit{beta}_{i , f} \geq 2 - M_tilde \left(1 - y_{i , ip , f}\right) , \forall i , ip \in I , f \in G .\end{matrix} \tag{eq\_0016} \\
+  & \begin{matrix} & T \cdot A_{ip , 1 , fp} - T \cdot D_{i , z , f} \geq r_{t u r n}^{min} + \left(y_{i , ip , fp} - 1\right) M_tilde , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0017} \\
+  & \begin{matrix} & T \cdot A_{ip , 1 , fp} - T \cdot D_{i , z , f} \leq r_{t u r n}^{max} + \left(1 - y_{i , ip , fp}\right) M_tilde , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0018} \\
   & \begin{matrix}\sum_{d \in D} e_{i , d , f} = 1 , \forall i \in I , f \in G .\end{matrix} \tag{eq\_0019} \\
-  & \begin{matrix} & e_{i^{'} , d , f} - e_{i , d , f^{'}} \leq {M} \cdot \left(1 - y_{i , i^{'} , f}\right) , \forall i , i^{'} \in I , d \in D , f , f^{'} \in G , f \neq f^{'}\end{matrix} \tag{eq\_0020} \\
-  & \begin{matrix} & e_{i^{'} , d , f} - e_{i , d , f^{'}} \geq - {M} \cdot \left(1 - y_{i , i^{'} , f}\right) , \forall i , i^{'} \in I , d \in D , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0021} \\
-  & \begin{matrix} & \left(\sum_{i = 1}^{i^{'}} \left(1 - \mathit{alpha}_{i , f}\right) \cdot e_{i , d , f} - \sum_{i \in I} \left(1 - \mathit{beta}_{i , f}\right) \cdot \mathit{delta}_{i , i^{'} , f} \cdot e_{i , d , f^{'}}\right) \cdot e_{i^{'} , d , f} \leq N_{d , f} , \forall i^{'} \in I , d \in D , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0023} \\
-  & \begin{matrix}\sum_{i^{'} = i}^{i + \mathit{lambda}_{max} - 1} p_{i^{'} , l , f} \leq \mathit{lambda}_{max} - 1 , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0024} \\
+  & \begin{matrix} & e_{ip , d , f} - e_{i , d , fp} \leq M_tilde \cdot \left(1 - y_{i , ip , f}\right) , \forall i , ip \in I , d \in D , f , fp \in G , f \neq fp\end{matrix} \tag{eq\_0020} \\
+  & \begin{matrix} & e_{ip , d , f} - e_{i , d , fp} \geq - M_tilde \cdot \left(1 - y_{i , ip , f}\right) , \forall i , ip \in I , d \in D , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0021} \\
+  & \begin{matrix} & \left(\sum_{i = 1}^{ip} \left(1 - \mathit{alpha}_{i , f}\right) \cdot e_{i , d , f} - \sum_{i \in I} \left(1 - \mathit{beta}_{i , f}\right) \cdot \mathit{delta}_{i , ip , f} \cdot e_{i , d , fp}\right) \cdot e_{ip , d , f} \leq N_{d , f} , \forall ip \in I , d \in D , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0023} \\
+  & \begin{matrix}\sum_{ip = i}^{i + \mathit{lambda}_{max} - 1} p_{ip , l , f} \leq \mathit{lambda}_{max} - 1 , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0024} \\
   & \begin{matrix} & p_{i , 1 , f} = 0 , \forall i \in I , f \in G .\end{matrix} \tag{eq\_0025} \\
   & \begin{matrix} & p_{i , z , f} = 0 , \forall i \in I , f \in G .\end{matrix} \tag{eq\_0026} \\
   & \begin{matrix}n_{i , l , f}^{a r r i v e} = h_{i , l , f} \cdot b_{i , l , f} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0028} \\
   & \begin{matrix}n_{i , l , f}^{d e t} = n_{i , l , f}^{w a i t} - n_{i , l , f}^{i n a} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0030} \\
   & \begin{matrix} & n_{i , l , f}^{d e t} \geq 0 , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0031} \\
   & \begin{matrix} & n_{l , f}^{d e t} = \sum_{i \in I} n_{i , l , f}^{d e t} - \sum_{i \in I \backslash \left\{n\right\}} p_{i , l , f} \cdot n_{i , l , f}^{d e t} , \forall l \in L , f \in G .\end{matrix} \tag{eq\_0032} \\
-  & \begin{matrix}F_{1} = - \sum_{i , i^{'} \in I , f \in G} y_{i , i^{'} , f} .\end{matrix} \tag{eq\_0037} \\
-  & \begin{matrix}F_{2} = \sum_{f \in G} \sum_{l \in L \backslash \left\{z\right\}} n_{l , f}^{d e t} .\end{matrix} \tag{eq\_0038} \\
+  & \begin{matrix}F_{1} = - \sum_{i , ip \in I , f \in G} y_{i , ip , f} .\end{matrix} \tag{eq\_0037} \\
+  & \begin{matrix}F_{2} = \sum_{f \in G, l \in L \backslash \left\{z\right\}} n_{l , f}^{d e t} .\end{matrix} \tag{eq\_0038} \\
   & \begin{matrix}F = \mathit{eta}_{1} \frac{F_{1} - F_{1 , min}}{F_{1 , max} - F_{1 , min}} + \mathit{eta}_{2} \frac{F_{2} - F_{2 , min}}{F_{2 , max} - F_{2 , min}} .\end{matrix} \tag{eq\_0039} \\
-  \begin{matrix}\quad & & & min F = \mathit{eta}_{1} \frac{F_{1} - F_{1 , min}}{F_{1 , max} - F_{1 , min}} + \mathit{eta}_{2} \frac{F_{2} - F_{2 , min}}{F_{2 , max} - F_{2 , min}} \\ & & s . t . \begin{cases} \text{Constraints} \left(1\right) - \left(9\right) , \left(13\right) - \left(36\right) \\ T \cdot D_{1 , 1 , f} = \left(\hat{T \cdot D}\right)_{1 , 1 , f} , T \cdot D_{1 , z , f} = \left(\hat{T \cdot D}\right)_{1 , z , f} , \forall f \in G \\ T \cdot D_{n , 1 , f} = \left(\hat{T \cdot D}\right)_{n , 1 , f} , T \cdot D_{n , z , f} = \left(\hat{T \cdot D}\right)_{n , z , f} , \forall f \in G \end{cases}\end{matrix} \tag{eq\_0040} \\
-  & p \cdot t 1_{i , l , f} \leq {M} p_{i , l , f} \tag{eq\_0041\_a} \\
-  & p \cdot t 1_{i , l , f} \geq {m} p_{i , l , f} \tag{eq\_0041\_b} \\
-  & p \cdot t 1_{i , l , f} \leq T \cdot D_{i , l , f} - {m} \left(1 - p_{i , l , f}\right) \tag{eq\_0041\_c} \\
-  & p \cdot t 1_{i , l , f} \geq T \cdot D_{i , l , f} - {M} \left(1 - p_{i , l , f}\right) \tag{eq\_0041\_d} \\
-  & p \cdot t 2_{i , l , f} \leq {M} p_{i , l , f} \tag{eq\_0042\_a} \\
-  & p \cdot t 2_{i , l , f} \geq {m} p_{i , l , f} \tag{eq\_0042\_b} \\
-  & p \cdot t 2_{i , l , f} \leq T \cdot A_{i + 1 , l , f} - {m} \left(1 - p_{i , l , f}\right) \tag{eq\_0042\_c} \\
-  & p \cdot t 2_{i , l , f} \geq T \cdot A_{i + 1 , l , f} - {M} \left(1 - p_{i , l , f}\right) \tag{eq\_0042\_d} \\
+  \begin{matrix}\quad & & & min F = \mathit{eta}_{1} \frac{F_{1} - F_{1 , min}}{F_{1 , max} - F_{1 , min}} + \mathit{eta}_{2} \frac{F_{2} - F_{2 , min}}{F_{2 , max} - F_{2 , min}} \\ & & s . t . \begin{cases} \text{Constraints} \left(1\right) - \left(9\right) , \left(13\right) - \left(36\right) \\ T \cdot D_{1 , 1 , f} = \left(TD_hat\right)_{1 , 1 , f} , T \cdot D_{1 , z , f} = \left(TD_hat\right)_{1 , z , f} , \forall f \in G \\ T \cdot D_{n , 1 , f} = \left(TD_hat\right)_{n , 1 , f} , T \cdot D_{n , z , f} = \left(TD_hat\right)_{n , z , f} , \forall f \in G \end{cases}\end{matrix} \tag{eq\_0040} \\
+  & p \cdot t 1_{i , l , f} \leq M_tilde p_{i , l , f} \tag{eq\_0041\_a} \\
+  & p \cdot t 1_{i , l , f} \geq m_tilde p_{i , l , f} \tag{eq\_0041\_b} \\
+  & p \cdot t 1_{i , l , f} \leq T \cdot D_{i , l , f} - m_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0041\_c} \\
+  & p \cdot t 1_{i , l , f} \geq T \cdot D_{i , l , f} - M_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0041\_d} \\
+  & p \cdot t 2_{i , l , f} \leq M_tilde p_{i , l , f} \tag{eq\_0042\_a} \\
+  & p \cdot t 2_{i , l , f} \geq m_tilde p_{i , l , f} \tag{eq\_0042\_b} \\
+  & p \cdot t 2_{i , l , f} \leq T \cdot A_{i + 1 , l , f} - m_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0042\_c} \\
+  & p \cdot t 2_{i , l , f} \geq T \cdot A_{i + 1 , l , f} - M_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0042\_d} \\
   & \begin{matrix}T \cdot A_{i + 1 , l , f} - p \cdot t 2_{i , l , f} - T \cdot D_{i , l , f} + p \cdot t 1_{i , l , f} \geq 0 , \forall i \in I \backslash \left\{n\right\} , l \in L , f \in G .\end{matrix} \tag{eq\_0043} \\
-  & n_{i , l , f}^{a d d} \leq {M} p_{i , l , f} \tag{eq\_0044\_a} \\
-  & n_{i , l , f}^{a d d} \geq {m} p_{i , l , f} \tag{eq\_0044\_b} \\
-  & n_{i , l , f}^{a d d} \leq n_{i , l , f}^{d e t} - {m} \left(1 - p_{i , l , f}\right) \tag{eq\_0044\_c} \\
-  & n_{i , l , f}^{a d d} \geq n_{i , l , f}^{d e t} - {M} \left(1 - p_{i , l , f}\right) \tag{eq\_0044\_d} \\
+  & n_{i , l , f}^{a d d} \leq M_tilde p_{i , l , f} \tag{eq\_0044\_a} \\
+  & n_{i , l , f}^{a d d} \geq m_tilde p_{i , l , f} \tag{eq\_0044\_b} \\
+  & n_{i , l , f}^{a d d} \leq n_{i , l , f}^{d e t} - m_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0044\_c} \\
+  & n_{i , l , f}^{a d d} \geq n_{i , l , f}^{d e t} - M_tilde \left(1 - p_{i , l , f}\right) \tag{eq\_0044\_d} \\
   & \begin{matrix}n_{l , f}^{det} = \sum_{i \in I} n_{i , l , f}^{det} - \sum_{i \in I \backslash \left\{n\right\}} n_{i , l , f}^{a d d} , \forall l \in L \backslash \left\{1\right\} , f \in G .\end{matrix} \tag{eq\_0045} \\
   & - \mathit{alpha}_{i , f} + \mathit{alpha} \cdot e_{i , d , f} \leq 0 \tag{eq\_0046\_a} \\
   & - e_{i , d , f} + \mathit{alpha} \cdot e_{i , d , f} \leq 0 \tag{eq\_0046\_b} \\
   & \mathit{alpha}_{i , f} + e_{i , d , f} - \mathit{alpha} \cdot e_{i , d , f} \leq 1 \tag{eq\_0046\_c} \\
-  & - \mathit{delta}_{i , i^{'} , f} + \mathit{delta} \cdot e_{i , i^{'} , d , f} \leq 0 \tag{eq\_0047\_a} \\
-  & - e_{i , d , f^{'}} + \mathit{delta} \cdot e_{i , i^{'} , d , f} \leq 0 \tag{eq\_0047\_b} \\
-  & \mathit{delta}_{i , i^{'} , f} + e_{i , d , f^{'}} - \mathit{delta} \cdot e_{i , i^{'} , d , f} \leq 1 \tag{eq\_0047\_c} \\
-  & - \mathit{delta} \cdot e_{i , i^{'} , d , f} + \hbar_{i , i^{'} , d , f} \leq 0 \tag{eq\_0048\_a} \\
-  & - \mathit{beta}_{i , f} + \hbar_{i , i^{'} , d , f} \leq 0 \tag{eq\_0048\_b} \\
-  & \mathit{delta} \cdot e_{i , i^{'} , d , f} + \mathit{beta}_{i , f} - \hbar_{i , i^{'} , d , f} \leq 1 \tag{eq\_0048\_c} \\
-  & \begin{matrix}\sum_{i = 1}^{i^{'}} \left(e_{i , d , f} - \mathit{alpha} \cdot e_{i , d , f}\right) - \sum_{i \in I} \left(\mathit{delta} \cdot e_{i , i^{'} , d , f} - \hbar_{i , i^{'} , d , f}\right) \leq N_{d , f} , \forall i^{'} \in I , d \in D , f \in G .\end{matrix} \tag{eq\_0049} \\
+  & - \mathit{delta}_{i , ip , f} + \mathit{delta} \cdot e_{i , ip , d , f} \leq 0 \tag{eq\_0047\_a} \\
+  & - e_{i , d , fp} + \mathit{delta} \cdot e_{i , ip , d , f} \leq 0 \tag{eq\_0047\_b} \\
+  & \mathit{delta}_{i , ip , f} + e_{i , d , fp} - \mathit{delta} \cdot e_{i , ip , d , f} \leq 1 \tag{eq\_0047\_c} \\
+  & - \mathit{delta} \cdot e_{i , ip , d , f} + \hbar_{i , ip , d , f} \leq 0 \tag{eq\_0048\_a} \\
+  & - \mathit{beta}_{i , f} + \hbar_{i , ip , d , f} \leq 0 \tag{eq\_0048\_b} \\
+  & \mathit{delta} \cdot e_{i , ip , d , f} + \mathit{beta}_{i , f} - \hbar_{i , ip , d , f} \leq 1 \tag{eq\_0048\_c} \\
+  & \begin{matrix}\sum_{i = 1}^{ip} \left(e_{i , d , f} - \mathit{alpha} \cdot e_{i , d , f}\right) - \sum_{i \in I} \left(\mathit{delta} \cdot e_{i , ip , d , f} - \hbar_{i , ip , d , f}\right) \leq N_{d , f} , \forall ip \in I , d \in D , f \in G .\end{matrix} \tag{eq\_0049} \\
   & \begin{matrix} & A \left(o\right) \leq a_{max} \cdot \left(1 - \mathit{delta}\right) , \forall o \in O .\end{matrix} \tag{eq\_0050} \\
   & \begin{matrix} & A \left(o\right) \geq \mathit{varphi} + \left(a_{min} - \mathit{varphi}\right) \cdot \mathit{delta} , \forall o \in O .\end{matrix} \tag{eq\_0051} \\
-  & \begin{matrix} & T \cdot D_{i , z , f^{'}} + t_{e n t e r} + t_{e x i t} - T \cdot A_{i^{'} , 1 , f} \leq {M} \cdot \left(1 - \mathit{delta}_{i , i^{'} , f}\right) , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0052} \\
-  & \begin{matrix} & T \cdot D_{i , z , f^{'}} + t_{e n t e r} + t_{e x i t} - T \cdot A_{i^{'} , 1 , f} \geq \mathit{varphi} + \left({m} - \mathit{varphi}\right) \cdot \mathit{delta}_{i , i^{'} , f} , \forall i , i^{'} \in I , f \neq f^{'} .\end{matrix} \tag{eq\_0053} \\
-  & {z} \leq {y} \tag{eq\_0054\_a} \\
-  & {z} \leq {x} \tag{eq\_0054\_b} \\
-  & {z} \geq {y} - {M} \left(1 - {u}\right) \tag{eq\_0054\_c} \\
-  & {z} \geq {x} - {M} {u} \tag{eq\_0054\_d} \\
+  & \begin{matrix} & T \cdot D_{i , z , fp} + t_{e n t e r} + t_{e x i t} - T \cdot A_{ip , 1 , f} \leq M_tilde \cdot \left(1 - \mathit{delta}_{i , ip , f}\right) , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix} & T \cdot D_{i , z , fp} + t_{e n t e r} + t_{e x i t} - T \cdot A_{ip , 1 , f} \geq \mathit{varphi} + \left(m_tilde - \mathit{varphi}\right) \cdot \mathit{delta}_{i , ip , f} , \forall i , ip \in I , f \neq fp .\end{matrix} \tag{eq\_0053} \\
+  & z_tilde \leq y_tilde \tag{eq\_0054\_a} \\
+  & z_tilde \leq x_tilde \tag{eq\_0054\_b} \\
+  & z_tilde \geq y_tilde - M_tilde \left(1 - u_tilde\right) \tag{eq\_0054\_c} \\
+  & z_tilde \geq x_tilde - M_tilde u_tilde \tag{eq\_0054\_d} \\
   & n_{i , l , f}^{i n a} \leq n_{i , l , f}^{r e m a i n} \tag{eq\_0055\_a} \\
   & n_{i , l , f}^{i n a} \leq n_{i , l , f}^{w a i t} \tag{eq\_0055\_b} \\
-  & n_{i , l , f}^{i n a} \geq n_{i , l , f}^{r e m a i n} - {M} \left(1 - u_{i , k , f}\right) \tag{eq\_0055\_c} \\
-  & n_{i , l , f}^{i n a} \geq n_{i , l , f}^{w a i t} - {M} u_{i , k , f} \tag{eq\_0055\_d} \\
-  & \begin{matrix} & T \cdot D_{i , l , f}^{max} = \left(\hat{T \cdot D}\right)_{1 , l , f} + \left(i - 1\right) \cdot t_{max} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0056} \\
-  & \begin{matrix} & T \cdot D_{i , l , f}^{min} = \left(\hat{T \cdot D}\right)_{1 , l , f} + \left(i - 1\right) \cdot \frac{t_{min}}{2} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0057} \\
+  & n_{i , l , f}^{i n a} \geq n_{i , l , f}^{r e m a i n} - M_tilde \left(1 - u_{i , k , f}\right) \tag{eq\_0055\_c} \\
+  & n_{i , l , f}^{i n a} \geq n_{i , l , f}^{w a i t} - M_tilde u_{i , k , f} \tag{eq\_0055\_d} \\
+  & \begin{matrix} & T \cdot D_{i , l , f}^{max} = \left(TD_hat\right)_{1 , l , f} + \left(i - 1\right) \cdot t_{max} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0056} \\
+  & \begin{matrix} & T \cdot D_{i , l , f}^{min} = \left(TD_hat\right)_{1 , l , f} + \left(i - 1\right) \cdot \frac{t_{min}}{2} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0057} \\
   & \begin{matrix} & T \cdot A_{i , l , f}^{max} = T \cdot D_{i , l , f}^{max} - \mathit{epsilon}_{l , f}^{min} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0058} \\
   & T \cdot A_{i , l , f}^{min} = T \cdot D_{i , l , f}^{min} - \mathit{epsilon}_{l , f}^{max} \tag{eq\_0059} \\
-  & \begin{matrix}\left(T \cdot A_{i^{'} , 1 , f}^{max} - \left(\hat{T \cdot D}\right)_{1 , z , f^{'}} < r_{t u r n}^{min}\right) \rightarrow \left(\mathit{alpha}_{i^{'} , f} = 0\right) , \forall i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0060} \\
-  & \begin{matrix}\left(\left(\hat{T \cdot D}\right)_{n , 1 , f} - \mathit{epsilon}_{1 , f}^{min} - T \cdot D_{i , z , f^{'}}^{min} < r_{t u r n}^{min}\right) \rightarrow \left(\mathit{beta}_{i , f} = 0\right) , \forall i \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0061} \\
-  & \begin{matrix} & \left(T \cdot A_{i^{'} , 1 , f}^{max} - T \cdot D_{i , z , f^{'}}^{min} < r_{t u r n}^{min}\right) \rightarrow \left(y_{i , i^{'} , f} = 0\right) , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0062} \\
-  & \begin{matrix} & \left(T \cdot A_{i^{'} , 1 , f}^{min} - T \cdot D_{i , z , f^{'}}^{max} > r_{t u r n}^{max}\right) \rightarrow \left(y_{i , i^{'} , f} = 0\right) , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0063} \\
-  & \begin{matrix} & \left(T \cdot D_{i , z , f}^{min} + t_{e n t e r} + t_{e x i t} - T \cdot A_{i^{'} , 1 , f^{'}}^{max} > 0\right) \rightarrow \left(\mathit{delta}_{i , i^{'} , f} = 0\right) , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0064} \\
-  & \begin{matrix} & \left(T \cdot D_{i , z , f}^{max} + t_{e n t e r} + t_{e x i t} - T \cdot A_{i^{'} , 1 , f^{'}}^{min} < 0\right) \rightarrow \left(\mathit{delta}_{i , i^{'} , f} = 1\right) , \forall i , i^{'} \in I , f , f^{'} \in G , f \neq f^{'} .\end{matrix} \tag{eq\_0065} \\
+  & \begin{matrix}\left(T \cdot A_{ip , 1 , f}^{max} - \left(TD_hat\right)_{1 , z , fp} < r_{t u r n}^{min}\right) \rightarrow \left(\mathit{alpha}_{ip , f} = 0\right) , \forall ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0060} \\
+  & \begin{matrix}\left(\left(TD_hat\right)_{n , 1 , f} - \mathit{epsilon}_{1 , f}^{min} - T \cdot D_{i , z , fp}^{min} < r_{t u r n}^{min}\right) \rightarrow \left(\mathit{beta}_{i , f} = 0\right) , \forall i \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0061} \\
+  & \begin{matrix} & \left(T \cdot A_{ip , 1 , f}^{max} - T \cdot D_{i , z , fp}^{min} < r_{t u r n}^{min}\right) \rightarrow \left(y_{i , ip , f} = 0\right) , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0062} \\
+  & \begin{matrix} & \left(T \cdot A_{ip , 1 , f}^{min} - T \cdot D_{i , z , fp}^{max} > r_{t u r n}^{max}\right) \rightarrow \left(y_{i , ip , f} = 0\right) , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0063} \\
+  & \begin{matrix} & \left(T \cdot D_{i , z , f}^{min} + t_{e n t e r} + t_{e x i t} - T \cdot A_{ip , 1 , fp}^{max} > 0\right) \rightarrow \left(\mathit{delta}_{i , ip , f} = 0\right) , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0064} \\
+  & \begin{matrix} & \left(T \cdot D_{i , z , f}^{max} + t_{e n t e r} + t_{e x i t} - T \cdot A_{ip , 1 , fp}^{min} < 0\right) \rightarrow \left(\mathit{delta}_{i , ip , f} = 1\right) , \forall i , ip \in I , f , fp \in G , f \neq fp .\end{matrix} \tag{eq\_0065} \\
 \end{align}

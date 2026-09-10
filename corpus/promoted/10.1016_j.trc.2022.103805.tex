@@ -58,8 +58,8 @@
 %@ con eq_0025 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
 \begin{align}
   & 0 < \left|\mathcal{X}_{\text{conflict}}\right| \leq \left|\mathcal{X}_{\text{plan}}\right| \leq \left|\mathcal{X}_{\text{pool}}\right| . \tag{eq\_0001} \\
-  \min\quad & \sum_{o d \in \mathcal{OD}} \sum_{s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\
-  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}} \sum_{r \in \mathcal{R}_{l}} x_{l , f , r} \left\{\begin{matrix} = 1 & \text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} , \\ \leq 1 & \text{otherwise} , \end{matrix}\right \forall l \in \mathcal{L} , \tag{eq\_0005} \\
+  \min\quad & \sum_{o d \in \mathcal{OD}, s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\
+  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}, r \in \mathcal{R}_{l}} x_{l , f , r} \left\{\begin{matrix} = 1 & \text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} , \\ \leq 1 & \text{otherwise} , \end{matrix}\right \forall l \in \mathcal{L} , \tag{eq\_0005} \\
   & \sum_{s \in \mathit{delta}^{-} \left(v\right)} p_{s}^{o d} - \sum_{s \in \mathit{delta}^{+} \left(v\right)} p_{s}^{o d} = \left\{\begin{matrix} - \mathit{gamma}^{o d} & \text{if} v = o , \\ \mathit{gamma}^{o d} & \text{if} v = d , \\ 0 & \text{otherwise} , \end{matrix}\right \forall v \in \mathcal{V} , \forall o d \in \mathcal{OD} , \tag{eq\_0006} \\
   & \sum_{o d \in \mathcal{OD}} p_{s}^{o d} \leq \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot \left(\mathit{cap}\right)_{r} \cdot f , \forall i \in \mathcal{I} , \tag{eq\_0007} \\
   & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{pool}}}{\sum} x_{l , f , r} \cdot \left(\mathit{mix}\right)_{g , r} \cdot f \leq g_{\text{max}} , \forall g \in \mathcal{G} , \tag{eq\_0008} \\

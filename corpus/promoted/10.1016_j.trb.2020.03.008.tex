@@ -82,26 +82,26 @@
   & \sum_{t \in T} x_{i j}^{t} \leq \mathit{CAP}_{i j} \left(1 - v_{i j}\right) \forall \left(i , j\right) \in A^{t} \tag{eq\_0011} \\
   & \sum_{\left(i , j\right) \in A} v_{i j} \leq n \tag{eq\_0012} \\
   & x_{i j}^{t} , o_{i}^{t} , d_{i}^{t} , v_{i j} \in \left\{0 , 1\right\} \forall t \in T , n \in N^{t} \tag{eq\_0013} \\
-  & T_{{D} , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{{A} , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0014} \\
-  & T_{{D} , i}^{t} + \mathit{tau}_{i j}^{t} x_{i j}^{t} \leq T_{{A} , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0015} \\
-  & T_{{D} , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0016} \\
-  & T_{{D} , i}^{t} - T_{{A} , i}^{t} \geq t_{i}^{t} - M \cdot \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0017} \\
-  & T_{{D} , i}^{t} - T_{{A} , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
-  & T_{{D} , i}^{t} \geq T_{{D} , i}^{m} + h_{i j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0019} \\
-  & T_{{A} , i} , T_{{D} , i} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0020} \\
+  & T_{D_tilde , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{A_tilde , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0014} \\
+  & T_{D_tilde , i}^{t} + \mathit{tau}_{i j}^{t} x_{i j}^{t} \leq T_{A_tilde , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0015} \\
+  & T_{D_tilde , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0016} \\
+  & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} - M \cdot \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0017} \\
+  & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
+  & T_{D_tilde , i}^{t} \geq T_{D_tilde , i}^{m} + h_{i j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0019} \\
+  & T_{A_tilde , i} , T_{D_tilde , i} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0020} \\
   & \sum_{p \in P^{k}} y_{p}^{k} + z_{k} \geq 1 \forall k \in K \tag{eq\_0021} \\
   & z_{k} \leq 1 - y_{p}^{k} \forall k \in K , p \in P^{k} \tag{eq\_0022} \\
   & y_{p}^{k} \geq 1 - \sum_{\left(i , j\right) \in A^{p}} v_{i j} \forall k \in K , p \in P^{k} \tag{eq\_0023} \\
-  & \sum_{k \in K} \sum_{p \in P^{k}} \mathit{delta}_{i , j}^{p} y_{p}^{k} \leq \sum_{t \in T} M \cdot x_{i j}^{t} \left(i , j\right) \in A \tag{eq\_0024} \\
+  & \sum_{k \in K, p \in P^{k}} \mathit{delta}_{i , j}^{p} y_{p}^{k} \leq \sum_{t \in T} M \cdot x_{i j}^{t} \left(i , j\right) \in A \tag{eq\_0024} \\
   & \sum_{p \in P^{k}} f_{p}^{k} \leq \left(1 - z_{k}\right) \forall k \in K \tag{eq\_0025} \\
-  & \sum_{k \in K} \sum_{p \in P^{k}} \mathit{delta}_{i , j}^{p} d_{k} f_{p}^{k} \leq \sum_{t \in T} s^{t} \cdot x_{i j}^{t} \forall \left(i , j\right) \in A \tag{eq\_0026} \\
+  & \sum_{k \in K, p \in P^{k}} \mathit{delta}_{i , j}^{p} d_{k} f_{p}^{k} \leq \sum_{t \in T} s^{t} \cdot x_{i j}^{t} \forall \left(i , j\right) \in A \tag{eq\_0026} \\
   & z_{k} , y_{p}^{k} = \left\{0 , 1\right\} \forall k \in K , p \in P^{k} \tag{eq\_0027} \\
   & f_{p}^{k} = \left[0 , 1\right] \forall k \in K , p \in P^{k} \tag{eq\_0028} \\
   & C_{z}^{k} = c_{k} \cdot d_{k} \tag{eq\_0029} \\
   & C_{f}^{p , k} = \frac{1}{c_{p}^{k}} d_{k} \tag{eq\_0031} \\
   & C_{x}^{i , j , t} = c_{t} t_{i j}^{t} \tag{eq\_0032} \\
   & C_{c}^{t} = u \cdot c_{s c h e d}^{t} \tag{eq\_0033} \\
-  \max\quad & \mathit{lambda} \sum_{k \in K} C_{z}^{k} \cdot z_{k} - \left(1 - \mathit{lambda}\right) \sum_{k \in K} \sum_{p \in P^{k}} C_{y}^{p , k} \cdot y_{p}^{k} + \mathit{omega} \left[\sum_{k \in K} \sum_{p \in P^{k}} C_{f}^{p , k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}} \sum_{i \in N} \sum_{j \in N} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} C_{c}^{t} \cdot d_{N \left(O_{t}\right)}\right] \tag{eq\_0034} \\
+  \max\quad & \mathit{lambda} \sum_{k \in K} C_{z}^{k} \cdot z_{k} - \left(1 - \mathit{lambda}\right) \sum_{k \in K, p \in P^{k}} C_{y}^{p , k} \cdot y_{p}^{k} + \mathit{omega} \left[\sum_{k \in K, p \in P^{k}} C_{f}^{p , k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, i \in N, j \in N} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} C_{c}^{t} \cdot d_{N \left(O_{t}\right)}\right] \tag{eq\_0034} \\
   & z_{k} , y_{p}^{k} \in \left[0 , 1\right] \forall k \in K , p \in \bar{P^{k}} , t \in T , \left(i , j\right) \in A \tag{eq\_0035} \\
   & \sum_{\left(i , j\right) \in A} \mathit{delta}_{i , j}^{p} \mathit{pi}_{i j} + \mathit{sigma}_{k} - \frac{\mathit{omega}}{c_{p}^{k}} \cdot d_{k} \geq 0 \forall k \in K \tag{eq\_0036} \\
 \end{align}

@@ -40,18 +40,18 @@
 %@ con eq_0015 kind=linear :: Bounds on maximum connection time derived from constraints (12)-(14) (Eq. 15).
 %@ con eq_0016 kind=linear :: Upper bound on maximum connection time by M0 (Eq. 16).
 \begin{align}
-  & \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(\bar{t}\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k - 1} \left(\hat{t}\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L , \text{and} \tag{eq\_0001} \\
-  & \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(\bar{t}\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k} \left(\hat{t}\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L . \tag{eq\_0002} \\
-  & t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) = \mathit{Dep}_{k}^{l^{'}} \left(t_{l^{'}}^{R}\right) - \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) - \mathit{Tra}_{k}^{l l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L , \tag{eq\_0003} \\
-  \min\quad & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} \left[p_{l l^{'}}^{k} \cdot w_{l l^{'}}^{k} \left(t_{l}^{R} , t_{l^{'}}^{R}\right)\right] \tag{eq\_0006} \\
-  & w_{l l^{'}}^{k} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) = t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) - y_{l l^{'}}^{k} \cdot H_{l^{'}} + \left(1 - x_{l l^{'}}^{k}\right) \cdot M \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0007} \\
-  & M \cdot \left(x_{l l^{'}}^{k} - 1\right) \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq M \cdot x_{l l^{'}}^{k} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0008} \\
-  & \left[t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) / H_{l^{'}}\right] - 1 \leq y_{l l^{'}}^{k} \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) / H_{l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0009} \\
-  & x_{l l^{'}}^{k} \in \left\{0 , 1\right\} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0010} \\
-  & y_{l l^{'}}^{k} \in \mathcal{Z}^{+} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0011} \\
+  & \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(t_bar\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k - 1} \left(t_hat\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L , \text{and} \tag{eq\_0001} \\
+  & \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(t_bar\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k} \left(t_hat\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L . \tag{eq\_0002} \\
+  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) = \mathit{Dep}_{k}^{lp} \left(t_{lp}^{R}\right) - \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) - \mathit{Tra}_{k}^{l lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L , \tag{eq\_0003} \\
+  \min\quad & \sum_{\forall l \in L, \forall lp \in L, k \in S \left(l\right) \cap S \left(lp\right)} \left[p_{l lp}^{k} \cdot w_{l lp}^{k} \left(t_{l}^{R} , t_{lp}^{R}\right)\right] \tag{eq\_0006} \\
+  & w_{l lp}^{k} \left(t_{l}^{R} , t_{lp}^{R}\right) = t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) - y_{l lp}^{k} \cdot H_{lp} + \left(1 - x_{l lp}^{k}\right) \cdot M \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0007} \\
+  & M \cdot \left(x_{l lp}^{k} - 1\right) \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M \cdot x_{l lp}^{k} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0008} \\
+  & \left[t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp}\right] - 1 \leq y_{l lp}^{k} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0009} \\
+  & x_{l lp}^{k} \in \left\{0 , 1\right\} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0010} \\
+  & y_{l lp}^{k} \in \mathcal{Z}^{+} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0011} \\
   & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Dep}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0012} \\
   & \mathit{Arr}_{min}^{l} \leq \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Arr}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0013} \\
   & T_{l}^{min} \leq t_{l}^{R} \leq T_{l}^{max} \forall l \in L \tag{eq\_0014} \\
-  & \mathit{Dep}_{min}^{l^{'}} - \mathit{Arr}_{max}^{l} - \mathit{Tra}_{k}^{l l^{'}} \leq t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq \mathit{Dep}_{max}^{l^{'}} - \mathit{Arr}_{min}^{l} - \mathit{Tra}_{k}^{l l^{'}} , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l \in L \tag{eq\_0015} \\
-  & t_{k l l^{'}}^{R} \left(t_{l}^{R} , t_{l^{'}}^{R}\right) \leq M_{0} , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l \in L \tag{eq\_0016} \\
+  & \mathit{Dep}_{min}^{lp} - \mathit{Arr}_{max}^{l} - \mathit{Tra}_{k}^{l lp} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq \mathit{Dep}_{max}^{lp} - \mathit{Arr}_{min}^{l} - \mathit{Tra}_{k}^{l lp} , \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l \in L \tag{eq\_0015} \\
+  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M_{0} , \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l \in L \tag{eq\_0016} \\
 \end{align}

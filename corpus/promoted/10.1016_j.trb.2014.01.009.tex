@@ -52,15 +52,15 @@
   & t_{k} \geq t_{h} + f_{\mathit{hk}} - M \left(1 - x_{\mathit{jk}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0004} \\
   & t_{j} \geq t_{i} + f_{\mathit{ij}} - \mathit{Mx}_{\mathit{jk}} \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0005} \\
   & subject to \sum_{c \in C} x_{r , c} = 1 r \in R \tag{eq\_0007} \\
-  & x_{r , c} = \sum_{c^{'} \in C} z_{r , c , c^{'}} r \in \mathcal{R} , c \in C \tag{eq\_0008} \\
-  & x_{r^{'} , c^{'}} = \sum_{c \in C} z_{r , c , c^{'}} \left(r , r^{'}\right) \in \mathcal{R} , c^{'} \in C \tag{eq\_0009} \\
-  & I_{s , m}^{0} + \sum_{r^{'} \in R_{s , r}} \sum_{c \in C} a_{s , r^{'} , c , m} \cdot x_{r^{'} , c} \geq 0 \cdot s \in S , r \in R , m \in M \tag{eq\_0010} \\
-  & I_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} a_{s , r , c , m} \cdot x_{r , c} = i_{s , m}^{\infty} s \in S , m \in M \tag{eq\_0011} \\
+  & x_{r , c} = \sum_{cp \in C} z_{r , c , cp} r \in \mathcal{R} , c \in C \tag{eq\_0008} \\
+  & x_{rp , cp} = \sum_{c \in C} z_{r , c , cp} \left(r , rp\right) \in \mathcal{R} , cp \in C \tag{eq\_0009} \\
+  & I_{s , m}^{0} + \sum_{rp \in R_{s , r}, c \in C} a_{s , rp , c , m} \cdot x_{rp , c} \geq 0 \cdot s \in S , r \in R , m \in M \tag{eq\_0010} \\
+  & I_{s , m}^{0} + \sum_{r \in R, c \in C} a_{s , r , c , m} \cdot x_{r , c} = i_{s , m}^{\infty} s \in S , m \in M \tag{eq\_0011} \\
   & i_{s , m}^{\infty} = I_{s , m}^{\infty} + d_{s , m}^{+} - d_{s , m}^{-} \cdot s \in S , m \in M \tag{eq\_0012} \\
   & x_{r , c} = x_{r , c}^{0} r \in R_{\mathit{tau}} , c \in C \tag{eq\_0013} \\
   & x_{r , c} \in \left\{0 , 1\right\} r \in R , c \in C \tag{eq\_0014} \\
-  \min\quad & \sum_{j \in D} \sum_{k \in K_{j}} c_{j}^{k} x_{j}^{k} + \sum_{i \in T} f_{i} \cdot y_{i} \tag{eq\_0015} \\
-  & subject to \sum_{j \in D} \sum_{k \in K_{j}} a_{\mathit{ij}}^{k} \cdot x_{j}^{k} + y_{i} \geq 1 , \forall i \in T \tag{eq\_0016} \\
+  \min\quad & \sum_{j \in D, k \in K_{j}} c_{j}^{k} x_{j}^{k} + \sum_{i \in T} f_{i} \cdot y_{i} \tag{eq\_0015} \\
+  & subject to \sum_{j \in D, k \in K_{j}} a_{\mathit{ij}}^{k} \cdot x_{j}^{k} + y_{i} \geq 1 , \forall i \in T \tag{eq\_0016} \\
   & \sum_{k \in K_{j}} x_{j}^{k} = 1 \forall j \in D \tag{eq\_0017} \\
   & x_{j}^{k} \in \left\{0 , 1\right\} \forall j \in D \forall k \in K_{j} \tag{eq\_0018} \\
   & y_{i} \in \left\{0 , 1\right\} \forall i \in T \tag{eq\_0019} \\

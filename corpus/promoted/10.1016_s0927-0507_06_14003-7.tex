@@ -37,7 +37,7 @@
 %@ con eq_0015 kind=linear domain=- indicator=- :: Direct connection variables y_p are binary
 %@ con eq_0023 kind=linear domain=- indicator=- :: Linearized modulo constraint relating event times, bounds and binary q_ef
 \begin{align}
-  \max\quad & w_{1} \sum_{l \in L} \sum_{p \in P} d_{l p} - w_{2} \sum_{i \in I} k_{i} \cdot x_{i} \tag{eq\_0002} \\
+  \max\quad & w_{1} \sum_{l \in L, p \in P} d_{l p} - w_{2} \sum_{i \in I} k_{i} \cdot x_{i} \tag{eq\_0002} \\
   & \text{subject to} \sum_{i \in I : l_{i} = l} x_{i} \leq 1 , l \in L , \tag{eq\_0003} \\
   & \underset{i \in I : e \in E_{l_{i}}}{\sum} f_{i} \cdot c_{i} \cdot x_{i} \geq d_{e} , e \in E , \tag{eq\_0004} \\
   & \sum_{p \in P : e \in E_{p}} d_{l p} \leq \sum_{i \in I : l_{i} = l} f_{i} \cdot c_{i} \cdot x_{i} , l \in L , e \in E_{l} , \tag{eq\_0005} \\
@@ -46,7 +46,7 @@
   & d_{l p} \geq 0 , l \in L , p \in P . \tag{eq\_0008} \\
   & y_{p} \leq \underset{i \in I : E_{p} \subset E_{l_{i}}}{\sum} x_{i} , p \in P , \tag{eq\_0011} \\
   & \sum_{i \in I : l_{i} = l} x_{i} \leq y_{p} , p \in P , l \in L , E_{p} \subset E_{l} , \tag{eq\_0012} \\
-  & \underset{p^{'} \in P : E_{p} \subset E_{p^{'}}}{\sum} d_{p^{'}} \cdot y_{p^{'}} \leq \underset{i \in I : E_{p} \subset E_{l_{i}}}{\sum} f_{i} \cdot c_{i} \cdot x_{i} , p \in P , \tag{eq\_0013} \\
+  & \underset{pp \in P : E_{p} \subset E_{pp}}{\sum} d_{pp} \cdot y_{pp} \leq \underset{i \in I : E_{p} \subset E_{l_{i}}}{\sum} f_{i} \cdot c_{i} \cdot x_{i} , p \in P , \tag{eq\_0013} \\
   & y_{p} \in \left\{0 , 1\right\} , p \in P . \tag{eq\_0015} \\
   & l_{e f} \leq v_{e} - v_{f} + \mathcal{T} q_{e f} \leq u_{e f} . \tag{eq\_0023} \\
 \end{align}

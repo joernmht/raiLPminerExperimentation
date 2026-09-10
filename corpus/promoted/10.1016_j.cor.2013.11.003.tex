@@ -48,11 +48,11 @@
 %@ con eq_0023 kind=linear domain=- indicator=- :: LF3: upper bound on departure time from station i+1
 %@ con eq_0024 kind=linear domain=- indicator=- :: LF3: lower bound on departure time from station i+1
 \begin{align}
-  \min\quad & \mathit{delta} \sum_{i \in \mathcal{S} â§¹ \left\{n\right\}} \sum_{t \in \mathcal{T} â§¹ \left\{p\right\}} f_{i}^{t} \tag{eq\_0001} \\
+  \min\quad & \mathit{delta} \sum_{i \in \mathcal{S} â§¹ \left\{n\right\}, t \in \mathcal{T} â§¹ \left\{p\right\}} f_{i}^{t} \tag{eq\_0001} \\
   & f_{i}^{t} = f_{i}^{t - 1} + \sum_{j \in \mathcal{S} , j > i} d_{\mathit{ij}}^{t} - u_{i}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , t \in \mathcal{T} \tag{eq\_0002} \\
   & u_{i}^{t} \leq \sum_{k \in \mathcal{M}} x_{\mathit{ki}}^{t} \sum_{t ' = 0}^{t} \sum_{j \in \mathcal{S} , j > i} d_{\mathit{ij}}^{t '} , i \in \mathcal{S} â§¹ \left\{n\right\} , t \in \mathcal{T} \tag{eq\_0003} \\
   & x_{\mathit{ki}}^{t} \leq \sum_{t ' = 0}^{t} x_{k - 1 , i}^{t '} i \in \mathcal{S} , k \in \mathcal{M} â§¹ \left\{1\right\} , t \in \mathcal{T} \tag{eq\_0004} \\
-  & \sum_{t \in \mathcal{T}} \sum_{k \in \mathcal{M}} x_{k 1}^{t} \leq m \tag{eq\_0005} \\
+  & \sum_{t \in \mathcal{T}, k \in \mathcal{M}} x_{k 1}^{t} \leq m \tag{eq\_0005} \\
   & \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq 1 , i \in \mathcal{S} , k \in \mathcal{M} \tag{eq\_0006} \\
   & \sum_{t \in \mathcal{T}} \mathit{tx}_{k , i + 1}^{t} = \sum_{t \in \mathcal{T}} \mathit{tx}_{\mathit{ki}}^{t} + s_{i}^{k} \cdot l_{i , i + 1} + w_{i + 1}^{k} , i \in \mathcal{S} â§¹ \left\{n\right\} , k \in \mathcal{M} \tag{eq\_0007} \\
   & w_{\mathit{min}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} \leq w_{i}^{k} \leq w_{\mathit{max}} \sum_{t \in \mathcal{T}} x_{\mathit{ki}}^{t} , i \in \mathcal{S} , k \in \mathcal{M} â§¹ \left\{m\right\} \tag{eq\_0008} \\

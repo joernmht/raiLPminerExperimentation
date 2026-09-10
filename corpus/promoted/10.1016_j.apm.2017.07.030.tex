@@ -66,17 +66,17 @@
   & x_{k}^{e n d} = e_{k}^{s t a t i c} , \forall k \in E : e_{k}^{s t a t i c} > 0 \tag{eq\_0007} \\
   & x_{k}^{e n d} - \mathit{Buff}_{k} \cdot h_{k} - e_{k}^{\text{nominal}} \leq z_{k} , \forall k \in E \tag{eq\_0008} \\
   & \sum_{t c \in P_{j}} q_{k , j , t c} = 1 , \forall k \in L_{j} , j \in B \tag{eq\_0009} \\
-  & q_{k , j , t c} + q_{\hat{k} , j , t c} - 1 \leq \mathit{lambda}_{k , \hat{k}} + \mathit{gamma}_{k , \hat{k}} , \forall k , \hat{k} \in L_{j} , t c \in P_{j} , j \in B ; k < \hat{k} \tag{eq\_0010} \\
-  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{gamma}_{k , \hat{k}} - M \left(1 - \mathit{gamma}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} \neq o_{k} \tag{eq\_0011} \\
-  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{gamma}_{k , \hat{k}} - M \left(1 - \mathit{gamma}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} = o_{k} \tag{eq\_0012} \\
-  & x_{k}^{b e g i n} - x_{\hat{k}}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{lambda}_{k , \hat{k}} - M \left(1 - \mathit{lambda}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} \neq o_{k} \tag{eq\_0013} \\
-  & x_{k}^{b e g i n} - x_{\hat{k}}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{lambda}_{k , \hat{k}} - M \left(1 - \mathit{lambda}_{k , \hat{k}}\right) , \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} , o_{\hat{k}} = o_{k} \tag{eq\_0014} \\
-  & \mathit{lambda}_{k , \hat{k}} + \mathit{gamma}_{k , \hat{k}} \leq 1 \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} \tag{eq\_0015} \\
+  & q_{k , j , t c} + q_{k_hat , j , t c} - 1 \leq \mathit{lambda}_{k , k_hat} + \mathit{gamma}_{k , k_hat} , \forall k , k_hat \in L_{j} , t c \in P_{j} , j \in B ; k < k_hat \tag{eq\_0010} \\
+  & x_{k_hat}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{gamma}_{k , k_hat} - M \left(1 - \mathit{gamma}_{k , k_hat}\right) , \forall k , k_hat \in L_{j} , j \in B ; k < k_hat , o_{k_hat} \neq o_{k} \tag{eq\_0011} \\
+  & x_{k_hat}^{b e g i n} - x_{k}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{gamma}_{k , k_hat} - M \left(1 - \mathit{gamma}_{k , k_hat}\right) , \forall k , k_hat \in L_{j} , j \in B ; k < k_hat , o_{k_hat} = o_{k} \tag{eq\_0012} \\
+  & x_{k}^{b e g i n} - x_{k_hat}^{e n d} \geq \mathit{Delta}_{j}^{M} \mathit{lambda}_{k , k_hat} - M \left(1 - \mathit{lambda}_{k , k_hat}\right) , \forall k , k_hat \in L_{j} , j \in B ; k < k_hat , o_{k_hat} \neq o_{k} \tag{eq\_0013} \\
+  & x_{k}^{b e g i n} - x_{k_hat}^{e n d} \geq \mathit{Delta}_{j}^{F} \mathit{lambda}_{k , k_hat} - M \left(1 - \mathit{lambda}_{k , k_hat}\right) , \forall k , k_hat \in L_{j} , j \in B ; k < k_hat , o_{k_hat} = o_{k} \tag{eq\_0014} \\
+  & \mathit{lambda}_{k , k_hat} + \mathit{gamma}_{k , k_hat} \leq 1 \forall k , k_hat \in L_{j} , j \in B ; k < k_hat \tag{eq\_0015} \\
   & g_{i}^{t r a i n} \cdot q_{k , j , t c} \leq g_{j , t c}^{t r a c k} \forall k \in \left(K_{i} \cap L_{j}\right) , t c \in P_{j} , j \in B , i \in T \tag{eq\_0016} \\
   & z_{k} + \mathit{Buff}_{k} \cdot h_{k} - w_{k} \leq M \mathit{varepsilon}_{k} \forall k \in E \tag{eq\_0017} \\
-  & x_{\hat{k}}^{b e g i n} - x_{k}^{e n d} \geq g_{k , \hat{k}}^{c o n n e c t i o n} \forall k , \hat{k} \in E ; k , \hat{k} \in E^{c o n n e c t i o n} \tag{eq\_0018} \\
+  & x_{k_hat}^{b e g i n} - x_{k}^{e n d} \geq g_{k , k_hat}^{c o n n e c t i o n} \forall k , k_hat \in E ; k , k_hat \in E^{c o n n e c t i o n} \tag{eq\_0018} \\
   & x_{k}^{b e g i n} , x_{k}^{e n d} , z_{k} \geq 0 \forall k \in E \tag{eq\_0019} \\
-  & \mathit{gamma}_{k , \hat{k}} , \mathit{lambda}_{k , \hat{k}} \in \left\{0 , 1\right\} \forall k , \hat{k} \in L_{j} , j \in B ; k < \hat{k} \tag{eq\_0020} \\
+  & \mathit{gamma}_{k , k_hat} , \mathit{lambda}_{k , k_hat} \in \left\{0 , 1\right\} \forall k , k_hat \in L_{j} , j \in B ; k < k_hat \tag{eq\_0020} \\
   & q_{k , j , t c} \in \left\{0 , 1\right\} \forall k \in L_{j} , t c \in P_{j} , j \in B \tag{eq\_0021} \\
   & \mathit{varepsilon}_{k} \in \left\{0 , 1\right\} \forall k \in E \tag{eq\_0022} \\
   & \mathit{Buff}_{k} \in \left[0 , \mathit{Buff}_{max}\right] \forall k \in E \tag{eq\_0023} \\

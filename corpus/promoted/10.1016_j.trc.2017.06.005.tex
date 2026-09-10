@@ -48,30 +48,30 @@
 %@ con eq_0037 kind=linear domain=- indicator=- :: Appendix constraint for constructing the remaining station set S_i
 %@ con eq_0039 kind=linear domain=- indicator=- :: Appendix auxiliary constraint for the automatic rescheduling strategy
 \begin{align}
-  f^{\quad & \cdot } = min f = min \sum_{i \in \mathbf{N} , k \in \mathbf{K}} \left|a_{i , k} - {a}_{i , k}\right| + \left|d_{i , k} - {d}_{i , k}\right| . \tag{eq\_0001} \\
+  f^{*}\quad & = min f = min \sum_{i \in \mathbf{N} , k \in \mathbf{K}} \left|a_{i , k} - a_tilde_{i , k}\right| + \left|d_{i , k} - d_tilde_{i , k}\right| . \tag{eq\_0001} \\
   & a_{i , k} - d_{i , k - 1} \geq \mathit{Rt}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0003} \\
   & d_{i , k} - a_{i , k} \geq \mathit{Dt}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0004} \\
-  & a_{i , k} \geq {a}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0005} \\
-  & d_{i , k} \geq {d}_{i , k} , i = 1 , 2 , \ldots , N , k = 0 , 1 , \ldots , K - 1 \tag{eq\_0006} \\
+  & a_{i , k} \geq a_tilde_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0005} \\
+  & d_{i , k} \geq d_tilde_{i , k} , i = 1 , 2 , \ldots , N , k = 0 , 1 , \ldots , K - 1 \tag{eq\_0006} \\
   & a_{i + 1 , k} - a_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 1 , 2 , \ldots , K \tag{eq\_0007} \\
   & d_{i + 1 , k} - d_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 0 , 1 , 2 , \ldots , K - 1 \tag{eq\_0008} \\
   & a_{i + 1 , k} - d_{i , k} \geq h_{s} , i = 1 , 2 , \ldots , N - 1 , k = 1 , 2 , \ldots , K - 1 \tag{eq\_0009} \\
-  & d_{i , k} = {d}_{i , k} + \mathit{delta} . \tag{eq\_0010} \\
-  & a_{i , k} = {a}_{i , k} + \mathit{delta} . \tag{eq\_0011} \\
-  & d_{i + 1 , k} \leq {d}_{i + 1 , k} . \tag{eq\_0012} \\
-  & d_{i+1,k} = \hat{d}_{i+1,k} \tag{eq\_0013\_a} \\
-  & a_{i+1,k+1} = \hat{a}_{i+1,k+1} , if \tilde{d}_{i,k+1} + \mathit{delta} \geq \hat{d}_{i+1,k} \tag{eq\_0013\_b} \\
-  & d_{i + 1 , k} \geq {d}_{i , k + 1} + \mathit{delta} , if {d}_{i , k + 1} + \mathit{delta} < {d}_{i + 1 , k} . \tag{eq\_0014} \\
-  & d_{i + 1 , k} = {d}_{i + 1 , k} , if {a}_{i , k + 1} + \mathit{delta} \geq {d}_{i + 1 , k} , \tag{eq\_0015} \\
-  & d_{i + 1 , k} \geq {a}_{i , k + 1} + \mathit{delta} , if {a}_{i , k + 1} + \mathit{delta} < {d}_{i + 1 , k} , \tag{eq\_0016} \\
-  & d_{i+2,k} = \hat{d}_{i+2,k} \tag{eq\_0017\_a} \\
-  & a_{i+2,k+1} = \hat{a}_{i+2,k+1} , if \tilde{d}_{i,k+1} + \mathit{delta} \geq \hat{d}_{i+2,k} \tag{eq\_0017\_b} \\
-  & d_{i + 2 , k} \geq {d}_{i , k + 1} + \mathit{delta} , if {d}_{i , k + 1} + \mathit{delta} < {d}_{i + 2 , k} , \tag{eq\_0018} \\
-  & d_{i + 2 , k} = {d}_{i + 2 , k} , if {a}_{i , k + 1} + \mathit{delta} \geq {d}_{i + 2 , k} , \tag{eq\_0019} \\
-  & d_{i + 2 , k} \geq {a}_{i , k + 1} + \mathit{delta} , if {a}_{i , k + 1} + \mathit{delta} < {d}_{i + 2 , k} . \tag{eq\_0020} \\
-  & d_{4,3} = \hat{d}_{4,3} , a_{4,4} = \hat{a}_{4,4} \tag{eq\_0023\_a} \\
-  & d_{5,2} = \hat{d}_{5,2} , a_{5,3} = \hat{a}_{5,3} \tag{eq\_0023\_b} \\
-  & \mathit{buf}_{i , k} = {a}_{i + 1 , k} - {d}_{i , k} - h_{s} , \tag{eq\_0036} \\
-  & \mathit{delta}_{m} \leq \sum_{i \leq i^{'} \leq j} \mathit{buf}_{i^{'} , k} , \tag{eq\_0037} \\
+  & d_{i , k} = d_tilde_{i , k} + \mathit{delta} . \tag{eq\_0010} \\
+  & a_{i , k} = a_tilde_{i , k} + \mathit{delta} . \tag{eq\_0011} \\
+  & d_{i + 1 , k} \leq d_hat_{i + 1 , k} . \tag{eq\_0012} \\
+  & d_{i+1,k} = d_hat_{i+1,k} \tag{eq\_0013\_a} \\
+  & a_{i+1,k+1} = a_hat_{i+1,k+1} , if d_tilde_{i,k+1} + \mathit{delta} \geq d_hat_{i+1,k} \tag{eq\_0013\_b} \\
+  & d_{i + 1 , k} \geq d_tilde_{i , k + 1} + \mathit{delta} , if d_tilde_{i , k + 1} + \mathit{delta} < d_hat_{i + 1 , k} . \tag{eq\_0014} \\
+  & d_{i + 1 , k} = d_hat_{i + 1 , k} , if a_tilde_{i , k + 1} + \mathit{delta} \geq d_hat_{i + 1 , k} , \tag{eq\_0015} \\
+  & d_{i + 1 , k} \geq a_tilde_{i , k + 1} + \mathit{delta} , if a_tilde_{i , k + 1} + \mathit{delta} < d_hat_{i + 1 , k} , \tag{eq\_0016} \\
+  & d_{i+2,k} = d_hat_{i+2,k} \tag{eq\_0017\_a} \\
+  & a_{i+2,k+1} = a_hat_{i+2,k+1} , if d_tilde_{i,k+1} + \mathit{delta} \geq d_hat_{i+2,k} \tag{eq\_0017\_b} \\
+  & d_{i + 2 , k} \geq d_tilde_{i , k + 1} + \mathit{delta} , if d_tilde_{i , k + 1} + \mathit{delta} < d_hat_{i + 2 , k} , \tag{eq\_0018} \\
+  & d_{i + 2 , k} = d_hat_{i + 2 , k} , if a_tilde_{i , k + 1} + \mathit{delta} \geq d_hat_{i + 2 , k} , \tag{eq\_0019} \\
+  & d_{i + 2 , k} \geq a_tilde_{i , k + 1} + \mathit{delta} , if a_tilde_{i , k + 1} + \mathit{delta} < d_hat_{i + 2 , k} . \tag{eq\_0020} \\
+  & d_{4,3} = d_hat_{4,3} , a_{4,4} = a_hat_{4,4} \tag{eq\_0023\_a} \\
+  & d_{5,2} = d_hat_{5,2} , a_{5,3} = a_hat_{5,3} \tag{eq\_0023\_b} \\
+  & \mathit{buf}_{i , k} = a_tilde_{i + 1 , k} - d_tilde_{i , k} - h_{s} , \tag{eq\_0036} \\
+  & \mathit{delta}_{m} \leq \sum_{i \leq ip \leq j} \mathit{buf}_{ip , k} , \tag{eq\_0037} \\
   & \mathit{delta}_{m} \leq \mathit{buf}_{i , k + 1} + \mathit{buf}_{i + 1 , k + 1} + \mathit{buf}_{i + 2 , k + 1} . \tag{eq\_0039} \\
 \end{align}

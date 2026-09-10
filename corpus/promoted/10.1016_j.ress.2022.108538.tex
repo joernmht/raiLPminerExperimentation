@@ -52,7 +52,7 @@
 %@ con eq_0024 kind=linear domain=- indicator=- :: Integrality of train routing, short-turn origin and destination variables
 %@ con eq_0025 kind=linear domain=- indicator=- :: Passenger path flow bounds between 0 and 1
 \begin{align}
-  \max\quad & \sum_{k \in K} \sum_{p \in P^{k}} 1 / c_{p}^{k} \cdot d_{k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}} \sum_{\left(i , j\right) \in A} c_{c a n c e l}^{t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} \sum_{\left(i , j\right) \in A} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T} \sum_{i \in N} c_{d e l a y}^{t} \cdot \left(T_{\bar{A} , i}^{t} - T_{A , i}^{t}\right) \tag{eq\_0002} \\
+  \max\quad & \sum_{k \in K, p \in P^{k}} 1 / c_{p}^{k} \cdot d_{k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} c_{c a n c e l}^{t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T, i \in N} c_{d e l a y}^{t} \cdot \left(T_{A_bar , i}^{t} - T_{A , i}^{t}\right) \tag{eq\_0002} \\
   & \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \left\{\begin{matrix} - o_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{a}\textrm{ }\text{starting}\textrm{ }\text{node} \\ d_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{an}\textrm{ }\text{ending}\textrm{ }\text{node} \\ 0 , \text{otherwise} \end{matrix}\right \forall t \in T , i \in N^{t} \tag{eq\_0004} \\
   & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0006} \\
   & o_{i}^{t} = 1 \forall t \in T , i = N \left(O_{t}\right) \tag{eq\_0007} \\
@@ -63,13 +63,13 @@
   & d_{i}^{t} \geq m_{i j} \forall t \in T^{S T} , j \in N^{t} , \left(i , j\right) \in A^{t} \tag{eq\_0012} \\
   & \sum_{i \in N^{t}} o_{i}^{t} \leq \sum_{\left(i , j\right) \in A^{t}} m_{i j} + 1 \forall t \in T^{R R} \cup T^{S T} \tag{eq\_0013} \\
   & \sum_{i \in N^{t}} d_{j}^{t} \leq \sum_{\left(i , j\right) \in A^{t}} m_{i j} + 1 \forall t \in T^{R R} \cup T^{S T} \tag{eq\_0014} \\
-  & T_{\bar{D} , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{\bar{A} , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0015} \\
-  & T_{\bar{D} , i}^{t} + \mathit{tau}_{i j}^{t} \cdot x_{i j}^{t} \leq T_{\bar{A} , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0016} \\
-  & T_{\bar{D} , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0017} \\
-  & T_{\bar{D} , i}^{t} - T_{\bar{A} , i}^{t} \geq t_{i}^{t} - M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0018} \\
-  & T_{\bar{D} , i}^{t} - T_{\bar{A} , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A \tag{eq\_0019} \\
-  & T_{\bar{D} , i}^{t} \geq T_{\bar{D} , i}^{m} + h_{i , j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0020} \\
-  & T_{\bar{A} , i}^{t} - T_{\bar{D} , i}^{t} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0021} \\
+  & T_{D_bar , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{A_bar , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0015} \\
+  & T_{D_bar , i}^{t} + \mathit{tau}_{i j}^{t} \cdot x_{i j}^{t} \leq T_{A_bar , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0016} \\
+  & T_{D_bar , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0017} \\
+  & T_{D_bar , i}^{t} - T_{A_bar , i}^{t} \geq t_{i}^{t} - M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0018} \\
+  & T_{D_bar , i}^{t} - T_{A_bar , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A \tag{eq\_0019} \\
+  & T_{D_bar , i}^{t} \geq T_{D_bar , i}^{m} + h_{i , j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0020} \\
+  & T_{A_bar , i}^{t} - T_{D_bar , i}^{t} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0021} \\
   & \sum_{p \in P^{k}} \mathit{delta}_{i j}^{p} \cdot d_{k} \cdot f_{p}^{k} \leq \sum_{t \in T} s^{t} \cdot x_{i j}^{t} \forall \left(i , j\right) \in A \tag{eq\_0022} \\
   & \sum_{p \in P^{k}} f_{p}^{k} \leq 1 \forall k \in K \tag{eq\_0023} \\
   & x_{i j}^{t} , o_{i}^{t} , d_{i}^{t} \in \left\{0 , 1\right\} \forall t \in T , n \in N^{t} \tag{eq\_0024} \\

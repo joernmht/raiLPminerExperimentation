@@ -66,14 +66,14 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: IP-PESP (18) integrality of cycle tensions z
 %@ con eq_0037 kind=linear domain=- indicator=- :: IP-PESP (19) integrality of arc tensions x
 \begin{align}
-  & min \underset{\genfrac{}{}{0pt}{}{r \in R}{i \in B_{r}}}{\sum} \left[\mathit{beta}_{r , i} \left|d_{r , i} - d_{r , i}^{ \cdot }\right|^{\mathit{phi}} + \mathit{alpha}_{r , i} \left|a_{r , i} - a_{r , i}^{ \cdot }\right|^{\mathit{phi}}\right] \tag{eq\_0001} \\
+  & min \underset{\genfrac{}{}{0pt}{}{r \in R}{i \in B_{r}}}{\sum} \left[\mathit{beta}_{r , i} \left|d_{r , i} - d_{r , i}^{*}\right|^{\mathit{phi}} + \mathit{alpha}_{r , i} \left|a_{r , i} - a_{r , i}^{*}\right|^{\mathit{phi}}\right] \tag{eq\_0001} \\
   & d_{r , i} \geq a_{r , i} \forall r \in R ; i \in B_{r} \tag{eq\_0002} \\
-  & I_{r , r^{'} , i , j} + F_{r , r^{'} , i , j} + G_{r , r^{'} , i , j} = 1 \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0004} \\
-  & a_{r , i} - d_{r , j} \geq s_{r , i , j} + \underset{\genfrac{}{}{0pt}{}{r^{'} \in R}{i , j \in B_{r} \cap B_{r^{'}}}}{\sum} f_{r , r^{'} , i , j} \cdot I_{r , r^{'} , i , j} \forall r \in R ; i , j \in B_{r} \tag{eq\_0005} \\
-  & d_{r , i} - a_{r^{'} , i} \geq M \left(F_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0006} \\
-  & d_{r^{'} , j} - a_{r , j} \geq M \left(G_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0007} \\
-  & a_{r^{'} , i} - d_{r , i} \geq M \left(I_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0008} \\
-  & a_{r , j} - d_{r^{'} , j} \geq M \left(I_{r , r^{'} , i , j} - 1\right) \forall r , r^{'} \in R ; i , j \in B_{r} \cap B_{r^{'}} \tag{eq\_0009} \\
+  & I_{r , rp , i , j} + F_{r , rp , i , j} + G_{r , rp , i , j} = 1 \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0004} \\
+  & a_{r , i} - d_{r , j} \geq s_{r , i , j} + \underset{\genfrac{}{}{0pt}{}{rp \in R}{i , j \in B_{r} \cap B_{rp}}}{\sum} f_{r , rp , i , j} \cdot I_{r , rp , i , j} \forall r \in R ; i , j \in B_{r} \tag{eq\_0005} \\
+  & d_{r , i} - a_{rp , i} \geq M \left(F_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0006} \\
+  & d_{rp , j} - a_{r , j} \geq M \left(G_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0007} \\
+  & a_{rp , i} - d_{r , i} \geq M \left(I_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0008} \\
+  & a_{r , j} - d_{rp , j} \geq M \left(I_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0009} \\
   & a , d \geq 0 \cdot I , F , G \in \left\{0 , 1\right\} . \tag{eq\_0010} \\
   & min \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , t\right) \in B^{r}}}{\sum} c_{i , t}^{r} \cdot x_{i , t}^{r} \tag{eq\_0011} \\
   & \sum_{\left(i , t\right) \in B^{r} \left|\right. i = o^{r}} x_{i , t}^{r} = 1 \forall r \in R \tag{eq\_0012} \\

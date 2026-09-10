@@ -74,10 +74,40 @@
   \min\quad & \mathit{omega} \tag{eq\_0002\_a} \\
   & \mathit{omega} = \sum_{k \in \mathcal{K}} t_{k,s_{k}^{e}} \tag{eq\_0002\_b} \\
   & t_{i,sp} = t_{i,s} + n_{i,s} \qquad \forall i \in \mathcal{K}, (s,sp) \in \mathcal{F}, s,sp \in \mathcal{S}_{i} \tag{eq\_0003} \\
+  & t_{i , s} \geq t_{j , s} + n_{j , s} + \mathit{delta} - \mathit{lambda}_{i j s} M , \forall i , j \in \mathcal{K} , i < j , s \in \mathcal{S}_{i} \cap \mathcal{S}_{j} \backslash \mathcal{Z} \tag{eq\_0004} \\
+  & t_{j , s} \geq t_{i , s} + n_{i , s} + \mathit{delta} - \left(1 - \mathit{lambda}_{i j s}\right) M , \forall i , j \in \mathcal{K} , i < j , s \in \mathcal{S}_{i} \cap \mathcal{S}_{j} \backslash \mathcal{Z} \tag{eq\_0006} \\
+  & t_{i , s} \geq t_{j , s} + h_{m i n} - \mathit{lambda}_{i j s} M , \forall i , j \in \mathcal{K} , i < j , s = s_{i}^{b} = s_{j}^{b} \tag{eq\_0007} \\
+  & t_{j , s} \geq t_{i , s} + h_{m i n} - \left(1 - \mathit{lambda}_{i j s}\right) M , \forall i , j \in \mathcal{K} , i < j , s = s_{i}^{b} = s_{j}^{b} \tag{eq\_0009} \\
+  & \sum_{j \in \mathcal{K}_{s} \backslash \left\{i\right\}} x_{i j} \mathit{xi}_{j} + \sum_{j \in \mathcal{K}_{s} \backslash \left\{i\right\}, jp \in \mathcal{K}_{s} \backslash \left\{i , j\right\}} x_{i j} \cdot x_{j jp} \mathit{xi}_{jp} = \sum_{j \in \mathcal{K}_{s} \backslash \left\{i\right\}} x_{i j} , \forall i \in \mathcal{K}_{s} \cap \mathcal{K}_{C} , s \in \mathcal{S}_{B} : s = s_{i}^{b} \tag{eq\_0011} \\
+  & \sum_{j \in \mathcal{K}_{s} \backslash \left\{i\right\}} x_{i j} \mathit{xi}_{j} + \sum_{j \in \mathcal{K}_{s} \backslash \left\{i\right\}, jp \in \mathcal{K}_{s} \backslash \left\{i , j\right\}} x_{i j} \cdot x_{j jp} \mathit{xi}_{jp} \leq 1 , \forall i \in \mathcal{K}_{s} \cap \mathcal{K}_{T} , s \in \mathcal{S}_{B} : s = s_{i}^{b} \tag{eq\_0013} \\
+  & t_{i , s} \leq t_{j , s} + h_{m a x} + \mathit{lambda}_{i j s} M + \left(1 - x_{j i}\right) M , \forall i , j \in \mathcal{K} , i < j , s \in \mathcal{S}_{B} : s_{i}^{b} = s_{j}^{b} \tag{eq\_0014} \\
+  & t_{j , s} \leq t_{i , s} + h_{m a x} + \left(1 - \mathit{lambda}_{i j s}\right) M + \left(1 - x_{i j}\right) M , \forall i , j \in \mathcal{K} , i < j , s \in \mathcal{S}_{B} : s_{i}^{b} = s_{j}^{b} \tag{eq\_0016} \\
   & \sum_{j \in \mathcal{K}_s \setminus \{i\}} x_{i,j} \le 1 \qquad \forall i \in \mathcal{K}_s, s \in \mathcal{S}_B : s = s_{i}^{b} \tag{eq\_0017} \\
   & \sum_{i \in \mathcal{K}_s \setminus \{j\}} x_{i,j} \le 1 \qquad \forall j \in \mathcal{K}_s, s \in \mathcal{S}_B : s = s_{j}^{b} \tag{eq\_0019} \\
   & \sum_{i \in \mathcal{K}_{s}, j \in \mathcal{K}_{s} \backslash \{i\}} x_{i,j} = N_{C}^{s} + N_{T}^{s} - 1 \qquad \forall s \in \mathcal{S}_{B} \tag{eq\_0020} \\
+  & x_{i j} \leq \mathit{lambda}_{i j s} . \forall i , j \in \mathcal{K}_{s} , i \neq j , s \in \mathcal{S}_{B} : s_{i}^{b} = s_{j}^{b} \tag{eq\_0021} \\
   & v_{k,s_k^b}^{in} = 0 \qquad \forall k \in \mathcal{K} \tag{eq\_0022} \\
   & v_{k,s_{k}^{e}}^{in} = 0 \qquad \forall k \in \mathcal{K} \tag{eq\_0024} \\
+  & 0 \leq v_{k , s}^{i n} \leq v_{s}^{l i m} , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0025} \\
+  & 0 \leq v_{k , s}^{c r u} \leq v_{s}^{l i m} , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0027} \\
+  & t_{k , s} \leq t_{k , s}^{b c} \leq t_{k , s}^{e c} \leq t_{k , sp} , \forall k \in \mathcal{K} , \left(s , sp\right) \in \mathcal{F} , s , sp \in \mathcal{S}_{k} \tag{eq\_0028} \\
+  & v_{k , s}^{c r u} = v_{k , s}^{i n} + a_{k , s} \left(t_{k , s}^{b c} - t_{k , s}\right) , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0029} \\
+  & v_{k , sp}^{i n} = v_{k , s}^{c r u} + b_{k , s} \left(t_{k , sp} - t_{k , s}^{e c}\right) , \forall k \in \mathcal{K} , \left(s , sp\right) \in \mathcal{F} , s , sp \in \mathcal{S}_{k} \tag{eq\_0031} \\
   & L_{s} = l_{k , s}^{i n} + l_{k , s}^{c r u} + l_{k , s}^{o u t} , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0032} \\
+  & l_{k , s}^{i n} = \frac{1}{2} \left(v_{k , s}^{i n} + v_{k , s}^{c r u}\right) \cdot \left(t_{k , s}^{b c} - t_{k , s}\right) , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0033} \\
+  & l_{k , s}^{c r u} = v_{k , s}^{c r u} \cdot \left(t_{k , s}^{e c} - t_{k , s}^{b c}\right) , \forall k \in \mathcal{K} , s \in \mathcal{S}_{k} \tag{eq\_0035} \\
+  & l_{k , s}^{o u t} = \frac{1}{2} \left(v_{k , s}^{c r u} + v_{k , sp}^{i n}\right) \cdot \left(t_{k , sp} - t_{k , s}^{e c}\right) . \forall k \in \mathcal{K} , \left(s , sp\right) \in \mathcal{F} , s , sp \in \mathcal{S}_{k} \tag{eq\_0036} \\
+  & t_{j , s} - t_{i , \hat{sp}} \leq t^{u l i m} \left(1 - {\mathit{theta}}_{i j sp s}\right) , \forall \mathcal{Q} \tag{eq\_0039} \\
+  & t_{j , s} - t_{i , \hat{sp}} \geq \mathit{varepsilon} + \left(- t^{n l i m} - \mathit{varepsilon}\right) {\mathit{theta}}_{i j sp s} , \forall \mathcal{Q} \tag{eq\_0041} \\
+  & t_{i , \hat{sp}} - t_{j , s_hat} \leq t^{p l i m} \left(1 - theta_hat_{i j sp s}\right) , \forall \mathcal{Q} \tag{eq\_0042} \\
+  & t_{i , \hat{sp}} - t_{j , s_hat} \geq \mathit{varepsilon} + \left(- t^{w l i m} - \mathit{varepsilon}\right) theta_hat_{i j sp s} , \forall \mathcal{Q} \tag{eq\_0043} \\
+  & \mathit{zeta}_{i j sp s} \geq {\mathit{theta}}_{i j sp s} + theta_hat_{i j sp s} + \mathit{lambda}_{i j sp} - 2 , \forall \mathcal{Q} \tag{eq\_0044} \\
+  & \mathit{zeta}_{i j sp s} \leq {\mathit{theta}}_{i j sp s} , \forall \mathcal{Q} \tag{eq\_0045} \\
+  & \mathit{zeta}_{i j sp s} \leq theta_hat_{i j sp s} , \forall \mathcal{Q} \tag{eq\_0046} \\
+  & \mathit{zeta}_{i j sp s} \leq \mathit{lambda}_{i j sp} . \forall \mathcal{Q} \tag{eq\_0047} \\
+  & t_{j , s_hat} - t_{i , \hat{sp}} \geq \frac{v_{j , s}^{m a x}}{b_{m a x}} + \mathit{delta} - \left(3 - \mathit{iota}_{\mathit{alpha} , j , s} - \mathit{iota}_{\mathit{beta} , j , s} - \mathit{zeta}_{i j sp s}\right) M , \forall \mathcal{Q} \tag{eq\_0048} \\
+  & t_{i , sp} \geq t_{j , sp} + n_{j , sp} + \mathit{delta} - \mathit{lambda}_{i j sp} M + \mathit{sigma}_{i j} , \tag{eq\_0058} \\
+  & t_{j , sp} \geq t_{i , sp} + n_{i , sp} + \mathit{delta} - \left(1 - \mathit{lambda}_{i j sp}\right) M + \mathit{sigma}_{i j} , \tag{eq\_0060} \\
+  & N^{C} = \sum_{s \in \mathcal{S}_{B}} N_{C}^{s} , \tag{eq\_0061} \\
+  & N^{T} = \sum_{s \in \mathcal{S}_{B}} N_{T}^{s} , \tag{eq\_0062} \\
 \end{align}

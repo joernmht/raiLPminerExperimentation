@@ -32,11 +32,11 @@
 \begin{align}
   \min\quad & F(X,Z) \tag{eq\_0002} \\
   & \text{subject to} \sum_{c \in C} X_{r , c} = 1 \forall r \in R \tag{eq\_0003} \\
-  & X_{r , c} = \sum_{c^{'} \in C} Z_{r , r^{'} , c , c^{'}} \forall \left(r , r^{'}\right) \in T , c \in C \tag{eq\_0004} \\
-  & X_{r^{'} , c^{'}} = \sum_{c \in C} Z_{r , r^{'} , c , c^{'}} \forall \left(r , r^{'}\right) \in T , c^{'} \in C \tag{eq\_0005} \\
-  & 0 \leq i_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} \mathit{alpha}_{r , s , t} \cdot n_{c , m} \cdot X_{r , c} \forall t , s \in S , m \in M \tag{eq\_0006} \\
-  & i_{s , m}^{\infty} = i_{s , m}^{0} + \sum_{r \in R} \sum_{c \in C} \mathit{alpha}_{r , s}^{\infty} \cdot n_{c , m} \cdot X_{r , c} \forall s \in S , m \in M \tag{eq\_0007} \\
+  & X_{r , c} = \sum_{cp \in C} Z_{r , rp , c , cp} \forall \left(r , rp\right) \in T , c \in C \tag{eq\_0004} \\
+  & X_{rp , cp} = \sum_{c \in C} Z_{r , rp , c , cp} \forall \left(r , rp\right) \in T , cp \in C \tag{eq\_0005} \\
+  & 0 \leq i_{s , m}^{0} + \sum_{r \in R, c \in C} \mathit{alpha}_{r , s , t} \cdot n_{c , m} \cdot X_{r , c} \forall t , s \in S , m \in M \tag{eq\_0006} \\
+  & i_{s , m}^{\infty} = i_{s , m}^{0} + \sum_{r \in R, c \in C} \mathit{alpha}_{r , s}^{\infty} \cdot n_{c , m} \cdot X_{r , c} \forall s \in S , m \in M \tag{eq\_0007} \\
   & D_{s , m} \geq i_{s , m}^{\infty} - I_{s , m}^{\infty} \forall s \in S , m \in M \tag{eq\_0008\_a} \\
   & D_{s , m} \geq I_{s , m}^{\infty} - i_{s , m}^{\infty} \forall s \in S , m \in M \tag{eq\_0008\_b} \\
-  & \sum_{r \in R} \sum_{c \in C} w_{r , c} \cdot X_{r , c} + \sum_{r , r^{'} \in T} \sum_{c , c^{'} \in C \cdot C} \mathit{gamma}_{r , r^{'} , c , c^{'}} Z_{r , r^{'} , c , c^{'}} + \mathit{beta} \cdot \sum_{s \in S} \sum_{m \in M} D_{s , m} \tag{eq\_0009} \\
+  & \sum_{r \in R, c \in C} w_{r , c} \cdot X_{r , c} + \sum_{r , rp \in T, c , cp \in C \cdot C} \mathit{gamma}_{r , rp , c , cp} Z_{r , rp , c , cp} + \mathit{beta} \cdot \sum_{s \in S, m \in M} D_{s , m} \tag{eq\_0009} \\
 \end{align}

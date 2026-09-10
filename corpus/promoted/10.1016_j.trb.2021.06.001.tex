@@ -31,14 +31,14 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Binary integrality of train arc variables x^k_uv
 %@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegativity of passenger flow variables y^r_uv
 \begin{align}
-  & \mathbf{P} : \text{Minimize} \sum_{k \in K} \sum_{u \rightarrow v \in A} \mathit{xi}^{k} \left(u , v\right) x_{u v}^{k} + \sum_{r \in R} \sum_{u \rightarrow v \in A} \mathit{zeta}^{r} \left(u , v\right) y_{u v}^{r} \tag{eq\_0009} \\
-  & \text{subject}\textrm{ }\text{to}\textrm{ }\textrm{ } \underset{\left\{v : {o} \rightarrow v \in A\right\}}{\sum} x_{{o} v}^{k} = 1 , \text{for}\textrm{ }\text{all}\textrm{ } k \in K \tag{eq\_0011} \\
-  & \underset{\left\{u : u \rightarrow {d} \in A\right\}}{\sum} x_{u {d}}^{k} = 1 , \text{for}\textrm{ }\text{all}\textrm{ } k \in K \tag{eq\_0012} \\
-  & \sum_{\left\{u : u \rightarrow v \in A\right\}} x_{u v}^{k} = \sum_{\left\{w : v \rightarrow w \in A\right\}} x_{v w}^{k} , \text{for}\textrm{ }\text{all}\textrm{ } k \in K ; v \in V \backslash \left\{{o} , {d}\right\} \tag{eq\_0013} \\
-  & \underset{\left\{v : {o} \rightarrow v \in A\right\}}{\sum} y_{{o} v}^{r} = z_{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R \tag{eq\_0014} \\
-  & \underset{\left\{u : u \rightarrow {d} \in A\right\}}{\sum} y_{u {d}}^{r} = z_{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R \tag{eq\_0015} \\
-  & \sum_{\left\{u : u \rightarrow v \in A\right\}} y_{u v}^{r} = \sum_{\left\{w : v \rightarrow w \in A\right\}} y_{v w}^{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R ; v \in V \backslash \left\{{o} , {d}\right\} \tag{eq\_0016} \\
-  & \sum_{k \in K} \sum_{u \rightarrow v \in C} x_{u v}^{k} \leq 1 , \text{for}\textrm{ }\text{all}\textrm{ } C \in \mathcal{C} \tag{eq\_0017} \\
+  & \mathbf{P} : \text{Minimize} \sum_{k \in K, u \rightarrow v \in A} \mathit{xi}^{k} \left(u , v\right) x_{u v}^{k} + \sum_{r \in R, u \rightarrow v \in A} \mathit{zeta}^{r} \left(u , v\right) y_{u v}^{r} \tag{eq\_0009} \\
+  & \text{subject}\textrm{ }\text{to}\textrm{ }\textrm{ } \underset{\left\{v : o_bar \rightarrow v \in A\right\}}{\sum} x_{o_bar v}^{k} = 1 , \text{for}\textrm{ }\text{all}\textrm{ } k \in K \tag{eq\_0011} \\
+  & \underset{\left\{u : u \rightarrow d_bar \in A\right\}}{\sum} x_{u d_bar}^{k} = 1 , \text{for}\textrm{ }\text{all}\textrm{ } k \in K \tag{eq\_0012} \\
+  & \sum_{\left\{u : u \rightarrow v \in A\right\}} x_{u v}^{k} = \sum_{\left\{w : v \rightarrow w \in A\right\}} x_{v w}^{k} , \text{for}\textrm{ }\text{all}\textrm{ } k \in K ; v \in V \backslash \left\{o_bar , d_bar\right\} \tag{eq\_0013} \\
+  & \underset{\left\{v : o_bar \rightarrow v \in A\right\}}{\sum} y_{o_bar v}^{r} = z_{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R \tag{eq\_0014} \\
+  & \underset{\left\{u : u \rightarrow d_bar \in A\right\}}{\sum} y_{u d_bar}^{r} = z_{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R \tag{eq\_0015} \\
+  & \sum_{\left\{u : u \rightarrow v \in A\right\}} y_{u v}^{r} = \sum_{\left\{w : v \rightarrow w \in A\right\}} y_{v w}^{r} , \text{for}\textrm{ }\text{all}\textrm{ } r \in R ; v \in V \backslash \left\{o_bar , d_bar\right\} \tag{eq\_0016} \\
+  & \sum_{k \in K, u \rightarrow v \in C} x_{u v}^{k} \leq 1 , \text{for}\textrm{ }\text{all}\textrm{ } C \in \mathcal{C} \tag{eq\_0017} \\
   & \sum_{r \in R} y_{u v}^{r} \leq \sum_{k \in K} \mathit{Gamma}_{k} x_{u v}^{k} , \text{for}\textrm{ }\text{all}\textrm{ } u \rightarrow v \in A_{d e p} \cup A_{t r v} \tag{eq\_0018} \\
   & x_{u v}^{k} \in \left\{0 , 1\right\} , \text{for}\textrm{ }\text{all}\textrm{ } k \in K ; u \rightarrow v \in A \tag{eq\_0019} \\
   & y_{u v}^{r} \geq 0 , \text{for}\textrm{ }\text{all}\textrm{ } r \in R ; u \rightarrow v \in A \tag{eq\_0020} \\

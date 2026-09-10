@@ -121,10 +121,10 @@
   & 2 \cdot \mathit{gamma}_{k , l , m} \leq \sum_{i \in \mathbf{S}_{M}^{\left(d\right)}} z_{k , i , m} + \sum_{i \in \mathbf{S}_{M}^{\left(u\right)}} z_{l , 2 N + 1 - m , i} , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} , \tag{eq\_0026} \\
   & a_{l , 2 N + 1 - m} - d_{k , m} \geq \mathit{delta}_{m}^{m i n} + M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} , \tag{eq\_0027} \\
   & a_{l , 2 N + 1 - m} - d_{k , m} \leq \mathit{delta}_{m}^{m a x} - M \cdot \left(\mathit{gamma}_{k , l , m} - 1\right) , \forall k \in \mathbf{K}^{\left(d\right)} , l \in \mathbf{K}^{\left(u\right)} , m \in \mathbf{S}_{M}^{\left(d\right)} . \tag{eq\_0028} \\
-  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}} \sum_{l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0029} \\
-  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}} \sum_{l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0030} \\
-  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}} \sum_{l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0031} \\
-  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}} \sum_{l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0032} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}, l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0029} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}, l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{l , k , m} + \mathit{alpha}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0030} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(u\right)}, l \in \mathbf{K}^{\left(d\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(u\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(u\right)} , \tag{eq\_0031} \\
+  & \sum_{m \in \mathbf{S}_{M}^{\left(d\right)}, l \in \mathbf{K}^{\left(u\right)}} \mathit{gamma}_{k , l , m} + \mathit{beta}_{k}^{\left(d\right)} = \mathit{tau}_{k} , \forall k \in \mathbf{K}^{\left(d\right)} . \tag{eq\_0032} \\
   & R \cdot S^{1} \geq \sum_{k \in \mathbf{K}^{\left(u\right)}} \mathit{alpha}_{k}^{\left(u\right)} . \tag{eq\_0033} \\
   & R \cdot S^{2} \geq \sum_{k \in \mathbf{K}^{\left(d\right)}} \mathit{alpha}_{k}^{\left(d\right)} . \tag{eq\_0034} \\
   & R \cdot S^{1} + R \cdot S^{2} \leq R \cdot S . \tag{eq\_0035} \\
@@ -144,7 +144,7 @@
   & \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} = 1 . \tag{eq\_0057} \\
   & d_{k , i} = \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} \cdot T_{r} + \mathit{mu}_{k , i}^{r} . \tag{eq\_0058} \\
   & \mathit{mu}_{k , i}^{r} \leq \left(\mathit{rho} - \mathit{epsilon}\right) \cdot \mathit{theta}_{k , i}^{r} . \tag{eq\_0059} \\
-  & Q_{k , i , j} = \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} \cdot \left(\sum_{r^{'} = 1}^{r - 1} P_{i , j} \left[r^{'}\right] \cdot \mathit{rho}\right) + \sum_{r = 1}^{R} \mathit{mu}_{k , i}^{r} \cdot P_{i , j} \left[r\right] . \tag{eq\_0060} \\
+  & Q_{k , i , j} = \sum_{r = 1}^{R} \mathit{theta}_{k , i}^{r} \cdot \left(\sum_{rp = 1}^{r - 1} P_{i , j} \left[rp\right] \cdot \mathit{rho}\right) + \sum_{r = 1}^{R} \mathit{mu}_{k , i}^{r} \cdot P_{i , j} \left[r\right] . \tag{eq\_0060} \\
   & 0 \leq w_{k , i , j}^{b} \leq w_{k , i , j} , \tag{eq\_0062} \\
   & w_{k , i , j}^{b} \leq M \cdot \mathit{lambda}_{k , i} , \tag{eq\_0063} \\
   & w_{k , i , j}^{b} \leq M \cdot \mathit{lambda}_{k , j} , \tag{eq\_0064} \\

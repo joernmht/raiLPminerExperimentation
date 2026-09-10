@@ -81,15 +81,15 @@
   & p \cdot w_{i} \left(k\right) = p \cdot w_{i - 1} \left(k\right) + x_{i} \left(k\right) b_{i} \left(k\right) - c_{i} \left(k\right) - p \cdot e_{i} \left(k\right) , \tag{eq\_0002} \\
   & p_{i} \left(k\right) = p_{i} \left(k - 1\right) + p \cdot e_{i} \left(k\right) - p \cdot s_{i} \left(k\right) , \tag{eq\_0003} \\
   & p \cdot s_{i} \left(k\right) = \mathit{gamma}_{i} \left(k\right) p_{i} \left(k - 1\right) , \tag{eq\_0004} \\
-  & \begin{matrix} & & \mathit{alpha}_{i^{'}} = \sum_{i \in I \text{and} i < i^{'}} \mathit{theta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0011} \\
-  & \begin{matrix} & & \mathit{beta}_{i} = \sum_{i^{'} \in I \text{and} i^{'} > i} \mathit{theta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0012} \\
-  & \mathit{alpha}_{i^{'}} + \mathit{beta}_{i} \leq 2 + M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0013\_a} \\
-  & \mathit{alpha}_{i^{'}} + \mathit{beta}_{i} \geq 2 - M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0013\_b} \\
-  & \sum_{i^{'}} x_{i^{'}} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \leq r_{1 , max}^{\text{turn}} + M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0014\_a} \\
-  & \sum_{i^{'}} x_{i^{'}} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \geq r_{1 , min}^{\text{turn}} - M \left(1 - \mathit{theta}_{i , i^{'}}\right) \tag{eq\_0014\_b} \\
+  & \begin{matrix} & & \mathit{alpha}_{ip} = \sum_{i \in I \text{and} i < ip} \mathit{theta}_{i , ip} ,\end{matrix} \tag{eq\_0011} \\
+  & \begin{matrix} & & \mathit{beta}_{i} = \sum_{ip \in I \text{and} ip > i} \mathit{theta}_{i , ip} ,\end{matrix} \tag{eq\_0012} \\
+  & \mathit{alpha}_{ip} + \mathit{beta}_{i} \leq 2 + M \left(1 - \mathit{theta}_{i , ip}\right) \tag{eq\_0013\_a} \\
+  & \mathit{alpha}_{ip} + \mathit{beta}_{i} \geq 2 - M \left(1 - \mathit{theta}_{i , ip}\right) \tag{eq\_0013\_b} \\
+  & \sum_{ip} x_{ip} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \leq r_{1 , max}^{\text{turn}} + M \left(1 - \mathit{theta}_{i , ip}\right) \tag{eq\_0014\_a} \\
+  & \sum_{ip} x_{ip} \left(1\right) - \left[\sum_{i} x_{i} \left(1\right) + \sum_{k = 1}^{2 K} s_{i} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{i} \left(k\right)\right] \geq r_{1 , min}^{\text{turn}} - M \left(1 - \mathit{theta}_{i , ip}\right) \tag{eq\_0014\_b} \\
   & \sum_{m = 1}^{i} \left(1 - \mathit{alpha}_{m}\right) - \sum_{m = 1}^{i - 1} \left(1 - \mathit{beta}_{m}\right) \mathit{lambda}_{m , i} \leq N_{\text{train}} , \tag{eq\_0016} \\
-  & T_{1}^{'} = \sum_{i^{'}} \sum_{i < i^{'}} \mathit{theta}_{i , i^{'}} , \tag{eq\_0017} \\
-  & T_{1} = - \sum_{i^{'}} \sum_{i < i^{'}} \mathit{theta}_{i , i^{'}} . \tag{eq\_0018} \\
+  & T_{1}^{'} = \sum_{ip, i < ip} \mathit{theta}_{i , ip} , \tag{eq\_0017} \\
+  & T_{1} = - \sum_{ip, i < ip} \mathit{theta}_{i , ip} . \tag{eq\_0018} \\
   & T_{2} = \sum_{i = 1}^{I} \sum_{k < 1}^{2 K} c_{i} \left(k\right) , \tag{eq\_0019} \\
   & T_{3} = \sum_{i = 1}^{I} \sum_{k < 1}^{2 K} p \cdot w_{i} \left(k\right) . \tag{eq\_0020} \\
   & J = \mathit{omega}_{1} \frac{T_{1} - T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \mathit{omega}_{2} \frac{T_{2} - T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \mathit{omega}_{3} \frac{T_{3} - T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} , \tag{eq\_0021} \\
@@ -116,10 +116,10 @@
   & z \geq f_{min} \mathit{delta} \tag{eq\_0036\_d} \\
   & z \leq f - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_e} \\
   & z \geq f - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_f} \\
-  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \leq {M} \left(1 - \mathit{lambda}_{m , i}\right) \tag{eq\_0037\_a} \\
-  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \geq \mathit{epsilon} + \left({m} - \mathit{epsilon}\right) \mathit{lambda}_{m , i} \tag{eq\_0037\_b} \\
-  & {M} = t_{\text{enter}} + t_{\text{exit}} \tag{eq\_0038\_a} \\
-  & {m} = t_{\text{enter}} + t_{\text{exit}} - \sum_{i} x_{i}^{max} \left(k\right) \tag{eq\_0038\_b} \\
+  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \leq M_tilde \left(1 - \mathit{lambda}_{m , i}\right) \tag{eq\_0037\_a} \\
+  & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \geq \mathit{epsilon} + \left(m_tilde - \mathit{epsilon}\right) \mathit{lambda}_{m , i} \tag{eq\_0037\_b} \\
+  & M_tilde = t_{\text{enter}} + t_{\text{exit}} \tag{eq\_0038\_a} \\
+  & m_tilde = t_{\text{enter}} + t_{\text{exit}} - \sum_{i} x_{i}^{max} \left(k\right) \tag{eq\_0038\_b} \\
   & - \mathit{beta}_{m} + \mathit{phi}_{m , i} \leq 0 \tag{eq\_0039\_a} \\
   & - \mathit{lambda}_{m , i} + \mathit{phi}_{m , i} \leq 0 \tag{eq\_0039\_b} \\
   & \mathit{beta}_{m} + \mathit{lambda}_{m , i} - \mathit{phi}_{m , i} \leq 1 \tag{eq\_0039\_c} \\

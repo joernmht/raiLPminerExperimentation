@@ -90,9 +90,9 @@
   & z_{i j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0015} \\
   & h_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq T - h_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0016} \\
   & r_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \mathit{theta} \cdot r_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \tag{eq\_0017} \\
-  & z_{i j} + z_{i^{'} j^{'}} + z_{i i^{'}} + z_{j j^{'}} = 2 \cdot c_{i i^{'} j j^{'}} \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0018} \\
-  & 0 \leq c_{i i^{'} j j^{'}} \leq 2 \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0019} \\
-  & c_{i i^{'} j j^{'}} \in \mathcal{N} \left(i , j\right) , \left(i^{'} , j^{'}\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , i^{'}\right) , \left(j , j^{'}\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0020} \\
+  & z_{i j} + z_{ip jp} + z_{i ip} + z_{j jp} = 2 \cdot c_{i ip j jp} \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0018} \\
+  & 0 \leq c_{i ip j jp} \leq 2 \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0019} \\
+  & c_{i ip j jp} \in \mathcal{N} \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0020} \\
   & \lfloor \frac{T}{f_{l}} \rfloor - \mathit{xi} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \lceil \frac{T}{f_{l}} \rceil + \mathit{xi} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , l \in L \tag{eq\_0021} \\
   & \mathit{pi}_{n} - \mathit{pi}_{m} + z_{m n} \cdot T = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \forall \left(m , n\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{k}^{l}\right) , \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , k \in \left[2 , N\right] , l \in L \tag{eq\_0022} \\
   & - \mathit{delta}_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T - \mathit{phi}_{i j} \leq \mathit{delta}_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0023} \\
@@ -102,8 +102,8 @@
   & \underset{\left(i , j\right) \in \mathbf{\mathcal{P}}_{l} , \left(i , j\right) \in \mathbf{\mathcal{A}}_{dwell}}{\sum} y_{i j} \leq O_{l}^{m a x} \forall l \in \mathbf{\mathcal{L}} \tag{eq\_0027} \\
   & u_{i j} = d_{i j} + \mathit{eta}_{i j} \cdot y_{i j} \tag{eq\_0028} \\
   & F \left(s_{i} , s_{j}\right) = \underset{l \in \mathbf{\mathcal{L}}}{\sum} f_{l} \cdot v_{s_{i}}^{l} \cdot v_{s_{j}}^{l} \tag{eq\_0031} \\
-  & \left(\bar{I}\right)_{s_{i} , s_{j}} = \frac{T}{F \left(s_{i} , s_{j}\right)} \tag{eq\_0032} \\
-  & R \left(s_{i} , s_{j}\right) = \frac{1}{F \left(s_{i} , s_{j}\right)} \sum_{\mathit{tau} = 1}^{F \left(s_{i} , s_{j}\right)} \frac{\left|\right. I_{s_{i} , s_{j}}^{\mathit{tau} , \mathit{tau}^{'}} - \left(\bar{I}\right)_{s_{i} , s_{j}} \left|\right.}{\left(\bar{I}\right)_{s_{i} , s_{j}}} \tag{eq\_0033} \\
+  & \left(I_bar\right)_{s_{i} , s_{j}} = \frac{T}{F \left(s_{i} , s_{j}\right)} \tag{eq\_0032} \\
+  & R \left(s_{i} , s_{j}\right) = \frac{1}{F \left(s_{i} , s_{j}\right)} \sum_{\mathit{tau} = 1}^{F \left(s_{i} , s_{j}\right)} \frac{\left|\right. I_{s_{i} , s_{j}}^{\mathit{tau} , taup} - \left(I_bar\right)_{s_{i} , s_{j}} \left|\right.}{\left(I_bar\right)_{s_{i} , s_{j}}} \tag{eq\_0033} \\
   & R = \frac{1}{N_{O D}} \underset{s_{i} \in \mathbf{\mathcal{S}}}{\sum} \underset{s_{j} \in \mathbf{\mathcal{S}} : i < j}{\sum} R \left(s_{i} , s_{j}\right) \tag{eq\_0034} \\
   & M_{V R} = \frac{V^{n} - V^{\star}}{V^{\star}} + \frac{R^{n} - R^{\star}}{R^{\star}} \tag{eq\_0035} \\
   & V_{1} = \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \cup \mathbf{\mathcal{A}}_{dwell}}{\sum} \frac{\mathit{lambda}_{i j} \cdot \left(\mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T\right)}{N_{run} + N_{dwell}} \tag{eq\_0037} \\

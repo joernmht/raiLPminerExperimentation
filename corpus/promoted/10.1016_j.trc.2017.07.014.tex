@@ -47,30 +47,30 @@
 %@ con eq_0026 kind=linear domain=- indicator=- :: Activate alpha or gamma only if a tram traverses in relevant cycle
 \begin{align}
   & T_{i}^{E} \leq t_{i 1}^{D} \leq T_{i}^{E} + \mathit{Delta} \forall i \in I \tag{eq\_0001} \\
-  & \mathit{theta}_{s}^{\text{min}} \leq t_{\mathit{is}}^{D} - t_{\mathit{is}}^{A} \leq \mathit{theta}_{s}^{\text{max}} \forall i \in I , s \in S \backslash {S} \tag{eq\_0002} \\
-  & t_{\mathit{is}}^{D} = t_{\mathit{is}}^{A} \forall i \in I , s \in {S} \tag{eq\_0003} \\
+  & \mathit{theta}_{s}^{\text{min}} \leq t_{\mathit{is}}^{D} - t_{\mathit{is}}^{A} \leq \mathit{theta}_{s}^{\text{max}} \forall i \in I , s \in S \backslash S_tilde \tag{eq\_0002} \\
+  & t_{\mathit{is}}^{D} = t_{\mathit{is}}^{A} \forall i \in I , s \in S_tilde \tag{eq\_0003} \\
   & \mathit{rho}_{s , s + 1}^{\text{min}} \leq t_{i , s + 1}^{A} - t_{\mathit{is}}^{D} \leq \mathit{rho}_{s , s + 1}^{\text{max}} \forall i \in I , s \in S \backslash \left\{\left|S\right|\right\} \tag{eq\_0004} \\
   & t_{i + 1 , s}^{A} - t_{\mathit{is}}^{A} \geq h_{a} \forall i \in I \backslash \left\{\left|I\right|\right\} , s \in S \tag{eq\_0005} \\
   & t_{i + 1 , s}^{D} - t_{\mathit{is}}^{D} \geq h_{d} \forall i \in I \backslash \left\{\left|I\right|\right\} , s \in S \tag{eq\_0006} \\
   & t_{i + 1 , s}^{A} - t_{\mathit{is}}^{D} \geq h_{a}^{d} \forall i \in I \backslash \left\{\left|I\right|\right\} , \forall s \in S \tag{eq\_0007} \\
-  & u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{min}}^{\mathit{alpha}} \leq t_{\mathit{sk}}^{\mathit{alpha}} \leq u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{max}}^{\mathit{alpha}} \forall s \in {S} , k \in K_{s} \tag{eq\_0008} \\
-  & t_{\mathit{sk}}^{\mathit{beta}} = u_{\mathit{sk}}^{\mathit{beta}} \cdot o_{s}^{\mathit{beta}} \forall s \in {S} , k \in K_{s} \tag{eq\_0009} \\
-  & u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{min}}^{\mathit{gamma}} \leq t_{\mathit{sk}}^{\mathit{gamma}} \leq u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{max}}^{\mathit{gamma}} \forall s \in {S} , k \in K_{s} \tag{eq\_0010} \\
-  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0011} \\
-  & t_{\mathit{sk} \mathit{gamma}}^{\text{S}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0012} \\
-  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , k \in K_{s} \tag{eq\_0013} \\
-  & \sum_{w \in W} u_{\mathit{sk}}^{w} \leq 1 \forall s \in {S} , k \in K_{s} \tag{eq\_0014} \\
-  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0015} \\
-  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk}}^{RS} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0016} \\
-  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk}}^{RS} = t_{s}^{\text{R}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0017} \\
-  & t_{s , k + 1}^{\text{RS}} - t_{\mathit{sk} \mathit{gamma}}^{\text{S}} = t_{s}^{\text{G}} \forall s \in {S} , \forall k \in K_{s} \tag{eq\_0018} \\
-  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{alpha}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0019} \\
-  & 0 < t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0020} \\
-  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{beta}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0021} \\
-  & 0 < t_{\mathit{sk} \mathit{gamma}}^{S} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}}\right) \cdot M \leq M \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0022} \\
-  & \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}} = \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0023} \\
-  & \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} = \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \forall i \in I , s \in {S} , k \in K_{s} \tag{eq\_0024} \\
-  & \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \geq u_{\mathit{sk}}^{\mathit{beta}} \forall s \in {S} , k \in K_{s} \tag{eq\_0025} \\
-  & \sum_{i \in I} \mathit{lambda}_{i , s , k + 1}^{\mathit{alpha}} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \geq u_{s , k + 1}^{\mathit{alpha}} + u_{s k}^{\mathit{gamma}} \forall s \in {S} , k \in K_{s} \backslash \left\{\left|K_{s}\right|\right\} \tag{eq\_0026} \\
-  \min\quad & \sum_{i \in I} \left(t_{i , \left|S\right|}^{A} - t_{i , 1}^{D}\right) + \sum_{s \in {S} , w \in W , k \in K_{s}} \left(C_{s}^{w} \cdot u_{\mathit{sk}}^{w} + \mathit{tau}_{s}^{w} \cdot t_{\mathit{sk}}^{w}\right) \tag{eq\_0027} \\
+  & u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{min}}^{\mathit{alpha}} \leq t_{\mathit{sk}}^{\mathit{alpha}} \leq u_{\mathit{sk}}^{\mathit{alpha}} \cdot o_{\text{max}}^{\mathit{alpha}} \forall s \in S_tilde , k \in K_{s} \tag{eq\_0008} \\
+  & t_{\mathit{sk}}^{\mathit{beta}} = u_{\mathit{sk}}^{\mathit{beta}} \cdot o_{s}^{\mathit{beta}} \forall s \in S_tilde , k \in K_{s} \tag{eq\_0009} \\
+  & u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{min}}^{\mathit{gamma}} \leq t_{\mathit{sk}}^{\mathit{gamma}} \leq u_{\mathit{sk}}^{\mathit{gamma}} \cdot o_{\text{max}}^{\mathit{gamma}} \forall s \in S_tilde , k \in K_{s} \tag{eq\_0010} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0011} \\
+  & t_{\mathit{sk} \mathit{gamma}}^{\text{S}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} \geq T_{\text{min}}^{\text{R}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0012} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in S_tilde , k \in K_{s} \tag{eq\_0013} \\
+  & \sum_{w \in W} u_{\mathit{sk}}^{w} \leq 1 \forall s \in S_tilde , k \in K_{s} \tag{eq\_0014} \\
+  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{alpha}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0015} \\
+  & t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{sk}}^{RS} + t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk} \mathit{beta}}^{\text{E}} = t_{s}^{\text{R}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0016} \\
+  & t_{\mathit{sk}}^{\text{RE}} - t_{\mathit{sk}}^{RS} = t_{s}^{\text{R}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0017} \\
+  & t_{s , k + 1}^{\text{RS}} - t_{\mathit{sk} \mathit{gamma}}^{\text{S}} = t_{s}^{\text{G}} \forall s \in S_tilde , \forall k \in K_{s} \tag{eq\_0018} \\
+  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{alpha}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}}\right) \cdot M \leq M \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0019} \\
+  & 0 < t_{\mathit{sk} \mathit{beta}}^{\text{S}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1}\right) \cdot M \leq M \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0020} \\
+  & T_{\text{B}} \leq t_{\mathit{sk} \mathit{beta}}^{\text{E}} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2}\right) \cdot M \leq M \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0021} \\
+  & 0 < t_{\mathit{sk} \mathit{gamma}}^{S} - t_{\mathit{is}}^{\text{D}} + \left(1 - \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}}\right) \cdot M \leq M \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0022} \\
+  & \mathit{lambda}_{\mathit{isk}}^{\mathit{alpha}} = \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0023} \\
+  & \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} = \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \forall i \in I , s \in S_tilde , k \in K_{s} \tag{eq\_0024} \\
+  & \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 2} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{beta} 1} \geq u_{\mathit{sk}}^{\mathit{beta}} \forall s \in S_tilde , k \in K_{s} \tag{eq\_0025} \\
+  & \sum_{i \in I} \mathit{lambda}_{i , s , k + 1}^{\mathit{alpha}} - \sum_{i \in I} \mathit{lambda}_{\mathit{isk}}^{\mathit{gamma}} \geq u_{s , k + 1}^{\mathit{alpha}} + u_{s k}^{\mathit{gamma}} \forall s \in S_tilde , k \in K_{s} \backslash \left\{\left|K_{s}\right|\right\} \tag{eq\_0026} \\
+  \min\quad & \sum_{i \in I} \left(t_{i , \left|S\right|}^{A} - t_{i , 1}^{D}\right) + \sum_{s \in S_tilde , w \in W , k \in K_{s}} \left(C_{s}^{w} \cdot u_{\mathit{sk}}^{w} + \mathit{tau}_{s}^{w} \cdot t_{\mathit{sk}}^{w}\right) \tag{eq\_0027} \\
 \end{align}

@@ -105,18 +105,18 @@
   & h_{min} \leq d_{i + 1 , j}^{dn} - d_{i , j}^{dn} \leq h_{max} \tag{eq\_0004\_b} \\
   & r_{J , min}^{turn} \leq a_{i , J}^{dn} - d_{i , J}^{up} \leq r_{J , max}^{turn} , \tag{eq\_0005} \\
   & d_{i + 1 , J}^{up} - a_{i , J}^{dn} \geq 0 , \forall i \in \mathbf{I} / \left\{I\right\} , \tag{eq\_0006} \\
-  & a_{i^{'} , 1}^{up} - d_{i , 1}^{dn} \geq r_{1 , min}^{turn} - M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0007\_a} \\
-  & a_{i^{'} , 1}^{up} - d_{i , 1}^{dn} \leq r_{1 , max}^{turn} + M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0007\_b} \\
+  & a_{ip , 1}^{up} - d_{i , 1}^{dn} \geq r_{1 , min}^{turn} - M \left(1 - \mathit{beta}_{i , ip}\right) \tag{eq\_0007\_a} \\
+  & a_{ip , 1}^{up} - d_{i , 1}^{dn} \leq r_{1 , max}^{turn} + M \left(1 - \mathit{beta}_{i , ip}\right) \tag{eq\_0007\_b} \\
   & \mathit{lambda}_{j , k}^{up} = \mathit{kappa}_{j , k}^{up} / \left(t_{k} - t_{k - 1}\right) , \forall k \in \left\{1 , 2 , \hdots , K\right\} , \tag{eq\_0009} \\
   & \mathit{sigma}_{i , j}^{up} \leq \mathit{sigma}_{max} \tag{eq\_0010\_a} \\
   & \mathit{sigma}_{i , j}^{dn} \leq \mathit{sigma}_{max} , \forall i \in \mathbf{I} , j \in \mathbf{J} \tag{eq\_0010\_b} \\
   & \mathit{sigma}_{i , j}^{up} = \frac{p_{i , j}^{up}}{C_{train}} , \forall i \in \mathbf{I} , j \in \mathbf{J} , \tag{eq\_0011} \\
-  & \mathit{xi}_{i^{'}} = 1 - \sum_{i \in \mathbf{I}} \mathit{beta}_{i , i^{'}} , \tag{eq\_0014} \\
-  & \sum_{i \in \mathbf{I}} \mathit{beta}_{i , i^{'}} \leq 1 . \tag{eq\_0015} \\
-  & \begin{matrix}\mathit{delta}_{i} = 1 - \sum_{i^{'} \in \mathbf{I}} \mathit{beta}_{i , i^{'}} ,\end{matrix} \tag{eq\_0016} \\
-  & \sum_{i^{'} \in \mathbf{I}} \mathit{beta}_{i , i^{'}} \leq 1 . \tag{eq\_0017} \\
-  & \mathit{delta}_{i} + \mathit{xi}_{i^{'}} \leq M \left(1 - \mathit{beta}_{i , i^{'}}\right) \tag{eq\_0018\_a} \\
-  & \mathit{delta}_{i} + \mathit{xi}_{i^{'}} \geq - M \left(1 - \mathit{beta}_{i , i^{'}}\right) . \tag{eq\_0018\_b} \\
+  & \mathit{xi}_{ip} = 1 - \sum_{i \in \mathbf{I}} \mathit{beta}_{i , ip} , \tag{eq\_0014} \\
+  & \sum_{i \in \mathbf{I}} \mathit{beta}_{i , ip} \leq 1 . \tag{eq\_0015} \\
+  & \begin{matrix}\mathit{delta}_{i} = 1 - \sum_{ip \in \mathbf{I}} \mathit{beta}_{i , ip} ,\end{matrix} \tag{eq\_0016} \\
+  & \sum_{ip \in \mathbf{I}} \mathit{beta}_{i , ip} \leq 1 . \tag{eq\_0017} \\
+  & \mathit{delta}_{i} + \mathit{xi}_{ip} \leq M \left(1 - \mathit{beta}_{i , ip}\right) \tag{eq\_0018\_a} \\
+  & \mathit{delta}_{i} + \mathit{xi}_{ip} \geq - M \left(1 - \mathit{beta}_{i , ip}\right) . \tag{eq\_0018\_b} \\
   & \sum_{m = 1}^{i} \mathit{xi}_{m} - \sum_{m = 1}^{i - 1} \mathit{delta}_{m} y_{m , i} \leq N_{rs} , \tag{eq\_0019} \\
   & d_{m , 1}^{dn} - d_{i , 1}^{up} + t_{enter} + t_{exit} \leq M \left(1 - y_{m , i}\right) . \tag{eq\_0020} \\
   & f_{load} = \sum_{i \in \mathbf{I}} \left(\left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{up} - \mathit{sigma}_{mean}^{up}\right| + \left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{dn} - \mathit{sigma}_{mean}^{dn}\right|\right) , \tag{eq\_0021} \\
@@ -147,15 +147,15 @@
   & \sum_{k = 1}^{K} z_{i , j , k}^{up} = d_{i , j}^{up} \tag{eq\_0040\_a} \\
   & z_{i , j , k}^{up} \leq x_{i , j , k}^{up} \cdot M \tag{eq\_0040\_b} \\
   & z_{i , j , k}^{up} \geq 0 . \tag{eq\_0040\_c} \\
-  & p_{i , j}^{up} \approx \left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) \cdot \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) , \tag{eq\_0041} \\
+  & p_{i , j}^{up} \approx \left(lambda_tilde\right)_{j}^{up} \left(d_{i , j}^{up}\right) \cdot \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) , \tag{eq\_0041} \\
   & \left(t_{K} - t_{k}\right) y_{i , j , k}^{up} \leq t_{K} - d_{i , j}^{up} \tag{eq\_0043\_a} \\
   & \left(t_{0} - t_{k} - \mathit{epsilon}\right) y_{i , j , k}^{up} \leq d_{i , j}^{up} - t_{k} - \mathit{epsilon} \tag{eq\_0043\_b} \\
   & x_{i , j , k}^{up} = y_{i , j , k}^{up} - y_{i , j , k - 1}^{up} , \forall i \in \mathbf{I} , j \in \mathbf{J} , k \in \left\{1 , 2 , \hdots , K\right\} . \tag{eq\_0044} \\
-  & \begin{aligned}\left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(1 - y_{i , j , 1}^{up}\right) y_{i , j , 2}^{up} \mathit{lambda}_{j , 2}^{up} + \hdots + \left(1 - y_{i , j , k - 1}^{up}\right) y_{i , j , k}^{up} \mathit{lambda}_{j , k}^{up} + \hdots \\ & + \left(1 - y_{i , j , K - 1}^{up}\right) y_{i , j , K}^{up} \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0045} \\
-  & - y_{i , j , k - 1}^{up} + \left({y}\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_a} \\
-  & - y_{i , j , k}^{up} + \left({y}\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_b} \\
-  & y_{i , j , k - 1}^{up} + y_{i , j , k}^{up} - \left({y}\right)_{i , j , k - 1}^{up} \leq 1 . \tag{eq\_0046\_c} \\
-  & \begin{aligned}\left({\mathit{lambda}}\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(y_{i , j , 2}^{up} - \left({y}\right)_{i , j , 1}^{up}\right) \mathit{lambda}_{j , 2}^{up} + \hdots + \left(y_{i , j , k}^{up} - \left({y}\right)_{i , j , k - 1}^{up}\right) \mathit{lambda}_{j , k}^{up} + \hdots + \left(y_{i , j , K}^{up} - \left({y}\right)_{i , j , K - 1}^{up}\right) \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0047} \\
+  & \begin{aligned}\left(lambda_tilde\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(1 - y_{i , j , 1}^{up}\right) y_{i , j , 2}^{up} \mathit{lambda}_{j , 2}^{up} + \hdots + \left(1 - y_{i , j , k - 1}^{up}\right) y_{i , j , k}^{up} \mathit{lambda}_{j , k}^{up} + \hdots \\ & + \left(1 - y_{i , j , K - 1}^{up}\right) y_{i , j , K}^{up} \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0045} \\
+  & - y_{i , j , k - 1}^{up} + \left(y_tilde\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_a} \\
+  & - y_{i , j , k}^{up} + \left(y_tilde\right)_{i , j , k - 1}^{up} \leq 0 \tag{eq\_0046\_b} \\
+  & y_{i , j , k - 1}^{up} + y_{i , j , k}^{up} - \left(y_tilde\right)_{i , j , k - 1}^{up} \leq 1 . \tag{eq\_0046\_c} \\
+  & \begin{aligned}\left(lambda_tilde\right)_{j}^{up} \left(d_{i , j}^{up}\right) = & y_{i , j , 1}^{up} \mathit{lambda}_{j , 1}^{up} + \left(y_{i , j , 2}^{up} - \left(y_tilde\right)_{i , j , 1}^{up}\right) \mathit{lambda}_{j , 2}^{up} + \hdots + \left(y_{i , j , k}^{up} - \left(y_tilde\right)_{i , j , k - 1}^{up}\right) \mathit{lambda}_{j , k}^{up} + \hdots + \left(y_{i , j , K}^{up} - \left(y_tilde\right)_{i , j , K - 1}^{up}\right) \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0047} \\
   & \begin{aligned}p_{i , j}^{up} \approx & z_{i , j , 1}^{up , 1} \mathit{lambda}_{j , 1}^{up} + \left(z_{i , j , 2}^{up , 1} - z_{i , j , 1}^{up , 2}\right) \mathit{lambda}_{j , 2}^{up} + \hdots + \left(z_{i , j , k}^{up , 1} - z_{i , j , k - 1}^{up , 2}\right) \mathit{lambda}_{j , k}^{up} + \hdots + \left(z_{i , j , K}^{up , 1} - z_{i , j , K - 1}^{up , 2}\right) \mathit{lambda}_{j , K}^{up} \\ & - z_{i , j , 1}^{up , 3} \mathit{lambda}_{j , 1}^{up} - \left(z_{i , j , 2}^{up , 3} - z_{i , j , 1}^{up , 4}\right) \mathit{lambda}_{j , 2}^{up} - \hdots - \left(z_{i , j , k}^{up , 3} - z_{i , j , k - 1}^{up , 4}\right) \mathit{lambda}_{j , k}^{up} - \hdots - \left(z_{i , j , K}^{up , 3} - z_{i , j , K - 1}^{up , 4}\right) \mathit{lambda}_{j , K}^{up} .\end{aligned} \tag{eq\_0048} \\
   & z_{i , j , k}^{up , 1} \leq t_{K} \cdot y_{i , j , k}^{up} \tag{eq\_0049\_a} \\
   & z_{i , j , k}^{up , 1} \geq t_{0} \cdot y_{i , j , k}^{up} \tag{eq\_0049\_b} \\

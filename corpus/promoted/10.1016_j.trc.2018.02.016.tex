@@ -28,11 +28,11 @@
 %@ con eq_0010 kind=linear :: Binary definition of passenger flow variables x_a on arcs (i,j,t,s,m,m')
 %@ con eq_0011 kind=linear :: Binary definition of train flow variables y on arcs (i,j,t,s)
 \begin{align}
-  \min\quad & \sum_{a \in A} \sum_{\left(i , j , t , s , m , m^{'}\right) \in E^{''}} x^{a} \left(i , j , t , s , m , m^{'}\right) \cdot c \left(i , j , t , s , m , m^{'}\right) \tag{eq\_0005} \\
-  & \sum_{i , t , m : \left(i , j , t , s , m , m^{'}\right) \in E^{''}} x^{a} \left(i , j , t , s , m , m^{'}\right) - \sum_{i , t , m : \left(j , i , t , s , m^{'} , m\right) \in E^{''}} x^{a} \left(j , i , s , t , m^{'} , m\right) = \left\{\begin{matrix} - 1 & j = o \left(a\right) , s = \mathit{dep} \left(a\right) , m^{'} = m_{0} \\ 1 & j = d \left(a\right) , s = T , m^{'} = m_{0} , \\ 0 & \mathit{otherwise} \end{matrix}\right \forall a \tag{eq\_0006} \\
-  & \sum_{i , t : \left(i , j , t , s\right) \in E^{'}} y \left(i , j , t , s\right) - \sum_{i , t : \left(j , i , t , s\right) \in E^{'}} y \left(j , i , s , t\right) = \left\{\begin{matrix} - 1 & j = o \left(q\right) , s = \mathit{dep} \left(q\right) \\ 1 & j = d \left(q\right) , s = \mathit{arr} \left(q\right) , \forall q \\ 0 & \mathit{otherwise} \end{matrix}\right \tag{eq\_0007} \\
-  & \sum_{a \in A} \sum_{m \in M} x^{a} \left(i , j , t , s , m , m\right) \leq y \left(i , j , t , s\right) \cdot \mathit{cap} \left(i , j , t , s\right) \forall \left(i , j , t , s\right) \tag{eq\_0008} \\
-  & \sum_{a \in A} \sum_{m \in M} \sum_{\forall t^{'} \leq t , \forall s^{'} \geq t : \left(i , i , t^{'} , s^{'} , m , m\right) \in E^{''}} x^{a} \left(i , i , t^{'} , s^{'} , m , m\right) \leq \mathit{cap} \left(i\right) \forall \left(i , t\right) \tag{eq\_0009} \\
-  & x^{a} \left(i , j , t , s , m , m^{'}\right) \in \left\{0 , 1\right\} \tag{eq\_0010} \\
+  \min\quad & \sum_{a \in A, \left(i , j , t , s , m , mp\right) \in Epp} x^{a} \left(i , j , t , s , m , mp\right) \cdot c \left(i , j , t , s , m , mp\right) \tag{eq\_0005} \\
+  & \sum_{i , t , m : \left(i , j , t , s , m , mp\right) \in Epp} x^{a} \left(i , j , t , s , m , mp\right) - \sum_{i , t , m : \left(j , i , t , s , mp , m\right) \in Epp} x^{a} \left(j , i , s , t , mp , m\right) = \left\{\begin{matrix} - 1 & j = o \left(a\right) , s = \mathit{dep} \left(a\right) , mp = m_{0} \\ 1 & j = d \left(a\right) , s = T , mp = m_{0} , \\ 0 & \mathit{otherwise} \end{matrix}\right \forall a \tag{eq\_0006} \\
+  & \sum_{i , t : \left(i , j , t , s\right) \in Ep} y \left(i , j , t , s\right) - \sum_{i , t : \left(j , i , t , s\right) \in Ep} y \left(j , i , s , t\right) = \left\{\begin{matrix} - 1 & j = o \left(q\right) , s = \mathit{dep} \left(q\right) \\ 1 & j = d \left(q\right) , s = \mathit{arr} \left(q\right) , \forall q \\ 0 & \mathit{otherwise} \end{matrix}\right \tag{eq\_0007} \\
+  & \sum_{a \in A, m \in M} x^{a} \left(i , j , t , s , m , m\right) \leq y \left(i , j , t , s\right) \cdot \mathit{cap} \left(i , j , t , s\right) \forall \left(i , j , t , s\right) \tag{eq\_0008} \\
+  & \sum_{a \in A, m \in M, \forall tp \leq t , \forall sp \geq t : \left(i , i , tp , sp , m , m\right) \in Epp} x^{a} \left(i , i , tp , sp , m , m\right) \leq \mathit{cap} \left(i\right) \forall \left(i , t\right) \tag{eq\_0009} \\
+  & x^{a} \left(i , j , t , s , m , mp\right) \in \left\{0 , 1\right\} \tag{eq\_0010} \\
   & y \left(i , j , t , s\right) \in \left\{0 , 1\right\} \tag{eq\_0011} \\
 \end{align}

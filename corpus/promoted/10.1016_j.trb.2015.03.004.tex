@@ -41,7 +41,7 @@
 %@ con eq_0034 kind=linear :: Exactly one one-hour period selected for each departure
 %@ con eq_0035 kind=linear :: Linking train departure time and one-hour demand period
 \begin{align}
-  \min\quad & \sum_{j = 1}^{N} \sum_{u = 1}^{S - 1} \sum_{v = u + 1}^{S} \underset{t \in \left[\mathit{TD}_{\bar{j}}^{u} , \mathit{TD}_{j}^{u}\right)}{\sum} \mathit{tau}_{j}^{u , v} \cdot P^{u , v} \left(t\right) \cdot \left(\mathit{TD}_{j}^{u} - t\right) \tag{eq\_0005} \\
+  \min\quad & \sum_{j = 1}^{N} \sum_{u = 1}^{S - 1} \sum_{v = u + 1}^{S} \underset{t \in \left[\mathit{TD}_{j_bar}^{u} , \mathit{TD}_{j}^{u}\right)}{\sum} \mathit{tau}_{j}^{u , v} \cdot P^{u , v} \left(t\right) \cdot \left(\mathit{TD}_{j}^{u} - t\right) \tag{eq\_0005} \\
   & Q_{j}^{u} \leq c_{j} \forall u , j \tag{eq\_0009} \\
   & \mathit{TA}_{j}^{u} = \mathit{TD}_{j}^{u - 1} + r^{u - 1} + \mathit{epsilon} \cdot \left(\mathit{mu}_{j}^{u - 1} + \mathit{mu}_{j}^{u}\right) + \mathit{TR}_{j}^{u - 1} \forall u > 1 , j \tag{eq\_0010} \\
   & \mathit{TD}_{j}^{u} = \mathit{TA}_{j}^{u} + \mathit{TS}_{j}^{u} \forall u , j \tag{eq\_0011} \\
@@ -51,10 +51,10 @@
   & \mathit{lambda}_{min} \leq \mathit{TS}_{j}^{u} \leq \mathit{lambda}_{max} \forall u , j \tag{eq\_0015} \\
   & \sum_{u = 1}^{S - 1} \mathit{TR}_{j}^{u} \leq \mathit{Delta}_{max} \forall j \tag{eq\_0016} \\
   & \mathit{TD}_{j}^{E} \leq \mathit{TD}_{j}^{1} \leq \mathit{TD}_{j}^{L} \forall j \tag{eq\_0017} \\
-  & \sum_{u^{'} = 1}^{u} \sum_{v = u + 1}^{S} \sum_{t \in \left[0 , T\right]} \mathit{tau}_{j}^{u^{'} , v} \cdot P^{u^{'} , v} \left(t\right) \cdot \mathit{TL}_{j}^{u^{'} , v} \left(t\right) \leq c_{j} \tag{eq\_0020} \\
+  & \sum_{up = 1}^{u} \sum_{v = u + 1}^{S} \sum_{t \in \left[0 , T\right]} \mathit{tau}_{j}^{up , v} \cdot P^{up , v} \left(t\right) \cdot \mathit{TL}_{j}^{up , v} \left(t\right) \leq c_{j} \tag{eq\_0020} \\
   & z_{j}^{u} \left(t - 1\right) \leq z_{j}^{u} \left(t\right) \tag{eq\_0021} \\
   & \mathit{TD}_{j}^{u} = \sum_{t \in \left[0 , T\right]} t \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \tag{eq\_0022} \\
-  & Q_{j}^{u} = \sum_{u^{'} = 1}^{u} \sum_{v = u + 1}^{N} Q_{j}^{u^{'} , v} \leq c_{j} \tag{eq\_0032} \\
+  & Q_{j}^{u} = \sum_{up = 1}^{u} \sum_{v = u + 1}^{N} Q_{j}^{up , v} \leq c_{j} \tag{eq\_0032} \\
   & 60 \left(k - 1\right) - \mathit{TD}_{j}^{u} \leq M \cdot \left[1 - x_{j}^{u} \left(k\right)\right] \tag{eq\_0033} \\
   & \mathit{TD}_{j}^{u} - 60 k \leq M \cdot \left[1 - x_{j}^{u} \left(k\right)\right] \tag{eq\_0034} \\
   & \sum_{k = 1}^{K} x_{j}^{u} \left(k\right) = 1 \tag{eq\_0035} \\

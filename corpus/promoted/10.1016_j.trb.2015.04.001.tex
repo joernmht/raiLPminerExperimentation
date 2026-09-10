@@ -46,14 +46,14 @@
   & x_{e} = q_{e} \forall e \in E : q_{e} \leq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0006} \\
   & y_{t_{e}} = 0 \forall e \in E_{s_{1}}^{\mathit{dep}} : q_{e} \leq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0007} \\
   & x_{f} - x_{e} \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{train}} \tag{eq\_0010} \\
-  & \mathit{lambda}_{a} + \mathit{lambda}_{a^{'}} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} \land a^{'} = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track}} \tag{eq\_0012} \\
+  & \mathit{lambda}_{a} + \mathit{lambda}_{ap} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} \land ap = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track}} \tag{eq\_0012} \\
   & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{lambda}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} \tag{eq\_0013} \\
-  & \mathit{lambda}_{a} - \mathit{lambda}_{a^{'}} = 0 \forall \left(a , a^{'}\right) \in B \tag{eq\_0014} \\
-  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in {S} , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0016} \\
+  & \mathit{lambda}_{a} - \mathit{lambda}_{ap} = 0 \forall \left(a , ap\right) \in B \tag{eq\_0014} \\
+  & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} \leq C_{s} - 1 \forall s \in S_bar , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0016} \\
   & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{varphi}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A^{\mathit{station}} \tag{eq\_0017} \\
   & H_{\mathit{dis}}^{\mathit{end}} \cdot \left(1 - \mathit{chi}_{e}^{\mathit{dep}}\right) < x_{e} \leq H_{\mathit{dis}}^{\mathit{end}} + \left(1 - \mathit{chi}_{e}^{\mathit{dep}}\right) \cdot M_{2} \forall i < k ; e \in E_{s_{i}}^{\mathit{dep}} \tag{eq\_0019} \\
   & \underset{e \in E_{s_{i - 1}}^{2}}{\sum} \mathit{chi}_{e}^{\mathit{dep}} \leq C_{s_{i}} - U_{s_{i}} \forall i \leq k \tag{eq\_0020} \\
   & \mathit{chi}_{e}^{\mathit{dep}} + y_{t_{e}} \leq 1 \forall e \in E_{s}^{\mathit{dep}} , s \in S \tag{eq\_0027} \\
-  & \begin{aligned} & \mathit{lambda}_{a} \geq \mathit{varphi}_{a^{'}} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} , a^{'} = \left(e^{'} , f\right) \in A^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , e^{'} \in E_{s}^{\mathit{dep}} , t_{e} = t_{e^{'}} , f \in E_{s}^{\mathit{arr}} , s \in {S}\end{aligned} \tag{eq\_0028} \\
+  & \begin{aligned} & \mathit{lambda}_{a} \geq \mathit{varphi}_{ap} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} , ap = \left(ep , f\right) \in A^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , ep \in E_{s}^{\mathit{dep}} , t_{e} = t_{ep} , f \in E_{s}^{\mathit{arr}} , s \in S_bar\end{aligned} \tag{eq\_0028} \\
   & \mathit{lambda}_{a} + y_{t_{e}} + y_{t_{f}} \geq 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track}} : q_{e} < q_{f} \tag{eq\_0029} \\
 \end{align}

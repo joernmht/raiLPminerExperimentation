@@ -72,8 +72,8 @@
 \begin{align}
   \min\quad & F \tag{eq\_0001} \\
   & \sum_{p \in P_{t}} X_{t,p} = 1 \qquad \forall t \in T \tag{eq\_0002} \\
-  & X_{t , p} = \sum_{p^{'} \in P_{\mathit{nu} \left(t\right)} : \left(p , p^{'}\right) \in \mathit{Gamma}_{t}} Z_{t , p , p^{'}} \forall t \in T \backslash T_{1} ; p \in P_{t} , \tag{eq\_0003} \\
-  & X_{\mathit{nu} \left(t\right) , p^{'}} = \sum_{p \in P_{t} : \left(p , p^{'}\right) \in \mathit{Gamma}_{t}} Z_{t , p , p^{'}} \forall t \in T \backslash T_{1} ; p^{'} \in P_{\mathit{nu} \left(t\right)} , \tag{eq\_0004} \\
+  & X_{t , p} = \sum_{pp \in P_{\mathit{nu} \left(t\right)} : \left(p , pp\right) \in \mathit{Gamma}_{t}} Z_{t , p , pp} \forall t \in T \backslash T_{1} ; p \in P_{t} , \tag{eq\_0003} \\
+  & X_{\mathit{nu} \left(t\right) , pp} = \sum_{p \in P_{t} : \left(p , pp\right) \in \mathit{Gamma}_{t}} Z_{t , p , pp} \forall t \in T \backslash T_{1} ; pp \in P_{\mathit{nu} \left(t\right)} , \tag{eq\_0004} \\
   & N_{t,m} = \sum_{p \in P_{t}} n_{p,m} \cdot X_{t,p} \qquad \forall t \in T, m \in M \tag{eq\_0005} \\
   & C_{\mathit{nu}_{t},m} = \sum_{(p,p2) \in \mathit{Gammaplus}_{t,m}} (n_{p2,m} - n_{p,m}) \cdot Z_{t,p,p2} \qquad \forall t \in T \setminus T_{1}, m \in M \tag{eq\_0006} \\
   & U_{t,m} = \sum_{(p,p2) \in \mathit{Gammaminus}_{t,m}} (n_{p,m} - n_{p2,m}) \cdot Z_{t,p,p2} \qquad \forall t \in T \setminus T_{1}, m \in M \tag{eq\_0007} \\
@@ -91,11 +91,11 @@
   & I_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_d} \\
   & \mathit{I0}_{s,m} \ge 0 \qquad \forall s \in S, m \in M \tag{eq\_0014} \\
   & Z_{t,p,p2} \ge 0 \qquad \forall t \in T, (p,p2) \in \mathit{Gamma}_{t} \tag{eq\_0015} \\
-  & CKM = \sum_{t \in T} \sum_{m \in M} \mathit{ell}_{t} \cdot c_{m} \cdot N_{t , m} , \tag{eq\_0016} \\
-  & SKM = \sum_{t \in T} \sum_{p \in P_{t}} \mathit{ell}_{t} \cdot s_{t , p} \cdot X_{t , p} . \tag{eq\_0017} \\
-  & SHM = \sum_{t \in T} \underset{\genfrac{}{}{0pt}{}{\left(p , p^{'}\right) \in \mathit{Gamma}_{t} :}{\mathit{beta} \left(p\right) \neq \mathit{beta} \left(p^{'}\right)}}{\sum} Z_{t , p , p^{'}} . \tag{eq\_0018} \\
+  & CKM = \sum_{t \in T, m \in M} \mathit{ell}_{t} \cdot c_{m} \cdot N_{t , m} , \tag{eq\_0016} \\
+  & SKM = \sum_{t \in T, p \in P_{t}} \mathit{ell}_{t} \cdot s_{t , p} \cdot X_{t , p} . \tag{eq\_0017} \\
+  & SHM = \sum_{t \in T} \underset{\genfrac{}{}{0pt}{}{\left(p , pp\right) \in \mathit{Gamma}_{t} :}{\mathit{beta} \left(p\right) \neq \mathit{beta} \left(pp\right)}}{\sum} Z_{t , p , pp} . \tag{eq\_0018} \\
   & Y_{t , b} = \sum_{p \in P_{t} : b = \mathit{beta} \left(p\right)} X_{t , p} \forall t \in T ; b \in B_{t} . \tag{eq\_0020} \\
-  & SKM = \sum_{t \in T} \sum_{b \in B_{t}} \mathit{ell}_{t} \cdot s_{t , b} \cdot Y_{t , b} . \tag{eq\_0021} \\
+  & SKM = \sum_{t \in T, b \in B_{t}} \mathit{ell}_{t} \cdot s_{t , b} \cdot Y_{t , b} . \tag{eq\_0021} \\
   & X_{t , p} = \sum_{p_{1} , p_{2} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p \in P_{t} , \tag{eq\_0022} \\
   & X_{\mathit{nu}^{1} \left(t\right) , p_{1}} = \sum_{p , p_{2} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p_{1} \in P_{\mathit{nu}^{1} \left(t\right)} , \tag{eq\_0023} \\
   & X_{\mathit{nu}^{2} \left(t\right) , p_{2}} = \sum_{p , p_{1} : \left(p , p_{1} , p_{2}\right) \in \mathit{Gamma}_{t}^{s}} Z_{t , p , p_{1} , p_{2}}^{s} \forall p_{2} \in P_{\mathit{nu}^{2} \left(t\right)} . \tag{eq\_0024} \\

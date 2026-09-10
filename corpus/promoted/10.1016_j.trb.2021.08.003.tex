@@ -114,38 +114,38 @@
   & \sum_{g \in \mathbf{G}} \mathit{beta}_{f , g , p_{d}}^{up} + x_{f , p_{d} , p_{d} + 1}^{up} + \mathit{alpha}_{f , p_{d}}^{up} = c_{f , p_{d}}^{up} , \forall f \in \mathbf{F} , \tag{eq\_0031} \\
   & \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p}^{dn} + x_{f , p - 1 , p}^{up} = c_{f , p}^{up} , \forall f \in \mathbf{F} , p \in \mathbf{P} , \tag{eq\_0032} \\
   & \sum_{g \in \mathbf{G}} \mathit{beta}_{g , f , p_{d}}^{dn} + x_{f , p_{d} - 1 , p_{d}}^{up} + \mathit{theta}_{f , p_{d}}^{up} = c_{f , p_{d}}^{up} , \forall f \in \mathbf{F} , \tag{eq\_0033} \\
-  & a_{f^{'} , i_{d}}^{up} - a_{f , i_{d}}^{up} \leq a_{f}^{UB} \cdot \left(1 - \mathit{delta}_{f , f^{'}}^{up}\right) , \tag{eq\_0035} \\
-  & a_{f^{'} , i_{d}}^{up} - a_{f , i_{d}}^{up} \geq \mathit{epsilon} + \left(- a_{f}^{LB} - \mathit{epsilon}\right) \cdot \mathit{delta}_{f , f^{'}}^{up} , \tag{eq\_0036} \\
-  & \mathit{theta}_{f , p_{d}}^{up} \leq N_{p_{d}} - \sum_{f^{'} \in \mathbf{F}} \mathit{delta}_{f , f^{'} , p_{d}}^{up} \mathit{theta}_{f^{'} , p_{d}}^{up} - \sum_{g^{'} \in \mathbf{G}} \mathit{zeta}_{f , g^{'} , p_{d}}^{up} \mathit{theta}_{g^{'} , p_{d}}^{dn} + \sum_{f^{'} \in \mathbf{F}} \mathit{eta}_{f , f^{'} , p_{d}}^{up} \mathit{alpha}_{f^{'} , p_{d}}^{up} + \sum_{g^{'} \in \mathbf{G}} \mathit{pi}_{f , g^{'} , p_{d}}^{up} \mathit{alpha}_{g^{'} , p_{d}}^{dn} - 1 , \tag{eq\_0037} \\
-  & Z_{deviation} = \sum_{f \in \mathbf{F}} \sum_{i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. d_{f , i}^{up} - {d}_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}} \sum_{i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. d_{g , i}^{dn} - {d}_{g , i}^{dn} \left|\right. + \sum_{f \in \mathbf{F}} \sum_{i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. a_{f , i}^{up} - {a}_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}} \sum_{i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. a_{g , i}^{dn} - {a}_{g , i}^{dn} \left|\right. , \tag{eq\_0039} \\
-  & x_{f , p , p + 1}^{up} \leq {x}_{f , p , p + 1}^{up} , \forall f \in \mathbf{F} , p \in \left\{1 , 2 , \ldots , P - 1\right\} , \tag{eq\_0040} \\
-  & Z_{cancel} = \sum_{f \in \mathbf{F}} \sum_{p \in \mathbf{P} , p \neq P} \left({x}_{f , p , p + 1}^{up} - x_{f , p , p + 1}^{up}\right) + \sum_{g \in \mathbf{G}} \sum_{p \in \mathbf{P} , p \neq 1} \left({x}_{g , p , p - 1}^{dn} - x_{g , p , p - 1}^{dn}\right) . \tag{eq\_0041} \\
-  & Z_{headway} = \sum_{f \in \mathbf{F} , f \neq 1 , f \neq F} \sum_{i \in \mathbf{I} , i \neq 1} \left(y_{f - 1 , i - 1 , i}^{up} \cdot y_{f , i - 1 , i}^{up} \cdot y_{f + 1 , i - 1 , i}^{up} \left(d_{f + 1 , i}^{up} + d_{f - 1 , i}^{up} - 2 \cdot d_{f , i}^{up}\right)\right) + \sum_{g \in \mathbf{G} , g \neq 1 , g \neq G} \sum_{i \in \mathbf{I} , i \neq I} \left(y_{g - 1 , i + 1 , i}^{dn} \cdot y_{g , i + 1 , i}^{dn} \cdot y_{g + 1 , i + 1 , i}^{dn} \left(d_{g + 1 , i}^{dn} + d_{g - 1 , i}^{dn} - 2 \cdot d_{g , i}^{dn}\right)\right) , \tag{eq\_0043} \\
+  & a_{fp , i_{d}}^{up} - a_{f , i_{d}}^{up} \leq a_{f}^{UB} \cdot \left(1 - \mathit{delta}_{f , fp}^{up}\right) , \tag{eq\_0035} \\
+  & a_{fp , i_{d}}^{up} - a_{f , i_{d}}^{up} \geq \mathit{epsilon} + \left(- a_{f}^{LB} - \mathit{epsilon}\right) \cdot \mathit{delta}_{f , fp}^{up} , \tag{eq\_0036} \\
+  & \mathit{theta}_{f , p_{d}}^{up} \leq N_{p_{d}} - \sum_{fp \in \mathbf{F}} \mathit{delta}_{f , fp , p_{d}}^{up} \mathit{theta}_{fp , p_{d}}^{up} - \sum_{gp \in \mathbf{G}} \mathit{zeta}_{f , gp , p_{d}}^{up} \mathit{theta}_{gp , p_{d}}^{dn} + \sum_{fp \in \mathbf{F}} \mathit{eta}_{f , fp , p_{d}}^{up} \mathit{alpha}_{fp , p_{d}}^{up} + \sum_{gp \in \mathbf{G}} \mathit{pi}_{f , gp , p_{d}}^{up} \mathit{alpha}_{gp , p_{d}}^{dn} - 1 , \tag{eq\_0037} \\
+  & Z_{deviation} = \sum_{f \in \mathbf{F}, i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. d_{f , i}^{up} - d_bar_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}, i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. d_{g , i}^{dn} - d_bar_{g , i}^{dn} \left|\right. + \sum_{f \in \mathbf{F}, i \in \mathbf{I} , i \neq 1} y_{f , i - 1 , i}^{up} \left|\right. a_{f , i}^{up} - a_bar_{f , i}^{up} \left|\right. + \sum_{g \in \mathbf{G}, i \in \mathbf{I} , i \neq I} y_{g , i + 1 , i}^{dn} \left|\right. a_{g , i}^{dn} - a_bar_{g , i}^{dn} \left|\right. , \tag{eq\_0039} \\
+  & x_{f , p , p + 1}^{up} \leq x_bar_{f , p , p + 1}^{up} , \forall f \in \mathbf{F} , p \in \left\{1 , 2 , \ldots , P - 1\right\} , \tag{eq\_0040} \\
+  & Z_{cancel} = \sum_{f \in \mathbf{F}, p \in \mathbf{P} , p \neq P} \left(x_bar_{f , p , p + 1}^{up} - x_{f , p , p + 1}^{up}\right) + \sum_{g \in \mathbf{G}, p \in \mathbf{P} , p \neq 1} \left(x_bar_{g , p , p - 1}^{dn} - x_{g , p , p - 1}^{dn}\right) . \tag{eq\_0041} \\
+  & Z_{headway} = \sum_{f \in \mathbf{F} , f \neq 1 , f \neq F, i \in \mathbf{I} , i \neq 1} \left(y_{f - 1 , i - 1 , i}^{up} \cdot y_{f , i - 1 , i}^{up} \cdot y_{f + 1 , i - 1 , i}^{up} \left(d_{f + 1 , i}^{up} + d_{f - 1 , i}^{up} - 2 \cdot d_{f , i}^{up}\right)\right) + \sum_{g \in \mathbf{G} , g \neq 1 , g \neq G, i \in \mathbf{I} , i \neq I} \left(y_{g - 1 , i + 1 , i}^{dn} \cdot y_{g , i + 1 , i}^{dn} \cdot y_{g + 1 , i + 1 , i}^{dn} \left(d_{g + 1 , i}^{dn} + d_{g - 1 , i}^{dn} - 2 \cdot d_{g , i}^{dn}\right)\right) , \tag{eq\_0043} \\
   \min\quad & w_{1} \cdot \frac{Z_{deviation}}{Z_{deviation,nom}} + w_{2} \cdot \frac{Z_{cancel}}{Z_{cancel,nom}} + w_{3} \cdot \frac{Z_{headway}}{Z_{headway,nom}} , \tag{eq\_0045} \\
   & r_{i_{r} , i_{r}^{'}}^{up} = \sum_{\mathit{ell} =_{r}^{'}}^{i_{r}^{'} - 1} r_{\mathit{ell} , \mathit{ell} + 1}^{up} + \sum_{\mathit{ell} = i_{r} + 1}^{i_{r}^{'} - 1} w_{\mathit{ell}}^{up} . \tag{eq\_0050} \\
-  & \mathit{beta}_{f , g , p}^{up} = \hat{\mathit{beta}}_{f , g , p}^{up} \tag{eq\_0054\_a} \\
-  & \mathit{beta}_{g , f , p}^{dn} = \hat{\mathit{beta}}_{g , f , p}^{dn} \tag{eq\_0054\_b} \\
+  & \mathit{beta}_{f , g , p}^{up} = beta_hat_{f , g , p}^{up} \tag{eq\_0054\_a} \\
+  & \mathit{beta}_{g , f , p}^{dn} = beta_hat_{g , f , p}^{dn} \tag{eq\_0054\_b} \\
   & \mathit{beta}_{f , g , p}^{up} \left(t_{d,end} - d_{f , p}^{up}\right) \geq 0 , \forall f \in \mathbf{F} , g \in \mathbf{G} , p \in \mathbf{P} / \left\{1 , P\right\} . \tag{eq\_0056} \\
-  & {f} \left(x\right) \leq {F}_{max} \left(1 - {\mathit{theta}}\right) \tag{eq\_0057\_a} \\
-  & {f} \left(x\right) \geq \mathit{epsilon} + \left({F}_{min} - \mathit{epsilon}\right) {\mathit{theta}} . \tag{eq\_0057\_b} \\
-  & - {\mathit{theta}}_{1} + {\mathit{theta}}_{3} \leq 0 \tag{eq\_0058\_a} \\
-  & - {\mathit{theta}}_{2} + {\mathit{theta}}_{3} \leq 0 \tag{eq\_0058\_b} \\
-  & {\mathit{theta}}_{1} + {\mathit{theta}}_{2} - {\mathit{theta}}_{3} \leq 1 . \tag{eq\_0058\_c} \\
-  & {z} \leq {F}_{max} {\mathit{theta}} \tag{eq\_0059\_a} \\
-  & {z} \geq {F}_{min} {\mathit{theta}} \tag{eq\_0059\_b} \\
-  & {z} \leq {f} \left(x\right) - {F}_{min} \left(1 - {\mathit{theta}}\right) \tag{eq\_0059\_c} \\
-  & {z} \geq {f} \left(x\right) - {F}_{max} \left(1 - {\mathit{theta}}\right) . \tag{eq\_0059\_d} \\
-  & - c_{f - \mathit{ell} , i - 1 , i}^{up} + {c}_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_a} \\
-  & - c_{f , i - 1 , i}^{up} + {c}_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_b} \\
-  & c_{f - \mathit{ell} , i}^{up} + c_{f , i}^{up} - {c}_{f - \mathit{ell} , f , i}^{up} \leq 1 \tag{eq\_0060\_c} \\
-  & {c}_{f - \mathit{ell} , f , i}^{up} \left(d_{f , i}^{up} - d_{f - \mathit{ell} , i}^{up}\right) \geq {c}_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} . \tag{eq\_0062} \\
-  & {z}_{f , i}^{up} \leq {d}_{max} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_a} \\
-  & {z}_{f , i}^{up} \geq {d}_{min} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_b} \\
-  & {z}_{f , i}^{up} \leq d_{f , i}^{up} - {d}_{min} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_c} \\
-  & {z}_{f , i}^{up} \geq d_{f , i}^{up} - {d}_{max} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_d} \\
-  & {z}_{f , i}^{up} \leq {d}_{max} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_a} \\
-  & {z}_{f , i}^{up} \geq {d}_{min} {c}_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_b} \\
-  & {z}_{f , i}^{up} \leq d_{f - \mathit{ell} , i}^{up} - {d}_{min} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0064\_c} \\
-  & {z}_{f , i}^{up} \geq d_{f - \mathit{ell} , i}^{up} - {d}_{max} \left(1 - {c}_{f - \mathit{ell} , f , i}^{up}\right) . \tag{eq\_0064\_d} \\
-  & {z}_{f , i}^{up} - {z}_{f - \mathit{ell} , i}^{up} \geq {c}_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} , \tag{eq\_0066} \\
+  & f_tilde \left(x\right) \leq F_tilde_{max} \left(1 - theta_tilde\right) \tag{eq\_0057\_a} \\
+  & f_tilde \left(x\right) \geq \mathit{epsilon} + \left(F_tilde_{min} - \mathit{epsilon}\right) theta_tilde . \tag{eq\_0057\_b} \\
+  & - theta_tilde_{1} + theta_tilde_{3} \leq 0 \tag{eq\_0058\_a} \\
+  & - theta_tilde_{2} + theta_tilde_{3} \leq 0 \tag{eq\_0058\_b} \\
+  & theta_tilde_{1} + theta_tilde_{2} - theta_tilde_{3} \leq 1 . \tag{eq\_0058\_c} \\
+  & z_tilde \leq F_tilde_{max} theta_tilde \tag{eq\_0059\_a} \\
+  & z_tilde \geq F_tilde_{min} theta_tilde \tag{eq\_0059\_b} \\
+  & z_tilde \leq f_tilde \left(x\right) - F_tilde_{min} \left(1 - theta_tilde\right) \tag{eq\_0059\_c} \\
+  & z_tilde \geq f_tilde \left(x\right) - F_tilde_{max} \left(1 - theta_tilde\right) . \tag{eq\_0059\_d} \\
+  & - c_{f - \mathit{ell} , i - 1 , i}^{up} + c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_a} \\
+  & - c_{f , i - 1 , i}^{up} + c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_b} \\
+  & c_{f - \mathit{ell} , i}^{up} + c_{f , i}^{up} - c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 1 \tag{eq\_0060\_c} \\
+  & c_tilde_{f - \mathit{ell} , f , i}^{up} \left(d_{f , i}^{up} - d_{f - \mathit{ell} , i}^{up}\right) \geq c_tilde_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} . \tag{eq\_0062} \\
+  & z_tilde_{f , i}^{up} \leq d_tilde_{max} c_tilde_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_a} \\
+  & z_tilde_{f , i}^{up} \geq d_tilde_{min} c_tilde_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0063\_b} \\
+  & z_tilde_{f , i}^{up} \leq d_{f , i}^{up} - d_tilde_{min} \left(1 - c_tilde_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_c} \\
+  & z_tilde_{f , i}^{up} \geq d_{f , i}^{up} - d_tilde_{max} \left(1 - c_tilde_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0063\_d} \\
+  & z_tilde_{f , i}^{up} \leq d_tilde_{max} c_tilde_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_a} \\
+  & z_tilde_{f , i}^{up} \geq d_tilde_{min} c_tilde_{f - \mathit{ell} , f , i}^{up} \tag{eq\_0064\_b} \\
+  & z_tilde_{f , i}^{up} \leq d_{f - \mathit{ell} , i}^{up} - d_tilde_{min} \left(1 - c_tilde_{f - \mathit{ell} , f , i}^{up}\right) \tag{eq\_0064\_c} \\
+  & z_tilde_{f , i}^{up} \geq d_{f - \mathit{ell} , i}^{up} - d_tilde_{max} \left(1 - c_tilde_{f - \mathit{ell} , f , i}^{up}\right) . \tag{eq\_0064\_d} \\
+  & z_tilde_{f , i}^{up} - z_tilde_{f - \mathit{ell} , i}^{up} \geq c_tilde_{f - \mathit{ell} , f , i}^{up} h_{min} , \forall f \in \mathbf{F} , i \in \mathbf{I} , \mathit{ell} \in \left\{1 , 2 , \ldots , L\right\} , \tag{eq\_0066} \\
 \end{align}

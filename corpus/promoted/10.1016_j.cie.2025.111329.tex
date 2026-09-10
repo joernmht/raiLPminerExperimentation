@@ -36,7 +36,7 @@
 %@ con eq_0023_b kind=linear domain=- indicator=- :: Condition: scheduled arrival at upstream end is before disruption start
 %@ con eq_0023_c kind=linear domain=- indicator=- :: Condition: scheduled departure from downstream end is before disruption end
 \begin{align}
-  \min\quad & m i n \sum_{l \in L} \sum_{v \in V} \sum_{v_{r} \in V_{r}} \sum_{r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - \left({t}\right)_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - \left({t}\right)_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
+  \min\quad & m i n \sum_{l \in L, v \in V, v_{r} \in V_{r}, r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - \left(t_tilde\right)_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - \left(t_tilde\right)_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
   & t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} = t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} + t_{\text{l},\text{v},\text{s}}^{\mathit{stop}} , \forall l \in L , v \in V , s \in S \tag{eq\_0009} \\
   & t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v},\text{s}-\text{1}}^{\mathit{dep}} + t_{\text{l},\text{v},[\text{s}-\text{1},\text{s}]}^{\mathit{run}} , \forall l \in L , v \in V , s \in S \tag{eq\_0010} \\
   & h_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v}+\text{1},\text{s}}^{\mathit{arr}} - t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} , \forall l \in L , v \in V , s \in S \tag{eq\_0011} \\
@@ -49,9 +49,9 @@
   & h_{\text{l},\text{v},\text{s}}^{\mathit{dep} - a r r} \geq h_{\text{min}} , \forall l \in L , v \in V , s \in S \tag{eq\_0018} \\
   & t_{l^{+} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{+} , r} = t_{l^{-} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{+} \in L^{+} , v \in V , r \in R , l^{-} \in L^{-} \tag{eq\_0019} \\
   & t_{l^{-} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{-} , r} = t_{l^{+} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{-} \in L^{-} , v \in V , r \in R , l^{+} \in L^{+} \tag{eq\_0020} \\
-  & t_{l , v , e}^{\mathit{arr}} = \left({t}\right)_{l , v , e}^{\mathit{arr}} , \mathit{ift}_{l , v , e}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} , \forall l \in L , v \in V , s \in S \tag{eq\_0021} \\
-  & t_{l , v , e}^{\mathit{dep}} = \left({t}\right)_{l , v , e}^{\mathit{dep}} , \mathit{ift}_{l , v , e}^{\mathit{dep}} > t_{\mathit{break} ,}^{\mathit{end}} , \forall l \in L , v \in V , s \in S \tag{eq\_0022} \\
+  & t_{l , v , e}^{\mathit{arr}} = \left(t_tilde\right)_{l , v , e}^{\mathit{arr}} , \mathit{ift}_{l , v , e}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} , \forall l \in L , v \in V , s \in S \tag{eq\_0021} \\
+  & t_{l , v , e}^{\mathit{dep}} = \left(t_tilde\right)_{l , v , e}^{\mathit{dep}} , \mathit{ift}_{l , v , e}^{\mathit{dep}} > t_{\mathit{break} ,}^{\mathit{end}} , \forall l \in L , v \in V , s \in S \tag{eq\_0022} \\
   & t_{l , v , j}^{\mathit{dep}} > t_{\mathit{break}}^{\mathit{end}} \tag{eq\_0023\_a} \\
-  & i f \left({t}\right)_{l , v , i}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} \tag{eq\_0023\_b} \\
-  & \left({t}\right)_{l , v , j}^{\text{dep}} < t_{\mathit{break}}^{\mathit{end}} , \forall l \in L , v \in V , i \in S , j \in S \tag{eq\_0023\_c} \\
+  & i f \left(t_tilde\right)_{l , v , i}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} \tag{eq\_0023\_b} \\
+  & \left(t_tilde\right)_{l , v , j}^{\text{dep}} < t_{\mathit{break}}^{\mathit{end}} , \forall l \in L , v \in V , i \in S , j \in S \tag{eq\_0023\_c} \\
 \end{align}

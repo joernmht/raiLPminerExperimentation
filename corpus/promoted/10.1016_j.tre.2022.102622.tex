@@ -57,7 +57,7 @@
   & \mathit{gamma}_{p , q}^{3} = \mathit{sigma}_{p}^{l} + \sum_{i = 1}^{4} f_{s_{i}} + \mathit{rho} - \left(f_{s_{6}} + \mathit{sigma}_{q}^{c} + \mathit{sigma}_{q}^{l}\right) < \mathit{gamma}_{p , q}^{2} , \tag{eq\_0007} \\
   & \mathit{gamma}_{p , q}^{2} = \mathit{sigma}_{p}^{l} + t_{p} + \mathit{rho} - \sum_{s \in \mathcal{S}_{p , q}^{p +}} f_{s} ; \tag{eq\_0010} \\
   & \mathit{gamma}_{p , q}^{3} = \mathit{sigma}_{p}^{l} + t_{p} + \mathit{rho} - \sum_{s \in \mathcal{S}_{p , q}^{p +}} f_{s} - \left(\sum_{s \in \mathcal{S}_{p , q}^{q -}} f_{s} + \mathit{sigma}_{q}^{l} + \mathit{sigma}_{q}^{c}\right) . \tag{eq\_0011} \\
-  & \mathit{tau}_{k^{'} , q} \geq \mathit{tau}_{k , p} + \mathit{gamma}_{p , q}^{\mathit{pi}} . \tag{eq\_0012} \\
+  & \mathit{tau}_{kp , q} \geq \mathit{tau}_{k , p} + \mathit{gamma}_{p , q}^{\mathit{pi}} . \tag{eq\_0012} \\
   & y_{k}^{d} - y_{k}^{a} \geq \mathit{Omega}_{k} , \forall k \in \mathcal{K} , \tag{eq\_0013} \\
   & y_{k}^{a} \geq t_{k}^{a} , \forall k \in \mathcal{K} , \tag{eq\_0014} \\
   & y_{k}^{d} \geq t_{k}^{d} , \forall k \in \mathcal{K} , \tag{eq\_0016} \\
@@ -66,11 +66,11 @@
   & w_{k , i} = \sum_{p \in \mathcal{R}^{r}} \left(x_{k , p} \mathit{theta}_{p , i}\right) , \forall k \in \mathcal{K} , i \in \mathcal{T} , \tag{eq\_0020} \\
   & w_{k , i} = \sum_{p \in \mathcal{R}^{d}} \left(x_{k , p} \mathit{delta}_{p , i}\right) , \forall k \in \mathcal{K} , i \in \mathcal{T} . \tag{eq\_0022} \\
   & \sum_{i \in \mathcal{T}} w_{k , i} = 1 , \forall k \in \mathcal{K} . \tag{eq\_0023} \\
-  & M \cdot \left(2 + B_{k , k^{'}} - w_{k , i} - w_{k^{'} , i}\right) + y_{k^{'}}^{r} - y_{k}^{d} \geq \mathit{rho} , \forall k , k^{'} \in \mathcal{K} , k < k^{'} , \forall i \in \mathcal{T} , \tag{eq\_0024} \\
-  & M \cdot \left(3 - B_{k , k^{'}} - w_{k , i} - w_{k^{'} , i}\right) + y_{k}^{r} - y_{k^{'}}^{d} \geq \mathit{rho} , \forall k , k^{'} \in \mathcal{K} , k < k^{'} , \forall i \in \mathcal{T} , \tag{eq\_0026} \\
-  & \mathit{tau}_{k , p} - \mathit{tau}_{k^{'} , p^{'}} + M \cdot \left(3 - V_{k , k^{'}}^{\mathit{phi}} - x_{k , p} - x_{k^{'} , p^{'}}\right) \geq \mathit{gamma}_{p^{'} , p}^{\mathit{pi}} , \forall k , k^{'} \in \mathcal{K} , k \neq k^{'} , \forall p , p^{'} \text{such}\textrm{ }\text{that} \mathit{gamma}_{p^{'} , p}^{\mathit{pi}} > 0 , \tag{eq\_0027} \\
-  & \mathit{tau}_{k^{'} , p^{'}} - \mathit{tau}_{k , p} + M \cdot \left(2 + V_{k , k^{'}}^{\mathit{phi}} - x_{k , p} - x_{k^{'} , p^{'}}\right) \geq \mathit{gamma}_{p , p^{'}}^{\mathit{pi}} , \forall k , k^{'} \in \mathcal{K} , k \neq k^{'} , \forall p , p^{'} \text{such}\textrm{ }\text{that} \mathit{gamma}_{p , p^{'}}^{\mathit{pi}} > 0 , \tag{eq\_0029} \\
-  & M \cdot \left(1 - B_{k , k^{'}}\right) \geq y_{k^{'}}^{a} - y_{k}^{a} , \forall k , k^{'} \in \mathcal{K} , \tag{eq\_0030} \\
-  & M \cdot B_{k , k^{'}} \geq y_{k}^{a} - y_{k^{'}}^{a} , \forall k , k^{'} \in \mathcal{K} . \tag{eq\_0032} \\
-  \min\quad & z \left(\mathbf{x} , \mathbf{y} , \mathbf{w}\right) = \sum_{k \in \mathcal{K}} \left(y_{k}^{a} - t_{k}^{a}\right) + \sum_{k \in \mathcal{K}} \left(y_{k}^{d} - t_{k}^{d}\right) - \mathit{epsilon} \sum_{k \in \mathcal{K}} w_{k , {i}_{k}} , \tag{eq\_0033} \\
+  & M \cdot \left(2 + B_{k , kp} - w_{k , i} - w_{kp , i}\right) + y_{kp}^{r} - y_{k}^{d} \geq \mathit{rho} , \forall k , kp \in \mathcal{K} , k < kp , \forall i \in \mathcal{T} , \tag{eq\_0024} \\
+  & M \cdot \left(3 - B_{k , kp} - w_{k , i} - w_{kp , i}\right) + y_{k}^{r} - y_{kp}^{d} \geq \mathit{rho} , \forall k , kp \in \mathcal{K} , k < kp , \forall i \in \mathcal{T} , \tag{eq\_0026} \\
+  & \mathit{tau}_{k , p} - \mathit{tau}_{kp , pp} + M \cdot \left(3 - V_{k , kp}^{\mathit{phi}} - x_{k , p} - x_{kp , pp}\right) \geq \mathit{gamma}_{pp , p}^{\mathit{pi}} , \forall k , kp \in \mathcal{K} , k \neq kp , \forall p , pp \text{such}\textrm{ }\text{that} \mathit{gamma}_{pp , p}^{\mathit{pi}} > 0 , \tag{eq\_0027} \\
+  & \mathit{tau}_{kp , pp} - \mathit{tau}_{k , p} + M \cdot \left(2 + V_{k , kp}^{\mathit{phi}} - x_{k , p} - x_{kp , pp}\right) \geq \mathit{gamma}_{p , pp}^{\mathit{pi}} , \forall k , kp \in \mathcal{K} , k \neq kp , \forall p , pp \text{such}\textrm{ }\text{that} \mathit{gamma}_{p , pp}^{\mathit{pi}} > 0 , \tag{eq\_0029} \\
+  & M \cdot \left(1 - B_{k , kp}\right) \geq y_{kp}^{a} - y_{k}^{a} , \forall k , kp \in \mathcal{K} , \tag{eq\_0030} \\
+  & M \cdot B_{k , kp} \geq y_{k}^{a} - y_{kp}^{a} , \forall k , kp \in \mathcal{K} . \tag{eq\_0032} \\
+  \min\quad & z \left(\mathbf{x} , \mathbf{y} , \mathbf{w}\right) = \sum_{k \in \mathcal{K}} \left(y_{k}^{a} - t_{k}^{a}\right) + \sum_{k \in \mathcal{K}} \left(y_{k}^{d} - t_{k}^{d}\right) - \mathit{epsilon} \sum_{k \in \mathcal{K}} w_{k , i_bar_{k}} , \tag{eq\_0033} \\
 \end{align}

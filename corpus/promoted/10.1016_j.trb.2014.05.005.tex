@@ -78,25 +78,25 @@
 %@ con eq_0058 kind=linear :: Equation 58 of the paper
 %@ con eq_0059 kind=linear :: Equation 59 of the paper
 \begin{align}
-  \left(\text{P}\quad & 1\right) Z = min \sum_{f} \left\{\left|\underset{i : \left(i , s_{f}\right) \in E^{\text{s}} \left(\text{s}_{f}\right) \cap E_{f}}{\sum} \bar{d}_{f} \left(i , s_{f}\right) - D \left(s_{f}\right)\right|\right\} \tag{eq\_0001} \\
+  \left(\text{P}\quad & 1\right) Z = min \sum_{f} \left\{\left|\underset{i : \left(i , s_{f}\right) \in E^{\text{s}} \left(\text{s}_{f}\right) \cap E_{f}}{\sum} d_bar_{f} \left(i , s_{f}\right) - D \left(s_{f}\right)\right|\right\} \tag{eq\_0001} \\
   & \underset{i , j : \left(i , j\right) \in E^{\text{o}} \left(o_{f}\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = 1 , \forall f \tag{eq\_0002} \\
   & \underset{i : \left(i , j\right) \in E^{\text{s}} \left(j\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = \underset{k : \left(j , k\right) \in E^{\text{o}} \left(j\right) \cap E_{f}}{\sum} x_{f} \left(j , k\right) , \forall f , j \in N - o_{f} - s_{f} \tag{eq\_0003} \\
   & \underset{i , j : \left(i , j\right) \in E^{\text{s}} \left(s_{f}\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = 1 , \forall f \tag{eq\_0004} \\
-  & \sum_{j : \left(o_{f} , j\right) \in E_{f}} \bar{a}_{f} \left(o_{f} , j\right) + \left(1 - x_{f} \left(i , j\right)\right) \cdot M \geq \mathit{EST}_{f} , \forall f \tag{eq\_0005} \\
-  & \sum_{i , j : \left(i , j\right) \in E_{f}} \bar{d}_{f} \left(i , j\right) = \sum_{j , k : \left(j , k\right) \in E_{f}} \bar{a}_{f} \left(j , k\right) , \forall f , j \in N - o_{f} - s_{f} \tag{eq\_0006} \\
-  & x_{f} \left(i , j\right) - 1 \leq \bar{a}_{f} \left(i , j\right) \leq x_{f} \left(i , j\right) \cdot M , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0007} \\
-  & x_{f} \left(i , j\right) - 1 \leq \bar{d}_{f} \left(i , j\right) \leq x_{f} \left(i , j\right) \cdot M , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0008} \\
-  & \mathit{TT}_{f} \left(i , j\right) = \bar{d}_{f} \left(i , j\right) - \bar{a}_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0009} \\
+  & \sum_{j : \left(o_{f} , j\right) \in E_{f}} a_bar_{f} \left(o_{f} , j\right) + \left(1 - x_{f} \left(i , j\right)\right) \cdot M \geq \mathit{EST}_{f} , \forall f \tag{eq\_0005} \\
+  & \sum_{i , j : \left(i , j\right) \in E_{f}} d_bar_{f} \left(i , j\right) = \sum_{j , k : \left(j , k\right) \in E_{f}} a_bar_{f} \left(j , k\right) , \forall f , j \in N - o_{f} - s_{f} \tag{eq\_0006} \\
+  & x_{f} \left(i , j\right) - 1 \leq a_bar_{f} \left(i , j\right) \leq x_{f} \left(i , j\right) \cdot M , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0007} \\
+  & x_{f} \left(i , j\right) - 1 \leq d_bar_{f} \left(i , j\right) \leq x_{f} \left(i , j\right) \cdot M , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0008} \\
+  & \mathit{TT}_{f} \left(i , j\right) = d_bar_{f} \left(i , j\right) - a_bar_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0009} \\
   & \mathit{TT}_{f} \left(i , j\right) + \left(1 - x_{f} \left(i , j\right)\right) \cdot M \geq \mathit{FT}_{f} \left(i , j\right) \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0010} \\
   & \mathit{TT}_{f} \left(i , j\right) + \left(1 - x_{f} \left(i , j\right)\right) \cdot M \geq w_{f}^{min} \left(i , j\right) + \mathit{FT}_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \cap \mathit{Omega} \tag{eq\_0011} \\
   & \mathit{TT}_{f} \left(i , j\right) + \left(x_{f} \left(i , j\right) - 1\right) \cdot M \leq w_{f}^{max} \left(i , j\right) + \mathit{FT}_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \cap \mathit{Omega} \tag{eq\_0012} \\
-  & x_{f} \left(i , j\right) + x_{f^{'}} \left(i , j\right) - 1 \leq \mathit{theta} \left(f , f^{'} , i , j\right) + \mathit{theta} \left(f^{'} , f , i , j\right) \leq 3 - x_{f} \left(i , j\right) - x_{f^{'}} \left(i , j\right) , \forall f , f^{'} , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} \tag{eq\_0013} \\
-  & \mathit{theta} \left(f , f^{'} , i , j\right) \leq x_{f} \left(i , j\right) , \forall f , f^{'} , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} \tag{eq\_0014} \\
-  & \mathit{theta} \left(f , f^{'} , i , j\right) \leq x_{f^{'}} \left(i , j\right) , \forall f , f^{'} , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} \tag{eq\_0015} \\
-  & \bar{a}_{f^{'}} \left(i , j\right) + \left(3 - x_{f} \left(i , j\right) - x_{f^{'}} \left(i , j\right) - \mathit{theta} \left(f , f^{'} , i , j\right)\right) \cdot M \geq \bar{d}_{f} \left(i , j\right) + g + h , \forall f , f^{'} , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} \tag{eq\_0016} \\
-  & \bar{a}_{f} \left(i , j\right) + \left(3 - x_{f} \left(i , j\right) - x_{f^{'}} \left(i , j\right) - \mathit{theta} \left(f^{'} , f , i , j\right)\right) \cdot M \geq \bar{d}_{f^{'}} \left(i , j\right) + g + h , \forall f , f^{'} , f \neq f^{'} , \left(i , j\right) \in E_{f} \cap E_{f^{'}} \tag{eq\_0017} \\
-  & \bar{a}_{f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot \left[a_{f} \left(i , j , t\right) - a_{f} \left(i , j , t - 1\right)\right] \tag{eq\_0018} \\
-  & \bar{d}_{f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot \left[d_{f} \left(i , j , t\right) - d_{f} \left(i , j , t - 1\right)\right] \tag{eq\_0019} \\
+  & x_{f} \left(i , j\right) + x_{fp} \left(i , j\right) - 1 \leq \mathit{theta} \left(f , fp , i , j\right) + \mathit{theta} \left(fp , f , i , j\right) \leq 3 - x_{f} \left(i , j\right) - x_{fp} \left(i , j\right) , \forall f , fp , f \neq fp , \left(i , j\right) \in E_{f} \cap E_{fp} \tag{eq\_0013} \\
+  & \mathit{theta} \left(f , fp , i , j\right) \leq x_{f} \left(i , j\right) , \forall f , fp , f \neq fp , \left(i , j\right) \in E_{f} \cap E_{fp} \tag{eq\_0014} \\
+  & \mathit{theta} \left(f , fp , i , j\right) \leq x_{fp} \left(i , j\right) , \forall f , fp , f \neq fp , \left(i , j\right) \in E_{f} \cap E_{fp} \tag{eq\_0015} \\
+  & a_bar_{fp} \left(i , j\right) + \left(3 - x_{f} \left(i , j\right) - x_{fp} \left(i , j\right) - \mathit{theta} \left(f , fp , i , j\right)\right) \cdot M \geq d_bar_{f} \left(i , j\right) + g + h , \forall f , fp , f \neq fp , \left(i , j\right) \in E_{f} \cap E_{fp} \tag{eq\_0016} \\
+  & a_bar_{f} \left(i , j\right) + \left(3 - x_{f} \left(i , j\right) - x_{fp} \left(i , j\right) - \mathit{theta} \left(fp , f , i , j\right)\right) \cdot M \geq d_bar_{fp} \left(i , j\right) + g + h , \forall f , fp , f \neq fp , \left(i , j\right) \in E_{f} \cap E_{fp} \tag{eq\_0017} \\
+  & a_bar_{f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot \left[a_{f} \left(i , j , t\right) - a_{f} \left(i , j , t - 1\right)\right] \tag{eq\_0018} \\
+  & d_bar_{f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot \left[d_{f} \left(i , j , t\right) - d_{f} \left(i , j , t - 1\right)\right] \tag{eq\_0019} \\
   & \underset{i , j : \left(i , j\right) \in E^{\text{o}} \left(o_{f}\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = 1 , \forall f \tag{eq\_0021} \\
   & \underset{i : \left(i , j\right) \in E^{\text{s}} \left(j\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = \underset{k : \left(j , k\right) \in E^{\text{o}} \left(j\right) \cap E_{f}}{\sum} x_{f} \left(j , k\right) , \forall f , j \in N - o_{f} - s_{f} \tag{eq\_0022} \\
   & \underset{i , j : \left(i , j\right) \in E^{\text{s}} \left(s_{f}\right) \cap E_{f}}{\sum} x_{f} \left(i , j\right) = 1 , \forall f \tag{eq\_0023} \\
@@ -109,7 +109,7 @@
   & \mathit{TT}_{f} \left(i , j\right) \geq \mathit{FT}_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \tag{eq\_0030} \\
   & w_{f}^{min} \left(i , j\right) + \mathit{FT}_{f} \left(i , j\right) \leq \mathit{TT}_{f} \left(i , j\right) \leq w_{f}^{max} \left(i , j\right) + \mathit{FT}_{f} \left(i , j\right) , \forall f , \left(i , j\right) \in E_{f} \cap \mathit{Omega} \tag{eq\_0031} \\
   & y_{f} \left(i , j , t\right) = a_{f} \left(i , j , t + g\right) - d_{f} \left(i , j , t - h\right) , \forall f , \left(i , j\right) \in E_{f} , t \tag{eq\_0032} \\
-  & \sum_{f : \left(i , j\right) \in E_{f}} y_{f} \left(i , j , t\right) + \underset{f^{'} : \left(j , i\right) \in E_{f^{'}}}{\sum} y_{f^{'}} \left(j , i , t\right) \leq \mathit{Cap} \left(i , j , t\right) , \forall i , j , t \tag{eq\_0033} \\
+  & \sum_{f : \left(i , j\right) \in E_{f}} y_{f} \left(i , j , t\right) + \underset{fp : \left(j , i\right) \in E_{fp}}{\sum} y_{fp} \left(j , i , t\right) \leq \mathit{Cap} \left(i , j , t\right) , \forall i , j , t \tag{eq\_0033} \\
   & a_{f} \left(i , j , t\right) \geq a_{f} \left(i , j , t - 1\right) , \forall f , \left(i , j\right) \in E_{f} , t \tag{eq\_0034} \\
   & d_{f} \left(i , j , t\right) \geq d_{f} \left(i , j , t - 1\right) , \forall f , \left(i , j\right) \in E_{f} , t \tag{eq\_0035} \\
   & \mathit{delta}_{f} \left(i , j , t\right) = a_{f} \left(i , j , t\right) - a_{f} \left(i , j , t - 1\right) \tag{eq\_0041} \\
@@ -123,7 +123,7 @@
   & \mathit{TT}_{f} \left(\mathit{phi}_{f}^{p , m}\right) \geq \mathit{FT}_{f} \left(\mathit{phi}_{f}^{p , m}\right) , \forall f , p , m \tag{eq\_0054} \\
   & w_{f}^{min} \left(\mathit{phi}_{f}^{p , m}\right) + \mathit{FT}_{f} \left(\mathit{phi}_{f}^{p , m}\right) \leq \mathit{TT}_{f} \left(\mathit{phi}_{f}^{p , m}\right) \leq w_{f}^{max} \left(\mathit{phi}_{f}^{p , m}\right) + \mathit{FT}_{f} \left(\mathit{phi}_{f}^{p , m}\right) , \forall f , \mathit{phi}_{f}^{p , m} \in \mathit{Omega} \tag{eq\_0055} \\
   & y_{f}^{p} \left(m , t\right) = a_{f}^{p} \left(m , t + g\right) - d_{f}^{p} \left(m , t - h\right) , \forall f , p , m , t \tag{eq\_0056} \\
-  & \underset{f^{'} , p^{'} , m^{'} : \mathit{phi}_{f^{'}}^{p^{'} , m^{'}} = \mathit{phi}_{f}^{p , m}}{\sum} y_{f^{'}}^{p^{'}} \left(m^{'} , t\right) \leq \mathit{Cap} \left(\mathit{phi}_{f}^{p , m} , t\right) , \forall f , p , m , t \tag{eq\_0057} \\
+  & \underset{fp , pp , mp : \mathit{phi}_{fp}^{pp , mp} = \mathit{phi}_{f}^{p , m}}{\sum} y_{fp}^{pp} \left(mp , t\right) \leq \mathit{Cap} \left(\mathit{phi}_{f}^{p , m} , t\right) , \forall f , p , m , t \tag{eq\_0057} \\
   & a_{f}^{p} \left(m , t\right) \geq a_{f}^{p} \left(m , t - 1\right) , \forall f , p , m , t \tag{eq\_0058} \\
   & d_{f}^{p} \left(m , t\right) \geq d_{f}^{p} \left(m , t - 1\right) , \forall f , p , m , t \tag{eq\_0059} \\
 \end{align}

@@ -46,18 +46,18 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Relaxed Lagrangian objective with penalty terms.
 %@ con eq_0020 kind=linear domain=- indicator=- :: Remaining constraint in the relaxed integrated model.
 \begin{align}
-  \min\quad & \sum_{p \in P} \sum_{\left(i , j , t , t^{'}\right) \in A_{p a}^{p}} c_{i , j , t , t^{'}}^{p} \cdot n_{p} \cdot v_{i , j , t , t^{'}}^{p} + \mathit{omega} \cdot \sum_{k \in K} \sum_{\left(i , j , t , t^{'}\right) \in A_{t r}^{k}} c_{i , j , t , t^{'}}^{k} \cdot x_{i , j , t , t^{'}}^{k} \tag{eq\_0007} \\
-  & \begin{aligned}\textbf{subject} \textbf{to}: & & \\ & & \text{Train} \text{operational} \text{constraints}: \\ & & \underset{\left(i , j , t , t^{'}\right) \in A_{t r , o_{k}}^{k , +}}{\sum} x_{i , j , t , t^{'}}^{k} = 1 \forall k \in K\end{aligned} \tag{eq\_0008} \\
-  & \sum_{\left(i , j , t , t^{'}\right) \in A_{t r , i}^{k , -}} x_{i , j , t , t^{'}}^{k} = \sum_{\left(j , i , t , t^{'}\right) \in A_{t r , i}^{k , +}} x_{j , i , t , t^{'}}^{k} \forall k \in K , \forall i \in N^{k} : i \neq o_{k} \cap i \neq d_{k} , \tag{eq\_0009} \\
-  & \underset{\left(i , j , t , t^{'}\right) \in A_{t r , d_{k}}^{k , -}}{\sum} x_{i , j , t , t^{'}}^{k} = 1 \forall k \in K \tag{eq\_0010} \\
-  & \sum_{k \in K} \sum_{\left(i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'}\right) \in \mathit{Phi} \left(i , j , t , t^{'}\right)} x_{i^{'} , j^{'} , \mathit{tau} , \mathit{tau}^{'}}^{k} \leq 1 \forall \left(i , j , t , t^{'}\right) \in A_{t r}^{d r i v e} \text{or} \left(i , j , t , t^{'}\right) \in A_{t r}^{S t r a c k} \tag{eq\_0011} \\
-  & x_{i , j , t , t^{'}}^{k} \in \left\{0 , 1\right\} \forall \left(i , j , t , t^{'}\right) \in A_{t r} , \forall k \in K \tag{eq\_0012} \\
-  & \begin{matrix} & & \text{Passenger} \text{route} \text{choice} \text{constraints}: \\ & & \underset{\left(i , j , t , t^{'}\right) \in A_{p a , o_{p}^{'}}^{p , +}}{\sum} v_{i , j , t , t^{'}}^{p} = 1 \forall p \in P\end{matrix} \tag{eq\_0013} \\
-  & \underset{\left(i , j , t , t^{'}\right) \in A_{p a , d_{p}^{'}}^{p , -}}{\sum} v_{i , j , t , t^{'}}^{p} = 1 \forall p \in P \tag{eq\_0014} \\
-  & \sum_{\left(i , j , t , t^{'}\right) \in A_{p a , i}^{p , -}} v_{i , j , t , t^{'}}^{p} = \sum_{\left(j , i , t , t^{'}\right) \in A_{p a , i}^{p , +}} v_{j , i , t , t^{'}}^{p} \forall p \in P , \forall i \in N^{p} : i \neq o_{p}^{'} \cap i \neq d_{p}^{'} \tag{eq\_0015} \\
-  & \sum_{p \in P} n_{p} \cdot v_{i , j , t , t^{'}}^{p} \leq \sum_{k \in K} q_{k} \cdot x_{i , j , t , t^{'}}^{k} \forall \left(i , j , t , t^{'}\right) \in A_{t r} \cap A_{p a} \tag{eq\_0016} \\
-  & v_{i , j , t , t^{'}}^{p} \geq x_{i , j , t , t^{'}}^{k} \forall k \in K , \forall p \in P^{k} , \forall \left(i , j , t , t^{'}\right) \in A_{t r}^{k} \cap A_{p a}^{p} \tag{eq\_0017} \\
-  & v_{i , j , t , t^{'}}^{p} \in \left\{0 , 1\right\} \forall p \in P , \forall \left(i , j , t , t^{'}\right) \in A_{p a}^{p} \tag{eq\_0018} \\
-  & \sum_{k \in K} \sum_{a^{'} \in \mathit{Phi} \left(a\right) \left.\right)} x_{a^{'}}^{k} + r_{a} = 1 \tag{eq\_0019} \\
+  \min\quad & \sum_{p \in P, \left(i , j , t , tp\right) \in A_{p a}^{p}} c_{i , j , t , tp}^{p} \cdot n_{p} \cdot v_{i , j , t , tp}^{p} + \mathit{omega} \cdot \sum_{k \in K, \left(i , j , t , tp\right) \in A_{t r}^{k}} c_{i , j , t , tp}^{k} \cdot x_{i , j , t , tp}^{k} \tag{eq\_0007} \\
+  & \begin{aligned}\textbf{subject} \textbf{to}: & & \\ & & \text{Train} \text{operational} \text{constraints}: \\ & & \underset{\left(i , j , t , tp\right) \in A_{t r , o_{k}}^{k , +}}{\sum} x_{i , j , t , tp}^{k} = 1 \forall k \in K\end{aligned} \tag{eq\_0008} \\
+  & \sum_{\left(i , j , t , tp\right) \in A_{t r , i}^{k , -}} x_{i , j , t , tp}^{k} = \sum_{\left(j , i , t , tp\right) \in A_{t r , i}^{k , +}} x_{j , i , t , tp}^{k} \forall k \in K , \forall i \in N^{k} : i \neq o_{k} \cap i \neq d_{k} , \tag{eq\_0009} \\
+  & \underset{\left(i , j , t , tp\right) \in A_{t r , d_{k}}^{k , -}}{\sum} x_{i , j , t , tp}^{k} = 1 \forall k \in K \tag{eq\_0010} \\
+  & \sum_{k \in K, \left(ip , jp , \mathit{tau} , taup\right) \in \mathit{Phi} \left(i , j , t , tp\right)} x_{ip , jp , \mathit{tau} , taup}^{k} \leq 1 \forall \left(i , j , t , tp\right) \in A_{t r}^{d r i v e} \text{or} \left(i , j , t , tp\right) \in A_{t r}^{S t r a c k} \tag{eq\_0011} \\
+  & x_{i , j , t , tp}^{k} \in \left\{0 , 1\right\} \forall \left(i , j , t , tp\right) \in A_{t r} , \forall k \in K \tag{eq\_0012} \\
+  & \begin{matrix} & & \text{Passenger} \text{route} \text{choice} \text{constraints}: \\ & & \underset{\left(i , j , t , tp\right) \in A_{p a , o_{p}^{'}}^{p , +}}{\sum} v_{i , j , t , tp}^{p} = 1 \forall p \in P\end{matrix} \tag{eq\_0013} \\
+  & \underset{\left(i , j , t , tp\right) \in A_{p a , d_{p}^{'}}^{p , -}}{\sum} v_{i , j , t , tp}^{p} = 1 \forall p \in P \tag{eq\_0014} \\
+  & \sum_{\left(i , j , t , tp\right) \in A_{p a , i}^{p , -}} v_{i , j , t , tp}^{p} = \sum_{\left(j , i , t , tp\right) \in A_{p a , i}^{p , +}} v_{j , i , t , tp}^{p} \forall p \in P , \forall i \in N^{p} : i \neq o_{p}^{'} \cap i \neq d_{p}^{'} \tag{eq\_0015} \\
+  & \sum_{p \in P} n_{p} \cdot v_{i , j , t , tp}^{p} \leq \sum_{k \in K} q_{k} \cdot x_{i , j , t , tp}^{k} \forall \left(i , j , t , tp\right) \in A_{t r} \cap A_{p a} \tag{eq\_0016} \\
+  & v_{i , j , t , tp}^{p} \geq x_{i , j , t , tp}^{k} \forall k \in K , \forall p \in P^{k} , \forall \left(i , j , t , tp\right) \in A_{t r}^{k} \cap A_{p a}^{p} \tag{eq\_0017} \\
+  & v_{i , j , t , tp}^{p} \in \left\{0 , 1\right\} \forall p \in P , \forall \left(i , j , t , tp\right) \in A_{p a}^{p} \tag{eq\_0018} \\
+  & \sum_{k \in K, ap \in \mathit{Phi} \left(a\right) \left.\right)} x_{ap}^{k} + r_{a} = 1 \tag{eq\_0019} \\
   & \sum_{p \in P} n_{p} \cdot v_{a}^{p} + s_{a} = \sum_{k \in K} q_{k} \cdot x_{a}^{k} \tag{eq\_0020} \\
 \end{align}

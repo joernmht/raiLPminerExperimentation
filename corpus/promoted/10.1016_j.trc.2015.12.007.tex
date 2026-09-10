@@ -32,15 +32,15 @@
 %@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity: number of waiting trains at station i at time t cannot exceed sidetracks u_i.
 %@ con eq_0011 kind=linear domain=- indicator=- :: No overtaking: two trains cannot use the same single-track section within conflicting time windows.
 \begin{align}
-  & \mathit{pi} \left(k\right) = \mathit{pi}^{max} \left(k\right) - \left[\mathit{alpha} \left(k\right) \cdot \sum_{i} \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right)\right] - \left[\mathit{beta} \left(k\right) \cdot \sum_{i} y_{o \left(k\right) , i} \left(k\right)\right] \forall k \tag{eq\_0001} \\
+  & \mathit{pi} \left(k\right) = \mathit{pi}^{max} \left(k\right) - \left[\mathit{alpha} \left(k\right) \cdot \sum_{i, s, t} x_{i , i}^{t , s} \left(k\right)\right] - \left[\mathit{beta} \left(k\right) \cdot \sum_{i} y_{o \left(k\right) , i} \left(k\right)\right] \forall k \tag{eq\_0001} \\
   \text{Z}_{1}\quad & = max \sum_{k} \mathit{pi} \left(k\right) \tag{eq\_0002} \\
-  & \sum_{s} \sum_{j} x_{i , j}^{t , s} \left(k\right) - \sum_{s} \sum_{j} x_{j , i}^{s , t} \left(k\right) = \left\{\begin{matrix} 1 & i = o \left(k\right) , t = t_{o} \left(k\right) \\ - 1 & i = q \left(k\right) , t = t_{q} \left(k\right) \\ 0 & \text{otherwise} \end{matrix}\right \forall k , i , t \tag{eq\_0003} \\
+  & \sum_{s, j} x_{i , j}^{t , s} \left(k\right) - \sum_{s, j} x_{j , i}^{s , t} \left(k\right) = \left\{\begin{matrix} 1 & i = o \left(k\right) , t = t_{o} \left(k\right) \\ - 1 & i = q \left(k\right) , t = t_{q} \left(k\right) \\ 0 & \text{otherwise} \end{matrix}\right \forall k , i , t \tag{eq\_0003} \\
   & y_{o \left(k\right) , i} \left(k\right) = 0 \cdot i \leq o \left(k\right) \text{or} i > q \left(k\right) \forall k \tag{eq\_0004} \\
   & \sum_{k} y_{i , j} \left(k\right) \geq v_{i , j} \forall i , j , i \neq j \tag{eq\_0005} \\
-  & \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right) \leq w_{i}^{max} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0006} \\
-  & \sum_{s} \sum_{t} x_{i , i}^{t , s} \left(k\right) \geq w_{i}^{min} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0007} \\
-  & \sum_{k} \sum_{j} \sum_{s} \sum_{t \in \left(t^{'} , t^{'} + f\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall i , t^{'} \tag{eq\_0008} \\
-  & \sum_{k} \sum_{i} \sum_{t} \sum_{s \in \left(t^{'} , t^{'} + h\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall j , t^{'} \tag{eq\_0009} \\
-  & \sum_{k} \sum_{s} x_{i , i}^{t , s} \left(k\right) \leq u_{i} \forall i , t \tag{eq\_0010} \\
-  & x_{i , j}^{t^{'} , t^{'} + l_{i , j} \left(k\right)} \left(k\right) + \sum_{s \in \left[t^{'} , t^{'} + l_{i , j} \left(k\right)\right]} \sum_{t \in \left[t^{'} , t^{'} + l_{i , j} \left(k\right)\right]} x_{i , j}^{t , s} \left(k^{'}\right) \leq 1 \forall i , j , k , k^{'} , t^{'} \tag{eq\_0011} \\
+  & \sum_{s, t} x_{i , i}^{t , s} \left(k\right) \leq w_{i}^{max} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0006} \\
+  & \sum_{s, t} x_{i , i}^{t , s} \left(k\right) \geq w_{i}^{min} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0007} \\
+  & \sum_{k, j, s, t \in \left(tp , tp + f\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall i , tp \tag{eq\_0008} \\
+  & \sum_{k, i, t, s \in \left(tp , tp + h\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall j , tp \tag{eq\_0009} \\
+  & \sum_{k, s} x_{i , i}^{t , s} \left(k\right) \leq u_{i} \forall i , t \tag{eq\_0010} \\
+  & x_{i , j}^{tp , tp + l_{i , j} \left(k\right)} \left(k\right) + \sum_{s \in \left[tp , tp + l_{i , j} \left(k\right)\right], t \in \left[tp , tp + l_{i , j} \left(k\right)\right]} x_{i , j}^{t , s} \left(kp\right) \leq 1 \forall i , j , k , kp , tp \tag{eq\_0011} \\
 \end{align}

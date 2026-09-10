@@ -57,35 +57,35 @@
 %@ con eq_0044 kind=ordering domain=- indicator=- :: Station ordering in the destination line: C[d]_l - C[b]_l > 0.
 %@ con eq_0045 kind=linear domain=- indicator=- :: Nonnegativity of bus waiting times w and bus departure times t_ij^B.
 \begin{align}
-  \max\quad & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} p_{l l^{'}}^{k} \cdot x_{l l^{'}}^{k} + \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \cdot p_{l l^{'}}^{i j} \tag{eq\_0001} \\
-  & p_{l l^{'}}^{k} = \sum_{i = 1}^{k - 1} \sum_{j = k + 1}^{z} p_{l l^{'}}^{i j} \cdot k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0002} \\
+  \max\quad & \sum_{\forall l \in L, \forall lp \in L, k \in S \left(l\right) \cap S \left(lp\right)} p_{l lp}^{k} \cdot x_{l lp}^{k} + \sum_{\forall l \in L, \forall lp \in L, \forall i \in S \left(l\right), \forall j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \cdot p_{l lp}^{i j} \tag{eq\_0001} \\
+  & p_{l lp}^{k} = \sum_{i = 1}^{k - 1} \sum_{j = k + 1}^{z} p_{l lp}^{i j} \cdot k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0002} \\
   & \mathit{Arr}_{k}^{l} = t_{l}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l} + \sum_{s = 0}^{k - 1} t_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0003} \\
-  & \mathit{Dep}_{k}^{l^{'}} = t_{l^{'}}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l^{'}} + \sum_{s = 0}^{k} t_{s}^{l^{'}} \forall k \in S \left(l\right) , \forall l^{'} \in L \tag{eq\_0004} \\
+  & \mathit{Dep}_{k}^{lp} = t_{lp}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{lp} + \sum_{s = 0}^{k} t_{s}^{lp} \forall k \in S \left(l\right) , \forall lp \in L \tag{eq\_0004} \\
   & T_{l}^{min} \leq t_{l}^{R} \leq T_{l}^{max} \forall l \in L \tag{eq\_0005} \\
   & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \leq \mathit{Dep}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0006} \\
-  & t_{k l l^{'}}^{R} = \mathit{Dep}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0007} \\
-  & M \cdot \left(x_{l l^{'}}^{k} - 1\right) \leq t_{k l l^{'}}^{R} \leq M \cdot x_{l l^{'}}^{k} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0009} \\
-  & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq N \forall l \neq l^{'} , \forall i \neq j \tag{eq\_0010} \\
-  & x_{l l^{'}}^{k} + \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall l , l^{'} \in L , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0011} \\
+  & t_{k l lp}^{R} = \mathit{Dep}_{k}^{lp} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0007} \\
+  & M \cdot \left(x_{l lp}^{k} - 1\right) \leq t_{k l lp}^{R} \leq M \cdot x_{l lp}^{k} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0009} \\
+  & \sum_{\forall l \in L, \forall lp \in L, \forall i \in S \left(l\right), \forall j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \leq N \forall l \neq lp , \forall i \neq j \tag{eq\_0010} \\
+  & x_{l lp}^{k} + \mathit{alpha}_{l lp}^{i j} \leq 1 \forall l , lp \in L , \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) \tag{eq\_0011} \\
   & C \left[k\right]_{l} - C \left[i\right]_{l} > 0 \forall i , k \in S \left(l\right) , \forall l \in L \tag{eq\_0012} \\
-  & C \left[j\right]_{l^{'}} - C \left[k\right]_{l^{'}} > 0 \forall j , k \in S \left(l^{'}\right) , \forall l^{'} \in L \tag{eq\_0013} \\
-  & \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall k \in S \left(l\right) \cap S \left(l^{'}\right)} \left(1 - x_{l l^{'}}^{k}\right) - \sum_{\forall l \in L} \sum_{\forall l^{'} \in L} \sum_{\forall i \in S \left(l\right)} \sum_{\forall j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \geq 0 \tag{eq\_0014} \\
-  & \sum_{j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall l , l^{'} \in L \tag{eq\_0015} \\
-  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0016} \\
-  & x_{l l^{'}}^{k} , \mathit{alpha}_{l l^{'}}^{i j} \in \left\{0 , 1\right\} \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0017} \\
+  & C \left[j\right]_{lp} - C \left[k\right]_{lp} > 0 \forall j , k \in S \left(lp\right) , \forall lp \in L \tag{eq\_0013} \\
+  & \sum_{\forall l \in L, \forall lp \in L, \forall k \in S \left(l\right) \cap S \left(lp\right)} \left(1 - x_{l lp}^{k}\right) - \sum_{\forall l \in L, \forall lp \in L, \forall i \in S \left(l\right), \forall j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \geq 0 \tag{eq\_0014} \\
+  & \sum_{j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall l , lp \in L \tag{eq\_0015} \\
+  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l lp}^{i j} \leq 1 \forall j \in S \left(lp\right) , \forall l , lp \in L \tag{eq\_0016} \\
+  & x_{l lp}^{k} , \mathit{alpha}_{l lp}^{i j} \in \left\{0 , 1\right\} \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) \tag{eq\_0017} \\
   & t_{l}^{R} , \mathit{Arr}_{k}^{l} , \mathit{Dep}_{k}^{l} \geq 0 \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0018} \\
-  & t_{k l l^{'}}^{R} = \left(\mathit{Arr}_{k}^{l^{'}} + t_{k}^{l^{'}}\right) - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} = \left(\mathit{Arr}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}}\right) + t_{k}^{l^{'}} \tag{eq\_0019} \\
-  & \begin{aligned}\mathit{Delta}_{k l l^{'}}^{R} & = & \mathit{Arr}_{k}^{l^{'}} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l l^{'}} \\ & = & \left(t_{l^{'}}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l^{'}} + \sum_{s = 0}^{k - 1} t_{s}^{l^{'}} \right) \\ & & - \left(t_{l}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l} + \sum_{s = 0}^{k - 1} t_{s}^{l}\right) - \mathit{Tra}_{k}^{l l^{'}}\end{aligned} \tag{eq\_0020} \\
-  & t_{k l l^{'}}^{R} = \mathit{Delta}_{k l l^{'}}^{R} + t_{s}^{l^{'}} \forall k \in S \left(l\right) \cap S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0021} \\
-  & w_{l l^{'}}^{k} = t_{k l l^{'}}^{R} - \left\|t_{k l l^{'}}^{R} / H_{l^{'}}^{R}\right\| \cdot H_{l^{'}}^{R} + M \cdot \left(1 - x_{l l^{'}}^{k}\right) , \tag{eq\_0032} \\
-  & X = \sum_{l \in L} \sum_{l^{'} \in L} \sum_{k \in S \left(l\right) \cap S \left(l^{'}\right)} x_{l l^{'}}^{k} \forall l , l^{'} \in L , \forall k \in S \left(l\right) \cap S \left(l^{'}\right) \tag{eq\_0033} \\
-  & \begin{aligned}w_{i j}^{B} & = & max \left\{t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{R B} , M \cdot \left(1 - \mathit{alpha}_{l l^{'}}^{i j}\right)\right\} \\ & & \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L\end{aligned} \tag{eq\_0037} \\
-  & \begin{aligned}w_{i j}^{B} & = & t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{\text{RB}} + M \cdot \left(1 - \mathit{alpha}_{l l^{'}}^{i j}\right) \forall i \in S \left(l\right) , \\ & & \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L\end{aligned} \tag{eq\_0038} \\
-  & t_{min}^{B} \leq t_{i j}^{B} + \mathit{Delta}_{i j}^{B} \leq t_{max}^{B} \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) \tag{eq\_0039} \\
-  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l l^{'}}^{i j} + \sum_{j \in S \left(l^{'}\right)} \mathit{alpha}_{l l^{'}}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0040} \\
-  & \mathit{alpha}_{l l^{'}}^{i d} - \mathit{alpha}_{l l^{'}}^{i b} \geq 0 \forall i \in S \left(l\right) , \forall b , d \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0041} \\
-  & C \left[d\right]_{l^{'}} - C \left[b\right]_{l^{'}} > 0 \forall b , d \in S \left(l^{'}\right) , \forall l^{'} \in L \tag{eq\_0042} \\
-  & \mathit{alpha}_{l l^{'}}^{b j} - \mathit{alpha}_{l l^{'}}^{d j} \geq 0 \forall b , d \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0043} \\
+  & t_{k l lp}^{R} = \left(\mathit{Arr}_{k}^{lp} + t_{k}^{lp}\right) - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l lp} = \left(\mathit{Arr}_{k}^{lp} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l lp}\right) + t_{k}^{lp} \tag{eq\_0019} \\
+  & \begin{aligned}\mathit{Delta}_{k l lp}^{R} & = & \mathit{Arr}_{k}^{lp} - \mathit{Arr}_{k}^{l} - \mathit{Tra}_{k}^{l lp} \\ & = & \left(t_{lp}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{lp} + \sum_{s = 0}^{k - 1} t_{s}^{lp} \right) \\ & & - \left(t_{l}^{R} + \sum_{s = 1}^{k} t_{\left(s - 1\right) s}^{l} + \sum_{s = 0}^{k - 1} t_{s}^{l}\right) - \mathit{Tra}_{k}^{l lp}\end{aligned} \tag{eq\_0020} \\
+  & t_{k l lp}^{R} = \mathit{Delta}_{k l lp}^{R} + t_{s}^{lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0021} \\
+  & w_{l lp}^{k} = t_{k l lp}^{R} - \left\|t_{k l lp}^{R} / H_{lp}^{R}\right\| \cdot H_{lp}^{R} + M \cdot \left(1 - x_{l lp}^{k}\right) , \tag{eq\_0032} \\
+  & X = \sum_{l \in L, lp \in L, k \in S \left(l\right) \cap S \left(lp\right)} x_{l lp}^{k} \forall l , lp \in L , \forall k \in S \left(l\right) \cap S \left(lp\right) \tag{eq\_0033} \\
+  & \begin{aligned}w_{i j}^{B} & = & max \left\{t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{R B} , M \cdot \left(1 - \mathit{alpha}_{l lp}^{i j}\right)\right\} \\ & & \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) , \forall l , lp \in L\end{aligned} \tag{eq\_0037} \\
+  & \begin{aligned}w_{i j}^{B} & = & t_{i j}^{B} + \mathit{Delta}_{i j}^{B} - \mathit{Arr}_{i}^{l} - \mathit{Tra}_{i}^{\text{RB}} + M \cdot \left(1 - \mathit{alpha}_{l lp}^{i j}\right) \forall i \in S \left(l\right) , \\ & & \forall j \in S \left(lp\right) , \forall l , lp \in L\end{aligned} \tag{eq\_0038} \\
+  & t_{min}^{B} \leq t_{i j}^{B} + \mathit{Delta}_{i j}^{B} \leq t_{max}^{B} \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) \tag{eq\_0039} \\
+  & \sum_{i \in S \left(l\right)} \mathit{alpha}_{l lp}^{i j} + \sum_{j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \leq 1 \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) , \forall l , lp \in L \tag{eq\_0040} \\
+  & \mathit{alpha}_{l lp}^{i d} - \mathit{alpha}_{l lp}^{i b} \geq 0 \forall i \in S \left(l\right) , \forall b , d \in S \left(lp\right) , \forall l , lp \in L \tag{eq\_0041} \\
+  & C \left[d\right]_{lp} - C \left[b\right]_{lp} > 0 \forall b , d \in S \left(lp\right) , \forall lp \in L \tag{eq\_0042} \\
+  & \mathit{alpha}_{l lp}^{b j} - \mathit{alpha}_{l lp}^{d j} \geq 0 \forall b , d \in S \left(l\right) , \forall j \in S \left(lp\right) , \forall l , lp \in L \tag{eq\_0043} \\
   & C \left[d\right]_{l} - C \left[b\right]_{l} > 0 \forall b , d \in S \left(l\right) , \forall l \in L \tag{eq\_0044} \\
-  & w_{i j}^{B} , t_{i j}^{B} \geq 0 \forall i \in S \left(l\right) , \forall j \in S \left(l^{'}\right) , \forall l , l^{'} \in L \tag{eq\_0045} \\
+  & w_{i j}^{B} , t_{i j}^{B} \geq 0 \forall i \in S \left(l\right) , \forall j \in S \left(lp\right) , \forall l , lp \in L \tag{eq\_0045} \\
 \end{align}

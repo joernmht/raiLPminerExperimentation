@@ -62,10 +62,10 @@
 %@ con eq_0027_c kind=linear domain=- indicator=- :: Ordering sum constraint p_ijk + p_jik = 1 for trains in different directions
 %@ con eq_0029 kind=linear domain=- indicator=- :: Waiting time calculation r_i = M(1 - b_i) when train cannot proceed
 \begin{align}
-  & a_{i k} = \left(\bar{a}\right)_{i k} , \text{if} \left(\bar{a}\right)_{i k} \leq t_{s} , i \in O , k \in \left\{2 , 3 , \ldots , k^{\star}\right\} , \tag{eq\_0002} \\
-  & d_{i k} = \left(\bar{d}\right)_{i k} , \text{if} \left(\bar{d}\right)_{i k} \leq t_{s} , i \in O , k \in \left\{1 , 2 , 3 , \ldots , k^{\star} - 1\right\} , \tag{eq\_0003} \\
-  & a_{i k} = \left(\bar{a}\right)_{i k} , \text{if} \left(\bar{a}\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m - 1\right\} , \tag{eq\_0004} \\
-  & d_{i k} = \left(\bar{d}\right)_{i k} , \text{if} \left(\bar{d}\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m\right\} . \tag{eq\_0005} \\
+  & a_{i k} = \left(a_bar\right)_{i k} , \text{if} \left(a_bar\right)_{i k} \leq t_{s} , i \in O , k \in \left\{2 , 3 , \ldots , k^{\star}\right\} , \tag{eq\_0002} \\
+  & d_{i k} = \left(d_bar\right)_{i k} , \text{if} \left(d_bar\right)_{i k} \leq t_{s} , i \in O , k \in \left\{1 , 2 , 3 , \ldots , k^{\star} - 1\right\} , \tag{eq\_0003} \\
+  & a_{i k} = \left(a_bar\right)_{i k} , \text{if} \left(a_bar\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m - 1\right\} , \tag{eq\_0004} \\
+  & d_{i k} = \left(d_bar\right)_{i k} , \text{if} \left(d_bar\right)_{i k} \leq t_{s} , i \in I , k \in \left\{l^{\star} + 1 , \ldots , m\right\} . \tag{eq\_0005} \\
   & a_{i , k + 1} + h_{0} \leq a_{j , k + 1} + M \left(1 - q_{i j k}\right) , i , j \in O , k \in E , \tag{eq\_0006} \\
   & a_{j , k + 1} + h_{0} \leq a_{i , k + 1} + M \left(1 - q_{j i k}\right) , i , j \in O , k \in E . \tag{eq\_0007} \\
   & d_{i k} + h_{0} \leq d_{j k} + M \left(1 - q_{i j k}\right) , i , j \in O , k \in E \tag{eq\_0008} \\
@@ -76,18 +76,18 @@
   & d_{j , k + 1} + h_{0} \leq d_{i , k + 1} + M \left(1 - q_{j i k}\right) , i , j \in I , k \in E , \tag{eq\_0013} \\
   & d_{j k^{\star}} + h_{j i k^{\star}}^{d a} \leq a_{i k^{\star}} + M \left(1 - p_{j i k^{\star}}\right) , i \in O \cap R , j \in I \cap R , \tag{eq\_0014} \\
   & a_{i , l^{\star} + 1} + h_{i j , l^{\star} + 1}^{a d} \leq d_{j , l^{\star} + 1} + M \left(1 - p_{i j , l^{\star} + 1}\right) , i \in O \cap R , j \in I \cap R . \tag{eq\_0015} \\
-  & d_{i k} - a_{i k} \geq \left(\bar{t}\right)_{i k} , i \in O \cup I , k \in V . \tag{eq\_0016} \\
-  & a_{i n} \geq \left(\bar{a}\right)_{i n} , i \in O , \tag{eq\_0017} \\
-  & a_{j 1} \geq \left(\bar{a}\right)_{j 1} , j \in I . \tag{eq\_0018} \\
+  & d_{i k} - a_{i k} \geq \left(t_bar\right)_{i k} , i \in O \cup I , k \in V . \tag{eq\_0016} \\
+  & a_{i n} \geq \left(a_bar\right)_{i n} , i \in O , \tag{eq\_0017} \\
+  & a_{j 1} \geq \left(a_bar\right)_{j 1} , j \in I . \tag{eq\_0018} \\
   & a_{i k} \geq t_{r} , i \in B \cap I , k \in W . \tag{eq\_0019} \\
   & d_{i k^{\star}} + h_{0} \leq d_{j k^{\star}} + M \left(1 - q_{i j k}\right) , i \in I \cap G , j \in I \cap B , \tag{eq\_0020} \\
   & d_{j k^{\star}} + h_{0} \leq d_{i k^{\star}} + M \left(1 - q_{j i k}\right) , i \in I \cap G , j \in I \cap B . \tag{eq\_0021} \\
-  & \left(\bar{a}\right)_{i , k^{\star} - 1} - \left(\bar{d}\right)_{i k^{\star}} + t_{c} \leq a_{i , k^{\star} - 1} - d_{i k^{\star}} , i \in I \cap R , \tag{eq\_0022} \\
-  & \left(\bar{a}\right)_{i l^{\star}} - \left(\bar{d}\right)_{i , l^{\star} + 1} + t_{c} \leq a_{i l^{\star}} - d_{i , l^{\star} + 1} , i \in I \cap R . \tag{eq\_0023} \\
+  & \left(a_bar\right)_{i , k^{\star} - 1} - \left(d_bar\right)_{i k^{\star}} + t_{c} \leq a_{i , k^{\star} - 1} - d_{i k^{\star}} , i \in I \cap R , \tag{eq\_0022} \\
+  & \left(a_bar\right)_{i l^{\star}} - \left(d_bar\right)_{i , l^{\star} + 1} + t_{c} \leq a_{i l^{\star}} - d_{i , l^{\star} + 1} , i \in I \cap R . \tag{eq\_0023} \\
   & q_{i j k} = 1 , \text{if} i < j , i , j \in O - G \text{or} i , j \in I - G . \tag{eq\_0024} \\
   & \mathit{kappa} < \mathit{Gamma} , \tag{eq\_0025} \\
-  & T_{d} = \sum_{i \in O} \left(a_{i n} - \left(\bar{a}\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(\bar{a}\right)_{i 1}\right) . \tag{eq\_0026} \\
-  \min\quad & \sum_{i \in O} \left(a_{i n} - \left(\bar{a}\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(\bar{a}\right)_{i 1}\right) \tag{eq\_0027\_a} \\
+  & T_{d} = \sum_{i \in O} \left(a_{i n} - \left(a_bar\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(a_bar\right)_{i 1}\right) . \tag{eq\_0026} \\
+  \min\quad & \sum_{i \in O} \left(a_{i n} - \left(a_bar\right)_{i n}\right) + \sum_{i \in I} \left(a_{i 1} - \left(a_bar\right)_{i 1}\right) \tag{eq\_0027\_a} \\
   & q_{i j k} + q_{j i k} = 1 , i , j \in R \cap I , \text{or} i , j \in R \cap O , k \in V \tag{eq\_0027\_b} \\
   & p_{i j k} + p_{j i k} = 1 , i \in R \cap I \text{and} j \in R \cap O , \text{or} i \in R \cap O \text{and} j \in R \cap I , k \in V \tag{eq\_0027\_c} \\
   & r_{i} = M \left(1 - b_{i}\right) . \tag{eq\_0029} \\

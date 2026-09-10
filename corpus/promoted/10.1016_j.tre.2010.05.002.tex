@@ -35,15 +35,15 @@
 %@ con eq_0013 kind=linear domain=- indicator=- :: Binary integrality of train slot selection variables
 %@ con eq_0014 kind=linear domain=- indicator=- :: Reduced cost definition for train slot i on route k
 \begin{align}
-  \min\quad & z \left(x\right) = \sum_{k \in K} \sum_{i \in I^{k}} \sum_{a \in A^{i}} c_{a} \cdot x_{a} \tag{eq\_0001} \\
-  & \text{Subject to} \sum_{i \in I^{k}} \sum_{a \in d_{i}^{+} \left(\mathit{alpha}\right)} x_{a} = \mathit{eta}^{k} , \forall k \in K \tag{eq\_0002} \\
+  \min\quad & z \left(x\right) = \sum_{k \in K, i \in I^{k}, a \in A^{i}} c_{a} \cdot x_{a} \tag{eq\_0001} \\
+  & \text{Subject to} \sum_{i \in I^{k}, a \in d_{i}^{+} \left(\mathit{alpha}\right)} x_{a} = \mathit{eta}^{k} , \forall k \in K \tag{eq\_0002} \\
   & \sum_{a \in d_{i}^{+} \left(\mathit{alpha}\right)} x_{a} \leq 1 , \forall i \in I^{k} \forall k \in K \tag{eq\_0003} \\
   & \sum_{a \in d_{i}^{-} \left(n^{t}\right)} x_{a} = \sum_{a \in d_{i}^{+} \left(n^{t}\right)} x_{a} , \forall i \in I^{k} \forall k \in K \forall n^{t} \in N_{T} \backslash \left\{\mathit{alpha} , \mathit{beta}\right\} \forall t \in T \tag{eq\_0004} \\
   & \sum_{a \in d_{i}^{-} \left(\mathit{beta}\right)} x_{a} \leq 1 , \forall i \in I^{k} \forall k \in K \tag{eq\_0005} \\
   & \sum_{a \in C} x_{a} \leq 1 , \forall C \in \hbar \tag{eq\_0006} \\
   & x_{a} \in \left\{0 , 1\right\} , \forall a \in A^{i} \forall i \in I^{k} \forall k \in K \tag{eq\_0007} \\
   & \text{subject to} \sum_{i \in I^{k}} y_{i} = \mathit{eta}^{k} , \forall k \in K \tag{eq\_0011} \\
-  & \sum_{k \in K} \sum_{i \in I^{k}} \mathit{delta}_{\mathit{lt}}^{i} \cdot y_{i} \leq \mathit{ell}_{\mathit{lt}} , \forall l \in L \forall t \in T \tag{eq\_0012} \\
+  & \sum_{k \in K, i \in I^{k}} \mathit{delta}_{\mathit{lt}}^{i} \cdot y_{i} \leq \mathit{ell}_{\mathit{lt}} , \forall l \in L \forall t \in T \tag{eq\_0012} \\
   & y_i \in \{0,1\}, \forall i \in I^k \forall k \in K \tag{eq\_0013} \\
-  & \mathit{lambda}_{i}^{k} = c_{i} + \mathit{rho} \left(\mathit{mu}_{i}\right) + \sum_{t \in T} \sum_{l \in L} \mathit{delta}_{\mathit{lt}}^{i} ϖ_{\mathit{lt}} - \mathit{sigma}^{k} , \forall i \in I^{k} \forall k \in K . \tag{eq\_0014} \\
+  & \mathit{lambda}_{i}^{k} = c_{i} + \mathit{rho} \left(\mathit{mu}_{i}\right) + \sum_{t \in T, l \in L} \mathit{delta}_{\mathit{lt}}^{i} ϖ_{\mathit{lt}} - \mathit{sigma}^{k} , \forall i \in I^{k} \forall k \in K . \tag{eq\_0014} \\
 \end{align}

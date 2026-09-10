@@ -70,16 +70,16 @@
   & \mathtt{FinishIns} \underline \mathtt{time} \left(s\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i\right) \tag{eq\_0003\_b} \\
   & H^{k} \left(s_{m}\right) \supseteq N^{p} \left(s_{m} , s_{m + 1}\right) \forall m \in \left\{0 , \ldots , n - 1\right\} \tag{eq\_0006\_a} \\
   & H^{k} \left(s_{n}\right) \supseteq N^{p} \left(s_{n}\right) \tag{eq\_0006\_b} \\
-  \min\quad & \sum_{k \in K} \sum_{p \in P^{k}} c_{p}^{k} \cdot x_{p}^{k} \tag{eq\_0007} \\
-  & \text{subject to} \sum_{k \in K} \sum_{p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} = 1 \forall i \in I \cup D , \tag{eq\_0008} \\
-  & \sum_{k \in K} \sum_{p \in P^{k}} a_{\hat{i} p}^{k} \cdot x_{p}^{k} \leq 2 \forall \hat{i} \in \hat{I} , \tag{eq\_0009} \\
+  \min\quad & \sum_{k \in K, p \in P^{k}} c_{p}^{k} \cdot x_{p}^{k} \tag{eq\_0007} \\
+  & \text{subject to} \sum_{k \in K, p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} = 1 \forall i \in I \cup D , \tag{eq\_0008} \\
+  & \sum_{k \in K, p \in P^{k}} a_{i_hat p}^{k} \cdot x_{p}^{k} \leq 2 \forall i_hat \in I_hat , \tag{eq\_0009} \\
   & \sum_{p \in P^{k}} x_{p}^{k} = 1 \forall k \in K , \tag{eq\_0010} \\
-  & \sum_{k \in K} \sum_{p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \leq L_{t}^{b} \forall b \in B \forall t \in T , \tag{eq\_0011} \\
+  & \sum_{k \in K, p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \leq L_{t}^{b} \forall b \in B \forall t \in T , \tag{eq\_0011} \\
   & x_{p}^{k} \in \left\{0 , 1\right\} \forall k \in K \forall p \in P^{k} . \tag{eq\_0012} \\
   & \text{find} k \in K \cdot p \in P^{k} \tag{eq\_0021\_a} \\
-  & \text{such that} c_{p}^{k} - \sum_{i \in I \cup \hat{I} \cup D} a_{\mathit{ip}}^{k} \cdot \mathit{lambda}_{i} - \mathit{mu}^{k} - \sum_{b \in B} \sum_{t \in T} a_{\mathit{tp}}^{\mathit{bk}} \cdot \mathit{nu}_{t}^{b} < 0 \tag{eq\_0021\_b} \\
-  & I_{\mathit{ell} + 1} := I_{\mathit{ell}} \cup \left\{i \in I \cup D \left|\right. \sum_{k \in K} \sum_{p \in P_{\mathit{ell}}^{k}} a_{\mathit{ip}}^{k} \bar{x}_{p}^{k} + \bar{y} > 1\right\} \tag{eq\_0023\_a} \\
-  & \hat{I}_{\mathit{ell} + 1} := \hat{I}_{\mathit{ell}} \cup \left\{\hat{i} \in \hat{I} \left|\right. \sum_{k \in K} \sum_{p \in P_{\mathit{ell}}^{k}} a_{\hat{i} p}^{k} \bar{x}_{p}^{k} + 2 \bar{y} > 2\right\} \tag{eq\_0023\_b} \\
-  & z_{i}^{k} := \sum_{p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} \forall k \in K \forall i \in I \cup \hat{I} \cup D \tag{eq\_0024\_a} \\
+  & \text{such that} c_{p}^{k} - \sum_{i \in I \cup I_hat \cup D} a_{\mathit{ip}}^{k} \cdot \mathit{lambda}_{i} - \mathit{mu}^{k} - \sum_{b \in B, t \in T} a_{\mathit{tp}}^{\mathit{bk}} \cdot \mathit{nu}_{t}^{b} < 0 \tag{eq\_0021\_b} \\
+  & I_{\mathit{ell} + 1} := I_{\mathit{ell}} \cup \left\{i \in I \cup D \left|\right. \sum_{k \in K, p \in P_{\mathit{ell}}^{k}} a_{\mathit{ip}}^{k} \cdot x_bar_{p}^{k} + y_bar > 1\right\} \tag{eq\_0023\_a} \\
+  & I_hat_{\mathit{ell} + 1} := I_hat_{\mathit{ell}} \cup \left\{i_hat \in I_hat \left|\right. \sum_{k \in K, p \in P_{\mathit{ell}}^{k}} a_{i_hat p}^{k} \cdot x_bar_{p}^{k} + 2 y_bar > 2\right\} \tag{eq\_0023\_b} \\
+  & z_{i}^{k} := \sum_{p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} \forall k \in K \forall i \in I \cup I_hat \cup D \tag{eq\_0024\_a} \\
   & z_{t}^{\mathit{bk}} := \sum_{p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \forall k \in K \forall b \in B \forall t \in T \tag{eq\_0024\_b} \\
 \end{align}

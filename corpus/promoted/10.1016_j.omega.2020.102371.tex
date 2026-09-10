@@ -96,9 +96,9 @@
   & t \cdot d_{i , s} \geq t_{m , s}^{e n d} - \left(1 - \mathit{delta}_{1 , i , s}\right) M , s , s + 1 \in S_{i , m} , \tag{eq\_0019} \\
   & t_{m , s}^{e n d} - T_{m , s}^{s t a r t} = \sum_{a_{q}} m_{a_{q} , s} \cdot T_{min}^{a_{q}} + \mathit{omega}_{s}^{m} , s , s + 1 \in S_{m} , \tag{eq\_0020} \\
   & \sum_{a_{q}} m_{a_{q} , s} = 1 , s , s + 1 \in S_{m} . \tag{eq\_0021} \\
-  & \begin{aligned}t a_{i , s^{'} + 1} - t \cdot d_{i , s^{'}} & \geq & \left(\mathit{tau}_{i , s}^{m o} + \mathit{omega}_{i , s^{'}}^{r}\right) \left(\mathit{delta}_{2 , i , s} + \mathit{delta}_{3 , i , s} - y_{i} - 1\right) , \\ & & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0024} \\
-  & \begin{aligned}t a_{i , s + 1} - t \cdot d_{i , s} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{m^{'}} + \mathit{omega}_{i , s}^{r}\right) - y_{i} \cdot M - \left(1 - \mathit{delta}_{1 , i , s}\right) M , \\ & & s , s + 1 \in S_{i , m} ,\end{aligned} \tag{eq\_0025} \\
-  & \begin{aligned}t a_{i , s^{'} + 1} - t \cdot d_{i , s^{'}} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{m^{'} o} + \mathit{omega}_{i , s^{'}}^{r}\right) - y_{i} \cdot M - \mathit{delta}_{2 , i , s} M , \\ & & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0026} \\
+  & \begin{aligned}t a_{i , sp + 1} - t \cdot d_{i , sp} & \geq & \left(\mathit{tau}_{i , s}^{m o} + \mathit{omega}_{i , sp}^{r}\right) \left(\mathit{delta}_{2 , i , s} + \mathit{delta}_{3 , i , s} - y_{i} - 1\right) , \\ & & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0024} \\
+  & \begin{aligned}t a_{i , s + 1} - t \cdot d_{i , s} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{mp} + \mathit{omega}_{i , s}^{r}\right) - y_{i} \cdot M - \left(1 - \mathit{delta}_{1 , i , s}\right) M , \\ & & s , s + 1 \in S_{i , m} ,\end{aligned} \tag{eq\_0025} \\
+  & \begin{aligned}t a_{i , sp + 1} - t \cdot d_{i , sp} & \geq & \sum_{a_{q}} m_{a_{q} , s} \left(\mathit{tau}_{i , s , a_{q}}^{mp o} + \mathit{omega}_{i , sp}^{r}\right) - y_{i} \cdot M - \mathit{delta}_{2 , i , s} M , \\ & & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} ,\end{aligned} \tag{eq\_0026} \\
   & z_{i , s}^{1} \leq \mathit{delta}_{1 , i , s} , s , s + 1 \in S_{i , m} . \tag{eq\_0027} \\
   & t \cdot d_{j , s} \geq t \cdot d_{i , s} - \left(1 - z_{i , s}^{1}\right) M - \left(1 - \mathit{delta}_{1 , j , s}\right) M \tag{eq\_0028\_a} \\
   & i \neq j , s , s + 1 \in S_{i , j , m} \tag{eq\_0028\_b} \\
@@ -109,7 +109,7 @@
   & \sum_{i} \mathit{delta}_{1 , i , s} \leq \sum_{i} z_{i , s}^{1} \cdot M , s , s + 1 \in S_{i , m} , \tag{eq\_0032} \\
   & \sum_{i} \mathit{delta}_{1 , i , s} - 1 \leq \sum_{i} z_{i , s}^{2} \cdot M , s , s + 1 \in S_{i , m} . \tag{eq\_0033} \\
   & t a_{i , s + 1} - t \cdot d_{i , s} \geq z_{i , s}^{1} \mathit{tau}_{s}^{m 1} + z_{i , s}^{2} \mathit{tau}_{s}^{m 2} + w_{i , s}^{r} , s , s + 1 \in S_{i , m} , \tag{eq\_0034} \\
-  & T_{1} = \sum_{i} \sum_{s \in S_{i}} d a_{i , s}^{+} + \sum_{i} \sum_{s \in S_{i}} d a_{i , s}^{-} + \sum_{i} \sum_{s \in S_{i}} d \cdot d_{i , s} , \tag{eq\_0035} \\
+  & T_{1} = \sum_{i, s \in S_{i}} d a_{i , s}^{+} + \sum_{i, s \in S_{i}} d a_{i , s}^{-} + \sum_{i, s \in S_{i}} d \cdot d_{i , s} , \tag{eq\_0035} \\
   & d a_{i , s}^{+} \geq \left(t a_{i , s} - T a_{i , s}\right) Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0036} \\
   & d a_{i , s}^{+} \geq y_{i} \cdot M_{1} \cdot Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0037} \\
   & d a_{i , s}^{-} \geq \left(T a_{i , s} - t a_{i , s}\right) Y_{i , s}^{d} - y_{i} \cdot M , s \in S_{i} , \tag{eq\_0038} \\
@@ -117,11 +117,11 @@
   & d \cdot d_{i , s} \geq \left(t \cdot d_{i , s} - T \cdot d_{i , s}\right) Y_{i , s}^{d} , s \in S_{i} , \tag{eq\_0040} \\
   & d \cdot d_{i , s} \geq y_{i} \cdot M_{1} \cdot Y_{i , s}^{d} , s \in S_{i} . \tag{eq\_0041} \\
   & T_{2} = \sum_{i} C_{y_{i}} \cdot y_{i} . \tag{eq\_0042} \\
-  & T_{3} = \sum_{i} \sum_{s \in S_{i}} u_{i , s}^{d} . \tag{eq\_0043} \\
-  & T_{4} = \sum_{s \in S_{m}} \sum_{a_{q}} C_{a_{q}} \cdot m_{a_{q} , s} , \tag{eq\_0044} \\
+  & T_{3} = \sum_{i, s \in S_{i}} u_{i , s}^{d} . \tag{eq\_0043} \\
+  & T_{4} = \sum_{s \in S_{m}, a_{q}} C_{a_{q}} \cdot m_{a_{q} , s} , \tag{eq\_0044} \\
   \min\quad & a T_{1} + b \cdot T_{2} + c \cdot T_{3} + d \cdot T_{4} , \tag{eq\_0045} \\
   & \sum_{j = 1 , j \neq i , s \in S_{j}}^{N} Z_{i , j , s} - y_{i} \cdot M \leq C_{s} - 1 , s \in S_{i} , Z_{i , j , s} \leq 1 - y_{i} , s \in S_{i} , Z_{i , j , s} \geq 0 , s \in S_{i} , Z_{i , j , s} \leq u_{i , j , s} - x_{i , j , s}^{a} , s \in S_{i} \tag{eq\_0057\_a} \\
   & Z_{i , j , s} \geq u_{i , j , s} - x_{i , j , s}^{a} - y_{j} , s \in S_{i} \tag{eq\_0057\_b} \\
-  & \begin{matrix}\begin{cases} t \cdot d_{i , s^{'}} - t_{m , s}^{e n d} \leq \left(M_{2 , i , s} - \mathit{epsilon}\right) \left(1 - \mathit{delta}_{2 , i , s}\right) + \mathit{epsilon} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , s^{'}} - t_{m , s}^{e n d} \geq m_{2 , i , s} \mathit{delta}_{2 , i , s} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases} \end{matrix} \tag{eq\_0059} \\
-  & \begin{matrix}\begin{cases} t \cdot d_{i , s^{'}} - T_{m , s}^{s t a r t} \leq \left(M_{3 , i , s} - \mathit{epsilon}\right) \mathit{delta}_{3 , i , s} + \mathit{epsilon} , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , s^{'}} - T_{m , s}^{s t a r t} \geq m_{3 , i , s} \left(1 - \mathit{delta}_{3 , i , s}\right) , & s^{'} , s^{'} + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases}\end{matrix} \tag{eq\_0061} \\
+  & \begin{matrix}\begin{cases} t \cdot d_{i , sp} - t_{m , s}^{e n d} \leq \left(M_{2 , i , s} - \mathit{epsilon}\right) \left(1 - \mathit{delta}_{2 , i , s}\right) + \mathit{epsilon} , & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , sp} - t_{m , s}^{e n d} \geq m_{2 , i , s} \mathit{delta}_{2 , i , s} , & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases} \end{matrix} \tag{eq\_0059} \\
+  & \begin{matrix}\begin{cases} t \cdot d_{i , sp} - T_{m , s}^{s t a r t} \leq \left(M_{3 , i , s} - \mathit{epsilon}\right) \mathit{delta}_{3 , i , s} + \mathit{epsilon} , & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} , \\ t \cdot d_{i , sp} - T_{m , s}^{s t a r t} \geq m_{3 , i , s} \left(1 - \mathit{delta}_{3 , i , s}\right) , & sp , sp + 1 \in S_{i} , s , s + 1 \in S_{m} , \end{cases}\end{matrix} \tag{eq\_0061} \\
 \end{align}

@@ -71,11 +71,11 @@
 %@ con eq_0041 kind=linear domain=- indicator=- :: Reward function of the MDP
 %@ con eq_0042 kind=linear domain=- indicator=- :: Bellman optimality equation for the Q-function
 \begin{align}
-  & d_{k^{ \cdot } , i^{ \cdot }} = {d}_{k^{ \cdot } , i^{ \cdot }} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0001} \\
-  & a_{k^{ \cdot } , i^{ \cdot }} = {a}_{k^{ \cdot } , i^{ \cdot }} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0002} \\
-  & d_{k , i} = \left(1 - \mathit{xi}_{k , i}\right) {d}_{k , i} + \mathit{xi}_{k , i} \left[{d}_{k , i} + t_{\text{end}} - t_{\text{start}} - \underset{\genfrac{}{}{0pt}{}{k^{'} \in \mathcal{K}}{k^{ \cdot } < k^{'} \leq k}}{\sum} \sum_{i^{'} \in \mathcal{I}} \mathit{xi}_{k^{'} , i^{'}} \left(h_{p} - h_{min}\right)\right] , \tag{eq\_0004} \\
-  & a_{k , i} = {a}_{k , i} , \forall i \in \mathcal{I}_{k}^{r} , k \in \mathcal{K} . \tag{eq\_0007} \\
-  & x_{k , i , j} = {x}_{k , i , j} , \forall j \in \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} . \tag{eq\_0008} \\
+  & d_{k^{*} , i^{*}} = d_bar_{k^{*} , i^{*}} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0001} \\
+  & a_{k^{*} , i^{*}} = a_bar_{k^{*} , i^{*}} + t_{\text{end}} - t_{\text{start}} . \tag{eq\_0002} \\
+  & d_{k , i} = \left(1 - \mathit{xi}_{k , i}\right) d_bar_{k , i} + \mathit{xi}_{k , i} \left[d_bar_{k , i} + t_{\text{end}} - t_{\text{start}} - \underset{\genfrac{}{}{0pt}{}{kp \in \mathcal{K}}{k^{*} < kp \leq k}}{\sum} \sum_{ip \in \mathcal{I}} \mathit{xi}_{kp , ip} \left(h_{p} - h_{min}\right)\right] , \tag{eq\_0004} \\
+  & a_{k , i} = a_bar_{k , i} , \forall i \in \mathcal{I}_{k}^{r} , k \in \mathcal{K} . \tag{eq\_0007} \\
+  & x_{k , i , j} = x_bar_{k , i , j} , \forall j \in \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} . \tag{eq\_0008} \\
   & \sum_{\left(j , i\right) \in \mathcal{L}} x_{k , j , i} = \sum_{\left(i , j\right) \in \mathcal{L}} x_{k , i , j} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0009} \\
   & a_{k , j} - d_{k , i} \geq \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} r_{i , j}^{q} - M \cdot \left(1 - x_{k , i , j}\right) , \forall j \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} , \tag{eq\_0011} \\
   & a_{k , j} - d_{k , i} \leq \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} r_{i , j}^{q} + M \cdot \left(1 - x_{k , i , j}\right) , \forall j \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} , \left(i , j\right) \in \mathcal{L} , k \in \mathcal{K} , \tag{eq\_0012} \\
@@ -83,7 +83,7 @@
   & d_{k , i} - a_{k , i} \geq \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} s_{i}^{w} - M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} , \tag{eq\_0014} \\
   & d_{k , i} - a_{k , i} \leq \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} s_{i}^{w} + M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} , \tag{eq\_0015} \\
   & \sum_{w \in \mathcal{W}} \mathit{tau}_{k , i}^{w} = y_{k , i} , \forall i \in i \in \mathcal{I} \backslash \mathcal{I}_{k}^{r} \cap \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0016} \\
-  & a_{k , i} - d_{k^{'} , i} \geq h_{min} - M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I}_{s} , k , k^{'} \in \mathcal{K} , k^{'} < k . \tag{eq\_0017} \\
+  & a_{k , i} - d_{kp , i} \geq h_{min} - M \cdot \left(1 - y_{k , i}\right) , \forall i \in \mathcal{I}_{s} , k , kp \in \mathcal{K} , kp < k . \tag{eq\_0017} \\
   & \sum_{\left(i , j\right) \in \mathcal{L}_{u}} x_{k , i , j} \leq 1 , \forall k \in \mathcal{K} , \tag{eq\_0018} \\
   & \sum_{\left(i , j\right) \in \mathcal{L}_{b}} x_{k , i , j} \leq 1 , \forall k \in \mathcal{K} . \tag{eq\_0019} \\
   & m_{i} \left(t\right) = m_{i} \left(t - \mathit{delta}\right) + m_{i}^{b} \left(t\right) - m_{i}^{u} \left(t\right) , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} \backslash \left\{t_{0}\right\} . \tag{eq\_0020} \\
@@ -96,10 +96,10 @@
   & 0 \leq m_{i} \left(t\right) \leq 1 , \forall i \in \mathcal{I}_{g} , t \in \mathcal{T} . \tag{eq\_0027} \\
   & n_{k , i} = n_{k , i - 1} - n_{k , i}^{a} + n_{k , i}^{b} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0035} \\
   & n_{k , i}^{r} = n_{k , i}^{w} - n_{k , i}^{b} , \forall i \in \mathcal{I}_{s} , k \in \mathcal{K} . \tag{eq\_0036} \\
-  & Z_{k}^{d} = \sum_{i \in \mathcal{I}_{k}^{p}} \left(\left|a_{k , i} - {a}_{k , i} \cdot y_{k , i}\right| + \left|d_{k , i} - {d}_{k , i} \cdot y_{k , i}\right|\right) . \tag{eq\_0037} \\
-  & Z_{k}^{c} = \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{s}} \left({y}_{k , i} - y_{k , i}\right) . \tag{eq\_0038} \\
+  & Z_{k}^{d} = \sum_{i \in \mathcal{I}_{k}^{p}} \left(\left|a_{k , i} - a_bar_{k , i} \cdot y_{k , i}\right| + \left|d_{k , i} - d_bar_{k , i} \cdot y_{k , i}\right|\right) . \tag{eq\_0037} \\
+  & Z_{k}^{c} = \sum_{i \in \mathcal{I}_{k}^{p} \cap \mathcal{I}_{s}} \left(y_bar_{k , i} - y_{k , i}\right) . \tag{eq\_0038} \\
   & Z_{k}^{p} = \sum_{i \in \mathcal{I}_{k}^{p}} n_{k , i}^{r} . \tag{eq\_0039} \\
-  & Z_{k}^{e} = \sum_{\left(i , j\right) \in \mathcal{L}} \sum_{q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} E_{i , j}^{q} . \tag{eq\_0040} \\
+  & Z_{k}^{e} = \sum_{\left(i , j\right) \in \mathcal{L}, q \in \mathcal{Q}} \mathit{alpha}_{k , i , j}^{q} E_{i , j}^{q} . \tag{eq\_0040} \\
   & \left(\text{master \cdot model}\right) \left\{\begin{matrix} & min \textrm{ } Z = \sum_{k \in \mathcal{K}} \left(\mathit{omega}_{d} Z_{k}^{d} + \mathit{omega}_{c} Z_{k}^{c} + \mathit{omega}_{p} Z_{k}^{p} + \mathit{omega}_{e} Z_{k}^{e}\right) , \\ & s . t . \\ & \text{constraints }(\text{1})–(\text{35}), \end{matrix}\right \tag{eq\_0041} \\
   & \left(\text{submodel} k\right) \left\{\begin{matrix} & min \textrm{ } Z_{k} = \mathit{omega}_{d} Z_{k}^{d} + \mathit{omega}_{c} Z_{k}^{c} + \mathit{omega}_{p} Z_{k}^{p} + \mathit{omega}_{e} Z_{k}^{e} , \\ & s . t . \\ & \text{constraints }(\text{1})–(\text{35})\text{ for train service} k . \end{matrix}\right \tag{eq\_0042} \\
   \max_{\mathit{pi}}\quad & \mathcal{E} \left[R \left(\mathbf{S}_{k , i} , \mathbf{A}_{k , i}\right) + \mathit{gamma} R \left(\mathbf{S}_{k , j} , \mathbf{A}_{k , j}\right) + \cdots \left|\mathbf{S}_{k , i} , \mathbf{A}_{k , i} , \mathbf{O}_{k} , \mathit{pi}\right)\right] \tag{eq\_0049} \\

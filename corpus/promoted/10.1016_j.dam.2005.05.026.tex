@@ -51,7 +51,7 @@
 %@ con eq_0025 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
 %@ con eq_0026 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
 \begin{align}
-  \max\quad & \sum_{j \in T} \sum_{a \in A^{j}} p_{a} x_{a} \tag{eq\_0002} \\
+  \max\quad & \sum_{j \in T, a \in A^{j}} p_{a} x_{a} \tag{eq\_0002} \\
   & \text{s}.\text{t}. \sum_{a \in \mathit{delta}_{j}^{+} \left(\mathit{sigma}\right)} x_{a} \leq 1 , j \in T , \tag{eq\_0003} \\
   & \sum_{a \in \mathit{delta}_{j}^{-} \left(v\right)} x_{a} = \sum_{a \in \mathit{delta}_{j}^{+} \left(v\right)} x_{a} , j \in T , v \in V^{j} \backslash \left\{\mathit{sigma} , \mathit{tau}\right\} , \tag{eq\_0004} \\
   & z_{\mathit{jv}} = \sum_{a \in \mathit{delta}_{j}^{-} \left(v\right)} x_{a} , j \in T , v \in V^{j} , \tag{eq\_0005} \\
@@ -64,13 +64,13 @@
   & b_{i}^{\mathit{jk}} := max \left\{d_{i} , a_{i + 1} + t_{j} - t_{k}\right\} \tag{eq\_0014} \\
   & \sum_{w \in W^{i} \cap V^{j} : v_{1} \preceq w \prec v_{2}} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{j} : w \succeq v_{2} , \mathit{Delta} \left(v_{2} , w\right) < b_{i}^{\mathit{kj}}}{\sum} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{k} : w \succeq v_{2} , \mathit{Delta} \left(v_{1} , w\right) < b_{i}^{\mathit{jk}}}{\sum} z_{\mathit{kw}} \leq 1 , i \in S \backslash \left\{s\right\} , j , k \in T , j \neq k , i , i + 1 \in S^{j} \cap S^{k} , v_{1} , v_{2} \in W^{i} , v_{1} \preceq v_{2} , \mathit{Delta} \left(v_{1} , v_{2}\right) < b_{i}^{\mathit{jk}} . \tag{eq\_0015} \\
   & \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} = \sum_{w \in W^{i} \cap V^{j} : w \succeq u - t_{j}} z_{\mathit{jw}} . \tag{eq\_0016} \\
-  & \sum_{w \in W^{i} \cap V^{j}} \sum_{a \in \mathit{delta}_{j}^{-} \left(w\right)} x_{a} \leq 1 \tag{eq\_0017} \\
+  & \sum_{w \in W^{i} \cap V^{j}, a \in \mathit{delta}_{j}^{-} \left(w\right)} x_{a} \leq 1 \tag{eq\_0017} \\
   & \sum_{w \in W^{i} \cap V^{j}} z_{\mathit{jw}} \leq 1 . \tag{eq\_0018} \\
   & \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} = \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{j} : w \succeq u - t_{j}} z_{\mathit{jw}} \leq \sum_{w \in W^{i} \cap V^{j}} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} \leq 1 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} . \tag{eq\_0019} \\
   & \sum_{w \in W^{i} \cap V^{k} : w \succeq v} z_{\mathit{kw}} + \sum_{w \in W^{i} \cap V^{k} : w \preceq u} z_{\mathit{kw}} \leq 1 + \sum_{w \in W^{i} \cap V^{k} : v \preceq w \preceq u - t_{k}} z_{\mathit{kw}} , \tag{eq\_0020} \\
   & 2 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \preceq v} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{k} : v \preceq w \preceq u - t_{k}} z_{\mathit{kw}} \leq 2 + \sum_{w \in W^{i} \cap V^{j} : u - t_{j} \preceq w \prec v} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{j} : w \succeq v , \mathit{Delta} \left(v , w\right) < b_{i}^{\mathit{kj}}}{\sum} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{k} : w \succeq v , \mathit{Delta} \left(u - t_{j} , w\right) < b_{i}^{\mathit{jk}}}{\sum} z_{\mathit{kw}} \tag{eq\_0021} \\
   & b_{i}^{\mathit{jk}} := t_{j} + c_{i} . \tag{eq\_0023} \\
-  & \sum_{j \in T \left(i , t\right)} \sum_{a \in A^{j} \left(i , t\right)} x_{a} \leq k_{i} , i \in S , t = 1 , \ldots , q . \tag{eq\_0024} \\
+  & \sum_{j \in T \left(i , t\right), a \in A^{j} \left(i , t\right)} x_{a} \leq k_{i} , i \in S , t = 1 , \ldots , q . \tag{eq\_0024} \\
   & \mathit{alpha}_{a} = \sum_{t = \mathit{theta} \left(u\right)}^{\mathit{theta} \left(v\right)} \mathit{lambda}_{\mathit{it}} , \tag{eq\_0025} \\
   & \mathit{beta}_{i , t} := \sum_{p = 1}^{t} \mathit{lambda}_{\mathit{ip}} \tag{eq\_0026} \\
 \end{align}

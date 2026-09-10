@@ -40,14 +40,14 @@
 \begin{align}
   \min\quad & \mathit{alpha} \cdot \left(Z_{1} + Z_{2} + Z_{3} + Z_{4}\right) + \left(1 - \mathit{alpha}\right) Z_{5} \tag{eq\_0006} \\
   & \sum_{l \in L_{k}} x_{k}^{l} \leq 1 , \forall k \in K \tag{eq\_0007} \\
-  & \sum_{i^{'} \in S , i^{'} \leq i} \sum_{j \in S , j > i} p_{i^{'} j}^{k} \leq F_{k} , \forall k \in K , i \in S \backslash \left\{\left|S\right|\right\} \tag{eq\_0008} \\
+  & \sum_{ip \in S , ip \leq i, j \in S , j > i} p_{ip j}^{k} \leq F_{k} , \forall k \in K , i \in S \backslash \left\{\left|S\right|\right\} \tag{eq\_0008} \\
   & \sum_{k \in K} p_{i j}^{k} \leq P_{i j} , \forall i , j \in S , i < j \tag{eq\_0009} \\
-  & \sum_{k \in K} \sum_{l \in L_{k}} x_{k}^{l} \mathit{theta}_{l}^{i} \mathit{theta}_{l}^{j} \geq q_{i j}^{o} , \forall i , j \in S , i < j \tag{eq\_0010} \\
+  & \sum_{k \in K, l \in L_{k}} x_{k}^{l} \mathit{theta}_{l}^{i} \mathit{theta}_{l}^{j} \geq q_{i j}^{o} , \forall i , j \in S , i < j \tag{eq\_0010} \\
   & p_{i j}^{k} \leq M \sum_{l \in L_{k}} x_{k}^{l} \mathit{theta}_{l}^{i} \mathit{theta}_{l}^{i} , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0011} \\
-  & \sum_{i , t : \left(i , i^{'} , t , t^{'}\right) \in E_{k}} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) - \sum_{i , t : \left(i^{'} , i , t^{'} , t\right) \in E_{k}} y_{k}^{l} \left(i^{'} , i , t^{'} , t\right) = \left\{\begin{matrix} - 1 i^{'} = o_{k} , t^{'} = \mathit{dep}_{k}^{s} \\ 1 i^{'} = d_{k} , t^{'} = T \\ 0 \cdot o t h e r w i s e \end{matrix}\right \forall k \in K , l \in L \tag{eq\_0012} \\
-  & \sum_{k \in K} \sum_{l \in L_{k}} \sum_{\left(i , i^{'} , t , t^{'}\right) \in \mathit{phi} \left(j , j^{'} , \mathit{tau}\right)} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) \leq 1 , \forall \left(j , j^{'}\right) \in G^{' '} , \mathit{tau} \in T \tag{eq\_0013} \\
-  & \sum_{t , t^{'} : \left(i , i^{'} , t , t^{'}\right) \in E_{k}} y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) = x_{k}^{l} , \forall k \in K , l \in L , \left(i , i^{'}\right) \in G_{k}^{' '} \tag{eq\_0014} \\
+  & \sum_{i , t : \left(i , ip , t , tp\right) \in E_{k}} y_{k}^{l} \left(i , ip , t , tp\right) - \sum_{i , t : \left(ip , i , tp , t\right) \in E_{k}} y_{k}^{l} \left(ip , i , tp , t\right) = \left\{\begin{matrix} - 1 ip = o_{k} , tp = \mathit{dep}_{k}^{s} \\ 1 ip = d_{k} , tp = T \\ 0 \cdot o t h e r w i s e \end{matrix}\right \forall k \in K , l \in L \tag{eq\_0012} \\
+  & \sum_{k \in K, l \in L_{k}, \left(i , ip , t , tp\right) \in \mathit{phi} \left(j , jp , \mathit{tau}\right)} y_{k}^{l} \left(i , ip , t , tp\right) \leq 1 , \forall \left(j , jp\right) \in G^{' '} , \mathit{tau} \in T \tag{eq\_0013} \\
+  & \sum_{t , tp : \left(i , ip , t , tp\right) \in E_{k}} y_{k}^{l} \left(i , ip , t , tp\right) = x_{k}^{l} , \forall k \in K , l \in L , \left(i , ip\right) \in G_{k}^{' '} \tag{eq\_0014} \\
   & x_{k}^{l} \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} \tag{eq\_0015} \\
-  & y_{k}^{l} \left(i , i^{'} , t , t^{'}\right) \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} , \left(i , i^{'} , t , t^{'}\right) \in E_{k} \tag{eq\_0016} \\
+  & y_{k}^{l} \left(i , ip , t , tp\right) \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} , \left(i , ip , t , tp\right) \in E_{k} \tag{eq\_0016} \\
   & p_{i j}^{k} \geq 0 , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0017} \\
 \end{align}

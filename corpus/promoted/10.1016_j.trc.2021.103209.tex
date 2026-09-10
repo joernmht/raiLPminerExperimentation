@@ -115,14 +115,14 @@
   & f_{variation}^{up} = \sum_{\begin{matrix}i \in \mathcal{I} / \left\{1\right\} , \\ j \in \mathcal{J} '\end{matrix}} \mid \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right) + 1} \mid , \tag{eq\_0024} \\
   & f_{variation} = f_{variation}^{up} + f_{variation}^{dn} . \tag{eq\_0025} \\
   & f_{\mathit{zeta}} = \sum_{i \in \mathcal{I}} \mathit{zeta}_{i} . \tag{eq\_0026} \\
-  & f_{energy} = \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{up} \mathit{beta}_{i , j , n}^{up} + \sum_{i \in \mathcal{I}} \sum_{j \in \mathcal{J} / \left\{1\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{dn} \mathit{beta}_{i , j , n}^{dn} , \tag{eq\_0027} \\
+  & f_{energy} = \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} E_{j , n}^{up} \mathit{beta}_{i , j , n}^{up} + \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{1\right\}, n \in \mathcal{N}} E_{j , n}^{dn} \mathit{beta}_{i , j , n}^{dn} , \tag{eq\_0027} \\
   & f_{obj 1} = \frac{w_{1} \frac{f_{deviation}}{f_{deviation , nom}} + w_{2} \frac{f_{variation}}{f_{variation , nom}} + w_{3} \frac{f_{\mathit{zeta}}}{f_{\mathit{zeta} , nom}}}{f_{sum , nom}} , \tag{eq\_0028} \\
   & f_{obj 2} = \frac{f_{energy}}{f_{energy , nom}} , \tag{eq\_0029} \\
   & f_{obj} = \mathit{gamma} f_{obj 1} + \left(1 - \mathit{gamma}\right) f_{obj 2} . \tag{eq\_0030} \\
-  \min\quad & \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} E_{j , n}^{up} {\mathit{beta}}_{j , n}^{up} \tag{eq\_0031\_a} \\
-  & \sum_{n \in \mathcal{N}} {\mathit{beta}}_{j , n}^{up} = 1 , j \in \mathcal{J} / \left\{J\right\} \tag{eq\_0031\_b} \\
-  & \sum_{j \in \mathcal{J} / \left\{J\right\}} \sum_{n \in \mathcal{N}} r_{j , n}^{up} {\mathit{beta}}_{j , n}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 1}^{up} = \sum_{j \in \mathcal{J} / \left\{J\right\}} r_{j , 2}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 2}^{up} \tag{eq\_0031\_c} \\
-  & \mathit{beta}_{i , j , \bar{n}_{j}^{up}}^{up} \geq 1 - \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} , \tag{eq\_0032} \\
+  \min\quad & \sum_{j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} E_{j , n}^{up} beta_tilde_{j , n}^{up} \tag{eq\_0031\_a} \\
+  & \sum_{n \in \mathcal{N}} beta_tilde_{j , n}^{up} = 1 , j \in \mathcal{J} / \left\{J\right\} \tag{eq\_0031\_b} \\
+  & \sum_{j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} r_{j , n}^{up} beta_tilde_{j , n}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 1}^{up} = \sum_{j \in \mathcal{J} / \left\{J\right\}} r_{j , 2}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 2}^{up} \tag{eq\_0031\_c} \\
+  & \mathit{beta}_{i , j , n_bar_{j}^{up}}^{up} \geq 1 - \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} , \tag{eq\_0032} \\
   & \sum_{m \in \mathcal{M}} \mathit{alpha}_{j , m}^{op , up} = 1 , \forall j \in \mathcal{J} . \tag{eq\_0033} \\
   & \sum_{n \in \mathcal{N}} \mathit{beta}_{j , n}^{op , up} = 1 , \forall j \in \mathcal{J} / \left\{J\right\} . \tag{eq\_0034} \\
   & \left[\mathit{ell}_{i , j}^{up} = 0\right] \Leftrightarrow \left[\mathit{alpha}_{i , j , m}^{up} = \mathit{alpha}_{j , m}^{op , up}\right] , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \forall m \in \mathcal{M} , \tag{eq\_0035} \\
@@ -140,8 +140,8 @@
   & \mathit{delta}_{3} \leq \mathit{delta}_{1} \tag{eq\_0044\_a} \\
   & \mathit{delta}_{3} \leq \mathit{delta}_{2} \tag{eq\_0044\_b} \\
   & \mathit{delta}_{1} + \mathit{delta}_{2} - \mathit{delta}_{3} \leq 1 \tag{eq\_0044\_c} \\
-  & \bar{f} \geq f \tag{eq\_0045\_a} \\
-  & \bar{f} \geq - f \tag{eq\_0045\_b} \\
+  & f_bar \geq f \tag{eq\_0045\_a} \\
+  & f_bar \geq - f \tag{eq\_0045\_b} \\
   & \mathit{Theta}_{i , i '}^{up} \leq t_{end} \mathit{theta}_{i , i '} \tag{eq\_0046\_a} \\
   & \mathit{Theta}_{i , i '}^{up} \geq 0 \tag{eq\_0046\_b} \\
   & \mathit{Theta}_{i , i '}^{up} \leq a_{i ' , 1}^{up} \tag{eq\_0046\_c} \\

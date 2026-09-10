@@ -70,15 +70,15 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reformulated cyclicity constraint with 60/120 min differences
 %@ con eq_0037 kind=linear domain=- indicator=- :: Selects one of two possible headways in reformulated cyclicity
 \begin{align}
-  \begin{matrix}\quad & & & max \sum_{\mathit{ell} \in L} \sum_{v \in V^{\mathit{ell}}} \sum_{s \in S^{\mathit{ell}}} \mathit{omega}_{v s}^{\mathit{ell}} \cdot e_{s} - \sum_{\mathit{ell} \in L} \sum_{v \in V^{\mathit{ell}}} \left(\mathit{alpha}_{v}^{\mathit{ell}} \cdot f \cdot k^{\mathit{ell}} + \mathit{mu}_{v}^{\mathit{ell}} \cdot o \cdot k^{\mathit{ell}}\right)\end{matrix} \tag{eq\_0001} \\
-  & \begin{matrix} & & - \mathit{VOT} \cdot \sum_{i \in I} \sum_{t \in T_{i}} n_{i}^{t} \cdot \mathcal{T}_{i}^{t} \geq \mathit{varepsilon} ,\end{matrix} \tag{eq\_0007} \\
+  \begin{matrix}\quad & & & max \sum_{\mathit{ell} \in L, v \in V^{\mathit{ell}}, s \in S^{\mathit{ell}}} \mathit{omega}_{v s}^{\mathit{ell}} \cdot e_{s} - \sum_{\mathit{ell} \in L, v \in V^{\mathit{ell}}} \left(\mathit{alpha}_{v}^{\mathit{ell}} \cdot f \cdot k^{\mathit{ell}} + \mathit{mu}_{v}^{\mathit{ell}} \cdot o \cdot k^{\mathit{ell}}\right)\end{matrix} \tag{eq\_0001} \\
+  & \begin{matrix} & & - \mathit{VOT} \cdot \sum_{i \in I, t \in T_{i}} n_{i}^{t} \cdot \mathcal{T}_{i}^{t} \geq \mathit{varepsilon} ,\end{matrix} \tag{eq\_0007} \\
   & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq \mathcal{T}_{i}^{t p} - M \cdot \left(1 - x_{i}^{t p}\right) , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} ,\end{matrix} \tag{eq\_0008} \\
   & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq \mathcal{V}_{i}^{t} \cdot \left(1 - \sum_{p \in P_{i}} x_{i}^{t p}\right) , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0009} \\
   & \begin{matrix} & & \sum_{p \in P_{i}} x_{i}^{t p} \leq 1 , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0010} \\
   & \begin{matrix} & & \sum_{v \in V^{\mathit{ell}}} y_{i}^{t p \mathit{ell} v} = x_{i}^{t p} , \forall i \in I , \forall t \in T_{i} , \forall p \in P_{i} , \forall \mathit{ell} \in L^{p} ,\end{matrix} \tag{eq\_0011} \\
   & \begin{matrix} & & \left(d_{v}^{\mathit{ell}} - d_{v - 1}^{\mathit{ell}}\right) = c \cdot z_{v}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v > 1 ,\end{matrix} \tag{eq\_0012} \\
   & \begin{matrix} & & d_{v}^{\mathit{ell}} \leq d_{v + 1}^{\mathit{ell}} - 1 , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} : v < \left|V^{\mathit{ell}}\right| ,\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix} & & \mathit{omega}_{v s}^{\mathit{ell}} = \sum_{i \in I} \sum_{t \in T_{i}} \sum_{p \in P_{i}} y_{i}^{t p \mathit{ell} v} \cdot n_{i}^{t} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & & \mathit{omega}_{v s}^{\mathit{ell}} = \sum_{i \in I, t \in T_{i}, p \in P_{i}} y_{i}^{t p \mathit{ell} v} \cdot n_{i}^{t} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0014} \\
   & \begin{matrix} & & \mathit{mu}_{v}^{\mathit{ell}} \cdot q \geq \mathit{omega}_{v s}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} , \forall s \in S^{\mathit{ell}} ,\end{matrix} \tag{eq\_0015} \\
   & \begin{matrix} & & \mathit{alpha}_{v}^{\mathit{ell}} \cdot g \geq \mathit{mu}_{v}^{\mathit{ell}} , \forall \mathit{ell} \in L , \forall v \in V^{\mathit{ell}} ,\end{matrix} \tag{eq\_0016} \\
   & \begin{matrix} & & \mathcal{T}_{i}^{t} \geq 0 , \forall i \in I , \forall t \in T_{i} ,\end{matrix} \tag{eq\_0017} \\
