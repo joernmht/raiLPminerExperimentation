@@ -1053,6 +1053,15 @@ def render_report_md(report: dict) -> str:
         joined = ", ".join(f"{k} {v}" for k, v in report["unrecognised_status"].items())
         lines.append(f"- **unrecognised statuses: {joined}**")
 
+    if report.get("removed_stale"):
+        lines += ["", "## Stale outputs removed", ""]
+        lines += [f"- `{path}`" for path in report["removed_stale"]]
+        lines.append("")
+        lines.append(
+            "Files of papers that did not promote in this run; the corpus directory "
+            "now equals this report."
+        )
+
     lines += ["", "## Failures by cause", ""]
     if report["failures_by_cause"]:
         lines.append("| cause | category | papers | remedy |")
@@ -1148,7 +1157,51 @@ def promote_all(
                 partial=partial,
             )
         )
-    return build_report(outcomes, unrecognised)
+    report = build_report(outcomes, unrecognised)
+    if write:
+        report["removed_stale"] = remove_stale_outputs(outcomes, out_dirs)
+    return report
+
+
+def remove_stale_outputs(outcomes: list[Outcome], out_dirs: dict[str, Path] | None) -> list[str]:
+    """Delete the formulation / provenance / rewrites files of every paper
+    that did NOT promote in this run, and return the removed paths.
+
+    A promote run only ever wrote for promoted papers, so a file left behind
+    by an earlier run for a paper the current report disowns would publish a
+    model the pipeline no longer stands behind (the 2026-09-10 re-run under
+    rewrite-2026.09.0 retracted two earlier promotions whose objectives had
+    been accepted with undeclared symbols). The corpus directory must equal
+    the report. Only papers in ``outcomes`` are considered, so ``--only``
+    runs never touch the rest of the corpus.
+    """
+    dirs = {"formulations": FORMULATIONS, "provenance": PROVENANCE, "promoted": PROMOTED}
+    dirs.update({k: v for k, v in (out_dirs or {}).items() if k in dirs})
+    removed: list[str] = []
+    for outcome in outcomes:
+        if outcome.promoted or outcome.cause == "id_conflict":
+            continue
+        # Only this paper's own entry may go: a provenance record that names
+        # another source_id (or cannot be read) marks a foreign entry, and
+        # foreign entries are never touched (same rule as the write path).
+        provenance = dirs["provenance"] / f"{outcome.entry_id}.json"
+        if provenance.exists():
+            try:
+                owner = json.loads(provenance.read_text(encoding="utf-8")).get("source_id")
+            except json.JSONDecodeError:
+                continue
+            if owner != outcome.entry_id:
+                continue
+        for directory, name in (
+            (dirs["formulations"], f"{outcome.entry_id}.json"),
+            (dirs["provenance"], f"{outcome.entry_id}.json"),
+            (dirs["promoted"], f"{outcome.entry_id}.rewrites.json"),
+        ):
+            path = directory / name
+            if path.exists():
+                path.unlink()
+                removed.append(_rel(path))
+    return sorted(removed)
 
 
 def main(argv: list[str] | None = None) -> int:

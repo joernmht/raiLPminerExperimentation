@@ -582,3 +582,28 @@ def test_promote_paper_accepts_an_explicit_output_layout(workspace, tmp_path):
     )
     assert outcome.promoted
     assert (staging / "formulations" / f"{outcome.entry_id}.json").exists()
+
+
+def test_stale_outputs_of_a_failed_paper_are_removed(workspace):
+    from corpusbuilder.promote import entry_id_for
+
+    (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.tex").unlink()
+    _write_decisions(workspace, _accept_all(workspace))
+    entry_id = entry_id_for(workspace["dossier"].key)
+    stale = [
+        workspace["dirs"]["formulations"] / f"{entry_id}.json",
+        workspace["dirs"]["provenance"] / f"{entry_id}.json",
+        workspace["dirs"]["promoted"] / f"{entry_id}.rewrites.json",
+    ]
+    for path in stale:
+        path.write_text(json.dumps({"source_id": entry_id}), encoding="utf-8")
+
+    dry = _promote(workspace, write=False)
+    assert "removed_stale" not in dry
+    assert all(path.exists() for path in stale)
+
+    report = _promote(workspace)
+    assert _cause(report) == "missing_declarations"
+    assert len(report["removed_stale"]) == 3
+    assert not any(path.exists() for path in stale)
+    assert "## Stale outputs removed" in promote.render_report_md(report)

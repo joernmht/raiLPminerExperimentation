@@ -70,6 +70,10 @@ _GRAMMAR_CLASSES: tuple[tuple[str, str], ...] = (
     ("chained relation with", "chain: 3+ comparators"),
     ("mixed-direction or equality chained", "chain: mixed / equality"),
     ("cannot serve as an index family", "label subscript"),
+    # rewrite-2026.09.0: the codec refuses undeclared symbols by name; the
+    # folded spellings (t_arr, v_c) the sidecars do not declare yet land here.
+    ("not a declared variable or parameter", "undeclared symbol (vocabulary)"),
+    ("not a declared parameter", "undeclared coefficient (vocabulary)"),
     ("string_pattern_mismatch", "parenthesised / text residue"),
     ("could not convert string to float", "non-numeric coefficient"),
     ("subscripted coefficient", "subscripted-coef shape mismatch"),
