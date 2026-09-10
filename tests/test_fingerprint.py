@@ -15,6 +15,9 @@ from pathlib import Path
 
 import pytest
 
+# talkpack imports matplotlib at module level; CI installs [dev,corpus] only.
+pytest.importorskip("matplotlib")
+
 from corpusbuilder import fingerprint, talkpack
 
 # ---------------------------------------------------------------------------

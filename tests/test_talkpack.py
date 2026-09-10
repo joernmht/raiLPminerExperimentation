@@ -17,8 +17,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-import matplotlib
 import pytest
+
+# talkpack pins a headless backend at import; CI installs [dev,corpus] only.
+pytest.importorskip("matplotlib")
+
+import matplotlib
 
 from corpusbuilder import talkpack
 
