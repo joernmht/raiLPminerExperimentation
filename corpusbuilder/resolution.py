@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import json
 import statistics
+from collections.abc import Callable
 from pathlib import Path
 
 from corpusbuilder.dossier import Dossier
@@ -144,10 +145,13 @@ def paper_record(dossier: Dossier, table: dict[str, str]) -> dict:
     }
 
 
-def compute() -> dict:
+def compute(progress: Callable[[int, int, str], None] | None = None) -> dict:
     tables = load_symbol_tables(sorted(DECISIONS.glob("*.json"))) if DECISIONS.exists() else {}
     papers = []
-    for path in sorted(DOSSIERS.glob("*.json")):
+    paths = sorted(DOSSIERS.glob("*.json"))
+    for i, path in enumerate(paths):
+        if progress is not None:  # heartbeat hook (ADR-0018); never changes the result
+            progress(i, len(paths), path.stem)
         dossier = Dossier.load(path)
         if dossier.formulas:
             papers.append(paper_record(dossier, tables.get(dossier.key, {})))
@@ -303,7 +307,10 @@ def render_macros(r: dict) -> str:
 def main(out_dir: Path | None = None) -> int:
     out = out_dir or CORPUS
     out.mkdir(parents=True, exist_ok=True)
-    r = compute()
+    from corpusbuilder import factory  # heartbeat only (ADR-0018)
+
+    with factory.running("resolution") as tick:
+        r = compute(progress=lambda done, total, key: tick(done, note=key, total=total))
     (out / "resolution.json").write_text(
         json.dumps(r, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
     )

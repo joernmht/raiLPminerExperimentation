@@ -146,7 +146,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--include-generated", action="store_true")
     ap.add_argument("--out", type=Path, default=CORPUS / "wl")
     args = ap.parse_args(argv)
-    report = similarity_report(args.include_generated)
+    from corpusbuilder import factory  # heartbeat only (ADR-0018)
+
+    with factory.running("wlcluster"):
+        report = similarity_report(args.include_generated)
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "similarity.json").write_text(
         json.dumps(report, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"

@@ -20,3 +20,10 @@ def config() -> PipelineConfig:
 @pytest.fixture(scope="session")
 def corpus(config: PipelineConfig):
     return load_corpus(config)
+
+
+@pytest.fixture(autouse=True)
+def _heartbeat_to_tmp(tmp_path, monkeypatch):
+    """Never let a test's CLI entry point write the live corpus/factory_status.json
+    (ADR-0018): heartbeats go to the test's tmp dir instead."""
+    monkeypatch.setenv("RAILP_FACTORY_STATUS", str(tmp_path / "factory_status.json"))

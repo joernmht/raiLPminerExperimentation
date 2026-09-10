@@ -1845,11 +1845,15 @@ def main(argv: list[str] | None = None) -> int:
     force = frozenset(args.force_stage)
 
     runs: dict[str, PaperRun] = {}
-    for key in keys:
-        run = annotate_paper(ws, key, upto=upto, force=force, today=today)
-        runs[key] = run
-        stages_text = " ".join(f"{s}:{v}" for s, v in sorted(run.stages.items()))
-        print(f"{key}  {stages_text}" + (f"  [{run.cell}]" if run.cell else ""))
+    from corpusbuilder import factory  # heartbeat only (ADR-0018); never changes a reply
+
+    with factory.running("assist", total=len(keys)) as tick:
+        for i, key in enumerate(keys):
+            tick(i, note=key)
+            run = annotate_paper(ws, key, upto=upto, force=force, today=today)
+            runs[key] = run
+            stages_text = " ".join(f"{s}:{v}" for s, v in sorted(run.stages.items()))
+            print(f"{key}  {stages_text}" + (f"  [{run.cell}]" if run.cell else ""))
 
     if args.promote_loop > 0:
         promotion = promote_loop(ws, keys, args.promote_loop, runs, today=today)
