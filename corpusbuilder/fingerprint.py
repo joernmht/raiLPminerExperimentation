@@ -100,7 +100,9 @@ _FLOW_BALANCE = re.compile(r"\\sum(?![a-zA-Z])[^=]*-[^=]*\\sum(?![a-zA-Z])[^=]*=
 _HEADWAY = re.compile(rf"([a-zA-Z]){_SCRIPTS}\s*-\s*\1{_SCRIPTS}[^=<>]*(?:\\geq?(?![a-zA-Z])|≥|>)")
 
 #: Modulo / PESP arithmetic in the spellings that survive MathML conversion.
-_MODULO = re.compile(r"\\(?:p|b)?mod(?![a-zA-Z])|(?<![a-zA-Z\\])mod(?![a-zA-Z])|\\operatorname\s*\{\s*mod")
+_MODULO = re.compile(
+    r"\\(?:p|b)?mod(?![a-zA-Z])|(?<![a-zA-Z\\])mod(?![a-zA-Z])|\\operatorname\s*\{\s*mod"
+)
 
 #: The ``\leq`` that may bound a capacity row.
 _LEQ = re.compile(r"\\leq?(?![a-zA-Z])|≤")
@@ -291,13 +293,14 @@ def write_features(payload: dict, out: Path) -> tuple[Path, Path]:
     json_path.write_text(
         json.dumps(rounded, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     names = payload["features"]
     lines = ["paper_key," + ",".join(names)]
     for key, vec in sorted(payload["papers"].items()):
         lines.append(key + "," + ",".join(f"{_round(vec[n]):g}" for n in names))
     csv_path = out / "features.csv"
-    csv_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    csv_path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     return json_path, csv_path
 
 
@@ -451,18 +454,14 @@ def cluster_features(payload: dict, k_range: tuple[int, int] = K_RANGE_DEFAULT) 
     ordered = sorted(groups.values(), key=lambda pts: (-len(pts), keys[pts[0]]))
     clusters = []
     for cid, pts in enumerate(ordered):
-        mean_z = [
-            (names[j], sum(z[i][j] for i in pts) / len(pts)) for j in range(len(names))
-        ]
+        mean_z = [(names[j], sum(z[i][j] for i in pts) / len(pts)) for j in range(len(names))]
         top = sorted(mean_z, key=lambda kv: (-kv[1], kv[0]))[:4]
         clusters.append(
             {
                 "id": cid,
                 "size": len(pts),
                 "papers": [keys[i] for i in pts],
-                "top_features": [
-                    {"feature": name, "mean_z": _round(value)} for name, value in top
-                ],
+                "top_features": [{"feature": name, "mean_z": _round(value)} for name, value in top],
             }
         )
     return {
@@ -536,6 +535,7 @@ def run(
     clusters_path.write_text(
         json.dumps(clusters, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return {
         "papers": len(payload["papers"]),

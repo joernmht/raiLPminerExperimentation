@@ -75,7 +75,7 @@ def test_algebraic_prefill_costs_the_reviewer_nothing():
 
 
 def test_a_reviewer_verdict_overrides_the_inference():
-    """"\\sum_{t=1}^{T}" is circumstantial: T may be a horizon parameter."""
+    """ "\\sum_{t=1}^{T}" is circumstantial: T may be a horizon parameter."""
     d = _dossier(r"\sum_{t = 1}^{T} x_t \le T")
     rec = paper_record(d, {"T": "parameter", "x": "variable"})
     assert rec["n_reviewed"] == 2

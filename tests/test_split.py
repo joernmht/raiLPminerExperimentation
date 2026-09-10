@@ -31,7 +31,7 @@ needs_corpus = pytest.mark.skipif(not DOSSIERS.exists(), reason="corpus missing"
 
 
 def _records():
-    return json.loads(LABELS.read_text())["records"]
+    return json.loads(LABELS.read_text(encoding="utf-8"))["records"]
 
 
 @needs_labels
@@ -97,7 +97,7 @@ HOLDOUT = [
 
 
 def _formula(doi: str, fid: str) -> str:
-    d = json.loads((DOSSIERS / f"{doi}.json").read_text())
+    d = json.loads((DOSSIERS / f"{doi}.json").read_text(encoding="utf-8"))
     return next(f["latex"] for f in d["formulas"] if f["id"] == fid)
 
 

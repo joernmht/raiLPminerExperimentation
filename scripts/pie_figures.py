@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 def data() -> tuple[list, list, int, int]:
-    r = json.loads((ROOT / "corpus/resolution.json").read_text())
+    r = json.loads((ROOT / "corpus/resolution.json").read_text(encoding="utf-8"))
     total = r["formulas"]
     parses = r["structural_axes"]["parses"]
     clean = r["structurally_clean"]
@@ -36,7 +36,7 @@ def data() -> tuple[list, list, int, int]:
     if sum(n for _, n, _ in pie1) != total:
         raise SystemExit("pie 1 does not sum to the formula total")
 
-    p = json.loads((ROOT / "corpus/promotion.json").read_text())
+    p = json.loads((ROOT / "corpus/promotion.json").read_text(encoding="utf-8"))
     canon = excl = grammar = other = 0
     for e in p["papers"]:
         rows = e.get("rows") or 0
@@ -69,21 +69,44 @@ def draw() -> None:
     ax.set_ylim(H, 0)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.text(0.4, 0.45, "Deterministic parsing vs canonical translation",
-            fontsize=21, fontweight="bold", color=ef.INK, ha="left", va="top")
-    ax.text(0.4, 0.92,
-            "the deterministic layer covers nearly everything; the canonical "
-            "grammar is the measured frontier (work in progress)",
-            fontsize=13.5, style="italic", color=ef.MUTED, ha="left", va="top")
+    ax.text(
+        0.4,
+        0.45,
+        "Deterministic parsing vs canonical translation",
+        fontsize=21,
+        fontweight="bold",
+        color=ef.INK,
+        ha="left",
+        va="top",
+    )
+    ax.text(
+        0.4,
+        0.92,
+        "the deterministic layer covers nearly everything; the canonical "
+        "grammar is the measured frontier (work in progress)",
+        fontsize=13.5,
+        style="italic",
+        color=ef.MUTED,
+        ha="left",
+        va="top",
+    )
 
     canon_share = pie2[3][1] / total2
     specs = (
-        (0.35, f"all {total1:,} extracted formulas",
-         "deterministic structural checks", pie1,
-         (f"{pie1[0][1] / total1:.0%}", "structurally clean", ef.CD["tuerkis"])),
-        (7.35, f"all {total2:,} review-kept candidate rows",
-         "distance to the canonical formulation", pie2,
-         (f"{canon_share:.1%}", "canonical so far", ef.CD["tuerkis"])),
+        (
+            0.35,
+            f"all {total1:,} extracted formulas",
+            "deterministic structural checks",
+            pie1,
+            (f"{pie1[0][1] / total1:.0%}", "structurally clean", ef.CD["tuerkis"]),
+        ),
+        (
+            7.35,
+            f"all {total2:,} review-kept candidate rows",
+            "distance to the canonical formulation",
+            pie2,
+            (f"{canon_share:.1%}", "canonical so far", ef.CD["tuerkis"]),
+        ),
     )
     for x0, head, sub, slices, centre in specs:
         axp = fig.add_axes([(x0 + 0.30) / W, 0.10, 3.9 / W, 3.9 / H])
@@ -91,34 +114,58 @@ def draw() -> None:
         vals = [n for _, n, _ in slices]
         cols = [c for _, _, c in slices]
         axp.pie(
-            vals, colors=cols, startangle=90, counterclock=False,
+            vals,
+            colors=cols,
+            startangle=90,
+            counterclock=False,
             wedgeprops=dict(width=0.42, edgecolor="white", linewidth=2),
         )
         axp.set_aspect("equal")
         c_val, c_label, c_color = centre
-        axp.text(0, 0.10, c_val, fontsize=27, fontweight="bold",
-                 color=c_color, ha="center", va="center")
-        axp.text(0, -0.24, c_label, fontsize=11, color=ef.MUTED,
-                 ha="center", va="center")
-        ax.text(x0 + 2.25, 1.72, head, fontsize=14.5, fontweight="bold",
-                color=ef.INK, ha="center", va="top")
-        ax.text(x0 + 2.25, 2.08, sub, fontsize=11.5, color=ef.MUTED,
-                ha="center", va="top")
+        axp.text(
+            0, 0.10, c_val, fontsize=27, fontweight="bold", color=c_color, ha="center", va="center"
+        )
+        axp.text(0, -0.24, c_label, fontsize=11, color=ef.MUTED, ha="center", va="center")
+        ax.text(
+            x0 + 2.25,
+            1.72,
+            head,
+            fontsize=14.5,
+            fontweight="bold",
+            color=ef.INK,
+            ha="center",
+            va="top",
+        )
+        ax.text(x0 + 2.25, 2.08, sub, fontsize=11.5, color=ef.MUTED, ha="center", va="top")
         # label column to the right of the donut
         ly = 2.95
         for name, n, c in slices:
-            ax.add_patch(plt.Rectangle((x0 + 4.45, ly - 0.09), 0.18, 0.18,
-                                       facecolor=c, edgecolor="none"))
-            ax.text(x0 + 4.72, ly, f"{name}", fontsize=12, color=ef.INK,
-                    ha="left", va="center")
-            ax.text(x0 + 4.72, ly + 0.30,
-                    f"{n:,}  ·  {n / sum(vals):.1%}", fontsize=11.5,
-                    color=ef.MUTED, ha="left", va="center", family=ef.MONO)
+            ax.add_patch(
+                plt.Rectangle((x0 + 4.45, ly - 0.09), 0.18, 0.18, facecolor=c, edgecolor="none")
+            )
+            ax.text(x0 + 4.72, ly, f"{name}", fontsize=12, color=ef.INK, ha="left", va="center")
+            ax.text(
+                x0 + 4.72,
+                ly + 0.30,
+                f"{n:,}  ·  {n / sum(vals):.1%}",
+                fontsize=11.5,
+                color=ef.MUTED,
+                ha="left",
+                va="center",
+                family=ef.MONO,
+            )
             ly += 0.86
-    ax.text(0.4, H - 0.30,
-            "Sources: corpus/resolution.json (deterministic axes) and corpus/promotion.json "
-            "(partial promotion, ADR-0013); candidate rows = accepted or corrected in review.",
-            fontsize=10.5, color=ef.MUTED, ha="left", va="center", style="italic")
+    ax.text(
+        0.4,
+        H - 0.30,
+        "Sources: corpus/resolution.json (deterministic axes) and corpus/promotion.json "
+        "(partial promotion, ADR-0013); candidate rows = accepted or corrected in review.",
+        fontsize=10.5,
+        color=ef.MUTED,
+        ha="left",
+        va="center",
+        style="italic",
+    )
     ef._save(fig, "fig_pies_parse_vs_canonical")
 
 

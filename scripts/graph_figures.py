@@ -30,9 +30,19 @@ def _counts(g) -> dict:
     return {k: c.get(k, 0) for k in ef.CLS_ORDER if c.get(k)}
 
 
-def figure_graph(name: str, g, title: str, subtitle: str, W=9.0, H=8.2,
-                 seed=7, node_size=110, hand_pos=None, labels=None,
-                 labels_above=()) -> Path:
+def figure_graph(
+    name: str,
+    g,
+    title: str,
+    subtitle: str,
+    W=9.0,
+    H=8.2,
+    seed=7,
+    node_size=110,
+    hand_pos=None,
+    labels=None,
+    labels_above=(),
+) -> Path:
     ef._style()
     fig = plt.figure(figsize=(W, H))
     fig.patch.set_facecolor("white")
@@ -41,13 +51,23 @@ def figure_graph(name: str, g, title: str, subtitle: str, W=9.0, H=8.2,
     ax.set_ylim(H, 0)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.text(0.35, 0.42, title, fontsize=21, fontweight="bold",
-            color=ef.INK, ha="left", va="top")
-    ax.text(0.35, 0.90, subtitle, fontsize=14, style="italic",
-            color=ef.MUTED, ha="left", va="top")
-    ef.draw_schema_graph(fig, 0.5, 1.25, W - 1.0, H - 2.55, g, W, H, seed=seed,
-                         node_size=node_size, hand_pos=hand_pos, labels=labels,
-                         labels_above=labels_above)
+    ax.text(0.35, 0.42, title, fontsize=21, fontweight="bold", color=ef.INK, ha="left", va="top")
+    ax.text(0.35, 0.90, subtitle, fontsize=14, style="italic", color=ef.MUTED, ha="left", va="top")
+    ef.draw_schema_graph(
+        fig,
+        0.5,
+        1.25,
+        W - 1.0,
+        H - 2.55,
+        g,
+        W,
+        H,
+        seed=seed,
+        node_size=node_size,
+        hand_pos=hand_pos,
+        labels=labels,
+        labels_above=labels_above,
+    )
     ef.graph_legend(ax, 0.5, H - 1.05, W - 1.0, _counts(g))
     return ef._save(fig, name)
 
@@ -76,12 +96,16 @@ def main() -> None:
     hand = {k: v for k, v in hand_pos.items() if k in present}
     lab = {k: v for k, v in labels.items() if k in present}
     figure_graph(
-        "fig_graph_toy", g_toy,
+        "fig_graph_toy",
+        g_toy,
         "Typed schema graph: toy model",
         "two trains, one single-track section · real lp2graph output "
         f"({g_toy.number_of_nodes()} nodes, {g_toy.number_of_edges()} edges)",
-        W=8.0, H=7.0, node_size=900,
-        hand_pos=hand or None, labels=lab,
+        W=8.0,
+        H=7.0,
+        node_size=900,
+        hand_pos=hand or None,
+        labels=lab,
         labels_above=("objective:0", "constraint:headway"),
     )
 
@@ -89,12 +113,15 @@ def main() -> None:
     f_real = load("corpus/formulations/10.1016_j.trb.2017.06.018.json")
     g_real = schema_nx(f_real)
     figure_graph(
-        "fig_graph_real", g_real,
+        "fig_graph_real",
+        g_real,
         "Typed schema graph: skip-stop timetabling (2017)",
         "10.1016/j.trb.2017.06.018 · 11/14 rows canonical · "
         f"{g_real.number_of_nodes()} nodes, {g_real.number_of_edges()} edges "
         "(bottom rows: declared but never referenced)",
-        W=10.0, H=9.0, node_size=130,
+        W=10.0,
+        H=9.0,
+        node_size=130,
     )
 
     # 3) the WL twin pair, side by side, one figure.
@@ -115,14 +142,28 @@ def main() -> None:
     ax.set_ylim(H, 0)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.text(0.35, 0.42,
-            "One true structural twin: identical canonical cores (WL 1.00)",
-            fontsize=21, fontweight="bold", color=ef.INK, ha="left", va="top")
-    ax.text(0.35, 0.90,
-            "Weisfeiler-Lehman subtree features on the connected cores of the "
-            "typed schema graphs; exact isomorphism says \u201cdifferent\u201d "
-            "because one model declares an index it never uses",
-            fontsize=13.5, style="italic", color=ef.MUTED, ha="left", va="top")
+    ax.text(
+        0.35,
+        0.42,
+        "One true structural twin: identical canonical cores (WL 1.00)",
+        fontsize=21,
+        fontweight="bold",
+        color=ef.INK,
+        ha="left",
+        va="top",
+    )
+    ax.text(
+        0.35,
+        0.90,
+        "Weisfeiler-Lehman subtree features on the connected cores of the "
+        "typed schema graphs; exact isomorphism says \u201cdifferent\u201d "
+        "because one model declares an index it never uses",
+        fontsize=13.5,
+        style="italic",
+        color=ef.MUTED,
+        ha="left",
+        va="top",
+    )
     half = (W - 1.4) / 2
 
     import networkx as nx
@@ -150,33 +191,51 @@ def main() -> None:
             h = (max(ys) - min(ys)) or 0.5
             scale = max(len(comp) ** 0.5 / 3.0, 0.45)
             for n, (px, py) in p.items():
-                pos[n] = (x_off + (px - min(xs)) / w * scale,
-                          (py - min(ys)) / h * scale - scale / 2)
+                pos[n] = (
+                    x_off + (px - min(xs)) / w * scale,
+                    (py - min(ys)) / h * scale - scale / 2,
+                )
             x_off += scale + 0.42
         return core, pos
+
     for gx, x0, head, sub in (
-        (ga, 0.5, "mip_2_8_pesp (seed corpus)",
-         "PESP cyclic timetabling · declares one unused index · "
-         f"{ga.number_of_nodes()} nodes, {ga.number_of_edges()} edges"),
-        (gb, 0.9 + half, "pesp_solvable (seed corpus)",
-         "same model, bounded wrap counters · "
-         f"{gb.number_of_nodes()} nodes, {gb.number_of_edges()} edges"),
+        (
+            ga,
+            0.5,
+            "mip_2_8_pesp (seed corpus)",
+            "PESP cyclic timetabling · declares one unused index · "
+            f"{ga.number_of_nodes()} nodes, {ga.number_of_edges()} edges",
+        ),
+        (
+            gb,
+            0.9 + half,
+            "pesp_solvable (seed corpus)",
+            "same model, bounded wrap counters · "
+            f"{gb.number_of_nodes()} nodes, {gb.number_of_edges()} edges",
+        ),
     ):
-        ax.text(x0 + half / 2, 1.30, head, fontsize=13,
-                fontweight="bold", color=ef.INK, ha="center", va="top")
-        ax.text(x0 + half / 2, 1.66, sub, fontsize=12,
-                color=ef.MUTED, ha="center", va="top")
+        ax.text(
+            x0 + half / 2,
+            1.30,
+            head,
+            fontsize=13,
+            fontweight="bold",
+            color=ef.INK,
+            ha="center",
+            va="top",
+        )
+        ax.text(x0 + half / 2, 1.66, sub, fontsize=12, color=ef.MUTED, ha="center", va="top")
         core, pos = packed_core(gx)
-        ef.draw_schema_graph(fig, x0, 1.95, half, H - 3.3, core, W, H,
-                             node_size=170, hand_pos=pos)
+        ef.draw_schema_graph(fig, x0, 1.95, half, H - 3.3, core, W, H, node_size=170, hand_pos=pos)
     from collections import Counter
 
     both = Counter()
     for gx in (ga, gb):
         for _, dat in gx.nodes(data=True):
             both[dat.get("cls")] += 1
-    ef.graph_legend(ax, 0.5, H - 1.0, W - 1.0,
-                    {k: both.get(k, 0) for k in ef.CLS_ORDER if both.get(k)})
+    ef.graph_legend(
+        ax, 0.5, H - 1.0, W - 1.0, {k: both.get(k, 0) for k in ef.CLS_ORDER if both.get(k)}
+    )
     ef._save(fig, "fig_graph_wl_twins")
 
 
@@ -193,8 +252,10 @@ def figure_similar() -> None:
 
     from corpusbuilder.wlcluster import cosine, wl_features
 
-    a = load("corpus/repo_formulations/"
-             "Yinwenxu-1212__crewScheduling__crew-pairing-set-covering-master.json")
+    a = load(
+        "corpus/repo_formulations/"
+        "Yinwenxu-1212__crewScheduling__crew-pairing-set-covering-master.json"
+    )
     b = load("corpus/repo_formulations/lintim__openlintim__vehicle-scheduling-ip.json")
     fa, fb = wl_features(a), wl_features(b)
 
@@ -219,48 +280,93 @@ def figure_similar() -> None:
     ax.set_ylim(H, 0)
     ax.set_aspect("equal")
     ax.axis("off")
-    ax.text(0.35, 0.42,
-            "Similarity without identity: crew pairing ~ vehicle scheduling",
-            fontsize=21, fontweight="bold", color=ef.INK, ha="left", va="top")
-    ax.text(0.35, 0.90,
-            "two independent code repositories; both minimize a binary selection "
-            "under exactly-one cover constraints — connected cores, WL similarity "
-            "by depth",
-            fontsize=13.5, style="italic", color=ef.MUTED, ha="left", va="top")
+    ax.text(
+        0.35,
+        0.42,
+        "Similarity without identity: crew pairing ~ vehicle scheduling",
+        fontsize=21,
+        fontweight="bold",
+        color=ef.INK,
+        ha="left",
+        va="top",
+    )
+    ax.text(
+        0.35,
+        0.90,
+        "two independent code repositories; both minimize a binary selection "
+        "under exactly-one cover constraints — connected cores, WL similarity "
+        "by depth",
+        fontsize=13.5,
+        style="italic",
+        color=ef.MUTED,
+        ha="left",
+        va="top",
+    )
     half = (W - 1.4) / 2
     for gx, x0, head, sub1, sub2 in (
-        (ga, 0.5, "crew-pairing set-covering master",
-         "crewScheduling repo · rosters cover flights and duties",
-         f"{ga.number_of_nodes()} nodes, {ga.number_of_edges()} edges"),
-        (gb, 0.9 + half, "vehicle-scheduling IP",
-         "LinTim · connections cover trips (in/out degree = 1)",
-         f"{gb.number_of_nodes()} nodes, {gb.number_of_edges()} edges"),
+        (
+            ga,
+            0.5,
+            "crew-pairing set-covering master",
+            "crewScheduling repo · rosters cover flights and duties",
+            f"{ga.number_of_nodes()} nodes, {ga.number_of_edges()} edges",
+        ),
+        (
+            gb,
+            0.9 + half,
+            "vehicle-scheduling IP",
+            "LinTim · connections cover trips (in/out degree = 1)",
+            f"{gb.number_of_nodes()} nodes, {gb.number_of_edges()} edges",
+        ),
     ):
-        ax.text(x0 + half / 2, 1.30, head, fontsize=13.5,
-                fontweight="bold", color=ef.INK, ha="center", va="top")
-        ax.text(x0 + half / 2, 1.62, sub1, fontsize=12,
-                color=ef.MUTED, ha="center", va="top")
-        ax.text(x0 + half / 2, 1.90, sub2, fontsize=12,
-                color=ef.MUTED, ha="center", va="top")
-        ef.draw_schema_graph(fig, x0, 2.2, half, H - 4.35, gx, W, H,
-                             node_size=190)
+        ax.text(
+            x0 + half / 2,
+            1.30,
+            head,
+            fontsize=13.5,
+            fontweight="bold",
+            color=ef.INK,
+            ha="center",
+            va="top",
+        )
+        ax.text(x0 + half / 2, 1.62, sub1, fontsize=12, color=ef.MUTED, ha="center", va="top")
+        ax.text(x0 + half / 2, 1.90, sub2, fontsize=12, color=ef.MUTED, ha="center", va="top")
+        ef.draw_schema_graph(fig, x0, 2.2, half, H - 4.35, gx, W, H, node_size=190)
     # depth-similarity strip
     y0 = H - 1.95
-    ax.text(0.5, y0, "core-WL similarity by depth:", fontsize=13.5,
-            fontweight="bold", color=ef.INK, ha="left", va="center")
+    ax.text(
+        0.5,
+        y0,
+        "core-WL similarity by depth:",
+        fontsize=13.5,
+        fontweight="bold",
+        color=ef.INK,
+        ha="left",
+        va="center",
+    )
     labels = ["iteration 0 (anatomy)", "depth <= 1", "depth <= 3 (fine wiring)"]
     x = 4.1
     for lab, s in zip(labels, sims, strict=True):
         bw = 2.4
-        ax.add_patch(plt.Rectangle((x, y0 - 0.14), bw, 0.28, facecolor="#e7ecef",
-                                   edgecolor="none", zorder=1))
-        ax.add_patch(plt.Rectangle((x, y0 - 0.14), bw * s, 0.28,
-                                   facecolor=ef.CD["tuerkis"], edgecolor="none",
-                                   zorder=2))
-        ax.text(x + bw / 2, y0 + 0.36, lab, fontsize=11.5, color=ef.MUTED,
-                ha="center", va="center")
-        ax.text(x + bw + 0.12, y0, f"{s:.2f}", fontsize=13, fontweight="bold",
-                color=ef.INK, ha="left", va="center")
+        ax.add_patch(
+            plt.Rectangle((x, y0 - 0.14), bw, 0.28, facecolor="#e7ecef", edgecolor="none", zorder=1)
+        )
+        ax.add_patch(
+            plt.Rectangle(
+                (x, y0 - 0.14), bw * s, 0.28, facecolor=ef.CD["tuerkis"], edgecolor="none", zorder=2
+            )
+        )
+        ax.text(x + bw / 2, y0 + 0.36, lab, fontsize=11.5, color=ef.MUTED, ha="center", va="center")
+        ax.text(
+            x + bw + 0.12,
+            y0,
+            f"{s:.2f}",
+            fontsize=13,
+            fontweight="bold",
+            color=ef.INK,
+            ha="left",
+            va="center",
+        )
         x += bw + 0.62
     from collections import Counter as C2
 
@@ -268,8 +374,9 @@ def figure_similar() -> None:
     for gx in (ga, gb):
         for _, dat in gx.nodes(data=True):
             both[dat.get("cls")] += 1
-    ef.graph_legend(ax, 0.5, H - 1.15, W - 1.0,
-                    {k: both.get(k, 0) for k in ef.CLS_ORDER if both.get(k)})
+    ef.graph_legend(
+        ax, 0.5, H - 1.15, W - 1.0, {k: both.get(k, 0) for k in ef.CLS_ORDER if both.get(k)}
+    )
     ef._save(fig, "fig_graph_wl_similar")
 
 

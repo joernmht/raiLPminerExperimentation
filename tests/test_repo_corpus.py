@@ -161,7 +161,9 @@ def test_exclusion_and_failure_are_honest(toy_run: tuple[dict, Path]) -> None:
 
 def test_sidecar_carries_repo_license_doi_and_notes(toy_run: tuple[dict, Path]) -> None:
     _, out = toy_run
-    meta = json.loads((out / "acme__toy__toy-assignment-milp.meta.json").read_text())
+    meta = json.loads(
+        (out / "acme__toy__toy-assignment-milp.meta.json").read_text(encoding="utf-8")
+    )
     assert meta["repo"] == "acme/toy"
     assert meta["license"] == "MIT"
     assert meta["source_paper"] == {"doi": "10.5555/toy.2026"}

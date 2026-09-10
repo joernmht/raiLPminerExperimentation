@@ -65,13 +65,17 @@ def _load_checkpoint() -> dict[str, list[dict]]:
     if not CHECKPOINT.exists():
         return {}
     try:
-        return json.loads(CHECKPOINT.read_text())["by_query"]
+        return json.loads(CHECKPOINT.read_text(encoding="utf-8"))["by_query"]
     except (json.JSONDecodeError, KeyError, OSError):
         return {}  # a corrupt checkpoint is worth nothing; start over
 
 
 def _save_checkpoint(by_query: dict[str, list[dict]]) -> None:
-    CHECKPOINT.write_text(json.dumps({"by_query": by_query}, indent=2, ensure_ascii=False))
+    CHECKPOINT.write_text(
+        json.dumps({"by_query": by_query}, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def _key_of(rec: dict) -> str:
@@ -117,7 +121,7 @@ def _write_markdown(ranked: list[dict], queries: list[str], retrieved: str) -> N
         lines.append(
             f"| {i} | {r['cited_by_count']} | {r['year'] or '—'} | {path} | {doi} | {title} |"
         )
-    OUT_MD.write_text("\n".join(lines) + "\n")
+    OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -129,7 +133,7 @@ def main(argv: list[str] | None = None) -> int:
     args = p.parse_args(argv)
 
     config.load_env()
-    queries: list[str] = json.loads(MANIFEST.read_text())["queries"]
+    queries: list[str] = json.loads(MANIFEST.read_text(encoding="utf-8"))["queries"]
     client = OpenAlexClient()
 
     by_query = _load_checkpoint() if args.resume else {}
@@ -171,7 +175,9 @@ def main(argv: list[str] | None = None) -> int:
         "n_candidates": len(ranked),
         "candidates": ranked,
     }
-    OUT_JSON.write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+    OUT_JSON.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n"
+    )
     _write_markdown(ranked, queries, args.retrieved)
     CHECKPOINT.unlink(missing_ok=True)  # the complete artifact supersedes it
 

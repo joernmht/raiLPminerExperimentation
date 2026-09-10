@@ -35,7 +35,7 @@ _RELEVANT = re.compile(
 
 
 def _load(path: Path, default):
-    return json.loads(path.read_text()) if path.exists() else default
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
 
 
 # --------------------------------------------------------------------------- #
@@ -87,7 +87,9 @@ def hitl_tally(decision_files, formulas_total: int) -> dict[str, object]:
     """
     latest: dict[tuple[str, str], str] = {}
     for path in sorted(str(p) for p in decision_files):
-        for paper, fid, status in _iter_decisions(json.loads(Path(path).read_text())):
+        for paper, fid, status in _iter_decisions(
+            json.loads(Path(path).read_text(encoding="utf-8"))
+        ):
             latest[(paper, fid)] = status
 
     counts: dict[str, int] = dict.fromkeys(HITL_STATUSES, 0)
@@ -125,7 +127,7 @@ def main() -> None:
 
     # --- Reports sought / retrieved: the dossiers actually built ---
     doss = [
-        json.loads(Path(p).read_text())
+        json.loads(Path(p).read_text(encoding="utf-8"))
         for p in sorted(glob.glob(str(CORPUS / "dossiers" / "*.json")))
     ]
     n_retrieved = len(doss)
@@ -195,7 +197,9 @@ def main() -> None:
         },
     }
     payload = {"schema_version": "prisma-1", "derived_from": "corpus/*", "flow": flow}
-    (CORPUS / "prisma.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False))
+    (CORPUS / "prisma.json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8", newline="\n"
+    )
 
     h = flow["included"]["hitl_review"]
     _unattr = f", {unattributed} without a DOI (arm unattributed)" if unattributed else ""
@@ -238,7 +242,7 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
 - HITL review: accepted {h["accepted"]} · corrected {h["corrected"]} · duplicate {h["duplicate"]} · rejected {h["rejected"]} · unreviewed {h["unreviewed"]}{_unrec}
 - Per-cell P1–P5 distribution: _pending domain/activity classification step_
 """
-    (CORPUS / "prisma.md").write_text(md)
+    (CORPUS / "prisma.md").write_text(md, encoding="utf-8", newline="\n")
 
     def cmd(name, val):
         return f"\\newcommand{{\\{name}}}{{{val}}}"
@@ -269,7 +273,7 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
         )
         + "\n"
     )
-    (CORPUS / "prisma_macros.tex").write_text(tex)
+    (CORPUS / "prisma_macros.tex").write_text(tex, encoding="utf-8", newline="\n")
 
     print(
         f"PRISMA: db {i['database_search_records']}→{i['database_unique_records']} unique; "

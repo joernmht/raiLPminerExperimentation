@@ -304,9 +304,11 @@ def main(out_dir: Path | None = None) -> int:
     out = out_dir or CORPUS
     out.mkdir(parents=True, exist_ok=True)
     r = compute()
-    (out / "resolution.json").write_text(json.dumps(r, indent=2, sort_keys=True) + "\n")
-    (out / "resolution.md").write_text(render_md(r))
-    (out / "resolution_macros.tex").write_text(render_macros(r))
+    (out / "resolution.json").write_text(
+        json.dumps(r, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
+    (out / "resolution.md").write_text(render_md(r), encoding="utf-8", newline="\n")
+    (out / "resolution_macros.tex").write_text(render_macros(r), encoding="utf-8", newline="\n")
     print(
         f"Resolution: {r['formulas']} formulas over {r['papers']} papers; "
         f"{r['typed_pairs']}/{r['symbol_pairs']} symbol pairs typed "

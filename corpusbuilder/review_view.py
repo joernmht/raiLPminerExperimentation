@@ -211,8 +211,10 @@ def main() -> None:
     doss.sort(key=lambda d: d.source.cited_by_count or 0, reverse=True)
     (OUT / "papers").mkdir(parents=True, exist_ok=True)
     for d in doss:
-        (OUT / "papers" / f"{d.key}.html").write_text(_paper_page(d), encoding="utf-8")
-    (OUT / "index.html").write_text(_index_page(doss), encoding="utf-8")
+        (OUT / "papers" / f"{d.key}.html").write_text(
+            _paper_page(d), encoding="utf-8", newline="\n"
+        )
+    (OUT / "index.html").write_text(_index_page(doss), encoding="utf-8", newline="\n")
     print(
         f"wrote {OUT / 'index.html'} + {len(doss)} paper pages "
         f"({sum(len(d.formulas) for d in doss)} formulas)"
