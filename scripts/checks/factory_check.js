@@ -47,7 +47,7 @@ if (isPublic) {
   const svg = d.querySelector('svg.fl');
   ok(svg && Number(svg.getAttribute('height')) > Number(svg.getAttribute('width')), 'vertical floor is taller than wide');
   ok(d.querySelectorAll('svg.fl .st').length === data.stations.length, 'every station drawn (' + d.querySelectorAll('svg.fl .st').length + ')');
-  ok(d.querySelector('svg.fl .st.kind-gate') && d.querySelector('svg.fl .st.kind-planned'), 'gate and planned vocab station drawn');
+  ok(d.querySelector('svg.fl .st.kind-gate') && d.querySelector('svg.fl .st[data-id="vocab"]'), 'gate and vocab station drawn (planned or live)');
   ok(d.querySelectorAll('svg.fl a.stl').length === data.stations.filter(s => s.href).length, 'linked stations are <a> elements');
   ok(d.querySelectorAll('svg.fl path.edge').length === data.edges.length, 'every conveyor drawn');
   const rot = d.getElementById('rotBtn');

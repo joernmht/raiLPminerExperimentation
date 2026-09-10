@@ -464,6 +464,9 @@ def snapshot(
     n_stubs = _count("*.stub.tex", decl_dir)
     n_sidecars = _count("*.tex", decl_dir) - n_stubs
     n_cache = _count("*", corpus / "assist" / "cache")
+    vocab_report = _load_json(corpus / "vocab.json") or {}
+    n_vocab = _count("*.json", corpus / "vocab")
+    vocab_live = bool(vocab_report) and n_vocab > 0
     form_dir = corpus / "formulations"
     form_files = sorted(p.name for p in form_dir.glob("*.json")) if form_dir.exists() else []
     n_mined = sum(1 for n in form_files if n.startswith("10."))
@@ -680,14 +683,27 @@ def snapshot(
             "lane": "det",
             "col": 8,
             "row": 0,
-            "kind": "planned",
+            "kind": "station" if vocab_live else "planned",
             "stage": "vocab",
             "stereo": "«corpusbuilder.vocab»",
             "title": "Vocabulary check",
             "role": "used names vs declared names",
-            "count": "planned",
-            "count_label": "the fill-in list per paper",
-            "artifact": art("corpus/vocab/*.json", "not built yet", False),
+            "count": (
+                f"{_fmt(vocab_report.get('papers_complete', 0))} / "
+                f"{_fmt(vocab_report.get('papers', 0))}"
+                if vocab_live
+                else "planned"
+            ),
+            "count_label": (
+                f"complete · {_fmt(vocab_report.get('missing_names_total', 0))} names to fill"
+                if vocab_live
+                else "the fill-in list per paper"
+            ),
+            "artifact": art(
+                "corpus/vocab/*.json",
+                f"{_fmt(n_vocab)} fill-in lists" if vocab_live else "not built yet",
+                vocab_live,
+            ),
         },
         {
             "id": "algebra",
@@ -854,8 +870,8 @@ def snapshot(
         {"from": "split", "to": "review"},
         {"from": "review", "to": "resolution"},
         {"from": "resolution", "to": "assist"},
-        {"from": "assist", "to": "vocab", "dashed": True},
-        {"from": "vocab", "to": "algebra", "dashed": True},
+        {"from": "assist", "to": "vocab", "dashed": not vocab_live},
+        {"from": "vocab", "to": "algebra", "dashed": not vocab_live},
         {"from": "assist", "to": "algebra"},
         {"from": "algebra", "to": "promote"},
         {"from": "promote", "to": "codec"},
@@ -1395,6 +1411,8 @@ __FOOTER__
     requestAnimationFrame(function(){ document.querySelectorAll("#bins .bb > span").forEach(function(sp){ sp.style.width = sp.getAttribute("data-w") + "%"; }); });
   }
   function renderLegend(data){
+    var vocabSt = (data.stations || []).filter(function(s){ return s.id === "vocab"; })[0];
+    var vocabPlanned = !vocabSt || vocabSt.kind === "planned";
     $("legend").innerHTML =
       '<div class="lcard"><div class="h">UML elements, factory reading</div><ul>' +
       '<li><b>Station</b> = a UML component «module» with its role and a live counter; the two small tabs on its left edge are the component icon.</li>' +
@@ -1403,11 +1421,11 @@ __FOOTER__
       '<li><b>Thick bar</b> = UML join: the two identification arms (database queries, citation snowball) merge into one retrieval queue.</li>' +
       '<li><b>Gate</b> (orange posts) = promotion: a paper passes only if every accepted row is in the canonical grammar; everything else is sorted into the bins below, by cause.</li>' +
       '<li><b>Swimlanes</b> = the determinism boundary: only the top lane is byte-reproducible; human verdicts and LLM replies enter as logged, versioned inputs and are parser-gated.</li></ul></div>' +
-      '<div class="lcard vocab"><div class="h">The planned station: vocabulary check</div>' +
+      '<div class="lcard vocab"><div class="h">' + (vocabPlanned ? 'The planned station: vocabulary check' : 'The vocabulary check station') + '</div>' +
       '<p style="margin:0 0 6px">It lists, per paper, the symbol names the formulas use after normalization next to the names the declaration sidecar declares; the difference is the fill-in list.</p>' +
       '<ul><li>A formula writes <code>t_{i}^{arr}</code>; after the rewrite rules that symbol is spelled <code>t_arr</code>.</li>' +
       '<li>The sidecar today declares <code>t</code> only, so the gate refuses the paper by name.</li>' +
-      '<li>The check prints exactly the missing names, so a human or the assist stage declares <code>t_arr</code> and nothing else.</li></ul></div>';
+      '<li>The check prints exactly the missing names, so a human or the assist stage (stage V, <code>corpusbuilder.assist --vocab</code>) declares <code>t_arr</code> and nothing else; the answers land in the sidecar under a marked, dated block.</li></ul></div>';
   }
   function renderNotes(data){
     $("notes").innerHTML = (data.notes || []).map(function(n){ return "<li>" + esc(n) + "</li>"; }).join("");

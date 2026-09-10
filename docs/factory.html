@@ -250,12 +250,12 @@
    "to": "assist"
   },
   {
-   "dashed": true,
+   "dashed": false,
    "from": "assist",
    "to": "vocab"
   },
   {
-   "dashed": true,
+   "dashed": false,
    "from": "vocab",
    "to": "algebra"
   },
@@ -678,15 +678,15 @@
   },
   {
    "artifact": {
-    "count": "not built yet",
+    "count": "181 fill-in lists",
     "name": "corpus/vocab/*.json",
-    "present": false
+    "present": true
    },
    "col": 8,
-   "count": "planned",
-   "count_label": "the fill-in list per paper",
+   "count": "11 / 181",
+   "count_label": "complete · 2,971 names to fill",
    "id": "vocab",
-   "kind": "planned",
+   "kind": "station",
    "lane": "det",
    "role": "used names vs declared names",
    "row": 0,
@@ -1051,6 +1051,8 @@
     requestAnimationFrame(function(){ document.querySelectorAll("#bins .bb > span").forEach(function(sp){ sp.style.width = sp.getAttribute("data-w") + "%"; }); });
   }
   function renderLegend(data){
+    var vocabSt = (data.stations || []).filter(function(s){ return s.id === "vocab"; })[0];
+    var vocabPlanned = !vocabSt || vocabSt.kind === "planned";
     $("legend").innerHTML =
       '<div class="lcard"><div class="h">UML elements, factory reading</div><ul>' +
       '<li><b>Station</b> = a UML component «module» with its role and a live counter; the two small tabs on its left edge are the component icon.</li>' +
@@ -1059,11 +1061,11 @@
       '<li><b>Thick bar</b> = UML join: the two identification arms (database queries, citation snowball) merge into one retrieval queue.</li>' +
       '<li><b>Gate</b> (orange posts) = promotion: a paper passes only if every accepted row is in the canonical grammar; everything else is sorted into the bins below, by cause.</li>' +
       '<li><b>Swimlanes</b> = the determinism boundary: only the top lane is byte-reproducible; human verdicts and LLM replies enter as logged, versioned inputs and are parser-gated.</li></ul></div>' +
-      '<div class="lcard vocab"><div class="h">The planned station: vocabulary check</div>' +
+      '<div class="lcard vocab"><div class="h">' + (vocabPlanned ? 'The planned station: vocabulary check' : 'The vocabulary check station') + '</div>' +
       '<p style="margin:0 0 6px">It lists, per paper, the symbol names the formulas use after normalization next to the names the declaration sidecar declares; the difference is the fill-in list.</p>' +
       '<ul><li>A formula writes <code>t_{i}^{arr}</code>; after the rewrite rules that symbol is spelled <code>t_arr</code>.</li>' +
       '<li>The sidecar today declares <code>t</code> only, so the gate refuses the paper by name.</li>' +
-      '<li>The check prints exactly the missing names, so a human or the assist stage declares <code>t_arr</code> and nothing else.</li></ul></div>';
+      '<li>The check prints exactly the missing names, so a human or the assist stage (stage V, <code>corpusbuilder.assist --vocab</code>) declares <code>t_arr</code> and nothing else; the answers land in the sidecar under a marked, dated block.</li></ul></div>';
   }
   function renderNotes(data){
     $("notes").innerHTML = (data.notes || []).map(function(n){ return "<li>" + esc(n) + "</li>"; }).join("");
