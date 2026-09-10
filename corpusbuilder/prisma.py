@@ -38,6 +38,76 @@ def _load(path: Path, default):
     return json.loads(path.read_text()) if path.exists() else default
 
 
+# --------------------------------------------------------------------------- #
+# HITL review tally
+# --------------------------------------------------------------------------- #
+
+# The review game's four terminal verdicts. ``duplicate`` (⧉) is a decision like
+# any other — a formula ruled a re-print of one already in the corpus — and must
+# not be lost from the flow just because it is not accept/correct/reject.
+HITL_STATUSES = ("accepted", "corrected", "rejected", "duplicate")
+
+
+def _iter_decisions(payload: dict):
+    """Yield ``(paper_key, formula_id, status)`` from either export schema.
+
+    Two producers write into ``corpus/decisions/``:
+
+    * ``corpusbuilder.game`` (``schema_version: game-decisions-1``) — the review
+      game, which exports **many** papers under a top-level ``formula_decisions``
+      list, each entry holding its own ``decisions``.
+    * ``corpusbuilder.review_view`` — the older single-paper view, whose export
+      puts ``decisions`` at the top level.
+
+    Reading only the top-level ``decisions`` key silently yields nothing for a
+    game export, which is how every HITL count in the flow came out as zero.
+    """
+    groups = payload.get("formula_decisions")
+    if groups is None:
+        groups = [payload] if isinstance(payload.get("decisions"), list) else []
+    for g in groups:
+        if not isinstance(g, dict):
+            continue
+        paper = str(g.get("paper_key") or g.get("doi") or "")
+        for d in g.get("decisions") or []:
+            if isinstance(d, dict):
+                yield paper, str(d.get("id", "")), str(d.get("status") or "unreviewed")
+
+
+def hitl_tally(decision_files, formulas_total: int) -> dict[str, object]:
+    """Tally HITL verdicts over the exported decision files.
+
+    Deduplicated by ``(paper_key, formula_id)`` so that re-exports and
+    multi-device exports do not double-count the same formula; files are read in
+    sorted order and the last verdict for a formula wins, which keeps the tally
+    deterministic. ``unreviewed`` is the *residual* against ``formulas_total`` —
+    formulas in papers nobody has opened yet emit no decision record at all, so
+    counting only what the files contain under-reports the work outstanding.
+    Statuses outside :data:`HITL_STATUSES` are reported, never dropped.
+    """
+    latest: dict[tuple[str, str], str] = {}
+    for path in sorted(str(p) for p in decision_files):
+        for paper, fid, status in _iter_decisions(json.loads(Path(path).read_text())):
+            latest[(paper, fid)] = status
+
+    counts: dict[str, int] = dict.fromkeys(HITL_STATUSES, 0)
+    unrecognised: dict[str, int] = {}
+    for status in latest.values():
+        if status == "unreviewed":
+            continue
+        if status in counts:
+            counts[status] += 1
+        else:
+            unrecognised[status] = unrecognised.get(status, 0) + 1
+
+    decided = sum(counts.values()) + sum(unrecognised.values())
+    tally: dict[str, object] = dict(counts)
+    tally["unreviewed"] = max(0, formulas_total - decided)
+    if unrecognised:
+        tally["unrecognised_status"] = dict(sorted(unrecognised.items()))
+    return tally
+
+
 def main() -> None:
     cand = _load(CORPUS / "candidates.json", {"candidates": [], "queries": [], "n_candidates": 0})
     snow = _load(CORPUS / "snowball_candidates.json", {"n_candidates": 0, "n_recommended": 0})
@@ -59,7 +129,7 @@ def main() -> None:
         for p in sorted(glob.glob(str(CORPUS / "dossiers" / "*.json")))
     ]
     n_retrieved = len(doss)
-    from_db = from_cite = 0
+    from_db = from_cite = unattributed = 0
     incl_papers = 0
     formulas_total = 0
     excl = {"not_entitled": 0, "no_machine_readable_formulas": 0, "awaiting_tier3_pdf": 0}
@@ -69,7 +139,12 @@ def main() -> None:
         doi = s.get("doi") or ""
         nf = len(d.get("formulas", []))
         formulas_total += nf
-        if doi.lower() in db_seed_dois:
+        # Arm attribution keys off the DOI. A dossier without one cannot be
+        # matched against the database-arm seeds, so it is reported as
+        # unattributed rather than silently swelling the citation arm.
+        if not doi:
+            unattributed += 1
+        elif doi.lower() in db_seed_dois:
             from_db += 1
         else:
             from_cite += 1
@@ -85,16 +160,9 @@ def main() -> None:
             else:
                 excl["awaiting_tier3_pdf"] += 1
 
-    # --- HITL review state (decisions exported from the review view, if any) ---
+    # --- HITL review state (decisions exported from the review game/view) ---
     dec_files = glob.glob(str(CORPUS / "decisions" / "*.json"))
-    reviewed = {"accepted": 0, "corrected": 0, "rejected": 0, "unreviewed": formulas_total}
-    if dec_files:
-        reviewed = {"accepted": 0, "corrected": 0, "rejected": 0, "unreviewed": 0}
-        for f in dec_files:
-            for dd in json.loads(Path(f).read_text()).get("decisions", []):
-                reviewed[dd.get("status", "unreviewed")] = (
-                    reviewed.get(dd.get("status", "unreviewed"), 0) + 1
-                )
+    reviewed = hitl_tally(dec_files, formulas_total)
 
     flow = {
         "freeze_date": cand.get("retrieved")
@@ -115,6 +183,7 @@ def main() -> None:
             "reports_retrieved": n_retrieved,
             "from_database_arm": from_db,
             "from_citation_arm": from_cite,
+            "arm_unattributed": unattributed,
             "reports_excluded": excl,
             "reports_excluded_total": sum(excl.values()),
         },
@@ -128,6 +197,15 @@ def main() -> None:
     payload = {"schema_version": "prisma-1", "derived_from": "corpus/*", "flow": flow}
     (CORPUS / "prisma.json").write_text(json.dumps(payload, indent=2, ensure_ascii=False))
 
+    h = flow["included"]["hitl_review"]
+    _unattr = f", {unattributed} without a DOI (arm unattributed)" if unattributed else ""
+    _unrec = (
+        " · **unrecognised statuses: "
+        + ", ".join(f"{k} {v}" for k, v in h["unrecognised_status"].items())
+        + "**"
+        if "unrecognised_status" in h
+        else ""
+    )
     i, s_, r, inc = (
         flow["identification"],
         flow["screening"],
@@ -148,7 +226,7 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
 - Flagged off-topic among retrieved dossiers (topical screen): **{s_["flagged_off_topic_in_corpus"]}**
 
 ## Retrieval & eligibility
-- Reports retrieved (dossiers built): **{r["reports_retrieved"]}** — {r["from_database_arm"]} via database arm, {r["from_citation_arm"]} via citation searching
+- Reports retrieved (dossiers built): **{r["reports_retrieved"]}** — {r["from_database_arm"]} via database arm, {r["from_citation_arm"]} via citation searching{_unattr}
 - Reports excluded at eligibility: **{r["reports_excluded_total"]}**
   - full text not entitled (metadata-only): {r["reports_excluded"]["not_entitled"]}
   - full text retrieved, no machine-readable formulas: {r["reports_excluded"]["no_machine_readable_formulas"]}
@@ -157,7 +235,7 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
 ## Included
 - Source papers with ≥1 recoverable formulation (**M**): **{inc["source_papers"]}**
 - Candidate formulations extracted (**N**, pre-review): **{inc["candidate_formulations"]}**
-- HITL review: accepted {inc["hitl_review"]["accepted"]} · corrected {inc["hitl_review"]["corrected"]} · rejected {inc["hitl_review"]["rejected"]} · unreviewed {inc["hitl_review"]["unreviewed"]}
+- HITL review: accepted {h["accepted"]} · corrected {h["corrected"]} · duplicate {h["duplicate"]} · rejected {h["rejected"]} · unreviewed {h["unreviewed"]}{_unrec}
 - Per-cell P1–P5 distribution: _pending domain/activity classification step_
 """
     (CORPUS / "prisma.md").write_text(md)
@@ -182,6 +260,11 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
                 cmd("prismaExclTierThree", r["reports_excluded"]["awaiting_tier3_pdf"]),
                 cmd("prismaInclPapers", inc["source_papers"]),
                 cmd("prismaInclFormulations", inc["candidate_formulations"]),
+                cmd("prismaHitlAccepted", h["accepted"]),
+                cmd("prismaHitlCorrected", h["corrected"]),
+                cmd("prismaHitlDuplicate", h["duplicate"]),
+                cmd("prismaHitlRejected", h["rejected"]),
+                cmd("prismaHitlUnreviewed", h["unreviewed"]),
             ]
         )
         + "\n"
