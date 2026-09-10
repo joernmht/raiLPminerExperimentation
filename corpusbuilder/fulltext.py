@@ -73,8 +73,12 @@ def fetch_all(sleep_s: float = 0.7, refetch: bool = False) -> dict:
         if not is_elsevier_doi(doi):
             log["skipped"].append(key)
             continue
-        if target.exists() and not refetch and ElsevierClient.has_full_text(
-            target.read_text(encoding="utf-8", errors="replace")[:200_000]
+        if (
+            target.exists()
+            and not refetch
+            and ElsevierClient.has_full_text(
+                target.read_text(encoding="utf-8", errors="replace")[:200_000]
+            )
         ):
             log["cached"].append(key)
             continue
@@ -88,11 +92,13 @@ def fetch_all(sleep_s: float = 0.7, refetch: bool = False) -> dict:
         if not ElsevierClient.has_full_text(xml):
             log["no_body"].append(key)  # metadata-only: not entitled via this route
         else:
-            target.write_text(xml, encoding="utf-8")
+            target.write_text(xml, encoding="utf-8", newline="\n")
             log["fetched"].append(key)
         print(f"[{i}/{len(dossiers)}] {'ok  ' if key in log['fetched'] else 'meta'} {key}")
         time.sleep(sleep_s)
-    (FULLTEXT / "_fetch_log.json").write_text(json.dumps(log, indent=1), encoding="utf-8")
+    (FULLTEXT / "_fetch_log.json").write_text(
+        json.dumps(log, indent=1), encoding="utf-8", newline="\n"
+    )
     return log
 
 
@@ -186,10 +192,12 @@ def extract_all() -> dict:
             log["failed"].append({"key": d.key, "error": str(e)[:200]})
             continue
         (PROSE / f"{d.key}.json").write_text(
-            json.dumps(digest, ensure_ascii=False, indent=1), encoding="utf-8"
+            json.dumps(digest, ensure_ascii=False, indent=1), encoding="utf-8", newline="\n"
         )
         (log["ok"] if digest["paras"] else log["empty"]).append(d.key)
-    (PROSE / "_extract_log.json").write_text(json.dumps(log, indent=1), encoding="utf-8")
+    (PROSE / "_extract_log.json").write_text(
+        json.dumps(log, indent=1), encoding="utf-8", newline="\n"
+    )
     return log
 
 
@@ -209,7 +217,9 @@ def main(argv: list[str] | None = None) -> int:
         )
     if args.extract:
         log = extract_all()
-        print(f"extract: {len(log['ok'])} ok, {len(log['empty'])} empty, {len(log['failed'])} failed")
+        print(
+            f"extract: {len(log['ok'])} ok, {len(log['empty'])} empty, {len(log['failed'])} failed"
+        )
     return 0
 
 

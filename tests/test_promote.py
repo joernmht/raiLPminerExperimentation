@@ -84,7 +84,9 @@ def workspace(tmp_path):
         ],
     )
     dossier.save(dirs["dossiers"])
-    (dirs["declarations"] / f"{dossier.key}.tex").write_text(_declarations(canonical))
+    (dirs["declarations"] / f"{dossier.key}.tex").write_text(
+        _declarations(canonical), encoding="utf-8"
+    )
     return {
         "dirs": dirs,
         "dossier": dossier,
@@ -111,7 +113,7 @@ def _accept_all(workspace, cell: str | None = "P3") -> dict:
 
 def _write_decisions(workspace, payload: dict, name: str = "game_decisions_2026-08-13.json"):
     path = workspace["dirs"]["decisions"] / name
-    path.write_text(json.dumps(payload))
+    path.write_text(json.dumps(payload), encoding="utf-8")
     return path
 
 
@@ -133,7 +135,9 @@ def _promote(workspace, *, write: bool = True):
 
 def test_reads_the_game_export_schema(tmp_path):
     path = tmp_path / "game_decisions_2026-08-13.json"
-    path.write_text(json.dumps(_game_export("p1", [{"id": "eq-1", "status": "accepted"}])))
+    path.write_text(
+        json.dumps(_game_export("p1", [{"id": "eq-1", "status": "accepted"}])), encoding="utf-8"
+    )
     papers, unrecognised = load_decisions([path])
     assert unrecognised == {}
     assert papers["p1"].cell == "P3"
@@ -151,7 +155,8 @@ def test_reads_the_review_view_export_schema(tmp_path):
                 "doi": "10.1/x",
                 "decisions": [{"id": "eq-1", "status": "accepted"}],
             }
-        )
+        ),
+        encoding="utf-8",
     )
     papers, _ = load_decisions([path])
     assert [(d.paper_key, d.status) for d in papers["p1"].decisions] == [("p1", "accepted")]
@@ -160,8 +165,12 @@ def test_reads_the_review_view_export_schema(tmp_path):
 def test_a_later_export_supersedes_an_earlier_verdict(tmp_path):
     early = tmp_path / "game_decisions_2026-08-10.json"
     late = tmp_path / "game_decisions_2026-08-11.json"
-    early.write_text(json.dumps(_game_export("p1", [{"id": "eq-1", "status": "accepted"}])))
-    late.write_text(json.dumps(_game_export("p1", [{"id": "eq-1", "status": "rejected"}])))
+    early.write_text(
+        json.dumps(_game_export("p1", [{"id": "eq-1", "status": "accepted"}])), encoding="utf-8"
+    )
+    late.write_text(
+        json.dumps(_game_export("p1", [{"id": "eq-1", "status": "rejected"}])), encoding="utf-8"
+    )
     papers, _ = load_decisions([late, early])  # deliberately out of order
     assert len(papers["p1"].decisions) == 1
     assert papers["p1"].decisions[0].status == "rejected"
@@ -169,7 +178,9 @@ def test_a_later_export_supersedes_an_earlier_verdict(tmp_path):
 
 def test_unknown_statuses_are_reported_not_counted(tmp_path):
     path = tmp_path / "d.json"
-    path.write_text(json.dumps(_game_export("p1", [{"id": "eq-1", "status": "maybe"}])))
+    path.write_text(
+        json.dumps(_game_export("p1", [{"id": "eq-1", "status": "maybe"}])), encoding="utf-8"
+    )
     papers, unrecognised = load_decisions([path])
     assert unrecognised == {"maybe": 1}
     assert papers["p1"].decisions == ()
@@ -191,7 +202,8 @@ def test_corrected_parts_are_all_kept(tmp_path):
                     }
                 ],
             )
-        )
+        ),
+        encoding="utf-8",
     )
     papers, _ = load_decisions([path])
     assert papers["p1"].decisions[0].replacement == ("a \\le b", "c \\le d")
@@ -220,7 +232,9 @@ def test_a_provenance_record_is_written_alongside(workspace):
     report = _promote(workspace)
     entry = report["papers"][0]["entry_id"]
 
-    record = json.loads((workspace["dirs"]["provenance"] / f"{entry}.json").read_text())
+    record = json.loads(
+        (workspace["dirs"]["provenance"] / f"{entry}.json").read_text(encoding="utf-8")
+    )
     assert record["source_id"] == entry
     assert record["priority_cell"] == "P3"
     assert (record["domain_shell"], record["activity"]) == ("railway", "operations")
@@ -234,12 +248,14 @@ def test_the_ingested_document_is_kept_for_audit(workspace):
     report = _promote(workspace)
     entry = report["papers"][0]["entry_id"]
 
-    document = (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text()
+    document = (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text(encoding="utf-8")
     assert f"%@ meta id={entry} family=milp" in document
     assert "%@ name :: A big-M ordering model" in document
     assert "%@ prov source :: 10.1016/j.test.2020.01" in document
     assert document.count(r"\tag{") == len(workspace["rows"])
-    rewrites = json.loads((workspace["dirs"]["promoted"] / f"{entry}.rewrites.json").read_text())
+    rewrites = json.loads(
+        (workspace["dirs"]["promoted"] / f"{entry}.rewrites.json").read_text(encoding="utf-8")
+    )
     assert rewrites["rules_version"]
 
 
@@ -247,13 +263,15 @@ def test_promotion_is_deterministic(workspace):
     _write_decisions(workspace, _accept_all(workspace))
     first = _promote(workspace)
     entry = first["papers"][0]["entry_id"]
-    formulation = (workspace["dirs"]["formulations"] / f"{entry}.json").read_text()
-    document = (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text()
+    formulation = (workspace["dirs"]["formulations"] / f"{entry}.json").read_text(encoding="utf-8")
+    document = (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text(encoding="utf-8")
 
     second = _promote(workspace)
     assert second == first
-    assert (workspace["dirs"]["formulations"] / f"{entry}.json").read_text() == formulation
-    assert (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text() == document
+    assert (workspace["dirs"]["formulations"] / f"{entry}.json").read_text(
+        encoding="utf-8"
+    ) == formulation
+    assert (workspace["dirs"]["promoted"] / f"{entry}.tex").read_text(encoding="utf-8") == document
 
 
 def test_dry_run_writes_nothing(workspace):
@@ -300,7 +318,9 @@ def test_missing_declarations_fail_and_leave_a_fillable_stub(workspace):
 
     assert _cause(report) == "missing_declarations"
     assert report["failures_by_category"] == {"under_specified": 1}
-    stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text()
+    stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text(
+        encoding="utf-8"
+    )
     assert "%@ obj sense=? name=objective" in stub
     for symbol in ("t", "y", "M", "h"):
         assert f"%@ var {symbol} " in stub
@@ -318,11 +338,11 @@ def test_the_stub_declares_the_index_families_the_binders_name(workspace):
     (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.tex").unlink()
     _write_decisions(workspace, _accept_all(workspace))
     _promote(workspace)
-    stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text()
+    stub = (workspace["dirs"]["declarations"] / f"{workspace['dossier'].key}.stub.tex").read_text(
+        encoding="utf-8"
+    )
 
-    families = {
-        line.split()[2] for line in stub.splitlines() if line.startswith("%@ index ")
-    }
+    families = {line.split()[2] for line in stub.splitlines() if line.startswith("%@ index ")}
     assert "I" in families
 
     # A bound letter is not a family: offering "%@ index i" invites the reviewer
@@ -332,13 +352,16 @@ def test_the_stub_declares_the_index_families_the_binders_name(workspace):
 
 
 def test_the_stub_fills_in_domains_it_can_read_off_a_domain_row():
-    """"y \\in {0,1}" is an explicit statement; the reviewer confirms, not guesses."""
+    """ "y \\in {0,1}" is an explicit statement; the reviewer confirms, not guesses."""
     dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
     rows = [
-        Row(formula_id="eq-0001", name="eq_0001", latex=r"\min \sum_{i \in I} c_i y_i",
-            is_objective=True),
-        Row(formula_id="eq-0002", name="eq_0002", latex=r"y_{i} \in \{0,1\}",
-            is_objective=False),
+        Row(
+            formula_id="eq-0001",
+            name="eq_0001",
+            latex=r"\min \sum_{i \in I} c_i y_i",
+            is_objective=True,
+        ),
+        Row(formula_id="eq-0002", name="eq_0002", latex=r"y_{i} \in \{0,1\}", is_objective=False),
     ]
     stub = declaration_stub(dossier, rows)
 
@@ -352,8 +375,9 @@ def test_the_stub_fills_in_domains_it_can_read_off_a_domain_row():
 
 def test_a_reviewer_verdict_outranks_the_algebra_in_the_stub():
     dossier = Dossier(source=SourceInfo(title="T", doi="10.1/x"))
-    rows = [Row(formula_id="eq-0001", name="eq_0001", latex=r"\sum_{t = 1}^{T} x_t",
-                is_objective=False)]
+    rows = [
+        Row(formula_id="eq-0001", name="eq_0001", latex=r"\sum_{t = 1}^{T} x_t", is_objective=False)
+    ]
 
     assert "%@ index T " in declaration_stub(dossier, rows)
     reviewed = declaration_stub(dossier, rows, {"T": "parameter"})
@@ -463,13 +487,13 @@ def test_a_foreign_entry_id_is_never_overwritten(workspace):
     _write_decisions(workspace, _accept_all(workspace))
     entry = promote.entry_id_for(workspace["dossier"].key)
     (workspace["dirs"]["provenance"] / f"{entry}.json").write_text(
-        json.dumps({"source_id": "someone_else"})
+        json.dumps({"source_id": "someone_else"}), encoding="utf-8"
     )
     report = _promote(workspace)
     assert _cause(report) == "id_conflict"
-    assert json.loads((workspace["dirs"]["provenance"] / f"{entry}.json").read_text()) == {
-        "source_id": "someone_else"
-    }
+    assert json.loads(
+        (workspace["dirs"]["provenance"] / f"{entry}.json").read_text(encoding="utf-8")
+    ) == {"source_id": "someone_else"}
 
 
 def test_papers_reviewed_but_undecided_are_not_a_source_finding(workspace):

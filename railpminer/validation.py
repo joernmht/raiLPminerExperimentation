@@ -172,7 +172,7 @@ def external_fidelity(
 
     results: list[ExternalFidelity] = []
     for ipath in sorted(config.instances_dir.glob("*.json")):
-        d = json.loads(ipath.read_text())
+        d = json.loads(ipath.read_text(encoding="utf-8"))
         fid = d.get("formulation_id")
         f = by_id.get(fid)
         if f is None:

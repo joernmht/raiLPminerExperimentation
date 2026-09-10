@@ -609,10 +609,10 @@ def run_scenario(
     rounds_to_valid: int | None = None
 
     def emit(row: dict[str, object]) -> None:
-        with transcript_path.open("a", encoding="utf-8") as fh:
+        with transcript_path.open("a", encoding="utf-8", newline="\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n")
 
-    transcript_path.write_text("", encoding="utf-8")  # a rerun starts a fresh log
+    transcript_path.write_text("", encoding="utf-8", newline="\n")  # a rerun starts a fresh log
     emit(
         _transcript_row(
             "start",
@@ -703,7 +703,7 @@ def run_scenario(
             )
 
     if final_text:
-        (run_dir / "final.tex").write_text(final_text, encoding="utf-8")
+        (run_dir / "final.tex").write_text(final_text, encoding="utf-8", newline="\n")
 
     report_doc: dict[str, object] = {
         "schema_version": REPORT_SCHEMA,
@@ -727,8 +727,9 @@ def run_scenario(
     (run_dir / "report.json").write_text(
         json.dumps(report_doc, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
-    (run_dir / "report.md").write_text(_report_markdown(report_doc), encoding="utf-8")
+    (run_dir / "report.md").write_text(_report_markdown(report_doc), encoding="utf-8", newline="\n")
     emit(
         _transcript_row(
             "end",
@@ -910,6 +911,7 @@ def run_batch(
     (out_dir / "summary.json").write_text(
         json.dumps(summary, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
     return summary
 
@@ -977,9 +979,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
             print(f"summary: {args.out / 'summary.json'}")
         else:
-            scenario = load_scenario(
-                paper_key=args.paper_key, scenario_file=args.scenario_file
-            )
+            scenario = load_scenario(paper_key=args.paper_key, scenario_file=args.scenario_file)
             result = run_scenario(
                 scenario,
                 client.chat,

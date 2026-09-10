@@ -424,9 +424,7 @@ def _group_end(s: str, i: int) -> int:
     return len(s)
 
 
-def extract_symbols(
-    latex: str, *, limit: int | None = 12
-) -> tuple[list[list], list[list], str]:
+def extract_symbols(latex: str, *, limit: int | None = 12) -> tuple[list[list], list[list], str]:
     """Deterministically extract (symbols, operators, relation) from LaTeX.
 
     Returns ``(syms, ops, rel)`` where ``syms``/``ops`` are
@@ -3204,7 +3202,7 @@ def main(argv: list[str] | None = None) -> None:
         .replace("__LOGO__", _logo_svg())
     )
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(html, encoding="utf-8")
+    out.write_text(html, encoding="utf-8", newline="\n")
     print(
         f"wrote {out} ({out.stat().st_size / 1e6:.1f} MB, "
         f"{len(data['papers'])} papers, {data['n_formulas']} formulas)"
@@ -3214,7 +3212,7 @@ def main(argv: list[str] | None = None) -> None:
         report = _objective_flag_report(data)
         args.flags.parent.mkdir(parents=True, exist_ok=True)
         args.flags.write_text(
-            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
         )
         c = report["counts"]
         print(

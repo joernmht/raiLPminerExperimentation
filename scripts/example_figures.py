@@ -178,17 +178,40 @@ def draw_card(ax, x, y, w, number, title, tag, lines, extra: float = 0.0) -> flo
     h = card_height(lines, extra)
     ax.add_patch(
         FancyBboxPatch(
-            (x, y), w, h,
+            (x, y),
+            w,
+            h,
             boxstyle="round,pad=0,rounding_size=0.10",
-            linewidth=1.4, edgecolor=GRID, facecolor="white", zorder=2,
+            linewidth=1.4,
+            edgecolor=GRID,
+            facecolor="white",
+            zorder=2,
         )
     )
     cx, cy = x + 0.34, y + HEAD_H / 2 + 0.02
     ax.add_patch(Circle((cx, cy), 0.16, facecolor=CD["dunkelblau"], edgecolor="none", zorder=3))
-    ax.text(cx, cy, str(number), color="white", fontsize=13, fontweight="bold",
-            ha="center", va="center", zorder=4)
-    ax.text(x + 0.62, cy, title, fontsize=15, fontweight="bold", color=INK,
-            ha="left", va="center", zorder=4)
+    ax.text(
+        cx,
+        cy,
+        str(number),
+        color="white",
+        fontsize=13,
+        fontweight="bold",
+        ha="center",
+        va="center",
+        zorder=4,
+    )
+    ax.text(
+        x + 0.62,
+        cy,
+        title,
+        fontsize=15,
+        fontweight="bold",
+        color=INK,
+        ha="left",
+        va="center",
+        zorder=4,
+    )
     llm = tag == TAG_LLM
     tcol = CD["orange"] if llm else CD["tuerkis"]
     tfill = "#FAEDE4" if llm else "#E4F1F0"
@@ -196,22 +219,43 @@ def draw_card(ax, x, y, w, number, title, tag, lines, extra: float = 0.0) -> flo
     tx = x + w - PAD_X * 0.8 - tw
     ax.add_patch(
         FancyBboxPatch(
-            (tx, cy - 0.15), tw, 0.32,
+            (tx, cy - 0.15),
+            tw,
+            0.32,
             boxstyle="round,pad=0,rounding_size=0.13",
-            linewidth=1.0, edgecolor=tcol, facecolor=tfill, zorder=3,
+            linewidth=1.0,
+            edgecolor=tcol,
+            facecolor=tfill,
+            zorder=3,
         )
     )
-    ax.text(tx + tw / 2, cy + 0.005, tag, fontsize=13, color=tcol,
-            ha="center", va="center", zorder=4)
-    ax.plot([x + PAD_X * 0.6, x + w - PAD_X * 0.6], [y + HEAD_H, y + HEAD_H],
-            color=GRID, linewidth=1.0, zorder=3)
+    ax.text(
+        tx + tw / 2, cy + 0.005, tag, fontsize=13, color=tcol, ha="center", va="center", zorder=4
+    )
+    ax.plot(
+        [x + PAD_X * 0.6, x + w - PAD_X * 0.6],
+        [y + HEAD_H, y + HEAD_H],
+        color=GRID,
+        linewidth=1.0,
+        zorder=3,
+    )
     cy2 = y + HEAD_H + 0.08
     for kind, text in lines:
         fs, lh, fam, col, wt, st = LINE[kind]
         if text:
-            ax.text(x + PAD_X, cy2 + lh / 2, text, fontsize=fs, family=fam,
-                    color=col, fontweight=wt, fontstyle=st, ha="left",
-                    va="center", zorder=4)
+            ax.text(
+                x + PAD_X,
+                cy2 + lh / 2,
+                text,
+                fontsize=fs,
+                family=fam,
+                color=col,
+                fontweight=wt,
+                fontstyle=st,
+                ha="left",
+                va="center",
+                zorder=4,
+            )
         cy2 += lh
     return y + h
 
@@ -219,9 +263,13 @@ def draw_card(ax, x, y, w, number, title, tag, lines, extra: float = 0.0) -> flo
 def arrow_down(ax, x, y0, y1) -> None:
     ax.add_patch(
         FancyArrowPatch(
-            (x, y0 + 0.03), (x, y1 - 0.03),
-            arrowstyle="-|>", mutation_scale=16, linewidth=1.8,
-            color=CD["tuerkis"], zorder=1,
+            (x, y0 + 0.03),
+            (x, y1 - 0.03),
+            arrowstyle="-|>",
+            mutation_scale=16,
+            linewidth=1.8,
+            color=CD["tuerkis"],
+            zorder=1,
         )
     )
 
@@ -229,13 +277,23 @@ def arrow_down(ax, x, y0, y1) -> None:
 def elbow(ax, p0, p1, xg) -> None:
     """3-segment elbow p0 -> (xg, y0) -> (xg, y1) -> p1 with an arrow head."""
     (x0, y0), (x1, y1) = p0, p1
-    ax.plot([x0, xg, xg], [y0, y0, y1], color=CD["tuerkis"], linewidth=1.8,
-            solid_capstyle="round", zorder=1)
+    ax.plot(
+        [x0, xg, xg],
+        [y0, y0, y1],
+        color=CD["tuerkis"],
+        linewidth=1.8,
+        solid_capstyle="round",
+        zorder=1,
+    )
     ax.add_patch(
         FancyArrowPatch(
-            (xg, y1), (x1, y1),
-            arrowstyle="-|>", mutation_scale=16, linewidth=1.8,
-            color=CD["tuerkis"], zorder=1,
+            (xg, y1),
+            (x1, y1),
+            arrowstyle="-|>",
+            mutation_scale=16,
+            linewidth=1.8,
+            color=CD["tuerkis"],
+            zorder=1,
         )
     )
 
@@ -250,10 +308,26 @@ def graph_legend(ax, x, y, w, counts) -> None:
             continue
         r, c = divmod(k, cols)
         lx, ly = x + c * cw, y + r * 0.32
-        ax.add_patch(Circle((lx + 0.09, ly), 0.08, facecolor=CLS_COLOR[cls],
-                            edgecolor=INK, linewidth=0.6, zorder=4))
-        ax.text(lx + 0.25, ly, f"{cls} ({counts[cls]})", fontsize=13,
-                color=INK, ha="left", va="center", zorder=4)
+        ax.add_patch(
+            Circle(
+                (lx + 0.09, ly),
+                0.08,
+                facecolor=CLS_COLOR[cls],
+                edgecolor=INK,
+                linewidth=0.6,
+                zorder=4,
+            )
+        )
+        ax.text(
+            lx + 0.25,
+            ly,
+            f"{cls} ({counts[cls]})",
+            fontsize=13,
+            color=INK,
+            ha="left",
+            va="center",
+            zorder=4,
+        )
         k += 1
 
 
@@ -268,9 +342,23 @@ def _collapse_multi(g: nx.MultiDiGraph) -> nx.DiGraph:
     return simple
 
 
-def draw_schema_graph(fig, x, y, w, h, g, W, H, seed=7, node_size=90,
-                      hand_pos=None, labels=None, labels_above=(),
-                      edge_labels=None, margins=(0.05, 0.05)) -> None:
+def draw_schema_graph(
+    fig,
+    x,
+    y,
+    w,
+    h,
+    g,
+    W,
+    H,
+    seed=7,
+    node_size=90,
+    hand_pos=None,
+    labels=None,
+    labels_above=(),
+    edge_labels=None,
+    margins=(0.05, 0.05),
+) -> None:
     """Embed the schema graph into the rect (x, y, w, h) in figure inches."""
     rect = [x / W, 1.0 - (y + h) / H, w / W, h / H]
     axg = fig.add_axes(rect)
@@ -293,27 +381,62 @@ def draw_schema_graph(fig, x, y, w, h, g, W, H, seed=7, node_size=90,
             r, c = divmod(k_i, cols)
             step = 2.0 / max(1, cols - 1)
             pos[n] = (-1.0 + c * step, -1.45 - 0.30 * r)
-    nx.draw_networkx_edges(simple, pos, ax=axg, edge_color="#aab4bc", width=1.2,
-                           arrows=True, arrowsize=10, node_size=node_size)
+    nx.draw_networkx_edges(
+        simple,
+        pos,
+        ax=axg,
+        edge_color="#aab4bc",
+        width=1.2,
+        arrows=True,
+        arrowsize=10,
+        node_size=node_size,
+    )
     if edge_labels:
         for txt, (ex, ey), ha, rot in edge_labels:
-            axg.text(ex, ey, txt, fontsize=13, ha=ha, va="center",
-                     color=MUTED, family=MONO, rotation=rot, zorder=2,
-                     rotation_mode="anchor", transform_rotates_text=True,
-                     bbox=dict(facecolor="white", edgecolor="none", pad=1.2))
+            axg.text(
+                ex,
+                ey,
+                txt,
+                fontsize=13,
+                ha=ha,
+                va="center",
+                color=MUTED,
+                family=MONO,
+                rotation=rot,
+                zorder=2,
+                rotation_mode="anchor",
+                transform_rotates_text=True,
+                bbox=dict(facecolor="white", edgecolor="none", pad=1.2),
+            )
     node_colors = [CLS_COLOR.get(dat.get("cls"), MUTED) for _, dat in g.nodes(data=True)]
-    nodes = nx.draw_networkx_nodes(g, pos, ax=axg, node_size=node_size,
-                                   node_color=node_colors, edgecolors=INK,
-                                   linewidths=0.7)
+    nodes = nx.draw_networkx_nodes(
+        g, pos, ax=axg, node_size=node_size, node_color=node_colors, edgecolors=INK, linewidths=0.7
+    )
     nodes.set_zorder(3)
     if labels:
         for n, (px, py) in pos.items():
             if n in labels_above:
-                axg.text(px, py + 0.11, labels.get(n, ""), fontsize=14,
-                         fontweight="bold", ha="center", va="bottom", color=INK)
+                axg.text(
+                    px,
+                    py + 0.11,
+                    labels.get(n, ""),
+                    fontsize=14,
+                    fontweight="bold",
+                    ha="center",
+                    va="bottom",
+                    color=INK,
+                )
             else:
-                axg.text(px, py - 0.11, labels.get(n, ""), fontsize=14,
-                         fontweight="bold", ha="center", va="top", color=INK)
+                axg.text(
+                    px,
+                    py - 0.11,
+                    labels.get(n, ""),
+                    fontsize=14,
+                    fontweight="bold",
+                    ha="center",
+                    va="top",
+                    color=INK,
+                )
     axg.margins(x=margins[0], y=margins[1])
 
 
@@ -324,7 +447,7 @@ def draw_schema_graph(fig, x, y, w, h, g, W, H, seed=7, node_size=90,
 
 def real_data() -> dict:
     d = {}
-    dossier = json.loads((CORPUS / "dossiers" / f"{KEY}.json").read_text())
+    dossier = json.loads((CORPUS / "dossiers" / f"{KEY}.json").read_text(encoding="utf-8"))
     d["title"] = dossier["source"]["title"]
     d["year"] = dossier["source"]["year"]
     d["doi"] = dossier["source"]["doi"]
@@ -335,7 +458,7 @@ def real_data() -> dict:
     d["raw_eq1"] = raw["eq-0001"]
     d["raw_eq3"] = raw["eq-0003"]
 
-    dec = json.loads((CORPUS / "decisions" / f"assist_{KEY}.json").read_text())
+    dec = json.loads((CORPUS / "decisions" / f"assist_{KEY}.json").read_text(encoding="utf-8"))
     decisions = dec["formula_decisions"][0]["decisions"]
     counts: dict[str, int] = {}
     for row in decisions:
@@ -344,20 +467,20 @@ def real_data() -> dict:
     d["corr_eq3"] = next(r for r in decisions if r["id"] == "eq-0003")["parts"][0]
     d["symbols"] = dec["symbol_tables"][0]["symbols"]
 
-    cache = json.loads((CORPUS / "assist" / "cache" / f"{KEY}.a.json").read_text())
+    cache = json.loads((CORPUS / "assist" / "cache" / f"{KEY}.a.json").read_text(encoding="utf-8"))
     inner = json.loads(cache["records"][-1]["content"])
     rej = next(r for r in inner["decisions"] if r["status"] == "rejected")
     d["rej_id"], d["rej_reason"] = rej["id"], rej["reason"]
 
-    decl_lines = (CORPUS / "declarations" / f"{KEY}.tex").read_text().splitlines()
+    decl_lines = (CORPUS / "declarations" / f"{KEY}.tex").read_text(encoding="utf-8").splitlines()
     picks = ("%@ index T ", "%@ param p ", "%@ var x ", "%@ obj ")
     d["decls"] = [next(ln for ln in decl_lines if ln.startswith(p)) for p in picks]
 
-    promoted = (CORPUS / "promoted" / f"{KEY}.tex").read_text().splitlines()
+    promoted = (CORPUS / "promoted" / f"{KEY}.tex").read_text(encoding="utf-8").splitlines()
     d["can_obj"] = next(ln.strip() for ln in promoted if "\\max\\quad" in ln)
     d["can_con"] = next(ln.strip() for ln in promoted if "eq\\_0003" in ln)
 
-    promo = json.loads((CORPUS / "promotion.json").read_text())
+    promo = json.loads((CORPUS / "promotion.json").read_text(encoding="utf-8"))
     entry = next(p for p in promo["papers"] if p["paper_key"] == KEY)
     d["rows"] = entry["rows"]
     d["rows_in"] = entry["partial"]["rows_included"]
@@ -365,13 +488,13 @@ def real_data() -> dict:
 
     d["graph"] = schema_nx(load(CORPUS / "formulations" / f"{KEY}.json"))
 
-    wl = json.loads((CORPUS / "wl" / "similarity.json").read_text())
+    wl = json.loads((CORPUS / "wl" / "similarity.json").read_text(encoding="utf-8"))
     row = wl["matrix"][KEY]
     sim, nb = max((s, m) for m, s in row.items() if m != KEY)
-    nbd = json.loads((CORPUS / "dossiers" / f"{nb}.json").read_text())["source"]
+    nbd = json.loads((CORPUS / "dossiers" / f"{nb}.json").read_text(encoding="utf-8"))["source"]
     d["wl_sim"], d["wl_title"], d["wl_year"] = sim, nbd["title"], nbd["year"]
 
-    clusters = json.loads((CORPUS / "fingerprint" / "clusters.json").read_text())
+    clusters = json.loads((CORPUS / "fingerprint" / "clusters.json").read_text(encoding="utf-8"))
     from corpusbuilder.fingerprint import cluster_label
 
     cl = next(c for c in clusters["clusters"] if KEY in c["papers"])
@@ -398,82 +521,166 @@ def figure_real() -> Path:
     ax.set_aspect("equal")
     ax.axis("off")
 
-    ax.text(xl, 0.32, "One paper through the LP-mining pipeline",
-            fontsize=19, fontweight="bold", color=INK, ha="left", va="center")
-    ax.text(xl, 0.66, f"every excerpt below is the real artifact for {d['doi']}",
-            fontsize=13.5, color=MUTED, ha="left", va="center", fontstyle="italic")
+    ax.text(
+        xl,
+        0.32,
+        "One paper through the LP-mining pipeline",
+        fontsize=19,
+        fontweight="bold",
+        color=INK,
+        ha="left",
+        va="center",
+    )
+    ax.text(
+        xl,
+        0.66,
+        f"every excerpt below is the real artifact for {d['doi']}",
+        fontsize=13.5,
+        color=MUTED,
+        ha="left",
+        va="center",
+        fontstyle="italic",
+    )
 
     y0 = 1.05
     gap = 0.38
 
     # ---- left column -----------------------------------------------------
     title_lines = [("bold", t) for t in _wrap(f"“{d['title']}”", BOLD_W)]
-    b1 = draw_card(ax, xl, y0, colw, 1, "SOURCE", TAG_DET, [
-        *title_lines,
-        ("body", f"{', '.join(a.split()[-1] for a in d['authors'])} ({d['year']})"),
-        ("body", f"DOI {d['doi']}"),
-        ("body", f"Elsevier full-text XML → {d['n_formulas']} extracted formulas"),
-        ("muted", "(MathML → LaTeX, deterministic converter)"),
-    ])
+    b1 = draw_card(
+        ax,
+        xl,
+        y0,
+        colw,
+        1,
+        "SOURCE",
+        TAG_DET,
+        [
+            *title_lines,
+            ("body", f"{', '.join(a.split()[-1] for a in d['authors'])} ({d['year']})"),
+            ("body", f"DOI {d['doi']}"),
+            ("body", f"Elsevier full-text XML → {d['n_formulas']} extracted formulas"),
+            ("muted", "(MathML → LaTeX, deterministic converter)"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b1, b1 + gap)
-    b2 = draw_card(ax, xl, b1 + gap, colw, 2, "RAW EXTRACTION", TAG_DET, [
-        *_mwrap("mono", d["raw_eq2"], 2),
-        ("muted", "eq-0002 verbatim: spaced identifiers “T_{n e w}” and"),
-        ("muted", "\\underset big operators — typical MathML damage"),
-    ])
+    b2 = draw_card(
+        ax,
+        xl,
+        b1 + gap,
+        colw,
+        2,
+        "RAW EXTRACTION",
+        TAG_DET,
+        [
+            *_mwrap("mono", d["raw_eq2"], 2),
+            ("muted", "eq-0002 verbatim: spaced identifiers “T_{n e w}” and"),
+            ("muted", "\\underset big operators — typical MathML damage"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b2, b2 + gap)
     v = d["verdicts"]
-    b3 = draw_card(ax, xl, b2 + gap, colw, 3, "TRIAGE", TAG_LLM, [
-        ("body", f"{sum(v.values())} formulas → {v.get('accepted', 0)} accepted · "
-                 f"{v.get('corrected', 0)} corrected · {v.get('rejected', 0)} rejected"),
-        ("bad", _trunc(d["raw_eq1"], MONO_W)),
-        ("body", f"✖ {d['rej_id']} rejected — reason: “{d['rej_reason']}”"),
-        ("muted", "(a set definition, not a model statement)"),
-    ])
+    b3 = draw_card(
+        ax,
+        xl,
+        b2 + gap,
+        colw,
+        3,
+        "TRIAGE",
+        TAG_LLM,
+        [
+            (
+                "body",
+                f"{sum(v.values())} formulas → {v.get('accepted', 0)} accepted · "
+                f"{v.get('corrected', 0)} corrected · {v.get('rejected', 0)} rejected",
+            ),
+            ("bad", _trunc(d["raw_eq1"], MONO_W)),
+            ("body", f"✖ {d['rej_id']} rejected — reason: “{d['rej_reason']}”"),
+            ("muted", "(a set definition, not a model statement)"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b3, b3 + gap)
     sym = d["symbols"]
-    srows = [("T", sym["T"]), ("p", sym["p"]), ("x", sym["x"]),
-             ("z", sym["z"]), ("Δ", sym["Δ"])]
+    srows = [("T", sym["T"]), ("p", sym["p"]), ("x", sym["x"]), ("z", sym["z"]), ("Δ", sym["Δ"])]
     sline1 = "   ".join(f"{k} → {v}" for k, v in srows[:3])
     sline2 = "   ".join(f"{k} → {v}" for k, v in srows[3:])
-    b4 = draw_card(ax, xl, b3 + gap, colw, 4, "SYMBOLS", TAG_LLM, [
-        ("mono", sline1),
-        ("mono", sline2),
-        ("muted", f"5 of {len(sym)} rows of the per-paper symbol table;"),
-        ("muted", "one verdict per (paper, symbol), reviewer overrides"),
-    ])
+    b4 = draw_card(
+        ax,
+        xl,
+        b3 + gap,
+        colw,
+        4,
+        "SYMBOLS",
+        TAG_LLM,
+        [
+            ("mono", sline1),
+            ("mono", sline2),
+            ("muted", f"5 of {len(sym)} rows of the per-paper symbol table;"),
+            ("muted", "one verdict per (paper, symbol), reviewer overrides"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b4, b4 + gap)
-    b5 = draw_card(ax, xl, b4 + gap, colw, 5, "DECLARATIONS", TAG_LLM, [
-        ("mono", _trunc(d["decls"][0], MONO_W)),
-        ("mono", _trunc(d["decls"][1], MONO_W)),
-        ("mono", _trunc(d["decls"][2], MONO_W)),
-        ("mono", _trunc(d["decls"][3], MONO_W)),
-        ("muted", "sidecar corpus/declarations/….tex — states what the"),
-        ("muted", "equations never do; marked non-deterministically sourced"),
-    ])
+    b5 = draw_card(
+        ax,
+        xl,
+        b4 + gap,
+        colw,
+        5,
+        "DECLARATIONS",
+        TAG_LLM,
+        [
+            ("mono", _trunc(d["decls"][0], MONO_W)),
+            ("mono", _trunc(d["decls"][1], MONO_W)),
+            ("mono", _trunc(d["decls"][2], MONO_W)),
+            ("mono", _trunc(d["decls"][3], MONO_W)),
+            ("muted", "sidecar corpus/declarations/….tex — states what the"),
+            ("muted", "equations never do; marked non-deterministically sourced"),
+        ],
+    )
 
     # ---- right column ----------------------------------------------------
-    b6 = draw_card(ax, xr, y0, colw, 6, "REPAIR", TAG_LLM, [
-        *_mwrap("mono", d["raw_eq3"], 2),
-        ("body", "↓  LLM proposes the repaired form (eq-0003)"),
-        *_mwrap("good", d["corr_eq3"], 2),
-        ("muted", "accepted only because the deterministic parser passes it"),
-    ])
+    b6 = draw_card(
+        ax,
+        xr,
+        y0,
+        colw,
+        6,
+        "REPAIR",
+        TAG_LLM,
+        [
+            *_mwrap("mono", d["raw_eq3"], 2),
+            ("body", "↓  LLM proposes the repaired form (eq-0003)"),
+            *_mwrap("good", d["corr_eq3"], 2),
+            ("muted", "accepted only because the deterministic parser passes it"),
+        ],
+    )
 
     arrow_down(ax, xr + colw / 2, b6, b6 + gap)
-    b7 = draw_card(ax, xr, b6 + gap, colw, 7, "CANONICAL MODEL", TAG_DET, [
-        ("mono", "\\begin{align}   % corpus/promoted/….tex"),
-        *_mwrap("mono", " " + d["can_obj"], 2),
-        *_mwrap("mono", " " + d["can_con"], 2),
-        ("mono", "\\end{align}"),
-        ("body", f"{d['rows_in']}/{d['rows']} rows canonical "
-                 f"({round(100 * d['rows_in'] / d['rows'])}% coverage); {d['rows_ex']} rows"),
-        ("body", "excluded, each with its parser message recorded"),
-    ])
+    b7 = draw_card(
+        ax,
+        xr,
+        b6 + gap,
+        colw,
+        7,
+        "CANONICAL MODEL",
+        TAG_DET,
+        [
+            ("mono", "\\begin{align}   % corpus/promoted/….tex"),
+            *_mwrap("mono", " " + d["can_obj"], 2),
+            *_mwrap("mono", " " + d["can_con"], 2),
+            ("mono", "\\end{align}"),
+            (
+                "body",
+                f"{d['rows_in']}/{d['rows']} rows canonical "
+                f"({round(100 * d['rows_in'] / d['rows'])}% coverage); {d['rows_ex']} rows",
+            ),
+            ("body", "excluded, each with its parser message recorded"),
+        ],
+    )
 
     arrow_down(ax, xr + colw / 2, b7, b7 + gap)
     y8 = b7 + gap
@@ -483,35 +690,53 @@ def figure_real() -> Path:
         counts[dat.get("cls")] = counts.get(dat.get("cls"), 0) + 1
     graph_h = 2.55
     cap = [
-        ("body", f"schema graph: {g.number_of_nodes()} nodes · "
-                 f"{g.number_of_edges()} edges — one node per entity"),
+        (
+            "body",
+            f"schema graph: {g.number_of_nodes()} nodes · "
+            f"{g.number_of_edges()} edges — one node per entity",
+        ),
         ("muted", "bottom rows: entities declared but never referenced"),
     ]
     cap_h = sum(LINE[k][1] for k, _ in cap)
-    b8 = draw_card(ax, xr, y8, colw, 8, "TYPED GRAPH", TAG_DET, cap,
-                   extra=graph_h + 0.78)
+    b8 = draw_card(ax, xr, y8, colw, 8, "TYPED GRAPH", TAG_DET, cap, extra=graph_h + 0.78)
     ins_y = y8 + HEAD_H + 0.08 + cap_h + 0.05
     draw_schema_graph(fig, xr + 0.4, ins_y, colw - 0.8, graph_h, g, W, H, seed=7)
     graph_legend(ax, xr + PAD_X, ins_y + graph_h + 0.26, colw - 0.7, counts)
 
     arrow_down(ax, xr + colw / 2, b8, b8 + gap)
     wl_lines = [("bold", t) for t in _wrap(f"“{d['wl_title']}” ({d['wl_year']})", BOLD_W)]
-    fam_lines = [("body", t) for t in
-                 _wrap(f"fingerprint family: {d['family']}", BODY_W, indent="   ")]
-    b9 = draw_card(ax, xr, b8 + gap, colw, 9, "RELATIONS", TAG_DET, [
-        ("body", f"WL structural similarity {d['wl_sim']:.2f} to"),
-        *wl_lines,
-        *fam_lines,
-        ("muted", f"(cluster {d['family_id']}, n={d['family_n']} papers)"),
-    ])
+    fam_lines = [
+        ("body", t) for t in _wrap(f"fingerprint family: {d['family']}", BODY_W, indent="   ")
+    ]
+    b9 = draw_card(
+        ax,
+        xr,
+        b8 + gap,
+        colw,
+        9,
+        "RELATIONS",
+        TAG_DET,
+        [
+            ("body", f"WL structural similarity {d['wl_sim']:.2f} to"),
+            *wl_lines,
+            *fam_lines,
+            ("muted", f"(cluster {d['family_id']}, n={d['family_n']} papers)"),
+        ],
+    )
 
     # snake connector: card 5 -> card 6 through the column gutter
-    elbow(ax, (xl + colw, (b4 + gap + b5) / 2), (xr, y0 + HEAD_H / 2),
-          xl + colw + gut / 2)
+    elbow(ax, (xl + colw, (b4 + gap + b5) / 2), (xr, y0 + HEAD_H / 2), xl + colw + gut / 2)
 
-    ax.text(xl, max(b5, b9) + 0.44,
-            "LLM stages propose; the deterministic parser gates what enters the corpus.",
-            fontsize=13, color=MUTED, ha="left", va="center", fontstyle="italic")
+    ax.text(
+        xl,
+        max(b5, b9) + 0.44,
+        "LLM stages propose; the deterministic parser gates what enters the corpus.",
+        fontsize=13,
+        color=MUTED,
+        ha="left",
+        va="center",
+        fontstyle="italic",
+    )
     return _save(fig, "fig_example_real")
 
 
@@ -551,69 +776,148 @@ def figure_toy() -> tuple[Path, bool]:
     ax.set_aspect("equal")
     ax.axis("off")
 
-    ax.text(xl, 0.32, "The same pipeline on a toy example",
-            fontsize=19, fontweight="bold", color=INK, ha="left", va="center")
-    ax.text(xl, 0.66, "two trains, one single-track section — every artifact fully legible",
-            fontsize=13.5, color=MUTED, ha="left", va="center", fontstyle="italic")
+    ax.text(
+        xl,
+        0.32,
+        "The same pipeline on a toy example",
+        fontsize=19,
+        fontweight="bold",
+        color=INK,
+        ha="left",
+        va="center",
+    )
+    ax.text(
+        xl,
+        0.66,
+        "two trains, one single-track section — every artifact fully legible",
+        fontsize=13.5,
+        color=MUTED,
+        ha="left",
+        va="center",
+        fontstyle="italic",
+    )
 
     y0 = 1.05
     gap = 0.38
 
     # ---- left column -----------------------------------------------------
-    b1 = draw_card(ax, xl, y0, colw, 1, "SOURCE", TAG_DET, [
-        ("bold", "toy paper: two trains, one single-track section"),
-        ("body", "train B may enter the section only h minutes"),
-        ("body", "after train A → 2 extracted formulas"),
-    ])
+    b1 = draw_card(
+        ax,
+        xl,
+        y0,
+        colw,
+        1,
+        "SOURCE",
+        TAG_DET,
+        [
+            ("bold", "toy paper: two trains, one single-track section"),
+            ("body", "train B may enter the section only h minutes"),
+            ("body", "after train A → 2 extracted formulas"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b1, b1 + gap)
-    b2 = draw_card(ax, xl, b1 + gap, colw, 2, "RAW EXTRACTION", TAG_DET, [
-        ("mono", r"min Z = t A + t B , s . t ."),
-        ("mono", r"t B - t A \geq h \text{(headway)}"),
-        ("muted", "typical damage: identifiers split into single"),
-        ("muted", "letters, objective and constraint glued together"),
-    ])
+    b2 = draw_card(
+        ax,
+        xl,
+        b1 + gap,
+        colw,
+        2,
+        "RAW EXTRACTION",
+        TAG_DET,
+        [
+            ("mono", r"min Z = t A + t B , s . t ."),
+            ("mono", r"t B - t A \geq h \text{(headway)}"),
+            ("muted", "typical damage: identifiers split into single"),
+            ("muted", "letters, objective and constraint glued together"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b2, b2 + gap)
-    b3 = draw_card(ax, xl, b2 + gap, colw, 3, "TRIAGE", TAG_LLM, [
-        ("body", "2 formulas → both accepted"),
-        ("mono", "row 1: objective     row 2: constraint"),
-        ("muted", "(and the glued block is split into two rows)"),
-    ])
+    b3 = draw_card(
+        ax,
+        xl,
+        b2 + gap,
+        colw,
+        3,
+        "TRIAGE",
+        TAG_LLM,
+        [
+            ("body", "2 formulas → both accepted"),
+            ("mono", "row 1: objective     row 2: constraint"),
+            ("muted", "(and the glued block is split into two rows)"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b3, b3 + gap)
-    b4 = draw_card(ax, xl, b3 + gap, colw, 4, "SYMBOLS", TAG_LLM, [
-        ("mono", "t → variable     h → parameter"),
-        ("mono", "A, B → train labels (members of index T)"),
-    ])
+    b4 = draw_card(
+        ax,
+        xl,
+        b3 + gap,
+        colw,
+        4,
+        "SYMBOLS",
+        TAG_LLM,
+        [
+            ("mono", "t → variable     h → parameter"),
+            ("mono", "A, B → train labels (members of index T)"),
+        ],
+    )
 
     arrow_down(ax, xl + colw / 2, b4, b4 + gap)
-    b5 = draw_card(ax, xl, b4 + gap, colw, 5, "DECLARATIONS", TAG_LLM, [
-        ("mono", "%@ index T ordered=1 cyclic=0 :: trains {A, B}"),
-        ("mono", "%@ param h shape=- kind=scalar domain=-"),
-        ("mono", "     :: minimum headway"),
-        ("mono", "%@ var t shape=T domain=non_negative"),
-        ("mono", "     role=primary :: departure time"),
-        ("mono", "%@ obj sense=min name=objective combination=sum"),
-    ])
+    b5 = draw_card(
+        ax,
+        xl,
+        b4 + gap,
+        colw,
+        5,
+        "DECLARATIONS",
+        TAG_LLM,
+        [
+            ("mono", "%@ index T ordered=1 cyclic=0 :: trains {A, B}"),
+            ("mono", "%@ param h shape=- kind=scalar domain=-"),
+            ("mono", "     :: minimum headway"),
+            ("mono", "%@ var t shape=T domain=non_negative"),
+            ("mono", "     role=primary :: departure time"),
+            ("mono", "%@ obj sense=min name=objective combination=sum"),
+        ],
+    )
 
     # ---- right column ----------------------------------------------------
-    b6 = draw_card(ax, xr, y0, colw, 6, "REPAIR", TAG_LLM, [
-        ("bad", r"t A          t B - t A \geq h"),
-        ("body", "↓ spaced-identifier collapse, explicit \\cdot products"),
-        ("good", r"t_{A}        t_{B} - t_{A} \ge h"),
-        ("muted", "accepted only because the deterministic parser passes it"),
-    ])
+    b6 = draw_card(
+        ax,
+        xr,
+        y0,
+        colw,
+        6,
+        "REPAIR",
+        TAG_LLM,
+        [
+            ("bad", r"t A          t B - t A \geq h"),
+            ("body", "↓ spaced-identifier collapse, explicit \\cdot products"),
+            ("good", r"t_{A}        t_{B} - t_{A} \ge h"),
+            ("muted", "accepted only because the deterministic parser passes it"),
+        ],
+    )
 
     arrow_down(ax, xr + colw / 2, b6, b6 + gap)
-    b7 = draw_card(ax, xr, b6 + gap, colw, 7, "CANONICAL MODEL", TAG_DET, [
-        ("mono", r"\begin{align}"),
-        ("mono", r"  \min\quad & t_{A} + t_{B} \tag{objective} \\"),
-        ("mono", r"  & t_{B} - t_{A} \ge h \tag{headway} \\"),
-        ("mono", r"\end{align}"),
-        ("good", f"ingest_latex(doc).ok = {res.ok}  % run just now"),
-        ("body", "2/2 rows canonical (100% coverage)"),
-    ])
+    b7 = draw_card(
+        ax,
+        xr,
+        b6 + gap,
+        colw,
+        7,
+        "CANONICAL MODEL",
+        TAG_DET,
+        [
+            ("mono", r"\begin{align}"),
+            ("mono", r"  \min\quad & t_{A} + t_{B} \tag{objective} \\"),
+            ("mono", r"  & t_{B} - t_{A} \ge h \tag{headway} \\"),
+            ("mono", r"\end{align}"),
+            ("good", f"ingest_latex(doc).ok = {res.ok}  % run just now"),
+            ("body", "2/2 rows canonical (100% coverage)"),
+        ],
+    )
 
     arrow_down(ax, xr + colw / 2, b7, b7 + gap)
     y8 = b7 + gap
@@ -622,12 +926,14 @@ def figure_toy() -> tuple[Path, bool]:
         counts[dat.get("cls")] = counts.get(dat.get("cls"), 0) + 1
     graph_h = 2.85
     cap = [
-        ("body", f"real schema_nx output of the ingest: {g.number_of_nodes()} nodes"
-                 f" · {g.number_of_edges()} edges"),
+        (
+            "body",
+            f"real schema_nx output of the ingest: {g.number_of_nodes()} nodes"
+            f" · {g.number_of_edges()} edges",
+        ),
     ]
     cap_h = sum(LINE[k][1] for k, _ in cap)
-    b8 = draw_card(ax, xr, y8, colw, 8, "TYPED GRAPH", TAG_DET, cap,
-                   extra=graph_h + 0.78)
+    b8 = draw_card(ax, xr, y8, colw, 8, "TYPED GRAPH", TAG_DET, cap, extra=graph_h + 0.78)
     hand_pos = {
         "objective:0": (0.06, 0.90),
         "constraint:headway": (0.88, 0.90),
@@ -658,25 +964,52 @@ def figure_toy() -> tuple[Path, bool]:
         ("uses_index", (0.265, 0.29), "center", a_idx),
     ]
     ins_y = y8 + HEAD_H + 0.08 + cap_h + 0.05
-    draw_schema_graph(fig, xr + 0.4, ins_y, colw - 0.8, graph_h,
-                      g, W, H, node_size=640, hand_pos=hand_pos, labels=labels,
-                      labels_above={"objective:0", "constraint:headway"},
-                      edge_labels=edge_labels, margins=(0.16, 0.20))
+    draw_schema_graph(
+        fig,
+        xr + 0.4,
+        ins_y,
+        colw - 0.8,
+        graph_h,
+        g,
+        W,
+        H,
+        node_size=640,
+        hand_pos=hand_pos,
+        labels=labels,
+        labels_above={"objective:0", "constraint:headway"},
+        edge_labels=edge_labels,
+        margins=(0.16, 0.20),
+    )
     graph_legend(ax, xr + PAD_X, ins_y + graph_h + 0.26, colw - 0.7, counts)
 
     arrow_down(ax, xr + colw / 2, b8, b8 + gap)
-    b9 = draw_card(ax, xr, b8 + gap, colw, 9, "RELATIONS", TAG_DET, [
-        ("body", "WL similarity + structural fingerprint place the toy"),
-        ("body", "next to other single-resource ordering models"),
-        ("muted", "(computed corpus-wide, not per paper)"),
-    ])
+    b9 = draw_card(
+        ax,
+        xr,
+        b8 + gap,
+        colw,
+        9,
+        "RELATIONS",
+        TAG_DET,
+        [
+            ("body", "WL similarity + structural fingerprint place the toy"),
+            ("body", "next to other single-resource ordering models"),
+            ("muted", "(computed corpus-wide, not per paper)"),
+        ],
+    )
 
-    elbow(ax, (xl + colw, (b4 + gap + b5) / 2), (xr, y0 + HEAD_H / 2),
-          xl + colw + gut / 2)
-    ax.text(xl, max(b5, b9) + 0.44,
-            "the toy canonical document above is real: this script ingests it "
-            "with lp2graph before drawing",
-            fontsize=13, color=MUTED, ha="left", va="center", fontstyle="italic")
+    elbow(ax, (xl + colw, (b4 + gap + b5) / 2), (xr, y0 + HEAD_H / 2), xl + colw + gut / 2)
+    ax.text(
+        xl,
+        max(b5, b9) + 0.44,
+        "the toy canonical document above is real: this script ingests it "
+        "with lp2graph before drawing",
+        fontsize=13,
+        color=MUTED,
+        ha="left",
+        va="center",
+        fontstyle="italic",
+    )
     return _save(fig, "fig_example_toy"), res.ok
 
 

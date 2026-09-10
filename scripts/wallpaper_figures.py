@@ -106,7 +106,7 @@ def _verdicts(key: str) -> dict[str, str] | None:
     path = DECISIONS / f"assist_{key}.json"
     if not path.is_file():
         return None
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     out: dict[str, str] = {}
     for group in data.get("formula_decisions") or []:
         for dec in group.get("decisions") or []:
@@ -120,7 +120,7 @@ def _symbol_kinds(key: str) -> dict[str, str]:
     path = DECISIONS / f"assist_{key}.json"
     if not path.is_file():
         return {}
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     kinds: dict[str, str] = {}
     for tab in data.get("symbol_tables") or []:
         kinds.update(tab.get("symbols") or {})
@@ -133,7 +133,7 @@ def tile_graph(key: str) -> tuple[nx.Graph, int | None]:
     Returns ``(graph, year)``. Nodes carry ``color`` and ``size`` attributes;
     isolated nodes are dropped.
     """
-    dossier = json.loads((DOSSIERS / f"{key}.json").read_text())
+    dossier = json.loads((DOSSIERS / f"{key}.json").read_text(encoding="utf-8"))
     year = (dossier.get("source") or {}).get("year")
     verdicts = _verdicts(key)
     kinds = _symbol_kinds(key)
@@ -180,7 +180,7 @@ def tile_graph(key: str) -> tuple[nx.Graph, int | None]:
 def load_families() -> list[dict]:
     """Clusters in file order (size-descending), each with its member papers
     restricted to those that actually have a dossier on disk."""
-    data = json.loads(CLUSTERS.read_text())
+    data = json.loads(CLUSTERS.read_text(encoding="utf-8"))
     fams = []
     for c in data["clusters"]:
         papers = [k for k in c["papers"] if (DOSSIERS / f"{k}.json").is_file()]
@@ -189,7 +189,7 @@ def load_families() -> list[dict]:
 
 
 def _kept_formula_count(key: str) -> int:
-    dossier = json.loads((DOSSIERS / f"{key}.json").read_text())
+    dossier = json.loads((DOSSIERS / f"{key}.json").read_text(encoding="utf-8"))
     verdicts = _verdicts(key)
     n = 0
     for row in dossier.get("formulas") or []:
@@ -206,9 +206,7 @@ def stratified_50(fams: list[dict], total: int = 50) -> list[dict]:
     grand = sum(sizes)
     quotas = [s * total / grand for s in sizes]
     alloc = [max(1, int(q)) for q in quotas]
-    remainders = sorted(
-        range(len(fams)), key=lambda i: (-(quotas[i] - int(quotas[i])), i)
-    )
+    remainders = sorted(range(len(fams)), key=lambda i: (-(quotas[i] - int(quotas[i])), i))
     i = 0
     while sum(alloc) < total:
         alloc[remainders[i % len(fams)]] += 1
@@ -337,9 +335,7 @@ def render_wallpaper(
         for key in fam["papers"]:
             g, year = tile_graph(key)
             row, col = divmod(idx, cols)
-            ax = fig.add_axes(
-                [col * cell_w, 1.0 - (row + 1) * cell_h, cell_w, cell_h]
-            )
+            ax = fig.add_axes([col * cell_w, 1.0 - (row + 1) * cell_h, cell_w, cell_h])
             _draw_tile(ax, key, g, year, tint)
             counts[fam["id"]] = counts.get(fam["id"], 0) + 1
             idx += 1

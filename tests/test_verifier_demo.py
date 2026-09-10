@@ -277,9 +277,7 @@ def test_citation_resolves_dossier_metadata(tmp_path: Path, match_dir: Path):
     dossiers = tmp_path / "dossiers"
     dossiers.mkdir()
     (dossiers / "mip_2_8_pesp.json").write_text(
-        json.dumps(
-            {"source": {"title": "A PESP paper", "year": 2021, "doi": "10.1/xyz"}}
-        ),
+        json.dumps({"source": {"title": "A PESP paper", "year": 2021, "doi": "10.1/xyz"}}),
         encoding="utf-8",
     )
     candidate = ingest_latex(VALID, source="test").formulation

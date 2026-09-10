@@ -12,7 +12,10 @@ call to :func:`run` reproduces the whole experiment.
 from __future__ import annotations
 
 import json
+import platform
 from dataclasses import asdict, dataclass
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _dist_version
 from pathlib import Path
 from typing import Any
 
@@ -69,6 +72,7 @@ class MiningResult:
             ],
             "solvers_used": list(self.validation.solvers_used),
             "versions": _versioned_resources(),
+            "software": _software_versions(),
         }
 
 
@@ -83,8 +87,47 @@ def _versioned_resources() -> dict[str, str]:
     }
 
 
+def _software_versions() -> dict[str, str]:
+    """The code that produced this run, not just the data it was configured with.
+
+    ``_versioned_resources`` stamps lp2graph's frozen *resource* versions
+    (lexicon, thesaurus, ...), which pin the inputs of the method but say
+    nothing about the implementation. The dependency is declared as
+    ``lp2graph[mining,solver]>=0.3`` — unbounded — so two artifact sets with
+    identical resource stamps can still come from different algorithms. Record
+    the library, the harness and the interpreter so an artifact is traceable to
+    the code that emitted it.
+    """
+    return {
+        "railpminer": _railpminer_version(),
+        "lp2graph": _package_version("lp2graph"),
+        "python": platform.python_version(),
+    }
+
+
+def _railpminer_version() -> str:
+    from . import __version__
+
+    return __version__
+
+
+def _package_version(name: str) -> str:
+    """Installed distribution version, falling back to the module attribute.
+
+    lp2graph is commonly a sibling *source* checkout here rather than an
+    installed distribution (see :mod:`railpminer._lp2graph`), in which case
+    ``importlib.metadata`` knows nothing about it but the package still
+    carries ``__version__``.
+    """
+    try:
+        return _dist_version(name)
+    except PackageNotFoundError:
+        module = __import__(name)
+        return str(getattr(module, "__version__", "unknown"))
+
+
 def _write_json(path: Path, obj: Any) -> None:
-    path.write_text(json.dumps(obj, indent=2, default=str) + "\n")
+    path.write_text(json.dumps(obj, indent=2, default=str) + "\n", encoding="utf-8", newline="\n")
 
 
 def run(config: PipelineConfig | None = None, *, write: bool = True) -> MiningResult:
@@ -127,8 +170,12 @@ def run(config: PipelineConfig | None = None, *, write: bool = True) -> MiningRe
         out.mkdir(parents=True, exist_ok=True)
         _write_json(out / "dataset.json", ds)
         _write_json(out / "taxonomy.json", tax_artifact)
-        (out / "taxonomy.csv").write_text(taxonomy_export.to_csv(tax_artifact["axes"]))
-        (out / "taxonomy_axes.tex").write_text(taxonomy_export.to_latex(tax_artifact["axes"]))
+        (out / "taxonomy.csv").write_text(
+            taxonomy_export.to_csv(tax_artifact["axes"]), encoding="utf-8", newline="\n"
+        )
+        (out / "taxonomy_axes.tex").write_text(
+            taxonomy_export.to_latex(tax_artifact["axes"]), encoding="utf-8", newline="\n"
+        )
         _write_json(
             out / "clustering_report.json",
             {

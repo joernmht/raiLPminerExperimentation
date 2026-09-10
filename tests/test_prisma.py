@@ -14,7 +14,7 @@ from corpusbuilder.prisma import HITL_STATUSES, hitl_tally
 
 def _write(tmp_path, name: str, payload: dict) -> str:
     p = tmp_path / name
-    p.write_text(json.dumps(payload))
+    p.write_text(json.dumps(payload), encoding="utf-8")
     return str(p)
 
 
