@@ -1,0 +1,31 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling with Multiple Disruptions
+%@ desc :: A Mixed Integer Linear Programming (MILP) model to reschedule the timetable in case of multiple disruptions that occur at different geographic locations but have overlapping periods and are pairwise connected by at least one train line.
+%@ index T ordered=0 cyclic=0 :: Time periods.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index L ordered=0 cyclic=0 :: Train lines.
+%@ index D ordered=0 cyclic=0 :: Disruptions.
+%@ param d shape=D kind=scalar domain=time_duration :: Duration of each disruption.
+%@ param c shape=T,L kind=matrix domain=capacity :: Original timetable (number of trains at each time period and train line).
+%@ param p shape=S,L kind=matrix domain=capacity :: Platform capacity at each station and train line.
+%@ param r shape=S,L kind=matrix domain=capacity :: Rolling stock circulation at each station and train line.
+%@ var x shape=T,L domain=integer role=primary drole=flow_quantity lo=0 hi=- :: Number of trains at each time period and train line after rescheduling.
+%@ var y shape=T,L domain=binary role=primary drole=selection_assignment lo=- hi=- :: Cancellation of trains at each time period and train line.
+%@ var z shape=T,L domain=integer role=primary drole=auxiliary_linearization lo=- hi=- :: Retiming of trains at each time period and train line.
+%@ var w shape=S,L domain=integer role=primary drole=flow_quantity lo=0 hi=- :: Platform usage at each station and train line.
+%@ obj sense=min name=rescheduling_cost combination=sum :: Minimize the total cost of rescheduling (cancellations, delays, and platform usage).
+%@ con rescheduling kind=linear domain=- indicator=- :: Rescheduling constraint (number of trains after rescheduling).
+%@ con cancellation kind=linear domain=- indicator=- :: Cancellation constraint (cancellation of trains).
+%@ con retiming kind=linear domain=- indicator=- :: Retiming constraint (retiming of trains).
+%@ con platform kind=linear domain=- indicator=- :: Platform capacity constraint (platform usage).
+%@ con rolling_stock kind=linear domain=- indicator=- :: Rolling stock circulation constraint (rolling stock usage).
+\begin{align}
+  \min\quad & \sum_{t \in \mathcal{T}, l \in \mathcal{L}} y_{t,l} + \sum_{t \in \mathcal{T}, l \in \mathcal{L}} z_{t,l} + \sum_{s \in \mathcal{S}, l \in \mathcal{L}} w_{s,l} \tag{rescheduling\_cost} \\
+  & x_{t,l} \le c_{t,l} + z_{t,l} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L} \tag{rescheduling} \\
+  & y_{t,l} \ge x_{t,l} - c_{t,l} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L} \tag{cancellation} \\
+  & z_{t,l} \ge x_{t,l} - c_{t,l} \qquad \forall t \in \mathcal{T},\; \forall l \in \mathcal{L} \tag{retiming} \\
+  & w_{s,l} \le p_{s,l} \qquad \forall s \in \mathcal{S},\; \forall l \in \mathcal{L} \tag{platform} \\
+  & \sum_{t \in \mathcal{T}} x_{t,l} \le r_{s,l} \qquad \forall s \in \mathcal{S},\; \forall l \in \mathcal{L} \tag{rolling\_stock} \\
+\end{align}

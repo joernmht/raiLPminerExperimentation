@@ -1,0 +1,79 @@
+% lp2graph canonical LaTeX
+% Reversible with lp2graph.codec.from_canonical_latex (schema 0.1.0).
+%@ meta id=rail_reschedule family=milp schema=0.1.0
+%@ name :: Multiple‑disruption railway timetable rescheduling MILP
+%@ desc :: MILP model for retiming, reordering, cancellation, short‑turning and platform‑capacity handling under overlapping disruptions.
+%@ index S ordered=0 cyclic=0 :: Stations.
+%@ index L ordered=0 cyclic=0 :: Train lines.
+%@ index K ordered=0 cyclic=0 :: Train services (trains).
+%@ index T ordered=0 cyclic=0 :: Discrete time slots of the planning horizon.
+%@ index D ordered=0 cyclic=0 :: Disruptions.
+%@ param orig_dep shape=K kind=scalar domain=time :: Original scheduled departure time of train $k$.
+%@ param orig_arr shape=K kind=scalar domain=time :: Original scheduled arrival time of train $k$.
+%@ param line_of shape=K kind=scalar domain=line :: Line on which train $k$ runs.
+%@ param travel shape=L kind=scalar domain=time :: Travel time on line $\ell$ between consecutive stations.
+%@ param cap_station shape=S kind=scalar domain=integer :: Platform capacity (maximum number of trains) at station $s$.
+%@ param disc_start shape=D kind=scalar domain=time :: Start time of disruption $d$.
+%@ param disc_end shape=D kind=scalar domain=time :: End time of disruption $d$.
+%@ param disc_affected shape=S,D kind=scalar domain=boolean :: $1$ if station $s$ is affected by disruption $d$, $0$ otherwise.
+%@ param bigM shape=- kind=scalar domain=big :: Large constant for big‑M formulations.
+%@ var dep shape=K domain=continuous role=primary drole=- lo=0 hi=- :: New departure time of train $k$.
+%@ var arr shape=K domain=continuous role=primary drole=- lo=0 hi=- :: New arrival time of train $k$.
+%@ var cancel shape=K domain=binary role=primary drole=- lo=0 hi=1 :: Cancellation indicator of train $k$.
+%@ var shortturn shape=K,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Short‑turn (early stop) of train $k$ at station $s$.
+%@ var order shape=K,K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Ordering indicator: $1$ if train $k_1$ precedes train $k_2$ on a shared line segment.
+%@ obj sense=min name=total_cost combination=sum :: Minimize weighted total delay plus cancellation penalty.
+%@ con travel_time kind=- domain=- indicator=- :: Travel‑time feasibility.
+%@ con dep_orig_relax kind=- domain=- indicator=- :: Departure time lower bound with cancellation.
+%@ con arr_orig_relax kind=- domain=- indicator=- :: Arrival time lower bound with cancellation.
+%@ con shortturn_feas kind=- domain=- indicator=- :: Short‑turn feasible only if not cancelled.
+%@ con station_capacity kind=- domain=- indicator=- :: Platform capacity at each station.
+%@ con disruption_capacity kind=- domain=- indicator=- :: Capacity under disruptions.
+%@ con order_binary kind=- domain=- indicator=- :: Binary ordering consistency.
+%@ con order_time kind=- domain=- indicator=- :: Temporal linking of ordering.
+%@ con cancellation_budget kind=- domain=- indicator=- :: Global bound on number of cancellations.
+%@ con disruption_time kind=- domain=- indicator=- :: Logical ordering of disruption start/end.
+\begin{align}
+  \min\quad & \sum_{k \in \mathcal{K}} dep_{k}
+            - \sum_{k \in \mathcal{K}} \mathit{orig\_dep}_{k}
+            + \sum_{k \in \mathcal{K}} arr_{k}
+            - \sum_{k \in \mathcal{K}} \mathit{orig\_arr}_{k}
+            + \mathit{bigM} \cdot \sum_{k \in \mathcal{K}} cancel_{k}
+            \tag{total\_cost} \\
+  & arr_{k} - dep_{k} \ge \mathit{travel}_{\mathit{line\_of}_{k}} - \mathit{bigM} \cdot cancel_{k}
+    \qquad \forall k \in \mathcal{K}
+    \tag{travel\_time} \\
+  & dep_{k} \ge \mathit{orig\_dep}_{k} - \mathit{bigM} \cdot cancel_{k}
+    \qquad \forall k \in \mathcal{K}
+    \tag{dep\_orig\_relax} \\
+  & arr_{k} \ge \mathit{orig\_arr}_{k} - \mathit{bigM} \cdot cancel_{k}
+    \qquad \forall k \in \mathcal{K}
+    \tag{arr\_orig\_relax} \\
+  & shortturn_{k,s} \le 1 - cancel_{k}
+    \qquad \forall k \in \mathcal{K},\; \forall s \in \mathcal{S}
+    \tag{shortturn\_feas} \\
+  & \sum_{k \in \mathcal{K}} shortturn_{k,s} \le \mathit{cap\_station}_{s}
+    \qquad \forall s \in \mathcal{S}
+    \tag{station\_capacity} \\
+  & \sum_{k \in \mathcal{K}} shortturn_{k,s}
+    \le \mathit{cap\_station}_{s}
+       + \mathit{bigM} \cdot \bigl(1 - \mathit{disc\_affected}_{s,d}\bigr)
+    \qquad \forall s \in \mathcal{S},\; \forall d \in \mathcal{D}
+    \tag{disruption\_capacity} \\
+  & order_{k_1,k_2} + order_{k_2,k_1} \ge 1 - cancel_{k_1} - cancel_{k_2}
+    \qquad \forall k_1 \in \mathcal{K},\; \forall k_2 \in \mathcal{K},\; k_1 \neq k_2
+    \tag{order\_binary} \\
+  & dep_{k_2} \ge dep_{k_1}
+                + \mathit{travel}_{\mathit{line\_of}_{k_1}}
+                - \mathit{bigM} \cdot \bigl(1 - order_{k_1,k_2}\bigr)
+                - \mathit{bigM} \cdot cancel_{k_1}
+                - \mathit{bigM} \cdot cancel_{k_2}
+    \qquad \forall k_1 \in \mathcal{K},\; \forall k_2 \in \mathcal{K},\; k_1 \neq k_2
+    \tag{order\_time} \\
+  & \sum_{k \in \mathcal{K}} cancel_{k}
+    \le \sum_{t \in \mathcal{T}} 1
+    \tag{cancellation\_budget} \\
+  & \mathit{disc\_start}_{d} \le \mathit{disc\_end}_{d}
+    \qquad \forall d \in \mathcal{D}
+    \tag{disruption\_time}
+\end{align}

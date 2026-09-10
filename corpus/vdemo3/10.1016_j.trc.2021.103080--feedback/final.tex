@@ -1,0 +1,32 @@
+%@ meta id=railway_rescheduling family=milp schema=0.1.0
+%@ name :: Railway Rescheduling under Multiple Disruptions
+%@ desc :: A MILP model for railway rescheduling considering retiming, reordering, cancelling, and adding stops. The model aims to minimize delays and cancellations while respecting platform capacity and rolling stock circulation constraints.
+%@ index T ordered=0 cyclic=0 :: Set of trains.
+%@ index S ordered=0 cyclic=0 :: Set of stations.
+%@ index P ordered=0 cyclic=0 :: Set of platforms.
+%@ param a_sched shape=T,S kind=matrix domain=time_duration :: Scheduled arrival time of train i at station s.
+%@ param d_sched shape=T,S kind=matrix domain=time_duration :: Scheduled departure time of train i from station s.
+%@ param cap_s shape=S kind=vector domain=integer :: Capacity of station s.
+%@ param min_delay shape=- kind=scalar domain=time_duration :: Penalty weight for delays.
+%@ param cancel_penalty shape=- kind=scalar domain=time_duration :: Penalty weight for cancelling a train.
+%@ param big_M shape=- kind=scalar domain=time_duration :: Large constant for linearization.
+%@ var t_arr shape=T,S domain=non_negative role=primary drole=arrival_time lo=- hi=- :: Actual arrival time of train i at station s.
+%@ var t_dep shape=T,S domain=non_negative role=primary drole=departure_time lo=- hi=- :: Actual departure time of train i from station s.
+%@ var x_cancel shape=T domain=binary role=primary drole=cancellation lo=0 hi=1 :: Binary variable: 1 if train i is cancelled.
+%@ var x_stop shape=T,S domain=binary role=primary drole=stop_decision lo=0 hi=1 :: Binary variable: 1 if train i stops at station s.
+%@ var y_plat shape=T,S,P domain=binary role=primary drole=platform_assignment lo=0 hi=1 :: Binary variable: 1 if train i uses platform p at station s.
+%@ var delay shape=T,S domain=non_negative role=primary drole=delay lo=0 hi=- :: Delay of train i at station s.
+%@ obj sense=min name=total_disruption_cost combination=sum :: Minimize the sum of delay penalties and cancellation penalties.
+%@ con arrival_relation kind=linear domain=- indicator=- :: Arrival time must be at least scheduled arrival plus delay.
+%@ con departure_relation kind=linear domain=- indicator=- :: Departure time must be at least scheduled departure plus delay.
+%@ con stop_consistency kind=big_m domain=- indicator=- :: If a train is cancelled, it cannot arrive or depart.
+%@ con platform_assignment_limit kind=linear domain=- indicator=- :: A train must be assigned to exactly one platform if it stops.
+%@ con platform_capacity kind=capacity domain=- indicator=- :: Platform capacity constraints per station.
+\begin{align}
+  \min\quad & \sum_{i \in \mathcal{T}, s \in \mathcal{S}} min_delay \cdot delay_{i,s} + \sum_{i \in \mathcal{T}} cancel_penalty \cdot x_cancel_{i} \tag{total_disruption_cost} \\
+  & t_arr_{i,s} \ge a_sched_{i,s} + delay_{i,s} \qquad \forall i \in \mathcal{T}, \forall s \in \mathcal{S} \tag{arrival_relation} \\
+  & t_dep_{i,s} \ge d_sched_{i,s} + delay_{i,s} \qquad \forall i \in \mathcal{T}, \forall s \in \mathcal{S} \tag{departure_relation} \\
+  & t_arr_{i,s} \le big_M - big_M \cdot x_cancel_{i} \qquad \forall i \in \mathcal{T}, \forall s \in \mathcal{S} \tag{stop_consistency} \\
+  & \sum_{p \in \mathcal{P}} y_plat_{i,s,p} = x_stop_{i,s} \qquad \forall i \in \mathcal{T}, \forall s \in \mathcal{S} \tag{platform_assignment_limit} \\
+  & \sum_{i \in \mathcal{T}} y_plat_{i,s,p} \le cap_s_{s} \qquad \forall s \in \mathcal{S}, \forall p \in \mathcal{P} \tag{platform_capacity} \\
+\end{align}
