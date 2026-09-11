@@ -74,13 +74,36 @@
 %@ con eq_0038 kind=linear domain=- indicator=- :: Additional constraint from heuristic
 %@ con eq_0039 kind=linear domain=- indicator=- :: Additional constraint from heuristic
 %@ con eq_0040 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+%@ index A_drive ordered=0 cyclic=0 :: Set of driving activities
+%@ index A_headway ordered=0 cyclic=0 :: Set of headway activities
+%@ index Gamma ordered=0 cyclic=0 :: Set of composition transitions
+%@ index N_S ordered=0 cyclic=0 :: Set of shunting trains
+%@ index N_T ordered=0 cyclic=0 :: Set of regular trains
+%@ param I_end shape=M,S kind=scalar domain=- :: End-of-day inventory of rolling stock units of type m at station s
+%@ param I_off shape=M,S kind=scalar domain=- :: Off-balance inventory deviation of rolling stock units of type m at station s
+%@ param alpha shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that become part of successor composition cp
+%@ param beta shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that are removed when transitioning to successor composition cp
+%@ param d_plus_max shape=- kind=scalar domain=- :: Maximum positive delay allowed for a train
+%@ param i_0 shape=M,S kind=scalar domain=- :: Initial inventory of rolling stock units of type m at station s
+%@ param i_end shape=M,S kind=scalar domain=- :: Target end-of-day inventory of rolling stock units of type m at station s
+%@ var p_diff shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Indicator whether trip t is served by a composition different from the planned one
+%@ param pi shape=E kind=scalar domain=- :: Penalty or big-M parameter for event j
+%@ param rho shape=- kind=scalar domain=- :: Weighting parameter in the objective function
+%@ param tau shape=- kind=scalar domain=- :: Time-related parameter (departure/arrival time)
+%@ param w_1 shape=- kind=scalar domain=- :: Weight coefficient 1 in the objective function
+%@ param w_2 shape=- kind=scalar domain=- :: Weight coefficient 2 in the objective function
+%@ param w_3 shape=- kind=scalar domain=- :: Weight coefficient 3 in the objective function
+%@ param w_4 shape=- kind=scalar domain=- :: Weight coefficient 4 in the objective function
+%@ param w_5 shape=- kind=scalar domain=- :: Weight coefficient 5 in the objective function
+%@ param w_6 shape=- kind=scalar domain=- :: Weight coefficient 6 in the objective function
+%@ param w_7 shape=- kind=scalar domain=- :: Weight coefficient 7 in the objective function
 \begin{align}
   \min\quad & \sum_{t \in \mathcal{T}, c \in \mathcal{C}_{t}} w_{1} \cdot \mathit{carr}_{c} \cdot l_{t} \cdot x_{c}^{t} + \sum_{t \in \mathcal{T}, c \in \mathcal{C}_{t}} w_{2} \cdot \mathit{seat}_{c}^{t} \cdot h_{t} \cdot x_{c}^{t} + \sum_{t \in \mathcal{T}} w_{3} \cdot x_{0}^{t} + \sum_{s \in \mathcal{S}, m \in M} w_{4} \cdot I_{m , \text{off}}^{s} + \sum_{t \in \mathcal{T}} w_{5} \cdot n \cdot c_{t} + \sum_{t \in \mathcal{T}} w_{6} \cdot n \cdot u_{t} + \sum_{t \in \mathcal{T}} w_{7} \cdot p_{\text{diff}}^{t} \tag{eq\_0001} \\
   & \text{s}.\text{t}. \sum_{c \in \mathcal{C}_{t}} x_{c}^{t} = 1 \forall t \in \mathcal{T} \tag{eq\_0003} \\
   & x_{c}^{t} = \sum_{cp \in \mathcal{C}_{v \left(t\right)} : \left(c , cp\right) \in \mathit{Gamma}_{t}} z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , c \in \mathcal{C}_{t} \tag{eq\_0004} \\
   & x_{cp}^{v \left(t\right)} = \sum_{c \in \mathcal{C}_{t} : \left(c , cp\right) \in \mathit{Gamma}_{t}} z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , cp \in \mathcal{C}_{v \left(t\right)} \tag{eq\_0005} \\
-  & c_{m}^{v \left(t\right)} = \sum_{\left(c , cp\right) \in \mathit{Gamma}_{t}} \mathit{beta}_{c , cp}^{m} z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0006} \\
-  & u_{m}^{t} = \sum_{\left(c , cp\right) \in \mathit{Gamma}_{t}} \mathit{alpha}_{c , cp}^{m} z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0007} \\
+  & c_{m}^{v \left(t\right)} = \sum_{\left(c , cp\right) \in \mathit{Gamma}_{t}} \mathit{beta}_{c , cp}^{m} \cdot z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0006} \\
+  & u_{m}^{t} = \sum_{\left(c , cp\right) \in \mathit{Gamma}_{t}} \mathit{alpha}_{c , cp}^{m} \cdot z_{c , cp}^{t} \forall t \in \left(\mathcal{T} \backslash \mathcal{T}\right)_{1} , m \in M \tag{eq\_0007} \\
   & I_{m}^{t} = I_{m , 0}^{s_{d} \left(t\right)} - \underset{\genfrac{}{}{0pt}{}{tp \in \mathcal{T} : s_{\text{d}} \left(tp\right) = s_{\text{d}} \left(t\right) ,}{\mathit{tau}_{\text{d}} \left(tp\right) \leq \mathit{tau}_{\text{d}} \left(t\right)}}{\sum} c_{m}^{tp} + \underset{\genfrac{}{}{0pt}{}{tp \in \mathcal{T} : s_{\text{a}} \left(tp\right) = s_{\text{d}} \left(t\right) ,}{\mathit{tau}_{\text{a}} \left(tp\right) \leq \mathit{tau}_{\text{d}} \left(t\right) - \mathit{rho} \left(s_{\text{d}} \left(t\right)\right)}}{\sum} u_{m}^{tp} \forall t \in \mathcal{T} , m \in M \tag{eq\_0008} \\
   & I_{m , \text{end}}^{s} = I_{m , 0}^{s} - \underset{t \in \mathcal{T} : s_{\text{d}} \left(t\right) = s}{\sum} c_{m}^{t} + \underset{t \in \mathcal{T} : s_{\text{a}} \left(t\right) = s}{\sum} u_{m}^{t} \forall s \in \mathcal{S} , m \in M \tag{eq\_0009} \\
   & p_{\text{diff}}^{t} \geq \sum_{c \in \mathcal{C} : c \neq p_{0}^{t}} x_{c}^{t} \forall t \in \mathcal{T} \tag{eq\_0010} \\

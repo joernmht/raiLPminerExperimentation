@@ -116,3 +116,15 @@
 %@ con eq_0040 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
 %@ con eq_0041 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
 %@ con eq_0042 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.jrtpm.2025.100555.json (deterministic fill-in list); pending human confirmation.
+%@ index rho ordered=0 cyclic=0 :: Index for resource paths (alternative spelling)
+%@ param Delta shape=- kind=scalar domain=- :: Time horizon or period length
+%@ param T_bar shape=- kind=scalar domain=- :: Upper bound on cycle time
+%@ param T_underline shape=- kind=scalar domain=- :: Lower bound on cycle time
+%@ param delta shape=- kind=scalar domain=- :: Minimum separation time between entry and exit events
+%@ param k_hat shape=- kind=scalar domain=- :: Number of periods to consider
+%@ var lambda shape=K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%@ param omega shape=- kind=scalar domain=- :: Cycle time or period length
+%@ var t_entry shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
+%@ var t_exit shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path

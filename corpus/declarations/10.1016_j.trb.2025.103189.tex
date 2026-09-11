@@ -162,3 +162,28 @@
 %@ con eq_0038 kind=linear domain=- indicator=- :: Additional constraint from heuristic
 %@ con eq_0039 kind=linear domain=- indicator=- :: Additional constraint from heuristic
 %@ con eq_0040 kind=linear domain=- indicator=- :: Additional constraint from heuristic
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2025.103189.json (deterministic fill-in list); pending human confirmation.
+%@ index A_drive ordered=0 cyclic=0 :: Set of driving activities
+%@ index A_headway ordered=0 cyclic=0 :: Set of headway activities
+%@ index Gamma ordered=0 cyclic=0 :: Set of composition transitions
+%@ index N_S ordered=0 cyclic=0 :: Set of shunting trains
+%@ index N_T ordered=0 cyclic=0 :: Set of regular trains
+%@ param I_end shape=M,S kind=scalar domain=- :: End-of-day inventory of rolling stock units of type m at station s
+%@ param I_off shape=M,S kind=scalar domain=- :: Off-balance inventory deviation of rolling stock units of type m at station s
+%@ param alpha shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that become part of successor composition cp
+%@ param beta shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that are removed when transitioning to successor composition cp
+%@ param d_plus_max shape=- kind=scalar domain=- :: Maximum positive delay allowed for a train
+%@ param i_0 shape=M,S kind=scalar domain=- :: Initial inventory of rolling stock units of type m at station s
+%@ param i_end shape=M,S kind=scalar domain=- :: Target end-of-day inventory of rolling stock units of type m at station s
+%@ var p_diff shape=T domain=binary role=auxiliary drole=- lo=- hi=- :: Indicator whether trip t is served by a composition different from the planned one
+%@ param pi shape=E kind=scalar domain=- :: Penalty or big-M parameter for event j
+%@ param rho shape=- kind=scalar domain=- :: Weighting parameter in the objective function
+%@ param tau shape=- kind=scalar domain=- :: Time-related parameter (departure/arrival time)
+%@ param w_1 shape=- kind=scalar domain=- :: Weight coefficient 1 in the objective function
+%@ param w_2 shape=- kind=scalar domain=- :: Weight coefficient 2 in the objective function
+%@ param w_3 shape=- kind=scalar domain=- :: Weight coefficient 3 in the objective function
+%@ param w_4 shape=- kind=scalar domain=- :: Weight coefficient 4 in the objective function
+%@ param w_5 shape=- kind=scalar domain=- :: Weight coefficient 5 in the objective function
+%@ param w_6 shape=- kind=scalar domain=- :: Weight coefficient 6 in the objective function
+%@ param w_7 shape=- kind=scalar domain=- :: Weight coefficient 7 in the objective function

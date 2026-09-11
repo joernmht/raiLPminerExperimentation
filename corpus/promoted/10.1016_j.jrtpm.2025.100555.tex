@@ -52,6 +52,16 @@
 %@ con eq_0040 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
 %@ con eq_0041 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
 %@ con eq_0042 kind=linear domain=- indicator=- :: Constraint row in the C-MicroRTP model
+%@ index rho ordered=0 cyclic=0 :: Index for resource paths (alternative spelling)
+%@ param Delta shape=- kind=scalar domain=- :: Time horizon or period length
+%@ param T_bar shape=- kind=scalar domain=- :: Upper bound on cycle time
+%@ param T_underline shape=- kind=scalar domain=- :: Lower bound on cycle time
+%@ param delta shape=- kind=scalar domain=- :: Minimum separation time between entry and exit events
+%@ param k_hat shape=- kind=scalar domain=- :: Number of periods to consider
+%@ var lambda shape=K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%@ param omega shape=- kind=scalar domain=- :: Cycle time or period length
+%@ var t_entry shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
+%@ var t_exit shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path
 \begin{align}
   & \sum_{w \in \mathit{rho} \left(n\right)^{+}} x_{w} - \sum_{w \in \mathit{rho} \left(n\right)^{-}} x_{w} = \left\{\begin{matrix} 1 & \text{if} n \in \mathcal{N}^{\text{Source}} , \\ - 1 & \text{if} n \in \mathcal{N}^{\text{Sink}} , \\ 0 & \text{otherwise} , \end{matrix}\right \tag{eq\_0001} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A} . \tag{eq\_0002} \\
@@ -73,7 +83,7 @@
   & z_{p} \in \left\{0 , 1\right\} , \forall p \in \mathcal{P} \tag{eq\_0031\_b} \\
   & y_{p pp} , y_{pp p} \in \left\{0 , 1\right\} , \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0032} \\
   & x_{w} \in \left\{0 , 1\right\} , \forall w \in \mathcal{W} . \tag{eq\_0033} \\
-  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0034} \\
+  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0034} \\
   & k \cdot \mathit{omega} \leq t_{e} \leq \left(k + 1\right) \cdot \mathit{omega} , \forall e \in \mathcal{E}_{k}^{\text{origin}} \forall k \in \left\{0 , 1 , \ldots k_hat - 1\right\} \tag{eq\_0035} \\
   & t_{e^{\left(k\right)}} \leq t_{e^{\left(0\right)}} + k \cdot T_bar , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0036} \\
   & t_{e^{\left(k\right)}} \geq t_{e^{\left(0\right)}} + k \cdot T_underline , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0037} \\
