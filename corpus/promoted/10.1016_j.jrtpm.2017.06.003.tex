@@ -47,11 +47,26 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Select one short-turning location or cancel train line
 %@ con eq_0020 kind=linear domain=- indicator=- :: Enforce turnaround time if short-turning location chosen
 %@ con eq_0021 kind=linear domain=- indicator=- :: Adjusted station capacity constraints with short-turning relaxations
+%@ index E_arr ordered=0 cyclic=0 :: Set of arrival events for delay penalty
+%@ index E_shunt_dep ordered=0 cyclic=0 :: Set of departure events for shunting
+%@ param N_tracks shape=S kind=scalar domain=- :: Number of tracks at station s
+%@ var alpha shape=E domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable indicating whether event j is delayed by a full period
+%@ var d_plus shape=E domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Delay of event j beyond the scheduled time
+%@ param d_plus_max shape=- kind=scalar domain=- :: Maximum allowed delay
+%@ var delta shape=E domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for ordering of events
+%@ var gamma shape=A domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable indicating whether activity (i,j) is infeasible
+%@ var pi shape=E domain=continuous role=auxiliary drole=- lo=0 hi=T-1 :: Scheduled time of event i within the period
+%@ var q_shunt shape=E_shunt_dep domain=integer role=auxiliary drole=- lo=- hi=- :: Number of periods by which shunting departure is shifted
+%@ var sigma shape=M,M,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for short-turn assignment
+%@ param t_shunt shape=- kind=scalar domain=- :: Minimum shunting time
+%@ param tau shape=E,E kind=scalar domain=- :: Minimum turnaround time between events i and k
+%@ param w_cancel shape=M kind=scalar domain=- :: Penalty weight for cancelling train line m
+%@ param w_delay shape=E_arr kind=scalar domain=- :: Penalty weight for delay of arrival event j
 \begin{align}
   & l_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + p_{i j} \cdot T \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0001} \\
   & 0 \leq \mathit{pi}_{i} \leq T - 1 \forall i \in E \tag{eq\_0002} \\
   & p_{i j} \in \left\{0,1\right\} \forall \left(i , j\right) \in A \tag{eq\_0003} \\
-  & d_{j}^{+} = v_{j} + T \mathit{alpha}_{j} - \mathit{pi}_{j} \left(1 - x_{m}\right) \forall j \in E \tag{eq\_0004} \\
+  & d_{j}^{+} = v_{j} + T \cdot \mathit{alpha}_{j} - \mathit{pi}_{j} \left(1 - x_{m}\right) \forall j \in E \tag{eq\_0004} \\
   & 0 \leq v_{j} \leq \left(T - 1\right) \left(1 - x_{m}\right) \forall j \in E_{m} , m \in M \tag{eq\_0005} \\
   & l_{i j} \left(1 - \mathit{gamma}_{i j}\right) \leq v_{j} - v_{i} + q_{i j} \cdot T \leq u_{i j} + \left(T - 1\right) \mathit{gamma}_{i j} \forall \left(i , j\right) \in A \tag{eq\_0006} \\
   & 0 \leq d_{j}^{+} \leq d_{m a x}^{+} ; \mathit{alpha}_{j} \in \left\{0,1\right\} \forall j \in E \tag{eq\_0007} \\
@@ -64,6 +79,6 @@
   & \mathit{tau}_{i k} \left(1 - x_{m} - x_{n}\right) \leq v_{k} - v_{i} + q_{i k} \cdot T \leq \mathit{tau}_{i k} + \left(T - 1\right) \left(x_{m} + x_{n}\right) \tag{eq\_0017} \\
   & 0 \leq v_{k} - t_{s h u n t} + T \cdot q_{k}^{s h u n t} \leq T - 1 \forall k \in E_{s , d e p}^{s h u n t} \tag{eq\_0018} \\
   & \sum_{s \in S_{S T , \left(m , n\right)}} \mathit{sigma}_{m , n}^{s} + x_{m} = 1 \forall m \in M \tag{eq\_0019} \\
-  & \mathit{tau}_{i k} \mathit{sigma}_{m , n}^{s} \leq v_{k} - v_{i} + q_{i k} \cdot T \leq \mathit{tau}_{i k} + \left(T - 1\right) \left(1 - \mathit{sigma}_{m , n}^{s}\right) \forall s \in S_{S T , \left(m , n\right)} \tag{eq\_0020} \\
+  & \mathit{tau}_{i k} \cdot \mathit{sigma}_{m , n}^{s} \leq v_{k} - v_{i} + q_{i k} \cdot T \leq \mathit{tau}_{i k} + \left(T - 1\right) \left(1 - \mathit{sigma}_{m , n}^{s}\right) \forall s \in S_{S T , \left(m , n\right)} \tag{eq\_0020} \\
   & L \cdot B \leq v_{j} - v_{i} + T \cdot q_{i j} \leq U \cdot B \tag{eq\_0021} \\
 \end{align}

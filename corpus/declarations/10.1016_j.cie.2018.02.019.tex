@@ -170,3 +170,41 @@
 %@ con eq_0032_k kind=linear domain=- indicator=- :: MPC stop-time constraint: up_k + ωp_k + λ_k(ta_k - td_k) ≥ 0
 %@ con eq_0032_l kind=linear domain=- indicator=- :: MPC run-time control constraint: UR_min ≤ ur_k ≤ UR_max
 %@ con eq_0032_m kind=linear domain=- indicator=- :: MPC stop-time control constraint: UP_min ≤ up_k ≤ UP_max
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2018.02.019.json (deterministic fill-in list); pending human confirmation.
+%@ var E_T shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: total energy consumption at stage k
+%@ var E_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: energy consumption of train j at station i
+%@ param I_min shape=- kind=scalar domain=- :: minimum headway between trains
+%@ param Lambda shape=- kind=scalar domain=- :: coefficient in headway dynamics
+%@ param P_ac shape=- kind=scalar domain=- :: power consumption coefficient for acceleration
+%@ param P_lc shape=- kind=scalar domain=- :: power consumption coefficient for lighting and air conditioning
+%@ param S_0 shape=- kind=scalar domain=- :: nominal dwell time
+%@ param T_0 shape=k kind=scalar domain=- :: nominal running time at stage k
+%@ param Td_j shape=i,j kind=scalar domain=- :: scheduled departure time of train j at station i
+%@ param UP_max shape=i kind=scalar domain=- :: maximum dwell time deviation
+%@ param UP_min shape=i kind=scalar domain=- :: minimum dwell time deviation
+%@ param UR_max shape=i kind=scalar domain=- :: maximum running time deviation
+%@ param UR_min shape=i kind=scalar domain=- :: minimum running time deviation
+%@ param X_T shape=k kind=scalar domain=- :: weight for departure deviation at stage k
+%@ var X_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: departure deviation of train j at station i
+%@ param Y_T shape=k kind=scalar domain=- :: weight for headway deviation at stage k
+%@ var Y_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: headway deviation of train j at station i
+%@ var alpha shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: passenger arrival rate at stage k
+%@ var alpha_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: passenger arrival rate for train j at station i
+%@ var alpha_j_ob shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: onboard passenger count for train j at station i
+%@ var alpha_j_ob_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: initial onboard passenger count for train j
+%@ var alpha_ob shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: onboard passenger count at stage k
+%@ param j_0 shape=- kind=scalar domain=- :: first train index in regulation horizon
+%@ param l_j shape=i,j kind=scalar domain=- :: passenger alighting rate for train j at station i
+%@ var lambda shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: delay feedback coefficient at stage k
+%@ param lambda_j shape=i,j kind=scalar domain=- :: delay feedback coefficient for train j at station i
+%@ param omega shape=- kind=scalar domain=- :: weight for passenger flow deviation
+%@ var p_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: passenger flow deviation for train j at station i
+%@ var r_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: running time of train j at station i
+%@ var s_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time of train j at station i
+%@ var ta_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of train j at station i
+%@ var td_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of train j at station i
+%@ param up_T shape=k kind=scalar domain=- :: weight for dwell time deviation at stage k
+%@ var up_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time deviation of train j at station i
+%@ param ur_T shape=k kind=scalar domain=- :: weight for running time deviation at stage k
+%@ var ur_j shape=i,j domain=continuous role=auxiliary drole=- lo=- hi=- :: running time deviation of train j at station i

@@ -60,6 +60,24 @@
 %@ con eq_0029 kind=linear domain=- indicator=- :: Forbid y on change arcs (Ignore-Heuristic).
 %@ con eq_0030 kind=linear domain=- indicator=- :: Forbid x on non-reduced light arcs (Light-Heuristic).
 %@ con eq_0031 kind=linear domain=- indicator=- :: Enforce same consist on merged trains (Merge-Heuristic).
+%@ param gamma_Active shape=L,a kind=scalar domain=- :: Cost coefficient for active train arcs.
+%@ param gamma_Bust shape=- kind=scalar domain=- :: Cost coefficient for busting consists.
+%@ param gamma_Fix shape=L kind=scalar domain=- :: Fixed cost for using a locomotive of type l.
+%@ param gamma_Light shape=L,a kind=scalar domain=- :: Cost coefficient for light arcs.
+%@ param gamma_Passive shape=L,a kind=scalar domain=- :: Cost coefficient for passive train arcs.
+%@ param gamma_Pen shape=- kind=scalar domain=- :: Penalty cost for slack variable s_l.
+%@ index A_Bust ordered=0 cyclic=0 :: Set of busting arcs.
+%@ index A_Connect ordered=0 cyclic=0 :: Set of connecting arcs.
+%@ index A_In ordered=0 cyclic=0 :: Set of incoming arcs.
+%@ index A_Light ordered=0 cyclic=0 :: Set of light arcs.
+%@ index A_Out ordered=0 cyclic=0 :: Set of outgoing arcs.
+%@ index A_Pull ordered=0 cyclic=0 :: Set of pull arcs.
+%@ index A_Push ordered=0 cyclic=0 :: Set of push arcs.
+%@ index A_Sink ordered=0 cyclic=0 :: Set of sink arcs.
+%@ index A_Task ordered=0 cyclic=0 :: Set of task arcs.
+%@ index C_Push ordered=0 cyclic=0 :: Set of consists that can be pushed.
+%@ index N_Arrival ordered=0 cyclic=0 :: Set of arrival nodes.
+%@ index N_Departure ordered=0 cyclic=0 :: Set of departure nodes.
 \begin{align}
   \min\quad & \sum_{c \in C, l \in L_{c}} \left(\mathit{gamma}_{l}^{\text{Fix}} \cdot u_{l} + \mathit{gamma}^{\text{Pen}} \cdot s_{l} + \underset{a \in A^{\text{Light}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Light}} \cdot x_{l a} + \underset{a \in A^{\text{Train}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Active}} \cdot x_{l a} + \underset{a \in A^{\text{Train}} \cap A_{l}}{\sum} \mathit{gamma}_{l a}^{\text{Passive}} \cdot y_{l a}\right) + \underset{a \in A^{\text{Bust}}}{\sum} \mathit{gamma}^{\text{Bust}} \cdot w_{a} \tag{eq\_0001} \\
   & \text{s}.\text{t}. \underset{a \in A_{i}^{\text{In}} \cap A_{c}}{\sum} \left(x_{c a} + y_{c a}\right) = \underset{a \in A_{i}^{\text{Out}} \cap A_{c}}{\sum} \left(x_{c a} + y_{c a}\right) \forall i \in N , \forall c \in C , \tag{eq\_0002} \\

@@ -57,6 +57,14 @@
 %@ con eq_0025_c kind=linear domain=- indicator=- :: Linearization product variable lower bound
 %@ con eq_0026 kind=linear domain=- indicator=- :: Study horizon bounds for departure time
 %@ con eq_0027 kind=linear domain=- indicator=- :: Study horizon bounds for arrival time
+%@ var T_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: first component of objective (non-transfer passenger waiting time)
+%@ var T_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: second component of objective (transfer passenger waiting time at origin stations)
+%@ var T_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: third component of objective (number of passengers who fail to transfer)
+%@ param a_max shape=L,S kind=matrix domain=- :: maximum arrival time at station m on line l
+%@ param a_tr shape=L,N kind=matrix domain=- :: arrival time of train i on line l at transfer station
+%@ param d_max shape=L,S kind=matrix domain=- :: maximum departure time at station m on line l
+%@ param d_tr shape=L,N kind=matrix domain=- :: departure time of train ip on line lp at transfer station
+%@ param t_walking shape=- kind=scalar domain=- :: walking time for transfer between lines
 \begin{align}
   \text{Objective\quad & \cdot function} : min T = min \left(T_{1} + T_{2} + T_{3}\right) \tag{eq\_0001} \\
   & T_{1} = \sum_{l = 1}^{L} \sum_{lp = 1}^{L} \sum_{m = 1}^{S_{l} - 1} \sum_{mp = 1}^{S_{lp}} \sum_{i = 1}^{N_{l}} \sum_{t = 1}^{T} T \cdot W_{l , m , i}^{lp , mp} \left(t\right) = \sum_{l = 1}^{L} \sum_{lp = 1}^{L} \sum_{m = 1}^{S_{l} - 1} \sum_{mp = 1}^{S_{lp}} \sum_{i = 1}^{N_{l}} \sum_{t = 1}^{T} L_{l , m , i}^{lp , mp} \left(t\right) \star p_{l , m}^{lp , mp} \left(t\right) \star \left(d_{l , i}^{m} - t\right) \tag{eq\_0002} \\

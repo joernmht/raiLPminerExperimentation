@@ -94,6 +94,81 @@
 %@ con eq_0049_b kind=linear domain=- indicator=- :: Product z = y·d: lower bound using minimum time
 %@ con eq_0049_c kind=linear domain=- indicator=- :: Product z = y·d: upper bound using departure time
 %@ con eq_0049_d kind=linear domain=- indicator=- :: Product z = y·d: lower bound using departure time
+%@ param C_train shape=- kind=scalar domain=- :: Train capacity (number of passengers)
+%@ param N_rs shape=- kind=scalar domain=- :: Number of available rolling stocks
+%@ var a_dn shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time of down-direction train service i at station j
+%@ var a_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time of up-direction train service i at station j
+%@ var a_up_1 shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time of up-direction train service i at station 1
+%@ var beta shape=I,I domain=binary role=indicator drole=- lo=- hi=- :: 1 if down-direction service i is connected to up-direction service ip, 0 otherwise
+%@ var d_dn shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of down-direction train service i from station j
+%@ var d_dn_1 shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time of down-direction train service i from station 1
+%@ var d_up shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of up-direction train service i from station j
+%@ var d_up_1 shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time of up-direction train service i from station 1
+%@ var delta shape=I domain=binary role=indicator drole=- lo=- hi=- :: 1 if train service i enters/exits depot, 0 otherwise
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant
+%@ var f_depot shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for depot operations
+%@ param f_depot_nom shape=- kind=scalar domain=- :: Normalization factor for f_depot
+%@ var f_dn_headway shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for down-direction headway regularity
+%@ var f_headway shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for headway regularity
+%@ param f_headway_nom shape=- kind=scalar domain=- :: Normalization factor for f_headway
+%@ var f_load shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for passenger load balance
+%@ param f_load_nom shape=- kind=scalar domain=- :: Normalization factor for f_load
+%@ var f_up_headway shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for up-direction headway regularity
+%@ param gamma_1 shape=- kind=scalar domain=- :: Weight for f_load in objective
+%@ param gamma_2 shape=- kind=scalar domain=- :: Weight for f_headway in objective
+%@ param gamma_3 shape=- kind=scalar domain=- :: Weight for f_depot in objective
+%@ param h_max shape=- kind=scalar domain=- :: Maximum headway
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway
+%@ param i_1 shape=- kind=scalar domain=- :: Number of preceding train services in headway smoothing window
+%@ param i_2 shape=- kind=scalar domain=- :: Number of following train services in headway smoothing window
+%@ param kappa_up shape=J,K kind=scalar domain=- :: Passenger arrival rate parameter for up direction at station j in interval k
+%@ var lambda_tilde shape=J domain=continuous role=auxiliary drole=- lo=- hi=- :: Approximated passenger arrival rate function for up direction at station j
+%@ param lambda_up shape=J,K kind=scalar domain=- :: Passenger arrival rate for up direction at station j in interval k
+%@ param lambda_up_1 shape=J kind=scalar domain=- :: Passenger arrival rate for up direction at station j in interval 1
+%@ param lambda_up_2 shape=J kind=scalar domain=- :: Passenger arrival rate for up direction at station j in interval 2
+%@ var omega_dn shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for down-direction load deviation
+%@ var omega_up shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction load deviation
+%@ var p_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of passengers boarding up-direction train service i at station j
+%@ var q_dn shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for down-direction headway deviation
+%@ var q_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction headway deviation
+%@ var r_dn shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Running time of down-direction train service i between stations j and j-1
+%@ param r_dn_max shape=J kind=scalar domain=- :: Maximum running time for down direction at station j
+%@ param r_dn_min shape=J kind=scalar domain=- :: Minimum running time for down direction at station j
+%@ param r_turn_1_max shape=- kind=scalar domain=- :: Maximum turn-around time at station 1
+%@ param r_turn_1_min shape=- kind=scalar domain=- :: Minimum turn-around time at station 1
+%@ param r_turn_max shape=J kind=scalar domain=- :: Maximum turn-around time at station J
+%@ param r_turn_min shape=J kind=scalar domain=- :: Minimum turn-around time at station J
+%@ var r_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Running time of up-direction train service i between stations j and j+1
+%@ param r_up_max shape=J kind=scalar domain=- :: Maximum running time for up direction at station j
+%@ param r_up_min shape=J kind=scalar domain=- :: Minimum running time for up direction at station j
+%@ var sigma_dn shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Load factor of down-direction train service i at station j
+%@ var sigma_dn_mean shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Mean of maximum down-direction load factors
+%@ param sigma_max shape=- kind=scalar domain=- :: Maximum allowed load factor
+%@ var sigma_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Load factor of up-direction train service i at station j
+%@ var sigma_up_mean shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Mean of maximum up-direction load factors
+%@ param t_enter shape=- kind=scalar domain=- :: Time for a train to enter the depot
+%@ param t_exit shape=- kind=scalar domain=- :: Time for a train to exit the depot
+%@ var tau_dn shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Dwell time of down-direction train service i at station j
+%@ param tau_max shape=J kind=scalar domain=- :: Maximum dwell time at station j
+%@ param tau_min shape=J kind=scalar domain=- :: Minimum dwell time at station j
+%@ var tau_up shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Dwell time of up-direction train service i at station j
+%@ var x_up shape=I,J,K domain=binary role=indicator drole=- lo=- hi=- :: 1 if up-direction train service i departs station j in interval k, 0 otherwise
+%@ var xi shape=I domain=binary role=indicator drole=- lo=- hi=- :: 1 if up-direction service ip is not connected to any down-direction service, 0 otherwise
+%@ var y_tilde shape=I,J,K domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for up-direction departure time
+%@ var y_up shape=I,J,K domain=binary role=indicator drole=- lo=- hi=- :: 1 if up-direction train service i departs station j after time t_k, 0 otherwise
+%@ var y_up_1 shape=I,J domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for up-direction departure time in interval 1
+%@ var y_up_2 shape=I,J domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for up-direction departure time in interval 2
+%@ var z_up shape=I,J,K domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time
+%@ var z_up_1 shape=I,J,K domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (first part)
+%@ var z_up_1_1 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (first part, interval 1)
+%@ var z_up_1_2 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (first part, interval 2)
+%@ var z_up_2 shape=I,J,K domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (second part)
+%@ var z_up_2_1 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (second part, interval 1)
+%@ var z_up_3 shape=I,J,K domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (third part)
+%@ var z_up_3_1 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (third part, interval 1)
+%@ var z_up_3_2 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (third part, interval 2)
+%@ var z_up_4 shape=I,J,K domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (fourth part)
+%@ var z_up_4_1 shape=I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for up-direction departure time (fourth part, interval 1)
 \begin{align}
   & d_{i , j}^{up} = a_{i , j}^{up} + \mathit{tau}_{i , j}^{up} \tag{eq\_0001\_a} \\
   & a_{i , j + 1}^{up} = d_{i , j}^{up} + r_{i , j}^{up} \tag{eq\_0001\_b} \\
@@ -117,7 +192,7 @@
   & \sum_{ip \in \mathbf{I}} \mathit{beta}_{i , ip} \leq 1 . \tag{eq\_0017} \\
   & \mathit{delta}_{i} + \mathit{xi}_{ip} \leq M \left(1 - \mathit{beta}_{i , ip}\right) \tag{eq\_0018\_a} \\
   & \mathit{delta}_{i} + \mathit{xi}_{ip} \geq - M \left(1 - \mathit{beta}_{i , ip}\right) . \tag{eq\_0018\_b} \\
-  & \sum_{m = 1}^{i} \mathit{xi}_{m} - \sum_{m = 1}^{i - 1} \mathit{delta}_{m} y_{m , i} \leq N_{rs} , \tag{eq\_0019} \\
+  & \sum_{m = 1}^{i} \mathit{xi}_{m} - \sum_{m = 1}^{i - 1} \mathit{delta}_{m} \cdot y_{m , i} \leq N_{rs} , \tag{eq\_0019} \\
   & d_{m , 1}^{dn} - d_{i , 1}^{up} + t_{enter} + t_{exit} \leq M \left(1 - y_{m , i}\right) . \tag{eq\_0020} \\
   & f_{load} = \sum_{i \in \mathbf{I}} \left(\left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{up} - \mathit{sigma}_{mean}^{up}\right| + \left|\underset{j \in \mathbf{J}}{max} \mathit{sigma}_{i , j}^{dn} - \mathit{sigma}_{mean}^{dn}\right|\right) , \tag{eq\_0021} \\
   & \mathit{sigma}_{mean}^{up} = \frac{\sum_{i \in \mathbf{I}} max_{j \in \mathbf{J}} \mathit{sigma}_{i , j}^{up}}{I} \tag{eq\_0022\_a} \\

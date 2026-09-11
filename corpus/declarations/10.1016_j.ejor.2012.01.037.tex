@@ -80,3 +80,10 @@
 %@ con eq_0008_a kind=linear domain=- indicator=- :: Deviation variable bounds target minus final inventory
 %@ con eq_0008_b kind=linear domain=- indicator=- :: Deviation variable bounds final inventory minus target
 %@ con eq_0009 kind=linear domain=- indicator=- :: Final inventory computed from initial inventory and assigned compositions
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2012.01.037.json (deterministic fill-in list); pending human confirmation.
+%@ index fty ordered=0 cyclic=0 :: Index family for time horizon periods
+%@ param alpha shape=R,S,T kind=scalar domain=- :: Coefficient for trip r, station s, time t
+%@ param beta shape=- kind=scalar domain=- :: Penalty coefficient for unmet demand
+%@ param gamma shape=T,T,C,C kind=scalar domain=- :: Cost coefficient for consecutive trip pairs and compositions
+%@ param i_0 shape=S,M kind=scalar domain=- :: Initial inventory of rolling stock type m at station s

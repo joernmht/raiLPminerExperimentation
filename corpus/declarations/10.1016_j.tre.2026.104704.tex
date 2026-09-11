@@ -230,3 +230,42 @@
 %@ con eq_0084_b kind=linear domain=- indicator=- :: Master problem constraints: first-stage constraints and optimality cuts
 %@ con eq_0087 kind=linear domain=- indicator=- :: Definition of intermediate variable for operation-zone start station
 %@ con eq_0088 kind=linear domain=- indicator=- :: Definition of intermediate variable for operation-zone end station
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2026.104704.json (deterministic fill-in list); pending human confirmation.
+%@ index Omega ordered=0 cyclic=0 :: Set of uncertainty realizations (scenarios)
+%@ var Q_backup shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Backup train dispatch cost in second stage
+%@ var Q_cancel shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Cancellation penalty cost in second stage
+%@ var Q_deviation shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Schedule deviation penalty cost in second stage
+%@ var Q_variation shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Order variation penalty cost in second stage
+%@ param a_bar shape=R,P kind=scalar domain=- :: Planned arrival time of service r at station p
+%@ param alpha shape=- kind=scalar domain=- :: CVaR confidence level
+%@ param c_min shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ param d_bar shape=R,P kind=scalar domain=- :: Planned departure time of service r at station p
+%@ var delta shape=R,R,P domain=binary role=indicator drole=- lo=- hi=- :: 1 if departure of r at p is after arrival of rp at p
+%@ var gamma shape=R,P domain=binary role=indicator drole=- lo=- hi=- :: 1 if service r is short-turned at station p
+%@ var gamma_1 shape=R domain=binary role=indicator drole=- lo=- hi=- :: 1 if service r is short-turned at station 1
+%@ param lambda_5 shape=- kind=scalar domain=- :: Weight of expectation in mean-CVaR criterion
+%@ index m ordered=0 cyclic=0 :: Index for service groups in headway constraints
+%@ param n_max shape=P,P kind=scalar domain=- :: Maximum running time between adjacent stations
+%@ param n_min shape=P,P kind=scalar domain=- :: Minimum running time between adjacent stations
+%@ param o_min shape=- kind=scalar domain=- :: Minimum turnaround time at terminal stations
+%@ param p_tilde shape=- kind=scalar domain=- :: Station where the fault occurs
+%@ var pi shape=R,R domain=binary role=indicator drole=- lo=- hi=- :: 1 if service rp precedes service r in the same direction
+%@ var psi shape=R,P domain=binary role=indicator drole=- lo=- hi=- :: 1 if service r is cancelled at station p
+%@ var psi_1 shape=R domain=binary role=indicator drole=- lo=- hi=- :: 1 if service r is cancelled at any station
+%@ param q_max shape=- kind=scalar domain=- :: Maximum dwell time at stations
+%@ param q_min shape=- kind=scalar domain=- :: Minimum dwell time at stations
+%@ var rho shape=R,R,P domain=binary role=indicator drole=- lo=- hi=- :: 1 if service rp immediately precedes service r at station p
+%@ param sigma shape=- kind=scalar domain=- :: Binary parameter for fault type (0 or 1)
+%@ var sigma_enter shape=R,P domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of trains entering station p before service r
+%@ var sigma_leave shape=R,P domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of trains leaving station p before service r
+%@ param t_acc shape=- kind=scalar domain=- :: Acceleration time penalty
+%@ param t_dec shape=- kind=scalar domain=- :: Deceleration time penalty
+%@ param t_delay shape=- kind=scalar domain=- :: Delay duration of the fault
+%@ param t_dur shape=Omega kind=scalar domain=- :: Duration of the disruption
+%@ param t_res shape=- kind=scalar domain=- :: Recovery time after fault handling
+%@ param t_start shape=- kind=scalar domain=- :: Start time of the fault
+%@ param tau shape=- kind=scalar domain=- :: Binary parameter for fault type (0 or 1)
+%@ var theta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective value of the second-stage problem
+%@ index u ordered=0 cyclic=0 :: Index for service groups in headway constraints
+%@ var varphi shape=R,R,P domain=binary role=indicator drole=- lo=- hi=- :: 1 if service rp is short-turned to service r at station p

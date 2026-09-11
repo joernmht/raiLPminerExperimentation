@@ -47,11 +47,30 @@
 %@ con eq_0022 kind=linear domain=- indicator=- :: Auxiliary constraint in the linearization of the ADMM penalty terms (Eq. 22)
 %@ con eq_0023 kind=linear domain=- indicator=- :: Domain/auxiliary variable constraint in the linearized train-specific subproblem (Eq. 23)
 %@ con eq_0046 kind=linear domain=- indicator=- :: Equation (46) from the algorithmic/numerical analysis section
+%@ index Tpp ordered=0 cyclic=0 :: Set of time offsets for track capacity constraints
+%@ index phi ordered=0 cyclic=0 :: Mapping from section and time offset to space-time arcs
+%@ param Tp shape=- kind=scalar domain=- :: Time offset parameter
+%@ var Z_1 shape=- domain=continuous role=primary drole=- lo=- hi=- :: First objective component
+%@ var Z_2 shape=- domain=continuous role=primary drole=- lo=- hi=- :: Second objective component
+%@ var Z_3 shape=- domain=continuous role=primary drole=- lo=- hi=- :: Third objective component
+%@ param alpha_1 shape=- kind=scalar domain=- :: Weight for first objective component
+%@ param alpha_2 shape=- kind=scalar domain=- :: Weight for second objective component
+%@ param alpha_3 shape=- kind=scalar domain=- :: Weight for third objective component
+%@ param c_hat shape=K,E kind=scalar domain=- :: Cost parameter for train k on space-time arc
+%@ param e shape=- kind=scalar domain=- :: Constant in flow conservation
+%@ param gamma shape=- kind=scalar domain=- :: Step size for dual update
+%@ param h shape=- kind=scalar domain=- :: Constant in flow conservation
+%@ var lambda shape=G,K,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian multiplier for cross-resolution consistency
+%@ param lambda_n shape=G,K,S kind=scalar domain=- :: Previous iteration Lagrangian multiplier
+%@ var mu shape=G,Tpp domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Lagrangian multiplier for track capacity
+%@ param mu_n shape=G,Tpp kind=scalar domain=- :: Previous iteration multiplier for track capacity
+%@ param r shape=K,Q kind=scalar domain=- :: Train index mapping for cycles
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter for ADMM
 \begin{align}
   \min\quad & \mathit{alpha}_{1} Z_{1} + \mathit{alpha}_{2} Z_{2} + \mathit{alpha}_{3} Z_{3} \tag{eq\_0001} \\
   & \sum_{f \in F_{l}, s \in S_{l}} x_{l , f , s} \leq 1 , \forall l \in L \tag{eq\_0005} \\
   & \sum_{l \in L, f \in F_{l}, s \in S_{l}} x_{l , f , s} f \mathit{vartheta}_{i}^{s} \mathit{vartheta}_{j}^{s} \geq p_{i , j} , \forall \left(i , j\right) \in O \cdot D , i < j \tag{eq\_0006} \\
-  & \underset{i , t : \left(i , ip , t , tp\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(i , ip , t , tp , f , s\right) - \underset{i , t : \left(ip , i , tp , t\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(ip , i , tp , t , f , s\right) = \left\{\begin{matrix} - 1 & & ip = o_{b_{l , f}} , tp = \left(\mathit{dep}\right)_{b_{l , f}}^{s} \\ 1 & & ip = d_{b_{l , f}} , tp = Tp \\ 0 & & o t h e r w i s e \end{matrix}\right , \forall l \in L , f \in F_{l} , s \in S_{l} \tag{eq\_0007} \\
+  & \underset{i , t : \left(i , ip , t , tp\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(i , ip , t , tp , f , s\right) - \underset{i , t : \left(ip , i , tp , t\right) \in E_{b_{l , f}}}{\sum} y_{b_{l , f}} \left(ip , i , tp , t , f , s\right) = \left\{\begin{matrix} - 1 & & ip = o_{b_{l , f}} , tp = \left(\mathit{dep}\right)_{b_{l , f}}^{s} \\ 1 & & ip = d_{b_{l , f}} , tp = Tp \\ 0 & & o t h \cdot e \cdot r \cdot w i s e \end{matrix}\right , \forall l \in L , f \in F_{l} , s \in S_{l} \tag{eq\_0007} \\
   & y_{k + 1} \left(i , ip , t + min \left\{\left⌊T / f\right⌋ , T - 1\right\} , tp + min \left\{\left⌊T / f\right⌋ , T - 1\right\} , f , s\right) = y_{k} \left(i , ip , t , tp , f , s\right) , \forall l \in L , f \in F_{l} , k \in K_{l , f} \backslash \left\{b_{l , f}^{'}\right\} , s \in S_{l} , \left(i , ip , t , tp\right) \in E_{k} , f > 1 \tag{eq\_0008} \\
   & z_{r_{k , \mathit{vartheta}}} \left(i , ip , \mathit{tau} , taup , f_{r_{k , \mathit{vartheta}}} , s\right) = y_{k} \left(i , ip , t + \mathit{vartheta} T , tp + \mathit{vartheta} T , f_{k} , s\right) , \forall k \in K , \left(i , ip , t , tp\right) \in E_{k} , \left(i , ip , \mathit{tau} , taup\right) \in E_{r_{k , \mathit{vartheta}}}^{'} , \mathit{vartheta} \in \left\{0 , \ldots , Q\right\} , \mathit{tau} = t + \mathit{vartheta} T , taup = tp + \mathit{vartheta} T \tag{eq\_0010} \\
   & \sum_{k \in Kp} \underset{s \in S_{l_{k}}}{\sum} \sum_{\left(i , ip , \mathit{tau} , taup\right) \in \mathit{phi} \left(j , jp , taupp\right)} z_{k} \left(i , ip , \mathit{tau} , taup , f_{k} , s\right) \leq 1 , \forall \left(j , jp\right) \in Gpp , taupp \in Tpp \tag{eq\_0012} \\

@@ -24,6 +24,11 @@
 %@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total passenger delay)
 %@ param g shape=i kind=vector domain=- :: Weight (number of passengers) for operation i
 %@ param t_hat shape=i kind=vector domain=- :: Scheduled time for operation i
+%@ index N_STOP ordered=0 cyclic=0 :: Set of stop operations in the alternative graph
+%@ param My_ij shape=i,j kind=scalar domain=- :: Big-M parameter for alternative arc (i,j)
+%@ param f_hk shape=h,k kind=scalar domain=- :: Fixed arc weight for alternative arc (h,k)
+%@ param f_ij shape=i,j kind=scalar domain=- :: Fixed arc weight for fixed arc (i,j)
+%@ var Z_DELAY shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total weighted passenger delay objective
 \begin{align}
   \begin{matrix}Minimize\quad & & Z_{\mathtt{DELAY}} = \underset{i \in N_{\mathtt{STOP}}}{\sum} g_{i} \cdot d_{i} \\ Subject to : & & \\ & t_{i} - t_hat_{i} \leq d_{i} ; & i \in N_{\mathtt{STOP}} \\ & t_{j} - t_{i} \geq f_{\mathit{ij}} ; & \left(i , j\right) \in F \\ & t_{j} - t_{i} \geq f_{\mathit{ij}} - M \left(1 - y_{\mathit{ij}}\right) ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A \\ & t_{k} - t_{h} \geq f_{\mathit{hk}} - \mathit{My}_{\mathit{ij}} ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A \\ & d_{i} \geq 0 ; & i \in N_{\mathtt{STOP}} ; \\ & y_{\mathit{ij}} \in \left\{0 , 1\right\} ; & \left(\left(i , j\right) , \left(h , k\right)\right) \in A\end{matrix} \tag{eq\_0006} \\
 \end{align}

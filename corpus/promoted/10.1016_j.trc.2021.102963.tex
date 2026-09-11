@@ -93,6 +93,23 @@
 %@ con eq_0053_a kind=linear domain=- indicator=- :: Lower bound on auxiliary travel time variable
 %@ con eq_0053_b kind=linear domain=- indicator=- :: Upper bound on auxiliary travel time variable
 %@ con eq_0054 kind=linear domain=- indicator=- :: Aggregation of travel time components into total travel time
+%@ index Omega ordered=0 cyclic=0 :: Scenario index (ω ∈ Ω)
+%@ param C_max shape=- kind=scalar domain=- :: Maximum train capacity
+%@ var E_aux shape=i,k,omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary energy consumption for auxiliary systems
+%@ var E_tilde_aux shape=i,k,omega,f domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary energy consumption for speed profile f
+%@ var E_tilde_tra shape=i,k,omega,f domain=continuous role=auxiliary drole=- lo=- hi=- :: Traction energy consumption for speed profile f
+%@ var E_tra shape=i,k,omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Traction energy consumption
+%@ param H_bar shape=- kind=scalar domain=- :: Maximum headway
+%@ param H_underline shape=- kind=scalar domain=- :: Minimum headway
+%@ param PW_aux shape=i,k,omega kind=scalar domain=- :: Auxiliary power consumption
+%@ param P_ac shape=- kind=scalar domain=- :: Air conditioning power
+%@ param P_lc shape=- kind=scalar domain=- :: Lighting and other auxiliary power
+%@ param Q_0 shape=- kind=scalar domain=- :: Capacity of a train service
+%@ var R_tilde shape=i,k,omega,t domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for passenger waiting time at station i
+%@ var S_tilde shape=i,k,omega,t domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for passenger waiting time at station i
+%@ param T_tilde shape=i kind=scalar domain=- :: Minimum required service time at station i
+%@ var d_hat shape=i,k domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary departure time variable
+%@ var y_hat shape=k domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for service k
 \begin{align}
   & z_{i , k} \left(t\right) \geq z_{i , k} \left(t - 1\right) , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} , t \in \mathbf{\mathcal{T}} \backslash \left\{1\right\} \tag{eq\_0002} \\
   & d_{i , k} = z_{i , k} \left(1\right) + \underset{t \in \mathbf{\mathcal{T}} \backslash \left\{1\right\}}{\sum} t \cdot \left[z_{i , k} \left(t\right) - z_{i , k} \left(t - 1\right)\right] , \forall i \in \mathbf{\mathcal{N}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0003} \\

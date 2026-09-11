@@ -30,6 +30,10 @@
 %@ con eq_0011 kind=linear domain=- indicator=- :: Main line headway at origin (cycle end)
 %@ con eq_0012 kind=linear domain=- indicator=- :: Main line headway: express train after local train
 %@ con eq_0013 kind=linear domain=- indicator=- :: Main line headway: local train after express train
+%@ var MY_st shape=s,t domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary variable in headway constraint
+%@ var Y_st shape=s,t domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for headway constraint
+%@ param w_1 shape=- kind=scalar domain=- :: weight coefficient for cycle interval in objective
+%@ param w_2 shape=- kind=scalar domain=- :: weight coefficient for total dwell time in objective
 \begin{align}
   \min\quad & w_{1} \cdot \mathit{Interval} + w_{2} \cdot \sum_{s = 1}^{S} D_{s} \tag{eq\_0006} \\
   & \text{Subject to} D_{s} \geq \mathit{dMin}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0007} \\

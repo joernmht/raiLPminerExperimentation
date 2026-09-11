@@ -209,3 +209,59 @@
 %@ con eq_0074 kind=linear :: Train system constraint on acceleration and deceleration comfort bounds
 %@ con eq_0075 kind=linear :: Boundary constraint between STS arc and speed profile
 %@ con eq_0076 kind=linear :: Initial boundary condition for shooting interval
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2025.105076.json (deterministic fill-in list); pending human confirmation.
+%@ index A_diruption ordered=0 cyclic=0 :: Set of disruption arcs in the space-time-state network
+%@ index A_drive ordered=0 cyclic=0 :: Set of driving arcs in the space-time-state network
+%@ index A_dwell ordered=0 cyclic=0 :: Set of dwelling arcs in the space-time-state network
+%@ index A_off ordered=0 cyclic=0 :: Set of off arcs in the space-time-state network
+%@ index A_on ordered=0 cyclic=0 :: Set of on arcs in the space-time-state network
+%@ index A_q_minus ordered=0 cyclic=0 :: Set of incoming arcs to node q in the space-time-state network
+%@ index A_q_plus ordered=0 cyclic=0 :: Set of outgoing arcs from node q in the space-time-state network
+%@ index A_tilde ordered=0 cyclic=0 :: Set of arcs in the space-time-state network excluding certain arcs
+%@ index A_track ordered=0 cyclic=0 :: Set of track arcs in the space-time-state network
+%@ index Omega ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
+%@ index Phi ordered=0 cyclic=0 :: Set of arcs preceding a given arc
+%@ index varphi ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
+%@ param C_0 shape=- kind=scalar domain=- :: Coefficient in cost function
+%@ param Psi_1 shape=- kind=scalar domain=- :: Penalty function for train order constraints
+%@ param Psi_2 shape=- kind=scalar domain=- :: Penalty function for power supply constraints
+%@ param T_arr shape=W_hat kind=vector domain=- :: Scheduled arrival time of train k at station w
+%@ param T_dep shape=W_hat kind=vector domain=- :: Scheduled departure time of train k from station w
+%@ param alpha shape=- kind=vector domain=- :: Control variable (acceleration) in speed profile
+%@ param b_max shape=K kind=vector domain=- :: Maximum braking force for train k
+%@ param beta shape=- kind=vector domain=- :: State variable (speed) in speed profile
+%@ param beta_0 shape=- kind=scalar domain=- :: Initial speed in speed profile
+%@ param c_tilde shape=A,K kind=matrix domain=- :: Modified cost coefficient for arc a and train k
+%@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
+%@ param chi_bar shape=- kind=scalar domain=- :: Upper bound for chi
+%@ param chi_max shape=- kind=scalar domain=- :: Maximum value for chi
+%@ param chi_min shape=- kind=scalar domain=- :: Minimum value for chi
+%@ param chi_underline shape=- kind=scalar domain=- :: Lower bound for chi
+%@ param d_off shape=W_hat kind=vector domain=- :: Delay cost coefficient for off arcs at station w
+%@ param d_on shape=W_hat kind=vector domain=- :: Delay cost coefficient for on arcs at station w
+%@ param delta shape=A kind=vector domain=- :: Slack variable for arc a
+%@ param delta_star shape=A kind=vector domain=- :: Optimal slack variable for arc a
+%@ param eta shape=- kind=scalar domain=- :: Parameter in ADMM penalty update
+%@ param f_max shape=K kind=vector domain=- :: Maximum traction force for train k
+%@ param gamma shape=- kind=scalar domain=- :: Parameter in ADMM penalty update
+%@ var lambda shape=A domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Dual variable for arc a
+%@ param lambda_theta shape=A kind=vector domain=- :: Dual variable at iteration theta for arc a
+%@ var mu shape=A,K domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for arc a and train k
+%@ param p_max shape=K kind=vector domain=- :: Maximum power for train k
+%@ var pi shape=R,T,K domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for power supply district r, time t, train k
+%@ param res_theta shape=- kind=scalar domain=- :: Residual at iteration theta
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter in ADMM
+%@ param rho_1 shape=- kind=scalar domain=- :: Penalty parameter for train order constraints
+%@ param rho_2 shape=- kind=scalar domain=- :: Penalty parameter for power supply constraints
+%@ param rho_theta shape=- kind=scalar domain=- :: Penalty parameter at iteration theta
+%@ param theta_1 shape=- kind=scalar domain=- :: Weight for passenger delay in objective
+%@ param theta_2 shape=- kind=scalar domain=- :: Weight for energy consumption in objective
+%@ param u_bar shape=- kind=scalar domain=- :: Upper bound for control variable u
+%@ param u_underline shape=- kind=scalar domain=- :: Lower bound for control variable u
+%@ param v_max shape=- kind=scalar domain=- :: Maximum speed limit
+%@ param x_bar shape=- kind=scalar domain=- :: Upper bound for state variable x
+%@ param x_underline shape=- kind=scalar domain=- :: Lower bound for state variable x
+%@ var xi shape=R,T domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Dual variable for power supply district r and time t
+%@ var zeta shape=R,T domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Slack variable for power supply district r and time t
+%@ param zeta_star shape=R,T kind=vector domain=- :: Optimal slack variable for power supply district r and time t

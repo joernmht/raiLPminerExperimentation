@@ -56,6 +56,11 @@
 %@ con eq_0023 kind=linear domain=- indicator=- :: Integrality of the period adjustment variables k_a.
 %@ con eq_0024 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
 %@ con eq_0025 kind=linear domain=- indicator=- :: Additional linear constraint of the infrastructure-aware integrated model.
+%@ index delta_minus ordered=0 cyclic=0 :: Set of incoming edges to a node in the passenger flow network.
+%@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing edges from a node in the passenger flow network.
+%@ param f_max shape=I kind=scalar domain=- :: Maximum allowed frequency on track section i.
+%@ param g_max shape=- kind=scalar domain=- :: Maximum number of rolling stock units of type g.
+%@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
 \begin{align}
   & 0 < \left|\mathcal{X}_{\text{conflict}}\right| \leq \left|\mathcal{X}_{\text{plan}}\right| \leq \left|\mathcal{X}_{\text{pool}}\right| . \tag{eq\_0001} \\
   \min\quad & \sum_{o d \in \mathcal{OD}, s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\

@@ -107,3 +107,19 @@
 %@ con eq_0013_h kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case h)
 %@ con eq_0013_i kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case i)
 %@ con eq_0013_j kind=linear domain=- indicator=- :: Epigraph constraint for min-max objective (case j)
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2014.11.001.json (deterministic fill-in list); pending human confirmation.
+%@ var A_tq shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time of train q on line t at transfer station j
+%@ var D_tq shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Dwelling time of train q on line t at transfer station j
+%@ param L_t_0 shape=- kind=scalar domain=- :: Departure time of the first train on line t from the initial station
+%@ var L_tq shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time of train q on line t from transfer station j
+%@ param L_tq_0 shape=- kind=scalar domain=- :: Departure time of train q on line t from the initial station
+%@ var R_tq shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Running time of train q on line t between transfer stations j and j+1
+%@ var alpha_tq shape=tp,qp,j domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating whether train q on line t arrives before train qp on line tp at transfer station j
+%@ param c_tq shape=tp,qp,j kind=scalar domain=- :: Weight coefficient for waiting time of transfer passengers
+%@ param e_t shape=tp,j kind=scalar domain=- :: Minimum transfer time from line t to line tp at transfer station j
+%@ param h_tp shape=- kind=scalar domain=- :: Headway of line tp
+%@ param h_underline shape=t kind=scalar domain=- :: Minimum headway of line t
+%@ param r_bar_tq shape=j kind=scalar domain=- :: Maximum running time of train q on line t between transfer stations j and j+1
+%@ param r_underline_tq shape=j kind=scalar domain=- :: Minimum running time of train q on line t between transfer stations j and j+1
+%@ var w_tq shape=tp,qp,j domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time of passengers transferring from train q on line t to train qp on line tp at transfer station j

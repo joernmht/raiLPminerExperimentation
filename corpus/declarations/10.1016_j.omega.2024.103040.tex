@@ -154,3 +154,20 @@
 %@ index stop shape=- domain=- role=index drole=- lo=- hi=- :: stop set label
 %@ index dep shape=- domain=- role=index drole=- lo=- hi=- :: departure label
 %@ param b shape=- domain=integer role=coefficient drole=- lo=-1 hi=1 :: net flow balance
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.omega.2024.103040.json (deterministic fill-in list); pending human confirmation.
+%@ index A_disruption ordered=0 cyclic=0 :: disrupted arc set label
+%@ index A_drive ordered=0 cyclic=0 :: driving arc set label
+%@ index A_i_minus ordered=0 cyclic=0 :: incoming arc set label
+%@ index A_i_plus ordered=0 cyclic=0 :: outgoing arc set label
+%@ index I_stop ordered=0 cyclic=0 :: stop station set label
+%@ index Phi ordered=0 cyclic=0 :: incompatible arc set label
+%@ index Phi_headway ordered=0 cyclic=0 :: headway incompatible arc set label
+%@ index Phi_safety ordered=0 cyclic=0 :: safety incompatible arc set label
+%@ param L_rho shape=- kind=scalar domain=- :: Lagrangian function value with penalty parameter rho
+%@ param Q_0 shape=- kind=scalar domain=- :: quadratic penalty term constant
+%@ param T_dep shape=K,I_stop kind=scalar domain=- :: scheduled departure time of train k from station s
+%@ param c_hat shape=A,K kind=scalar domain=- :: adjusted cost coefficient for arc a and train k
+%@ param lambda_theta shape=A kind=scalar domain=- :: dual variable for incompatible arc set constraint at iteration theta
+%@ param m shape=- kind=scalar domain=- :: big-M constant
+%@ var x_hat shape=A,K domain=binary role=primary drole=- lo=- hi=- :: binary decision variable for arc a and train k in subproblem

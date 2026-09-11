@@ -150,3 +150,20 @@
 %@ con eq_0048 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains
 %@ con eq_0049 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains (continued)
 %@ con eq_0050 kind=linear domain=- indicator=- :: Residual linear constraint ensuring feasible multi-line coordinated adjustment
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2025.111770.json (deterministic fill-in list); pending human confirmation.
+%@ param C_1 shape=- kind=scalar domain=- :: weight coefficient for objective term z_1
+%@ param C_2 shape=U kind=vector domain=- :: line-dependent weight coefficient for objective term z_2
+%@ param C_3 shape=- kind=scalar domain=- :: weight coefficient for objective term z_2
+%@ param Delta shape=- kind=scalar domain=- :: time slot duration parameter
+%@ param alpha shape=S,T,T,U kind=matrix domain=- :: assignment coefficient linking departure time to station-time-line
+%@ param epsilon shape=- kind=tolerance domain=- :: small positive tolerance for strict inequality linearization
+%@ var eta shape=S,T,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: passenger arrival rate at station s in time t on line u
+%@ param eta_bar shape=S,T,U kind=matrix domain=- :: baseline passenger arrival rate at station s in time t on line u
+%@ var gamma shape=L,S,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: auxiliary variable for linearizing dwell time constraints
+%@ param h_min shape=- kind=scalar domain=- :: minimum headway between consecutive trains
+%@ var t_a shape=L,S kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: adjusted arrival time of train l at station s
+%@ var t_bar shape=L,S,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: scheduled departure time of train l from station s on line u
+%@ var x_bar shape=L,S,T,U kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for additional train l at station s in time t on line u
+%@ var z_1 shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: objective component for passenger waiting time
+%@ var z_2 shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: objective component for operational cost

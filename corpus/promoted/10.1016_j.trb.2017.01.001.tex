@@ -64,6 +64,10 @@
 %@ con eq_0035 kind=linear domain=- indicator=- :: Linearized mixed-integer programming formulation of RTS model
 %@ con eq_0036 kind=linear domain=- indicator=- :: Upper bound on utilized regenerative energy from traction energy (r_t^u ≤ F_a(u,t))
 %@ con eq_0046 kind=linear domain=- indicator=- :: Allowable passenger boarding speed cap at each station and time interval (b_t^i ≤ b_max^i)
+%@ param Z_1 shape=- kind=scalar domain=- :: Objective function value for the first optimization model (ETS)
+%@ param b_max shape=I kind=vector domain=- :: Maximum number of passengers that can board a train at station i
+%@ param d_underline shape=I kind=vector domain=- :: Minimum dwell time at station i
+%@ param t_0 shape=- kind=scalar domain=- :: Initial timestamp of the planning horizon
 \begin{align}
   & \begin{matrix}W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot n_{t}^{i} ,\end{matrix} \tag{eq\_0004} \\
   & \begin{matrix}n_{t}^{i} = n_{t - \mathit{delta}}^{i} + \sum_{i \leq j \leq 2 I} p_{i j} \left(t\right) \cdot \mathit{delta} - b_{t}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , i \in \mathcal{I} ,\end{matrix} \tag{eq\_0005} \\

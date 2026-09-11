@@ -47,6 +47,16 @@
 %@ index I shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for i from 1 to n
 %@ index J shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for j from 1 to n
 %@ index I_after shape=set domain=integer role=index drole=- lo=C^{B}+1 hi=n :: index set for i from C^B+1 to n
+%@ param C_A shape=- kind=scalar domain=- :: Maximum number of trains that can be simultaneously in service on the corridor.
+%@ param C_B shape=- kind=scalar domain=- :: Number of trains based at the terminal with a yard.
+%@ param F_D shape=- kind=scalar domain=- :: Maximum headway function for down-direction departures.
+%@ param F_U shape=- kind=scalar domain=- :: Maximum headway function for up-direction departures.
+%@ param sigma shape=- kind=scalar domain=- :: Binary indicator whether a train stops at station s_k.
+%@ param t_D shape=- kind=scalar domain=- :: Down-direction departure time window bounds (L = latest start, E = earliest end).
+%@ param t_U shape=- kind=scalar domain=- :: Up-direction departure time window bounds (L = latest start, E = earliest end).
+%@ param tau_A shape=- kind=scalar domain=- :: Minimum turnaround time at the terminal without a yard.
+%@ param tau_B shape=- kind=scalar domain=- :: Minimum turnaround time at the terminal with a yard.
+%@ param tau_min shape=- kind=scalar domain=- :: Minimum required headway between consecutive train trips.
 \begin{align}
   & \mathit{sigma}^{s_{k}} \left(x_{i + 1}\right) = 0 , s_{k} \in S \backslash \left\{s_{B}\right\} \tag{eq\_0003} \\
   & F^{\text{D}} \left(x_{i}\right) = \mathit{tau}_{\text{min}} \tag{eq\_0004} \\

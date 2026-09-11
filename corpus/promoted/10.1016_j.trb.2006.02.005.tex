@@ -19,6 +19,10 @@
 %@ index k ordered=0 cyclic=0 :: index for event
 %@ con eq_0001_b kind=linear domain=- indicator=- :: precedence constraint
 %@ con eq_0001_c kind=linear domain=- indicator=- :: alternative constraint
+%@ param a_hk shape=i,j kind=scalar domain=- :: minimum time separation for alternative constraint pair (h,k)
+%@ param a_ij shape=i,j kind=scalar domain=- :: minimum time separation for alternative constraint pair (i,j)
+%@ param f_ij shape=i,j kind=scalar domain=- :: minimum time separation for precedence constraint (i,j)
+%@ var t_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: start time of the first event
 \begin{align}
   \min\quad & t_{n} - t_{0} \tag{eq\_0001\_a} \\
   & t_{j} - t_{i} > f_{\mathit{ij}} \left(i , j\right) \in F \tag{eq\_0001\_b} \\

@@ -98,6 +98,20 @@
 %@ con eq_0043_n kind=linear domain=- indicator=- :: DM subproblem: integer domain for rho
 %@ con eq_0043_o kind=linear domain=- indicator=- :: DM subproblem: integer domain for b
 %@ con eq_0043_p kind=linear domain=- indicator=- :: DM subproblem: capacity penalty constraint
+%@ param Delta shape=- kind=scalar domain=- :: Scaling coefficient in objective function
+%@ var F_c shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Congestion cost component
+%@ var F_e shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time cost component
+%@ var alpha shape=I,S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for reservation allocation
+%@ var beta shape=I,S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for unreserved passenger allocation
+%@ var d_i1 shape=I domain=integer role=auxiliary drole=- lo=- hi=- :: Departure time of train i from station 1
+%@ var epsilon shape=I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Dwell time adjustment variable
+%@ var eta shape=I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Travel time adjustment variable
+%@ var gamma shape=I,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for passenger flow control
+%@ var kappa shape=I,S,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Ratio parameter for passenger allocation
+%@ param lambda_c shape=- kind=scalar domain=- :: Weight for congestion cost in objective
+%@ param lambda_e shape=- kind=scalar domain=- :: Weight for waiting time cost in objective
+%@ var theta shape=I,S,T,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for reservation timing
+%@ var varrho shape=S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Reservation slot allocation variable
 \begin{align}
   \begin{aligned}min\quad & & \mathit{lambda}^{e} F^{e} + \mathit{lambda}^{c} F^{c}\end{aligned} \tag{eq\_0001} \\
   & \begin{aligned}F^{e} & = \mathit{Delta} \left[\sum_{i \in \mathcal{I}, s \in \mathcal{S}, t \in \mathcal{T}} \left(y_{i s t} \sum_{tp \in \mathcal{T} , tp \leq t} y_{i s tp} \sum_{v \in \mathcal{S} , v > s} D_{s v t}\right) + \sum_{i \in \mathcal{I}, s \in \mathcal{S}, t \in \mathcal{T}} \left(y_{i s t} \sum_{v \in \mathcal{S} , v > s} r_{i s v}\right)\right] , & \end{aligned} \tag{eq\_0002} \\
@@ -110,12 +124,12 @@
   & \begin{matrix} & a_{i s} = d_{i \left(s - 1\right)} + \mathit{eta}_{i \left(s - 1\right)} & & \forall i \in \mathcal{I} , s \in \mathcal{S} \backslash \left\{1\right\} ,\end{matrix} \tag{eq\_0011} \\
   & \begin{matrix} & y_{i s t} = \begin{cases} & x_{i s t} i = 1 \\ & x_{i s t} - x_{\left(i - 1\right) s t} i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & & \forall s \in \mathcal{S} , t \in \mathcal{T} ,\end{matrix} \tag{eq\_0012} \\
   & \begin{matrix} & x_{i s t} \in \left\{0 , 1\right\} & & \forall i \in \mathcal{I} , s \in \mathcal{S} , t \in \mathcal{T} .\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix} & \left(b_hat\right)_{i s v} = \sum_{t \in \mathcal{T}} y_{i s t} \mathit{varrho}_{s t} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix} & \left(b_hat\right)_{i s v} = \sum_{t \in \mathcal{T}} y_{i s t} \cdot \mathit{varrho}_{s t} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0014} \\
   & \begin{matrix} & \sum_{i \in \mathcal{I}} \left(b_hat\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{varrho}_{s v t} & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0015} \\
   & \begin{matrix} & 0 \leq \mathit{varrho}_{s v t} \leq D_{s v t} & & \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} ,\end{matrix} \tag{eq\_0016} \\
   & \begin{matrix} & \mathit{varrho}_{s v t} \in \mathcal{Z}_{\geq 0} & & \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} .\end{matrix} \tag{eq\_0017} \\
   & \begin{matrix} & w_{i s v} = \begin{cases} & \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) i = 1 \\ & \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) - \sum_{j \in \mathcal{I} , j < i} b_{j s v} i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0018} \\
-  & \begin{matrix} & \mathit{kappa}_{i s v} w_{i s v} \leq b_{i s v} \leq w_{i s v} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0019} \\
+  & \begin{matrix} & \mathit{kappa}_{i s v} \cdot w_{i s v} \leq b_{i s v} \leq w_{i s v} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0019} \\
   & \begin{matrix} & r_{i s v} = w_{i s v} - b_{i s v} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0020} \\
   & \begin{matrix} & \sum_{i \in \mathcal{I}} b_{i s v} = \sum_{t \in \mathcal{T}} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) & & \forall s , v \in \mathcal{S} , v > s ,\end{matrix} \tag{eq\_0021} \\
   & \begin{matrix} & b_{i s v} \in \mathcal{Z}_{\geq 0} & & \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s .\end{matrix} \tag{eq\_0022} \\
@@ -156,7 +170,7 @@
   & \sum_{i \in \mathcal{I}} \left(b_hat\right)_{i s v} = \sum_{t \in \mathcal{T}} \mathit{varrho}_{s v t} \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_e} \\
   & 0 \leq \mathit{varrho}_{s v t} \leq D_{s v t} \forall s , v \in \mathcal{S} , v > s , t \in \mathcal{T} \tag{eq\_0043\_f} \\
   & w_{i s v} = \begin{cases} \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) & i = 1 \\ \sum_{t \in \mathcal{T}} x_{i s t} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) - \sum_{j \in \mathcal{I} , j < i} b_{j s v} & i \in \mathcal{I} \backslash \left\{1\right\} \end{cases} \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_g} \\
-  & \mathit{kappa}_{i s v} w_{i s v} \leq b_{i s v} \leq w_{i s v} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_h} \\
+  & \mathit{kappa}_{i s v} \cdot w_{i s v} \leq b_{i s v} \leq w_{i s v} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_h} \\
   & r_{i s v} = w_{i s v} - b_{i s v} \forall i \in \mathcal{I} , s , v \in \mathcal{S} , v > s \tag{eq\_0043\_i} \\
   & \sum_{i \in \mathcal{I}} b_{i s v} = \sum_{t \in \mathcal{T}} \left(D_{s v t} - \mathit{varrho}_{s v t}\right) \forall s , v \in \mathcal{S} , v > s \tag{eq\_0043\_j} \\
   & \left(o_hat\right)_{i s} = \sum_{m \in \mathcal{S} , m \leq s - 1, v \in \mathcal{S} , v \geq s + 1} \left(b_hat\right)_{i m v} \forall i \in \mathcal{I} , s \in \mathcal{S} \tag{eq\_0043\_k} \\

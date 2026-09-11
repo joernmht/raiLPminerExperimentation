@@ -78,3 +78,14 @@
 %@ con eq_0018 kind=capacity domain=- indicator=- :: Train capacity constraints on departure and travel arcs
 %@ con eq_0019 kind=linear domain=- indicator=- :: Binary integrality of train arc variables x^k_uv
 %@ con eq_0020 kind=linear domain=- indicator=- :: Nonnegativity of passenger flow variables y^r_uv
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2021.06.001.json (deterministic fill-in list); pending human confirmation.
+%@ index A_dep ordered=0 cyclic=0 :: Set of departure arcs in the time-space network
+%@ index A_trv ordered=0 cyclic=0 :: Set of travel arcs in the time-space network
+%@ param Gamma shape=K kind=scalar domain=- :: Capacity of train k
+%@ param mu_uv shape=- kind=scalar domain=- :: Cost coefficient for passenger flow on arc u->v
+%@ param o_bar shape=- kind=scalar domain=- :: Origin vertex in the time-space network
+%@ param xi shape=K kind=scalar domain=- :: Cost coefficient for train k on arc u->v
+%@ param zeta shape=R kind=scalar domain=- :: Cost coefficient for passenger group r on arc u->v
+%@ var x_uv shape=A,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train k uses arc u->v
+%@ var y_uv shape=A,R domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow variable for group r on arc u->v

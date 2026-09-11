@@ -58,8 +58,37 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Definition of trains dwelling at station at stage start
 %@ con eq_0039 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for downside trains
 %@ con eq_0040 kind=capacity domain=- indicator=- :: Rolling horizon station capacity constraint for upside trains
+%@ index A_1 ordered=0 cyclic=0 :: First set of order activity pairs for station headway constraints
+%@ index A_2 ordered=0 cyclic=0 :: Second set of order activity pairs for station headway constraints
+%@ index A_run_train ordered=0 cyclic=0 :: Set of run activities for train services
+%@ index A_station_head ordered=0 cyclic=0 :: Set of station headway activities
+%@ index A_track_1_head ordered=0 cyclic=0 :: Set of track 1 headway activities
+%@ index A_train ordered=0 cyclic=0 :: Set of train activities
+%@ index E_arr ordered=0 cyclic=0 :: Set of arrival events
+%@ index E_dep ordered=0 cyclic=0 :: Set of departure events
+%@ index T_down ordered=0 cyclic=0 :: Set of down direction train services
+%@ index T_down_dis ordered=0 cyclic=0 :: Set of down direction train services affected by disruption
+%@ index T_up ordered=0 cyclic=0 :: Set of up direction train services
+%@ index T_up_dis ordered=0 cyclic=0 :: Set of up direction train services affected by disruption
+%@ param C_down shape=S kind=scalar domain=- :: Capacity of down direction at station s
+%@ param C_up shape=S kind=scalar domain=- :: Capacity of up direction at station s
+%@ param H_end_dis shape=- kind=scalar domain=- :: End time of disruption
+%@ param L_max shape=A kind=scalar domain=- :: Maximum running time for activity a
+%@ param M_1 shape=- kind=big_m domain=- :: Big-M constant for cancellation constraints
+%@ param M_2 shape=- kind=big_m domain=- :: Big-M constant for headway constraints
+%@ var chi_d shape=E domain=binary role=indicator drole=- lo=- hi=- :: 1 if event e occurs after disruption end, 0 otherwise
+%@ var d_minus shape=E domain=non_negative role=auxiliary drole=- lo=- hi=- :: Delay (negative deviation) of event e
+%@ var d_plus shape=E domain=non_negative role=auxiliary drole=- lo=- hi=- :: Delay (positive deviation) of event e
+%@ param delta shape=- kind=scalar domain=- :: Maximum allowed imbalance in cancellation counts
+%@ param gamma shape=T kind=scalar domain=- :: Penalty cost for canceling train service t
+%@ var lambda shape=A domain=binary role=primary drole=- lo=- hi=- :: 1 if activity a is selected, 0 otherwise
+%@ param mu_minus shape=E kind=scalar domain=- :: Penalty cost for negative deviation of event e
+%@ param mu_plus shape=E kind=scalar domain=- :: Penalty cost for positive deviation of event e
+%@ param omega_down shape=S,H kind=scalar domain=- :: Number of down direction trains already in station s at disruption start
+%@ param omega_up shape=S,H kind=scalar domain=- :: Number of up direction trains already in station s at disruption start
+%@ var varphi shape=A domain=binary role=primary drole=- lo=- hi=- :: 1 if activity a is selected for station headway, 0 otherwise
 \begin{align}
-  \begin{aligned}\quad & & min \\ & \sum_{t \in T} \mathit{gamma}_{t} y_{t} + \sum_{e \in E} \mathit{mu}_{e}^{+} d_{e}^{+} + \underset{e \in E^{\mathit{arr}}}{\sum} \mathit{mu}_{e}^{-} d_{e}^{-}\end{aligned} \tag{eq\_0001} \\
+  \begin{aligned}\quad & & min \\ & \sum_{t \in T} \mathit{gamma}_{t} \cdot y_{t} + \sum_{e \in E} \mathit{mu}_{e}^{+} d_{e}^{+} + \underset{e \in E^{\mathit{arr}}}{\sum} \mathit{mu}_{e}^{-} d_{e}^{-}\end{aligned} \tag{eq\_0001} \\
   & \begin{aligned} & \text{subject to} \\ & y_{t_{e}} \left(M_{1} + D_{e}\right) - D_{e} \leq x_{e} - q_{e} \leq M_{1} \forall e \in E\end{aligned} \tag{eq\_0002} \\
   & x_{e} \geq q_{e} \forall e \in E^{\mathit{dep}} \tag{eq\_0003} \\
   & d_{e}^{+} \geq x_{e} - q_{e} - M_{1} \cdot y_{t_{e}} \forall e \in E \tag{eq\_0004} \\

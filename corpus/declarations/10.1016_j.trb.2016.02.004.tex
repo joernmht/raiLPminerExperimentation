@@ -99,3 +99,26 @@
 %@ con eq_0013 kind=linear domain=- indicator=- :: Binary restriction on line-cancellation variables
 %@ con eq_0014 kind=linear domain=- indicator=- :: Bounds on connection-time exceeding variable y
 %@ con eq_0015 kind=linear domain=- indicator=- :: Binary restriction on missed-connection variables
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2016.02.004.json (deterministic fill-in list); pending human confirmation.
+%@ index B_varphi ordered=0 cyclic=0 :: Set of shared blocks for a given varphi
+%@ index W_varphi ordered=0 cyclic=0 :: Cyclic pattern of successive train pairs for a given varphi
+%@ var chi shape=Q domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator for connection q being infeasible
+%@ param d_e shape=L,L,S kind=scalar domain=- :: Departure time of train l from block i
+%@ param mu shape=- kind=scalar domain=- :: Robustness measure for a given varphi
+%@ param pi_bar shape=Q kind=scalar domain=- :: Penalty for connection q
+%@ param pi_canc shape=L kind=scalar domain=- :: Penalty for cancelling line l
+%@ param pi_conn shape=Q kind=scalar domain=- :: Penalty for connection q
+%@ param pi_dwell shape=L kind=scalar domain=- :: Dwell time penalty for line l
+%@ param pi_runn shape=L kind=scalar domain=- :: Running time penalty for line l
+%@ param t_approach shape=S,S kind=scalar domain=- :: Approach time at block i
+%@ param t_block shape=S,S kind=scalar domain=- :: Block time at block i
+%@ param t_clear shape=S,S kind=scalar domain=- :: Clear time at block i
+%@ param t_release shape=S,S kind=scalar domain=- :: Release time at block i
+%@ param t_setup shape=S,S kind=scalar domain=- :: Setup time at block i
+%@ param t_sight shape=S,S kind=scalar domain=- :: Sight time at block i
+%@ param tau_A shape=S,P kind=scalar domain=- :: Arrival time at point s for path p
+%@ param tau_D shape=S,P kind=scalar domain=- :: Departure time at point s for path p
+%@ param u_underline shape=Q kind=scalar domain=- :: Minimum headway time for connection q
+%@ param varphi shape=- kind=scalar domain=- :: Scenario parameter
+%@ var xi shape=L domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator for line l being cancelled

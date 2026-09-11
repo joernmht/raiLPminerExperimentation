@@ -124,3 +124,13 @@
 %@ con eq_0025_c kind=linear domain=- indicator=- :: Linearization product variable lower bound
 %@ con eq_0026 kind=linear domain=- indicator=- :: Study horizon bounds for departure time
 %@ con eq_0027 kind=linear domain=- indicator=- :: Study horizon bounds for arrival time
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2020.106374.json (deterministic fill-in list); pending human confirmation.
+%@ var T_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: first component of objective (non-transfer passenger waiting time)
+%@ var T_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: second component of objective (transfer passenger waiting time at origin stations)
+%@ var T_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: third component of objective (number of passengers who fail to transfer)
+%@ param a_max shape=L,S kind=matrix domain=- :: maximum arrival time at station m on line l
+%@ param a_tr shape=L,N kind=matrix domain=- :: arrival time of train i on line l at transfer station
+%@ param d_max shape=L,S kind=matrix domain=- :: maximum departure time at station m on line l
+%@ param d_tr shape=L,N kind=matrix domain=- :: departure time of train ip on line lp at transfer station
+%@ param t_walking shape=- kind=scalar domain=- :: walking time for transfer between lines

@@ -79,3 +79,17 @@
 %@ con eq_0008 kind=linear domain=- indicator=- :: If a service is cancelled, no short-turning pair can be selected for it
 %@ con eq_0009 kind=big_m domain=- indicator=- :: If a short-turning pair is selected, the departure time of the returning service is at least the arrival time of the incoming service plus the minimum turnaround time
 %@ con eq_0010 kind=linear domain=- indicator=- :: If a service is not cancelled, exactly one platform is assigned to it
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.jrtpm.2018.02.002.json (deterministic fill-in list); pending human confirmation.
+%@ index L_Dist ordered=0 cyclic=0 :: Set of disrupted lines or directions
+%@ index S_1 ordered=0 cyclic=0 :: Set of stations or scenarios (first subset)
+%@ var c_i shape=L,n domain=binary role=auxiliary drole=- lo=- hi=- :: Short-turning decision for incoming service i on line l at position n
+%@ var c_j shape=L,n domain=binary role=auxiliary drole=- lo=- hi=- :: Short-turning decision for outgoing service j on line l at position n
+%@ var d_a shape=V domain=continuous role=primary drole=- lo=- hi=- :: Arrival delay of a train service
+%@ var d_d shape=V domain=continuous role=primary drole=- lo=- hi=- :: Departure delay of a train service
+%@ var lambda shape=Out domain=binary role=primary drole=- lo=- hi=- :: Short-turning assignment variable for a pair of services
+%@ param omega shape=V kind=scalar domain=- :: Weight coefficient for delay of a train service
+%@ param omega_c shape=V kind=scalar domain=- :: Weight coefficient for short-turning decision of a train service
+%@ var t_a shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Actual arrival time of a train service
+%@ var t_d shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Actual departure time of a train service
+%@ param theta_min shape=V kind=scalar domain=- :: Minimum turnaround time for a train service

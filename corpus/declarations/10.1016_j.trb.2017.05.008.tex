@@ -144,3 +144,17 @@
 %@ index B1 shape=- domain=- role=set drole=- lo=- hi=- :: Singleton braking level 1
 %@ index B_pair shape=- domain=- role=set drole=- lo=- hi=- :: Forbidden braking level pairs
 %@ index Dplus shape=- domain=- role=set drole=t lo=- hi=- :: Successor positions
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2017.05.008.json (deterministic fill-in list); pending human confirmation.
+%@ index B_1 ordered=0 cyclic=0 :: Singleton braking level 1
+%@ index B_2 ordered=0 cyclic=0 :: Set of speed levels for braking pair
+%@ index S_bar ordered=0 cyclic=0 :: Set of sections impacted by disruption
+%@ param W_1 shape=- kind=scalar domain=- :: Big-M constant for speed adaptation
+%@ param W_2 shape=- kind=scalar domain=- :: Big-M constant for speed adaptation
+%@ var beta shape=B,T,S domain=binary role=primary drole=- lo=- hi=- :: Speed level selection variable
+%@ param delta shape=S kind=scalar domain=- :: Minimum headway time for section
+%@ var lambda shape=T,T,S,S domain=binary role=primary drole=- hi=- :: Train ordering variable for alternative arcs
+%@ var mu shape=T,T,vartheta domain=binary role=primary drole=- hi=- :: Train ordering variable for speed-dependent arcs
+%@ var omega shape=T,S domain=continuous role=primary drole=- hi=- :: Entry time of train into section
+%@ var omega_end shape=T domain=continuous role=primary drole=- hi=- :: Exit time of train from last section
+%@ var x_bar shape=T,S domain=binary role=auxiliary drole=- hi=- :: Speed adaptation indicator variable

@@ -156,3 +156,16 @@
 %@ con eq_0035 kind=linear domain=- indicator=- :: Calculates generalized time for passengers not served within horizon
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reformulated cyclicity constraint with 60/120 min differences
 %@ con eq_0037 kind=linear domain=- indicator=- :: Selects one of two possible headways in reformulated cyclicity
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2016.04.003.json (deterministic fill-in list); pending human confirmation.
+%@ var alpha shape=L,v domain=binary role=primary drole=- lo=- hi=- :: Train activation indicator
+%@ param beta shape=- kind=scalar domain=- :: Passenger weighting coefficients
+%@ var delta shape=I,T,P domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Waiting time deviation
+%@ index ell_2 ordered=0 cyclic=0 :: Line index
+%@ var gamma shape=I,T,P domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Waiting time deviation
+%@ var mu shape=L,v domain=continuous role=auxiliary drole=- lo=- hi=- :: Maximum passenger waiting time
+%@ var omega shape=L,v,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Passenger waiting time
+%@ param r_1 shape=I kind=scalar domain=- :: Initial running time
+%@ param varepsilon shape=- kind=scalar domain=- :: Passenger satisfaction level
+%@ var z_v1 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 60-minute headway indicator
+%@ var z_v2 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 120-minute headway indicator

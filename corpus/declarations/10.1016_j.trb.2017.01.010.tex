@@ -165,3 +165,53 @@
 %@ con eq_0040 kind=linear domain=- indicator=- :: Stacked capacity vector L for the QP constraints
 %@ con eq_0041 kind=linear domain=- indicator=- :: Stacked control upper bound U_max_bar for the QP constraints
 %@ con eq_0042 kind=linear domain=- indicator=- :: Stacked control lower bound U_min_bar for the QP constraints
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2017.01.010.json (deterministic fill-in list); pending human confirmation.
+%@ param A_i shape=j kind=matrix domain=- :: State transition coefficient matrix for train i at station j
+%@ param B_i shape=j kind=matrix domain=- :: Coupling coefficient matrix for train i at station j
+%@ param C_i shape=j kind=matrix domain=- :: Control input coefficient matrix for train i at station j
+%@ param E_2 shape=- kind=scalar domain=- :: Auxiliary scalar in quadratic cost expansion
+%@ param E_T shape=- kind=vector domain=- :: Transpose of state error vector E
+%@ param F_T shape=- kind=matrix domain=- :: Transpose of prediction matrix F
+%@ param G_i shape=j kind=matrix domain=- :: Disturbance coefficient matrix for train i at station j
+%@ param H_1 shape=- kind=matrix domain=- :: Constraint coefficient matrix for headway deviation
+%@ param H_2 shape=- kind=matrix domain=- :: Constraint coefficient matrix for state bounds
+%@ param H_3 shape=- kind=matrix domain=- :: Constraint coefficient matrix for dwell time bounds
+%@ param H_4 shape=- kind=matrix domain=- :: Constraint coefficient matrix for dwell time bounds
+%@ param H_5 shape=- kind=matrix domain=- :: Constraint coefficient matrix for dwell time bounds
+%@ var L_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Nominal passenger load of train i at station j
+%@ param P_i shape=j kind=matrix domain=- :: State penalty weight matrix for train i at station j
+%@ param Phi shape=- kind=matrix domain=- :: Prediction matrix mapping control inputs to states
+%@ param Phi_T shape=- kind=matrix domain=- :: Transpose of prediction matrix Phi
+%@ param Q_i shape=j kind=matrix domain=- :: State deviation penalty weight matrix for train i at station j
+%@ param R_i shape=j kind=scalar domain=- :: Nominal running time of train i at station j
+%@ var T_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Nominal departure time of train i at station j
+%@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control input vector
+%@ param U_T shape=- kind=vector domain=- :: Transpose of control input vector U
+%@ param U_max shape=- kind=vector domain=- :: Upper bound on control input
+%@ param U_min shape=- kind=vector domain=- :: Lower bound on control input
+%@ var U_star shape=- domain=continuous role=primary drole=- lo=- hi=- :: Optimal control input vector
+%@ param alpha shape=- kind=scalar domain=- :: Dwell time coefficient
+%@ param beta_i shape=j kind=scalar domain=- :: Alighting rate of train i at station j
+%@ var e_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: State error of train i at station j
+%@ param gamma_i shape=j kind=scalar domain=- :: Boarding rate of train i at station j
+%@ var l_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Actual passenger load of train i at station j
+%@ param l_max shape=- kind=scalar domain=- :: Maximum passenger load capacity
+%@ var m_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of boarding passengers for train i at station j
+%@ var n_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of alighting passengers for train i at station j
+%@ var p_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of passengers left behind by train i at station j
+%@ param p_max shape=- kind=scalar domain=- :: Maximum passenger flow control bound
+%@ param p_min shape=- lo=- hi=- kind=scalar domain=- :: Minimum passenger flow control bound
+%@ var r_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Actual running time of train i at station j
+%@ var s_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Actual dwell time of train i at station j
+%@ var t_i shape=j domain=continuous role=primary drole=- lo=- hi=- :: Actual departure time of train i at station j
+%@ param t_min shape=- kind=scalar domain=- :: Minimum headway
+%@ var u_1 shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Control input for running time
+%@ var u_2 shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Control input for dwell time
+%@ var u_i shape=j domain=continuous role=primary drole=- lo=- hi=- :: Control input for train i at station j
+%@ param u_max shape=- kind=scalar domain=- :: Maximum running time control bound
+%@ param u_min shape=- kind=scalar domain=- :: Minimum running time control bound
+%@ var w_1 shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Disturbance in running time
+%@ var w_2 shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Disturbance in dwell time
+%@ var w_i shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Disturbance for train i at station j
+%@ var x_i shape=j domain=continuous role=primary drole=- lo=- hi=- :: State vector of train i at station j

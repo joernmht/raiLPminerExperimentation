@@ -56,6 +56,20 @@
 %@ con eq_0043 kind=ordering domain=- indicator=- :: Destination station ordering: if a bus is deployed from b to j, it must also be deployed from all later stations d to j.
 %@ con eq_0044 kind=ordering domain=- indicator=- :: Station ordering in the destination line: C[d]_l - C[b]_l > 0.
 %@ con eq_0045 kind=linear domain=- indicator=- :: Nonnegativity of bus waiting times w and bus departure times t_ij^B.
+%@ param Delta_B shape=S,S kind=scalar domain=- :: Bus travel time adjustment between station i and station j.
+%@ param Delta_R shape=L,L kind=scalar domain=- :: Difference in arrival times between lines l and lp at station k.
+%@ param Dep_max shape=L kind=scalar domain=- :: Maximum departure time for line l.
+%@ param Dep_min shape=L kind=scalar domain=- :: Minimum departure time for line l.
+%@ param H_R shape=L kind=scalar domain=- :: Headway of line lp for rail-to-rail transfers.
+%@ param T_max shape=L kind=scalar domain=- :: Maximum start time for line l.
+%@ param T_min shape=L kind=scalar domain=- :: Minimum start time for line l.
+%@ param Tra_RB shape=S kind=scalar domain=- :: Transfer time from rail to bus at station i.
+%@ var alpha shape=L,L,S,S domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating whether a rail-to-bus transfer is selected.
+%@ var t_B shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Bus departure time from station i to station j.
+%@ param t_B_max shape=- kind=scalar domain=- :: Maximum bus travel time.
+%@ param t_B_min shape=- kind=scalar domain=- :: Minimum bus travel time.
+%@ var t_R shape=L domain=continuous role=primary drole=- lo=- hi=- :: Start time of the last train on line l.
+%@ var w_B shape=S,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time for bus passengers from station i to station j.
 \begin{align}
   \max\quad & \sum_{\forall l \in L, \forall lp \in L, k \in S \left(l\right) \cap S \left(lp\right)} p_{l lp}^{k} \cdot x_{l lp}^{k} + \sum_{\forall l \in L, \forall lp \in L, \forall i \in S \left(l\right), \forall j \in S \left(lp\right)} \mathit{alpha}_{l lp}^{i j} \cdot p_{l lp}^{i j} \tag{eq\_0001} \\
   & p_{l lp}^{k} = \sum_{i = 1}^{k - 1} \sum_{j = k + 1}^{z} p_{l lp}^{i j} \cdot k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0002} \\

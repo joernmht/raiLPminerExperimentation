@@ -98,3 +98,15 @@
 %@ con eq_0012 kind=linear domain=- indicator=- :: Terminal capacity: train slots using a terminal in a period cannot exceed available slots
 %@ con eq_0013 kind=linear domain=- indicator=- :: Binary integrality of train slot selection variables
 %@ con eq_0014 kind=linear domain=- indicator=- :: Reduced cost definition for train slot i on route k
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2010.05.002.json (deterministic fill-in list); pending human confirmation.
+%@ index d_minus ordered=0 cyclic=0 :: Set of incoming arcs at a node
+%@ index d_plus ordered=0 cyclic=0 :: Set of outgoing arcs at a node
+%@ param delta_lt shape=I kind=scalar domain=- :: Indicator whether train slot i loads/unloads at terminal l in period t
+%@ param ell_lt shape=- kind=scalar domain=- :: Capacity of terminal l in period t
+%@ param eta shape=K kind=scalar domain=- :: Frequency requirement for route k
+%@ param lambda shape=I,K kind=scalar domain=- :: Reduced cost of train slot i on route k
+%@ param lt shape=- kind=scalar domain=- :: Dummy parameter lt
+%@ param mu shape=I kind=scalar domain=- :: Dummy parameter mu for train slot i
+%@ param rho shape=- kind=scalar domain=- :: Dummy function rho
+%@ param sigma shape=K kind=scalar domain=- :: Dummy parameter sigma for route k

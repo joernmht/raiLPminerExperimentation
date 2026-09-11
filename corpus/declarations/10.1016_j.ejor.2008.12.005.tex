@@ -147,3 +147,16 @@
 %@ con eq_0026_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 26b)
 %@ con eq_0027_a kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27a)
 %@ con eq_0027_b kind=linear domain=- indicator=- :: Train scheduling constraint row (Eq. 27b)
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2008.12.005.json (deterministic fill-in list); pending human confirmation.
+%@ index K ordered=0 cyclic=0 :: Number of operations in a job (position index)
+%@ index K_ip ordered=0 cyclic=0 :: Number of operations in job ip (position index)
+%@ var e_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary edge variable e_1
+%@ var e_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary edge variable e_2
+%@ var fpos_ip shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Position of operation in job ip
+%@ var fstage_ip shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Stage of operation in job ip
+%@ var k_star shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Index of the operation at the found stage
+%@ param l_J shape=i kind=scalar domain=- :: Job length (processing time of job i)
+%@ param l_M shape=j kind=scalar domain=- :: Machine length (processing time on machine j)
+%@ var o_ip shape=k domain=continuous role=auxiliary drole=- lo=- hi=- :: Operation of job ip at stage k
+%@ param p_bar shape=i,k kind=scalar domain=- :: Adjusted processing time for operation (i,k)

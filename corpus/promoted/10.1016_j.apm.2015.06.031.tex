@@ -61,6 +61,16 @@
 %@ con eq_0027_b kind=linear domain=- indicator=- :: Ordering sum constraint q_ijk + q_jik = 1 for trains in the same direction
 %@ con eq_0027_c kind=linear domain=- indicator=- :: Ordering sum constraint p_ijk + p_jik = 1 for trains in different directions
 %@ con eq_0029 kind=linear domain=- indicator=- :: Waiting time calculation r_i = M(1 - b_i) when train cannot proceed
+%@ param Gamma shape=- kind=scalar domain=- :: Upper bound on the number of trains that can be rescheduled
+%@ var a_i1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train i at station 1
+%@ var a_in shape=O domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of outbound train i at station n
+%@ var a_j1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train j at station 1
+%@ param h_0 shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ param h_ad shape=I,O domain=- kind=matrix :: Minimum headway from arrival to departure at crossover stations
+%@ param h_da shape=I,O domain=- kind=matrix :: Minimum headway from departure to arrival at crossover stations
+%@ param k_star shape=- kind=scalar domain=- :: Station index where the incident ends
+%@ param kappa shape=- kind=scalar domain=- :: Number of trains affected by the incident
+%@ param l_star shape=- kind=scalar domain=- :: Station index where the incident starts
 \begin{align}
   & a_{i k} = \left(a_bar\right)_{i k} , \text{if} \left(a_bar\right)_{i k} \leq t_{s} , i \in O , k \in \left\{2 , 3 , \ldots , k^{\star}\right\} , \tag{eq\_0002} \\
   & d_{i k} = \left(d_bar\right)_{i k} , \text{if} \left(d_bar\right)_{i k} \leq t_{s} , i \in O , k \in \left\{1 , 2 , 3 , \ldots , k^{\star} - 1\right\} , \tag{eq\_0003} \\

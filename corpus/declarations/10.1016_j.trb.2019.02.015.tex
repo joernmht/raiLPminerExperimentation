@@ -152,3 +152,44 @@
 %@ con eq_0074 kind=linear domain=- indicator=- :: Weight of cancelling arrival event e equals α times alighting plus through passengers
 %@ con eq_0075 kind=linear domain=- indicator=- :: Weight of skipping dwell stop a equals β times alighting plus boarding passengers
 %@ con eq_0076 kind=linear domain=- indicator=- :: Weight of adding stop to pass a equals γ times earlier boarding/alighting passengers
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2019.02.015.json (deterministic fill-in list); pending human confirmation.
+%@ index A_ar_de_head ordered=0 cyclic=0 :: Set of headway activities between arrival and departure events
+%@ index A_ar_head ordered=0 cyclic=0 :: Set of headway activities between arrival events
+%@ index A_de_ar_head ordered=0 cyclic=0 :: Set of headway activities between departure and arrival events
+%@ index A_de_head ordered=0 cyclic=0 :: Set of headway activities between departure events
+%@ index A_dwell ordered=0 cyclic=0 :: Set of dwelling activities
+%@ index A_odturn ordered=0 cyclic=0 :: Set of origin-destination turning activities
+%@ index A_pass ordered=0 cyclic=0 :: Set of passing activities
+%@ index A_plan_odturn ordered=0 cyclic=0 :: Set of planned origin-destination turning activities
+%@ index A_run ordered=0 cyclic=0 :: Set of running activities
+%@ index A_station ordered=0 cyclic=0 :: Set of station activities
+%@ index A_turn ordered=0 cyclic=0 :: Set of turning activities
+%@ index E_ar ordered=0 cyclic=0 :: Set of arrival events
+%@ index E_de ordered=0 cyclic=0 :: Set of departure events
+%@ index E_odturn_ar ordered=0 cyclic=0 :: Set of arrival events for origin-destination turning
+%@ index E_odturn_de ordered=0 cyclic=0 :: Set of departure events for origin-destination turning
+%@ param Delta_acce_ap shape=- kind=scalar domain=- :: Acceleration time penalty for running activity ap
+%@ param Delta_dece_ap shape=- kind=scalar domain=- :: Deceleration time penalty for running activity ap
+%@ index E_NMdelay ordered=0 cyclic=0 :: Set of events not subject to maximum delay
+%@ param L_ap shape=- kind=scalar domain=- :: Minimum running time for running activity ap
+%@ param M_2 shape=- kind=scalar domain=- :: Big-M constant for headway constraints
+%@ param N_p_st shape=- kind=scalar domain=- :: Number of platform tracks at station st
+%@ param N_st shape=- kind=scalar domain=- :: Number of tracks at station st
+%@ index ap ordered=0 cyclic=0 :: Index for running activities
+%@ index app ordered=0 cyclic=0 :: Index for dwelling activities following a running activity
+%@ var m_ap shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether running activity ap is used for turning
+%@ var n_p shape=E_ar,E_ar domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for platform track assignment between arrival events
+%@ var s_app shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating skipping of dwelling activity app
+%@ index t ordered=0 cyclic=0 :: Index for time periods
+%@ param t_end shape=- kind=scalar domain=- :: End time of the disruption
+%@ param t_start shape=- kind=scalar domain=- :: Start time of the disruption
+%@ param w_add shape=A_pass kind=scalar domain=- :: Weight for adding a stop at a passing activity
+%@ param w_cancel shape=E_ar kind=scalar domain=- :: Weight for cancelling an arrival event
+%@ param w_delay shape=E_ar kind=scalar domain=- :: Weight for delay of an arrival event
+%@ param w_skip shape=A_dwell kind=scalar domain=- :: Weight for skipping a dwelling activity
+%@ param z_Eboard shape=A_pass kind=scalar domain=- :: Number of passengers boarding at a passing activity
+%@ param z_Eoff shape=A_pass kind=scalar domain=- :: Number of passengers alighting at a passing activity
+%@ param z_alight shape=E_ar kind=scalar domain=- :: Number of passengers alighting at an arrival event
+%@ param z_board shape=E_ar kind=scalar domain=- :: Number of passengers boarding at a departure event
+%@ param z_pass shape=E_ar kind=scalar domain=- :: Number of passengers passing through an arrival event

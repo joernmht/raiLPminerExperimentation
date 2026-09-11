@@ -12,18 +12,29 @@
     ],
     "param": [
       "d",
+      "d_ij",
       "delta",
       "h",
-      "l"
+      "h_min",
+      "l",
+      "l_ij",
+      "l_in",
+      "s_max",
+      "s_min",
+      "w_min"
     ],
     "var": [
       "f",
       "s",
       "tx",
+      "tx_ki",
+      "tx_kj",
       "u",
       "v",
       "w",
-      "x"
+      "x",
+      "x_k1",
+      "x_ki"
     ]
   },
   "used": [
@@ -64,187 +75,30 @@
     "S",
     "T"
   ],
-  "missing": {
-    "d_ij": {
-      "rows": [
-        "eq_0002"
-      ],
-      "roles": {
-        "symbol": 1
-      },
-      "arities": {
-        "1": 1
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "h_min": {
-      "rows": [
-        "eq_0010"
-      ],
-      "roles": {
-        "symbol": 1
-      },
-      "arities": {
-        "0": 1
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "l_ij": {
-      "rows": [
-        "eq_0016",
-        "eq_0017"
-      ],
-      "roles": {
-        "symbol": 2
-      },
-      "arities": {
-        "0": 2
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "l_in": {
-      "rows": [
-        "eq_0014"
-      ],
-      "roles": {
-        "symbol": 1
-      },
-      "arities": {
-        "0": 1
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "s_max": {
-      "rows": [
-        "eq_0009",
-        "eq_0016",
-        "eq_0020",
-        "eq_0023"
-      ],
-      "roles": {
-        "coefficient": 3,
-        "symbol": 1
-      },
-      "arities": {
-        "0": 4
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "s_min": {
-      "rows": [
-        "eq_0009",
-        "eq_0014",
-        "eq_0017",
-        "eq_0021",
-        "eq_0024"
-      ],
-      "roles": {
-        "coefficient": 4,
-        "symbol": 1
-      },
-      "arities": {
-        "0": 5
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "tx_ki": {
-      "rows": [
-        "eq_0007",
-        "eq_0010",
-        "eq_0016",
-        "eq_0017",
-        "eq_0019",
-        "eq_0023",
-        "eq_0024"
-      ],
-      "roles": {
-        "symbol": 7
-      },
-      "arities": {
-        "1": 7
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "tx_kj": {
-      "rows": [
-        "eq_0016",
-        "eq_0017"
-      ],
-      "roles": {
-        "symbol": 2
-      },
-      "arities": {
-        "1": 2
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "w_min": {
-      "rows": [
-        "eq_0008",
-        "eq_0014",
-        "eq_0017",
-        "eq_0021",
-        "eq_0024"
-      ],
-      "roles": {
-        "symbol": 5
-      },
-      "arities": {
-        "0": 5
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "x_k1": {
-      "rows": [
-        "eq_0005"
-      ],
-      "roles": {
-        "symbol": 1
-      },
-      "arities": {
-        "1": 1
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
-    "x_ki": {
-      "rows": [
-        "eq_0003",
-        "eq_0004",
-        "eq_0006",
-        "eq_0008",
-        "eq_0009",
-        "eq_0010",
-        "eq_0011",
-        "eq_0014",
-        "eq_0015",
-        "eq_0020",
-        "eq_0021"
-      ],
-      "roles": {
-        "symbol": 13
-      },
-      "arities": {
-        "1": 13
-      },
-      "kind": "?",
-      "evidence": "position only"
-    }
-  },
+  "missing": {},
   "missing_index": [],
   "shape_mismatch": [
     {
+      "name": "d_ij",
+      "row": "eq_0002",
+      "written": 1,
+      "declared": 2
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0003",
+      "written": 1,
+      "declared": 3
+    },
+    {
       "name": "d",
       "row": "eq_0003",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0004",
       "written": 1,
       "declared": 3
     },
@@ -255,10 +109,52 @@
       "declared": 3
     },
     {
+      "name": "x_k1",
+      "row": "eq_0005",
+      "written": 1,
+      "declared": 2
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0006",
+      "written": 1,
+      "declared": 3
+    },
+    {
       "name": "tx",
       "row": "eq_0007",
       "written": 3,
       "declared": 2
+    },
+    {
+      "name": "tx_ki",
+      "row": "eq_0007",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0008",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0008",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0009",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0009",
+      "written": 1,
+      "declared": 3
     },
     {
       "name": "tx",
@@ -267,16 +163,100 @@
       "declared": 2
     },
     {
+      "name": "tx_ki",
+      "row": "eq_0010",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0010",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0011",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0014",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0015",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "tx_kj",
+      "row": "eq_0016",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "tx_ki",
+      "row": "eq_0016",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "tx_ki",
+      "row": "eq_0017",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "tx_kj",
+      "row": "eq_0017",
+      "written": 1,
+      "declared": 3
+    },
+    {
       "name": "tx",
       "row": "eq_0019",
       "written": 3,
       "declared": 2
     },
     {
+      "name": "tx_ki",
+      "row": "eq_0019",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0020",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "x_ki",
+      "row": "eq_0021",
+      "written": 1,
+      "declared": 3
+    },
+    {
       "name": "tx",
       "row": "eq_0023",
       "written": 3,
       "declared": 2
+    },
+    {
+      "name": "tx_ki",
+      "row": "eq_0023",
+      "written": 1,
+      "declared": 3
+    },
+    {
+      "name": "tx_ki",
+      "row": "eq_0024",
+      "written": 1,
+      "declared": 3
     },
     {
       "name": "tx",

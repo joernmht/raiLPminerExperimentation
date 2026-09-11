@@ -78,3 +78,13 @@
 %@ con eq_0014 kind=linear :: Bounds on last-train depot departure time t_l^R (Eq. 14).
 %@ con eq_0015 kind=linear :: Bounds on maximum connection time derived from constraints (12)-(14) (Eq. 15).
 %@ con eq_0016 kind=linear :: Upper bound on maximum connection time by M0 (Eq. 16).
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2017.05.001.json (deterministic fill-in list); pending human confirmation.
+%@ param Arr_max shape=l kind=scalar domain=- :: Upper bound on arrival time at stations of line l.
+%@ param Arr_min shape=l kind=scalar domain=- :: Lower bound on arrival time at stations of line l.
+%@ param Dep_max shape=l kind=scalar domain=- :: Upper bound on departure time at stations of line l.
+%@ param Dep_min shape=l kind=scalar domain=- :: Lower bound on departure time at stations of line l.
+%@ param M_0 shape=- kind=big_m domain=- :: Big-M constant used in linearization constraints.
+%@ param T_max shape=l kind=scalar domain=- :: Upper bound on last-train departure time for line l.
+%@ param T_min shape=l kind=scalar domain=- :: Lower bound on last-train departure time for line l.
+%@ var t_R shape=l domain=continuous role=primary drole=- lo=- hi=- :: Last-train departure time for line l.

@@ -128,3 +128,16 @@
 %@ con eq_0023 kind=linear :: Set the end of blocking time on open track sections
 %@ con eq_0024 kind=ordering :: Choose a train order on each shared track section
 %@ con eq_0025 kind=big_m :: Prevent simultaneous occupation of a track section by two trains
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2017.10.002.json (deterministic fill-in list); pending human confirmation.
+%@ param b_e shape=V,s kind=scalar domain=- :: earliest time train service v can leave track section s
+%@ param delta shape=V,V kind=scalar domain=- :: minimum time difference between consecutive services v and v_hat
+%@ var lambda shape=Pair kind=binary domain=binary role=indicator drole=- lo=- hi=- :: 1 if pair of services is short-turned at a station
+%@ param omega_c shape=V kind=scalar domain=- :: penalty weight for cancelling service v
+%@ param omega_d shape=V kind=scalar domain=- :: penalty weight for delaying service v
+%@ param s_0 shape=- kind=scalar domain=- :: reference track section for short-turning
+%@ param t_c shape=- kind=scalar domain=- :: constant time for coupling/decoupling
+%@ param t_run shape=V,R,S kind=scalar domain=- :: running time of service v on route r up to track section s
+%@ param tau_a shape=V kind=scalar domain=- :: scheduled arrival time of service v
+%@ param tau_d shape=V kind=scalar domain=- :: scheduled departure time of service v
+%@ param theta_min shape=V,V kind=scalar domain=- :: minimum headway time between services v and vp

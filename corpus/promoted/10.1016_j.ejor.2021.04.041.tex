@@ -49,6 +49,14 @@
 %@ con eq_0017 kind=linear :: Benders optimality cut for commodity k.
 %@ con eq_0018 kind=linear :: Updated objective function including passenger travel time weighted by α.
 %@ con eq_0019 kind=linear :: Additional constraint (undescribed in prose).
+%@ index A_bar ordered=0 cyclic=0 :: Set of arcs in passenger routing graph.
+%@ index V_bar ordered=0 cyclic=0 :: Set of nodes in passenger routing graph.
+%@ index delta_minus ordered=0 cyclic=0 :: Set of incoming arcs to a node in passenger routing graph.
+%@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing arcs from a node in passenger routing graph.
+%@ var lambda shape=Q domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether line group path q is selected.
+%@ var pi_1 shape=K domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable associated with commodity k in Benders optimality cut.
+%@ var pi_2 shape=K domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable associated with commodity k in Benders optimality cut.
+%@ var pi_4 shape=K,A_bar domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable associated with commodity k and arc a in Benders optimality cut.
 \begin{align}
   \min\quad & \sum_{q \in Q} c_{q} \cdot \mathit{lambda}_{q} \tag{eq\_0003} \\
   & \sum_{q \in Q^{l}} \mathit{lambda}_{q} = 1 \forall l \in L \tag{eq\_0004} \\

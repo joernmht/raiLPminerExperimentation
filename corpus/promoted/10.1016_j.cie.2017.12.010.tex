@@ -69,6 +69,9 @@
 %@ con eq_0031 kind=linear :: Deadline: each maintenance work ends within the time horizon
 %@ con eq_0032 kind=linear :: Deadline: each train exits the network within the time horizon
 %@ con eq_0033 kind=linear :: Routing stability: route chosen in the nominal scenario is kept in every scenario
+%@ param D shape=f kind=scalar domain=- :: Destination node of train f
+%@ param w_max shape=f,i,j,s kind=scalar domain=- :: Maximum travel time on arc (i,j) for train f in scenario s
+%@ param w_min shape=f,i,j,s kind=scalar domain=- :: Minimum travel time on arc (i,j) for train f in scenario s
 \begin{align}
   \min\quad & min \sum_{s \in S} \left[\mathit{Pr}_{s} \sum_{f \in F, i : \left(i , D_{f}\right) \in E_{f}} \left|d_{f} \left(i , D_{f} , s\right) - \mathit{PCT}_{f}\right|\right] \tag{eq\_0001} \\
   & \sum_{j : \left(O_{f} , j\right) \in E_{f}} x_{f} \left(O_{f} , j , s\right) = 1 \forall f \in F , \forall s \in S \tag{eq\_0003} \\

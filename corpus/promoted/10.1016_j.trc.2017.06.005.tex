@@ -47,6 +47,8 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Appendix constraint for constructing the rescheduled train set T
 %@ con eq_0037 kind=linear domain=- indicator=- :: Appendix constraint for constructing the remaining station set S_i
 %@ con eq_0039 kind=linear domain=- indicator=- :: Appendix auxiliary constraint for the automatic rescheduling strategy
+%@ var buf_ip shape=K domain=non_negative role=auxiliary drole=- lo=- hi=- :: buffer time variable indexed by station
+%@ var f_star shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: optimal objective value of the rescheduling model
 \begin{align}
   f^{*}\quad & = min f = min \sum_{i \in \mathbf{N} , k \in \mathbf{K}} \left|a_{i , k} - a_tilde_{i , k}\right| + \left|d_{i , k} - d_tilde_{i , k}\right| . \tag{eq\_0001} \\
   & a_{i , k} - d_{i , k - 1} \geq \mathit{Rt}_{i , k} , i = 1 , 2 , \ldots , N , k = 1 , 2 , \ldots , K \tag{eq\_0003} \\

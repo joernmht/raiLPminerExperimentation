@@ -121,3 +121,26 @@
 %@ con eq_0026_c kind=linear domain=- indicator=- :: Constraint (26c) in the ADMM-based decomposition.
 %@ con eq_0026_d kind=linear domain=- indicator=- :: Constraint (26d) in the ADMM-based decomposition.
 %@ con eq_0026_e kind=linear domain=- indicator=- :: Constraint (26e) in the ADMM-based decomposition.
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2020.102823.json (deterministic fill-in list); pending human confirmation.
+%@ index A_a ordered=0 cyclic=0 :: Set of arrival arcs for a train.
+%@ index A_se ordered=0 cyclic=0 :: Set of station entry arcs for a train.
+%@ index A_st ordered=0 cyclic=0 :: Set of station arcs for a train.
+%@ index N_a ordered=0 cyclic=0 :: Set of arrival nodes in a station.
+%@ index N_d ordered=0 cyclic=0 :: Set of departure nodes in a station.
+%@ index N_s ordered=0 cyclic=0 :: Set of station nodes.
+%@ index delta_minus ordered=0 cyclic=0 :: Set of incoming arcs to a node at a given time.
+%@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing arcs from a node at a given time.
+%@ index psi_a ordered=0 cyclic=0 :: Set of arcs in the space-time network for a train.
+%@ index sigma_plus ordered=0 cyclic=0 :: Set of successor nodes in the space-time network.
+%@ param D_fm shape=K kind=scalar domain=- :: Maximum number of trains that can be scheduled at station k.
+%@ param R_1 shape=A_st kind=scalar domain=- :: Auxiliary variable for constraint 1.
+%@ param R_4 shape=A_st kind=scalar domain=- :: Auxiliary variable for constraint 4.
+%@ param R_5 shape=A_st kind=scalar domain=- :: Auxiliary variable for constraint 5.
+%@ param R_i_t_k_2 shape=- kind=scalar domain=- :: Auxiliary variable for constraint 2.
+%@ param R_j_tau_k_3 shape=- kind=scalar domain=- :: Auxiliary variable for constraint 3.
+%@ param T_s shape=o kind=scalar domain=- :: Scheduled departure time of a train from its origin.
+%@ param U_1 shape=- kind=scalar domain=- :: Big-M constant for constraint 1.
+%@ param U_2 shape=- kind=scalar domain=- :: Big-M constant for constraint 2.
+%@ param o_hat shape=A_st kind=scalar domain=- :: Scheduled arrival time of a train at a station.
+%@ var theta shape=F domain=continuous role=primary drole=- lo=- hi=- :: Cancellation indicator for a train.

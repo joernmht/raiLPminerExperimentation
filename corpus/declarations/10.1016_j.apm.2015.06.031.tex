@@ -135,3 +135,15 @@
 %@ con eq_0027_b kind=linear domain=- indicator=- :: Ordering sum constraint q_ijk + q_jik = 1 for trains in the same direction
 %@ con eq_0027_c kind=linear domain=- indicator=- :: Ordering sum constraint p_ijk + p_jik = 1 for trains in different directions
 %@ con eq_0029 kind=linear domain=- indicator=- :: Waiting time calculation r_i = M(1 - b_i) when train cannot proceed
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.apm.2015.06.031.json (deterministic fill-in list); pending human confirmation.
+%@ param Gamma shape=- kind=scalar domain=- :: Upper bound on the number of trains that can be rescheduled
+%@ var a_i1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train i at station 1
+%@ var a_in shape=O domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of outbound train i at station n
+%@ var a_j1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train j at station 1
+%@ param h_0 shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ param h_ad shape=I,O domain=- kind=matrix :: Minimum headway from arrival to departure at crossover stations
+%@ param h_da shape=I,O domain=- kind=matrix :: Minimum headway from departure to arrival at crossover stations
+%@ param k_star shape=- kind=scalar domain=- :: Station index where the incident ends
+%@ param kappa shape=- kind=scalar domain=- :: Number of trains affected by the incident
+%@ param l_star shape=- kind=scalar domain=- :: Station index where the incident starts

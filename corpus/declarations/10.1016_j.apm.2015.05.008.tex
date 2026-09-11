@@ -62,3 +62,20 @@
 %@ con eq_0009 kind=linear domain=- indicator=- :: Running time limits between stations of line l'
 %@ con eq_0010 kind=linear domain=- indicator=- :: Dwell time limits at stations of line l
 %@ con eq_0011 kind=linear domain=- indicator=- :: Dwell time limits at stations of line l'
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.apm.2015.05.008.json (deterministic fill-in list); pending human confirmation.
+%@ param T_Dw_max shape=- kind=scalar domain=- :: maximum dwell time at a station
+%@ param T_Dw_min shape=- kind=scalar domain=- :: minimum dwell time at a station
+%@ param T_H shape=L kind=vector domain=- :: headway of line l
+%@ param T_R shape=L,S kind=matrix domain=- :: running time between consecutive stations on line l
+%@ param T_Tra_sllp shape=- kind=scalar domain=- :: transfer walking time from line l to line lp at station s
+%@ param T_earliest shape=- kind=scalar domain=- :: earliest allowed departure time of first train
+%@ param T_latest shape=- kind=scalar domain=- :: latest allowed departure time of first train
+%@ var t_A_sl shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of first train of line l at station s
+%@ var t_D_slp shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of first train of line lp at station s
+%@ var t_Dw shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
+%@ var t_Dw_lk shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station k on line l
+%@ var t_Dw_ls shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
+%@ var t_R shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: running time between consecutive stations on line l
+%@ var t_o shape=L domain=continuous role=primary drole=- lo=- hi=- :: departure time of first train of line l
+%@ var t_w_sllp shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: transfer waiting time for passengers transferring from line l to line lp at station s

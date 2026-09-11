@@ -46,6 +46,17 @@
 %@ con eq_0017 kind=linear domain=- indicator=- :: Each crew member is assigned exactly one completion: sum_{k in K_j} x_{jk}=1 for all j in D.
 %@ con eq_0018 kind=linear domain=- indicator=- :: Binary character of crew assignment variables: x_{jk} in {0,1}.
 %@ con eq_0019 kind=linear domain=- indicator=- :: Binary character of task cancellation variables: y_i in {0,1}.
+%@ param fty shape=- kind=scalar domain=- :: Fixed cost or penalty parameter associated with crew duty assignment (fty).
+%@ param I_0 shape=S,m kind=scalar domain=- :: Initial inventory of train units of type m at station s.
+%@ param Mx_jk shape=- kind=scalar domain=- :: Big-M constant for disjunctive constraint indexed by pair (j,k).
+%@ param a_ij shape=T,D,K kind=scalar domain=- :: Coefficient of crew assignment variable x_{j,k} in task coverage constraint for task i.
+%@ param d_minus shape=S,m kind=scalar domain=- :: Downward deviation (decrease) in train unit inventory at station s for type m.
+%@ param d_plus shape=S,m kind=scalar domain=- :: Upward deviation (increase) in train unit inventory at station s for type m.
+%@ param f_hk shape=- kind=scalar domain=- :: Minimum headway or processing time between operations h and k.
+%@ param f_ij shape=- kind=scalar domain=- :: Minimum headway or processing time between operations i and j.
+%@ param sigma shape=- kind=scalar domain=- :: Successor function mapping an operation to its successor in the fixed arc set.
+%@ param x_0 shape=R,C kind=scalar domain=- :: Initial (nominal) assignment of train units to trips and compositions.
+%@ var x_jk shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable for crew assignment or disjunctive arc selection indexed by pair (j,k).
 \begin{align}
   & subject to t_{\mathit{sigma} \left(i\right)} \geq t_{i} + f_{i} \left(i , \mathit{sigma} \left(i\right)\right) \in F \tag{eq\_0002} \\
   & \left(t_{k} \geq t_{h} + f_{\mathit{hk}}\right) \vee \left(t_{j} \geq t_{i} + f_{\mathit{ij}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0003} \\

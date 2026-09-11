@@ -161,3 +161,66 @@
 %@ con eq_0048_a kind=linear :: Linearization of peak-hour indicator times operation level (part a)
 %@ con eq_0048_b kind=linear :: Linearization of peak-hour indicator times operation level (part b)
 %@ con eq_0049 kind=linear :: Auxiliary variable constraint for objective linearization
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2021.103209.json (deterministic fill-in list); pending human confirmation.
+%@ param E_dn shape=J,N kind=matrix domain=- :: Energy consumption of a down-direction running level n at station j
+%@ param E_up shape=J,N kind=matrix domain=- :: Energy consumption of an up-direction running level n at station j
+%@ var L_up shape=I,J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for up-direction dwell level selection
+%@ param T_1 shape=M,I,N kind=matrix domain=- :: Minimum turnaround time at terminal station 1 for dwell level m, train i, running level n
+%@ param T_max shape=J kind=vector domain=- :: Maximum turnaround time at station J
+%@ param T_max_1 shape=- kind=scalar domain=- :: Maximum turnaround time at terminal station 1
+%@ var Theta_up shape=I,I domain=continuous role=auxiliary drole=- lo=0 hi=- :: Auxiliary continuous variable for up-direction departure time at station 1
+%@ var a_dn shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station j in down direction
+%@ var a_up shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station j in up direction
+%@ var alpha_dn shape=I,J,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable for down-direction dwell level selection
+%@ var alpha_op_up shape=J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for optimal identical up-direction dwell level selection
+%@ var alpha_p_up shape=J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pre-fixed up-direction dwell level selection
+%@ var alpha_up shape=I,J,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction dwell level selection
+%@ var beta_dn shape=I,J,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable for down-direction running level selection
+%@ var beta_op_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for optimal identical up-direction running level selection
+%@ var beta_p_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pre-fixed up-direction running level selection
+%@ var beta_tilde_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for up-direction running level selection in identical selection model
+%@ var beta_up shape=I,J,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction running level selection
+%@ var d_dn shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station j in down direction
+%@ var d_dn_1 shape=I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station 1 in down direction
+%@ var d_up shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station j in up direction
+%@ var d_up_1 shape=I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station 1 in up direction
+%@ var delta shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable for max/min selection
+%@ var delta_1 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 1
+%@ var delta_2 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 2
+%@ var delta_3 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 3
+%@ var ell_up shape=I,J domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i at station j uses pre-fixed up-direction operation levels
+%@ var eta shape=I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i is the last service
+%@ var f_dev shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for headway deviation of train i
+%@ var f_deviation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total headway deviation
+%@ param f_deviation_nom shape=- kind=scalar domain=- :: Nominal value for headway deviation
+%@ var f_dn_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Down-direction headway variation
+%@ var f_energy shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total energy consumption
+%@ param f_energy_nom shape=- kind=scalar domain=- :: Nominal value for energy consumption
+%@ param f_max shape=- kind=scalar domain=- :: Maximum value of f
+%@ var f_obj shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Overall objective function value
+%@ param f_sum_nom shape=- kind=scalar domain=- :: Nominal sum for objective normalization
+%@ var f_up_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Up-direction headway variation
+%@ var f_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total headway variation
+%@ param f_variation_nom shape=- kind=scalar domain=- :: Nominal value for headway variation
+%@ var f_zeta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total number of last services
+%@ param f_zeta_nom shape=- kind=scalar domain=- :: Nominal value for f_zeta
+%@ param gamma shape=- kind=scalar domain=- :: Weight parameter for objective combination
+%@ param h_max shape=- kind=scalar domain=- :: Maximum headway
+%@ param i_1 shape=- kind=scalar domain=- :: Number of preceding trains for variation calculation
+%@ param i_2 shape=- kind=scalar domain=- :: Number of succeeding trains for variation calculation
+%@ param r_dn shape=J,N kind=matrix domain=- :: Running time of down-direction running level n at station j
+%@ param r_up shape=J,N kind=matrix domain=- :: Running time of up-direction running level n at station j
+%@ param r_up_2 shape=J kind=vector domain=- :: Running time of up-direction running level 2 at station j
+%@ param t_end shape=- kind=scalar domain=- :: End time of the planning horizon
+%@ param tau_dn shape=J,M kind=matrix domain=- :: Dwell time of down-direction dwell level m at station j
+%@ param tau_up shape=J,M kind=matrix domain=- :: Dwell time of up-direction dwell level m at station j
+%@ param tau_up_1 shape=J kind=vector domain=- :: Dwell time of up-direction dwell level 1 at station j
+%@ param tau_up_2 shape=J kind=vector domain=- :: Dwell time of up-direction dwell level 2 at station j
+%@ var theta shape=I,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i precedes train i'
+%@ param w_1 shape=- kind=scalar domain=- :: Weight for headway deviation
+%@ param w_2 shape=- kind=scalar domain=- :: Weight for headway variation
+%@ param w_3 shape=- kind=scalar domain=- :: Weight for number of last services
+%@ var x_up shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction departure time interval selection
+%@ param x_up_1 shape=I,K kind=matrix domain=- :: Binary parameter for up-direction departure time interval selection at station 1
+%@ var zeta shape=I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i is the last service

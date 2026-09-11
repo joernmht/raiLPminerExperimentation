@@ -152,3 +152,44 @@
 %@ param hbar_up shape=- domain=- role=- drole=- lo=- hi=- :: average headway up
 %@ param hbar_dn shape=- domain=- role=- drole=- lo=- hi=- :: average headway down
 %@ param h_bar shape=- domain=- role=- drole=- lo=- hi=- :: average headway parameter
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2025.111244.json (deterministic fill-in list); pending human confirmation.
+%@ var Delta shape=B,s domain=continuous role=auxiliary drole=- lo=- hi=- :: Deviation in departure time for train b at station s
+%@ param F_max shape=- kind=scalar domain=- :: Maximum traction force
+%@ var P_hat_supply shape=B,Y,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Adjusted power supply from substation y to train b over interval (i,i+1)
+%@ var P_subs shape=B,Y,S,D,D,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Power supplied from substation y to train b between stations s and s+1 over interval (i,i+1)
+%@ param P_subs_max shape=- kind=scalar domain=- :: Maximum power supply capacity of a substation
+%@ var P_supply shape=B,Y,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Power supply from substation y to train b over interval (i,i+1)
+%@ var X_train shape=B,S,D,D,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Train position between stations s and s+1 over interval (i,i+1)
+%@ var alpha shape=K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k at station S
+%@ var alpha_1 shape=K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k
+%@ index alter ordered=0 cyclic=0 :: Set of alternative departure times
+%@ var beta shape=K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k at station S
+%@ var beta_1 shape=K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k
+%@ var delta shape=K,K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pairing trains k and kp
+%@ var eta shape=K,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for train k at station s
+%@ param f_max shape=- kind=scalar domain=- :: Maximum braking force
+%@ var gamma shape=K,K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for ordering trains k and kp at station s
+%@ param h_arr_min shape=- kind=scalar domain=- :: Minimum arrival headway
+%@ param h_dep_min shape=- kind=scalar domain=- :: Minimum departure headway
+%@ param h_dn shape=- kind=scalar domain=- :: Down direction headway
+%@ param h_up shape=- kind=scalar domain=- :: Up direction headway
+%@ var lambda shape=K,K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pairing trains k and kp
+%@ index option ordered=0 cyclic=0 :: Set of option departure times
+%@ var psi shape=B,S,D domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train b at station s with departure time d
+%@ var rho shape=K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k at station s
+%@ var sigma shape=K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k at station s
+%@ param t_dwell_max shape=S kind=vector domain=- :: Maximum dwell time at station s
+%@ param t_dwell_min shape=S kind=vector domain=- :: Minimum dwell time at station s
+%@ param t_end shape=- kind=scalar domain=- :: End time of the regulation period
+%@ param t_overzone shape=- kind=scalar domain=- :: Time when train enters the overzone
+%@ param t_run_max shape=S,S kind=matrix domain=- :: Maximum running time between stations s and s+1
+%@ param t_run_min shape=S,S kind=matrix domain=- :: Minimum running time between stations s and s+1
+%@ param t_switch shape=- kind=scalar domain=- :: Switching time between acceleration phases
+%@ param t_turn_min shape=- kind=scalar domain=- :: Minimum turn-around time
+%@ var theta shape=K,B domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k and train b
+%@ param u_CR shape=- kind=scalar domain=- :: Coasting control force
+%@ param u_PA shape=- kind=scalar domain=- :: Powering acceleration force
+%@ param v_max shape=- kind=scalar domain=- :: Maximum speed
+%@ var zeta shape=K,S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k at station s
+%@ var zeta_1 shape=K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for train k

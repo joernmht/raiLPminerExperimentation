@@ -1,6 +1,6 @@
 % lp2graph canonical LaTeX — assembled by corpusbuilder.promote
 % Source dossier: 10.1016_j.omega.2018.10.020
-%@ meta id=10.1016_j.omega.2018.10.020 family=lp schema=0.1.0
+%@ meta id=10.1016_j.omega.2018.10.020 family=milp schema=0.1.0
 %@ name :: Collaborative optimization for metro train scheduling and train connections combined with passenger flow control strategy
 %@ desc :: Mined from Collaborative optimization for metro train scheduling and train connections combined with passenger flow control strategy (Omega, 2018).
 %@ prov source :: 10.1016/j.omega.2018.10.020
@@ -76,6 +76,46 @@
 %@ con eq_0040 kind=linear domain=- indicator=- :: Lagrangian relaxation objective Δ(ρ,μ) dualizing turnaround constraints.
 %@ con eq_0042_a kind=linear domain=- indicator=- :: Constraint from Eq. (42) of the Lagrangian-relaxation based solution procedure.
 %@ con eq_0042_b kind=linear domain=- indicator=- :: Constraint from Eq. (42) of the Lagrangian-relaxation based solution procedure.
+%@ param M_tilde shape=- kind=big_m domain=- :: Big-M constant for train connection constraints.
+%@ param N_train shape=- kind=scalar domain=- :: Maximum number of trains available.
+%@ var T_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total train connection time.
+%@ param T_1_max shape=- kind=scalar domain=- :: Maximum value of T_1.
+%@ param T_1_min shape=- kind=scalar domain=- :: Minimum value of T_1.
+%@ var T_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total passenger waiting time.
+%@ param T_2_max shape=- kind=scalar domain=- :: Maximum value of T_2.
+%@ param T_2_min shape=- kind=scalar domain=- :: Minimum value of T_2.
+%@ var T_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total passenger crowding cost.
+%@ param T_3_max shape=- kind=scalar domain=- :: Maximum value of T_3.
+%@ param T_3_min shape=- kind=scalar domain=- :: Minimum value of T_3.
+%@ var alpha shape=i domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of trains before i that connect to i.
+%@ var beta shape=i domain=continuous role=auxiliary drole=- lo=- hi=- :: Number of trains after i that i connects to.
+%@ param c_max shape=- kind=scalar domain=- :: Maximum train capacity.
+%@ var delta shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator variable for constraint activation.
+%@ var delta_1 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator variable for connection direction 1.
+%@ var delta_2 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator variable for connection direction 2.
+%@ var delta_3 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator variable for connection direction 3.
+%@ param epsilon shape=- kind=tolerance domain=- :: Small positive constant for big-M constraints.
+%@ param f_max shape=- kind=scalar domain=- :: Maximum value of function f.
+%@ param f_min shape=- kind=scalar domain=- :: Minimum value of function f.
+%@ var gamma shape=i domain=continuous role=auxiliary drole=- lo=- hi=- :: Proportion of passengers alighting at station k.
+%@ var lambda shape=i,i domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating connection between trains m and i.
+%@ param m_tilde shape=- kind=big_m domain=- :: Big-M constant for train connection constraints.
+%@ param omega shape=- kind=vector domain=- :: Weights for objective terms.
+%@ param omega_1 shape=- kind=scalar domain=- :: Weight for T_1 in objective.
+%@ param omega_2 shape=- kind=scalar domain=- :: Weight for T_2 in objective.
+%@ param omega_3 shape=- kind=scalar domain=- :: Weight for T_3 in objective.
+%@ param p_max shape=- kind=scalar domain=- :: Maximum passenger load capacity.
+%@ var phi shape=i,i domain=binary role=indicator drole=- lo=- hi=- :: Binary variable for connection compatibility.
+%@ param r_turn_1_max shape=- kind=scalar domain=- :: Maximum turnaround time for connection type 1.
+%@ param r_turn_1_min shape=- kind=scalar domain=- :: Minimum turnaround time for connection type 1.
+%@ param s_max shape=- kind=scalar domain=- :: Maximum dwell time.
+%@ param s_min shape=- kind=scalar domain=- :: Minimum dwell time.
+%@ param t_enter shape=- kind=scalar domain=- :: Time to enter depot.
+%@ param t_exit shape=- kind=scalar domain=- :: Time to exit depot.
+%@ var theta shape=i,i domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating connection between trains i and ip.
+%@ param w_max shape=- kind=scalar domain=- :: Maximum waiting time.
+%@ param x_max shape=i kind=scalar domain=- :: Maximum number of trains at station i.
+%@ param x_min shape=- kind=scalar domain=- :: Minimum number of trains.
 \begin{align}
   & x_{i} \left(k + 1\right) = x_{i} \left(k\right) + s_{i} \left(k\right) - s_{i - 1} \left(k\right) , \tag{eq\_0001} \\
   & p \cdot w_{i} \left(k\right) = p \cdot w_{i - 1} \left(k\right) + x_{i} \left(k\right) b_{i} \left(k\right) - c_{i} \left(k\right) - p \cdot e_{i} \left(k\right) , \tag{eq\_0002} \\
@@ -97,8 +137,8 @@
   & f_{max} = \underset{x \in \mathit{chi}}{max} f \left(x\right) \tag{eq\_0023\_a} \\
   & f_{min} = \underset{x \in \mathit{chi}}{min} f \left(x\right) \tag{eq\_0023\_b} \\
   & \begin{matrix}\left[f \left(x\right) \leq 0\right] \Leftrightarrow \left[\mathit{delta} = 1\right] , \text{iff} \begin{cases} f \left(x\right) \leq f_{max} \left(1 - \mathit{delta}\right) , \\ f \left(x\right) \geq \mathit{epsilon} + \left(f_{min} - \mathit{epsilon}\right) \mathit{delta} , \end{cases}\end{matrix} \tag{eq\_0024} \\
-  & z \leq f_{max} \mathit{delta} \tag{eq\_0025\_a} \\
-  & z \geq f_{min} \mathit{delta} \tag{eq\_0025\_b} \\
+  & z \leq f_{max} \cdot \mathit{delta} \tag{eq\_0025\_a} \\
+  & z \geq f_{min} \cdot \mathit{delta} \tag{eq\_0025\_b} \\
   & z \leq f \left(x\right) - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0025\_c} \\
   & z \geq f \left(x\right) - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0025\_d} \\
   & - \mathit{delta}_{1} + \mathit{delta}_{3} \leq 0 \tag{eq\_0026\_a} \\
@@ -107,13 +147,13 @@
   & a = p \cdot w_{i - 1} \left(k\right) + x_{i} \left(k\right) b_{i} \left(k\right) - c_{i} \left(k\right) \tag{eq\_0027\_a} \\
   & b = p_{max} - \left[1 - \mathit{gamma}_{i} \left(k\right)\right] p_{i} \left(k - 1\right) \tag{eq\_0027\_b} \\
   & f = b - a , \tag{eq\_0030} \\
-  & z = f \mathit{delta} , \tag{eq\_0033} \\
+  & z = f \cdot \mathit{delta} , \tag{eq\_0033} \\
   & \begin{matrix} & & p \cdot w_{i} \left(k\right) = - z ,\end{matrix} \tag{eq\_0034} \\
   & \begin{matrix} & & p_{i} \left(k\right) = p_{max} - f + z .\end{matrix} \tag{eq\_0035} \\
   & f \leq f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_a} \\
   & f \geq \mathit{epsilon} + \left(f_{min} - \mathit{epsilon}\right) \mathit{delta} \tag{eq\_0036\_b} \\
-  & z \leq f_{max} \mathit{delta} \tag{eq\_0036\_c} \\
-  & z \geq f_{min} \mathit{delta} \tag{eq\_0036\_d} \\
+  & z \leq f_{max} \cdot \mathit{delta} \tag{eq\_0036\_c} \\
+  & z \geq f_{min} \cdot \mathit{delta} \tag{eq\_0036\_d} \\
   & z \leq f - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_e} \\
   & z \geq f - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0036\_f} \\
   & \left[\sum_{m} x_{m} \left(1\right) + \sum_{k = 1}^{2 K} s_{m} \left(k\right) + \sum_{k = 1}^{2 K - 1} r_{m} \left(k\right)\right] - \sum_{i} x_{i} \left(1\right) + t_{\text{enter}} + t_{\text{exit}} \leq M_tilde \left(1 - \mathit{lambda}_{m , i}\right) \tag{eq\_0037\_a} \\
@@ -125,5 +165,5 @@
   & \mathit{beta}_{m} + \mathit{lambda}_{m , i} - \mathit{phi}_{m , i} \leq 1 \tag{eq\_0039\_c} \\
   & \sum_{m = 1}^{i} \left(1 - \mathit{alpha}_{m}\right) - \sum_{m = 1}^{i - 1} \left(\mathit{lambda}_{m , i} - \mathit{phi}_{m , i}\right) \leq N_{\text{train}} . \tag{eq\_0040} \\
   & \mathit{omega}_{1}^{'} = \frac{\mathit{omega}_{1}}{T_{1 , \text{max}} - T_{1 , \text{min}}} , \mathit{omega}_{2}^{'} = \frac{\mathit{omega}_{2}}{T_{2 , \text{max}} - T_{2 , \text{min}}} , \mathit{omega}_{3}^{'} = \frac{\mathit{omega}_{3}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \tag{eq\_0042\_a} \\
-  & N = \frac{- \mathit{omega}_{1} T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \frac{- \mathit{omega}_{2} T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \frac{- \mathit{omega}_{3} T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \tag{eq\_0042\_b} \\
+  & N = \frac{- \mathit{omega}_{1} \cdot T_{1 , \text{min}}}{T_{1 , \text{max}} - T_{1 , \text{min}}} + \frac{- \mathit{omega}_{2} \cdot T_{2 , \text{min}}}{T_{2 , \text{max}} - T_{2 , \text{min}}} + \frac{- \mathit{omega}_{3} \cdot T_{3 , \text{min}}}{T_{3 , \text{max}} - T_{3 , \text{min}}} \tag{eq\_0042\_b} \\
 \end{align}

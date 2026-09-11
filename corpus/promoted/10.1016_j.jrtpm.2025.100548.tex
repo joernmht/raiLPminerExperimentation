@@ -86,6 +86,30 @@
 %@ con eq_0052 kind=linear domain=- indicator=- :: Constraint (52): if arc (f(v'),f(v)) is selected then train v arrives no earlier than v' at every station
 %@ con eq_0053 kind=linear domain=- indicator=- :: Constraint (53): if final arrival time of train v exceeds T2 then its path is not accommodated (x_{f(v)}=0)
 %@ con eq_0054 kind=linear domain=- indicator=- :: Constraint (54): if final arrival time of train v is within T2 then its path is accommodated (x_{f(v)}=1)
+%@ param T_1 shape=- kind=scalar domain=- :: Lower bound on departure times
+%@ param T_2 shape=- kind=scalar domain=- :: Upper bound on arrival times
+%@ var a_n shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time at last station for each train
+%@ var alphap shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for arrival order between trains at station
+%@ var alphapp shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for departure order between trains at station
+%@ var d_1 shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time from first station for each train
+%@ param h_1 shape=K kind=vector domain=- :: Headway time before departure at station
+%@ param h_2 shape=K kind=vector domain=- :: Headway time after arrival at station
+%@ param h_aa shape=- kind=scalar domain=- :: Minimum headway time for arrival-arrival
+%@ param h_ap shape=- kind=scalar domain=- :: Minimum headway time for arrival-departure
+%@ param h_dd shape=- kind=scalar domain=- :: Minimum headway time for departure-departure
+%@ param h_dp shape=- kind=scalar domain=- :: Minimum headway time for departure-arrival
+%@ param h_pa shape=- kind=scalar domain=- :: Minimum headway time for departure-arrival (alternative)
+%@ param h_pd shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
+%@ param h_pp shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
+%@ var o_1 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var o_2 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var o_3 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var s_4 shape=V,V domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for resource usage
+%@ param t_1 shape=K kind=vector domain=- :: Dwell time at station
+%@ param t_2 shape=K kind=vector domain=- :: Dwell time at station (alternative)
+%@ var z_1 shape=- domain=continuous role=primary drole=max :: Objective: maximize number of trains
+%@ var z_2 shape=- domain=continuous role=primary drole=min :: Objective: minimize total resource usage
+%@ var z_3 shape=- domain=continuous role=primary drole=min :: Objective: minimize total arrival time and penalty
 \begin{align}
   & \begin{matrix}\mathit{max} z_{1} = \sum_{v \in V} x_{f \left(v\right)}\end{matrix} \tag{eq\_0006} \\
   & \begin{matrix}a_{v}^{k} \leq T_{2} \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0007} \\

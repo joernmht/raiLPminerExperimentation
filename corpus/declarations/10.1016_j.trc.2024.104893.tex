@@ -195,3 +195,50 @@
 %@ con eq_0118_a kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
 %@ con eq_0118_b kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
 %@ con eq_0118_c kind=linear domain=- indicator=- :: Linearization of the headway-variation absolute-value term for downstream services.
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2024.104893.json (deterministic fill-in list); pending human confirmation.
+%@ var Z_backup shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for backup rolling stock utilization.
+%@ var Z_cancel shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for cancelled train services.
+%@ var Z_deviation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for timetable deviation.
+%@ var Z_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for headway variation.
+%@ param a_bar shape=N,S kind=scalar domain=- :: Planned arrival time of train n at station s.
+%@ var a_tilde shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Absolute deviation of arrival time.
+%@ var beta shape=N,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Backup rolling stock utilization indicator.
+%@ var beta_1 shape=N domain=binary role=auxiliary drole=- lo=0 hi=1 :: Backup rolling stock utilization indicator for downstream direction.
+%@ param d_bar shape=N,S kind=scalar domain=- :: Planned departure time of train n from station s.
+%@ var d_tilde shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Absolute deviation of departure time.
+%@ var delta shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Scenario indicator for delay.
+%@ index e ordered=0 cyclic=0 :: Set of emergency train services.
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant for linearization.
+%@ param g_max shape=S,S kind=scalar domain=- :: Maximum headway between consecutive stations.
+%@ param g_min shape=S,S kind=scalar domain=- :: Minimum headway between consecutive stations.
+%@ var gamma shape=N,N,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Order indicator for arrival/departure times.
+%@ var gamma_tilde shape=N,N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Linearization auxiliary variable for gamma.
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway between trains at the same station.
+%@ var h_tilde shape=N,N,N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Headway deviation auxiliary variable.
+%@ param h_tilde_max shape=- kind=scalar domain=- :: Maximum headway deviation.
+%@ param l_min shape=- kind=scalar domain=- :: Minimum time before start of service.
+%@ param lambda_1 shape=- kind=scalar domain=- :: Weight for deviation objective.
+%@ param lambda_2 shape=- kind=scalar domain=- :: Weight for cancellation objective.
+%@ param lambda_3 shape=- kind=scalar domain=- :: Weight for variation objective.
+%@ param lambda_4 shape=- kind=scalar domain=- :: Weight for backup objective.
+%@ var pi shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Number of trains turning at station s.
+%@ var psi_end shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Number of trains ending at station s.
+%@ var psi_start shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Number of trains starting at station s.
+%@ param q_max shape=- kind=scalar domain=- :: Maximum dwell time.
+%@ param q_min shape=- kind=scalar domain=- :: Minimum dwell time.
+%@ var rho shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Cancellation indicator auxiliary variable.
+%@ param s_tilde shape=- kind=scalar domain=- :: Fault station index.
+%@ var sigma shape=N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Number of trains arriving at station s.
+%@ param t_duration shape=- kind=scalar domain=- :: Duration of delay.
+%@ param t_start shape=- kind=scalar domain=- :: Start time of service.
+%@ param tau_acc shape=- kind=scalar domain=- :: Acceleration time penalty.
+%@ param tau_dec shape=- kind=scalar domain=- :: Deceleration time penalty.
+%@ param tau_res shape=- kind=scalar domain=- :: Rescue time.
+%@ param u_min shape=- kind=scalar domain=- :: Minimum turn-around time.
+%@ var v_tilde shape=N,N,N,S domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Linearization auxiliary variable for variation.
+%@ var varepsilon shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Scenario indicator for out-of-service.
+%@ var varphi shape=N,N domain=binary role=auxiliary drole=- lo=0 hi=1 :: Order indicator for emergency trains.
+%@ var vartheta shape=N,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Backup rolling stock utilization indicator.
+%@ var vartheta_1 shape=N domain=binary role=auxiliary drole=- lo=0 hi=1 :: Backup rolling stock utilization indicator for upstream direction.
+%@ var xi shape=N,N,S domain=binary role=primary drole=- lo=0 hi=1 :: Turn-back decision variable.

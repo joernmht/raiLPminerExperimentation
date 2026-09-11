@@ -87,6 +87,73 @@
 %@ con eq_0064_c kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
 %@ con eq_0064_d kind=big_m domain=- indicator=- :: Linearization of product of binary and continuous variables (Appendix A).
 %@ con eq_0066 kind=big_m domain=- indicator=- :: Linearization of product term (Appendix A).
+%@ param F_tilde_max shape=- kind=big_m domain=- :: Big-M upper bound for the auxiliary variable f_tilde.
+%@ param F_tilde_min shape=- kind=big_m domain=- :: Big-M lower bound for the auxiliary variable f_tilde.
+%@ var Z_cancel shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for cancellations.
+%@ param Z_cancel_nom shape=- kind=scalar domain=- :: Normalization constant for the cancellation objective.
+%@ var Z_deviation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for timetable deviations.
+%@ param Z_deviation_nom shape=- kind=scalar domain=- :: Normalization constant for the deviation objective.
+%@ var Z_headway shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective term for headway deviations.
+%@ param Z_headway_nom shape=- kind=scalar domain=- :: Normalization constant for the headway objective.
+%@ param a_LB shape=F kind=scalar domain=- :: Lower bound on arrival time difference for train service f.
+%@ param a_UB shape=F kind=scalar domain=- :: Upper bound on arrival time difference for train service f.
+%@ param a_bar_dn shape=G,I kind=scalar domain=- :: Nominal arrival time of down-direction train service g at station i.
+%@ param a_bar_up shape=F,I kind=scalar domain=- :: Nominal arrival time of up-direction train service f at station i.
+%@ var a_dn shape=G,I domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of down-direction train service g at station i.
+%@ var a_up shape=F,I domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of up-direction train service f at station i.
+%@ var alpha_dn shape=G,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for down-direction train service g turning at station p.
+%@ var alpha_up shape=F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for up-direction train service f turning at station p.
+%@ var beta_dn shape=G,F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for down-direction train service g connecting to up-direction train service f at station p.
+%@ param beta_hat_dn shape=G,F,P kind=scalar domain=- :: Fixed value of beta_dn from the first stage.
+%@ param beta_hat_up shape=F,G,P kind=scalar domain=- :: Fixed value of beta_up from the first stage.
+%@ var beta_up shape=F,G,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for up-direction train service f connecting to down-direction train service g at station p.
+%@ var c_tilde_up shape=F,F,I domain=binary role=indicator drole=- lo=- hi=- :: Indicator for headway constraint between up-direction train services f-ell and f at station i.
+%@ var c_up shape=F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for up-direction train service f serving station p.
+%@ param d_bar_dn shape=G,I kind=scalar domain=- :: Nominal departure time of down-direction train service g at station i.
+%@ param d_bar_up shape=F,I kind=scalar domain=- :: Nominal departure time of up-direction train service f at station i.
+%@ var d_dn shape=G,I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of down-direction train service g at station i.
+%@ param d_tilde_max shape=- kind=big_m domain=- :: Big-M upper bound for z_tilde_up.
+%@ param d_tilde_min shape=- kind=big_m domain=- :: Big-M lower bound for z_tilde_up.
+%@ var d_up shape=F,I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of up-direction train service f at station i.
+%@ var delta_up shape=F,F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for ordering of up-direction train services at station p.
+%@ param epsilon shape=- kind=tolerance domain=- :: Small positive constant.
+%@ var eta_up shape=F,F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for alpha_up in the first-stage constraint.
+%@ var f_tilde shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for the first-stage objective.
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway between consecutive train services.
+%@ param o_up shape=F,P kind=scalar domain=- :: Offset time for up-direction train service f at station p.
+%@ var pi_up shape=F,G,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for theta_dn in the first-stage constraint.
+%@ var r_dn shape=G,I,I domain=continuous role=primary drole=- lo=- hi=- :: Running time of down-direction train service g between stations i+1 and i.
+%@ param r_dn_max shape=I,I kind=scalar domain=- :: Maximum running time between stations i+1 and i in the down direction.
+%@ param r_dn_min shape=I,I kind=scalar domain=- :: Minimum running time between stations i+1 and i in the down direction.
+%@ var r_up shape=F,I,I domain=continuous role=primary drole=- lo=- hi=- :: Running time of up-direction train service f between stations i-1 and i.
+%@ param r_up_max shape=I,I kind=scalar domain=- :: Maximum running time between stations i-1 and i in the up direction.
+%@ param r_up_min shape=I,I kind=scalar domain=- :: Minimum running time between stations i-1 and i in the up direction.
+%@ param t_end shape=- kind=scalar domain=- :: End time of the disruption.
+%@ var t_turn shape=G,P domain=continuous role=primary drole=- lo=- hi=- :: Turnaround time of down-direction train service g at station p.
+%@ param t_turn_max shape=P kind=scalar domain=- :: Maximum turnaround time at station p.
+%@ param t_turn_min shape=P kind=scalar domain=- :: Minimum turnaround time at station p.
+%@ var theta_dn shape=G,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for down-direction train service g being cancelled at station p.
+%@ var theta_tilde shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator for the first-stage objective.
+%@ var theta_tilde_1 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Auxiliary binary variable for theta_tilde.
+%@ var theta_tilde_2 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Auxiliary binary variable for theta_tilde.
+%@ var theta_tilde_3 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Auxiliary binary variable for theta_tilde.
+%@ var theta_up shape=F,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for up-direction train service f being cancelled at station p.
+%@ param w_cr shape=P kind=scalar domain=- :: Crew walking time at station p.
+%@ var w_dn shape=G,I domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of down-direction train service g at station i.
+%@ param w_dn_max shape=I kind=scalar domain=- :: Maximum dwell time at station i in the down direction.
+%@ param w_dn_min shape=I kind=scalar domain=- :: Minimum dwell time at station i in the down direction.
+%@ var w_up shape=F,I domain=continuous role=primary drole=- lo=- hi=- :: Dwell time of up-direction train service f at station i.
+%@ param w_up_max shape=I kind=scalar domain=- :: Maximum dwell time at station i in the up direction.
+%@ param w_up_min shape=I kind=scalar domain=- :: Minimum dwell time at station i in the up direction.
+%@ param x_bar_dn shape=G,P,P kind=scalar domain=- :: Nominal indicator for down-direction train service g serving segment between stations p and p-1.
+%@ param x_bar_up shape=F,P,P kind=scalar domain=- :: Nominal indicator for up-direction train service f serving segment between stations p and p+1.
+%@ var x_dn shape=G,P,P domain=binary role=primary drole=- lo=- hi=- :: Indicator for down-direction train service g serving segment between stations p and p-1.
+%@ var x_up shape=F,P,P domain=binary role=primary drole=- lo=- hi=- :: Indicator for up-direction train service f serving segment between stations p and p+1.
+%@ var y_dn shape=G,I,I domain=binary role=primary drole=- lo=- hi=- :: Indicator for down-direction train service g serving segment between stations i and i-1.
+%@ var y_up shape=F,I,I domain=binary role=primary drole=- lo=- hi=- :: Indicator for up-direction train service f serving segment between stations i and i+1.
+%@ var z_tilde shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for the first-stage objective.
+%@ var z_tilde_up shape=F,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for headway deviation of up-direction train service f at station i.
+%@ var zeta_up shape=F,G,P domain=binary role=indicator drole=- lo=- hi=- :: Indicator for theta_dn in the first-stage constraint.
 \begin{align}
   & y_{f , i , i + 1}^{up} = x_{f , p , p + 1}^{up} , \forall f \in \mathbf{F} , \forall p \in \mathbf{P} / \left\{P\right\} , i \in \left\{I_{p} , I_{p} + 1 , \ldots , I_{p + 1} - 1\right\} , \tag{eq\_0002} \\
   & y_{g , i , i - 1}^{dn} = x_{g , p , p - 1}^{dn} , \forall g \in \mathbf{G} , \forall p \in \mathbf{P} / \left\{1\right\} , i \in \left\{I_{p} , I_{p} - 1 , \ldots , I_{p - 1} + 1\right\} . \tag{eq\_0003} \\

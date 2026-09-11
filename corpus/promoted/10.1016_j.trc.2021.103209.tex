@@ -89,6 +89,67 @@
 %@ con eq_0048_a kind=linear :: Linearization of peak-hour indicator times operation level (part a)
 %@ con eq_0048_b kind=linear :: Linearization of peak-hour indicator times operation level (part b)
 %@ con eq_0049 kind=linear :: Auxiliary variable constraint for objective linearization
+%@ param E_dn shape=J,N kind=matrix domain=- :: Energy consumption of a down-direction running level n at station j
+%@ param E_up shape=J,N kind=matrix domain=- :: Energy consumption of an up-direction running level n at station j
+%@ var L_up shape=I,J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Auxiliary binary variable for up-direction dwell level selection
+%@ param T_1 shape=M,I,N kind=matrix domain=- :: Minimum turnaround time at terminal station 1 for dwell level m, train i, running level n
+%@ param T_max shape=J kind=vector domain=- :: Maximum turnaround time at station J
+%@ param T_max_1 shape=- kind=scalar domain=- :: Maximum turnaround time at terminal station 1
+%@ var Theta_up shape=I,I domain=continuous role=auxiliary drole=- lo=0 hi=- :: Auxiliary continuous variable for up-direction departure time at station 1
+%@ var a_dn shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station j in down direction
+%@ var a_up shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station j in up direction
+%@ var alpha_dn shape=I,J,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable for down-direction dwell level selection
+%@ var alpha_op_up shape=J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for optimal identical up-direction dwell level selection
+%@ var alpha_p_up shape=J,M domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pre-fixed up-direction dwell level selection
+%@ var alpha_up shape=I,J,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction dwell level selection
+%@ var beta_dn shape=I,J,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable for down-direction running level selection
+%@ var beta_op_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for optimal identical up-direction running level selection
+%@ var beta_p_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for pre-fixed up-direction running level selection
+%@ var beta_tilde_up shape=J,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for up-direction running level selection in identical selection model
+%@ var beta_up shape=I,J,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction running level selection
+%@ var d_dn shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station j in down direction
+%@ var d_dn_1 shape=I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station 1 in down direction
+%@ var d_up shape=I,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station j in up direction
+%@ var d_up_1 shape=I domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station 1 in up direction
+%@ var delta shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable for max/min selection
+%@ var delta_1 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 1
+%@ var delta_2 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 2
+%@ var delta_3 shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator variable 3
+%@ var ell_up shape=I,J domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i at station j uses pre-fixed up-direction operation levels
+%@ var eta shape=I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i is the last service
+%@ var f_dev shape=I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for headway deviation of train i
+%@ var f_deviation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total headway deviation
+%@ param f_deviation_nom shape=- kind=scalar domain=- :: Nominal value for headway deviation
+%@ var f_dn_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Down-direction headway variation
+%@ var f_energy shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total energy consumption
+%@ param f_energy_nom shape=- kind=scalar domain=- :: Nominal value for energy consumption
+%@ param f_max shape=- kind=scalar domain=- :: Maximum value of f
+%@ var f_obj shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Overall objective function value
+%@ param f_sum_nom shape=- kind=scalar domain=- :: Nominal sum for objective normalization
+%@ var f_up_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Up-direction headway variation
+%@ var f_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total headway variation
+%@ param f_variation_nom shape=- kind=scalar domain=- :: Nominal value for headway variation
+%@ var f_zeta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Total number of last services
+%@ param f_zeta_nom shape=- kind=scalar domain=- :: Nominal value for f_zeta
+%@ param gamma shape=- kind=scalar domain=- :: Weight parameter for objective combination
+%@ param h_max shape=- kind=scalar domain=- :: Maximum headway
+%@ param i_1 shape=- kind=scalar domain=- :: Number of preceding trains for variation calculation
+%@ param i_2 shape=- kind=scalar domain=- :: Number of succeeding trains for variation calculation
+%@ param r_dn shape=J,N kind=matrix domain=- :: Running time of down-direction running level n at station j
+%@ param r_up shape=J,N kind=matrix domain=- :: Running time of up-direction running level n at station j
+%@ param r_up_2 shape=J kind=vector domain=- :: Running time of up-direction running level 2 at station j
+%@ param t_end shape=- kind=scalar domain=- :: End time of the planning horizon
+%@ param tau_dn shape=J,M kind=matrix domain=- :: Dwell time of down-direction dwell level m at station j
+%@ param tau_up shape=J,M kind=matrix domain=- :: Dwell time of up-direction dwell level m at station j
+%@ param tau_up_1 shape=J kind=vector domain=- :: Dwell time of up-direction dwell level 1 at station j
+%@ param tau_up_2 shape=J kind=vector domain=- :: Dwell time of up-direction dwell level 2 at station j
+%@ var theta shape=I,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i precedes train i'
+%@ param w_1 shape=- kind=scalar domain=- :: Weight for headway deviation
+%@ param w_2 shape=- kind=scalar domain=- :: Weight for headway variation
+%@ param w_3 shape=- kind=scalar domain=- :: Weight for number of last services
+%@ var x_up shape=I,J,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for up-direction departure time interval selection
+%@ param x_up_1 shape=I,K kind=matrix domain=- :: Binary parameter for up-direction departure time interval selection at station 1
+%@ var zeta shape=I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train i is the last service
 \begin{align}
   & I = \sum_{k \in \left\{1 , 2 , \ldots , K\right\}} I_{k} . \tag{eq\_0001} \\
   & d_{i , j}^{up} = a_{i , j}^{up} + \sum_{m \in \mathcal{M}} \mathit{alpha}_{i , j , m}^{up} \mathit{tau}_{j , m}^{up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \tag{eq\_0002} \\
@@ -106,7 +167,7 @@
   & \mathit{zeta}_{i '} = 1 - \sum_{i \in \mathcal{I} , i < i ' ,} \mathit{theta}_{i , i '} , \tag{eq\_0014} \\
   & \mathit{eta}_{i} = 1 - \sum_{i ' \in \mathcal{I} , i < i '} \mathit{theta}_{i , i '} . \tag{eq\_0015} \\
   & T_{1}^{min} - M \left(1 - \mathit{theta}_{i , i '}\right) \leq a_{i ' , 1}^{up} - d_{i , 1}^{dn} \leq T_{1}^{max} + M \left(1 - \mathit{theta}_{i , i '}\right) , \tag{eq\_0016} \\
-  & d_{i + 1 , 1}^{dn} - \sum_{i ' \in \mathcal{I} , i ' > i} \mathit{theta}_{i , i '} a_{i ' , 1}^{up} > 0 , \forall i \in \mathcal{I} / \left\{I\right\} . \tag{eq\_0017} \\
+  & d_{i + 1 , 1}^{dn} - \sum_{i ' \in \mathcal{I} , i ' > i} \mathit{theta}_{i , i '} \cdot a_{i ' , 1}^{up} > 0 , \forall i \in \mathcal{I} / \left\{I\right\} . \tag{eq\_0017} \\
   & \sum_{m \in \mathcal{M} p} \mathit{alpha}_{i , j , m}^{up} \mathit{ell}_{i , j}^{up} = \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} , \tag{eq\_0018} \\
   & \sum_{n \in \mathcal{N}_{p}} \mathit{beta}_{i , j , n}^{up} \mathit{ell}_{i , j}^{up} = \mathit{ell}_{i , j}^{up} , \forall i \in \mathcal{I} , j \in \mathcal{J} / \left\{J\right\} . \tag{eq\_0019} \\
   & \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} = 1 , \tag{eq\_0021} \\
@@ -118,7 +179,7 @@
   & f_{energy} = \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} E_{j , n}^{up} \mathit{beta}_{i , j , n}^{up} + \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{1\right\}, n \in \mathcal{N}} E_{j , n}^{dn} \mathit{beta}_{i , j , n}^{dn} , \tag{eq\_0027} \\
   & f_{obj 1} = \frac{w_{1} \frac{f_{deviation}}{f_{deviation , nom}} + w_{2} \frac{f_{variation}}{f_{variation , nom}} + w_{3} \frac{f_{\mathit{zeta}}}{f_{\mathit{zeta} , nom}}}{f_{sum , nom}} , \tag{eq\_0028} \\
   & f_{obj 2} = \frac{f_{energy}}{f_{energy , nom}} , \tag{eq\_0029} \\
-  & f_{obj} = \mathit{gamma} f_{obj 1} + \left(1 - \mathit{gamma}\right) f_{obj 2} . \tag{eq\_0030} \\
+  & f_{obj} = \mathit{gamma} \cdot f_{obj 1} + \left(1 - \mathit{gamma}\right) f_{obj 2} . \tag{eq\_0030} \\
   \min\quad & \sum_{j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} E_{j , n}^{up} beta_tilde_{j , n}^{up} \tag{eq\_0031\_a} \\
   & \sum_{n \in \mathcal{N}} beta_tilde_{j , n}^{up} = 1 , j \in \mathcal{J} / \left\{J\right\} \tag{eq\_0031\_b} \\
   & \sum_{j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} r_{j , n}^{up} beta_tilde_{j , n}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 1}^{up} = \sum_{j \in \mathcal{J} / \left\{J\right\}} r_{j , 2}^{up} + \sum_{j \in \mathcal{J}} \mathit{tau}_{j , 2}^{up} \tag{eq\_0031\_c} \\
@@ -133,8 +194,8 @@
   & \sum_{n \in \mathcal{N}_{p}} \mathit{beta}_{j , n}^{p , up} = 1 , \forall j \in \mathcal{J} / \left\{J\right\} , \tag{eq\_0040} \\
   & \mathit{alpha}_{i , j , m}^{up} \geq \mathit{ell}_{i , j}^{up} \mathit{alpha}_{j , m}^{p , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} , \forall m \in \mathcal{M}_{p} , \tag{eq\_0041} \\
   & \mathit{beta}_{i , j , n}^{up} \geq \mathit{ell}_{i , j}^{up} \mathit{beta}_{j , n}^{p , up} , \forall i \in \mathcal{I} , \forall j \in \mathcal{J} / \left\{J\right\} , \forall n \in \mathcal{N}_{p} . \tag{eq\_0042} \\
-  & z \leq f_{max} \mathit{delta} \tag{eq\_0043\_a} \\
-  & z \geq f_{min} \mathit{delta} \tag{eq\_0043\_b} \\
+  & z \leq f_{max} \cdot \mathit{delta} \tag{eq\_0043\_a} \\
+  & z \geq f_{min} \cdot \mathit{delta} \tag{eq\_0043\_b} \\
   & z \leq f - f_{min} \left(1 - \mathit{delta}\right) \tag{eq\_0043\_c} \\
   & z \geq f - f_{max} \left(1 - \mathit{delta}\right) \tag{eq\_0043\_d} \\
   & \mathit{delta}_{3} \leq \mathit{delta}_{1} \tag{eq\_0044\_a} \\
@@ -142,7 +203,7 @@
   & \mathit{delta}_{1} + \mathit{delta}_{2} - \mathit{delta}_{3} \leq 1 \tag{eq\_0044\_c} \\
   & f_bar \geq f \tag{eq\_0045\_a} \\
   & f_bar \geq - f \tag{eq\_0045\_b} \\
-  & \mathit{Theta}_{i , i '}^{up} \leq t_{end} \mathit{theta}_{i , i '} \tag{eq\_0046\_a} \\
+  & \mathit{Theta}_{i , i '}^{up} \leq t_{end} \cdot \mathit{theta}_{i , i '} \tag{eq\_0046\_a} \\
   & \mathit{Theta}_{i , i '}^{up} \geq 0 \tag{eq\_0046\_b} \\
   & \mathit{Theta}_{i , i '}^{up} \leq a_{i ' , 1}^{up} \tag{eq\_0046\_c} \\
   & \mathit{Theta}_{i , i '}^{up} \geq a_{i ' , 1}^{up} - t_{end} \left(1 - \mathit{theta}_{i , i '}\right) \tag{eq\_0046\_d} \\

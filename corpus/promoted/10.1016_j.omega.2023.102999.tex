@@ -59,6 +59,28 @@
 %@ con eq_0039 kind=linear domain=- indicator=- :: Scenario subproblem: track choice constraint for non-stopping trains
 %@ con eq_0040 kind=linear domain=- indicator=- :: Scenario subproblem: same-track departure-arrival headway constraint
 %@ con eq_0041 kind=linear domain=- indicator=- :: Scenario subproblem: maintenance conflict constraints
+%@ var T_d shape=W,k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station in scenario w
+%@ var T_d_1 shape=k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station in scenario 1
+%@ var T_d_2 shape=k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station in scenario 2
+%@ var T_d_3 shape=k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station in scenario 3
+%@ var T_d_4 shape=k domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from origin station in scenario 4
+%@ param a_e shape=k kind=scalar domain=- :: Earliest arrival time of train k at destination
+%@ param d_d shape=k kind=scalar domain=- :: Latest departure time of train k from origin
+%@ param d_e shape=k kind=scalar domain=- :: Earliest departure time of train k from origin
+%@ var delta shape=W,k,N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train k departs station i after maintenance ends in scenario w
+%@ param g_a shape=k kind=scalar domain=- :: Acceleration time of train k
+%@ param g_d shape=k kind=scalar domain=- :: Deceleration time of train k
+%@ param h_a shape=N kind=scalar domain=- :: Minimum headway time between arrivals at station i
+%@ param h_d shape=N kind=scalar domain=- :: Minimum headway time between departures at station i
+%@ param h_da shape=N kind=scalar domain=- :: Minimum headway time between departure and arrival at station i
+%@ var lambda shape=W,k,N,Q domain=binary role=indicator drole=- lo=- hi=- :: 1 if train k is assigned to track q at station i in scenario w
+%@ var lambda_1 shape=W,k,N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train k stops at station i in scenario w
+%@ param m_end shape=N kind=scalar domain=- :: End time of maintenance at station i
+%@ param m_start shape=W,N kind=scalar domain=- :: Start time of maintenance at station i in scenario w
+%@ var t_a shape=W,k,N domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train k at station i in scenario w
+%@ var t_d shape=W,k,N domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from station i in scenario w
+%@ param tau shape=N kind=scalar domain=- :: Minimum dwell time at station i
+%@ param v_u shape=k,N kind=scalar domain=- :: Maximum running time supplement for train k between stations i and i+1
 \begin{align}
   \min\quad & \sum_{k \in K, w \in W} p^{w} \cdot f_{w}^{k} = \sum_{k \in K, w \in W} p^{w} \cdot t_{w , k , s_{k}}^{a} \tag{eq\_0002} \\
   & d_{k}^{e} \leq T_{k}^{d} \leq d_{k}^{l} \forall k \in K \tag{eq\_0003} \\

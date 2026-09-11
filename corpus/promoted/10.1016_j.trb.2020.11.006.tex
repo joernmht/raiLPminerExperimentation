@@ -45,6 +45,18 @@
 %@ con eq_0018 kind=linear domain=- indicator=- :: Equality reformulation of coupling capacity constraint with slack variable.
 %@ con eq_0019 kind=linear domain=- indicator=- :: Relaxed Lagrangian objective with penalty terms.
 %@ con eq_0020 kind=linear domain=- indicator=- :: Remaining constraint in the relaxed integrated model.
+%@ index A_Strack_tr ordered=0 cyclic=0 :: Set of station-track arcs for trains.
+%@ index A_drive_tr ordered=0 cyclic=0 :: Set of driving arcs for trains.
+%@ index A_k_minus ordered=0 cyclic=0 :: Set of incoming arcs for train k.
+%@ index A_k_minus_tr ordered=0 cyclic=0 :: Set of incoming train arcs for train k.
+%@ index A_k_plus ordered=0 cyclic=0 :: Set of outgoing arcs for train k.
+%@ index A_k_plus_tr ordered=0 cyclic=0 :: Set of outgoing train arcs for train k.
+%@ index A_p_minus ordered=0 cyclic=0 :: Set of incoming arcs for passenger group p.
+%@ index A_p_minus_pa ordered=0 cyclic=0 :: Set of incoming passenger arcs for passenger group p.
+%@ index A_p_plus ordered=0 cyclic=0 :: Set of outgoing arcs for passenger group p.
+%@ index A_p_plus_pa ordered=0 cyclic=0 :: Set of outgoing passenger arcs for passenger group p.
+%@ index A_pa ordered=0 cyclic=0 :: Set of passenger arcs.
+%@ index A_tr ordered=0 cyclic=0 :: Set of train arcs.
 \begin{align}
   \min\quad & \sum_{p \in P, \left(i , j , t , tp\right) \in A_{p a}^{p}} c_{i , j , t , tp}^{p} \cdot n_{p} \cdot v_{i , j , t , tp}^{p} + \mathit{omega} \cdot \sum_{k \in K, \left(i , j , t , tp\right) \in A_{t r}^{k}} c_{i , j , t , tp}^{k} \cdot x_{i , j , t , tp}^{k} \tag{eq\_0007} \\
   & \begin{aligned}\textbf{subject} \textbf{to}: & & \\ & & \text{Train} \text{operational} \text{constraints}: \\ & & \underset{\left(i , j , t , tp\right) \in A_{t r , o_{k}}^{k , +}}{\sum} x_{i , j , t , tp}^{k} = 1 \forall k \in K\end{aligned} \tag{eq\_0008} \\

@@ -17,9 +17,13 @@
 %@ con eq_0001 kind=linear domain=- indicator=- :: Lower bound of velocity relaxation: v_i >= v_i^c - delta_v.
 %@ con eq_0002 kind=linear domain=- indicator=- :: Upper bound of velocity relaxation: v_i <= v_i^c + delta_v.
 %@ con eq_0005_b kind=linear domain=- indicator=- :: Definition of the delay-ratio objective F(V) as the ratio of total delay time to total free-run time.
+%@ param Delta shape=- kind=scalar domain=- :: velocity deviation bound
+%@ var T_f shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: free-run time of train i
+%@ var T_ob shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: observed (actual) travel time of train i
+%@ param v_c shape=N kind=vector domain=- :: free-run (cruising) velocity of train i
 \begin{align}
-  & v_{i}^{c} - \mathit{Delta} v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} v , \tag{eq\_0001} \\
+  & v_{i}^{c} - \mathit{Delta} \cdot v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} \cdot v , \tag{eq\_0001} \\
   & F \left(V\right) = \frac{\sum_{i = 1}^{N} \left(T_{i}^{\mathit{ob}} \left(v_{i} , V\right) - T_{i}^{f} \left(v_{i} , V\right)\right)}{\sum_{i = 1}^{N} T_{i}^{f} \left(v_{i} , V\right)} \tag{eq\_0002} \\
   \min\quad & F \left(V\right) \tag{eq\_0005\_a} \\
-  & v_{i}^{c} - \mathit{Delta} v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} v . \tag{eq\_0005\_b} \\
+  & v_{i}^{c} - \mathit{Delta} \cdot v \leq v_{i} \leq v_{i}^{c} + \mathit{Delta} \cdot v . \tag{eq\_0005\_b} \\
 \end{align}

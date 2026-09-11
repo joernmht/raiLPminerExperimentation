@@ -124,3 +124,22 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Transfer time violations are non-negative reals
 %@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain for transfer selection variables
 %@ con eq_0027 kind=linear domain=- indicator=- :: Additional constraint from the integrated timetabling and vehicle scheduling model
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2018.01.012.json (deterministic fill-in list); pending human confirmation.
+%@ index Q_O ordered=0 cyclic=0 :: Set of feasible vehicle movements (i,j,k) for the sub-problem
+%@ param Delta shape=- kind=scalar domain=- :: Upper bound on total operational cost
+%@ index T_1 ordered=0 cyclic=0 :: Set of trips excluded from headway constraints
+%@ var alpha shape=W domain=binary role=indicator drole=- lo=- hi=- :: Transfer assignment indicator for triplet (i,j,s)
+%@ param c_DW shape=T kind=scalar domain=- :: Cost of dwell time added to trip i
+%@ param c_TR shape=- kind=scalar domain=- :: Cost per unit of transfer time
+%@ param d_minus shape=T kind=scalar domain=- :: Earliest allowed departure time from start stop of trip i
+%@ param d_plus shape=T kind=scalar domain=- :: Latest allowed departure time from start stop of trip i
+%@ var delta shape=T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Dwell time added to trip i
+%@ var gamma shape=R domain=non_negative role=auxiliary drole=- lo=- hi=- :: Excess transfer time for transfer opportunity r
+%@ param h_minus shape=T,J kind=scalar domain=- :: Minimum headway between consecutive trips at stop s
+%@ param h_plus shape=T,J kind=scalar domain=- :: Maximum headway between consecutive trips at stop s
+%@ param q_minus shape=- kind=scalar domain=- :: Minimum turnaround time between trips
+%@ var tau_a shape=T,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of trip i at stop s
+%@ var tau_d shape=T,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of trip i from stop s
+%@ param w_minus shape=T,J kind=scalar domain=- :: Minimum dwell time at stop s of trip i
+%@ param w_plus shape=T,J kind=scalar domain=- :: Maximum dwell time at stop s of trip i

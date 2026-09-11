@@ -44,6 +44,16 @@
 %@ con eq_0025_d kind=linear :: Additional PESP valid inequality — part (d)
 %@ con eq_0025_e kind=linear :: Additional PESP valid inequality — part (e)
 %@ param wt
+%@ param A_t shape=- kind=scalar domain=- :: coefficient in objective
+%@ param ell_ij shape=- kind=scalar domain=- :: lower bound on y_ij
+%@ param gamma_t shape=- kind=scalar domain=- :: coefficient in constraints
+%@ param gamma_t_minus shape=- kind=scalar domain=- :: coefficient in constraints
+%@ param gamma_t_plus shape=- kind=scalar domain=- :: coefficient in constraints
+%@ param mu shape=- kind=scalar domain=- :: dimension of z
+%@ param p_ij shape=- kind=scalar domain=- :: integer period offset
+%@ var y_BC shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: event time difference
+%@ var y_EF shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: event time difference
+%@ var y_ij shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: event time difference
 \begin{align}
   \min\quad & wt \cdot y \tag{eq\_0002} \\
   & \text{subject}\textrm{ }\text{to} y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{i j} + p_{i j} \cdot T , i \cdot j \in A , 0 \leq y \leq u - \mathit{ell} , \tag{eq\_0004} \\

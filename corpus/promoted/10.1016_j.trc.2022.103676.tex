@@ -29,6 +29,12 @@
 %@ con eq_0012 kind=linear domain=- indicator=- :: Require no passengers are left by the last train at any station
 %@ con eq_0013 kind=linear domain=- indicator=- :: Update waiting passenger count for the next train from left passengers and newly arriving passengers
 %@ con eq_0018 kind=linear domain=- indicator=- :: Objective function minimizing the weighted sum of passenger waiting time, accumulation risk, and carriage reservation cost
+%@ param mu shape=- kind=scalar domain=- :: weight coefficient for passenger accumulation term
+%@ param n_max shape=- kind=scalar domain=- :: maximum number of carriages reserved per train at a station
+%@ param nu shape=- kind=scalar domain=- :: weight coefficient for carriage reservation cost term
+%@ param theta_1 shape=- kind=scalar domain=- :: weight for passenger accumulation objective term
+%@ param theta_2 shape=- kind=scalar domain=- :: weight for passenger waiting/accumulation objective term
+%@ param theta_3 shape=- kind=scalar domain=- :: weight for carriage reservation cost objective term
 \begin{align}
   & 0 \leq n_{i , k} \leq n_{\text{max}} , \forall i \in I , k \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0001} \\
   & n_{i , k} \geq n_{i , k + 1} , \forall i \in I , k , k + 1 \in S \backslash \left\{\left|S\right|\right\} . \tag{eq\_0002} \\

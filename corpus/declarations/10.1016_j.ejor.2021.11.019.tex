@@ -174,3 +174,24 @@
 %@ con eq_0074 kind=linear domain=- indicator=- :: Linearization constraint (74)
 %@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint (75)
 %@ var tau shape=- domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2021.11.019.json (deterministic fill-in list); pending human confirmation.
+%@ param S_1 shape=- kind=scalar domain=- :: Number of short-turn services in the up direction
+%@ param S_2 shape=- kind=scalar domain=- :: Number of short-turn services in the down direction
+%@ var alpha shape=K domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of trains assigned to service k in the up direction
+%@ var beta shape=K domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of trains assigned to service k in the down direction
+%@ var c_a shape=K,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers alighting from train k at station i
+%@ var c_b shape=K,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers boarding train k at station i
+%@ param delta shape=S,S,S,S kind=scalar domain=- :: Minimum turnaround time between services
+%@ param delta_max shape=S kind=scalar domain=- :: Maximum turnaround time between services
+%@ param epsilon shape=- kind=scalar domain=- :: Small positive constant
+%@ var gamma shape=K,K,S domain=binary role=indicator drole=- lo=- hi=- :: 1 if service k in the up direction and service l in the down direction are connected at station m
+%@ param h_max shape=- kind=scalar domain=- :: Maximum headway
+%@ var lambda shape=K,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers waiting for train k at station i
+%@ var mu shape=K,S,R domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers left behind by train k at station i in time interval r
+%@ param phi shape=K,S,S kind=scalar domain=- :: Proportion of passengers boarding train k at station i destined for station j
+%@ var psi shape=K,S domain=binary role=indicator drole=- lo=- hi=- :: 1 if train k is full at station i
+%@ param rho shape=- kind=scalar domain=- :: Passenger arrival rate
+%@ var theta shape=K,S,R domain=binary role=indicator drole=- lo=- hi=- :: 1 if train k arrives at station i in time interval r
+%@ param u shape=- kind=scalar domain=- :: Up direction indicator
+%@ var w_b shape=K,S,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers waiting for train k at station i destined for station j

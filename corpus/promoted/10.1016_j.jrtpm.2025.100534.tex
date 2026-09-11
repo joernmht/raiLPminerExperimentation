@@ -81,6 +81,25 @@
 %@ con eq_0059 kind=linear domain=- indicator=- :: Later turn-around train arrival after previous leaves arrival track: a_i,A^x >= a_i-1,R^x - c_ar + h2, i>2
 %@ con eq_0060 kind=linear domain=- indicator=- :: Later turn-around train return-track arrival: a_i,R^x = d_i-1,D^x - w - c_rd + h2, i>2
 %@ con eq_0061 kind=linear domain=- indicator=- :: Later turn-around train departure headway: d_i,D^x >= d_i-1,D^x + h2 + w, i>2
+%@ param I_plan shape=- kind=scalar domain=- :: Planned headway interval between consecutive trains
+%@ var a_x shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train i at station k in direction x
+%@ var a_x_1 shape=S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of first train at station in direction x
+%@ var a_x_2 shape=S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of second train at station in direction x
+%@ var a_y shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train j at station l in direction y
+%@ param c_d shape=- kind=scalar domain=- :: Dwell time at terminal station for turn-around
+%@ param c_r shape=- kind=scalar domain=- :: Running time between terminal stations for turn-around
+%@ var d_x shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train i from station k in direction x
+%@ var d_x_1 shape=S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of first train from station in direction x
+%@ var d_x_2 shape=S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of second train from station in direction x
+%@ var d_y shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train j from station l in direction y
+%@ param h_1 shape=- kind=scalar domain=- :: Minimum headway between consecutive trains at same station
+%@ param h_2 shape=- kind=scalar domain=- :: Minimum headway between arrival and departure of consecutive trains
+%@ param t_0 shape=- kind=scalar domain=- :: Start time of disruption
+%@ param t_max shape=- kind=scalar domain=- :: Maximum allowed time interval between consecutive train arrivals
+%@ param theta_x shape=S kind=vector domain=- :: Dwell time of train at station k in direction x
+%@ param theta_y shape=S kind=vector domain=- :: Dwell time of train at station l in direction y
+%@ param z_in shape=- kind=scalar domain=- :: Time required for dispatchers to confirm disruption
+%@ param z_min shape=- kind=scalar domain=- :: Minimum turn-around time at terminal station
 \begin{align}
   & d_{i , k}^{x} \geq a_{i , k}^{x} + \mathit{theta}_{k}^{x} , \forall i \in N_{x} , k \in S_{x} , \tag{eq\_0002} \\
   & d_{i , k + 1}^{x} = d_{i , k}^{x} + c_{k}^{k + 1} , \forall i \in N_{x} , k \in S_{x} , \tag{eq\_0003} \\

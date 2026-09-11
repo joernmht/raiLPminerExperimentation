@@ -92,3 +92,25 @@
 %@ con eq_0021_a kind=linear domain=- indicator=- :: First condition for non-negative FFCT in two-way synchronization
 %@ con eq_0021_b kind=linear domain=- indicator=- :: Second condition for non-negative FFCT in two-way synchronization
 %@ con eq_0022 kind=linear domain=- indicator=- :: Inequality relating dwell times and transfer times for two-way synchronization
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2016.07.006.json (deterministic fill-in list); pending human confirmation.
+%@ param Delta shape=- kind=scalar domain=- :: auxiliary parameter in the transfer waiting time equivalence derivation
+%@ param T_Dw shape=L,S kind=scalar domain=- :: dwell time of a train of line l at station s
+%@ param T_Dw_A1U shape=- kind=scalar domain=- :: dwell time at station A1U
+%@ param T_Dw_A2U shape=- kind=scalar domain=- :: dwell time at station A2U
+%@ param T_Dw_int shape=- kind=scalar domain=- :: dwell time at interchange stations
+%@ param T_Dw_tra shape=- kind=scalar domain=- :: dwell time at terminal stations
+%@ param T_R shape=L,S kind=scalar domain=- :: running time of line l between consecutive stations up to station s
+%@ param T_Tra shape=L,L,S kind=scalar domain=- :: transfer walking time at station s from line l to line lp
+%@ param T_Tra_A1U2U shape=- kind=scalar domain=- :: transfer walking time from station A1U to A2U
+%@ param T_Tra_A2U1U shape=- kind=scalar domain=- :: transfer walking time from station A2U to A1U
+%@ param T_max shape=L kind=scalar domain=- :: latest allowed first departure time of line l
+%@ param T_min shape=L kind=scalar domain=- :: earliest allowed first departure time of line l
+%@ var t_A shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of a train of line l at station s
+%@ var t_A_A1U shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time at station A1U
+%@ var t_A_A2U shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time at station A2U
+%@ var t_D shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of a train of line l from station s
+%@ var t_D_A1U shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time from station A1U
+%@ var t_D_A2U shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time from station A2U
+%@ var t_FFCT shape=L,L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: first train first connection time at station s between lines l and lp
+%@ var t_TWT shape=L,L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: total transfer waiting time at station s between lines l and lp

@@ -61,6 +61,32 @@
 %@ con eq_0038 kind=linear domain=- indicator=- :: Subproblem dual constraint (part 1)
 %@ con eq_0039 kind=linear domain=- indicator=- :: Subproblem dual constraint (part 2)
 %@ con eq_0040 kind=linear domain=- indicator=- :: Algorithm convergence or termination condition
+%@ index S_bar ordered=0 cyclic=0 :: Subset of stations for constraint indexing
+%@ index S_bar_star ordered=0 cyclic=0 :: Subset of stations for constraint indexing
+%@ index S_star ordered=0 cyclic=0 :: Subset of stations for constraint indexing
+%@ index S_underline ordered=0 cyclic=0 :: Subset of stations for constraint indexing
+%@ index S_underline_star ordered=0 cyclic=0 :: Subset of stations for constraint indexing
+%@ index V_bar ordered=0 cyclic=0 :: Subset of train services for constraint indexing
+%@ param I_fl shape=- kind=scalar domain=- :: Lower bound parameter for arrival/departure times
+%@ param Theta shape=- kind=scalar domain=- :: Minimum headway or time difference parameter
+%@ var Z_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for rolling stock assignment cost
+%@ var Z_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for delay and cancellation cost
+%@ var Z_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective component for total delay cost
+%@ var alpha shape=V,Vopp,C domain=binary role=auxiliary drole=- lo=- hi=- :: Assignment of opposite direction train service to rolling stock
+%@ var alpha_bar shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Aggregated or auxiliary variable for Benders cuts
+%@ var beta shape=V,V_bar,S_star domain=binary role=auxiliary drole=- lo=- hi=- :: Indicator for ordering of train services at stations
+%@ param delta shape=V kind=scalar domain=- :: Weight or penalty parameter for train service delays
+%@ var eta_bar shape=C domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for rolling stock balance
+%@ param omega shape=C kind=scalar domain=- :: Cost coefficient for using rolling stock unit
+%@ param omega_bar shape=C kind=scalar domain=- :: Cost coefficient for opposite direction rolling stock assignment
+%@ param p_bar shape=C kind=scalar domain=- :: Planned departure time or parameter for rolling stock
+%@ param p_underline shape=C kind=scalar domain=- :: Lower bound or minimum planned time for rolling stock
+%@ var phi_star shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Optimal value function in Benders decomposition
+%@ param pi shape=- kind=scalar domain=- :: Minimum number of rolling stock units required
+%@ var sigma shape=V,S domain=binary role=auxiliary drole=- lo=- hi=- :: Indicator for stop-skipping or service at station
+%@ var varrho shape=V,V_bar,C,F domain=binary role=auxiliary drole=- lo=- hi=- :: Assignment of opposite direction train service to rolling stock with direction
+%@ var varrho_bar shape=V,V_bar,C,F domain=continuous role=auxiliary drole=- lo=- hi=- :: Aggregated or auxiliary variable for Benders cuts
+%@ param xi shape=V,V_bar,C,F kind=scalar domain=- :: Coefficient in Benders optimality cuts
 \begin{align}
   & d_{\left(v + 1 , s\right)} - d_{\left(v , s\right)} \geq h_{d} \forall v \in V_{p} , \forall s \in S \tag{eq\_0003} \\
   & a_{\left(v , s + 1\right)} - d_{\left(v , s\right)} \geq r_{\left(s , s + 1\right)} \forall v \in V_{p} , \forall s \in S \left|\right. s + 1 \notin S^{*} \tag{eq\_0004} \\

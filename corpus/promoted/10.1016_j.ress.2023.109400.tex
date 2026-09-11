@@ -57,6 +57,25 @@
 %@ con eq_0026 kind=linear domain=- indicator=- :: Departure interval constraint for trains on the same main track and direction (out-area).
 %@ con eq_0027 kind=linear domain=- indicator=- :: Arrival interval constraint for trains on the same main track and direction (out-area).
 %@ con eq_0028 kind=linear domain=- indicator=- :: Station capacity constraint (out-area).
+%@ index A_seg ordered=0 cyclic=0 :: Set of segment activities (train running between stations).
+%@ index T_down ordered=0 cyclic=0 :: Set of down-direction train services.
+%@ index T_up ordered=0 cyclic=0 :: Set of up-direction train services.
+%@ param L_Dwell shape=a kind=scalar domain=- :: Minimum dwell time for activity a.
+%@ param L_Seg shape=a kind=scalar domain=- :: Minimum running time for segment activity a.
+%@ param L_interval shape=- kind=scalar domain=- :: Minimum interval time between arrival and departure events.
+%@ param M_1 shape=- kind=big_m domain=- :: Big-M constant for cancellation and deviation constraints.
+%@ param M_2 shape=- kind=big_m domain=- :: Big-M constant for sequencing constraints.
+%@ param P_minus shape=out kind=scalar domain=- :: Penalty for passenger early arrival (minus deviation).
+%@ param P_plus shape=out kind=scalar domain=- :: Penalty for passenger late arrival (plus deviation).
+%@ param d_minus shape=out kind=scalar domain=- :: Deviation variable for early passenger arrival.
+%@ param d_plus shape=out kind=scalar domain=- :: Deviation variable for late passenger arrival.
+%@ param eta_doc shape=- kind=scalar domain=- :: Weight for passenger delay cost.
+%@ param eta_supp shape=- kind=scalar domain=- :: Weight for supply (train) cost.
+%@ param eta_wou shape=- kind=scalar domain=- :: Weight for unmet demand cost.
+%@ var lambda shape=a kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: Sequencing variable for activities.
+%@ param t_o shape=e kind=scalar domain=- :: Original scheduled time of event e.
+%@ var varphi shape=a kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: Ordering variable for activities at stations.
+%@ var y_supp shape=- kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for supply activation.
 \begin{align}
   \min\quad & \underset{t_{o \underline \mathit{in}} \in T}{\sum} y_{t_{o \underline \mathit{in}}} \cdot P_{o \underline \mathit{in}}^{\mathit{canc} \mathit{el}} + \underset{e_{o \underline \mathit{in}} \in E \underline \mathit{in}}{\sum} d_{o \underline \mathit{in}}^{+} \cdot P_{o \underline \mathit{in}}^{+} + \underset{e_{o \underline \mathit{in}} \in E \underline \mathit{in}}{\sum} d_{o \underline \mathit{in}}^{-} \cdot P_{o \underline \mathit{in}}^{-} - \left(\underset{t_{\mathit{wou}} \in T}{\sum} \left(1 - y_{t_{\mathit{wou}}}\right) \cdot \mathit{eta}_{\mathit{wou}} + \underset{t_{\mathit{doc}} \in T}{\sum} \left(1 - y_{t_{\mathit{doc}}}\right) \cdot \mathit{eta}_{\mathit{doc}} + \underset{t_{\mathit{supp}} \in T}{\sum} \left(1 - y_{\mathit{supp}}\right) \cdot \mathit{eta}_{\mathit{supp}}\right) \tag{eq\_0002} \\
   & M_{1} \cdot y_{t_{o}} \leq x_{e_{o}} - \mathit{time} \left(t_{e}^{o}\right) \leq M_{1} + M_{1} \cdot y_{t_{o}} \forall e_{o} \in E^{d e p} \tag{eq\_0003} \\

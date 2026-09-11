@@ -32,6 +32,18 @@
 %@ con eq_0019 kind=linear :: Constraint set Z_k^I(w_k,n) for first-stage decisions at stage k
 %@ con eq_0020 kind=linear :: Constraint set Z_k^II(X_k(w_k,n),w_k,n) for second-stage decisions at stage k
 %@ con eq_0021 kind=linear :: Nonanticipativity constraint X_k(w_k,n)=X_k(w_k,m) at stage k
+%@ index E_ar ordered=0 cyclic=0 :: Set of arrival and departure events in the rolling horizon stage
+%@ index Z_I ordered=0 cyclic=0 :: Feasible set of first-stage decisions
+%@ index Z_II ordered=0 cyclic=0 :: Feasible set of second-stage decisions
+%@ index Z_II_1 ordered=0 cyclic=0 :: Feasible set of second-stage decisions in stage 1
+%@ index Z_I_1 ordered=0 cyclic=0 :: Feasible set of first-stage decisions in stage 1
+%@ param Q_I shape=- kind=scalar domain=- :: First-stage objective function value
+%@ param Q_II shape=- kind=scalar domain=- :: Second-stage objective function value
+%@ param W_1 shape=- kind=scalar domain=- :: Number of scenarios in stage 1
+%@ var X_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: First-stage decisions in stage 1
+%@ var Y_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: Second-stage decisions in stage 1
+%@ param beta shape=c kind=scalar domain=- :: Weight of cancellation cost
+%@ index w_1 ordered=0 cyclic=0 :: Scenario index in stage 1
 \begin{align}
   \min\quad & Q^{I} \left(X\right) + E_{w} \left[min Q^{II} \left(Y \left(w\right)\right)\right] , \tag{eq\_0001} \\
   & s.t. X \in Z^{I} , \tag{eq\_0003} \\

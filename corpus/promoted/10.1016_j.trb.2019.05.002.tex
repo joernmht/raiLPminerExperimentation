@@ -59,6 +59,23 @@
 %@ con eq_0033 kind=linear domain=- indicator=- :: Station capacity: total overtakings at station s_k ≤ O^{max}_{s_k}
 %@ con eq_0034 kind=linear domain=- indicator=- :: Epsilon-constraint bounding a secondary objective in MOPRT
 %@ con eq_0035 kind=linear domain=- indicator=- :: Epsilon-constraint bounding route/capacity-utilization indicator in MOPRT
+%@ param M_1 shape=- kind=big_m domain=- :: Big-M constant for headway lower bound disjunction
+%@ param M_2 shape=- kind=big_m domain=- :: Big-M constant for headway upper bound disjunction
+%@ param O_max shape=S kind=scalar domain=- :: Maximum number of overtakings at station
+%@ param P_max shape=- kind=scalar domain=- :: Maximum headway deviation parameter
+%@ param alpha shape=A kind=scalar domain=- :: Weight coefficient for journey time in objective
+%@ param beta shape=L kind=scalar domain=- :: Maximum allowed regularity deviation for line
+%@ var delta shape=A domain=continuous role=auxiliary drole=- lo=- hi=- :: Headway deviation auxiliary variable
+%@ index dwell ordered=0 cyclic=0 :: Set of dwell activities
+%@ param h_p shape=- kind=scalar domain=- :: Planned headway period
+%@ index head ordered=0 cyclic=0 :: Set of headway activities
+%@ param l_min shape=- kind=scalar domain=- :: Minimum headway parameter
+%@ param phi shape=- kind=scalar domain=- :: Headway deviation scaling factor
+%@ var pi shape=E domain=continuous role=primary drole=- lo=- hi=- :: Event time variable
+%@ index run ordered=0 cyclic=0 :: Set of run activities
+%@ index s ordered=0 cyclic=0 :: Station index family
+%@ var theta shape=A domain=non_negative role=auxiliary drole=- lo=- hi=- :: Regularity deviation variable
+%@ index thru ordered=0 cyclic=0 :: Set of through activities
 \begin{align}
   & a_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \tag{eq\_0001} \\
   \min\quad & \underset{\left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \cup \mathbf{\mathcal{A}}_{dwell}}{\sum} \mathit{alpha}_{i j} \cdot \left(\mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T\right) \tag{eq\_0002} \\

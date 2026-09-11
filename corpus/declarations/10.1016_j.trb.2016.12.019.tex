@@ -105,3 +105,14 @@
 %@ con eq_0011 kind=linear domain=- indicator=- :: Binary period shift variable
 %@ con eq_0012 kind=capacity domain=- indicator=- :: Station capacity constraints identifying present trains
 %@ con eq_0013 kind=capacity domain=- indicator=- :: Station capacity constraints ensuring platform availability
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2016.12.019.json (deterministic fill-in list); pending human confirmation.
+%@ index A_dwell ordered=0 cyclic=0 :: Set of dwell activity arcs
+%@ index A_run ordered=0 cyclic=0 :: Set of run activity arcs
+%@ index E_arr ordered=0 cyclic=0 :: Set of arrival events
+%@ param N_s_tracks shape=S kind=scalar domain=- :: Number of tracks at station s
+%@ var d_plus shape=E domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Positive delay of event j
+%@ param d_plus_max shape=- kind=scalar domain=- :: Maximum allowed positive delay
+%@ param dwell_s shape=M kind=scalar domain=- :: Scheduled dwell time for train line m
+%@ param w_cancel shape=M kind=scalar domain=- :: Weight (penalty) for cancelling train line m
+%@ param w_delay shape=E_arr kind=scalar domain=- :: Weight (penalty) for delay of arrival event j

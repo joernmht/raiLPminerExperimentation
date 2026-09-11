@@ -79,6 +79,37 @@
 %@ con eq_0052 kind=linear domain=- indicator=- :: Selection of an active piecewise segment for each squared speed variable
 %@ con eq_0053 kind=linear domain=- indicator=- :: Special-ordered-set restriction on adjacent piecewise segment weights
 %@ con eq_0054 kind=linear domain=- indicator=- :: Incoming speed selected from pre-generated speed profile options in P_TSPO
+%@ index E_stop ordered=0 cyclic=0 :: Set of stopping cells in the rail network
+%@ param L_cell shape=E,E kind=scalar domain=- :: Length of cell (i,j)
+%@ param L_cru shape=F,E,E kind=scalar domain=- :: Length of cruising segment for train f on cell (i,j)
+%@ param L_in shape=F,E,E kind=scalar domain=- :: Length of acceleration segment for train f on cell (i,j)
+%@ param L_out shape=F,E,E kind=scalar domain=- :: Length of deceleration segment for train f on cell (i,j)
+%@ param L_train shape=F kind=scalar domain=- :: Length of train f
+%@ var a_cru shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time at start of cruising segment for train f on cell (i,j)
+%@ var a_turn shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time at start of turning segment for train f on cell (i,j)
+%@ param c_pri shape=F kind=scalar domain=- :: Priority cost for train f
+%@ var d_cru shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time at end of cruising segment for train f on cell (i,j)
+%@ var d_turn shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time at end of turning segment for train f on cell (i,j)
+%@ var tau_approach shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Approach time for train f on cell (i,j)
+%@ var tau_clear shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Clearing time for train f on cell (i,j)
+%@ var tau_reaction shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Reaction time for train f on cell (i,j)
+%@ var tau_release shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Release time for train f on cell (i,j)
+%@ var tau_setup shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Setup time for train f on cell (i,j)
+%@ var tau_sight shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Sight time for train f on cell (i,j)
+%@ param v_clim shape=E,E kind=scalar domain=- :: Speed limit on cell (i,j)
+%@ var v_cru shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Cruising speed for train f on cell (i,j)
+%@ var v_in shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Entry speed for train f on cell (i,j)
+%@ param v_mincru shape=- kind=scalar domain=- :: Minimum cruising speed
+%@ param v_nlim shape=E kind=scalar domain=- :: Speed limit at node i
+%@ var v_out shape=F,E,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Exit speed for train f on cell (i,j)
+%@ var v_turn shape=F domain=continuous role=auxiliary drole=- lo=- hi=- :: Turning speed for train f
+%@ param varepsilon shape=- kind=tolerance domain=- :: Small positive tolerance
+%@ var vartheta shape=F,E,E,Y domain=binary role=indicator drole=- lo=- hi=- :: 1 if speed profile option b is selected for train f on cell (i,j)
+%@ param w_max shape=F,E,E kind=scalar domain=- :: Maximum dwell time for train f on cell (i,j)
+%@ param w_min shape=F,E,E kind=scalar domain=- :: Minimum dwell time for train f on cell (i,j)
+%@ param y_cru shape=F,E,E,Y kind=scalar domain=- :: Cruising speed value for profile option b of train f on cell (i,j)
+%@ param y_in shape=F,E,E,Y kind=scalar domain=- :: Entry speed value for profile option b of train f on cell (i,j)
+%@ param y_out shape=F,E,E,Y kind=scalar domain=- :: Exit speed value for profile option b of train f on cell (i,j)
 \begin{align}
   \begin{matrix}min\quad & Z = \sum_{f \in F} \underset{\left(i , j\right) \in E_{f}^{\text{stop}}}{\sum} \frac{\left|d_{f , i , j} - w_{f , i , j} - D_{f , i , j}\right|}{\left|E_{f}^{\text{stop}}\right|} ,\end{matrix} \tag{eq\_0001} \\
   & \begin{matrix}v_{f , i , j}^{\text{out}} = v_{f , j , k}^{\text{in}} , \forall f \in F , j \neq o_{f} , \left(i , j\right) \in E_{f} , \left(j , k\right) \in E_{f}\end{matrix} \tag{eq\_0002} \\

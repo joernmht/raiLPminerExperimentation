@@ -58,6 +58,29 @@
 %@ con eq_0042 kind=linear domain=- indicator=- :: Binary domain for train path variables x_g^f.
 %@ con eq_0043_a kind=linear domain=- indicator=- :: Binary domain for implicit siding occupation variables y_g^f.
 %@ con eq_0043_b kind=linear domain=- indicator=- :: Binary domain for maintenance start variables y_t^m.
+%@ index A_bar ordered=0 cyclic=0 :: Set of available space-time arcs for a train.
+%@ index A_d ordered=0 cyclic=0 :: Set of departure space-time arcs.
+%@ index A_s ordered=0 cyclic=0 :: Set of arrival space-time arcs.
+%@ index A_st ordered=0 cyclic=0 :: Set of station space-time arcs.
+%@ index A_vi ordered=0 cyclic=0 :: Set of virtual arcs for a train.
+%@ index N_sm ordered=0 cyclic=0 :: Set of station-maintenance nodes.
+%@ index Pi_aa ordered=0 cyclic=0 :: Set of incompatible arrival-arrival arc pairs.
+%@ index Pi_ad ordered=0 cyclic=0 :: Set of incompatible arrival-departure arc pairs.
+%@ index Pi_dd ordered=0 cyclic=0 :: Set of incompatible departure-departure arc pairs.
+%@ index V_a ordered=0 cyclic=0 :: Set of arrival space-time nodes.
+%@ index V_d ordered=0 cyclic=0 :: Set of departure space-time nodes.
+%@ index V_se ordered=0 cyclic=0 :: Set of station event space-time nodes.
+%@ index delta_minus ordered=0 cyclic=0 :: Set of incoming arcs to a node.
+%@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing arcs from a node.
+%@ index psi_a ordered=0 cyclic=0 :: Set of incompatible arrival nodes for headway constraints.
+%@ index psi_aa ordered=0 cyclic=0 :: Set of incompatible arrival-arrival node pairs for headway constraints.
+%@ index psi_ad_ks ordered=0 cyclic=0 :: Set of incompatible arrival-departure node pairs at station k.
+%@ index psi_d ordered=0 cyclic=0 :: Set of incompatible departure nodes for headway constraints.
+%@ param D_bar shape=K,F kind=scalar domain=- :: Upper bound on number of trains of type f at station k.
+%@ param D_underline shape=K,F kind=scalar domain=- :: Lower bound on number of trains of type f at station k.
+%@ param T_r shape=- kind=scalar domain=- :: Running time reserve or recovery time.
+%@ param T_sr shape=K kind=scalar domain=- :: Station route setup or release time at station k.
+%@ param o_hat shape=A kind=scalar domain=- :: Scheduled or planned start time of space-time arc g.
 \begin{align}
   \min\quad & \sum_{f \in F, g \in A_{f}} c_{g}^{f} \cdot x_{g}^{f} \tag{eq\_0001} \\
   & \sum_{g \in \mathit{delta}_{f}^{+} \left(\mathit{sigma}_{f}\right)} x_{g}^{f} = 1 \forall f \in F \tag{eq\_0005} \\

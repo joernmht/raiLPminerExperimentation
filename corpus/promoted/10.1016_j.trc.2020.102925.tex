@@ -85,6 +85,50 @@
 %@ con eq_0058_a kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part a).
 %@ con eq_0058_b kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part b).
 %@ con eq_0058_c kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part c).
+%@ param Lambda_Transfer_qn shape=Q,N kind=scalar domain=- :: Transfer predecessor train for path q at train n.
+%@ var Pi_Capacity shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable for capacity constraint of train n.
+%@ param T_Arrival shape=L kind=scalar domain=- :: Latest arrival time for line l.
+%@ param T_Depart shape=L kind=scalar domain=- :: Earliest departure time for line l.
+%@ param T_Dmax_sl shape=L,S kind=scalar domain=- :: Maximum dwell time for line l at station s.
+%@ param T_Dmin_sl shape=L,S kind=scalar domain=- :: Minimum dwell time for line l at station s.
+%@ param T_H shape=- kind=scalar domain=- :: Minimum headway time between trains.
+%@ param T_Lmin shape=L kind=scalar domain=- :: Minimum line separation time for line l.
+%@ param T_Platform shape=P,P kind=scalar domain=- :: Walking time between platforms.
+%@ param T_Run shape=L,S,S kind=scalar domain=- :: Running time for line l between stations s and sp.
+%@ param T_Wait shape=- kind=scalar domain=- :: Waiting time penalty coefficient.
+%@ var b_Line shape=N,N domain=binary role=auxiliary drole=- lo=- hi=- :: 1 if train n precedes train np on the same line.
+%@ var b_Path shape=Q,N,S,S domain=binary role=auxiliary drole=- lo=- hi=- :: 1 if path q uses train n from station s to sp.
+%@ var b_Track shape=N,P domain=binary role=auxiliary drole=- lo=- hi=- :: 1 if train n is assigned to platform p.
+%@ var c_Extra shape=Q domain=continuous role=auxiliary drole=- lo=- hi=- :: Extra cost for path q due to congestion.
+%@ var c_Unc shape=Q domain=continuous role=auxiliary drole=- lo=- hi=- :: Uncongested cost for path q.
+%@ var c_q1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: In-vehicle time component for path q.
+%@ var c_q2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time component for path q.
+%@ var c_q3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Penalty waiting time component for path q.
+%@ var c_q4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Walking time component for path q.
+%@ var c_tilde shape=R domain=continuous role=auxiliary drole=- lo=- hi=- :: Equilibrium cost for OD pair r.
+%@ param d shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ param e shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ param h shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ var i_Wait shape=Q domain=continuous role=auxiliary drole=- lo=- hi=- :: Indicator of waiting for path q.
+%@ var ifb_Line shape=N,N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train n and np are on the same line.
+%@ var ifb_Track shape=N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train n uses a track.
+%@ param j shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ var lambda shape=N,S,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable for capacity constraint on train n from s to sp.
+%@ param n_Origin shape=Q kind=scalar domain=- :: Origin train for path q.
+%@ param ns shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ param s_Alight shape=Q,N kind=scalar domain=- :: Alighting station for path q on train n.
+%@ param s_Alight_qn shape=Q,N kind=scalar domain=- :: Alighting station for path q on train n.
+%@ param s_Board_qn shape=Q,N kind=scalar domain=- :: Boarding station for path q on train n.
+%@ param s_Destination shape=L kind=scalar domain=- :: Destination station for line l.
+%@ param s_Origin shape=L kind=scalar domain=- :: Origin station for line l.
+%@ var t_Arrival shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train n at station s.
+%@ var t_Arrival_ns shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train n at station s.
+%@ var t_Departure shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train n from station s.
+%@ var t_Departure_ns shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train n from station s.
+%@ var t_Wait_qn shape=Q,N domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time for path q on train n.
+%@ var t_Walk shape=Q,N,N domain=continuous role=auxiliary drole=- lo=- hi=- :: Walking time for path q between trains n and np.
+%@ param x shape=- kind=scalar domain=- :: Dummy parameter from extraction.
+%@ param xi_Downstream_ns shape=N,S kind=scalar domain=- :: Downstream station of train n at station s.
 \begin{align}
   & T_{\mathit{ls} sp}^{R u n} \leq t_{n sp}^{A r r i v a l} - t_{\mathit{ns}}^{D e p a r t u r e} ; \tag{eq\_0004} \\
   & T_{l}^{D e p a r t} \leq t_{\mathit{ns}}^{D e p a r t u r e} \tag{eq\_0005\_a} \\
@@ -128,18 +172,18 @@
   & \left(c_tilde\right)_{r} \cdot \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) = 0 \tag{eq\_0052\_a} \\
   & \left(c_tilde\right)_{r} \geq 0 \tag{eq\_0052\_b} \\
   & \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r} \geq 0 \tag{eq\_0052\_c} \\
-  & F = \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \cdot c_{q}^{U n c} - \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} \mathit{lambda}_{\mathit{ns} sp} \left(\mathit{Pi}_{n}^{C a p a c i t y} - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} sp}^{P a t h} \cdot A_{q}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \mathit{lambda}_{r} \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \mathit{lambda}_{q} \tag{eq\_0053} \\
-  & c_{q}^{U n c} + \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r} - \mathit{lambda}_{q} = 0 ; \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0054} \\
+  & F = \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \cdot c_{q}^{U n c} - \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} \mathit{lambda}_{\mathit{ns} sp} \left(\mathit{Pi}_{n}^{C a p a c i t y} - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} sp}^{P a t h} \cdot A_{q}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \mathit{lambda}_{r} \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) - \underset{r \in \mathbf{\mathit{R}}}{\sum} \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} \cdot \mathit{lambda}_{q} \tag{eq\_0053} \\
+  & c_{q}^{U n c} + \underset{l \in \mathbf{\mathit{L}}}{\sum} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \cdot \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r} - \mathit{lambda}_{q} = 0 ; \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0054} \\
   & \mathit{lambda}_{\mathit{ns} sp} \left(\mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} sp}^{P a t h} \cdot A_{q}\right) = 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_a} \\
   & \mathit{lambda}_{\mathit{ns} sp} \geq 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_b} \\
   & \mathit{Pi}_{n}^{C a p a c i t y} - \sum_{r \in \mathbf{\mathit{R}}} \sum_{q \in \mathbf{\mathit{Q}}_{r}} b_{\mathit{qns} sp}^{P a t h} \cdot A_{q} \geq 0 , \forall l \in \mathbf{\mathit{L}} ; \forall n \in \mathbf{\mathit{N}}_{l} ; \forall s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m} \tag{eq\_0055\_c} \\
   & \mathit{lambda}_{r} \left(\sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r}\right) = 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_a} \\
   & \mathit{lambda}_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_b} \\
   & \sum_{q \in \mathbf{\mathit{Q}}_{r}} A_{q} - D_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} \tag{eq\_0056\_c} \\
-  & A_{q} \mathit{lambda}_{q} = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_a} \\
+  & A_{q} \cdot \mathit{lambda}_{q} = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_a} \\
   & A_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_b} \\
   & \mathit{lambda}_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0057\_c} \\
-  & A_{q} \left(c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r}\right) = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_a} \\
+  & A_{q} \left(c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \cdot \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r}\right) = 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_a} \\
   & A_{q} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_b} \\
-  & c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_c} \\
+  & c_{q}^{U n c} + \sum_{l \in \mathbf{\mathit{L}}} \sum_{n \in \mathbf{\mathit{N}}_{l}} \sum_{s , sp \in \mathbf{\mathit{S}}_{l} : sp = \mathit{xi}_{\mathit{ns}}^{D o w n s t r e a m}} b_{\mathit{qns} sp}^{P a t h} \cdot \mathit{lambda}_{\mathit{ns} sp} - \mathit{lambda}_{r} \geq 0 , \forall r \in \mathbf{\mathit{R}} ; \forall q \in \mathbf{\mathit{Q}}_{r} \tag{eq\_0058\_c} \\
 \end{align}

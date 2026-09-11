@@ -71,3 +71,11 @@
 %@ con eq_0009 kind=linear domain=- indicator=- :: Arrival headway: trains arriving at station j must be separated by at least h minutes.
 %@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity: number of waiting trains at station i at time t cannot exceed sidetracks u_i.
 %@ con eq_0011 kind=linear domain=- indicator=- :: No overtaking: two trains cannot use the same single-track section within conflicting time windows.
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2015.12.007.json (deterministic fill-in list); pending human confirmation.
+%@ param alpha shape=k kind=scalar domain=- :: Weight coefficient for train k in the profit function.
+%@ param beta shape=k kind=scalar domain=- :: Weight coefficient for train k in the profit function.
+%@ var pi shape=k domain=continuous role=primary drole=- lo=- hi=- :: Profit of train k.
+%@ param pi_max shape=k kind=scalar domain=- :: Maximum possible profit of train k.
+%@ param w_max shape=i kind=scalar domain=- :: Maximum dwell time at station i.
+%@ param w_min shape=i kind=scalar domain=- :: Minimum dwell time at station i.

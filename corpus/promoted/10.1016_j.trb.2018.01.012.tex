@@ -51,8 +51,25 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Transfer time violations are non-negative reals
 %@ con eq_0020 kind=linear domain=- indicator=- :: Binary domain for transfer selection variables
 %@ con eq_0027 kind=linear domain=- indicator=- :: Additional constraint from the integrated timetabling and vehicle scheduling model
+%@ index Q_O ordered=0 cyclic=0 :: Set of feasible vehicle movements (i,j,k) for the sub-problem
+%@ param Delta shape=- kind=scalar domain=- :: Upper bound on total operational cost
+%@ index T_1 ordered=0 cyclic=0 :: Set of trips excluded from headway constraints
+%@ var alpha shape=W domain=binary role=indicator drole=- lo=- hi=- :: Transfer assignment indicator for triplet (i,j,s)
+%@ param c_DW shape=T kind=scalar domain=- :: Cost of dwell time added to trip i
+%@ param c_TR shape=- kind=scalar domain=- :: Cost per unit of transfer time
+%@ param d_minus shape=T kind=scalar domain=- :: Earliest allowed departure time from start stop of trip i
+%@ param d_plus shape=T kind=scalar domain=- :: Latest allowed departure time from start stop of trip i
+%@ var delta shape=T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Dwell time added to trip i
+%@ var gamma shape=R domain=non_negative role=auxiliary drole=- lo=- hi=- :: Excess transfer time for transfer opportunity r
+%@ param h_minus shape=T,J kind=scalar domain=- :: Minimum headway between consecutive trips at stop s
+%@ param h_plus shape=T,J kind=scalar domain=- :: Maximum headway between consecutive trips at stop s
+%@ param q_minus shape=- kind=scalar domain=- :: Minimum turnaround time between trips
+%@ var tau_a shape=T,J domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of trip i at stop s
+%@ var tau_d shape=T,J domain=continuous role=primary drole=- lo=- hi=- :: Departure time of trip i from stop s
+%@ param w_minus shape=T,J kind=scalar domain=- :: Minimum dwell time at stop s of trip i
+%@ param w_plus shape=T,J kind=scalar domain=- :: Maximum dwell time at stop s of trip i
 \begin{align}
-  \begin{aligned}min\quad & & \sum_{\left(i , j , k\right) \in Q} c_{i j k} \cdot x_{i j k} + \sum_{i \in T} c_{i}^{D W} \mathit{delta}_{i} + c^{T R} \sum_{r \in R} f_{r} \mathit{gamma}_{r}\end{aligned} \tag{eq\_0001} \\
+  \begin{aligned}min\quad & & \sum_{\left(i , j , k\right) \in Q} c_{i j k} \cdot x_{i j k} + \sum_{i \in T} c_{i}^{D W} \cdot \mathit{delta}_{i} + c^{T R} \sum_{r \in R} f_{r} \cdot \mathit{gamma}_{r}\end{aligned} \tag{eq\_0001} \\
   & \begin{matrix}\text{s}.\text{t}. \sum_{\left(i , j , k\right) \in Q} x_{i j k} = 1 i \in T\end{matrix} \tag{eq\_0002} \\
   & \begin{matrix}\sum_{\left(i , j , k\right) \in Q} x_{i j k} - \sum_{\left(j , i , k\right) \in Q} x_{j i k} = 0 k \in K j \in V_{k}\end{matrix} \tag{eq\_0003} \\
   & \begin{matrix}\sum_{\left(i , j , k\right) \in Q^{O}} x_{i j k} \leq v_{k} k \in K\end{matrix} \tag{eq\_0004} \\
@@ -65,7 +82,7 @@
   & \begin{matrix}\sum_{\left(i , j , s\right) \in W \left(r\right)} \mathit{alpha}_{i j s} = 1 \cdot r = \left(i , l , s\right) \in R\end{matrix} \tag{eq\_0011} \\
   & \begin{matrix}\mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} \geq M \left(\mathit{alpha}_{i j s} - 1\right) r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0012} \\
   & \begin{matrix}M \sum_{\begin{matrix}\left(i , k , s\right) \in W \left(r\right) , \\ k \leq j\end{matrix}} \mathit{alpha}_{i k s} \geq \mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} \cdot r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix}\mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} - M \left(1 - \mathit{alpha}_{i j s}\right) \leq \mathit{gamma}_{r} r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0014} \\
+  & \begin{matrix}\mathit{tau}_{j s}^{d} - \mathit{tau}_{i s}^{a} - e_{r} - M \left(1 - \mathit{alpha}_{i j s}\right) \leq \mathit{gamma}_{r} \cdot r \in R \left(i , j , s\right) \in W \left(r\right)\end{matrix} \tag{eq\_0014} \\
   & \begin{matrix}x_{i j k} \in \left\{0 , 1\right\} \left(i , j , k\right) \in Q\end{matrix} \tag{eq\_0015} \\
   & \begin{matrix}\mathit{tau}_{i s}^{d} \in \mathcal{Z}_{+} i \in T s \in J_{i} \cup \left\{s t_{i}\right\}\end{matrix} \tag{eq\_0016} \\
   & \begin{matrix}\mathit{tau}_{i s}^{a} \in \mathcal{Z}_{+} i \in T s \in J_{i} \cup \left\{e \cdot t_{i}\right\}\end{matrix} \tag{eq\_0017} \\

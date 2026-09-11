@@ -50,3 +50,9 @@
 %@ con eq_0001 kind=linear domain=- indicator=- :: Lower bound of velocity relaxation: v_i >= v_i^c - delta_v.
 %@ con eq_0002 kind=linear domain=- indicator=- :: Upper bound of velocity relaxation: v_i <= v_i^c + delta_v.
 %@ con eq_0005_b kind=linear domain=- indicator=- :: Definition of the delay-ratio objective F(V) as the ratio of total delay time to total free-run time.
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.apm.2013.07.023.json (deterministic fill-in list); pending human confirmation.
+%@ param Delta shape=- kind=scalar domain=- :: velocity deviation bound
+%@ var T_f shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: free-run time of train i
+%@ var T_ob shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: observed (actual) travel time of train i
+%@ param v_c shape=N kind=vector domain=- :: free-run (cruising) velocity of train i

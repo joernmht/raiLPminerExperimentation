@@ -1,6 +1,6 @@
 % lp2graph canonical LaTeX — assembled by corpusbuilder.promote
 % Source dossier: 10.1016_j.trc.2023.104150
-%@ meta id=10.1016_j.trc.2023.104150 family=lp schema=0.1.0
+%@ meta id=10.1016_j.trc.2023.104150 family=milp schema=0.1.0
 %@ name :: ADMM-based joint rescheduling method for high-speed railway timetabling and platforming in case of uncertain perturbation
 %@ desc :: Mined from ADMM-based joint rescheduling method for high-speed railway timetabling and platforming in case of uncertain perturbation (Transportation Research Part C Emerging Technologies, 2023).
 %@ prov source :: 10.1016/j.trc.2023.104150
@@ -49,6 +49,33 @@
 %@ con eq_0037 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (third constraint)
 %@ con eq_0038 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (fourth constraint)
 %@ con eq_0039 kind=linear domain=- indicator=- :: Linearization of nonlinear headway term in Appendix A (fifth constraint)
+%@ index A_H ordered=0 cyclic=0 :: Set of activity pairs for headway constraints
+%@ index A_H_arr ordered=0 cyclic=0 :: Set of arrival headway activity pairs
+%@ index A_H_plat ordered=0 cyclic=0 :: Set of platform headway activity pairs
+%@ index Gamma ordered=0 cyclic=0 :: Set of stations for gamma constraints
+%@ index R_m ordered=0 cyclic=0 :: Set of possible events for a scheduled event (subset)
+%@ index R_r ordered=0 cyclic=0 :: Set of possible events for a scheduled event (subset)
+%@ index Sp ordered=0 cyclic=0 :: Set of sections
+%@ var gamma shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating if arrival time is before departure time
+%@ var gamma_1 shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for arrival time constraint
+%@ var gamma_2 shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for departure time constraint
+%@ param kappa_3_in shape=- kind=scalar domain=- :: Minimum inbound running time for event type 3
+%@ param kappa_3_out shape=- kind=scalar domain=- :: Minimum outbound running time for event type 3
+%@ param kappa_6_in shape=- kind=scalar domain=- :: Minimum inbound running time for event type 6
+%@ param kappa_6_out shape=- kind=scalar domain=- :: Minimum outbound running time for event type 6
+%@ param kappa_i_t shape=- kind=scalar domain=- :: Minimum running time for event i at time t
+%@ param kappa_in shape=- kind=scalar domain=- :: Minimum inbound running time
+%@ param kappa_j_t shape=- kind=scalar domain=- :: Minimum running time for event j at time t
+%@ param kappa_out shape=- kind=scalar domain=- :: Minimum outbound running time
+%@ var lambda shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for selecting a possible event
+%@ var omega shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Continuous variable for time difference
+%@ param omega_bar shape=- kind=scalar domain=- :: Upper bound for omega
+%@ param omega_vec shape=- kind=scalar domain=- :: Lower bound for omega
+%@ var sigma_0 shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for logical AND
+%@ var sigma_1 shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for logical XOR
+%@ var sigma_2 shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for logical AND
+%@ var tau shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for platform assignment
+%@ var zeta shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable for ordering of events
 \begin{align}
   \min\quad & \sum_{e \in E} \left(\sum_{e^{t} \in R_{e}} r_{e^{t}} - P_{e}\right) \tag{eq\_0001} \\
   & \sum_{e^{t} \in R_{e}} \mathit{lambda}_{e^{t}} = 1 \forall e \in E \tag{eq\_0002} \\
@@ -65,7 +92,7 @@
   & \mathit{gamma}_{e_{d}}^{2} \geq \mathit{gamma}_{q} \tag{eq\_0011\_b} \\
   & \frac{\mathit{gamma}_{e_{a}}^{1} + \mathit{gamma}_{e_{d}}^{2}}{2} - 0 . 5 \leq \mathit{gamma}_{q} \forall s_{v} \in \mathit{Gamma} , \forall e_{a} \in E_{a r r}^{s_{v}} , \forall e_{d} \in E_{d e p}^{s_{v}} , q = \left(e_{a} , e_{d}\right) \in A_{s_{v}} \tag{eq\_0011\_c} \\
   & \underset{e_{a}^{t} \in R_{e_{a}}}{\sum} \left(r_{e_{a}^{t}} - \mathit{lambda}_{e_{a}^{t}} \cdot \mathit{kappa}_{i n}^{t}\right) - \underset{e_{d}^{t} \in R_{e_{d}}}{\sum} \left(r_{e_{d}^{t}} + \mathit{lambda}_{e_{d}^{t}} \cdot \mathit{kappa}_{o u t}^{t}\right) \geq \mathit{omega}_{q} \forall s e c \in Sp , \forall q = \left(e_{a} , e_{d}\right) \in A_{s e c} \tag{eq\_0012} \\
-  & r_{e_{a}} - r_{e_{d}} \geq \mathit{gamma}_{q} \mathit{omega}_{s_{v}} + \mathit{omega}_{q} \forall s_{v} \in \mathit{Gamma} , \forall q = \left(e_{a} , e_{d}\right) \in A_{s_{v}} \tag{eq\_0013} \\
+  & r_{e_{a}} - r_{e_{d}} \geq \mathit{gamma}_{q} \cdot \mathit{omega}_{s_{v}} + \mathit{omega}_{q} \forall s_{v} \in \mathit{Gamma} , \forall q = \left(e_{a} , e_{d}\right) \in A_{s_{v}} \tag{eq\_0013} \\
   & \mathit{omega}_{q} + \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + \bar{\mathit{kappa}^{j , t}}\right) \leq \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + \bar{\mathit{kappa}^{i , t}}\right) + \left(1 - \mathit{zeta}_{q}\right) \cdot M \tag{eq\_0014\_a} \\
   & \mathit{omega}_{q} + \underset{e^{i , t} \in R_{e^{i}}}{\sum} \left(r_{e^{i , t}} + \bar{\mathit{kappa}^{i , t}}\right) \leq \underset{e^{j , t} \in R_{e^{j}}}{\sum} \left(r_{e^{j , t}} + \bar{\mathit{kappa}^{j , t}}\right) + \mathit{zeta}_{q} \cdot M \forall q = \left(e^{i} , e^{j}\right) \in A_{a r r}^{H} \cup A_{d e p}^{H} \tag{eq\_0014\_b} \\
   & \mathit{zeta}_{q_{1}} - \mathit{zeta}_{q_{2}} = 0 \forall \mathit{upsilon} \in Y_{s} \tag{eq\_0015} \\

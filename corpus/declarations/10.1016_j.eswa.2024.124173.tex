@@ -181,3 +181,24 @@
 %@ con eq_0028 kind=linear domain=- indicator=- :: Exiting passengers dynamics on platform
 %@ con eq_0029 kind=linear domain=- indicator=- :: All tap-in passengers served
 %@ con eq_0030 kind=linear domain=- indicator=- :: Real-time passengers on platform balance
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.eswa.2024.124173.json (deterministic fill-in list); pending human confirmation.
+%@ param PC_k_0 shape=N,F kind=matrix domain=- :: Capacity of passing facility f at station n when working status is 0 (closed)
+%@ param PC_k_1 shape=N,F kind=matrix domain=- :: Capacity of passing facility f at station n when working status is 1 (open)
+%@ var Z_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: First objective component: maximum train overcrowding ratio times sum of overcrowding indicators
+%@ var Z_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Second objective component: maximum platform overcrowding ratio times sum of platform overcrowding indicators
+%@ var Z_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Third objective component: total passenger waiting time
+%@ param alpha shape=- kind=scalar domain=- :: Coefficient for cycle time in recovery time calculation
+%@ param beta shape=- kind=scalar domain=- :: Threshold for platform overcrowding indicator
+%@ param delta_1 shape=- kind=scalar domain=- :: Weight for objective component Z_1
+%@ param delta_2 shape=- kind=scalar domain=- :: Weight for objective component Z_2
+%@ param delta_3 shape=- kind=scalar domain=- :: Weight for objective component Z_3
+%@ param dw_bar shape=- kind=scalar domain=- :: Upper bound on dwell time
+%@ param epsilon shape=- kind=scalar domain=- :: Scaling factor for objective component Z_3
+%@ var lambda shape=N,T,K domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers boarding at station n in time period t for train direction k
+%@ param rho shape=N,K,J kind=matrix domain=- :: Proportion of passengers alighting at station n for train j in direction k
+%@ var theta shape=N,K,J domain=binary role=indicator drole=- lo=- hi=- :: Indicator of train overcrowding at station n for train j in direction k
+%@ param u_bar shape=- kind=scalar domain=- :: Maximum passenger arrival rate per unit time
+%@ var varphi shape=N,T,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator of platform overcrowding at station n in time period t for direction k
+%@ param z_k_0 shape=N,F kind=matrix domain=- :: Binary parameter indicating whether passing facility f at station n is closed (status 0) for direction k
+%@ param z_k_1 shape=N,F kind=matrix domain=- :: Binary parameter indicating whether passing facility f at station n is open (status 1) for direction k

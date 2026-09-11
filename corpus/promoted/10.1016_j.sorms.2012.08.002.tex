@@ -65,6 +65,18 @@
 %@ con eq_0035 kind=linear domain=- indicator=- :: IP-PESP (17) lower and upper bounds on tensions
 %@ con eq_0036 kind=linear domain=- indicator=- :: IP-PESP (18) integrality of cycle tensions z
 %@ con eq_0037 kind=linear domain=- indicator=- :: IP-PESP (19) integrality of arc tensions x
+%@ index Gamma_T ordered=0 cyclic=0 :: Set of time periods for periodic timetable
+%@ index Omega ordered=0 cyclic=0 :: Set of track segments and time points for headway constraints
+%@ param a_star shape=r,i kind=scalar domain=- :: Target arrival time for train r at control point i
+%@ param alpha shape=r,i kind=scalar domain=- :: Weight for arrival time deviation for train r at control point i
+%@ param beta shape=r,i kind=scalar domain=- :: Weight for departure time deviation for train r at control point i
+%@ param d_star shape=r,i kind=scalar domain=- :: Target departure time for train r at control point i
+%@ param delta shape=- kind=scalar domain=- :: Time window parameter for headway constraints
+%@ param e shape=r kind=scalar domain=- :: End time parameter for train r
+%@ param epsilon shape=- kind=scalar domain=- :: Time window parameter for headway constraints
+%@ param nu shape=- kind=scalar domain=- :: Dimension of integer vector z
+%@ var tau shape=i domain=integer role=primary drole=- lo=- hi=- :: Time variable for control point i in periodic timetable
+%@ var upsilon shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Auxiliary integer variable for headway constraints
 \begin{align}
   & min \underset{\genfrac{}{}{0pt}{}{r \in R}{i \in B_{r}}}{\sum} \left[\mathit{beta}_{r , i} \left|d_{r , i} - d_{r , i}^{*}\right|^{\mathit{phi}} + \mathit{alpha}_{r , i} \left|a_{r , i} - a_{r , i}^{*}\right|^{\mathit{phi}}\right] \tag{eq\_0001} \\
   & d_{r , i} \geq a_{r , i} \forall r \in R ; i \in B_{r} \tag{eq\_0002} \\

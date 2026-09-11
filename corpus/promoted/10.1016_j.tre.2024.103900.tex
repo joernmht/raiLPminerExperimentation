@@ -27,14 +27,22 @@
 %@ con eq_0052 kind=linear domain=- indicator=- :: Equation (52): linear constraint for train rescheduling
 %@ con eq_0053 kind=linear domain=- indicator=- :: Equation (53): linear constraint for train rescheduling
 %@ con eq_0054 kind=linear domain=- indicator=- :: Equation (54): linear constraint for train rescheduling
+%@ var Delta shape=K,U domain=continuous role=auxiliary drole=- lo=- hi=- :: Delay of train k at station u
+%@ param H_end shape=U kind=scalar domain=- :: End time of disruption window at station u
+%@ param H_start shape=U kind=scalar domain=- :: Start time of disruption window at station u
+%@ param T_dwell shape=K,U kind=scalar domain=- :: Dwell time of train k at station u
+%@ param T_run shape=K,U kind=scalar domain=- :: Running time of train k at station u
+%@ var lambda shape=K,K,U domain=binary role=indicator drole=- lo=- hi=- :: Ordering indicator between trains k and k' at station u
+%@ param varphi shape=K,U kind=scalar domain=- :: Coefficient for minimum dwell/run time of train k at station u
+%@ var z_underline shape=K,U domain=binary role=indicator drole=- lo=- hi=- :: Indicator that train k is scheduled after disruption window at station u
 \begin{align}
   \min\quad & \sum_{k \in \mathcal{K}, u \in \mathcal{U}_{k}} max \left(0 , t_{k u} - q_{k u}\right) \tag{eq\_0045} \\
   & s . t . t_{k u} - q_{k u} = 0 , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} : q_{k u} \leq H_{u}^{\text{start}} \tag{eq\_0047} \\
   & t_{k u} \leq H_{u}^{\text{start}} + M \cdot z_bar_{k u} , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0048} \\
   & t_{k u} \geq H_{u}^{\text{end}} - M \cdot z_underline_{k u} , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0049} \\
-  & t_{k up} - t_{k u} = \mathit{Delta} t_{k u} , \forall k \in \mathcal{K} , \left(u , up\right) \in \mathcal{F} , u , up \in \mathcal{U}_{k} \tag{eq\_0050} \\
-  & \mathit{Delta} t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \backslash \mathcal{U}_{d} \tag{eq\_0051} \\
-  & \mathit{Delta} t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) + \left(z_bar_{k u} + z_underline_{k u} - 1\right) \cdot \left(H_{u}^{\text{end}} - H_{u}^{\text{start}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0052} \\
-  & t_{k u} \geq t_{kp u} + \mathit{Delta} t_{kp u} - \mathit{lambda}_{k kp}^{u} M , \forall k , kp \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{kp} \tag{eq\_0053} \\
-  & t_{kp u} \geq t_{k u} + \mathit{Delta} t_{k u} - \left(1 - \mathit{lambda}_{k kp}^{u}\right) M , \forall k , kp \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{kp} \tag{eq\_0054} \\
+  & t_{k up} - t_{k u} = \mathit{Delta} \cdot t_{k u} , \forall k \in \mathcal{K} , \left(u , up\right) \in \mathcal{F} , u , up \in \mathcal{U}_{k} \tag{eq\_0050} \\
+  & \mathit{Delta} \cdot t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \backslash \mathcal{U}_{d} \tag{eq\_0051} \\
+  & \mathit{Delta} \cdot t_{k u} \geq \mathit{varphi}_{k u} \cdot \left(T_{k u}^{\text{run}} + T_{k u}^{\text{dwell}}\right) + \left(z_bar_{k u} + z_underline_{k u} - 1\right) \cdot \left(H_{u}^{\text{end}} - H_{u}^{\text{start}}\right) , \forall k \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{d} \tag{eq\_0052} \\
+  & t_{k u} \geq t_{kp u} + \mathit{Delta} \cdot t_{kp u} - \mathit{lambda}_{k kp}^{u} \cdot M , \forall k , kp \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{kp} \tag{eq\_0053} \\
+  & t_{kp u} \geq t_{k u} + \mathit{Delta} \cdot t_{k u} - \left(1 - \mathit{lambda}_{k kp}^{u}\right) M , \forall k , kp \in \mathcal{K} , u \in \mathcal{U}_{k} \cap \mathcal{U}_{kp} \tag{eq\_0054} \\
 \end{align}

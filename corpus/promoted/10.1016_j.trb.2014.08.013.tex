@@ -33,6 +33,11 @@
 %@ con eq_0011 kind=linear domain=- indicator=- :: Binary usage variables: y_k in {0,1}
 %@ con eq_0013 kind=linear domain=- indicator=- :: F2 upper bound on departure from next station: x_k^{i+1} <= x_k^i + y_k(s_max l_{i,i+1} + w_max)
 %@ con eq_0014 kind=linear domain=- indicator=- :: F2 lower bound on departure from next station: x_k^i + y_k(s_min l_{i,i+1} + w_min) <= x_k^{i+1}
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ param s_max shape=- kind=scalar domain=- :: Maximum dwell time at a station
+%@ param s_min shape=- kind=scalar domain=- :: Minimum dwell time at a station
+%@ param w_max shape=- kind=scalar domain=- :: Maximum waiting time at a station
+%@ param w_min shape=- kind=scalar domain=- :: Minimum waiting time at a station
 \begin{align}
   \min\quad & \frac{1}{2} \sum_{i \in \mathcal{S}, k \in \mathcal{M} \cup \left\{m + 1\right\}} \left(D_{i} \left(x_{k}^{i}\right) - D_{i} \left(x_{k - 1}^{i}\right)\right) \left(x_{k}^{i} - x_{k - 1}^{i}\right) \tag{eq\_0001} \\
   & x_{0}^{i} = 0 i \in \mathcal{S} \tag{eq\_0002} \\

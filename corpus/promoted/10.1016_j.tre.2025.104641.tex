@@ -115,6 +115,52 @@
 %@ con eq_0063 kind=linear :: Logical inference: y=0 if max turnaround exceeded
 %@ con eq_0064 kind=linear :: Logical inference: δ=0 if rolling stock arrives too late
 %@ con eq_0065 kind=linear :: Logical inference: δ=1 if rolling stock arrives early enough
+%@ var A_1 shape=I,G domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of service i at station l in direction f
+%@ var A_max shape=I,L,G domain=continuous role=auxiliary drole=- lo=- hi=- :: maximum arrival time of service i at station l in direction f
+%@ var A_max_1 shape=I,G domain=continuous role=auxiliary drole=- lo=- hi=- :: maximum arrival time of service i at station l in direction f
+%@ var A_min shape=I,L,G domain=continuous role=auxiliary drole=- lo=- hi=- :: minimum arrival time of service i at station l in direction f
+%@ var A_min_1 shape=I,G domain=continuous role=auxiliary drole=- lo=- hi=- :: minimum arrival time of service i at station l in direction f
+%@ var D_1 shape=G domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of service i at station l in direction f
+%@ var D_1_1 shape=G domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of service i at station l in direction f
+%@ var D_max shape=I,L,G domain=continuous role=auxiliary drole=- lo=- hi=- :: maximum departure time of service i at station l in direction f
+%@ var D_min shape=I,L,G domain=continuous role=auxiliary drole=- lo=- hi=- :: minimum departure time of service i at station l in direction f
+%@ var F_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: first objective function value
+%@ param F_1_max shape=- kind=scalar domain=- :: maximum value of first objective function
+%@ param F_1_min shape=- kind=scalar domain=- :: minimum value of first objective function
+%@ var F_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: second objective function value
+%@ param F_2_max shape=- kind=scalar domain=- :: maximum value of second objective function
+%@ param F_2_min shape=- kind=scalar domain=- :: minimum value of second objective function
+%@ param M_tilde shape=- kind=big_m domain=- :: large positive constant
+%@ param TD_hat shape=- kind=scalar domain=- :: target departure time
+%@ param a_max shape=- kind=scalar domain=- :: maximum value of parameter a
+%@ param a_min shape=- kind=scalar domain=- :: minimum value of parameter a
+%@ var epsilon shape=I,L,G domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time of service i at station l in direction f
+%@ param epsilon_max shape=L,G kind=scalar domain=- :: maximum dwell time at station l in direction f
+%@ param epsilon_min shape=L,G kind=scalar domain=- :: minimum dwell time at station l in direction f
+%@ param epsilon_min_1 shape=G kind=scalar domain=- :: minimum dwell time at station l in direction f
+%@ param eta_1 shape=- kind=scalar domain=- :: weight for first objective function
+%@ param eta_2 shape=- kind=scalar domain=- :: weight for second objective function
+%@ param lambda_max shape=- kind=scalar domain=- :: maximum number of consecutive services
+%@ param m_tilde shape=- kind=big_m domain=- :: small positive constant
+%@ var n_add shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of additional passengers
+%@ var n_arrive shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of arriving passengers
+%@ var n_det shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of detained passengers
+%@ var n_ina shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of passengers unable to board
+%@ var n_remain shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of remaining passengers
+%@ var n_wait shape=I,L,G domain=non_negative role=auxiliary drole=- lo=- hi=- :: number of waiting passengers
+%@ param r_max shape=L,G kind=scalar domain=- :: maximum headway at station l in direction f
+%@ param r_max_turn shape=- kind=scalar domain=- :: maximum turnaround time
+%@ param r_min shape=L,G kind=scalar domain=- :: minimum headway at station l in direction f
+%@ param r_min_turn shape=- kind=scalar domain=- :: minimum turnaround time
+%@ param t_enter shape=- kind=scalar domain=- :: time to enter station
+%@ param t_exit shape=- kind=scalar domain=- :: time to exit station
+%@ param t_max shape=- kind=scalar domain=- :: maximum travel time between stations
+%@ param t_min shape=- kind=scalar domain=- :: minimum travel time between stations
+%@ var u_tilde shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: auxiliary binary variable for linearization
+%@ param varphi shape=- kind=scalar domain=- :: small positive constant
+%@ var x_tilde shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary continuous variable for linearization
+%@ var y_tilde shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary continuous variable for linearization
+%@ var z_tilde shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary continuous variable for linearization
 \begin{align}
   & \begin{matrix} & T \cdot D_{i , l , f} = T \cdot A_{i , l , f} + \mathit{epsilon}_{i , l , f} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0001} \\
   & \begin{matrix} & \mathit{epsilon}_{l , f}^{min} \leq \mathit{epsilon}_{i , l , f} \leq \mathit{epsilon}_{l , f}^{max} , \forall i \in I , l \in L , f \in G .\end{matrix} \tag{eq\_0002} \\

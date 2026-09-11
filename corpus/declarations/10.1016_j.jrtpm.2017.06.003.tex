@@ -119,3 +119,20 @@
 %@ con eq_0019 kind=linear domain=- indicator=- :: Select one short-turning location or cancel train line
 %@ con eq_0020 kind=linear domain=- indicator=- :: Enforce turnaround time if short-turning location chosen
 %@ con eq_0021 kind=linear domain=- indicator=- :: Adjusted station capacity constraints with short-turning relaxations
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.jrtpm.2017.06.003.json (deterministic fill-in list); pending human confirmation.
+%@ index E_arr ordered=0 cyclic=0 :: Set of arrival events for delay penalty
+%@ index E_shunt_dep ordered=0 cyclic=0 :: Set of departure events for shunting
+%@ param N_tracks shape=S kind=scalar domain=- :: Number of tracks at station s
+%@ var alpha shape=E domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable indicating whether event j is delayed by a full period
+%@ var d_plus shape=E domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Delay of event j beyond the scheduled time
+%@ param d_plus_max shape=- kind=scalar domain=- :: Maximum allowed delay
+%@ var delta shape=E domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for ordering of events
+%@ var gamma shape=A domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable indicating whether activity (i,j) is infeasible
+%@ var pi shape=E domain=continuous role=auxiliary drole=- lo=0 hi=T-1 :: Scheduled time of event i within the period
+%@ var q_shunt shape=E_shunt_dep domain=integer role=auxiliary drole=- lo=- hi=- :: Number of periods by which shunting departure is shifted
+%@ var sigma shape=M,M,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for short-turn assignment
+%@ param t_shunt shape=- kind=scalar domain=- :: Minimum shunting time
+%@ param tau shape=E,E kind=scalar domain=- :: Minimum turnaround time between events i and k
+%@ param w_cancel shape=M kind=scalar domain=- :: Penalty weight for cancelling train line m
+%@ param w_delay shape=E_arr kind=scalar domain=- :: Penalty weight for delay of arrival event j

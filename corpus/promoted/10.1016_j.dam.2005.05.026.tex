@@ -50,6 +50,19 @@
 %@ con eq_0024 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
 %@ con eq_0025 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
 %@ con eq_0026 kind=linear domain=- indicator=- :: Linear constraint from train timetabling model
+%@ index delta_minus ordered=0 cyclic=0 :: Set of arcs entering a node in the train-specific network
+%@ index delta_plus ordered=0 cyclic=0 :: Set of arcs leaving a node in the train-specific network
+%@ param Delta shape=- kind=scalar domain=- :: Time difference between two nodes
+%@ param alpha shape=- kind=scalar domain=- :: Auxiliary parameter for station capacity
+%@ param b_jk shape=- kind=scalar domain=- :: Minimum headway time between trains j and k at station i
+%@ param b_kj shape=- kind=scalar domain=- :: Minimum headway time between trains k and j at station i
+%@ param beta shape=- kind=scalar domain=- :: Cumulative arrival count parameter
+%@ param lambda_ip shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time p
+%@ param lambda_it shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time t
+%@ param sigma shape=- kind=scalar domain=- :: Source node in the train-specific network
+%@ param tau shape=- kind=scalar domain=- :: Sink node in the train-specific network
+%@ var z_jw shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train j uses node w
+%@ var z_kw shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train k uses node w
 \begin{align}
   \max\quad & \sum_{j \in T, a \in A^{j}} p_{a} x_{a} \tag{eq\_0002} \\
   & \text{s}.\text{t}. \sum_{a \in \mathit{delta}_{j}^{+} \left(\mathit{sigma}\right)} x_{a} \leq 1 , j \in T , \tag{eq\_0003} \\

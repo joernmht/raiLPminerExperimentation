@@ -35,6 +35,23 @@
 %@ con eq_0023_a kind=linear domain=- indicator=- :: No train may depart from downstream end of disruption section before disruption ends
 %@ con eq_0023_b kind=linear domain=- indicator=- :: Condition: scheduled arrival at upstream end is before disruption start
 %@ con eq_0023_c kind=linear domain=- indicator=- :: Condition: scheduled departure from downstream end is before disruption end
+%@ var h_arr shape=L,V,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Headway between arrival times of consecutive trains at a station
+%@ var h_dep shape=L,V,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Headway between departure times of consecutive trains at a station
+%@ param h_min shape=- kind=scalar domain=- :: Minimum required headway between trains
+%@ var ift_arr shape=L,V,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time of train if it is the first train after a break
+%@ var ift_dep shape=L,V,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time of train if it is the last train before a break
+%@ param m shape=- kind=scalar domain=- :: Big-M constant
+%@ param n shape=- kind=scalar domain=- :: Big-M constant
+%@ var t_arr shape=L,V,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of a train at a station
+%@ var t_dep shape=L,V,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of a train from a station
+%@ param t_end shape=- kind=scalar domain=- :: End time of the disruption break
+%@ param t_end_break shape=- kind=scalar domain=- :: End time of the break period
+%@ param t_run shape=L,V,S kind=scalar domain=- :: Running time between consecutive stations
+%@ param t_run_min shape=- kind=scalar domain=- :: Minimum running time between stations
+%@ param t_start_break shape=- kind=scalar domain=- :: Start time of the break period
+%@ param t_stop shape=V,S kind=scalar domain=- :: Dwell time of a train at a station
+%@ param t_stop_min shape=- kind=scalar domain=- :: Minimum dwell time at a station
+%@ param t_tilde shape=- kind=scalar domain=- :: Planned (nominal) arrival or departure time
 \begin{align}
   \min\quad & m i n \sum_{l \in L, v \in V, v_{r} \in V_{r}, r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - \left(t_tilde\right)_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - \left(t_tilde\right)_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
   & t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} = t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} + t_{\text{l},\text{v},\text{s}}^{\mathit{stop}} , \forall l \in L , v \in V , s \in S \tag{eq\_0009} \\

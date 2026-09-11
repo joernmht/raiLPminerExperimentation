@@ -74,3 +74,13 @@
 %@ con eq_0052 kind=linear domain=- indicator=- :: Equation (52): linear constraint for train rescheduling
 %@ con eq_0053 kind=linear domain=- indicator=- :: Equation (53): linear constraint for train rescheduling
 %@ con eq_0054 kind=linear domain=- indicator=- :: Equation (54): linear constraint for train rescheduling
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2024.103900.json (deterministic fill-in list); pending human confirmation.
+%@ var Delta shape=K,U domain=continuous role=auxiliary drole=- lo=- hi=- :: Delay of train k at station u
+%@ param H_end shape=U kind=scalar domain=- :: End time of disruption window at station u
+%@ param H_start shape=U kind=scalar domain=- :: Start time of disruption window at station u
+%@ param T_dwell shape=K,U kind=scalar domain=- :: Dwell time of train k at station u
+%@ param T_run shape=K,U kind=scalar domain=- :: Running time of train k at station u
+%@ var lambda shape=K,K,U domain=binary role=indicator drole=- lo=- hi=- :: Ordering indicator between trains k and k' at station u
+%@ param varphi shape=K,U kind=scalar domain=- :: Coefficient for minimum dwell/run time of train k at station u
+%@ var z_underline shape=K,U domain=binary role=indicator drole=- lo=- hi=- :: Indicator that train k is scheduled after disruption window at station u

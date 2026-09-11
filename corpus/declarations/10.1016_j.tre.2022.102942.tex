@@ -158,3 +158,40 @@
 %@ param cp shape=- domain=continuous :: Capacity
 %@ param hmin shape=- domain=continuous :: Minimum headway
 %@ param N shape=- domain=continuous :: Cardinality of J_l
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2022.102942.json (deterministic fill-in list); pending human confirmation.
+%@ var F_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: first objective component (timetable deviation)
+%@ var F_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: second objective component (passenger waiting time)
+%@ var F_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: third objective component (passenger accumulation risk)
+%@ var F_4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: fourth objective component (control effort)
+%@ param T_0 shape=- kind=scalar domain=- :: initial time reference
+%@ param alpha shape=L,U,X,J kind=scalar domain=- :: transfer proportion parameter
+%@ param delta shape=L,I kind=scalar domain=- :: transfer time parameter
+%@ var h_2 shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: squared headway auxiliary variable
+%@ param lambda shape=L,I,J kind=scalar domain=- :: passenger arrival rate
+%@ var p_al shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers alighting from train
+%@ var p_ar shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers arriving at station
+%@ var p_bt shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers boarding train
+%@ var p_ep shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers entering platform
+%@ var p_on shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers on train
+%@ var p_sp shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers staying on platform
+%@ var p_st shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers left behind
+%@ var p_wp shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: passengers waiting on platform
+%@ var p_wt shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: total passenger waiting time
+%@ var u_r shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: train regulation control (dwell time adjustment)
+%@ var u_s shape=L,I,J domain=continuous role=primary drole=- lo=- hi=- :: train regulation control (speed adjustment)
+%@ param ur_max shape=L kind=scalar domain=- :: upper bound on u_r
+%@ param ur_min shape=L kind=scalar domain=- :: lower bound on u_r
+%@ param us_max shape=L kind=scalar domain=- :: upper bound on u_s
+%@ param us_min shape=L kind=scalar domain=- :: lower bound on u_s
+%@ var w_r shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: disturbance on dwell time
+%@ var w_s shape=L,I,J domain=continuous role=auxiliary drole=- lo=- hi=- :: disturbance on speed
+%@ param xi_1 shape=- kind=scalar domain=- :: weight for timetable deviation
+%@ param xi_2 shape=- kind=scalar domain=- :: weight for headway deviation
+%@ param xi_3 shape=- kind=scalar domain=- :: weight for waiting time component
+%@ param xi_4 shape=- kind=scalar domain=- :: weight for left-behind passengers
+%@ param xi_5 shape=- kind=scalar domain=- :: weight for staying passengers
+%@ param xi_6 shape=- kind=scalar domain=- :: weight for transfer passengers
+%@ param xi_7 shape=- kind=scalar domain=- :: weight for passenger accumulation
+%@ param xi_8 shape=- kind=scalar domain=- :: weight for dwell time control
+%@ param xi_9 shape=- kind=scalar domain=- :: weight for speed control

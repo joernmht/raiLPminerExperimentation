@@ -46,12 +46,20 @@
 %@ con eq_0018 kind=linear domain=- indicator=- :: Symmetric tension constraint: x_a = x_{ \bar a }
 %@ con eq_0019 kind=linear domain=- indicator=- :: FDP constraint: ℓ_a ≤ π_j − π_i ≤ u_a
 %@ con eq_0020 kind=linear domain=- indicator=- :: FPESP constraint: ℓ_a + δ_i ≤ π_j − π_i + T p_a ≤ u_a − δ_j
+%@ param B_T shape=- kind=matrix domain=- :: Incidence matrix of the periodic event scheduling problem
+%@ param Gamma_T shape=- kind=matrix domain=- :: Matrix relating variables in the periodic event scheduling problem
+%@ param delta shape=V kind=vector domain=- :: Buffer time or delay tolerance for event i
+%@ param ell shape=A kind=vector domain=- :: Lower bound on the time difference for arc a
+%@ param pi shape=V kind=vector domain=- :: Event time (potential) for event i
+%@ var q_ij shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Integer variable for modulo constraint between events i and j
+%@ param v shape=- kind=scalar domain=- :: Dimension of the integer vector z
+%@ param w_T shape=- kind=scalar domain=- :: Weight or cost coefficient for the objective function
 \begin{align}
   \max\quad & \{ f(x) | x \in X \} \geq \max \{ f(x) | x \in X \cap Y \} \tag{eq\_0001} \\
   & 0 \leq \left(\mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{a}\right) \text{mod} T \leq u_{a} - \mathit{ell}_{a} \tag{eq\_0002} \\
   & \mathit{ell}_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{a} \leq u_{a} . \tag{eq\_0004} \\
-  & \mathbf{PESP} - \mathbf{MIP:} \mathbf{minimize} w^{T} \cdot \left(B^{T} \mathit{pi} + T \cdot p\right) \tag{eq\_0005} \\
-  & \text{Subject} \text{to} \mathit{ell} \leq B^{T} \mathit{pi} + T \cdot p \leq u \tag{eq\_0006} \\
+  & \mathbf{PESP} - \mathbf{MIP:} \mathbf{minimize} w^{T} \cdot \left(B^{T} \cdot \mathit{pi} + T \cdot p\right) \tag{eq\_0005} \\
+  & \text{Subject} \text{to} \mathit{ell} \leq B^{T} \cdot \mathit{pi} + T \cdot p \leq u \tag{eq\_0006} \\
   & 0 \leq \mathit{pi} < T 1 \tag{eq\_0007} \\
   & p_{a} \in \mathcal{Z}^{A} \tag{eq\_0008} \\
   & x_{a} : = \left(\mathit{pi}_{j} - \mathit{pi}_{i} - \mathit{ell}_{a}\right) \text{mod} T + \mathit{ell}_{a} , \tag{eq\_0009} \\

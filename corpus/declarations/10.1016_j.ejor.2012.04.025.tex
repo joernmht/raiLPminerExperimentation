@@ -151,3 +151,14 @@
 %@ con eq_0023_b kind=linear domain=- indicator=- :: Branching constraint on inspection coverage variable z_tb^k in branch-and-price (opposite branch)
 %@ con eq_0024_a kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths
 %@ con eq_0024_b kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths (opposite branch)
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2012.04.025.json (deterministic fill-in list); pending human confirmation.
+%@ index I_ell ordered=0 cyclic=0 :: Set of tasks covered up to iteration ell
+%@ index I_hat_ell ordered=0 cyclic=0 :: Set of deadhead train tasks covered up to iteration ell
+%@ param a_bk_tp shape=K,B,T kind=scalar domain=- :: Coefficient indicating whether path p of locomotive k uses depot b in time span t
+%@ param a_ip shape=I,P kind=scalar domain=- :: Coefficient indicating whether path p covers task i
+%@ var i_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for arrival station/time of first task in precedence
+%@ var i_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for departure station/time of second task in precedence
+%@ var x_bar shape=P,K domain=binary role=auxiliary drole=- lo=- hi=- :: Incumbent solution value for path p of locomotive k
+%@ var y_bar shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Incumbent objective value
+%@ var z_bk shape=K,B,T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of locomotives of type k using depot b in time span t

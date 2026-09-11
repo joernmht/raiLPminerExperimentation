@@ -101,6 +101,60 @@
 %@ con eq_0074 kind=linear :: Train system constraint on acceleration and deceleration comfort bounds
 %@ con eq_0075 kind=linear :: Boundary constraint between STS arc and speed profile
 %@ con eq_0076 kind=linear :: Initial boundary condition for shooting interval
+%@ index A_diruption ordered=0 cyclic=0 :: Set of disruption arcs in the space-time-state network
+%@ index A_drive ordered=0 cyclic=0 :: Set of driving arcs in the space-time-state network
+%@ index A_dwell ordered=0 cyclic=0 :: Set of dwelling arcs in the space-time-state network
+%@ index A_off ordered=0 cyclic=0 :: Set of off arcs in the space-time-state network
+%@ index A_on ordered=0 cyclic=0 :: Set of on arcs in the space-time-state network
+%@ index A_q_minus ordered=0 cyclic=0 :: Set of incoming arcs to node q in the space-time-state network
+%@ index A_q_plus ordered=0 cyclic=0 :: Set of outgoing arcs from node q in the space-time-state network
+%@ index A_tilde ordered=0 cyclic=0 :: Set of arcs in the space-time-state network excluding certain arcs
+%@ index A_track ordered=0 cyclic=0 :: Set of track arcs in the space-time-state network
+%@ index Omega ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
+%@ index Phi ordered=0 cyclic=0 :: Set of arcs preceding a given arc
+%@ index varphi ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
+%@ param C_0 shape=- kind=scalar domain=- :: Coefficient in cost function
+%@ param Psi_1 shape=- kind=scalar domain=- :: Penalty function for train order constraints
+%@ param Psi_2 shape=- kind=scalar domain=- :: Penalty function for power supply constraints
+%@ param T_arr shape=W_hat kind=vector domain=- :: Scheduled arrival time of train k at station w
+%@ param T_dep shape=W_hat kind=vector domain=- :: Scheduled departure time of train k from station w
+%@ param alpha shape=- kind=vector domain=- :: Control variable (acceleration) in speed profile
+%@ param b_max shape=K kind=vector domain=- :: Maximum braking force for train k
+%@ param beta shape=- kind=vector domain=- :: State variable (speed) in speed profile
+%@ param beta_0 shape=- kind=scalar domain=- :: Initial speed in speed profile
+%@ param c_tilde shape=A,K kind=matrix domain=- :: Modified cost coefficient for arc a and train k
+%@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
+%@ param chi_bar shape=- kind=scalar domain=- :: Upper bound for chi
+%@ param chi_max shape=- kind=scalar domain=- :: Maximum value for chi
+%@ param chi_min shape=- kind=scalar domain=- :: Minimum value for chi
+%@ param chi_underline shape=- kind=scalar domain=- :: Lower bound for chi
+%@ param d_off shape=W_hat kind=vector domain=- :: Delay cost coefficient for off arcs at station w
+%@ param d_on shape=W_hat kind=vector domain=- :: Delay cost coefficient for on arcs at station w
+%@ param delta shape=A kind=vector domain=- :: Slack variable for arc a
+%@ param delta_star shape=A kind=vector domain=- :: Optimal slack variable for arc a
+%@ param eta shape=- kind=scalar domain=- :: Parameter in ADMM penalty update
+%@ param f_max shape=K kind=vector domain=- :: Maximum traction force for train k
+%@ param gamma shape=- kind=scalar domain=- :: Parameter in ADMM penalty update
+%@ var lambda shape=A domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Dual variable for arc a
+%@ param lambda_theta shape=A kind=vector domain=- :: Dual variable at iteration theta for arc a
+%@ var mu shape=A,K domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for arc a and train k
+%@ param p_max shape=K kind=vector domain=- :: Maximum power for train k
+%@ var pi shape=R,T,K domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for power supply district r, time t, train k
+%@ param res_theta shape=- kind=scalar domain=- :: Residual at iteration theta
+%@ param rho shape=- kind=scalar domain=- :: Penalty parameter in ADMM
+%@ param rho_1 shape=- kind=scalar domain=- :: Penalty parameter for train order constraints
+%@ param rho_2 shape=- kind=scalar domain=- :: Penalty parameter for power supply constraints
+%@ param rho_theta shape=- kind=scalar domain=- :: Penalty parameter at iteration theta
+%@ param theta_1 shape=- kind=scalar domain=- :: Weight for passenger delay in objective
+%@ param theta_2 shape=- kind=scalar domain=- :: Weight for energy consumption in objective
+%@ param u_bar shape=- kind=scalar domain=- :: Upper bound for control variable u
+%@ param u_underline shape=- kind=scalar domain=- :: Lower bound for control variable u
+%@ param v_max shape=- kind=scalar domain=- :: Maximum speed limit
+%@ param x_bar shape=- kind=scalar domain=- :: Upper bound for state variable x
+%@ param x_underline shape=- kind=scalar domain=- :: Lower bound for state variable x
+%@ var xi shape=R,T domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Dual variable for power supply district r and time t
+%@ var zeta shape=R,T domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Slack variable for power supply district r and time t
+%@ param zeta_star shape=R,T kind=vector domain=- :: Optimal slack variable for power supply district r and time t
 \begin{align}
   & \sum_{\left(i , j , t , tp , v , vp\right) \in A_{k}^{q , +}} y_{i , j , t , tp , v , vp}^{k} - \sum_{\left(i , j , t , tp , v , vp\right) \in A_{k}^{q , -}} y_{i , j , t , tp , v , vp}^{k} = \left\{\begin{matrix} 1 , q = \left(o^{k} , e^{k} , 0\right) \\ - 1 , q = \left(d^{k} , l^{k} , 0\right) \\ 0 , q \in Q_{k} : \text{otherwise} , \forall \end{matrix}\right k \in K \tag{eq\_0002} \\
   & \sum_{k \in K, \left(i , j , \mathit{tau} , taup , u , up\right) \in \mathit{Phi}_{h} \left(i , j , t , tp , v , vp\right)} y_{i , j , \mathit{tau} , taup , u , up}^{k} \leq 1 , \forall \left(i , j , t , tp , v , vp\right) \in A_{\mathit{drive}} \tag{eq\_0004} \\
@@ -144,21 +198,21 @@
   & \mathit{zeta}_{r , t} = P_{r}^{t} - \sum_{k \in K, a \in \mathit{varphi} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0048} \\
   & \sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} = \sum_{kp \in K : kp \neq k, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{kp} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} = \mathit{mu}_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \tag{eq\_0049} \\
   & \sum_{k \in K, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \sum_{k \in K : kp \neq k, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{kp , t} \cdot y_{a}^{kp} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \mathit{pi}_{r , t}^{k} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0050} \\
-  & \begin{matrix}\left\|\sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left\{\begin{matrix} \begin{matrix}\left(2 \mathit{mu}_{a}^{k} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} , if \mathit{mu}_{a}^{k} \geq 1 \\ 0 , if \mathit{mu}_{a}^{k} = 0\end{matrix} \end{matrix}\right\end{matrix} \tag{eq\_0052} \\
+  & \begin{matrix}\left\|\sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left\{\begin{matrix} \begin{matrix}\left(2 \cdot \mathit{mu}_{a}^{k} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} , if \mathit{mu}_{a}^{k} \geq 1 \\ 0 , if \mathit{mu}_{a}^{k} = 0\end{matrix} \end{matrix}\right\end{matrix} \tag{eq\_0052} \\
   & \begin{matrix}\left\|\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{pi}_{r , t}^{k} - P_{r}^{t} + \mathit{zeta}_{r , t}\right\|^{2} \\ = \left\{\begin{matrix} \begin{matrix}\sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left(\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right) + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} , & if \mathit{pi}_{r , t}^{k} \geq P_{r}^{t} \\ 0 , & if \text{0} \leq \mathit{pi}_{r , t}^{k} < P_{r}^{t}\end{matrix} \end{matrix}\right\end{matrix} \tag{eq\_0053} \\
-  & \left(c_tilde\right)_{a}^{k} = \left\{\begin{matrix} \begin{matrix}\mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) + \mathit{xi}_{r , t} \cdot p_{a}^{k , t} \\ + \mathit{rho}_{2} \left(\mathit{pi}_{r , t}^{k} p_{a}^{k , t} + 1 / 2 \cdot \left(p_{a}^{k , t}\right)^{2} - P_{r}^{t} \cdot p_{a}^{k , t}\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \in \mathit{Omega} \left(r , t\right)\end{matrix} \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \notin \mathit{Omega} \left(r , t\right) \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} , otherwise \end{matrix}\right \tag{eq\_0055} \\
+  & \left(c_tilde\right)_{a}^{k} = \left\{\begin{matrix} \begin{matrix}\mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) + \mathit{xi}_{r , t} \cdot p_{a}^{k , t} \\ + \mathit{rho}_{2} \left(\mathit{pi}_{r , t}^{k} \cdot p_{a}^{k , t} + 1 / 2 \cdot \left(p_{a}^{k , t}\right)^{2} - P_{r}^{t} \cdot p_{a}^{k , t}\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \in \mathit{Omega} \left(r , t\right)\end{matrix} \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} + \mathit{rho}_{1} \left(\mathit{mu}_{a}^{k} + 1 / 2\right) , if a \in A_{\mathit{drive}} \cup A_{\mathit{track}} and a \notin \mathit{Omega} \left(r , t\right) \\ \mathit{theta}_{\text{1}} c_{a}^{k} + \mathit{theta}_{2} e_{a}^{k} , otherwise \end{matrix}\right \tag{eq\_0055} \\
   & \mathit{lambda}_{a}^{\mathit{theta} + 1} = \mathit{lambda}_{a}^{\mathit{theta}} + \mathit{rho}_{1} \left(\sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} - 1\right) \tag{eq\_0056} \\
   & \mathit{xi}_{r , t}^{\mathit{theta} + 1} = \mathit{xi}_{r , t}^{\mathit{theta} + 1} + \mathit{rho}_{2} \left(\sum_{k \in K, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} - P_{r}^{t}\right) \tag{eq\_0057} \\
   & \mathit{re} \cdot s_{i} = \left\{\begin{matrix} \mathit{max} \left\{0 , \sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} - 1\right\} , i = 1 \\ \mathit{max} \left\{0 , \sum_{k \in K, a \in \mathit{varphi} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} - P_{r}^{t}\right\} , i = 2 \end{matrix}\right \tag{eq\_0058} \\
-  & \mathit{rho}_{i}^{\mathit{theta} + 1} = \left\{\begin{matrix} \mathit{eta} \cdot \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} > \mathit{gamma} \mathit{res}_{i}^{\mathit{theta} - 1} \\ \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} \leq \mathit{gamma} \mathit{res}_{i}^{\mathit{theta} - 1} \end{matrix}\right , i = 1 , 2 \tag{eq\_0059} \\
+  & \mathit{rho}_{i}^{\mathit{theta} + 1} = \left\{\begin{matrix} \mathit{eta} \cdot \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} > \mathit{gamma} \cdot \mathit{res}_{i}^{\mathit{theta} - 1} \\ \mathit{rho}_{i}^{\mathit{theta}} , if \mathit{res}_{i}^{\mathit{theta}} \leq \mathit{gamma} \cdot \mathit{res}_{i}^{\mathit{theta} - 1} \end{matrix}\right , i = 1 , 2 \tag{eq\_0059} \\
   & \left(\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k}\right)^{2} = \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \tag{eq\_0063} \\
-  & \begin{matrix}\left\|\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k}\right)^{2} + 2 \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2} \\ = \left(2 \mathit{mu}_{a}^{k} + 2 \mathit{delta}_{a} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2}\end{matrix} \tag{eq\_0064} \\
-  & \mathit{Psi}_{1} \left(\mathit{delta}_{a}\right) = \left(\mathit{delta}_{a}\right)^{2} + 2 \mathit{delta}_{a} \left(\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1\right) + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \left(2 \mathit{mu}_{a}^{k} - 1\right) \tag{eq\_0065} \\
+  & \begin{matrix}\left\|\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k}\right)^{2} + 2 \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2} \\ = \left(2 \cdot \mathit{mu}_{a}^{k} + 2 \cdot \mathit{delta}_{a} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right)^{2}\end{matrix} \tag{eq\_0064} \\
+  & \mathit{Psi}_{1} \left(\mathit{delta}_{a}\right) = \left(\mathit{delta}_{a}\right)^{2} + 2 \cdot \mathit{delta}_{a} \left(\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1\right) + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \left(2 \cdot \mathit{mu}_{a}^{k} - 1\right) \tag{eq\_0065} \\
   & \mathit{delta}_{a}^{*} = 1 - \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} - \mathit{mu}_{a}^{k} \tag{eq\_0067} \\
-  & \left\|\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(2 \mathit{mu}_{a}^{k} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} \tag{eq\_0068} \\
+  & \left\|\sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \mathit{mu}_{a}^{k} - 1 + \mathit{delta}_{a}\right\|_{2}^{2} = \left(2 \cdot \mathit{mu}_{a}^{k} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} \tag{eq\_0068} \\
   & \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k}\right)^{2} = \sum_{a \in \mathit{Omega} \left(r , t\right)} \left(p_{a}^{k , t}\right)^{2} \cdot y_{a}^{k} \tag{eq\_0070} \\
   & \begin{matrix}\left\|\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{pi}_{r , t}^{k} - P_{r}^{t} + \mathit{zeta}_{r , t}\right\|_{2}^{2} = \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k}\right)^{2} + 2 \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right) \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2} \\ = \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)\right] + \left(\mathit{pi}_{r , t}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2}\end{matrix} \tag{eq\_0071} \\
-  & \mathit{Psi}_{2} \left(\mathit{zeta}_{r , t}\right) = \left(\mathit{zeta}_{r , t}\right)^{2} + 2 \mathit{zeta}_{r , t} \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} + \mathit{pi}_{r , t}^{k} - P_{r}^{t}\right) + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} + \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right] \tag{eq\_0072} \\
+  & \mathit{Psi}_{2} \left(\mathit{zeta}_{r , t}\right) = \left(\mathit{zeta}_{r , t}\right)^{2} + 2 \cdot \mathit{zeta}_{r , t} \left(\sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} + \mathit{pi}_{r , t}^{k} - P_{r}^{t}\right) + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} + \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right] \tag{eq\_0072} \\
   & \mathit{zeta}_{r , t}^{*} = P_{r}^{t} - \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} - \mathit{pi}_{r , t}^{k} \tag{eq\_0074} \\
   & \left(\sum_{k \in K, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \left(\mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2}\right)^{2} = \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \left[\left(p_{a}^{k , t}\right)^{2} + 2 \cdot p_{a}^{k , t} \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)\right] + \left(\mathit{pi}_{r , t}^{k} - P_{r}^{t}\right)^{2} \tag{eq\_0075} \\
   & \left(\sum_{k \in K, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} + \mathit{zeta}_{r , t} - P_{r}^{t}\right)^{2} = 0 \tag{eq\_0076} \\

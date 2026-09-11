@@ -51,6 +51,9 @@
 %@ con eq_0023 kind=linear domain=- indicator=- :: At most one path flow per OD pair k
 %@ con eq_0024 kind=linear domain=- indicator=- :: Integrality of train routing, short-turn origin and destination variables
 %@ con eq_0025 kind=linear domain=- indicator=- :: Passenger path flow bounds between 0 and 1
+%@ index T_RR ordered=0 cyclic=0 :: Set of time periods for railway restoration
+%@ param c_cancel shape=T_RR kind=scalar domain=- :: Cost coefficient for cancelling a train service at time t
+%@ param c_delay shape=T kind=scalar domain=- :: Cost coefficient for delay at time t
 \begin{align}
   \max\quad & \sum_{k \in K, p \in P^{k}} 1 / c_{p}^{k} \cdot d_{k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} c_{c a n c e l}^{t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T, i \in N} c_{d e l a y}^{t} \cdot \left(T_{A_bar , i}^{t} - T_{A , i}^{t}\right) \tag{eq\_0002} \\
   & \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \left\{\begin{matrix} - o_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{a}\textrm{ }\text{starting}\textrm{ }\text{node} \\ d_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{an}\textrm{ }\text{ending}\textrm{ }\text{node} \\ 0 , \text{otherwise} \end{matrix}\right \forall t \in T , i \in N^{t} \tag{eq\_0004} \\

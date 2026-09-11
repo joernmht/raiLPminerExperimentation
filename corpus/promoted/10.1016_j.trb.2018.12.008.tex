@@ -52,6 +52,23 @@
 %@ con eq_0026 kind=linear domain=- indicator=- :: Constraint linking binary precedence variables to route choices on common track-circuits.
 %@ con eq_0029_b kind=headway domain=- indicator=- :: Reformulated headway constraint (29b) in the reduced binary-variable model.
 %@ con eq_0029_c kind=headway domain=- indicator=- :: Reformulated headway constraint (29c) in the reduced binary-variable model.
+%@ index Psi_k ordered=0 cyclic=0 :: Route set in a k-double partition for a given k.
+%@ index Psi_k_tp ordered=0 cyclic=0 :: Route set in a k-double partition for the paired train tp.
+%@ index Q_minus ordered=0 cyclic=0 :: Subset of common track-circuits used with negative sign in valid inequalities.
+%@ index Q_plus ordered=0 cyclic=0 :: Subset of common track-circuits used with positive sign in valid inequalities.
+%@ index R_tp ordered=0 cyclic=0 :: Set of routes available for the paired train tp.
+%@ index S_tp ordered=0 cyclic=0 :: Section for the paired train tp.
+%@ param eU_tp shape=tc kind=vector domain=- :: Earliest usage time of track-circuit tc by the paired train tp.
+%@ param sU_tp shape=tc kind=vector domain=- :: Scheduled usage time of track-circuit tc by the paired train tp.
+%@ var x_r1 shape=T domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route r1 of train t.
+%@ var x_r2 shape=T domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route r2 of train t.
+%@ var x_tp shape=R_tp domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route rp of the paired train tp.
+%@ var x_tp_r3 shape=- domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route r3 of the paired train tp.
+%@ var x_tp_r4 shape=- domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route r4 of the paired train tp.
+%@ var x_tp_r5 shape=- domain=binary role=primary drole=- lo=- hi=- :: Route selection variable for route r5 of the paired train tp.
+%@ var y_tp shape=T,tc domain=binary role=primary drole=- lo=- hi=- :: Track-circuit occupation variable for train t on track-circuit tc in the paired-train formulation.
+%@ var y_tp_tc10 shape=T domain=binary role=primary drole=- lo=- hi=- :: Occupation variable for track-circuit tc10 by train t in the paired-train formulation.
+%@ var y_tp_tc15 shape=T domain=binary role=primary drole=- lo=- hi=- :: Occupation variable for track-circuit tc15 by train t in the paired-train formulation.
 \begin{align}
   & \begin{matrix}\sum_{r \in R_{t}} x_{t , r} = 1 .\end{matrix} \tag{eq\_0001} \\
   & \begin{matrix}\mathit{eU}_{t , \mathit{tc}} - M \left(1 - y_{t , tp , \mathit{tc}}\right) \leq \mathit{sU}_{tp , \mathit{tc}}\end{matrix} \tag{eq\_0002} \\

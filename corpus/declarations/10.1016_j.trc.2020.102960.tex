@@ -108,3 +108,18 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Multiplier update formula for Lagrangian multipliers
 %@ con eq_0037 kind=linear domain=- indicator=- :: Primal residual definition for incompatibility constraints
 %@ con eq_0038 kind=linear domain=- indicator=- :: Penalty parameter update rule based on primal residual
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2020.102960.json (deterministic fill-in list); pending human confirmation.
+%@ index A_dwell ordered=0 cyclic=0 :: Set of dwell arcs for train i
+%@ index A_run ordered=0 cyclic=0 :: Set of running arcs for train i
+%@ param c_q shape=I kind=scalar domain=- :: Cost of train i in iteration q
+%@ param c_q_1 shape=- kind=scalar domain=- :: Cost of first train in priority order
+%@ param c_q_2 shape=- kind=scalar domain=- :: Cost of second train in priority order
+%@ param d_bar shape=- kind=scalar domain=- :: Virtual destination node indicator
+%@ param d_star shape=I kind=scalar domain=- :: Auxiliary variable for train i
+%@ param lambda_q shape=I kind=scalar domain=- :: Dual variable for train i in iteration q
+%@ param o_bar shape=- kind=scalar domain=- :: Virtual origin node indicator
+%@ param rho_q shape=- kind=scalar domain=- :: Penalty parameter in iteration q
+%@ param w_max shape=I,U kind=scalar domain=- :: Maximum dwell time for train i at station u
+%@ param w_min shape=I,U kind=scalar domain=- :: Minimum dwell time for train i at station u
+%@ var x_q shape=I kind=binary domain=binary role=primary drole=- lo=- hi=- :: Decision variable for train i in iteration q

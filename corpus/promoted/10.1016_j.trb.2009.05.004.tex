@@ -18,6 +18,9 @@
 %@ index k ordered=0 cyclic=0 :: Index for an event node in alternative constraint
 %@ con eq_0001_b kind=linear domain=- indicator=- :: Fixed precedence constraints
 %@ con eq_0001_c kind=linear domain=- indicator=- :: Alternative precedence constraints
+%@ param t_0 shape=- kind=scalar domain=- :: Reference time at the start of the scheduling horizon
+%@ param w_hk shape=h,k kind=scalar domain=- :: Minimum time separation between events h and k
+%@ param w_ij shape=i,j kind=scalar domain=- :: Minimum time separation between events i and j
 \begin{align}
   \min\quad & t_{n} - t_{0} \tag{eq\_0001\_a} \\
   & t_{j} - t_{i} \geq w_{\mathit{ij}} \left(i , j\right) \in F \tag{eq\_0001\_b} \\

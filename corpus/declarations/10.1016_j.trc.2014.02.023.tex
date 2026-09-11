@@ -71,3 +71,14 @@
 %@ con eq_0015 kind=linear domain=- indicator=- :: Successive trains in the same section maintain at least the safe distance
 %@ param Bmin shape=- domain=- role=parameter drole=- lo=- hi=- :: Minimum dwell time parameter (renamed from B_{i,k}^{min})
 %@ param Vmax shape=- domain=- role=parameter drole=- lo=- hi=- :: Maximum speed parameter (renamed from V_{i,\text{max}})
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2014.02.023.json (deterministic fill-in list); pending human confirmation.
+%@ param B_min shape=i,k kind=scalar domain=- :: minimum headway time between trains at station k
+%@ param P shape=i,t kind=scalar domain=- :: power consumption of train i at time t
+%@ param V_max shape=i kind=scalar domain=- :: maximum speed of train i
+%@ param a shape=- kind=scalar domain=- :: acceleration/deceleration rate
+%@ param d_min shape=- kind=scalar domain=- :: minimum safety distance between trains
+%@ param f_bar shape=t kind=scalar domain=- :: reference value for objective f_t
+%@ param u shape=i,t kind=scalar domain=- :: binary indicator whether train i is running at time t
+%@ var v shape=i,t domain=continuous role=auxiliary drole=- lo=- hi=- :: speed of train i at time t
+%@ param w shape=i kind=scalar domain=- :: weight of train i

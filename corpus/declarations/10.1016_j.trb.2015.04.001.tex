@@ -93,3 +93,21 @@
 %@ con eq_0027 kind=linear domain=- indicator=- :: Canceled trains do not depart before disruption end
 %@ con eq_0028 kind=linear domain=- indicator=- :: Consistency between arrival and departure order for same train
 %@ con eq_0029 kind=linear domain=- indicator=- :: First scheduled first served: preserve scheduled order unless a train is canceled
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2015.04.001.json (deterministic fill-in list); pending human confirmation.
+%@ index A_1 ordered=0 cyclic=0 :: Set of track headway activities entering a station
+%@ index A_2 ordered=0 cyclic=0 :: Set of track headway activities leaving a station
+%@ index A_station ordered=0 cyclic=0 :: Set of station activities
+%@ index A_track_head ordered=0 cyclic=0 :: Set of track headway activities
+%@ index A_train ordered=0 cyclic=0 :: Set of train activities
+%@ index E_2 ordered=0 cyclic=0 :: Set of events at a station
+%@ index E_arr ordered=0 cyclic=0 :: Set of arrival events
+%@ index E_dep ordered=0 cyclic=0 :: Set of departure events
+%@ param H_end_dis shape=- kind=scalar domain=- :: End time of the disruption
+%@ param M_1 shape=- kind=big_m domain=- :: Big-M constant for delay constraints
+%@ param M_2 shape=- kind=big_m domain=- :: Big-M constant for ordering constraints
+%@ var chi_dep shape=E domain=binary role=indicator drole=- lo=- hi=- :: 1 if departure event e is scheduled after the disruption end
+%@ param gamma shape=T kind=scalar domain=- :: Weight of train t in the objective
+%@ var lambda shape=A_track_head domain=binary role=indicator drole=- lo=- hi=- :: 1 if track headway activity a is ordered in the forward direction
+%@ param mu shape=E kind=scalar domain=- :: Weight of delay of event e in the objective
+%@ var varphi shape=A_station domain=binary role=indicator drole=- lo=- hi=- :: 1 if station activity a is ordered in the forward direction

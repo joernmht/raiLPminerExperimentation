@@ -62,14 +62,32 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Equation (36): bounding product delta*xi between 0 and |K|
 %@ con eq_0037 kind=linear domain=- indicator=- :: Equation (37): linearization of rho for departure time greater than k
 %@ con eq_0038 kind=linear domain=- indicator=- :: Equation (38): linearization of rho for departure time not greater than k
+%@ var Z_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: operating cost objective component
+%@ var Z_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: passenger service level objective component
+%@ var alpha shape=R,N domain=binary role=primary drole=- lo=- hi=- :: route r serves station n
+%@ var beta shape=R,N domain=binary role=primary drole=- lo=- hi=- :: route r serves station s
+%@ var chi shape=T,F,P domain=binary role=primary drole=- lo=- hi=- :: passenger group p assigned to train (t,f)
+%@ var delta shape=T,R,F,D domain=binary role=primary drole=- lo=- hi=- :: train (t,f) operates on route r in direction d
+%@ var epsilon shape=T,R,F,D,N domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of train (t,f) at station n on route r in direction d
+%@ param eta shape=- kind=scalar domain=- :: passenger load factor
+%@ param lambda shape=- kind=scalar domain=- :: weight of operating cost in objective
+%@ param n_1 shape=P kind=scalar domain=- :: origin station of passenger group p
+%@ param omega shape=- kind=scalar domain=- :: maximum number of routes
+%@ param rho shape=T,R,F,D,N,K kind=scalar domain=- :: indicator that passenger boarding time k is before train arrival
+%@ param rho_d_n_k shape=T,R,F kind=scalar domain=- :: indicator that passenger boarding time k is before train arrival
+%@ param t_1 shape=D,N kind=scalar domain=- :: dwell time at station n in direction d
+%@ param t_2 shape=D,N kind=scalar domain=- :: travel time between stations in direction d
+%@ var theta shape=T,D,N domain=binary role=auxiliary drole=- lo=- hi=- :: train departure indicator at station n in direction d at time t
+%@ var upsilon shape=T,F,D,N domain=integer role=auxiliary drole=- lo=- hi=- :: number of passengers assigned to train (t,f) at station n in direction d
+%@ var xi shape=T,R,F,D,N domain=continuous role=primary drole=- lo=- hi=- :: departure time of train (t,f) from station n on route r in direction d
 \begin{align}
-  \min\quad & \mathit{lambda} Z_{1} + \left(1 - \mathit{lambda}\right) Z_{2} \tag{eq\_0001} \\
-  & Z_{1} = \sum_{d \in D, r \in R, t \in T_{d}, f \in F} c_{f} \cdot l_{r} \mathit{delta}_{t , r , f}^{d} \tag{eq\_0002} \\
+  \min\quad & \mathit{lambda} \cdot Z_{1} + \left(1 - \mathit{lambda}\right) Z_{2} \tag{eq\_0001} \\
+  & Z_{1} = \sum_{d \in D, r \in R, t \in T_{d}, f \in F} c_{f} \cdot l_{r} \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0002} \\
   & Z_{2} = c_{w} \sum_{p \in P} \left[\sum_{t \in T_{d}, f \in F} \left(\sum_{r \in R} \mathit{xi}_{t , r , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} - k_{p}\right) \cdot \mathit{chi}_{t , f}^{p}\right] \tag{eq\_0003} \\
-  & \sum_{r \in R} \mathit{alpha}_{r , n} Y_{r} \geq 1 \tag{eq\_0004} \\
+  & \sum_{r \in R} \mathit{alpha}_{r , n} \cdot Y_{r} \geq 1 \tag{eq\_0004} \\
   & \sum_{r \in R} Y_{r} \leq \mathit{omega} \tag{eq\_0005} \\
   & f \mathit{delta}_{t , r , f}^{d} \leq f_{r} \tag{eq\_0006} \\
-  & \mathit{eta} \sum_{r \in R, t \in T_{d}, f \in F} e_{f} \mathit{beta}_{r , s} \mathit{delta}_{t , r , f}^{d} \geq p_{s , d} \tag{eq\_0007} \\
+  & \mathit{eta} \sum_{r \in R, t \in T_{d}, f \in F} e_{f} \cdot \mathit{beta}_{r , s} \cdot \mathit{delta}_{t , r , f}^{d} \geq p_{s , d} \tag{eq\_0007} \\
   & \mathit{epsilon}_{t , r , f}^{d , n} \begin{cases} = \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot \left(\mathit{xi}_{t , r , f}^{d , n - 1} + t_{d , n - 1}^{2}\right) \forall d = 1 , n \in N / \left\{n_{r , d}^{1}\right\} , r \in R , t \in T \cdot d , f \in F \\ = \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot \left(\mathit{xi}_{t , r , f}^{d , n + 1} + t_{d , n + 1}^{2}\right) \forall d = 2 , n \in N / \left\{n_{r , d}^{2}\right\} , r \in R , t \in T \cdot d , f \in F \\ \leq \left|K\right| \cdot \mathit{delta}_{t , r , f}^{d} \forall d \in D , n = n_{r , d}^{1} , r \in R , t \in T \cdot d , f \in F \end{cases} \tag{eq\_0008} \\
   & \mathit{xi}_{t , r , f}^{d , n} = \mathit{epsilon}_{t , r , f}^{d , n} + t_{d , n}^{1} \cdot \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0009} \\
   & \mathit{theta}_{t}^{d , n} = \sum_{r \in R, f \in F} \mathit{delta}_{t , r , f}^{d} \cdot \mathit{alpha}_{r , n} \tag{eq\_0010} \\
@@ -92,12 +110,12 @@
   & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \leq \mathit{chi}_{t , f}^{p} \cdot F \tag{eq\_0028} \\
   & l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \geq - \mathit{chi}_{t , f}^{p} \cdot F \tag{eq\_0029} \\
   & Z_{2} = c_{1} \sum_{p \in P} \underset{t \in T_{d_{n_{p}^{1} , n_{p}^{2}}}}{\sum} \sum_{f \in F} l \cdot z_{t , f}^{d_{n_{p}^{1} , n_{p}^{2}} , n_{p}^{1}} \tag{eq\_0030} \\
-  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \mathit{xi}_{t , r , f}^{d , n - 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n - 1}^{2} \forall d = 1 \tag{eq\_0031} \\
-  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \mathit{xi}_{t , r , f}^{d , n + 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n + 1}^{2} \forall d = 2 \tag{eq\_0032} \\
-  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0033} \\
-  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \mathit{xi}_{t , r , f}^{d , n} \tag{eq\_0034} \\
-  & \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \geq \mathit{xi}_{t , r , f}^{d , n} - \left|K\right| \left(1 - \mathit{delta}_{t , r , f}^{d , n}\right) \tag{eq\_0035} \\
-  & 0 \leq \mathit{delta} \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \tag{eq\_0036} \\
+  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n - 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n - 1}^{2} \forall d = 1 \tag{eq\_0031} \\
+  & \mathit{epsilon}_{t , r , f}^{d , n} = \mathit{alpha}_{r , n} \cdot \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n + 1} + \mathit{alpha}_{r , n} \cdot \mathit{delta}_{t , r , f}^{d} \cdot t_{d , n + 1}^{2} \forall d = 2 \tag{eq\_0032} \\
+  & \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \cdot \mathit{delta}_{t , r , f}^{d} \tag{eq\_0033} \\
+  & \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n} \leq \mathit{xi}_{t , r , f}^{d , n} \tag{eq\_0034} \\
+  & \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n} \geq \mathit{xi}_{t , r , f}^{d , n} - \left|K\right| \left(1 - \mathit{delta}_{t , r , f}^{d , n}\right) \tag{eq\_0035} \\
+  & 0 \leq \mathit{delta} \cdot \mathit{xi}_{t , r , f}^{d , n} \leq \left|K\right| \tag{eq\_0036} \\
   & k - \mathit{xi}_{t , r , f}^{d , n} < F \cdot \left(1 - \mathit{rho}_{r , t , f}^{d , n , k}\right) \tag{eq\_0037} \\
   & \mathit{xi}_{t , r , f}^{d , n} - k \leq F \cdot \mathit{rho}_{r , t , f}^{d , n , k} \tag{eq\_0038} \\
 \end{align}

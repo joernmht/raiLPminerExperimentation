@@ -60,6 +60,23 @@
 %@ con eq_0026 kind=linear domain=- indicator=- :: Multiplier update by subgradient method
 %@ con eq_0027 kind=linear domain=- indicator=- :: Initialization of multipliers, step size, local and global bounds
 %@ con eq_0028 kind=linear domain=- indicator=- :: Update of global upper bound from feasible solutions
+%@ index T ordered=0 cyclic=0 :: Time horizon index (discrete time periods)
+%@ param Z_LR shape=- kind=scalar domain=- :: Lagrangian relaxation objective value
+%@ param Z_u_LB shape=- kind=scalar domain=- :: Lower bound of Lagrangian relaxation at iteration u
+%@ param Z_u_UB shape=- kind=scalar domain=- :: Upper bound of Lagrangian relaxation at iteration u
+%@ var a_bar shape=R,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted arrival time of train r at edge (i,j)
+%@ param alpha shape=E,T kind=scalar domain=- :: Lagrangian multipliers for track capacity constraints
+%@ param alpha_u shape=E,T kind=scalar domain=- :: Lagrangian multipliers at iteration u
+%@ var d_bar shape=R,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted departure time of train r at edge (i,j)
+%@ param delta_max shape=R,E kind=scalar domain=- :: Maximum running time of train r on edge (i,j)
+%@ param delta_min shape=R,E kind=scalar domain=- :: Minimum running time of train r on edge (i,j)
+%@ param lambda_u shape=- kind=scalar domain=- :: Step size for updating Lagrangian multipliers at iteration u
+%@ index s ordered=0 cyclic=0 :: Index for sink/destination nodes of trains
+%@ index t ordered=0 cyclic=0 :: Index for discrete time periods
+%@ param z_1_LB shape=- kind=scalar domain=- :: Initial lower bound at iteration 1
+%@ param z_1_UB shape=- kind=scalar domain=- :: Initial upper bound at iteration 1
+%@ param z_u_LB shape=- kind=scalar domain=- :: Lower bound at iteration u
+%@ param z_u_UB shape=- kind=scalar domain=- :: Upper bound at iteration u
 \begin{align}
   & a_bar_{r} \left(i , j\right) = \sum_{1 \leq t \leq T} t \cdot \left[a_{r} \left(i , j , t\right) - a_{r} \left(i , j , t - 1\right)\right] \tag{eq\_0001} \\
   & d_bar_{r} \left(i , j\right) = \sum_{1 \leq t \leq T} t \cdot \left[d_{r} \left(i , j , t\right) - d_{r} \left(i , j , t - 1\right)\right] \tag{eq\_0002} \\

@@ -58,6 +58,30 @@
 %@ con eq_0034 kind=linear domain=- indicator=- :: Linearization of train unit usage objective
 %@ con eq_0059 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model
 %@ con eq_0060 kind=linear domain=- indicator=- :: Feasibility constraint for train unit circulation in the integrated model
+%@ index P_ori ordered=0 cyclic=0 :: Set of passengers whose origin station is s
+%@ index P_seg ordered=0 cyclic=0 :: Set of passengers in a segment
+%@ index S_js ordered=0 cyclic=0 :: Set of stations where trains can be coupled or decoupled
+%@ index S_ts ordered=0 cyclic=0 :: Set of stations where train units can turn around
+%@ param a shape=- kind=scalar domain=- :: Arrival time offset parameter
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficient for total passenger waiting time in the objective
+%@ param beta shape=- kind=scalar domain=- :: Weight coefficient for number of train units used in the objective
+%@ param d shape=- kind=scalar domain=- :: Departure time offset parameter
+%@ param eta_1 shape=S kind=vector domain=- :: Coefficient for the number of coupled train units at station s
+%@ param eta_2 shape=S kind=vector domain=- :: Coefficient for the number of decoupled train units at station s
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway between consecutive train services
+%@ var mu shape=I,S,R domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers on service i at station s assigned to route r
+%@ var mu_1 shape=I,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers boarding coupled train units on service i at station s
+%@ var mu_2 shape=I,S domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of passengers boarding decoupled train units on service i at station s
+%@ var omega shape=P domain=non_negative role=auxiliary drole=- lo=- hi=- :: Waiting time of passenger p
+%@ var rho shape=I,I,S domain=binary role=indicator drole=- lo=- hi=- :: 1 if service ip can depart after service i at station s with sufficient turnaround time, 0 otherwise
+%@ var t_arr shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of service i at station s
+%@ var t_dep shape=I,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of service i at station s
+%@ param t_dt shape=S kind=vector domain=- :: Dwell time at station s
+%@ param t_rt shape=S kind=vector domain=- :: Running time from station s to the next station
+%@ param tau_cd shape=- kind=scalar domain=- :: Time required for coupling or decoupling operations
+%@ param tau_turn shape=- kind=scalar domain=- :: Minimum turnaround time for train units at a station
+%@ var upsilon shape=P,I domain=binary role=indicator drole=- lo=- hi=- :: 1 if passenger p can board service i, 0 otherwise
+%@ param xi shape=S kind=vector domain=- :: Coefficient for the number of train units at station s
 \begin{align}
   & t_{i + 1 , s}^{d e p} - t_{i , s}^{d e p} \geq h^{m i n} , \forall i \in I , s \in S . \tag{eq\_0001} \\
   & t_{i , s + 1}^{a r r} = t_{i , s}^{d e p} + t_{s}^{r t} , \forall i \in I_vec , s \in S \backslash \underset{l \in L}{\cup} \left\{s_{l , \left|s_{l}\right|}\right\} . \tag{eq\_0002} \\

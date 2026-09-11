@@ -47,6 +47,17 @@
 %@ con eq_0021 kind=linear domain=- indicator=- :: LF2: lower bound on elapsed time between consecutive departure times
 %@ con eq_0023 kind=linear domain=- indicator=- :: LF3: upper bound on departure time from station i+1
 %@ con eq_0024 kind=linear domain=- indicator=- :: LF3: lower bound on departure time from station i+1
+%@ param d_ij shape=S,S kind=big_m domain=- :: demand from station i to station j
+%@ param h_min shape=- kind=scalar domain=- :: minimum headway between consecutive trains
+%@ param l_ij shape=S,S kind=scalar domain=- :: travel time from station i to station j
+%@ param l_in shape=- kind=scalar domain=- :: travel time from station i to last station n
+%@ param s_max shape=- kind=scalar domain=- :: maximum dwell time at a station
+%@ param s_min shape=- kind=scalar domain=- :: minimum dwell time at a station
+%@ var tx_ki shape=M,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station i
+%@ var tx_kj shape=M,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station j
+%@ param w_min shape=- kind=scalar domain=- :: minimum waiting time at a station
+%@ var x_k1 shape=M,T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station 1 at time t
+%@ var x_ki shape=M,S,T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station i at time t
 \begin{align}
   \min\quad & \mathit{delta} \sum_{i \in \mathcal{S} â§¹ \left\{n\right\}, t \in \mathcal{T} â§¹ \left\{p\right\}} f_{i}^{t} \tag{eq\_0001} \\
   & f_{i}^{t} = f_{i}^{t - 1} + \sum_{j \in \mathcal{S} , j > i} d_{\mathit{ij}}^{t} - u_{i}^{t} , i \in \mathcal{S} â§¹ \left\{n\right\} , t \in \mathcal{T} \tag{eq\_0002} \\

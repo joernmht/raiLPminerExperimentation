@@ -147,3 +147,15 @@
 %@ con eq_0057 kind=linear :: Equation 57 of the paper
 %@ con eq_0058 kind=linear :: Equation 58 of the paper
 %@ con eq_0059 kind=linear :: Equation 59 of the paper
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2014.05.005.json (deterministic fill-in list); pending human confirmation.
+%@ index E_o ordered=0 cyclic=0 :: Set of cells (edges) in the network associated with origin o
+%@ index E_s ordered=0 cyclic=0 :: Set of cells (edges) in the network associated with destination s
+%@ index Omega ordered=0 cyclic=0 :: Set of cells (edges) subject to track occupancy constraints
+%@ var a_bar shape=E_o domain=continuous role=auxiliary drole=- lo=- hi=- :: Cumulative arrival flow variable on edge (i,j) for train f
+%@ var d_bar shape=E_s domain=continuous role=auxiliary drole=- lo=- hi=- :: Cumulative departure flow variable on edge (i,j) for train f
+%@ var delta shape=E_o,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Difference in cumulative arrival flow between consecutive time points
+%@ index mp ordered=0 cyclic=0 :: Index for paths in the capacity constraint
+%@ var theta shape=E_o,E_o domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator for ordering of trains on shared edges
+%@ param w_max shape=E_o kind=scalar domain=- :: Maximum waiting time on edge (i,j) for train f
+%@ param w_min shape=E_o kind=scalar domain=- :: Minimum waiting time on edge (i,j) for train f

@@ -180,3 +180,19 @@
 %@ con eq_0043_n kind=linear domain=- indicator=- :: DM subproblem: integer domain for rho
 %@ con eq_0043_o kind=linear domain=- indicator=- :: DM subproblem: integer domain for b
 %@ con eq_0043_p kind=linear domain=- indicator=- :: DM subproblem: capacity penalty constraint
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2025.105441.json (deterministic fill-in list); pending human confirmation.
+%@ param Delta shape=- kind=scalar domain=- :: Scaling coefficient in objective function
+%@ var F_c shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Congestion cost component
+%@ var F_e shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time cost component
+%@ var alpha shape=I,S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for reservation allocation
+%@ var beta shape=I,S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for unreserved passenger allocation
+%@ var d_i1 shape=I domain=integer role=auxiliary drole=- lo=- hi=- :: Departure time of train i from station 1
+%@ var epsilon shape=I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Dwell time adjustment variable
+%@ var eta shape=I,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Travel time adjustment variable
+%@ var gamma shape=I,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for passenger flow control
+%@ var kappa shape=I,S,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Ratio parameter for passenger allocation
+%@ param lambda_c shape=- kind=scalar domain=- :: Weight for congestion cost in objective
+%@ param lambda_e shape=- kind=scalar domain=- :: Weight for waiting time cost in objective
+%@ var theta shape=I,S,T,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for reservation timing
+%@ var varrho shape=S,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Reservation slot allocation variable

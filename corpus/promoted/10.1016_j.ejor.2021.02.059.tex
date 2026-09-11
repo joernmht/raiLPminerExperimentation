@@ -41,6 +41,9 @@
 %@ con eq_0031 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (31)
 %@ con eq_0032 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (32)
 %@ con eq_0033 kind=linear domain=- indicator=- :: Additional constraint from ALNS decomposition (33)
+%@ index S_r ordered=0 cyclic=0 :: Set of stations related to a line or path
+%@ var delta shape=L,t domain=binary role=auxiliary drole=- lo=- hi=- :: Binary indicator variable for train departure or arrival events
+%@ var xi shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective variable representing maximum station crowdedness
 \begin{align}
   \min_{x}\quad & \underset{t , i}{max} \frac{n_{i}^{t}}{S \cdot C_{i}} , \tag{eq\_0007} \\
   & \text{s}.\text{t}. n_{i}^{t} = \sum_{\mathit{tau} \in T_{t}} d_{i}^{\mathit{tau}} + \sum_{p \in \mathcal{P}_{i}^{r}, \mathit{tau} \in T_{p i t}} b_{p i_{p}^{+}}^{\mathit{tau}} - \sum_{\mathit{tau} \in T_{t}, p \in \mathcal{P}_{i}^{o} \cup \mathcal{P}_{i}^{r}} b_{p i}^{\mathit{tau}} , \forall i \in S , t \in T \tag{eq\_0008} \\

@@ -45,6 +45,47 @@
 %@ con eq_0024 kind=linear domain=- indicator=- :: lambda_isk_beta2 equals lambda_isk_gamma
 %@ con eq_0025 kind=linear domain=- indicator=- :: Activate beta only if a tram traverses in inserted phase
 %@ con eq_0026 kind=linear domain=- indicator=- :: Activate alpha or gamma only if a tram traverses in relevant cycle
+%@ param Delta shape=- kind=scalar domain=- :: maximum allowed deviation of first departure time from target
+%@ param T_E shape=I kind=scalar domain=- :: target departure time for tram i at first station
+%@ param T_R_min shape=- kind=scalar domain=- :: minimum red time at intersection
+%@ param h_d shape=- kind=scalar domain=- :: minimum departure headway between consecutive trams
+%@ var lambda shape=I,S,K kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: binary indicator for TSP action activation
+%@ var lambda_alpha shape=I,S,K kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: binary indicator for alpha TSP action
+%@ var lambda_alpha_isk shape=- kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: binary indicator for alpha TSP action at tram i, intersection s, cycle k
+%@ var lambda_gamma_isk shape=- kind=binary domain=binary role=auxiliary drole=- lo=- hi=- :: binary indicator for gamma TSP action at tram i, intersection s, cycle k
+%@ param o_alpha_max shape=- kind=scalar domain=- :: maximum offset for alpha TSP action
+%@ param o_alpha_min shape=- kind=scalar domain=- :: minimum offset for alpha TSP action
+%@ param o_beta shape=S kind=scalar domain=- :: offset for beta TSP action at intersection s
+%@ param o_gamma_max shape=- kind=scalar domain=- :: maximum offset for gamma TSP action
+%@ param o_gamma_min shape=- kind=scalar domain=- :: minimum offset for gamma TSP action
+%@ param rho_max shape=S kind=scalar domain=- :: maximum link travel time between consecutive stations
+%@ param rho_min shape=S kind=scalar domain=- :: minimum link travel time between consecutive stations
+%@ var t_A shape=I,S kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: arrival time of tram i at station s
+%@ var t_A_is shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: arrival time of tram i at station s
+%@ var t_D shape=I,S kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: departure time of tram i from station s
+%@ var t_D_1 shape=I kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: departure time of tram i from first station
+%@ var t_D_i1 shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: departure time of tram i from first station
+%@ var t_D_is shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: departure time of tram i from station s
+%@ var t_E shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: end time of TSP action at intersection s, cycle k
+%@ var t_G shape=S kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: green time at intersection s
+%@ var t_R shape=S kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: red time at intersection s
+%@ var t_RE_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: red end time at intersection s, cycle k
+%@ var t_RS shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: red start time at intersection s, cycle k
+%@ var t_RS_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: red start time at intersection s, cycle k
+%@ var t_S shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: start time of TSP action at intersection s, cycle k
+%@ var t_alpha_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of alpha TSP action at intersection s, cycle k
+%@ var t_beta_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of beta TSP action at intersection s, cycle k
+%@ var t_gamma_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of gamma TSP action at intersection s, cycle k
+%@ var t_sk shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of TSP action at intersection s, cycle k
+%@ param tau shape=S,W kind=scalar domain=- :: weight coefficient for TSP action duration
+%@ param theta_max shape=S kind=scalar domain=- :: maximum dwell time at station s
+%@ param theta_min shape=S kind=scalar domain=- :: minimum dwell time at station s
+%@ var u_alpha shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for alpha TSP action at intersection s, cycle k
+%@ param u_alpha_sk shape=- kind=scalar domain=- :: binary indicator for alpha TSP action at intersection s, cycle k
+%@ var u_beta_sk shape=- kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for beta TSP action at intersection s, cycle k
+%@ var u_gamma shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for gamma TSP action at intersection s, cycle k
+%@ param u_gamma_sk shape=- kind=scalar domain=- :: binary indicator for gamma TSP action at intersection s, cycle k
+%@ var u_sk shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for TSP action at intersection s, cycle k
 \begin{align}
   & T_{i}^{E} \leq t_{i 1}^{D} \leq T_{i}^{E} + \mathit{Delta} \forall i \in I \tag{eq\_0001} \\
   & \mathit{theta}_{s}^{\text{min}} \leq t_{\mathit{is}}^{D} - t_{\mathit{is}}^{A} \leq \mathit{theta}_{s}^{\text{max}} \forall i \in I , s \in S \backslash S_tilde \tag{eq\_0002} \\

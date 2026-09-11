@@ -95,6 +95,34 @@
 %@ con eq_0090_b kind=linear domain=- indicator=- :: Integer optimality cut linearization (b).
 %@ con eq_0090_c kind=linear domain=- indicator=- :: Integer optimality cut linearization (c).
 %@ con eq_0090_d kind=linear domain=- indicator=- :: Integer optimality cut linearization (d).
+%@ index Omega ordered=0 cyclic=0 :: Set of disturbance scenarios.
+%@ param a_bar shape=K,I kind=scalar domain=- :: Nominal arrival time of train k at station i.
+%@ param alpha shape=- kind=scalar domain=- :: Risk-aversion parameter for mean-CVaR.
+%@ var beta shape=K,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train k is cancelled at station i.
+%@ param beta_bar shape=K,I kind=scalar domain=- :: Nominal cancellation indicator for train k at station i.
+%@ param d_bar shape=K,I kind=scalar domain=- :: Nominal departure time of train k from station i.
+%@ param g_max shape=I,I kind=scalar domain=- :: Maximum running time between stations i and j.
+%@ param i_star shape=- kind=scalar domain=- :: Index of the disrupted station in a scenario.
+%@ param k_star shape=- kind=scalar domain=- :: Index of the disrupted train in a scenario.
+%@ param kappa shape=- kind=scalar domain=- :: Minimum headway or safety margin.
+%@ param l_min shape=- kind=scalar domain=- :: Minimum turnaround time at the depot.
+%@ var mu shape=K,K,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train m is assigned to train k at station i.
+%@ param p shape=- kind=scalar domain=- :: Penalty or weight parameter.
+%@ var phi shape=K,I,F domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether departure of train k from station i is after time period f.
+%@ var pi shape=K,K,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for linearizing products of binary variables.
+%@ var psi shape=K,I,I,F domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating a change in phi between consecutive time periods.
+%@ param q_max shape=- kind=scalar domain=- :: Maximum dwell time or headway.
+%@ var rho shape=I,I,F domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether backup rolling stock is used on segment (i,j) in period f.
+%@ var s_r shape=I,I,F domain=continuous role=auxiliary drole=- lo=- hi=- :: Remaining backup rolling stock on segment (i,j) at period f.
+%@ param t_start shape=- kind=scalar domain=- :: Start time of the disruption.
+%@ var theta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for the mean-CVaR objective.
+%@ param u_max shape=- kind=scalar domain=- :: Maximum transfer time for backup rolling stock.
+%@ var varphi shape=K,K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating the order of trains k and m.
+%@ var vartheta shape=K,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train k is short-turned at station i.
+%@ param vartheta_bar shape=K,I kind=scalar domain=- :: Nominal short-turn indicator for train k at station i.
+%@ var xi shape=K,K,I domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train m is coupled to train k at station i.
+%@ param xi_bar shape=K,K,I kind=scalar domain=- :: Nominal coupling indicator for trains k and m at station i.
+%@ var zeta shape=K domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether train k is cancelled.
 \begin{align}
   & \sum_{i \in \mathcal{I}_{d}} z_{b , i} \leq 1 , \forall b \in \mathcal{B} . \tag{eq\_0004} \\
   & \mathit{xi}_{k , m , i} \left(\mathit{omega}\right) = xi_bar_{k , m , i} , \forall k , m \in \mathcal{K}_{e} , i \in \mathcal{I}_{k}^{r} \left(\mathit{omega}\right) \cap \mathcal{I}_{t} , \tag{eq\_0006} \\
@@ -142,7 +170,7 @@
   & a_bar_{k , i^{*} \left(\mathit{omega}\right)} \geq d_{k^{*} \left(\mathit{omega}\right) , i^{*} \left(\mathit{omega}\right)} + \left(k - k^{*} \left(\mathit{omega}\right) - 1\right) q_{min} + \left(k - k^{*} \left(\mathit{omega}\right)\right) h_{min} , \tag{eq\_0079} \\
   & a_bar_{m , 2 I + 1 - i} \geq d_{k^{*} \left(\mathit{omega}\right) , i^{*} \left(\mathit{omega}\right)} + \left(i - i^{*} \left(\mathit{omega}\right)\right) q_{min} + \underset{\genfrac{}{}{0pt}{}{\left(ip , j\right) \in V}{ip \geq i^{*} \left(\mathit{omega}\right) , j \leq i}}{\sum} g_{ip , j}^{min} + \left(k - k^{*} \left(\mathit{omega}\right)\right) \left(q_{min} + h_{min}\right) + u_{min} , \tag{eq\_0080} \\
   & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \leq - \mathit{kappa} + \left(M + \mathit{kappa}\right) \left(1 - \mathit{mu}_{k , m , i} \left(\mathit{omega}\right)\right) \tag{eq\_0082\_a} \\
-  & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \geq - M \mathit{mu}_{k , m , i} \left(\mathit{omega}\right) \tag{eq\_0082\_b} \\
+  & a_{m , 2 I + 1 - i} \left(\mathit{omega}\right) - d_{k , i} \left(\mathit{omega}\right) \geq - M \cdot \mathit{mu}_{k , m , i} \left(\mathit{omega}\right) \tag{eq\_0082\_b} \\
   & d_{k , i} \left(\mathit{omega}\right) - t_{f} \leq M \left(1 - \mathit{phi}_{k , i , f} \left(\mathit{omega}\right)\right) \tag{eq\_0084\_a} \\
   & d_{k , i} \left(\mathit{omega}\right) - t_{f} \geq \mathit{kappa} - \left(M + \mathit{kappa}\right) \mathit{phi}_{k , i , f} \left(\mathit{omega}\right) \tag{eq\_0084\_b} \\
   & \mathit{pi}_{m , k , i} \left(\mathit{omega}\right) \leq \mathit{mu}_{m , k , i} \left(\mathit{omega}\right) \tag{eq\_0085\_a} \\
@@ -152,9 +180,9 @@
   & \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \leq x_{k , i , j} \left(\mathit{omega}\right) \tag{eq\_0087\_b} \\
   & \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \geq \mathit{phi}_{k , i , f + 1} \left(\mathit{omega}\right) - \mathit{phi}_{k , i , f} \left(\mathit{omega}\right) + x_{k , i , j} \left(\mathit{omega}\right) - 1 \tag{eq\_0087\_c} \\
   & \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \geq 2 - M \left(1 - \mathit{zeta}_{k} \left(\mathit{omega}\right)\right) \tag{eq\_0088\_a} \\
-  & \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \leq M \mathit{zeta}_{k} \left(\mathit{omega}\right) \tag{eq\_0088\_b} \\
+  & \sum_{i \in \mathcal{I}_{k}^{p}} y_{k , i} \left(\mathit{omega}\right) \leq M \cdot \mathit{zeta}_{k} \left(\mathit{omega}\right) \tag{eq\_0088\_b} \\
   & s_{i , j , f}^{b} \left(\mathit{omega}\right) \leq C \sum_{k \in \mathcal{K}} \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) \tag{eq\_0090\_a} \\
   & s_{i , j , f}^{b} \left(\mathit{omega}\right) \leq s_{i , j , f - 1}^{r} \left(\mathit{omega}\right) + s_{i , j , f} \tag{eq\_0090\_b} \\
-  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \geq C \sum_{k \in \mathcal{K}} \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) - M \mathit{rho}_{i , j , f} \left(\mathit{omega}\right) \tag{eq\_0090\_c} \\
+  & s_{i , j , f}^{b} \left(\mathit{omega}\right) \geq C \sum_{k \in \mathcal{K}} \mathit{psi}_{k , i , j , f} \left(\mathit{omega}\right) - M \cdot \mathit{rho}_{i , j , f} \left(\mathit{omega}\right) \tag{eq\_0090\_c} \\
   & s_{i , j , f}^{b} \left(\mathit{omega}\right) \geq s_{i , j , f - 1}^{r} \left(\mathit{omega}\right) + s_{i , j , f} - M \left(1 - \mathit{rho}_{i , j , f} \left(\mathit{omega}\right)\right) \tag{eq\_0090\_d} \\
 \end{align}

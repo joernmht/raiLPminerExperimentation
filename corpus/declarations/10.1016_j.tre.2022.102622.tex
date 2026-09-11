@@ -114,3 +114,27 @@
 %@ con eq_0029 kind=big_m domain=- indicator=- :: Platform conflict free condition when train k' precedes k on same platform (Eq. 15b)
 %@ con eq_0030 kind=big_m domain=- indicator=- :: Route conflict free condition when train k precedes k' on conflicting routes (Eq. 16a)
 %@ con eq_0032 kind=big_m domain=- indicator=- :: Route conflict free condition when train k' precedes k on conflicting routes (Eq. 16b)
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2022.102622.json (deterministic fill-in list); pending human confirmation.
+%@ param Omega shape=K kind=scalar domain=- :: minimum dwell time for train k
+%@ var V_phi shape=K,K domain=binary role=auxiliary drole=- lo=- hi=- :: ordering indicator for train pair (k,kp)
+%@ param alpha shape=R,I kind=scalar domain=- :: route-entry incidence coefficient
+%@ param beta shape=R,O kind=scalar domain=- :: route-exit incidence coefficient
+%@ param delta shape=R,T kind=scalar domain=- :: route-track incidence coefficient
+%@ param epsilon shape=- kind=scalar domain=- :: weight for platform assignment term in objective
+%@ param gamma_1 shape=R,R kind=scalar domain=- :: minimum headway time for route pair (p,q) case 1
+%@ param gamma_2 shape=R,R kind=scalar domain=- :: minimum headway time for route pair (p,q) case 2
+%@ param gamma_3 shape=R,R kind=scalar domain=- :: minimum headway time for route pair (p,q) case 3
+%@ param gamma_pi shape=R,R kind=scalar domain=- :: minimum headway time between routes p and q
+%@ param rho shape=- kind=scalar domain=- :: minimum safety separation time
+%@ param sigma_c shape=R kind=scalar domain=- :: clearing time of route p
+%@ param sigma_l shape=R kind=scalar domain=- :: locking time of route p
+%@ param t_a shape=K kind=scalar domain=- :: scheduled arrival time of train k
+%@ param t_d shape=K kind=scalar domain=- :: scheduled departure time of train k
+%@ param t_train shape=- kind=scalar domain=- :: train traversal time through the yard
+%@ var tau shape=K,R domain=continuous role=primary drole=- lo=- hi=- :: start time of route p for train k
+%@ param theta shape=R,T kind=scalar domain=- :: route-track incidence coefficient for arrival routes
+%@ var y_a shape=K domain=continuous role=primary drole=- lo=- hi=- :: actual arrival time of train k
+%@ var y_d shape=K domain=continuous role=primary drole=- lo=- hi=- :: actual departure time of train k
+%@ var y_l shape=K domain=continuous role=auxiliary drole=- lo=- hi=- :: leaving time of train k from the platform
+%@ var y_r shape=K domain=continuous role=auxiliary drole=- lo=- hi=- :: ready time of train k at the platform

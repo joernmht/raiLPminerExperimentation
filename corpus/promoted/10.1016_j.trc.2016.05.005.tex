@@ -42,6 +42,23 @@
 %@ con eq_0024 kind=linear domain=- indicator=- :: Upper bound for overtaking dwelling activities: x_ii' + (u_ii'^without - u_ii') × s_ii' ≤ u_ii'^without
 %@ con eq_0025 kind=linear domain=- indicator=- :: Relationship constraints between modulo parameters: (z_ij + z_i'j' + z_ii') - 2 × q_ii'jj' - s_ii'jj' = 0
 %@ con eq_0026 kind=linear domain=- indicator=- :: Logical constraint on binary variables: s_ii' = ∑_{(j,j')∈A_pass} s_ii'jj'
+%@ index epsilon ordered=0 cyclic=0 :: Set of events (nodes) in the periodic event scheduling problem
+%@ param T_max shape=- kind=scalar domain=- :: Upper bound on the cycle time T
+%@ param T_min shape=- kind=scalar domain=- :: Lower bound on the cycle time T
+%@ param f_ij shape=- kind=scalar domain=- :: Frequency (number of trains per cycle) on activity (i,j)
+%@ param h_ij shape=- kind=scalar domain=- :: Minimum headway/safety time on activity (i,j)
+%@ param l_ij shape=- kind=scalar domain=- :: Lower bound on the duration x_ij of activity (i,j)
+%@ param l_without_iip shape=- kind=scalar domain=- :: Lower bound on the duration of the dwell activity without the overtaking adjustment
+%@ var pi shape=epsilon domain=continuous role=auxiliary drole=- lo=0 hi=- :: Event time of event i within the cycle
+%@ var s_iip shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Indicator that overtaking occurs on dwell activity (i,ip)
+%@ param u_iip shape=- kind=scalar domain=- :: Upper bound on the duration of dwell activity (i,ip)
+%@ param u_ij shape=- kind=scalar domain=- :: Upper bound on the duration x_ij of activity (i,j)
+%@ param u_without_iip shape=- kind=scalar domain=- :: Upper bound on the duration of the dwell activity without the overtaking adjustment
+%@ var x_iip shape=- domain=continuous role=primary drole=- lo=- hi=- :: Duration of dwell activity (i,ip)
+%@ var x_ij shape=- domain=continuous role=primary drole=- lo=- hi=- :: Duration of activity (i,j)
+%@ var y_ij shape=- domain=continuous role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for the duration of activity (i,j) in the PESP formulation
+%@ var z_iip shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Binary period indicator for activity (i,ip)
+%@ var z_jjp shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Binary period indicator for activity (j,jp)
 \begin{align}
   \min\quad & T \tag{eq\_0005} \\
   & x_{\mathit{ij}} = \mathit{pi}_{j} - \mathit{pi}_{i} + y_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{pass}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0006} \\

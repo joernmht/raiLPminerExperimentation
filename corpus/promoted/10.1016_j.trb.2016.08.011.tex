@@ -76,6 +76,25 @@
 %@ con eq_0052 kind=linear domain=- indicator=- :: Objective function transformation (weighted sum)
 %@ con eq_0058_a kind=linear domain=- indicator=- :: Iterative algorithm constraint part a
 %@ con eq_0058_b kind=linear domain=- indicator=- :: Iterative algorithm constraint part b
+%@ index E ordered=0 cyclic=0 :: Set of services (trains) in the express (skip-stop) pattern
+%@ index F ordered=0 cyclic=0 :: Set of services (trains) in the full-stop pattern
+%@ var a shape=S,N domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
+%@ var a_1 shape=S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of service k at the first station
+%@ param beta shape=S,N,N kind=scalar domain=- :: Proportion of passengers alighting at station j from service k among those on board at station i
+%@ var d shape=S,N domain=continuous role=primary drole=- lo=- hi=- :: Departure time of service k from station i
+%@ param h shape=S kind=scalar domain=- :: Minimum headway between consecutive services
+%@ index ip ordered=0 cyclic=0 :: Index of a skipped station
+%@ var mu shape=S,N domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether the number of passengers on board exceeds capacity
+%@ var n_a shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers alighting from service k at station i
+%@ var n_b shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding service k at station i
+%@ param tau shape=S kind=scalar domain=- :: Additional time for acceleration or deceleration when a station is skipped
+%@ index u ordered=0 cyclic=0 :: Index of a service in the set of full-stop services
+%@ var w_b shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding service k at station i who are willing to wait
+%@ var w_r shape=S,N,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers remaining at station i after service k departs
+%@ param w_underline shape=S,N,N kind=scalar domain=- :: Lower bound on the number of passengers waiting at station i for service k
+%@ var x shape=S,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether service k stops at station i
+%@ var x_ip shape=S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether service k skips station ip
+%@ var x_jp shape=S domain=binary role=auxiliary drole=- lo=- hi=- :: Binary variable indicating whether service k skips station jp
 \begin{align}
   & a_{k , i + 1} - d_{k , i} = R \cdot t_{i} + x_{k , i} \cdot \mathit{tau}_{a} + x_{k , i + 1} \cdot \mathit{tau}_{d} , \text{for} k \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i , i + 1 \in \mathbf{N}_{k} . \tag{eq\_0005} \\
   & x_{k , i} \cdot M \geq d_{k , i} - a_{k , i} \geq x_{k , i} \cdot D \cdot t_{i} , \text{for} k \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0007} \\

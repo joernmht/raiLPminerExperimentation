@@ -77,6 +77,32 @@
 %@ con eq_0037 kind=linear domain=- indicator=- :: Regular energy cost CR from acceleration, cruising and regenerative braking
 %@ con eq_0038 kind=linear domain=- indicator=- :: Basic energy cost CB from train capacitance and train type scheme
 %@ con eq_0039 kind=linear domain=- indicator=- :: Objective function Z = λ1·W + λ2·(CR+CB)
+%@ index N_bar ordered=0 cyclic=0 :: Set of potential services (trains) in the up direction
+%@ index N_underline ordered=0 cyclic=0 :: Set of potential services (trains) in the down direction
+%@ index S_bar ordered=0 cyclic=0 :: Set of stations in the up direction
+%@ param CT_bar shape=K kind=scalar domain=- :: Cycle time for up direction trains of type k
+%@ param CT_underline shape=K kind=scalar domain=- :: Cycle time for down direction trains of type k
+%@ param R_0 shape=- kind=scalar domain=- :: Constant coefficient in train resistance formula
+%@ param R_1 shape=- kind=scalar domain=- :: Linear coefficient in train resistance formula
+%@ param R_2 shape=- kind=scalar domain=- :: Quadratic coefficient in train resistance formula
+%@ param T_tilde_down shape=- kind=scalar domain=- :: Minimum total travel time for down direction
+%@ param T_tilde_up shape=- kind=scalar domain=- :: Minimum total travel time for up direction
+%@ var d_1 shape=N_bar domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of up direction train j from first station
+%@ var e_dn shape=N_underline domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of down direction train j at last station
+%@ var e_up shape=N_bar domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of up direction train j at last station
+%@ param eta shape=- kind=scalar domain=- :: Energy efficiency coefficient
+%@ param h_max shape=- kind=scalar domain=- :: Maximum headway between consecutive trains
+%@ param h_min shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
+%@ param lambda_1 shape=- kind=scalar domain=- :: Weight for passenger waiting time in objective
+%@ param lambda_2 shape=- kind=scalar domain=- :: Weight for energy cost in objective
+%@ param r shape=S kind=scalar domain=- :: Running time on segment u
+%@ param sigma shape=- kind=scalar domain=- :: Time offset between up and down direction schedules
+%@ param t_ab shape=S kind=scalar domain=- :: Acceleration time on segment u
+%@ param t_bc shape=S kind=scalar domain=- :: Braking time on segment u
+%@ param t_cd shape=S kind=scalar domain=- :: Coasting time on segment u
+%@ var y_dn shape=N_underline,K domain=binary role=primary drole=- lo=- hi=- :: 1 if down direction train j is of type k
+%@ var y_up shape=N_bar,K domain=binary role=primary drole=- lo=- hi=- :: 1 if up direction train j is of type k
+%@ var z_1 shape=N_bar domain=binary role=auxiliary drole=- lo=- hi=- :: 1 if up direction train j is the first service
 \begin{align}
   & h_{\mathit{min}} \leq d_{j}^{1} - d_{j - 1}^{1} \leq h_{\mathit{max}} \forall j , j - 1 \in N_bar . \tag{eq\_0004} \\
   & h_{\mathit{min}} \leq d_{j}^{\left|S\right| + 1} - d_{j - 1}^{\left|S\right| + 1} \leq h_{\mathit{max}} \forall j , j - 1 \in N_underline . \tag{eq\_0005} \\

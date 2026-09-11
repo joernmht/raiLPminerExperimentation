@@ -147,3 +147,40 @@
 %@ index Sta shape=- domain=- role=index drole=- lo=- hi=- :: station indices per direction
 %@ param dwell shape=- domain=continuous role=parameter drole=- lo=- hi=- :: dwell time bound
 %@ param Df shape=- domain=integer role=parameter drole=- lo=- hi=- :: number of stations
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.apm.2016.06.040.json (deterministic fill-in list); pending human confirmation.
+%@ param lambda shape=K,F kind=scalar domain=- :: passenger arrival rate for train k on path f
+%@ param mu shape=- kind=scalar domain=- :: Lagrangian multiplier vector
+%@ param H_rk1 shape=- kind=scalar domain=- :: coefficient for train k on path 1
+%@ param H_rk2 shape=- kind=scalar domain=- :: coefficient for train k on path 2
+%@ param L_rk1 shape=- kind=scalar domain=- :: coefficient for train k on path 1
+%@ param L_rk2 shape=- kind=scalar domain=- :: coefficient for train k on path 2
+%@ param lambda_k1 shape=- kind=scalar domain=- :: arrival rate for train k on path 1
+%@ param lambda_k2 shape=- kind=scalar domain=- :: arrival rate for train k on path 2
+%@ param mu_r1 shape=- kind=scalar domain=- :: multiplier for train r on path 1
+%@ param mu_r1f shape=- kind=scalar domain=- :: multiplier for train r on path 1
+%@ param u_r1 shape=- kind=scalar domain=- :: multiplier for train r on path 1
+%@ param u_r2 shape=- kind=scalar domain=- :: multiplier for train r on path 2
+%@ param b_1 shape=Sta,F kind=scalar domain=- :: boarding passengers at station r on path f
+%@ param b_r1 shape=- kind=scalar domain=- :: boarding passengers at station r
+%@ param b_r1f shape=- kind=scalar domain=- :: boarding passengers at station r on path f
+%@ param d_1 shape=- kind=scalar domain=- :: departure time variable
+%@ param d_2 shape=- kind=scalar domain=- :: departure time variable
+%@ param d_2_1 shape=- kind=scalar domain=- :: departure time variable
+%@ param d_Df shape=K,F kind=scalar domain=- :: departure time of last train on path f
+%@ param delta_Df shape=K,F kind=scalar domain=- :: delay of last train on path f
+%@ param dwell_max shape=Kpair,F kind=scalar domain=- :: maximum dwell time
+%@ param dwell_min shape=Kpair,F kind=scalar domain=- :: minimum dwell time
+%@ param h_min shape=- kind=scalar domain=- :: minimum headway
+%@ param n_1 shape=Sta,F kind=scalar domain=- :: number of passengers on train
+%@ param n_r1 shape=- kind=scalar domain=- :: number of passengers on train
+%@ param t_min shape=- kind=scalar domain=- :: minimum turnaround time
+%@ param w_Df shape=K,F kind=scalar domain=- :: waiting time of last train on path f
+%@ param w_max shape=K kind=scalar domain=- :: maximum waiting time
+%@ param w_min shape=K kind=scalar domain=- :: minimum waiting time
+%@ var delta shape=Sta,K,F domain=non_negative role=auxiliary drole=- lo=- hi=- :: delay variable
+%@ var tau shape=Sta,K,F domain=non_negative role=auxiliary drole=- lo=- hi=- :: total time variable
+%@ var varphi shape=K,F domain=binary role=indicator drole=- lo=- hi=- :: train ordering indicator
+%@ var Z_LR shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian relaxation objective
+%@ var Z_1_LR shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian relaxation objective for path 1
+%@ var Z_2_LR shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Lagrangian relaxation objective for path 2

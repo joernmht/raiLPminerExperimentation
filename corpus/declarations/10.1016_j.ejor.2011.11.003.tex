@@ -211,3 +211,41 @@
 %@ con eq_0055 kind=linear domain=- indicator=- :: Nominal precedence: t_i - t_j ≥ d_ij
 %@ con eq_0056_a kind=linear domain=- indicator=- :: Robust precedence: t_i - t_j + γ_ij ≥ d_ij + Δ_ij
 %@ con eq_0056_b kind=linear domain=- indicator=- :: Nonnegativity of precedence slack: γ_ij ≥ 0
+% --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
+% Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2011.11.003.json (deterministic fill-in list); pending human confirmation.
+%@ index C_minus ordered=0 cyclic=0 :: Set of incoming arcs in constraint graph
+%@ index C_plus ordered=0 cyclic=0 :: Set of outgoing arcs in constraint graph
+%@ index Omega ordered=0 cyclic=0 :: Set of scenarios
+%@ index delta_minus ordered=0 cyclic=0 :: Set of incoming arcs at a node
+%@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing arcs at a node
+%@ param Delta_ij shape=- kind=scalar domain=- :: Delay parameter for pair (i,j)
+%@ param Gamma shape=M kind=scalar domain=- :: Robustness parameter for constraint i
+%@ param K_d_jkl shape=- kind=scalar domain=- :: Minimum headway between departures of trains j and k on link l
+%@ param K_jkl shape=- kind=scalar domain=- :: Minimum headway between arrivals of trains j and k on link l
+%@ param K_jl shape=- kind=scalar domain=- :: Minimum dwell/run time for train j on link l
+%@ param Tp_ij shape=- kind=scalar domain=- :: Periodic offset for pair (i,j)
+%@ param a_bar_jl shape=- kind=scalar domain=- :: Upper bound on arrival time of train j on link l
+%@ param a_ij shape=- kind=scalar domain=- :: Coefficient of variable x_j in constraint i
+%@ var a_jl shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train j on link l
+%@ var a_kl shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train k on link l
+%@ param a_underline_jl shape=- kind=scalar domain=- :: Lower bound on arrival time of train j on link l
+%@ param beta shape=- kind=scalar domain=- :: Robustness function
+%@ param c_d_jl shape=- kind=scalar domain=- :: Cost function for departure time of train j on link l
+%@ param c_jl shape=- kind=scalar domain=- :: Cost coefficient for train j on link l
+%@ param d_bar_jl shape=- kind=scalar domain=- :: Upper bound on departure time of train j on link l
+%@ param d_ij shape=- kind=scalar domain=- :: Minimum time difference for pair (i,j)
+%@ var d_jl shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train j on link l
+%@ var d_kl shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k on link l
+%@ param d_underline_jl shape=- kind=scalar domain=- :: Lower bound on departure time of train j on link l
+%@ param delta shape=- kind=scalar domain=- :: Tolerance parameter
+%@ param delta_ij shape=- kind=scalar domain=- :: Delay parameter for pair (i,j)
+%@ var gamma shape=M domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for constraint i
+%@ var gamma_ij shape=- domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Slack variable for pair (i,j)
+%@ param l_ij shape=- kind=scalar domain=- :: Lower bound on time difference for pair (i,j)
+%@ var s_ij shape=- domain=non_negative role=slack drole=- lo=0 hi=- :: Slack variable for pair (i,j)
+%@ param sigma shape=- kind=scalar domain=- :: Source node
+%@ param tau shape=- kind=scalar domain=- :: Sink node
+%@ param u_ij shape=- kind=scalar domain=- :: Upper bound on time difference for pair (i,j)
+%@ var v_tilde shape=- domain=continuous role=primary drole=- lo=- hi=- :: Adjusted event time
+%@ var x_it shape=- domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable for train i at time t
+%@ param z_star shape=- kind=scalar domain=- :: Optimal objective value

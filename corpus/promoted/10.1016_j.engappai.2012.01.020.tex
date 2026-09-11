@@ -27,6 +27,7 @@
 %@ con eq_0004 kind=linear domain=- indicator=- :: constraint ensuring trains pass block sections one after another
 %@ con eq_0005 kind=linear domain=- indicator=- :: precedence constraint ensuring at most one train occupies a block section concurrently
 %@ con eq_0006 kind=linear domain=- indicator=- :: departure time of train i from origin is within [l_i,u_i]
+%@ var pi shape=A domain=continuous role=primary drole=- lo=- hi=- :: scheduled event time of node in the periodic event-activity graph
 \begin{align}
   & \left(\mathit{pi}_{j} - \mathit{pi}_{i} - l_{a}\right) \mathit{modT} \leq u_{a} - l_{a} , \forall a = \left(i , j\right) \in A , \tag{eq\_0001} \\
   & l_{a} \leq \mathit{pi}_{j} - \mathit{pi}_{i} - T \cdot z_{a} \leq u_{a} \tag{eq\_0002} \\

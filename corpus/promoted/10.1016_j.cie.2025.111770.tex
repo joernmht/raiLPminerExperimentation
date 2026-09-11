@@ -73,11 +73,26 @@
 %@ con eq_0048 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains
 %@ con eq_0049 kind=linear domain=- indicator=- :: Insertion indicator consistency for standby trains (continued)
 %@ con eq_0050 kind=linear domain=- indicator=- :: Residual linear constraint ensuring feasible multi-line coordinated adjustment
+%@ param C_1 shape=- kind=scalar domain=- :: weight coefficient for objective term z_1
+%@ param C_2 shape=U kind=vector domain=- :: line-dependent weight coefficient for objective term z_2
+%@ param C_3 shape=- kind=scalar domain=- :: weight coefficient for objective term z_2
+%@ param Delta shape=- kind=scalar domain=- :: time slot duration parameter
+%@ param alpha shape=S,T,T,U kind=matrix domain=- :: assignment coefficient linking departure time to station-time-line
+%@ param epsilon shape=- kind=tolerance domain=- :: small positive tolerance for strict inequality linearization
+%@ var eta shape=S,T,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: passenger arrival rate at station s in time t on line u
+%@ param eta_bar shape=S,T,U kind=matrix domain=- :: baseline passenger arrival rate at station s in time t on line u
+%@ var gamma shape=L,S,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: auxiliary variable for linearizing dwell time constraints
+%@ param h_min shape=- kind=scalar domain=- :: minimum headway between consecutive trains
+%@ var t_a shape=L,S kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: adjusted arrival time of train l at station s
+%@ var t_bar shape=L,S,U kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: scheduled departure time of train l from station s on line u
+%@ var x_bar shape=L,S,T,U kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for additional train l at station s in time t on line u
+%@ var z_1 shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: objective component for passenger waiting time
+%@ var z_2 shape=- kind=continuous domain=non_negative role=primary drole=- lo=- hi=- :: objective component for operational cost
 \begin{align}
   \min\quad & z_{1} + z_{2} \tag{eq\_0001} \\
-  & z_{1} = C_{1} \sum_{u \in \mathcal{U}, s \in \mathcal{S}, t \in \mathcal{T} \backslash \left\{0\right\}} \mathit{Delta} t \cdot P \cdot W_{s t}^{u} \tag{eq\_0002} \\
+  & z_{1} = C_{1} \sum_{u \in \mathcal{U}, s \in \mathcal{S}, t \in \mathcal{T} \backslash \left\{0\right\}} \mathit{Delta} \cdot t \cdot P \cdot W_{s t}^{u} \tag{eq\_0002} \\
   & z_{2} = \sum_{u \in \mathcal{U}} C_{2}^{u} \sum_{l \in L_{s}, t \in \mathcal{T}} x_{l t}^{u} + C_{3} \sum_{u \in \mathcal{U}, l \in \mathcal{L}_{w}} \left(C \cdot V - C \cdot A_{l}^{u}\right) \cdot c \cdot t_{l}^{u} \tag{eq\_0003} \\
-  & x_{l s t}^{u} = \sum_{t_{0} \in \mathcal{T}} x_{l , t_{0}}^{u} \mathit{alpha}_{s , t , t_{0}}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0004} \\
+  & x_{l s t}^{u} = \sum_{t_{0} \in \mathcal{T}} x_{l , t_{0}}^{u} \cdot \mathit{alpha}_{s , t , t_{0}}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0004} \\
   & t_{l s}^{u} = \sum_{t \in \mathcal{T}} t \cdot x_bar_{l s t}^{u} , \forall u \in \mathcal{U}_{d} , l \in \mathcal{L}_{h} , s \in \mathcal{S} \tag{eq\_0005} \\
   & t_{l s}^{u} = \sum_{t \in \mathcal{T}} t \cdot x_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0006} \\
   & \left|t_{l s}^{u} - t_{lp s}^{u}\right| \geq h_{min} , \forall u \in \mathcal{U} , l , lp \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s = s_{0} \tag{eq\_0007} \\
@@ -108,8 +123,8 @@
   & h \cdot w_{l , l_bar}^{u} \leq h \cdot a_{l}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , l_bar \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0041} \\
   & P \cdot A_{l s}^{u} - M \left(1 - q_{l s}^{u}\right) \leq \mathit{gamma}_{l s}^{u} \left(C \cdot V - C \cdot A_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \tag{eq\_0042} \\
   & \mathit{gamma}_{l s}^{u} \left(C \cdot V - C \cdot A_{l s}^{u}\right) \leq P \cdot A_{l s}^{u} + 1 - \mathit{epsilon} + M \left(1 - q_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \tag{eq\_0043} \\
-  & P \cdot A_{l s}^{u} - M \left(1 - q_{l s}^{u}\right) \leq \mathit{gamma}_{l s}^{u} P O_{l , s - 1}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0044} \\
-  & \mathit{gamma}_{l s}^{u} P O_{l , s - 1}^{u} \leq P \cdot A_{l s}^{u} + 1 - \mathit{epsilon} + M \left(1 - q_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0045} \\
+  & P \cdot A_{l s}^{u} - M \left(1 - q_{l s}^{u}\right) \leq \mathit{gamma}_{l s}^{u} \cdot P \cdot O_{l , s - 1}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0044} \\
+  & \mathit{gamma}_{l s}^{u} \cdot P \cdot O_{l , s - 1}^{u} \leq P \cdot A_{l s}^{u} + 1 - \mathit{epsilon} + M \left(1 - q_{l s}^{u}\right) , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \tag{eq\_0045} \\
   & \mathit{eta}_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} = eta_bar_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} + \sum_{u \in \mathcal{U}_{c}, s \in \mathcal{S}_{c}, l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} w_{l s sp t}^{u up} , \forall up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , t \in \mathcal{T} \tag{eq\_0046} \\
   & w_{l s sp t}^{u up} \leq M_{l s sp t}^{u up} \cdot x_{l s t}^{u} , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0047} \\
   & w_{l s sp t}^{u up} \geq \mathit{PTA}_{l s sp}^{u up} - M_{l s sp t}^{u up} \cdot \left(1 - x_{l s t}^{u}\right) , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0048} \\

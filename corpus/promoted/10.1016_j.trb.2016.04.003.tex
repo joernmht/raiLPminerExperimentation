@@ -69,6 +69,17 @@
 %@ con eq_0035 kind=linear domain=- indicator=- :: Calculates generalized time for passengers not served within horizon
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reformulated cyclicity constraint with 60/120 min differences
 %@ con eq_0037 kind=linear domain=- indicator=- :: Selects one of two possible headways in reformulated cyclicity
+%@ var alpha shape=L,v domain=binary role=primary drole=- lo=- hi=- :: Train activation indicator
+%@ param beta shape=- kind=scalar domain=- :: Passenger weighting coefficients
+%@ var delta shape=I,T,P domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Waiting time deviation
+%@ index ell_2 ordered=0 cyclic=0 :: Line index
+%@ var gamma shape=I,T,P domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Waiting time deviation
+%@ var mu shape=L,v domain=continuous role=auxiliary drole=- lo=- hi=- :: Maximum passenger waiting time
+%@ var omega shape=L,v,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Passenger waiting time
+%@ param r_1 shape=I kind=scalar domain=- :: Initial running time
+%@ param varepsilon shape=- kind=scalar domain=- :: Passenger satisfaction level
+%@ var z_v1 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 60-minute headway indicator
+%@ var z_v2 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 120-minute headway indicator
 \begin{align}
   \begin{matrix}\quad & & & max \sum_{\mathit{ell} \in L, v \in V^{\mathit{ell}}, s \in S^{\mathit{ell}}} \mathit{omega}_{v s}^{\mathit{ell}} \cdot e_{s} - \sum_{\mathit{ell} \in L, v \in V^{\mathit{ell}}} \left(\mathit{alpha}_{v}^{\mathit{ell}} \cdot f \cdot k^{\mathit{ell}} + \mathit{mu}_{v}^{\mathit{ell}} \cdot o \cdot k^{\mathit{ell}}\right)\end{matrix} \tag{eq\_0001} \\
   & \begin{matrix} & & - \mathit{VOT} \cdot \sum_{i \in I, t \in T_{i}} n_{i}^{t} \cdot \mathcal{T}_{i}^{t} \geq \mathit{varepsilon} ,\end{matrix} \tag{eq\_0007} \\
