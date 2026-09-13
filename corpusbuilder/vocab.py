@@ -45,6 +45,26 @@ from corpusbuilder.promote import CORPUS, DECLARATIONS, PROMOTED, _rel
 from corpusbuilder.symbols import domain_declaration
 
 VOCAB_DIR = CORPUS / "vocab"
+GOLD_PATH = CORPUS / "vocab_gold.json"
+GOLD_LABELS_PATH = CORPUS / "vocab_gold_labels.json"
+PROSE_DIR = CORPUS / "prose"
+
+#: A human's "this name is not a symbol" verdict, kept in the sidecar so the
+#: audit stops listing the name and the provenance shows who decided.
+_NOT_SYMBOL_RE = re.compile(r"^\s*%\s*not a symbol \(human\):\s*([A-Za-z_]\w*)")
+VAR_DOMAINS = ("binary", "integer", "non_negative", "continuous")
+PARAM_KINDS = ("scalar", "vector", "matrix", "big_m", "tolerance")
+VAR_ROLES = ("primary", "auxiliary", "slack", "indicator")
+
+#: Provenance of a sidecar's ``%@`` lines, decided by the nearest preceding
+#: marker comment. A sidecar written by the assist stage opens with the
+#: ``ASSISTED RESOLUTION`` header (rung c); later blocks announce themselves.
+SOURCE_MARKERS: tuple[tuple[str, str], ...] = (
+    ("ASSISTED RESOLUTION", "assist-c"),
+    ("vocabulary fill (stage v", "assist-v"),
+    ("vocabulary (human", "human"),
+    ("index families the formulas bind", "deterministic"),
+)
 
 #: Symbol occurrence: a ``\mathit{name}`` or plain identifier, an optional
 #: subscript (braced or single character) and an optional superscript.
@@ -213,7 +233,11 @@ def doc_with_sidecar(promoted_text: str, sidecar_text: str) -> str:
     kept = [
         ln for ln in head.splitlines() if not re.match(r"\s*%@\s*(index|param|var|obj|con)\b", ln)
     ]
-    decl = [ln for ln in sidecar_text.splitlines() if ln.strip().startswith("%@")]
+    decl = [
+        ln
+        for ln in sidecar_text.splitlines()
+        if ln.strip().startswith("%@") or _NOT_SYMBOL_RE.match(ln)
+    ]
     return "\n".join(kept + decl) + "\n" + body
 
 
@@ -331,8 +355,15 @@ def scan_document(text: str) -> dict:
         fam = m.group(2) or m.group(3) or m.group(4)
         letter_families.setdefault(_plain(m.group(1)), set()).add(fam)
     shape_fixes = shape_repairs(uses, declared, letter_families)
+    not_symbols = sorted(
+        {m.group(1) for m in (_NOT_SYMBOL_RE.match(ln) for ln in text.splitlines()) if m}
+    )
+    for name in not_symbols:
+        missing.pop(name, None)
     return {
         "shape_fixes": shape_fixes,
+        "not_symbols": not_symbols,
+        "letter_families": {k: sorted(v) for k, v in sorted(letter_families.items())},
         "rewrite_rules_version": REWRITE_RULES_VERSION,
         "declared": {
             "index": sorted(declared.indices),
@@ -440,6 +471,364 @@ def apply_shape_fixes(sidecar_path: Path, fixes: list[dict]) -> int:
     return changed + len(added)
 
 
+def classify_sidecar_lines(text: str) -> list[tuple[str, str, str]]:
+    """``(record, name, source)`` for every index/param/var line of a sidecar.
+
+    Sources: ``assist-c`` (the rung-c fill), ``assist-v`` (stage V), ``human``
+    (a human block), ``deterministic`` (families added by this module),
+    ``unknown`` (no marker before the line, e.g. a hand-written sidecar).
+    A ``shape fixed by corpusbuilder.vocab`` note keeps the line's source; the
+    shape repair is counted separately by :func:`sidecar_source_counts`.
+    """
+    source = "unknown"
+    out: list[tuple[str, str, str]] = []
+    for raw in text.splitlines():
+        line = raw.strip()
+        if line.startswith("%") and not line.startswith("%@"):
+            for needle, src in SOURCE_MARKERS:
+                if needle in line:
+                    source = src
+                    break
+            continue
+        m = _DECL_RE.match(line)
+        if m:
+            out.append((m.group(1), m.group(2), source))
+    return out
+
+
+def sidecar_source_counts(text: str) -> dict[str, int]:
+    counts: Counter[str] = Counter(src for _rec, _name, src in classify_sidecar_lines(text))
+    counts["shape_fixed"] = sum(
+        1 for ln in text.splitlines() if "shape fixed by corpusbuilder.vocab" in ln
+    )
+    return dict(sorted(counts.items()))
+
+
+def proposals(sidecar_text: str) -> list[dict]:
+    """The model-proposed declarations of a sidecar (assist-c and assist-v lines)
+    as records a reviewer can confirm, fix or reject."""
+    out: list[dict] = []
+    for record, name, source in classify_sidecar_lines(sidecar_text):
+        if not source.startswith("assist"):
+            continue
+        for raw in sidecar_text.splitlines():
+            line = raw.strip()
+            m = _DECL_RE.match(line)
+            if m and m.group(1) == record and m.group(2) == name:
+                kv = dict(
+                    tok.split("=", 1) for tok in line.split("::", 1)[0].split()[2:] if "=" in tok
+                )
+                out.append(
+                    {
+                        "name": name,
+                        "kind": record,
+                        "shape": [f for f in kv.get("shape", "-").split(",") if f and f != "-"],
+                        "domain": kv.get("domain", "-"),
+                        "pkind": kv.get("kind", "-"),
+                        "role": kv.get("role", "-"),
+                        "desc": line.split("::", 1)[1].strip() if "::" in line else "",
+                        "source": source,
+                        "line": line,
+                    }
+                )
+                break
+    return out
+
+
+def _rows_for_names(text: str) -> dict[str, str]:
+    """Normalized row text by row name for one candidate document."""
+    normalized, _prov = normalize_latex(text, source="corpusbuilder.vocab")
+    bm = _BODY_RE.search(normalized)
+    return {
+        name: _TAG_RE.sub("", row).strip(" &\\\n")
+        for name, row in _rows(bm.group(1) if bm else normalized)
+    }
+
+
+def gold_sample(
+    *,
+    n: int = 100,
+    seed: int = 20260913,
+    vocab_dir: Path = VOCAB_DIR,
+    promoted_dir: Path = PROMOTED,
+    declarations_dir: Path = DECLARATIONS,
+    prose_dir: Path = PROSE_DIR,
+) -> dict:
+    """A fixed-seed random sample of missing names for BLIND human labelling.
+
+    Every item carries what a labeller needs and nothing a proposal could
+    anchor on: the rows the name occurs in (normalized), the paper's declared
+    index families, and the abstract when a prose digest exists locally.
+    """
+    import random
+
+    pool: list[tuple[str, str]] = []
+    for path in sorted(vocab_dir.glob("*.json")):
+        audit = json.loads(path.read_text(encoding="utf-8"))
+        for name in sorted(audit.get("missing", {})):
+            pool.append((audit["paper_key"], name))
+    rng = random.Random(seed)
+    chosen = sorted(rng.sample(pool, min(n, len(pool))))
+    items: list[dict] = []
+    rows_cache: dict[str, dict[str, str]] = {}
+    for key, name in chosen:
+        audit = json.loads((vocab_dir / f"{key}.json").read_text(encoding="utf-8"))
+        rec = audit["missing"][name]
+        if key not in rows_cache:
+            doc = (promoted_dir / f"{key}.tex").read_text(encoding="utf-8")
+            sidecar = declarations_dir / f"{key}.tex"
+            if sidecar.exists():
+                doc = doc_with_sidecar(doc, sidecar.read_text(encoding="utf-8"))
+            rows_cache[key] = _rows_for_names(doc)
+        prose_path = prose_dir / f"{key}.json"
+        abstract = ""
+        if prose_path.exists():
+            try:
+                abstract = str(
+                    json.loads(prose_path.read_text(encoding="utf-8")).get("abstract") or ""
+                )
+            except (OSError, json.JSONDecodeError):
+                abstract = ""
+        items.append(
+            {
+                "id": f"{key}::{name}",
+                "paper_key": key,
+                "name": name,
+                "evidence": rec["evidence"],
+                "kind_guess_hidden": rec["kind"],
+                "arities": rec["arities"],
+                "rows": [{"name": r, "latex": rows_cache[key].get(r, "")} for r in rec["rows"][:6]],
+                "families": audit["declared"]["index"],
+                "abstract": abstract[:2000],
+            }
+        )
+    return {
+        "schema_version": "vocab-gold-1",
+        "seed": seed,
+        "n": len(items),
+        "pool": len(pool),
+        "rewrite_rules_version": REWRITE_RULES_VERSION,
+        "items": items,
+    }
+
+
+def decision_line(d: dict) -> str | None:
+    """The ``%@`` line a human decision denotes (``None`` for non-declarations)."""
+    if d.get("verdict") != "declare":
+        return None
+    name = d["name"]
+    shape = ",".join(d.get("shape") or []) or "-"
+    desc = (d.get("desc") or "").strip().replace("\n", " ")
+    kind = d.get("kind")
+    if kind == "index":
+        return f"%@ index {name} ordered=0 cyclic=0 :: {desc}"
+    if kind == "param":
+        pkind = d.get("pkind") or "scalar"
+        return f"%@ param {name} shape={shape} kind={pkind} domain=- :: {desc}"
+    if kind == "var":
+        domain = d.get("domain") or "continuous"
+        role = d.get("role") or "primary"
+        return (
+            f"%@ var {name} shape={shape} domain={domain} role={role} drole=- lo=- hi=- :: {desc}"
+        )
+    return None
+
+
+def validate_decision(d: dict) -> list[str]:
+    errors: list[str] = []
+    if d.get("verdict") not in ("declare", "not_a_symbol", "skip"):
+        errors.append("verdict must be declare | not_a_symbol | skip")
+    if not re.fullmatch(r"[A-Za-z_]\w*", str(d.get("name", ""))):
+        errors.append("name is not an identifier")
+    if d.get("verdict") == "declare":
+        kind = d.get("kind")
+        if kind not in ("index", "param", "var"):
+            errors.append("kind must be index | param | var")
+        if kind == "var" and d.get("domain") not in VAR_DOMAINS:
+            errors.append(f"var domain must be one of {VAR_DOMAINS}")
+        if kind == "param" and (d.get("pkind") or "scalar") not in PARAM_KINDS:
+            errors.append(f"param kind must be one of {PARAM_KINDS}")
+        if kind == "var" and (d.get("role") or "primary") not in VAR_ROLES:
+            errors.append(f"var role must be one of {VAR_ROLES}")
+        for fam in d.get("shape") or []:
+            if not re.fullmatch(r"[A-Za-z_]\w*", str(fam)):
+                errors.append(f"shape family {fam!r} is not an identifier")
+    return errors
+
+
+def apply_decisions(
+    export: dict,
+    *,
+    declarations_dir: Path = DECLARATIONS,
+    gold_labels_path: Path = GOLD_LABELS_PATH,
+    today: str | None = None,
+) -> dict:
+    """Write a ``vocab-decisions-1`` export into the sidecars.
+
+    Every declaration lands under a dated ``% --- vocabulary (human, MODE,
+    DATE) ---`` block; a proposal the human superseded is commented out where
+    it stood, so the sidecar shows both the model's line and the person's.
+    ``not_a_symbol`` verdicts are kept as comments the audit honours. Blind
+    decisions are additionally recorded in ``corpus/vocab_gold_labels.json``
+    (merged by id) for the agreement measurement.
+    """
+    from datetime import date
+
+    if export.get("schema_version") != "vocab-decisions-1":
+        raise ValueError("expected a vocab-decisions-1 export")
+    mode = str(export.get("mode") or "confirm")
+    today = today or date.today().isoformat()
+    report: dict = {
+        "mode": mode,
+        "papers": 0,
+        "declared": 0,
+        "not_a_symbol": 0,
+        "skipped": 0,
+        "superseded": 0,
+        "families_added": 0,
+        "invalid": [],
+        "no_sidecar": [],
+    }
+    by_paper: dict[str, list[dict]] = {}
+    for d in export.get("decisions", []):
+        errors = validate_decision(d)
+        if errors:
+            report["invalid"].append({"id": d.get("id"), "errors": errors})
+            continue
+        by_paper.setdefault(str(d["paper_key"]), []).append(d)
+    for key, decisions in sorted(by_paper.items()):
+        sidecar_path = declarations_dir / f"{key}.tex"
+        if not sidecar_path.exists():
+            report["no_sidecar"].append(key)
+            continue
+        text = sidecar_path.read_text(encoding="utf-8")
+        lines = text.splitlines()
+        block: list[str] = [f"% --- vocabulary (human, {mode}, {today}) ---"]
+        declared_now: set[str] = set()
+        declared_families = {n for r, n, _s in classify_sidecar_lines(text) if r == "index"}
+        for d in sorted(decisions, key=lambda x: str(x["name"])):
+            name = str(d["name"])
+            if d["verdict"] == "skip":
+                report["skipped"] += 1
+                continue
+            # supersede any earlier declaration of the name (model or human)
+            for i, ln in enumerate(lines):
+                m = _DECL_RE.match(ln)
+                if m and m.group(2) == name and m.group(1) in ("index", "param", "var"):
+                    lines[i] = f"% superseded by human decision ({today}): {ln.strip()}"
+                    report["superseded"] += 1
+            if d["verdict"] == "not_a_symbol":
+                block.append(f"% not a symbol (human): {name}")
+                report["not_a_symbol"] += 1
+                continue
+            line = decision_line(d)
+            if line is None:
+                continue
+            if d.get("proposal") and d.get("changed"):
+                block.append(f"% changed from proposal: {d['proposal'].get('line', '')}")
+            block.append(line)
+            declared_now.add(name)
+            report["declared"] += 1
+            for fam in d.get("shape") or []:
+                if fam not in declared_families and fam not in declared_now:
+                    block.append(
+                        f"%@ index {fam} ordered=0 cyclic=0 :: family used in a human-decided shape"
+                    )
+                    declared_families.add(fam)
+                    report["families_added"] += 1
+        if len(block) > 1:
+            sidecar_path.write_text(
+                "\n".join(lines).rstrip() + "\n" + "\n".join(block) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+            report["papers"] += 1
+    if mode == "blind":
+        labels: dict = {"schema_version": "vocab-gold-labels-1", "labels": {}}
+        if gold_labels_path.exists():
+            labels = json.loads(gold_labels_path.read_text(encoding="utf-8"))
+        for d in export.get("decisions", []):
+            if not validate_decision(d):
+                labels["labels"][str(d["id"])] = {
+                    k: d.get(k)
+                    for k in (
+                        "paper_key",
+                        "name",
+                        "verdict",
+                        "kind",
+                        "shape",
+                        "domain",
+                        "pkind",
+                        "role",
+                    )
+                }
+        gold_labels_path.write_text(
+            json.dumps(labels, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+        )
+        report["gold_labels_total"] = len(labels["labels"])
+    return report
+
+
+def agreement(
+    *, gold_labels_path: Path = GOLD_LABELS_PATH, declarations_dir: Path = DECLARATIONS
+) -> dict:
+    """Blind human labels vs the model's declarations for the same names.
+
+    A name the model never declared counts as the model saying "not a
+    symbol"; kind agreement is scored over index / param / var /
+    not_a_symbol with Cohen's kappa, shape and domain agreement over the
+    pairs where both declared the same kind.
+    """
+    labels = json.loads(gold_labels_path.read_text(encoding="utf-8"))["labels"]
+    pairs: list[tuple[str, str]] = []
+    shape_ok = shape_n = domain_ok = domain_n = 0
+    no_proposal = 0
+    props_cache: dict[str, dict[str, dict]] = {}
+    for _id, lab in sorted(labels.items()):
+        if lab["verdict"] == "skip":
+            continue
+        key = lab["paper_key"]
+        if key not in props_cache:
+            path = declarations_dir / f"{key}.tex"
+            text = path.read_text(encoding="utf-8") if path.exists() else ""
+            props_cache[key] = {p["name"]: p for p in proposals(text)}
+        prop = props_cache[key].get(lab["name"])
+        human = lab["kind"] if lab["verdict"] == "declare" else "not_a_symbol"
+        model = prop["kind"] if prop else "not_a_symbol"
+        if not prop:
+            no_proposal += 1
+        pairs.append((human, model))
+        if prop and human == model and human in ("param", "var"):
+            shape_n += 1
+            shape_ok += int((lab.get("shape") or []) == prop["shape"])
+            if human == "var":
+                domain_n += 1
+                domain_ok += int(lab.get("domain") == prop["domain"])
+    n = len(pairs)
+    agree = sum(1 for h, m in pairs if h == m)
+    cats = ("index", "param", "var", "not_a_symbol")
+    ph = {c: sum(1 for h, _ in pairs if h == c) / n for c in cats} if n else {}
+    pm = {c: sum(1 for _, m in pairs if m == c) / n for c in cats} if n else {}
+    pe = sum(ph[c] * pm[c] for c in cats) if n else 0.0
+    po = agree / n if n else 0.0
+    kappa = (po - pe) / (1 - pe) if n and pe < 1 else 0.0
+    confusion = {
+        h: {m: sum(1 for hh, mm in pairs if hh == h and mm == m) for m in cats} for h in cats
+    }
+    return {
+        "schema_version": "vocab-agreement-1",
+        "n": n,
+        "no_proposal": no_proposal,
+        "kind_agreement": round(po, 4),
+        "kind_kappa": round(kappa, 4),
+        "shape_agreement": round(shape_ok / shape_n, 4) if shape_n else None,
+        "shape_n": shape_n,
+        "domain_agreement": round(domain_ok / domain_n, 4) if domain_n else None,
+        "domain_n": domain_n,
+        "confusion_human_rows_model_cols": confusion,
+    }
+
+
 def suggestion_block(key: str, audit: dict) -> str:
     """The fill-in list as ``%@`` lines a reviewer copies into the sidecar."""
     lines = [
@@ -506,6 +895,11 @@ def check_all(
         audit = scan_document(text)
         audit["paper_key"] = key
         audit["sidecar"] = sidecar_path.exists()
+        audit["declared_by_source"] = (
+            sidecar_source_counts(sidecar_path.read_text(encoding="utf-8"))
+            if sidecar_path.exists()
+            else {}
+        )
         if fix_shapes and write and audit["sidecar"] and audit["shape_fixes"]:
             audit["shape_fixes_applied"] = apply_shape_fixes(sidecar_path, audit["shape_fixes"])
         papers[key] = audit
@@ -542,6 +936,14 @@ def build_report(papers: dict[str, dict]) -> dict:
         "shape_mismatch_papers": sum(1 for a in papers.values() if a["shape_mismatch"]),
         "unresolved_script_papers": sum(1 for a in papers.values() if a["unresolved_script"]),
         "missing_index_papers": sum(1 for a in papers.values() if a["missing_index"]),
+        "declared_by_source": dict(
+            sorted(
+                sum(
+                    (Counter(a.get("declared_by_source", {})) for a in papers.values()),
+                    Counter(),
+                ).items()
+            )
+        ),
         "shape_fix_candidates": sum(len(a.get("shape_fixes", [])) for a in papers.values()),
         "shape_fixes_applied": sum(a.get("shape_fixes_applied", 0) for a in papers.values()),
         "most_common_missing": names.most_common(20),
@@ -579,6 +981,8 @@ def render_report_md(report: dict) -> str:
         f" · with an undeclared index family: {report['missing_index_papers']}",
         f"- shapes the formulas decide: {report['shape_fix_candidates']} candidates"
         f" · applied to sidecars this run: {report['shape_fixes_applied']}",
+        "- declarations by source: "
+        + " · ".join(f"{k} {v}" for k, v in report["declared_by_source"].items()),
         "",
         "## Most common missing names",
         "",
@@ -612,6 +1016,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--only", action="append", default=[], metavar="PAPER_KEY")
     parser.add_argument("--dry-run", action="store_true", help="report only; write nothing")
     parser.add_argument(
+        "--gold",
+        type=int,
+        default=None,
+        metavar="N",
+        help="draw a fixed-seed sample of N missing names for BLIND human labelling "
+        "into corpus/vocab_gold.json (rows + families + abstract; gitignored) and exit",
+    )
+    parser.add_argument("--seed", type=int, default=20260913, help="seed for --gold")
+    parser.add_argument(
+        "--apply-decisions",
+        type=Path,
+        default=None,
+        metavar="FILE",
+        help="write a vocab-decisions-1 export (the vocabulary round's output) into the "
+        "sidecars under a dated human block and exit",
+    )
+    parser.add_argument(
+        "--agreement",
+        action="store_true",
+        help="score the blind gold labels against the model's declarations and exit",
+    )
+    parser.add_argument(
         "--fix-shapes",
         action="store_true",
         help="rewrite sidecar shapes the formulas decide (every use writes the same bound "
@@ -620,6 +1046,31 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     from corpusbuilder import factory
+
+    if args.apply_decisions is not None:
+        report = apply_decisions(
+            json.loads(args.apply_decisions.read_text(encoding="utf-8")),
+            declarations_dir=args.declarations,
+        )
+        print(json.dumps(report, indent=1, ensure_ascii=False))
+        return 0
+    if args.agreement:
+        result = agreement(declarations_dir=args.declarations)
+        (CORPUS / "vocab_agreement.json").write_text(
+            json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+        )
+        print(json.dumps(result, indent=1))
+        return 0
+    if args.gold is not None:
+        gold = gold_sample(n=args.gold, seed=args.seed)
+        GOLD_PATH.write_text(
+            json.dumps(gold, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
+        )
+        print(
+            f"gold sample: {gold['n']} of {gold['pool']} missing names (seed {gold['seed']}) "
+            f"-> {_rel(GOLD_PATH)}"
+        )
+        return 0
 
     with factory.running("vocab") as beat:
         report = check_all(

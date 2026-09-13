@@ -1620,7 +1620,8 @@ Rules:
   %@ param NAME shape=<S> kind=scalar|vector|matrix|big_m|tolerance domain=- :: meaning
   %@ var NAME shape=<S> domain=binary|integer|non_negative|continuous role=primary|auxiliary|slack|indicator drole=- lo=- hi=- :: meaning
   where <S> is - for no index or a comma list of index families, one per written index,
-  in the written order; use only families already declared or added in this reply.
+  in the written order; use ONLY tokens from shape_tokens_allowed (family NAMES such as
+  I, T, K — never the index letters i, t, k).
 - param = given data (costs, times, capacities, big-M, weights); var = decided by the
   model; index = a set the formulas sum or quantify over.
 - A listed name that is not a symbol (an operator word, a unit, junk from extraction)
@@ -1656,7 +1657,14 @@ def vocab_input(
             }
         )
     abstract = str((prose or {}).get("abstract") or "")[:2500]
+    declared_families = [_parse_decl_line(ln)[1] for ln in families]
+    allowed = sorted(
+        {f for f in declared_families if f}
+        | set(audit.get("missing_index", []))
+        | {fams[0] for fams in audit.get("letter_families", {}).values() if len(fams) == 1}
+    )
     return {
+        "shape_tokens_allowed": allowed,
         "paper": {
             "title": dossier.source.title if dossier else "",
             "doi": dossier.source.doi if dossier else "",
@@ -1670,6 +1678,32 @@ def vocab_input(
         "fill_in": entries,
         "feedback": feedback,
     }
+
+
+def repair_vocab_shapes(reply: dict, letter_families: dict[str, list[str]]) -> dict:
+    """Deterministic repair of the one systematic reply defect measured in
+    the night run (231 of 342 rejections): a shape written with index
+    LETTERS (``shape=i,j``) where each letter is bound to exactly one family
+    in the document becomes the family tuple (``shape=I,J``). Anything else
+    is left for validation to refuse."""
+    lines = reply.get("declarations_add")
+    if not isinstance(lines, list):
+        return reply
+    fixed: list = []
+    for raw in lines:
+        line = str(raw)
+        m = re.search(r"\bshape=([^\s]+)", line)
+        if m and m.group(1) != "-":
+            parts = m.group(1).split(",")
+            new_parts = []
+            for part in parts:
+                fams = letter_families.get(part)
+                new_parts.append(fams[0] if fams and len(fams) == 1 and part not in fams else part)
+            if new_parts != parts:
+                line = line.replace(m.group(0), "shape=" + ",".join(new_parts), 1)
+        fixed.append(line)
+    reply["declarations_add"] = fixed
+    return reply
 
 
 def validate_vocab(reply: dict, allowed: set[str], index_names: set[str]) -> list[str]:
@@ -1785,7 +1819,9 @@ def fill_vocab_paper(
             VOCAB_STAGE,
             VOCAB_SYSTEM,
             build,
-            lambda r: validate_vocab(r, allowed, index_names),
+            lambda r: validate_vocab(
+                repair_vocab_shapes(r, audit.get("letter_families", {})), allowed, index_names
+            ),
             run.usage,
             retries=retries,
             force=force,
