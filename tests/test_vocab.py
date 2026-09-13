@@ -383,3 +383,16 @@ def test_agreement_scores_blind_labels_against_the_model(tmp_path: Path):
     assert result["shape_agreement"] == 1.0 and result["shape_n"] == 2
     assert result["domain_agreement"] == 1.0 and result["domain_n"] == 1
     assert 0 < result["kind_kappa"] < 1
+
+
+def test_row_display_text_keeps_leading_commands_and_drops_alignment():
+    assert (
+        vocab.row_display_text(r"  \min\quad & \left(x_{i} + 1\right) \tag{eq\_0001} \\")
+        == r"\min \left(x_{i} + 1\right)"
+    )
+    assert (
+        vocab.row_display_text(
+            r"  & \left| y \right| \le u \qquad \forall i \in \mathcal{I} \tag{r} \\"
+        )
+        == r"\left| y \right| \le u \qquad \forall i \in \mathcal{I}"
+    )

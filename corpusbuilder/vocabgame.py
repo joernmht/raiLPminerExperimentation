@@ -29,7 +29,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
+import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 from corpusbuilder.game import render_latex
@@ -187,10 +191,83 @@ def confirm_items(
     return items
 
 
+RENDER_DIR = Path(__file__).resolve().parents[1] / "scripts" / "render"
+
+
+def _node_path() -> str | None:
+    """Where mathjax-full lives: the repo-local install first, else NODE_PATH."""
+    local = RENDER_DIR / "node_modules"
+    if (local / "mathjax-full").exists():
+        return str(local)
+    for entry in (os.environ.get("NODE_PATH") or "").split(os.pathsep):
+        if entry and (Path(entry) / "mathjax-full").exists():
+            return entry
+    return None
+
+
+def prerender_mml(texts: list[str]) -> list[dict]:
+    """TeX -> MathML for every string, in one node process, at build time.
+
+    The pages then render with no network at all (MathML is native in
+    current browsers). Without node or mathjax-full the result is empty
+    dicts and the page shows each row's TeX in a code box instead.
+    Install once: ``npm install --prefix scripts/render``.
+    """
+    if not texts:
+        return []
+    node = shutil.which("node")
+    node_path = _node_path()
+    if node is None or node_path is None:
+        print(
+            "vocabgame: node or mathjax-full not found (npm install --prefix scripts/render); "
+            "rows will show their TeX unrendered",
+            file=sys.stderr,
+        )
+        return [{} for _ in texts]
+    env = {**os.environ, "NODE_PATH": node_path}
+    proc = subprocess.run(
+        [node, str(RENDER_DIR / "tex2mml.js")],
+        input=json.dumps(texts, ensure_ascii=False),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    if proc.returncode != 0:
+        print(f"vocabgame: tex2mml failed: {proc.stderr[:200]}", file=sys.stderr)
+        return [{} for _ in texts]
+    out = json.loads(proc.stdout)
+    return [dict(o) for o in out] if len(out) == len(texts) else [{} for _ in texts]
+
+
+def attach_mml(items: list[dict]) -> dict[str, int]:
+    """Pre-render every row of every item in place; returns counts."""
+    refs: list[tuple[int, int]] = []
+    texts: list[str] = []
+    for i, it in enumerate(items):
+        for j, r in enumerate(it.get("rows", [])):
+            refs.append((i, j))
+            texts.append(r["latex"])
+    rendered = prerender_mml(texts)
+    counts = {"rows": len(texts), "mml": 0, "error": 0, "unrendered": 0}
+    for (i, j), res in zip(refs, rendered, strict=True):
+        row = items[i]["rows"][j]
+        if res.get("mml"):
+            row["mml"] = res["mml"]
+            counts["mml"] += 1
+        elif res.get("error"):
+            row["error"] = res["error"]
+            counts["error"] += 1
+        else:
+            counts["unrendered"] += 1
+    return counts
+
+
 def build(mode: str, items: list[dict], out: Path) -> Path:
     """Render the page for ``mode`` (byte-identical for identical inputs)."""
     if mode not in ("blind", "confirm"):
         raise ValueError("mode must be 'blind' or 'confirm'")
+    attach_mml(items)
     data = {
         "schema_version": SCHEMA,
         "mode": mode,
@@ -244,8 +321,6 @@ TEMPLATE = r"""<!DOCTYPE html>
 <meta name="theme-color" content="#00103a" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔤</text></svg>">
 <title>Vocabulary round — __MODE__</title>
-<script>window.MathJax={tex:{displayMath:[["\\[","\\]"]]},options:{enableMenu:false},startup:{typeset:false}};</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" onerror="window.__mjfail=1"></script>
 <style>
 :root{
   --page1:#f3f7f8;--page2:#e7f1f1;--ink:#0c1f3a;--muted:#566782;
@@ -282,7 +357,7 @@ h1{font-size:21px;margin:4px 0 2px;font-weight:800;letter-spacing:-.01em}
 .ev{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted);margin:2px 4px 6px 0}
 .rows{margin-top:6px}.row{border-top:1px solid var(--line);padding:6px 0}
 .row .rn{font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.math{overflow-x:auto;font-size:15px}.math .err{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--bad);white-space:pre-wrap}
+.math{overflow-x:auto;font-size:15px}.math math{display:block;font-size:1.08em;padding:4px 0}.math .err{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--bad);white-space:pre-wrap}
 mjx-container{margin:4px 0 !important}
 details{margin-top:8px}summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:13px}
 .abs{font-size:13.5px;color:var(--ink);margin-top:6px;line-height:1.5}
@@ -399,19 +474,13 @@ function load(){
 function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } }
 function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),1600); }
 
-/* ---------- MathJax queue (one promise chain, waits for the CDN) ---------- */
-let mjQ = Promise.resolve();
-function renderMath(el, latex){
-  el.textContent = "";
-  const d = document.createElement("div"); d.textContent = "\\[ " + latex + " \\]"; el.appendChild(d);
-  if (window.__mjfail){ mjErr(el, latex); return; }
-  mjQ = mjQ.then(async ()=>{
-    for (let i=0; i<20 && !(window.MathJax && MathJax.typesetPromise); i++) await new Promise(r=>setTimeout(r,250));
-    if (window.__mjfail || !(window.MathJax && MathJax.typesetPromise)) throw 0;
-    await MathJax.typesetPromise([el]);
-  }).catch(()=>mjErr(el, latex));
+/* ---------- formulas: MathML pre-rendered at build time (no network) ---------- */
+function renderMath(el, row){
+  el.innerHTML = "";
+  if (row.mml){ el.innerHTML = row.mml; return; }
+  const d = document.createElement("div"); d.className = "err"; d.textContent = row.latex; el.appendChild(d);
+  if (row.error){ const e = document.createElement("div"); e.className = "sub"; e.textContent = "not rendered: " + row.error; el.appendChild(e); }
 }
-function mjErr(el, latex){ el.innerHTML=""; const d=document.createElement("div"); d.className="err"; d.textContent=latex; el.appendChild(d); }
 
 /* ---------- form ---------- */
 function emptyForm(item){
@@ -475,7 +544,7 @@ function paintItem(){
     const div = document.createElement("div"); div.className = "row";
     const rn = document.createElement("div"); rn.className = "rn"; rn.textContent = r.name; div.appendChild(rn);
     const m = document.createElement("div"); m.className = "math"; div.appendChild(m); rows.appendChild(div);
-    renderMath(m, r.latex);
+    renderMath(m, r);
   }
   if (item.abstract){ $("abstract").textContent = item.abstract; $("absBox").classList.remove("hidden"); } else { $("absBox").classList.add("hidden"); }
   $("familyChips").innerHTML = item.families.map((f, k) => '<button type="button" class="chip" data-f="' + esc(f) + '" data-n="' + (k+1) + '">' + esc(f) + '<span class="ord hidden"></span></button>').join("") || '<span class="sub">no index family declared for this paper</span>';
