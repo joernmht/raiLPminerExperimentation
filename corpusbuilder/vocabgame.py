@@ -205,12 +205,12 @@ def _node_path() -> str | None:
     return None
 
 
-def prerender_mml(texts: list[str]) -> list[dict]:
-    """TeX -> MathML for every string, in one node process, at build time.
-
-    The pages then render with no network at all (MathML is native in
-    current browsers). Without node or mathjax-full the result is empty
-    dicts and the page shows each row's TeX in a code box instead.
+def prerender_svg(texts: list[str]) -> list[dict]:
+    """TeX -> self-contained SVG for every string, in one node process, at
+    build time. The pages then render with no network and without relying
+    on the viewer's MathML support (glyphs are paths). Without node or
+    mathjax-full the result is empty dicts and the page shows each row's
+    TeX in a code box instead.
     Install once: ``npm install --prefix scripts/render``.
     """
     if not texts:
@@ -226,7 +226,7 @@ def prerender_mml(texts: list[str]) -> list[dict]:
         return [{} for _ in texts]
     env = {**os.environ, "NODE_PATH": node_path}
     proc = subprocess.run(
-        [node, str(RENDER_DIR / "tex2mml.js")],
+        [node, str(RENDER_DIR / "tex2svg.js")],
         input=json.dumps(texts, ensure_ascii=False),
         capture_output=True,
         text=True,
@@ -234,13 +234,19 @@ def prerender_mml(texts: list[str]) -> list[dict]:
         check=False,
     )
     if proc.returncode != 0:
-        print(f"vocabgame: tex2mml failed: {proc.stderr[:200]}", file=sys.stderr)
+        print(f"vocabgame: tex2svg failed: {proc.stderr[:200]}", file=sys.stderr)
         return [{} for _ in texts]
     out = json.loads(proc.stdout)
-    return [dict(o) for o in out] if len(out) == len(texts) else [{} for _ in texts]
+    items = out.get("items", []) if isinstance(out, dict) else out
+    if len(items) != len(texts):
+        return [{} for _ in texts]
+    rendered = [dict(o) for o in items]
+    if isinstance(out, dict) and out.get("cache") and rendered:
+        rendered[0]["font_cache"] = out["cache"]  # carried once, hoisted by attach_svg
+    return rendered
 
 
-def attach_mml(items: list[dict]) -> dict[str, int]:
+def attach_svg(items: list[dict]) -> dict[str, int]:
     """Pre-render every row of every item in place; returns counts."""
     refs: list[tuple[int, int]] = []
     texts: list[str] = []
@@ -248,18 +254,29 @@ def attach_mml(items: list[dict]) -> dict[str, int]:
         for j, r in enumerate(it.get("rows", [])):
             refs.append((i, j))
             texts.append(r["latex"])
-    rendered = prerender_mml(texts)
-    counts = {"rows": len(texts), "mml": 0, "error": 0, "unrendered": 0}
+    rendered = prerender_svg(texts)
+    counts = {"rows": len(texts), "svg": 0, "error": 0, "unrendered": 0}
+    font_cache = rendered[0].pop("font_cache", "") if rendered else ""
+    if font_cache and not font_cache.lstrip().startswith("<svg"):
+        # a bare <defs> block must sit inside an <svg> element to be SVG at all
+        font_cache = (
+            '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" '
+            'aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">'
+            + font_cache
+            + "</svg>"
+        )
+    counts["font_cache"] = len(font_cache)
     for (i, j), res in zip(refs, rendered, strict=True):
         row = items[i]["rows"][j]
-        if res.get("mml"):
-            row["mml"] = res["mml"]
-            counts["mml"] += 1
+        if res.get("svg"):
+            row["svg"] = res["svg"]
+            counts["svg"] += 1
         elif res.get("error"):
             row["error"] = res["error"]
             counts["error"] += 1
         else:
             counts["unrendered"] += 1
+    attach_svg.font_cache = font_cache  # type: ignore[attr-defined]
     return counts
 
 
@@ -267,8 +284,10 @@ def build(mode: str, items: list[dict], out: Path) -> Path:
     """Render the page for ``mode`` (byte-identical for identical inputs)."""
     if mode not in ("blind", "confirm"):
         raise ValueError("mode must be 'blind' or 'confirm'")
-    attach_mml(items)
+    attach_svg(items)
+    font_cache = getattr(attach_svg, "font_cache", "")
     data = {
+        "font_cache": font_cache,
         "schema_version": SCHEMA,
         "mode": mode,
         "kinds": list(KINDS),
@@ -357,7 +376,7 @@ h1{font-size:21px;margin:4px 0 2px;font-weight:800;letter-spacing:-.01em}
 .ev{display:inline-block;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--muted);margin:2px 4px 6px 0}
 .rows{margin-top:6px}.row{border-top:1px solid var(--line);padding:6px 0}
 .row .rn{font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.math{overflow-x:auto;font-size:15px}.math math{display:block;font-size:1.08em;padding:4px 0}.math .err{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--bad);white-space:pre-wrap}
+.math{overflow-x:auto;font-size:16px;color:var(--ink);padding:4px 0}.math svg{display:block;max-width:none;overflow:visible}.math .err{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:var(--bad);white-space:pre-wrap}
 mjx-container{margin:4px 0 !important}
 details{margin-top:8px}summary{cursor:pointer;color:var(--accent);font-weight:700;font-size:13px}
 .abs{font-size:13.5px;color:var(--ink);margin-top:6px;line-height:1.5}
@@ -406,6 +425,7 @@ input[type=text]{width:100%;font:inherit;padding:9px 11px;border:1.5px solid var
   <div id="evidence"></div>
   <div id="proposalBox" class="prop hidden"></div>
   <div class="rows" id="rows"></div>
+  <div id="fontCache" hidden></div>
   <details id="absBox"><summary>abstract</summary><div class="abs" id="abstract"></div></details>
 
   <h3>kind</h3>
@@ -474,10 +494,11 @@ function load(){
 function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } }
 function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(()=>el.classList.remove("show"),1600); }
 
-/* ---------- formulas: MathML pre-rendered at build time (no network) ---------- */
+/* ---------- formulas: SVG pre-rendered at build time (no network, no MathML needed) ---------- */
+(function(){ const fc = document.getElementById("fontCache"); if (fc && DATA.font_cache){ fc.innerHTML = DATA.font_cache; fc.hidden = false; fc.style.cssText = "position:absolute;width:0;height:0;overflow:hidden"; } })();
 function renderMath(el, row){
   el.innerHTML = "";
-  if (row.mml){ el.innerHTML = row.mml; return; }
+  if (row.svg){ el.innerHTML = row.svg; return; }
   const d = document.createElement("div"); d.className = "err"; d.textContent = row.latex; el.appendChild(d);
   if (row.error){ const e = document.createElement("div"); e.className = "sub"; e.textContent = "not rendered: " + row.error; el.appendChild(e); }
 }
