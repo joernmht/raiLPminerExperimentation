@@ -539,10 +539,20 @@ def _rows_for_names(text: str) -> dict[str, str]:
     """Normalized row text by row name for one candidate document."""
     normalized, _prov = normalize_latex(text, source="corpusbuilder.vocab")
     bm = _BODY_RE.search(normalized)
-    return {
-        name: _TAG_RE.sub("", row).strip(" &\\\n")
-        for name, row in _rows(bm.group(1) if bm else normalized)
-    }
+    return {name: row_display_text(row) for name, row in _rows(bm.group(1) if bm else normalized)}
+
+
+def row_display_text(row: str) -> str:
+    """One align row as displayable TeX: no ``\\tag``, no alignment ``&``, no
+    trailing ``\\\\``; the ``\\min\\quad &`` objective head becomes ``\\min``.
+    (A blanket strip of ``\\`` used to eat the backslash of a leading
+    ``\\left(`` and left the ``&`` in place: 27 of 247 gold rows failed to
+    render.)"""
+    text = _TAG_RE.sub("", row)
+    text = re.sub(r"\\\\\s*$", "", text.strip())
+    text = re.sub(r"\\quad\s*&", " ", text)
+    text = text.replace("&", " ")
+    return re.sub(r"\s{2,}", " ", text).strip()
 
 
 def gold_sample(
