@@ -102,6 +102,8 @@ def blind_items(gold: dict) -> list[dict]:
                 "rows": rows,
                 "families": list(it.get("families", [])),
                 "abstract": it.get("abstract", ""),
+                "definitions": list(it.get("definitions", [])),
+                "mentions": list(it.get("mentions", [])),
                 "proposal": None,
             }
         )
@@ -426,6 +428,7 @@ input[type=text]{width:100%;font:inherit;padding:9px 11px;border:1.5px solid var
   <div id="proposalBox" class="prop hidden"></div>
   <div class="rows" id="rows"></div>
   <div id="fontCache" hidden></div>
+  <details id="mentBox" open><summary>in the paper</summary><div class="abs" id="mentions"></div></details>
   <details id="absBox"><summary>abstract</summary><div class="abs" id="abstract"></div></details>
 
   <h3>kind</h3>
@@ -567,6 +570,10 @@ function paintItem(){
     const m = document.createElement("div"); m.className = "math"; div.appendChild(m); rows.appendChild(div);
     renderMath(m, r);
   }
+  const mb = $("mentions"); mb.innerHTML = "";
+  for (const d of (item.definitions || [])){ const p = document.createElement("p"); p.innerHTML = "<b>" + esc(d.term) + "</b> — " + esc(d.def); mb.appendChild(p); }
+  for (const m of (item.mentions || [])){ const p = document.createElement("p"); p.innerHTML = (m.labels && m.labels.length ? '<span class="ev">' + esc(m.labels.join(" ")) + "</span> " : "") + esc(m.text); mb.appendChild(p); }
+  $("mentBox").classList.toggle("hidden", !mb.childElementCount);
   if (item.abstract){ $("abstract").textContent = item.abstract; $("absBox").classList.remove("hidden"); } else { $("absBox").classList.add("hidden"); }
   $("familyChips").innerHTML = item.families.map((f, k) => '<button type="button" class="chip" data-f="' + esc(f) + '" data-n="' + (k+1) + '">' + esc(f) + '<span class="ord hidden"></span></button>').join("") || '<span class="sub">no index family declared for this paper</span>';
   $("domainBtns").innerHTML = DATA.var_domains.map(d => '<button type="button" data-d="' + d + '">' + d + '</button>').join("");
@@ -677,7 +684,7 @@ document.addEventListener("keydown", e => {
 });
 $("title").textContent = MODE === "blind" ? "Blind labels (gold set)" : "Confirm the proposals";
 $("subtitle").textContent = MODE === "blind"
-  ? "What is this symbol in this paper? Decide kind, shape and domain from the rows and the abstract. Nothing here was proposed by a model."
+  ? "What is this symbol in this paper? Decide kind, shape and domain from the rows, the paper's own words around them and the abstract. Nothing here was proposed by a model."
   : "A model proposed each line. Confirm it as is, or fix kind, shape or domain; every edit is recorded.";
 window.__vocab = {S: () => S, form: () => form, commit, next, back, exportPayload: () => ({schema_version: "vocab-decisions-1", mode: MODE, labeller: "human", decisions: ITEMS.filter(it => S.decisions[it.id]).map(it => S.decisions[it.id])}), importJSON, setKind, toggleFamily, confirmAsProposed};
 S.i = Math.min(S.i, ITEMS.length);

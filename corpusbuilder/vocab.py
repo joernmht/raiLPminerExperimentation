@@ -41,7 +41,7 @@ from lp2graph.mining.ingest import normalize_latex
 from lp2graph.mining.ingest.latex_normalizer import DocContext
 from lp2graph.mining.versions import REWRITE_RULES_VERSION
 
-from corpusbuilder.promote import CORPUS, DECLARATIONS, PROMOTED, _rel
+from corpusbuilder.promote import CORPUS, DECLARATIONS, DOSSIERS, PROMOTED, _rel
 from corpusbuilder.symbols import domain_declaration
 
 VOCAB_DIR = CORPUS / "vocab"
@@ -555,6 +555,59 @@ def row_display_text(row: str) -> str:
     return re.sub(r"\s{2,}", " ", text).strip()
 
 
+def _paper_mentions(
+    prose: dict | None, dossier_path: Path, row_names: list[str], name: str
+) -> tuple[list[dict], list[dict]]:
+    """The paper's own words about a symbol: notation-list entries that
+    mention it, and the paragraphs around the formulas it occurs in (the
+    formula's printed label links a row to its prose neighbourhood)."""
+    if not prose:
+        return [], []
+    definitions: list[dict] = []
+    base = name.split("_", 1)[0]
+    for entry in prose.get("deflists") or []:
+        if not isinstance(entry, dict):
+            continue
+        term = str(entry.get("term") or "")
+        if re.search(rf"(?<![A-Za-z]){re.escape(base)}(?![A-Za-z])", term):
+            definitions.append({"term": term[:120], "def": str(entry.get("def") or "")[:400]})
+        if len(definitions) >= 4:
+            break
+    labels: set[str] = set()
+    if dossier_path.exists():
+        try:
+            formulas = json.loads(dossier_path.read_text(encoding="utf-8")).get("formulas") or []
+        except (OSError, json.JSONDecodeError):
+            formulas = []
+        wanted = {re.sub(r"_[a-z]$", "", r) for r in row_names}
+        for f in formulas:
+            fid = re.sub(r"[^A-Za-z0-9_]+", "_", str(f.get("id") or "")).strip("_")
+            if fid in wanted and f.get("label"):
+                labels.add(str(f["label"]))
+    paras = [q for q in prose.get("paras") or [] if isinstance(q, dict) and q.get("text")]
+    linked = [
+        pos
+        for pos, q in enumerate(paras)
+        if labels & {str(lb) for lb in q.get("formula_labels") or []}
+    ]
+    mentions: list[dict] = []
+    seen: set[int] = set()
+    for pos in linked:
+        for k in (pos, pos + 1, pos - 1):
+            if 0 <= k < len(paras) and k not in seen:
+                seen.add(k)
+                q = paras[k]
+                mentions.append(
+                    {
+                        "labels": [str(lb) for lb in q.get("formula_labels") or []][:4],
+                        "text": str(q["text"])[:900],
+                    }
+                )
+        if len(mentions) >= 5:
+            break
+    return definitions, mentions[:5]
+
+
 def gold_sample(
     *,
     n: int = 100,
@@ -563,6 +616,7 @@ def gold_sample(
     promoted_dir: Path = PROMOTED,
     declarations_dir: Path = DECLARATIONS,
     prose_dir: Path = PROSE_DIR,
+    dossiers_dir: Path = DOSSIERS,
 ) -> dict:
     """A fixed-seed random sample of missing names for BLIND human labelling.
 
@@ -591,14 +645,17 @@ def gold_sample(
                 doc = doc_with_sidecar(doc, sidecar.read_text(encoding="utf-8"))
             rows_cache[key] = _rows_for_names(doc)
         prose_path = prose_dir / f"{key}.json"
-        abstract = ""
+        prose: dict | None = None
         if prose_path.exists():
             try:
-                abstract = str(
-                    json.loads(prose_path.read_text(encoding="utf-8")).get("abstract") or ""
-                )
+                loaded = json.loads(prose_path.read_text(encoding="utf-8"))
+                prose = loaded if isinstance(loaded, dict) else None
             except (OSError, json.JSONDecodeError):
-                abstract = ""
+                prose = None
+        abstract = str((prose or {}).get("abstract") or "")
+        definitions, mentions = _paper_mentions(
+            prose, dossiers_dir / f"{key}.json", rec["rows"][:6], name
+        )
         items.append(
             {
                 "id": f"{key}::{name}",
@@ -610,6 +667,8 @@ def gold_sample(
                 "rows": [{"name": r, "latex": rows_cache[key].get(r, "")} for r in rec["rows"][:6]],
                 "families": audit["declared"]["index"],
                 "abstract": abstract[:2000],
+                "definitions": definitions,
+                "mentions": mentions,
             }
         )
     return {
