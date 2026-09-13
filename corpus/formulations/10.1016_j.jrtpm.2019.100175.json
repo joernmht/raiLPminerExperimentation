@@ -1,0 +1,416 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.jrtpm.2019.100175",
+  "name": "A concurrent approach to the periodic event scheduling problem",
+  "family": "milp",
+  "description": "Mined from A concurrent approach to the periodic event scheduling problem (Journal of Rail Transport Planning & Management, 2019).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.jrtpm.2019.100175",
+    "reference": "A concurrent approach to the periodic event scheduling problem",
+    "author": "Ralf Borndörfer; Niels Lindner; Sarah Roth",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "i",
+      "description": "Index for events",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Index for events",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "w",
+      "description": "Weight vector for slack variables in objective",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "ell",
+      "description": "Lower bound on activity durations",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "A",
+      "description": "Incidence matrix of event-activity network",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Period length",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Upper bound on activity durations",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "Z",
+      "description": "Set of integers (symbol for integer domain)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Gamma",
+      "description": "Cycle matrix of the network",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "gamma",
+      "description": "Incidence vector of an oriented cycle",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "Modulo value used in change-cycle inequalities",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "wt",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "A_t",
+      "description": "coefficient in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ell_ij",
+      "description": "lower bound on y_ij",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma_t",
+      "description": "coefficient in constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma_t_minus",
+      "description": "coefficient in constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma_t_plus",
+      "description": "coefficient in constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu",
+      "description": "dimension of z",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "p_ij",
+      "description": "integer period offset",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "y",
+      "description": "Periodic slack on activities",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "pi",
+      "description": "Periodic timetable values for events",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "p",
+      "description": "Periodic offsets for activities",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Integer variables in cycle formulation",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_BC",
+      "description": "event time difference",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "y_EF",
+      "description": "event time difference",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "y_ij",
+      "description": "event time difference",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005_lo",
+      "description": "Bounds on periodic slack 0 <= y_ij <= u_ij - ell_ij",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005_up",
+      "description": "Bounds on periodic slack 0 <= y_ij <= u_ij - ell_ij",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "T",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011_lo",
+      "description": "Slack bounds in cycle formulation",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011_up",
+      "description": "Slack bounds in cycle formulation",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "ell",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_c_1",
+      "description": "Change-cycle inequality (Nachtigall) — part (c)",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y_BC",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y_EF",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_c_2",
+      "description": "Change-cycle inequality (Nachtigall) — part (c)",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y_EF",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted periodic slack",
+    "terms": [
+      {
+        "ref": "y",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "wt",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

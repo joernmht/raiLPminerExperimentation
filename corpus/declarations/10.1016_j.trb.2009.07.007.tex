@@ -25,7 +25,8 @@
 % con   NAME  kind=linear|big_m|ordering|headway|capacity|flow_balance|modulo|...
 
 %@ obj sense=max name=objective combination=sum :: Maximize total profit of assigning extra freight trains to routes
-%@ param p shape=T,R kind=matrix :: Profit of assigning train j to route r
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): p shape=T,R -> -
+%@ param p shape=- kind=matrix :: Profit of assigning train j to route r
 %@ var x shape=T,R domain=binary role=primary :: Binary variable indicating if train j uses route r
 %@ index R ordered=0 cyclic=0 :: Set of routes for train j
 %@ index T ordered=0 cyclic=0 :: Set of trains

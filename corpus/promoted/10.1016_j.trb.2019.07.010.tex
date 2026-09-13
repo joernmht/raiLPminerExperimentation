@@ -24,7 +24,7 @@
 %@ index S ordered=0 cyclic=0 :: Set of stations
 %@ index I ordered=0 cyclic=0 :: Set of passing block sections
 %@ index MOT ordered=0 cyclic=0 :: Set of maintenance tasks
-%@ param mot shape=MOT kind=vector domain=- :: Earliest start time of maintenance task m
+%@ param mot shape=MOT,S kind=vector domain=- :: Earliest start time of maintenance task m
 %@ param d shape=MOT kind=vector domain=- :: Minimum duration of maintenance task m
 %@ index C ordered=0 cyclic=0 :: Set of maintenance cells
 %@ var z shape=r,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train passing after maintenance
@@ -88,21 +88,18 @@
   & y_{r , b}^{e n t r} \leq M \cdot x_{r , b} , \forall r \in R , b \in B_{r} \tag{eq\_0003} \\
   & y_{r , b}^{e x i t} \leq M \cdot x_{r , b} , \forall r \in R , b \in B_{r} \tag{eq\_0004} \\
   & y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + x_{r , b} \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) , \forall r \in R , b \in \left\{\right. b \left|\right. n_{b}^{+} \neq n_{r}^{o} , b \in B_{r} \backslash B^{a} \left.\right\} \tag{eq\_0005} \\
-  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e x i t} \geq \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} + \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} x_{r , b} \sum_{l \in L_{b}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) + t_{r , s_{r}^{o}}^{s t o p} , \forall r \in R , n_{r}^{o} \notin N^{b} \tag{eq\_0006} \\
   & y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + x_{r , b} \sum_{l \in L_{b} \backslash l_{b}^{l a s t}} \left(t_{r , l} + t_{r , l}^{r e c o}\right) , \forall r \in R , b \in B_{r} \cap B^{a} \tag{eq\_0007} \\
-  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} \geq t_{r}^{s} , \forall r \in R \tag{eq\_0008} \\
-  & \underset{b \in B_{r , n_{r}^{o}}^{+}}{\sum} y_{r , b}^{e n t r} \leq t_{r}^{e} , \forall r \in R \tag{eq\_0009} \\
   & \sum_{n \in N_{r , s}, bp \in B_{r , n}^{a , -}} y_{r , bp}^{e x i t} + t_{r , s}^{s t o p} + \sum_{n \in N_{r , s}, bp \in B_{r , n}^{a , -}} x_{r , bp} \left(t_{r , l_{bp}^{l a s t}} + t_{r , l_{bp}^{l a s t}}^{r e c o}\right) = \sum_{n \in N_{r , s}, b \in B_{r , n}^{+}} y_{r , b}^{e n t r} , \forall r \in R , s \in S_{r}^{^{'}} \tag{eq\_0010} \\
   & \sum_{bp \in B_{r , n}^{-} , bp \notin B^{a}} y_{r , bp}^{e x i t} = \sum_{b \in B_{r , n}^{+}} y_{r , b}^{e n t r} , \forall r \in R , n \in \left\{\right. n \left|\right. n \neq n_{r}^{o} , n \neq n_{r}^{d} , n \in N_{r} \backslash N_{r , s} , s \in S_{r}^{^{'}} \left.\right\} \tag{eq\_0011} \\
   & t_{r , s}^{s t o p} \geq t_{r , s}^{d w e l l} , \forall r \in R , s \in S_{r} \tag{eq\_0012} \\
   & t_{r , s}^{s t o p} \leq \left(1 - x_{r , b}\right) M , \forall r \in R , n \in N^{m} , b \in B_{r , n}^{-} , s^{n} \in S_{r} \tag{eq\_0013} \\
-  & \sum_{b \in B_{r , n}^{+}} x_{r , b} - \sum_{b \in B_{r , n}^{-}} x_{r , b} = \begin{cases} 1 \\ - 1 \\ 0 \end{cases} \begin{matrix}n = n_{r}^{o} \\ n = n_{r}^{d} \\ o t h e r w i s e\end{matrix} , \forall r \in R \tag{eq\_0014} \\
+  & \sum_{b \in B_{r , n}^{+}} x_{r , b} - \sum_{b \in B_{r , n}^{-}} x_{r , b} = \begin{cases} 1 \\ - 1 \\ 0 \end{cases} n = n_{r}^{o} \\ n = n_{r}^{d} \\ o t h e r w i s e , \forall r \in R \tag{eq\_0014} \\
   & \sum_{n \in N^{s}, bp \in B_{r , n}^{-}} x_{r , bp} = 1 , \forall r \in R , s \in S_{r}^{'} \tag{eq\_0015} \\
-  & \begin{matrix} & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} - y_{r , b}^{e x i t} \geq t_{rp , bp}^{r e s} + t_{r , b}^{r e l} + t_{r , s}^{s t o p} + t_{r , l_{b}^{l a s t}} + t_{r , l_{b}^{l a s t}}^{r e c o} - M \left(1 - \mathit{mu}_{r , b , rp , bp}\right) , \\ & & \forall r , rp \in R , n \in N_{s} , np \in N_{s} , b \in B_{r , n}^{a , -} , bp \in B_{rp , np}^{a , -} , r \neq rp , s = s^{n} , l_{b}^{l a s t} = l_{bp}^{l a s t} , s \in S_{r}\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix} & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{rp , bp}^{e x i t} \geq t_{r , b}^{r e s} + t_{rp , bp}^{r e l} + t_{rp , s}^{s t o p} + t_{rp , l_{bp}^{l a s t}} + t_{r , l_{bp}^{l a s t}}^{r e c o} - M \mathit{mu}_{r , b , rp , bp} , \\ & & \forall r , rp \in R , n \in N_{s} , np \in N_{s} , b \in B_{r , n}^{a , -} , bp \in B_{rp , np}^{a , -} , r \neq rp , s = s^{n} , l_{b}^{l a s t} = l_{bp}^{l a s t} , s \in S_{rp}\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix} & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} - y_{r , b}^{e x i t} \geq t_{rp , bp}^{r e s} + t_{r , b}^{r e l} - M \left(1 - \mathit{mu}_{r , b , rp , bp}\right) , \\ & & \forall r , rp \in R , b \in B_{r} , bp \in B_{rp} , r \neq rp , \mathit{epsilon}_{b , bp} = 1\end{matrix} \tag{eq\_0018} \\
-  & \begin{matrix} & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{rp , bp}^{e x i t} \geq t_{r , b}^{r e s} + t_{rp , bp}^{r e l} - M \mathit{mu}_{r , b , rp , bp} , \\ & & \forall r , rp \in R , b \in B_{r} , bp \in B_{rp} , r \neq rp , \mathit{epsilon}_{b , bp} = 1\end{matrix} \tag{eq\_0019} \\
-  & \begin{matrix} & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} \geq y_{r , b}^{e x i t} + t_{rp , bp}^{r e s} + t_{r , b}^{r e l} , \\ & & \forall r , rp \in R , bp \in B_{rp , n_{r}^{o}}^{-} , n_{r}^{o} \in N_{s} , r \neq rp\end{matrix} \tag{eq\_0020} \\
+  &  & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} - y_{r , b}^{e x i t} \geq t_{rp , bp}^{r e s} + t_{r , b}^{r e l} + t_{r , s}^{s t o p} + t_{r , l_{b}^{l a s t}} + t_{r , l_{b}^{l a s t}}^{r e c o} - M \left(1 - \mathit{mu}_{r , b , rp , bp}\right) , \\ & & \forall r , rp \in R , n \in N_{s} , np \in N_{s} , b \in B_{r , n}^{a , -} , bp \in B_{rp , np}^{a , -} , r \neq rp , s = s^{n} , l_{b}^{l a s t} = l_{bp}^{l a s t} , s \in S_{r}  \tag{eq\_0016} \\
+  &  & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{rp , bp}^{e x i t} \geq t_{r , b}^{r e s} + t_{rp , bp}^{r e l} + t_{rp , s}^{s t o p} + t_{rp , l_{bp}^{l a s t}} + t_{r , l_{bp}^{l a s t}}^{r e c o} - M \mathit{mu}_{r , b , rp , bp} , \\ & & \forall r , rp \in R , n \in N_{s} , np \in N_{s} , b \in B_{r , n}^{a , -} , bp \in B_{rp , np}^{a , -} , r \neq rp , s = s^{n} , l_{b}^{l a s t} = l_{bp}^{l a s t} , s \in S_{rp}  \tag{eq\_0017} \\
+  &  & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} - y_{r , b}^{e x i t} \geq t_{rp , bp}^{r e s} + t_{r , b}^{r e l} - M \left(1 - \mathit{mu}_{r , b , rp , bp}\right) , \\ & & \forall r , rp \in R , b \in B_{r} , bp \in B_{rp} , r \neq rp , \mathit{epsilon}_{b , bp} = 1  \tag{eq\_0018} \\
+  &  & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e n t r} - y_{rp , bp}^{e x i t} \geq t_{r , b}^{r e s} + t_{rp , bp}^{r e l} - M \mathit{mu}_{r , b , rp , bp} , \\ & & \forall r , rp \in R , b \in B_{r} , bp \in B_{rp} , r \neq rp , \mathit{epsilon}_{b , bp} = 1  \tag{eq\_0019} \\
+  &  & & M \left(1 - x_{rp , bp}\right) + M \left(1 - x_{r , b}\right) + y_{rp , bp}^{e n t r} \geq y_{r , b}^{e x i t} + t_{rp , bp}^{r e s} + t_{r , b}^{r e l} , \\ & & \forall r , rp \in R , bp \in B_{rp , n_{r}^{o}}^{-} , n_{r}^{o} \in N_{s} , r \neq rp  \tag{eq\_0020} \\
   & \mathit{mu}_{r , b , rp , b} = \mathit{mu}_{r , bp , rp , bp} , \forall r , rp \in R , i \in I , \forall b , bp \in \left(B_{r} \cap B_{rp} \cap B^{p}\right) , r \neq rp , bp = b + 1 \tag{eq\_0021} \\
   & t_{m}^{s t a r t} \geq \mathit{mot}_{m}^{s} , \forall m \in \mathit{MOT} \tag{eq\_0022} \\
   & t_{m}^{s t a r t} \leq \mathit{mot}_{m}^{e} , \forall m \in \mathit{MOT} \tag{eq\_0023} \\
@@ -119,7 +116,7 @@
   & z_{r , c}^{2} \leq z_{r , c} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0034} \\
   & \sum_{r \in R} z_{r , c} - 1 \leq M \sum_{r \in R} z_{r , c}^{2} , \forall m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0035} \\
   & M \left(1 - z_{r , c}^{1}\right) + M \left(1 - z_{r , c}\right) + M \left(1 - z_{r ^{'} , c}\right) + \underset{b \in B_{r ^{'}} \cap B_{c}}{\sum} y_{r ^{'} , b}^{e n t r} \geq \sum_{b \in B_{r} \cap B_{c}} y_{r , b}^{e n t r} , \forall r , r ^{'} \in R , m \in \mathit{MOT} , c \in C_{m} , r \neq r ^{'} \tag{eq\_0036} \\
-  & \begin{matrix} & & M \left(1 - z_{r , c}^{2}\right) + M \cdot z_{rp , c}^{1} + M \left(1 - z_{r , c}\right) + M \left(1 - z_{rp , c}\right) + \underset{b \in B_{rp} \cap B_{c}}{\sum} y_{rp , b}^{e n t r} \geq \sum_{b \in B_{r} \cap B_{c}} y_{r , b}^{e n t r} , \\ & & \forall r , rp \in R , m \in \mathit{MOT} , c \in C_{m} , r \neq rp\end{matrix} \tag{eq\_0037} \\
+  &  & & M \left(1 - z_{r , c}^{2}\right) + M \cdot z_{rp , c}^{1} + M \left(1 - z_{r , c}\right) + M \left(1 - z_{rp , c}\right) + \underset{b \in B_{rp} \cap B_{c}}{\sum} y_{rp , b}^{e n t r} \geq \sum_{b \in B_{r} \cap B_{c}} y_{r , b}^{e n t r} , \\ & & \forall r , rp \in R , m \in \mathit{MOT} , c \in C_{m} , r \neq rp  \tag{eq\_0037} \\
   & z_{r , c}^{1} + z_{r , c}^{2} \leq 1 , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0038} \\
   & M \left(1 - x_{r , b}\right) + y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + t_{r , b}^{r e s t r i c t} , \forall r \in R , m \in \mathit{MOT} , b \in B_{r} , C_{b} \cap C_{m} \neq \emptyset \tag{eq\_0041} \\
   & y_{r , b}^{e n t r} + M \left(1 - \mathit{alpha}_{r , b , c}\right) \geq t_{m}^{e n d} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0042} \\
@@ -129,11 +126,7 @@
   & \mathit{alpha}_{r , b , c} + \mathit{beta}_{r , b , c} \leq 1 , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0046} \\
   & M \left(\mathit{alpha}_{r , b , c} + \mathit{beta}_{r , b , c}\right) + M \left(1 - x_{r , b}\right) + y_{r , b}^{e x i t} \geq y_{r , b}^{e n t r} + t_{r , b}^{r e d u c t i o n} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{m}\right) \tag{eq\_0047} \\
   & y_{r , b}^{e n t r} , y_{r , b}^{e x i t} \in N , \forall r \in R , b \in B_{r} \tag{eq\_0049} \\
-  & x_{r , b} \in \left\{0 , 1\right\} , \forall r \in R , b \in B_{r} \tag{eq\_0050} \\
-  & \mathit{mu}_{r , b , rp , bp} \in \left\{0 , 1\right\} , \forall r \in R , b \in B_{r} , r^{^{'}} \in R , b \in B_{rp} : r \neq rp \tag{eq\_0051} \\
   & t_{r , s}^{s t o p} \in N , \forall r \in R , s \in S^{r} \tag{eq\_0052} \\
-  & \mathit{alpha}_{r , b , c} , \mathit{beta}_{r , b , c} \in \left\{0 , 1\right\} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} , b \in \left(B_{r} \cap B_{c}\right) \tag{eq\_0054} \\
-  & z_{r , c} , z_{r , c}^{1} , z_{r , c}^{2} \in \left\{0 , 1\right\} , \forall r \in R , m \in \mathit{MOT} , c \in C_{m} \tag{eq\_0055} \\
   & x_{r , b} = 1 \forall r \in R , b \in B_{r , r e - r o u t e} \tag{eq\_0063} \\
   & t_{m}^{s t a r t} , t_{m}^{e n d} \in N , \forall m \in \mathit{MOT} \tag{eq\_0068} \\
   & t_{m}^{s t a r t} = \tilde{t_{m}^{s t a r t}} , \forall m \in \mathit{MOT} \tag{eq\_0073} \\

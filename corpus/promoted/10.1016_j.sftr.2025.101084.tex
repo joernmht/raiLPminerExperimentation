@@ -25,7 +25,7 @@
 %@ index K ordered=0 cyclic=0 :: Set of time points for passenger boarding
 %@ var h shape=D,T,N domain=continuous role=primary drole=- lo=- hi=- :: Headway between train t and its forward train at station n in direction d
 %@ index i ordered=0 cyclic=0 :: Index for time periods (used in constraints)
-%@ var z shape=T,F,P domain=continuous role=primary drole=- lo=- hi=- :: Linearization variable for passenger waiting cost calculation
+%@ var z shape=T,F domain=continuous role=primary drole=- lo=- hi=- :: Linearization variable for passenger waiting cost calculation
 %@ con eq_0002 kind=linear domain=- indicator=- :: Equation (2): enterprise operating cost Z1 calculation
 %@ con eq_0003 kind=linear domain=- indicator=- :: Equation (3): passenger waiting cost Z2 expression before linearization
 %@ con eq_0004 kind=linear domain=- indicator=- :: Equation (4): each station is served by at least one route
@@ -73,7 +73,7 @@
 %@ param lambda shape=- kind=scalar domain=- :: weight of operating cost in objective
 %@ param n_1 shape=P kind=scalar domain=- :: origin station of passenger group p
 %@ param omega shape=- kind=scalar domain=- :: maximum number of routes
-%@ param rho shape=T,R,F,D,N,K kind=scalar domain=- :: indicator that passenger boarding time k is before train arrival
+%@ param rho shape=T,R,F kind=scalar domain=- :: indicator that passenger boarding time k is before train arrival
 %@ param rho_d_n_k shape=T,R,F kind=scalar domain=- :: indicator that passenger boarding time k is before train arrival
 %@ param t_1 shape=D,N kind=scalar domain=- :: dwell time at station n in direction d
 %@ param t_2 shape=D,N kind=scalar domain=- :: travel time between stations in direction d

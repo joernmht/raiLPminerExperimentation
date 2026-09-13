@@ -12,16 +12,16 @@
 %@ index I ordered=0 cyclic=0 :: Macro station index
 %@ index J ordered=0 cyclic=0 :: Macro station index (destination)
 %@ index A ordered=0 cyclic=0 :: Set of space-time arcs in the network
-%@ var x shape=K,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
 %@ index K ordered=0 cyclic=0 :: Set of trains
 %@ index t ordered=0 cyclic=0 :: Micro time index
 %@ index i ordered=0 cyclic=0 :: Micro station index
 %@ index j ordered=0 cyclic=0 :: Micro station index (destination)
 %@ param h shape=- kind=scalar domain=- :: Minimum headway time between trains on a segment
-%@ var d shape=K,I,J,T domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
 %@ index G ordered=0 cyclic=0 :: Coupling set between macro and micro nodes
 %@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total cost)
-%@ param c shape=K,A kind=matrix domain=- :: Cost of using space-time arc a by train k
+%@ param c shape=- kind=matrix domain=- :: Cost of using space-time arc a by train k
 %@ con eq_0001 kind=linear domain=- indicator=- :: Macro flow balance constraint (Eq. 1)
 %@ con eq_0002 kind=linear domain=- indicator=- :: Micro flow balance constraint (Eq. 2)
 %@ con eq_0003 kind=linear domain=- indicator=- :: Definition of incompatible arc set Ψ (Eq. 3)
@@ -69,8 +69,8 @@
 %@ param t_o shape=- kind=scalar domain=- :: Micro origin time index
 %@ param w shape=- kind=scalar domain=- :: Flow conservation constant
 \begin{align}
-  & \underset{\left(J , Tp\right) \in A^{S M^{+}} \left(I , T\right)}{\sum} x \left(k , I , J , T , Tp\right) - \underset{\left(J , Tp\right) \in A^{S M^{-}} \left(I , T\right)}{\sum} x \left(k , J , I , Tp , T\right) = \left\{\begin{matrix} 1 & \left(I , T\right) = \left(I^{o} \left(k\right) , T^{o} \left(k\right)\right) \\ - 1 & \left(I , T\right) = \left(I^{d} \left(k\right) , T^{d} \left(k\right)\right) \\ 0 & o \cdot t \cdot h \cdot e \cdot r \cdot w \cdot i \cdot s \cdot e \forall k \in K \end{matrix}\right \tag{eq\_0001} \\
-  & \underset{\left(j , tp\right) \in A^{S m^{+}} \left(i , t\right)}{\sum} x \left(k , i , j , t , tp\right) - \underset{\left(j , tp\right) \in A^{S m^{-}} \left(i , t\right)}{\sum} x \left(k , j , i , tp , t\right) = \left\{\begin{matrix} 1 & \left(i , t\right) = \left(i^{o} \left(k\right) , t^{o} \left(k\right)\right) \\ - 1 & \left(i , t\right) = \left(i^{d} \left(k\right) , t^{d} \left(k\right)\right) \\ 0 & o \cdot t \cdot h \cdot e \cdot r \cdot w \cdot i \cdot s \cdot e \forall k \in K \end{matrix}\right \tag{eq\_0002} \\
+  & \underset{\left(J , Tp\right) \in A^{S M^{+}} \left(I , T\right)}{\sum} x \left(k , I , J , T , Tp\right) - \underset{\left(J , Tp\right) \in A^{S M^{-}} \left(I , T\right)}{\sum} x \left(k , J , I , Tp , T\right) = \left\{ 1 & \left(I , T\right) = \left(I^{o} \left(k\right) , T^{o} \left(k\right)\right) \\ - 1 & \left(I , T\right) = \left(I^{d} \left(k\right) , T^{d} \left(k\right)\right) \\ 0 & o \cdot t \cdot h \cdot e \cdot r \cdot w \cdot i \cdot s \cdot e \forall k \in K \right \tag{eq\_0001} \\
+  & \underset{\left(j , tp\right) \in A^{S m^{+}} \left(i , t\right)}{\sum} x \left(k , i , j , t , tp\right) - \underset{\left(j , tp\right) \in A^{S m^{-}} \left(i , t\right)}{\sum} x \left(k , j , i , tp , t\right) = \left\{ 1 & \left(i , t\right) = \left(i^{o} \left(k\right) , t^{o} \left(k\right)\right) \\ - 1 & \left(i , t\right) = \left(i^{d} \left(k\right) , t^{d} \left(k\right)\right) \\ 0 & o \cdot t \cdot h \cdot e \cdot r \cdot w \cdot i \cdot s \cdot e \forall k \in K \right \tag{eq\_0002} \\
   & \mathit{Psi} \left(a^{S M}\right) = \left\{\left(I , J , \mathit{tau} , taup\right) \left|\right. 0 \leq \left(\mathit{tau} - T\right) < h^{D} \left(I , J\right) , 0 \leq \left(taup - Tp\right) < h^{A} \left(I , J\right)\right\} \forall a^{S M} = \left(I , J , T , Tp\right) \in A^{S M} \tag{eq\_0003} \\
   & \sum_{k \in K, \left(I , J , \mathit{tau} , taup\right) \in \mathit{Psi} \left(\left(I , J , T , Tp\right)\right)} x \left(k , I , J , \mathit{tau} , taup\right) \leq 1 \forall \left(I , J , T , Tp\right) \in A^{S M} \tag{eq\_0005} \\
   & d \left(k , I , J , \mathit{tau}\right) = 1 \forall \mathit{tau} \in \left[T , T + h^{D} \left(I , J\right)\right) , \left(I , J , T , Tp\right) \in A^{S M} , k \in K \tag{eq\_0006} \\

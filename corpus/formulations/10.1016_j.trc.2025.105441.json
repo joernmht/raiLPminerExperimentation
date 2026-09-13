@@ -1,0 +1,2119 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2025.105441",
+  "name": "Incorporating reservation strategies into demand management and train scheduling in metro systems",
+  "family": "milp",
+  "description": "Mined from Incorporating reservation strategies into demand management and train scheduling in metro systems (Transportation Research Part C Emerging Technologies, 2025).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2025.105441",
+    "reference": "Incorporating reservation strategies into demand management and train scheduling in metro systems",
+    "author": "Yahan Lu; Lixing Yang; Dongyang Xia; Fanting Meng; Shadi Sharif Azadeh",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "I",
+      "description": "Set of train services",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of time steps",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "Set of nonnegative integers",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "D",
+      "description": "Passenger demand from station s to station v at time step t",
+      "shape": [
+        "S",
+        "S",
+        "T"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Lower bound on headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_bar",
+      "description": "Upper bound on headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C",
+      "description": "Train capacity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Big-M constant for linearization of product constraints",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "TS",
+      "description": "Train scheduling subproblem",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "DM",
+      "description": "Demand management subproblem",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Delta",
+      "description": "Scaling coefficient in objective function",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_c",
+      "description": "Weight for congestion cost in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_e",
+      "description": "Weight for waiting time cost in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "F",
+      "description": "Total objective value (weighted sum of passenger waiting time and line congestion)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "1 if time t falls within headway between train i-1 and i at station s",
+      "shape": [
+        "I",
+        "S",
+        "T"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "r",
+      "description": "Number of unreserved passengers stranded by train i at station s for destination v",
+      "shape": [
+        "I",
+        "S",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Maximum number of waiting passengers for train i",
+      "shape": [
+        "I"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "1 if train i has not departed station s at time t, 0 otherwise",
+      "shape": [
+        "I",
+        "S",
+        "T"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Departure time of train i from station s",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "a",
+      "description": "Arrival time of train i at station s",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "b_hat",
+      "description": "Number of reserved passengers boarding train i from s to v",
+      "shape": [
+        "I",
+        "S",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "b",
+      "description": "Number of unreserved passengers boarding train i from s to v",
+      "shape": [
+        "I",
+        "S",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Number of unreserved passengers waiting at station s for train i destined for v",
+      "shape": [
+        "I",
+        "S",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "o",
+      "description": "Number of unreserved passengers on board when train i leaves station s",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "o_hat",
+      "description": "Number of reserved passengers on board when train i leaves station s",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "l",
+      "description": "Number of unreserved passengers alighting from train i at station s",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_hat",
+      "description": "Binary headway variable in demand management subproblem",
+      "shape": [
+        "I",
+        "S",
+        "T"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "F_c",
+      "description": "Congestion cost component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F_e",
+      "description": "Waiting time cost component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "alpha",
+      "description": "Auxiliary variable for reservation allocation",
+      "shape": [
+        "I",
+        "S",
+        "S",
+        "T"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "beta",
+      "description": "Auxiliary variable for unreserved passenger allocation",
+      "shape": [
+        "I",
+        "S",
+        "S",
+        "T"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "d_i1",
+      "description": "Departure time of train i from station 1",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "epsilon",
+      "description": "Dwell time adjustment variable",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "eta",
+      "description": "Travel time adjustment variable",
+      "shape": [
+        "I",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "gamma",
+      "description": "Auxiliary variable for passenger flow control",
+      "shape": [
+        "I",
+        "S",
+        "T"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "kappa",
+      "description": "Ratio parameter for passenger allocation",
+      "shape": [
+        "I",
+        "S",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "theta",
+      "description": "Auxiliary variable for reservation timing",
+      "shape": [
+        "I"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "varrho",
+      "description": "Reservation slot allocation variable",
+      "shape": [
+        "S",
+        "S",
+        "T"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0003",
+      "description": "Definition of line congestion Fc",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "F_c",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "I"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Definition of headway indicator y",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "epsilon",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "Integer domain for reservation slots",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "b_hat",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "I"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "T"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0016_lo",
+      "description": "Number of waiting unreserved passengers",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0016_up",
+      "description": "Number of waiting unreserved passengers",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "D",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0020",
+      "description": "Integer domain for unreserved boarding variable",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "w",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "b",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0023",
+      "description": "Unreserved passengers on board calculation",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "o",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "o_hat",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "C",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0029_a",
+      "description": "Linearized Fe: term for newly arriving passengers",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tp",
+          "over": "T",
+          "restriction": "le_other",
+          "restriction_other": "t",
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "theta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i s t tp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0029_d_lo",
+      "description": "Linearized Fe (part d)",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tp",
+          "over": "T",
+          "restriction": "le_other",
+          "restriction_other": "t",
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "theta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i s t tp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0029_d_up",
+      "description": "Linearized Fe (part d)",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tp",
+          "over": "T",
+          "restriction": "le_other",
+          "restriction_other": "t",
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "theta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i s t tp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0030_a",
+      "description": "Linearization of alpha: b_hat equals sum of alpha",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "gamma",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0032_a",
+      "description": "Linearization of beta: beta <= M*x",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "b_hat",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "alpha",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "T"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0032_c",
+      "description": "Linearization of beta: beta >= rho - M*(1-x)",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "alpha",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0034_b",
+      "description": "Valid inequality: total trip time bound",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "beta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_c",
+      "description": "DM subproblem: b_hat from reservation slots",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "F_c",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "I"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_e",
+      "description": "DM subproblem: upper bound on rho",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "b_hat",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "I"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "T"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_f_lo",
+      "description": "DM subproblem: w definition",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_f_up",
+      "description": "DM subproblem: w definition",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "varrho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "D",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_i",
+      "description": "DM subproblem: conservation of unreserved",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "S",
+          "restriction": "gt_other",
+          "restriction_other": "s",
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "w",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "b",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted sum of passenger waiting time and line congestion",
+    "terms": [
+      {
+        "ref": "F_e",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_e",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "F_c",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

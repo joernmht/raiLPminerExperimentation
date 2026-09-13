@@ -87,7 +87,8 @@
 %@ param O shape=- kind=scalar domain=- :: Dummy origin station
 
 % s: classified as parameter during review
-%@ param s shape=I,I kind=matrix domain=- :: Length of link (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s shape=I,I -> -
+%@ param s shape=- kind=matrix domain=- :: Length of link (i,j)
 
 % R: classified as parameter during review
 %@ param R shape=- kind=scalar domain=- :: Regenerative braking energy
@@ -105,7 +106,8 @@
 %@ param N shape=- kind=scalar domain=- :: Set of nonnegative integer variables (N+)
 
 % G: classified as parameter during review
-%@ param G shape=U,T kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes u): G shape=U,T -> U
+%@ param G shape=U kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
 
 % constraints: classified as parameter during review
 %@ param constraints shape=- kind=scalar domain=- :: Set of constraints

@@ -20,7 +20,7 @@
 %@ param f shape=- kind=scalar domain=- :: Frequency of train line
 %@ param k shape=- kind=scalar domain=- :: Index of train in a line
 %@ index A ordered=0 cyclic=0 :: Set of arcs
-%@ var y shape=R,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger group r uses arc g
+%@ var y shape=R domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether passenger group r uses arc g
 %@ index R ordered=0 cyclic=0 :: Set of passenger groups
 %@ param h shape=I kind=vector domain=- :: Capacity of train i
 %@ param z shape=R kind=vector domain=- :: Number of passengers in group r
@@ -40,18 +40,14 @@
 %@ con eq_0049 kind=linear domain=- indicator=- :: ADMM multiplier update for track capacity constraint
 %@ con eq_0051 kind=linear domain=- indicator=- :: ADMM multiplier update for train capacity constraint
 \begin{align}
-  & \sum_{g \in \mathit{delta}^{+} \left(u\right)} x_{i} \left(g\right) - \sum_{g \in \mathit{delta}^{-} \left(u\right)} x_{i} \left(g\right) = \left\{\begin{matrix} - 1 & \text{if} u = v \\ 1 & \text{if} u = s \\ 0 & \text{otherwise} \end{matrix}\right \forall i \in I , u \in V_{i} \tag{eq\_0012} \\
-  & \sum_{i \in I, g \in \mathit{Psi}_{\left(n , t\right)} \cap A_{i}} x_{i} \left(g\right) \leq 1 \forall \left(n , t\right) \in \left\{\right. \left(n , t\right) \left|\right. n \in N^{c a p} , t \in T \left.\right\} \tag{eq\_0013} \\
+  & \sum_{g \in \mathit{delta}^{+} \left(u\right)} x_{i} g - \sum_{g \in \mathit{delta}^{-} \left(u\right)} x_{i} g = \left\{ - 1 & \text{if} u = v \\ 1 & \text{if} u = s \\ 0 & \text{otherwise} \right \forall i \in I , u \in V_{i} \tag{eq\_0012} \\
+  & \sum_{i \in I, g \in \mathit{Psi}_{\left(n , t\right)} \cap A_{i}} x_{i} g \leq 1 \forall \left(n , t\right) \in \left\{\right. \left(n , t\right) \left|\right. n \in N^{c a p} , t \in T \left.\right\} \tag{eq\_0013} \\
   & x_{i_{l}^{1}} \left(n , np , t , tp\right) = \underset{ϖ , ϖ^{'} \in \left[\frac{\left(k - 1\right) T}{f_{l}} - \mathit{xi} , \frac{\left(k - 1\right) T}{f_{l}} + \mathit{xi}\right] : \left(n , np , \left[t + ϖ\right]_{T} , \left[tp + ϖ^{'}\right]_{T}\right) \in A_{i_{l}^{k}}}{\sum} x_{i_{l}^{k}} \left(n , np , \left[t + ϖ\right]_{T} , \left[tp + ϖ^{'}\right]_{T}\right) \tag{eq\_0014} \\
-  & \sum_{g \in \mathit{delta}^{+} \left(u\right)} y_{r} \left(g\right) - \sum_{g \in \mathit{delta}^{-} \left(u\right)} y_{r} \left(g\right) = \left\{\begin{matrix} - 1 & \text{if} u = v \\ 1 & \text{if} u = s \\ 0 & \text{otherwise} \end{matrix}\right \forall r \in R , u \in V_{r} \tag{eq\_0017} \\
-  & \sum_{r \in R} z_{r} \cdot y_{r} \left(g\right) \leq \sum_{i \in I} h_{i} \cdot x_{i} \left(g\right) \forall g \in A^{c a p} \tag{eq\_0018} \\
-  \min\quad & \sum_{i \in I, g \in A_{i}} c_{i} \left(g\right) x_{i} \left(g\right) + \sum_{r \in R, g \in A_{r}} c_{r} \left(g\right) y_{r} \left(g\right) \tag{eq\_0019} \\
-  & x_{i} \left(g\right) \in \left\{0 , 1\right\} \forall i \in I , g \in A_{i} \tag{eq\_0020} \\
-  & y_{r} \left(g\right) \in \left\{0 , 1\right\} \forall r \in R , g \in A_{r} \tag{eq\_0022} \\
-  & \mathbf{\mathit{x}} \in \left\{0 , 1\right\}^{\left|I\right| \cdot \left|A^{t r}\right|} \tag{eq\_0036\_a} \\
-  & \mathbf{\mathit{y}} \in \left\{0 , 1\right\}^{\left|P\right| \cdot \left|A^{p a s}\right|} \tag{eq\_0036\_b} \\
-  & \mathbf{\mathit{\mathit{mu}}} \in \mathcal{R}_{+}^{\left|N^{c a p}\right| \cdot T} \tag{eq\_0037\_a} \\
-  & \mathbf{\mathit{\mathit{pi}}} \in \mathcal{R}_{+}^{\left|A^{c a p}\right|} \tag{eq\_0037\_b} \\
-  & \mathit{mu}_{n , t}^{k + 1} = \mathit{mu}_{n , t}^{k} + \mathit{delta}^{k} \cdot \left[\sum_{i \in I, g \in \mathit{Psi}_{\left(n , t\right)} \cap A_{i}^{s e c}} x_{i}^{k} \left(g\right) - 1\right] \tag{eq\_0049} \\
-  & \mathit{pi}_{g}^{k + 1} = \mathit{pi}_{g}^{k} + \mathit{rho} \cdot \left[\sum_{r \in R} z_{r} \cdot y_{r}^{k} \left(g\right) - \sum_{i \in I} h_{i} \cdot x_{i}^{k} \left(g\right)\right] \tag{eq\_0051} \\
+  & \sum_{g \in \mathit{delta}^{+} \left(u\right)} y_{r} g - \sum_{g \in \mathit{delta}^{-} \left(u\right)} y_{r} g = \left\{ - 1 & \text{if} u = v \\ 1 & \text{if} u = s \\ 0 & \text{otherwise} \right \forall r \in R , u \in V_{r} \tag{eq\_0017} \\
+  & \sum_{r \in R} z_{r} \cdot y_{r} g \leq \sum_{i \in I} h_{i} \cdot x_{i} g \forall g \in A^{c a p} \tag{eq\_0018} \\
+  \min\quad & \sum_{i \in I, g \in A_{i}} c_{i} g x_{i} g + \sum_{r \in R, g \in A_{r}} c_{r} g y_{r} g \tag{eq\_0019} \\
+  & x_{i} g \in \left\{0 , 1\right\} \forall i \in I , g \in A_{i} \tag{eq\_0020} \\
+  & y_{r} g \in \left\{0 , 1\right\} \forall r \in R , g \in A_{r} \tag{eq\_0022} \\
+  & \mathit{mu}_{n , t}^{k + 1} = \mathit{mu}_{n , t}^{k} + \mathit{delta}^{k} \cdot \left[\sum_{i \in I, g \in \mathit{Psi}_{\left(n , t\right)} \cap A_{i}^{s e c}} x_{i}^{k} g - 1\right] \tag{eq\_0049} \\
+  & \mathit{pi}_{g}^{k + 1} = \mathit{pi}_{g}^{k} + \mathit{rho} \cdot \left[\sum_{r \in R} z_{r} \cdot y_{r}^{k} g - \sum_{i \in I} h_{i} \cdot x_{i}^{k} g\right] \tag{eq\_0051} \\
 \end{align}

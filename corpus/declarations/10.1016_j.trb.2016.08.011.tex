@@ -49,7 +49,8 @@
 %@ param B shape=- kind=scalar domain=- :: Minimum back-turning time
 
 % s: classified as parameter during review
-%@ param s shape=- kind=scalar domain=- :: Maximum number of skipped stations per service
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): s shape=- -> S
+%@ param s shape=S kind=scalar domain=- :: Maximum number of skipped stations per service
 
 % w: classified as variable during review
 %@ var w shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station i for service k

@@ -74,7 +74,8 @@
 %@ index disruption shape=- domain=- role=index drole=- lo=- hi=- :: disrupted arc set label
 %@ index stop shape=- domain=- role=index drole=- lo=- hi=- :: stop set label
 %@ index dep shape=- domain=- role=index drole=- lo=- hi=- :: departure label
-%@ param b shape=- domain=integer role=coefficient drole=- lo=-1 hi=1 :: net flow balance
+% declaration fixed: param b: domain=integer -> -
+%@ param b shape=- domain=- role=coefficient drole=- lo=-1 hi=1 :: net flow balance
 %@ index A_disruption ordered=0 cyclic=0 :: disrupted arc set label
 %@ index A_drive ordered=0 cyclic=0 :: driving arc set label
 %@ index A_i_minus ordered=0 cyclic=0 :: incoming arc set label
@@ -108,13 +109,13 @@
   & \mathit{delta}_{a} + \sum_{k \in K, \mathit{ap} \in \mathit{Phi}_{a}} x_{\mathit{ap}}^{k} = 1 \qquad \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0020} \\
   & \mathit{mu}_{a}^{k} = \sum_{kp \in K : kp \neq k, ap \in \mathit{Phi} \left(a\right)} x_{ap}^{kp} , \forall a \in A_{d r i v e} \cup A_{t r a c k} \tag{eq\_0021} \\
   & \sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} = \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} + \sum_{kp \in K : kp \neq k, ap \in \mathit{Phi} \left(a\right)} x_{ap}^{kp} = \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} + \mathit{mu}_{a}^{k} \tag{eq\_0022} \\
-  & \mathit{delta} \left(a\right) = 1 - \mathit{mu}_{a}^{k} - \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} \tag{eq\_0023} \\
-  & L_{\mathit{rho} , k} = \sum_{a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}, ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}, ap \in \mathit{Phi} \left(a\right)} \left(\mathit{rho} \cdot \mathit{mu}_{ap}^{k} - \frac{\mathit{rho}}{2}\right) \cdot x_{a}^{k} = \sum_{a \in A} \left(c_hat\right)_{a}^{k} \cdot x_{a}^{k} + Q_{0} \tag{eq\_0025} \\
+  & \mathit{delta} \cdot a = 1 - \mathit{mu}_{a}^{k} - \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} \tag{eq\_0023} \\
+  & L_{\mathit{rho} , k} = \sum_{a \in A} c_{a}^{k} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}, ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} \cdot x_{a}^{k} + \sum_{a \in A_{d r i v e} \cup A_{t r a c k}, ap \in \mathit{Phi} \left(a\right)} \left(\mathit{rho} \cdot \mathit{mu}_{ap}^{k} - \frac{\mathit{rho}}{2}\right) \cdot x_{a}^{k} = \sum_{a \in A} c_hat_{a}^{k} \cdot x_{a}^{k} + Q_{0} \tag{eq\_0025} \\
   & \mathit{lambda}_{a}^{\mathit{theta} + 1} = \mathit{lambda}_{a}^{\mathit{theta}} + \mathit{rho} \cdot \left(\sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} - 1\right) , \forall a \in A^{d r i v e} \cup A^{t r a c k} \tag{eq\_0027} \\
   & \mathit{res} = max \left\{0 , \sum_{a \in A_{d r i v e} \cup A_{t r a c k}, k \in K, ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} - 1\right\} \tag{eq\_0028} \\
-  & q_{k} = \sum_{a \in A_{k}} c_{a}^{k} \cdot \left(x_hat\right)_{a}^{k} \tag{eq\_0030} \\
-  & p_{k} = \sum_{a \in A_{k}} \left({c}\right)_{a}^{k} \cdot \left(x_hat\right)_{a}^{k} \tag{eq\_0031} \\
-  & \left(c_hat\right)_{a}^{k} = \left({c}\right)_{a}^{k} + c_{a}^{k} + m \cdot a \cdot x \left\{0 , \mathit{rho} \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{mu}_{ap}^{k} - \frac{\mathit{rho}}{2}\right\} \tag{eq\_0032} \\
+  & q_{k} = \sum_{a \in A_{k}} c_{a}^{k} \cdot x_hat_{a}^{k} \tag{eq\_0030} \\
+  & p_{k} = \sum_{a \in A_{k}} \left({c}\right)_{a}^{k} \cdot x_hat_{a}^{k} \tag{eq\_0031} \\
+  & c_hat_{a}^{k} = \left({c}\right)_{a}^{k} + c_{a}^{k} + m \cdot a \cdot x \left\{0 , \mathit{rho} \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{mu}_{ap}^{k} - \frac{\mathit{rho}}{2}\right\} \tag{eq\_0032} \\
   & \sum_{a} \mathit{lambda}_{a} \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} = \sum_{a} \mathit{lambda}_{a} \cdot \left(\right. \sum_{a_{0} \in \mathit{Phi} \left(a\right)} x_{a_{0}}^{k} + 0 \left.\right) = \sum_{a} \mathit{lambda}_{a} \sum_{a_{0} \in \mathit{Phi} \left(a\right)} x_{a_{0}}^{k} = \sum_{a \in \mathit{Phi} \left(a_{0}\right)} \mathit{lambda}_{a} \cdot x_{a_{0}}^{k} = \sum_{ap \in \mathit{Phi} \left(a\right)} \mathit{lambda}_{ap} \sum_{a} x_{a}^{k} \tag{eq\_0034} \\
   & \left(\sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k}\right)^{2} = \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} \tag{eq\_0036} \\
   & Q = \left(\sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} + \mathit{mu}_{a}^{k} - 1\right)^{2} = \left(\sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k}\right)^{2} + 2 \cdot \left(\mathit{mu}_{a}^{k} - 1\right) \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} + \left(\mathit{mu}_{a}^{k} - 1\right)^{2} = \left(2 \cdot \mathit{mu}_{a}^{k} - 1\right) \cdot \sum_{ap \in \mathit{Phi} \left(a\right)} x_{ap}^{k} + Q_{0} \tag{eq\_0037} \\

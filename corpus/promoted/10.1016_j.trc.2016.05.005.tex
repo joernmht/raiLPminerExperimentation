@@ -61,24 +61,6 @@
 %@ var z_jjp shape=- domain=binary role=indicator drole=- lo=0 hi=1 :: Binary period indicator for activity (j,jp)
 \begin{align}
   \min\quad & T \tag{eq\_0005} \\
-  & x_{\mathit{ij}} = \mathit{pi}_{j} - \mathit{pi}_{i} + y_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{pass}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0006} \\
-  & x_{\mathit{ij}} = 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{pass}} . \tag{eq\_0007} \\
-  & y_{\mathit{ij}} \leq T_{\text{max}} \cdot z_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0008} \\
-  & y_{\mathit{ij}} \leq T , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0009} \\
-  & y_{\mathit{ij}} \geq T - T_{\text{max}} \cdot \left(1 - z_{\mathit{ij}}\right) , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0010} \\
-  & y_{\mathit{ij}} \geq 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} . \tag{eq\_0011} \\
-  & l_{\mathit{ij}} \leq x_{\mathit{ij}} \leq u_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} , \tag{eq\_0012} \\
-  & h_{\mathit{ij}} \leq x_{\mathit{ij}} \leq T - h_{\mathit{ij}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{safe}} , \tag{eq\_0013} \\
-  & \frac{T}{f_{\mathit{ij}}} - \frac{K}{f_{\mathit{ij}}} \leq x_{\mathit{ij}} \leq \frac{T}{f_{\mathit{ij}}} + \frac{K}{f_{\mathit{ij}}} , \forall \left(i , j\right) \in \mathcal{A}_{\text{regular}} . \tag{eq\_0014} \\
-  & y_{\mathit{ij}} = 0 , \forall \left(i , j\right) \in \mathcal{A}_{\text{regular}^{*}} . \tag{eq\_0015} \\
-  & z_{\mathit{ij}} \in \left\{0 , 1\right\} , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} , \tag{eq\_0016} \\
   & T_{min} \leq T \leq T_{\text{max}} , \tag{eq\_0017} \\
   & 0 \leq \mathit{pi}_{i} \leq T - 1 , \forall i \in \mathit{epsilon} , \tag{eq\_0018} \\
-  & 0 \leq x_{\mathit{ij}} \leq T - 1 , \forall \left(i , j\right) \in \mathcal{A} . \tag{eq\_0019} \\
-  & x_{\mathit{ij}} = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{\mathit{ij}} \cdot T , \forall \left(i , j\right) \in \mathcal{A}_{\text{run}} \cup \mathcal{A}_{\text{dwell}} \cup \mathcal{A}_{\text{pass}} \cup \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} . \tag{eq\_0020} \\
-  & \begin{aligned} & z_{\mathit{ij}} + z_{ip jp} + z_{iip} + z_{jjp} = 2 \cdot \left(w_{iip jjp} + v_{iip jjp}\right) \\ & \forall \left(i , j\right) , \left(ip , jp\right) \in \mathcal{A}_{\text{run}} , \left(i , ip\right) , \left(j , jp\right) \in \mathcal{A}_{\text{safe}} \cup \mathcal{A}_{\text{regular}} .\end{aligned} \tag{eq\_0022} \\
-  & - x_{iip} + \left[\left(h_{\mathit{ij}} + h_{ip jp}\right) - l_{iip}^{\mathit{without}}\right] \cdot s_{iip} \leq - l_{iip}^{\mathit{without}} , \forall \left(i , ip\right) \in \mathcal{A}_{\text{dwell}^{*}} , \left(i , j\right) , \left(ip , jp\right) \in \mathcal{A}_{\text{safe}} , \tag{eq\_0023} \\
-  & x_{iip} + \left(u_{iip}^{\mathit{without}} - u_{iip}\right) \cdot s_{iip} \leq u_{iip}^{\mathit{without}} , \forall \left(i , ip\right) \in \mathcal{A}_{\text{dwell}^{*}} , \tag{eq\_0024} \\
-  & \begin{aligned} & \left(z_{\mathit{ij}} + z_{ip jp} + z_{iip}\right) - 2 \cdot q_{iip jjp} - s_{iip jjp} = 0 , \\ & \forall \left(i , j\right) , \left(ip , jp\right) \in \mathcal{A}_{\text{safe}} , \left(i , ip\right) \in \mathcal{A}_{\text{dwell}^{*}} , \left(j , jp\right) \in \mathcal{A}_{\text{pass}} ,\end{aligned} \tag{eq\_0025} \\
-  & s_{iip} = \underset{\left(j , jp\right) \in \mathcal{A}_{\text{pass}}}{\sum} s_{iip jjp} , \forall \left(i , j\right) , \left(ip , jp\right) \in \mathcal{A}_{\text{safe}} , \left(i , ip\right) \in \mathcal{A}_{\text{dwell}^{*}} . \tag{eq\_0026} \\
 \end{align}

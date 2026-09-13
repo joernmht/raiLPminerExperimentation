@@ -141,10 +141,12 @@
 %@ index S ordered=0 cyclic=0 :: set of earliest-ready blocks for minimum train composition
 
 % LSA: classified as parameter during review
-%@ param LSA shape=Q,E kind=matrix domain=- :: left-side availability of resource at a stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): LSA shape=Q,E -> -
+%@ param LSA shape=- kind=matrix domain=- :: left-side availability of resource at a stage
 
 % RSA: classified as parameter during review
-%@ param RSA shape=Q,E kind=matrix domain=- :: right-side availability of resource at a stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): RSA shape=Q,E -> -
+%@ param RSA shape=- kind=matrix domain=- :: right-side availability of resource at a stage
 
 % body: classified as parameter during review
 %@ param body shape=- kind=scalar domain=- :: middle term in lower bound calculation
@@ -153,7 +155,8 @@
 %@ param head shape=- kind=scalar domain=- :: first term in lower bound calculation
 
 % tail: classified as parameter during review
-%@ param tail shape=L kind=vector domain=- :: last term in lower bound calculation
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): tail shape=L -> -
+%@ param tail shape=- kind=vector domain=- :: last term in lower bound calculation
 
 % theta: renamed from θ
 %@ param theta shape=L kind=vector domain=- :: tail time for outbound train

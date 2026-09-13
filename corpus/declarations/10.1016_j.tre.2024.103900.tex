@@ -76,7 +76,8 @@
 %@ con eq_0054 kind=linear domain=- indicator=- :: Equation (54): linear constraint for train rescheduling
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2024.103900.json (deterministic fill-in list); pending human confirmation.
-%@ var Delta shape=K,U domain=continuous role=auxiliary drole=- lo=- hi=- :: Delay of train k at station u
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Delta shape=K,U -> -
+%@ var Delta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Delay of train k at station u
 %@ param H_end shape=U kind=scalar domain=- :: End time of disruption window at station u
 %@ param H_start shape=U kind=scalar domain=- :: Start time of disruption window at station u
 %@ param T_dwell shape=K,U kind=scalar domain=- :: Dwell time of train k at station u

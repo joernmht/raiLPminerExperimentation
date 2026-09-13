@@ -8,17 +8,22 @@
 %@ prov author :: Jungang Shi; Yanshuo Sun; Paul Schonfeld; Jian Qi
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted sum of total tram travel time and TSP negative impact on other traffic
-%@ param T shape=I kind=vector domain=continuous :: Expected departure time for tram i from first station
+% declaration fixed: param T: domain=continuous -> -
+%@ param T shape=I kind=vector domain=- :: Expected departure time for tram i from first station
 %@ index I ordered=1 cyclic=0 :: Set of trams
 %@ var t shape=I,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival/departure times of trams at stations/intersections
 %@ index S ordered=1 cyclic=0 :: Set of stations and intersections
-%@ param h shape=- kind=scalar domain=continuous :: Minimum headway between trams (arrival/departure)
-%@ param o shape=S,W kind=matrix domain=continuous :: Green time durations for TSP actions (min/max)
+% declaration fixed: param h: domain=continuous -> -
+%@ param h shape=- kind=scalar domain=- :: Minimum headway between trams (arrival/departure)
+% declaration fixed: param o: domain=continuous -> -
+%@ param o shape=S,W kind=matrix domain=- :: Green time durations for TSP actions (min/max)
 %@ var u shape=S,W,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating activation of TSP action w at intersection s, cycle k
 %@ index K ordered=1 cyclic=0 :: Set of signal cycles at intersection s
 %@ index W ordered=0 cyclic=0 :: Set of TSP actions (alpha, beta, gamma)
-%@ param M shape=- kind=big_m domain=continuous :: Large positive constant for big-M constraints
-%@ param C shape=S,W kind=matrix domain=continuous :: Cost of activating TSP action w at intersection s
+% declaration fixed: param M: domain=continuous -> -
+%@ param M shape=- kind=big_m domain=- :: Large positive constant for big-M constraints
+% declaration fixed: param C: domain=continuous -> -
+%@ param C shape=S,W kind=matrix domain=- :: Cost of activating TSP action w at intersection s
 %@ con eq_0001 kind=linear domain=- indicator=- :: Schedule deviation bounds for adjusted departure time
 %@ con eq_0002 kind=linear domain=- indicator=- :: Dwell time range at stations
 %@ con eq_0003 kind=linear domain=- indicator=- :: Non-stop operations at intersections (arrival equals departure)
@@ -76,7 +81,7 @@
 %@ var t_alpha_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of alpha TSP action at intersection s, cycle k
 %@ var t_beta_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of beta TSP action at intersection s, cycle k
 %@ var t_gamma_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of gamma TSP action at intersection s, cycle k
-%@ var t_sk shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of TSP action at intersection s, cycle k
+%@ var t_sk shape=W kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of TSP action at intersection s, cycle k
 %@ param tau shape=S,W kind=scalar domain=- :: weight coefficient for TSP action duration
 %@ param theta_max shape=S kind=scalar domain=- :: maximum dwell time at station s
 %@ param theta_min shape=S kind=scalar domain=- :: minimum dwell time at station s
@@ -85,7 +90,7 @@
 %@ var u_beta_sk shape=- kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for beta TSP action at intersection s, cycle k
 %@ var u_gamma shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for gamma TSP action at intersection s, cycle k
 %@ param u_gamma_sk shape=- kind=scalar domain=- :: binary indicator for gamma TSP action at intersection s, cycle k
-%@ var u_sk shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for TSP action at intersection s, cycle k
+%@ var u_sk shape=W kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for TSP action at intersection s, cycle k
 \begin{align}
   & T_{i}^{E} \leq t_{i 1}^{D} \leq T_{i}^{E} + \mathit{Delta} \forall i \in I \tag{eq\_0001} \\
   & \mathit{theta}_{s}^{\text{min}} \leq t_{\mathit{is}}^{D} - t_{\mathit{is}}^{A} \leq \mathit{theta}_{s}^{\text{max}} \forall i \in I , s \in S \backslash S_tilde \tag{eq\_0002} \\

@@ -13,7 +13,7 @@
 %@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Cumulative departure flow variable for train f on cell (i,j) at time t
 %@ param P shape=- kind=scalar domain=- :: Problem identifier (e.g., P1, PLR)
 %@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (e.g., Z_P1, Z_LR)
-%@ param q shape=- kind=vector domain=- :: Ideal arrival time of real train r at its destination
+%@ param q shape=R kind=vector domain=- :: Ideal arrival time of real train r at its destination
 %@ index E ordered=0 cyclic=0 :: Set of cells (edges) in the railway network
 %@ index R ordered=0 cyclic=0 :: Set of real trains
 %@ index F ordered=0 cyclic=0 :: Set of all trains (real and virtual)
@@ -22,11 +22,11 @@
 %@ index N ordered=0 cyclic=0 :: Set of nodes in the railway network
 %@ var tau shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train f on cell (i,j)
 %@ param delta shape=- kind=matrix domain=- :: Minimum or maximum dwell time of real train r on cell (i,j)
-%@ param sigma shape=- kind=matrix domain=- :: Free flow running time of real train r on cell (i,j)
+%@ param sigma shape=R kind=matrix domain=- :: Free flow running time of real train r on cell (i,j)
 %@ index V ordered=0 cyclic=0 :: Set of virtual trains (PMTSs)
-%@ param w shape=- kind=matrix domain=- :: Duration of PMTS (virtual train) on cell (i,j)
-%@ param g shape=- kind=matrix domain=- :: Time interval between cell blockage and train arrival
-%@ param h shape=- kind=matrix domain=- :: Time interval between train departure and cell release
+%@ param w shape=V kind=matrix domain=- :: Duration of PMTS (virtual train) on cell (i,j)
+%@ param g shape=R kind=matrix domain=- :: Time interval between cell blockage and train arrival
+%@ param h shape=R kind=matrix domain=- :: Time interval between train departure and cell release
 %@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Cell occupancy indicator for train f on cell (i,j) at time t
 %@ param C shape=- kind=matrix domain=- :: Capacity of cell (i,j) at time t
 %@ var LR shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian subproblem objective for a train
@@ -64,12 +64,12 @@
 %@ param Z_LR shape=- kind=scalar domain=- :: Lagrangian relaxation objective value
 %@ param Z_u_LB shape=- kind=scalar domain=- :: Lower bound of Lagrangian relaxation at iteration u
 %@ param Z_u_UB shape=- kind=scalar domain=- :: Upper bound of Lagrangian relaxation at iteration u
-%@ var a_bar shape=R,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted arrival time of train r at edge (i,j)
+%@ var a_bar shape=R domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted arrival time of train r at edge (i,j)
 %@ param alpha shape=E,T kind=scalar domain=- :: Lagrangian multipliers for track capacity constraints
 %@ param alpha_u shape=E,T kind=scalar domain=- :: Lagrangian multipliers at iteration u
-%@ var d_bar shape=R,E domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted departure time of train r at edge (i,j)
-%@ param delta_max shape=R,E kind=scalar domain=- :: Maximum running time of train r on edge (i,j)
-%@ param delta_min shape=R,E kind=scalar domain=- :: Minimum running time of train r on edge (i,j)
+%@ var d_bar shape=R domain=continuous role=auxiliary drole=- lo=- hi=- :: Weighted departure time of train r at edge (i,j)
+%@ param delta_max shape=R kind=scalar domain=- :: Maximum running time of train r on edge (i,j)
+%@ param delta_min shape=R kind=scalar domain=- :: Minimum running time of train r on edge (i,j)
 %@ param lambda_u shape=- kind=scalar domain=- :: Step size for updating Lagrangian multipliers at iteration u
 %@ index s ordered=0 cyclic=0 :: Index for sink/destination nodes of trains
 %@ index t ordered=0 cyclic=0 :: Index for discrete time periods
@@ -104,6 +104,6 @@
   & \text{LR}_{r} = \sum_{\left(i , s_{r}\right) \in E_{S}} \left|\sum_{1 \leq t \leq T} \left[t \cdot \left(d_{r} \left(i , s_{r} , t\right) - d_{r} \left(i , s_{r} , t - 1\right)\right)\right] - q_{r}\right| + \sum_{\left(i , j\right) \in E, 1 \leq t \leq T} \left[\mathit{alpha}_{i , j , t} \cdot y_{r} \left(i , j , t\right)\right] \tag{eq\_0024} \\
   & \text{LR}_{v} = \sum_{\left(i , j\right) \in E, 1 \leq t \leq T} \left[\mathit{alpha}_{i , j , t} \cdot y_{v} \left(i , j , t\right)\right] \tag{eq\_0025} \\
   & \mathit{alpha}_{i , j , t}^{u + 1} = max \left\{0 , \mathit{alpha}_{i , j , t}^{u} + \mathit{lambda}^{u} \cdot \left[\frac{\sum_{v \in V : \left(i , j\right) \in E_{v}} y_{v} \left(i , j , t\right)}{\left|V\right|} + \sum_{r \in R : \left(i , j\right) \in E_{r}} y_{r} \left(i , j , t\right) + \underset{rp \in R : \left(j , i\right) \in E_{rp}}{\sum} y_{rp} \left(j , i , t\right) - C \left(i , j , t\right)\right]\right\} \tag{eq\_0026} \\
-  & Z_{\text{LB}}^{u} = \left\{\begin{matrix} z_{\text{LB}}^{1} , & \text{if} u = 1 \\ max \left\{z_{\text{LB}}^{u} , Z_{\text{LB}}^{u - 1}\right\} , & \text{if} u > 1 \end{matrix}\right \tag{eq\_0027} \\
-  & Z_{\text{UB}}^{u} = \left\{\begin{matrix} z_{\text{UB}}^{1} , & \text{if} u = 1 \\ min \left\{z_{\text{UB}}^{u} , Z_{\text{UB}}^{u - 1}\right\} , & \text{if} u > 1 \end{matrix}\right \tag{eq\_0028} \\
+  & Z_{\text{LB}}^{u} = \left\{ z_{\text{LB}}^{1} , & \text{if} u = 1 \\ max \left\{z_{\text{LB}}^{u} , Z_{\text{LB}}^{u - 1}\right\} , & \text{if} u > 1 \right \tag{eq\_0027} \\
+  & Z_{\text{UB}}^{u} = \left\{ z_{\text{UB}}^{1} , & \text{if} u = 1 \\ min \left\{z_{\text{UB}}^{u} , Z_{\text{UB}}^{u - 1}\right\} , & \text{if} u > 1 \right \tag{eq\_0028} \\
 \end{align}

@@ -8,9 +8,9 @@
 %@ prov author :: Shuguang Zhan; Jiemin Xie; S.C. Wong; Yongqiu Zhu; Francesco Corman
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize expected cost of train rescheduling across all perturbation scenarios
-%@ param d shape=- kind=scalar domain=- :: Occurrence of perturbation scenario
+%@ param d shape=Omega kind=scalar domain=- :: Occurrence of perturbation scenario
 %@ param f shape=- kind=scalar domain=- :: Cost function of train rescheduling under scenario
-%@ param p shape=- kind=scalar domain=- :: Probability of scenario
+%@ param p shape=Omega kind=scalar domain=- :: Probability of scenario
 %@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Decision variables for train rescheduling
 %@ index omega ordered=0 cyclic=0 :: Set of perturbation scenarios
 %@ param Z shape=- kind=scalar domain=- :: Constraint set for decision variables under scenario
@@ -25,7 +25,7 @@
 %@ index Omega ordered=0 cyclic=0 :: Set of uncertainty scenarios
 \begin{align}
   \min\quad & \sum_{\mathit{omega} \in \mathit{Omega}} p_{\mathit{omega}} \cdot f \left(x , d_{\mathit{omega}}\right) \tag{eq\_0001} \\
-  & s . t . x \in Z_{\mathit{omega}} , \forall \mathit{omega} \in \mathit{Omega} \tag{eq\_0002} \\
-  & s . t . x \in X \tag{eq\_0006} \\
-  & \left(S_{1} \left(x\right) , \left(\hdots , S\right)_{T} \left(x\right)\right) \in \mathcal{R} \tag{eq\_0007} \\
+  & x \in Z_{\mathit{omega}} , \forall \mathit{omega} \in \mathit{Omega} \tag{eq\_0002} \\
+  & x \in X \tag{eq\_0006} \\
+  & \left(S_{1} \cdot x , \left(\hdots , S\right)_{T} x\right) \in \mathcal{R} \tag{eq\_0007} \\
 \end{align}

@@ -95,7 +95,8 @@
 % unusable as an identifier, rename or drop: δ
 % unusable as an identifier, rename or drop: τ
 % k: classified as variable during review
-%@ var k shape=- domain=binary role=primary :: Binary indicator if service r skips stop at station p in scenario ω
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes r,p): k shape=- -> R,P
+%@ var k shape=R,P domain=binary role=primary :: Binary indicator if service r skips stop at station p in scenario ω
 
 % Q: classified as variable during review
 %@ var Q shape=- domain=continuous role=primary :: Objective function components (deviation, cancel, variation, backup) in scenario ω
@@ -233,10 +234,14 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.tre.2026.104704.json (deterministic fill-in list); pending human confirmation.
 %@ index Omega ordered=0 cyclic=0 :: Set of uncertainty realizations (scenarios)
-%@ var Q_backup shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Backup train dispatch cost in second stage
-%@ var Q_cancel shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Cancellation penalty cost in second stage
-%@ var Q_deviation shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Schedule deviation penalty cost in second stage
-%@ var Q_variation shape=Omega domain=continuous role=auxiliary drole=- lo=- hi=- :: Order variation penalty cost in second stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Q_backup shape=Omega -> -
+%@ var Q_backup shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Backup train dispatch cost in second stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Q_cancel shape=Omega -> -
+%@ var Q_cancel shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Cancellation penalty cost in second stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Q_deviation shape=Omega -> -
+%@ var Q_deviation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Schedule deviation penalty cost in second stage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Q_variation shape=Omega -> -
+%@ var Q_variation shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Order variation penalty cost in second stage
 %@ param a_bar shape=R,P kind=scalar domain=- :: Planned arrival time of service r at station p
 %@ param alpha shape=- kind=scalar domain=- :: CVaR confidence level
 %@ param c_min shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
@@ -262,7 +267,8 @@
 %@ param t_acc shape=- kind=scalar domain=- :: Acceleration time penalty
 %@ param t_dec shape=- kind=scalar domain=- :: Deceleration time penalty
 %@ param t_delay shape=- kind=scalar domain=- :: Delay duration of the fault
-%@ param t_dur shape=Omega kind=scalar domain=- :: Duration of the disruption
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_dur shape=Omega -> -
+%@ param t_dur shape=- kind=scalar domain=- :: Duration of the disruption
 %@ param t_res shape=- kind=scalar domain=- :: Recovery time after fault handling
 %@ param t_start shape=- kind=scalar domain=- :: Start time of the fault
 %@ param tau shape=- kind=scalar domain=- :: Binary parameter for fault type (0 or 1)

@@ -1,0 +1,463 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2016.05.005",
+  "name": "Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration",
+  "family": "milp",
+  "description": "Mined from Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration (Transportation Research Part C Emerging Technologies, 2016).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2016.05.005",
+    "reference": "Integrating capacity analysis with high-speed railway timetabling: A minimum cycle time calculation model with flexible overtaking constraints and intelligent enumeration",
+    "author": "Xin Zhang; Lei Nie",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "A",
+      "description": "Set of activities",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "epsilon",
+      "description": "Set of events (nodes) in the periodic event scheduling problem",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "l",
+      "description": "Lower bound for running/dwelling activity duration",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Upper bound for running/dwelling activity duration",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum headway for safety activity",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "f",
+      "description": "Frequency of line for regularity activity",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "K",
+      "description": "Nonnegative integer relaxation level for regularity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_max",
+      "description": "Upper bound on the cycle time T",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_min",
+      "description": "Lower bound on the cycle time T",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "f_ij",
+      "description": "Frequency (number of trains per cycle) on activity (i,j)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_ij",
+      "description": "Minimum headway/safety time on activity (i,j)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l_ij",
+      "description": "Lower bound on the duration x_ij of activity (i,j)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l_without_iip",
+      "description": "Lower bound on the duration of the dwell activity without the overtaking adjustment",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_iip",
+      "description": "Upper bound on the duration of dwell activity (i,ip)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_ij",
+      "description": "Upper bound on the duration x_ij of activity (i,j)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_without_iip",
+      "description": "Upper bound on the duration of the dwell activity without the overtaking adjustment",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "T",
+      "description": "Cycle time to be minimized",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Duration of activity (i,j)",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Auxiliary variable equal to z_ij * T",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary modulo parameter for activity (i,j)",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "v",
+      "description": "Auxiliary binary variable for non-collision constraint",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Auxiliary binary variable for non-collision constraint",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "s",
+      "description": "Binary variable indicating overtaking at dwelling",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "q",
+      "description": "Auxiliary binary variable for relationship constraints",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "pi",
+      "description": "Event time of event i within the cycle",
+      "shape": [
+        "epsilon"
+      ],
+      "domain": "continuous",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "s_iip",
+      "description": "Indicator that overtaking occurs on dwell activity (i,ip)",
+      "shape": [],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "indicator",
+      "domain_role": null
+    },
+    {
+      "name": "x_iip",
+      "description": "Duration of dwell activity (i,ip)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x_ij",
+      "description": "Duration of activity (i,j)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_ij",
+      "description": "Auxiliary variable for the duration of activity (i,j) in the PESP formulation",
+      "shape": [],
+      "domain": "continuous",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "z_iip",
+      "description": "Binary period indicator for activity (i,ip)",
+      "shape": [],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "indicator",
+      "domain_role": null
+    },
+    {
+      "name": "z_jjp",
+      "description": "Binary period indicator for activity (j,jp)",
+      "shape": [],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "indicator",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0017_lo",
+      "description": "Cycle time bounds: T_min ≤ T ≤ T_max",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "T_min",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "T",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017_up",
+      "description": "Cycle time bounds: T_min ≤ T ≤ T_max",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "T",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "T_max",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018_lo",
+      "description": "Event time bounds: 0 ≤ π_i ≤ T-1",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "epsilon",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "epsilon",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018_up",
+      "description": "Event time bounds: 0 ≤ π_i ≤ T-1",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "epsilon",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "epsilon",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "T",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize the cycle time of the timetable",
+    "terms": [
+      {
+        "ref": "T",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

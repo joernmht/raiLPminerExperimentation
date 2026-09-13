@@ -172,11 +172,13 @@
 %@ index fty ordered=0 cyclic=0 :: Set of fleet types (alternative notation)
 %@ param alpha shape=T kind=scalar domain=- :: Maximum number of trains that can be scheduled at time t
 %@ param beta shape=T kind=scalar domain=- :: Maximum number of trains that can be scheduled at time t (second parameter)
-%@ param chi shape=- kind=scalar domain=- :: Coefficient in objective function
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes m): chi shape=- -> M
+%@ param chi shape=M kind=scalar domain=- :: Coefficient in objective function
 %@ param delta shape=- kind=scalar domain=- :: Coefficient in objective function
 %@ param epsilon shape=S,T,C,C kind=scalar domain=- :: Number of passengers transferring between compositions
 %@ param gamma shape=S,T,T kind=scalar domain=- :: Number of passengers waiting at station s from time tp to t
-%@ param kappa shape=- kind=scalar domain=- :: Coefficient in objective function
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes ell): kappa shape=- -> L
+%@ param kappa shape=L kind=scalar domain=- :: Coefficient in objective function
 %@ param lambda shape=- kind=scalar domain=- :: Coefficient in objective function
 %@ param mu shape=S,T,T kind=scalar domain=- :: Number of passengers transferring at station s from time tp to t
 %@ param rho shape=S,T,C kind=scalar domain=- :: Number of passengers arriving at station s at time t for composition c

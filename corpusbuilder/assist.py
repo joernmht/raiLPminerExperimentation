@@ -1630,23 +1630,6 @@ Rules:
 VOCAB_MARK = "% --- vocabulary fill"
 
 
-def _doc_with_sidecar(promoted_text: str, sidecar_text: str) -> str:
-    """The assembled document with its header replaced by the CURRENT sidecar.
-
-    promote embeds the sidecar at assembly time, so after a fill the promoted
-    file is stale until promote runs again; the audit must see today's sidecar.
-    """
-    body_at = promoted_text.find("\\begin{align}")
-    head, body = (
-        (promoted_text[:body_at], promoted_text[body_at:]) if body_at >= 0 else ("", promoted_text)
-    )
-    kept = [
-        ln for ln in head.splitlines() if not re.match(r"\s*%@\s*(index|param|var|obj|con)\b", ln)
-    ]
-    decl = [ln for ln in sidecar_text.splitlines() if ln.strip().startswith("%@")]
-    return "\n".join(kept + decl) + "\n" + body
-
-
 def vocab_input(
     dossier: Dossier | None,
     prose: dict | None,
@@ -1775,7 +1758,7 @@ def fill_vocab_paper(
         run.stages[VOCAB_STAGE] = "skipped: no sidecar (stage c first)"
         return run
     sidecar = sidecar_path.read_text(encoding="utf-8")
-    doc = _doc_with_sidecar(doc_path.read_text(encoding="utf-8"), sidecar)
+    doc = vocab_mod.doc_with_sidecar(doc_path.read_text(encoding="utf-8"), sidecar)
     audit = vocab_mod.scan_document(doc)
     allowed = set(audit["missing"]) | set(audit["missing_index"])
     if not allowed:

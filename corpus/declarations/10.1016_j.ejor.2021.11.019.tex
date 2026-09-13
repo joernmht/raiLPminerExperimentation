@@ -50,7 +50,8 @@
 %@ var d shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of service k at station i
 
 % s: classified as parameter during review
-%@ param s shape=S kind=vector domain=- :: Running time on segment between stations i-1 and i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,i): s shape=S -> S,S
+%@ param s shape=S,S kind=vector domain=- :: Running time on segment between stations i-1 and i
 
 % e: classified as parameter during review
 %@ param e shape=S kind=vector domain=- :: Dwelling time at station i
@@ -94,7 +95,8 @@
 % unusable as an identifier, rename or drop: ε
 % unusable as an identifier, rename or drop: ρ
 % P: classified as parameter during review
-%@ param P shape=S,S,R kind=matrix domain=- :: Passenger arrival rate matrix
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): P shape=S,S,R -> S,S
+%@ param P shape=S,S kind=matrix domain=- :: Passenger arrival rate matrix
 
 % r: classified as index during review
 %@ index r ordered=1 cyclic=0 :: Time interval index
@@ -173,7 +175,8 @@
 %@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint (73)
 %@ con eq_0074 kind=linear domain=- indicator=- :: Linearization constraint (74)
 %@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint (75)
-%@ var tau shape=- domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): tau shape=- -> K
+%@ var tau shape=K domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.ejor.2021.11.019.json (deterministic fill-in list); pending human confirmation.
 %@ param S_1 shape=- kind=scalar domain=- :: Number of short-turn services in the up direction

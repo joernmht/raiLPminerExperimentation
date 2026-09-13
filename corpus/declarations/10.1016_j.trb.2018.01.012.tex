@@ -30,7 +30,8 @@
 %@ param c shape=- kind=matrix domain=continuous :: Cost coefficients for vehicle movements and dwell time
 
 % f: classified as parameter during review
-%@ param f shape=- kind=vector domain=continuous :: Transfer frequency weight for transfer opportunity r
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes r): f shape=- -> R
+%@ param f shape=R kind=vector domain=continuous :: Transfer frequency weight for transfer opportunity r
 
 % x: classified as variable during review
 %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if vehicle k serves trip i then j
@@ -56,7 +57,8 @@
 %@ index V ordered=0 cyclic=0 :: Set of trips that can be served by vehicle k
 
 % v: classified as parameter during review
-%@ param v shape=- kind=vector domain=integer :: Number of available vehicles of type k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): v shape=- -> K
+%@ param v shape=K kind=vector domain=integer :: Number of available vehicles of type k
 
 % d: classified as parameter during review
 %@ param d shape=- kind=matrix domain=continuous :: Earliest and latest departure times for trip i at stop s
@@ -94,7 +96,8 @@
 %@ index W ordered=0 cyclic=0 :: Set of all possible transfer triplets (i,j,s)
 
 % e: classified as parameter during review
-%@ param e shape=- kind=vector domain=continuous :: Minimum transfer time for transfer opportunity r
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes r): e shape=- -> R
+%@ param e shape=R kind=vector domain=continuous :: Minimum transfer time for transfer opportunity r
 
 % Z: classified as index during review
 %@ index Z ordered=0 cyclic=0 :: Set of non-negative integers

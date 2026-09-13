@@ -13,7 +13,7 @@
 %@ index F ordered=1 cyclic=0 :: Set of train services in the up direction.
 %@ index i ordered=1 cyclic=0 :: Station index.
 %@ index p ordered=1 cyclic=0 :: Turnaround station index.
-%@ var x shape=F,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between turnaround stations.
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between turnaround stations.
 %@ var y shape=F,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating operation of train service between consecutive stations.
 %@ index G ordered=1 cyclic=0 :: Set of train services in the down direction.
 %@ var a shape=F,I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train service at station.
@@ -193,15 +193,15 @@
   & \mathit{beta}_{f , g , p}^{up} = beta_hat_{f , g , p}^{up} \tag{eq\_0054\_a} \\
   & \mathit{beta}_{g , f , p}^{dn} = beta_hat_{g , f , p}^{dn} \tag{eq\_0054\_b} \\
   & \mathit{beta}_{f , g , p}^{up} \left(t_{d,end} - d_{f , p}^{up}\right) \geq 0 , \forall f \in \mathbf{F} , g \in \mathbf{G} , p \in \mathbf{P} / \left\{1 , P\right\} . \tag{eq\_0056} \\
-  & f_tilde \left(x\right) \leq F_tilde_{max} \left(1 - theta_tilde\right) \tag{eq\_0057\_a} \\
-  & f_tilde \left(x\right) \geq \mathit{epsilon} + \left(F_tilde_{min} - \mathit{epsilon}\right) theta_tilde . \tag{eq\_0057\_b} \\
+  & f_tilde x \leq F_tilde_{max} \left(1 - theta_tilde\right) \tag{eq\_0057\_a} \\
+  & f_tilde x \geq \mathit{epsilon} + \left(F_tilde_{min} - \mathit{epsilon}\right) theta_tilde . \tag{eq\_0057\_b} \\
   & - theta_tilde_{1} + theta_tilde_{3} \leq 0 \tag{eq\_0058\_a} \\
   & - theta_tilde_{2} + theta_tilde_{3} \leq 0 \tag{eq\_0058\_b} \\
   & theta_tilde_{1} + theta_tilde_{2} - theta_tilde_{3} \leq 1 . \tag{eq\_0058\_c} \\
   & z_tilde \leq F_tilde_{max} theta_tilde \tag{eq\_0059\_a} \\
   & z_tilde \geq F_tilde_{min} theta_tilde \tag{eq\_0059\_b} \\
-  & z_tilde \leq f_tilde \left(x\right) - F_tilde_{min} \left(1 - theta_tilde\right) \tag{eq\_0059\_c} \\
-  & z_tilde \geq f_tilde \left(x\right) - F_tilde_{max} \left(1 - theta_tilde\right) . \tag{eq\_0059\_d} \\
+  & z_tilde \leq f_tilde x - F_tilde_{min} \left(1 - theta_tilde\right) \tag{eq\_0059\_c} \\
+  & z_tilde \geq f_tilde x - F_tilde_{max} \left(1 - theta_tilde\right) . \tag{eq\_0059\_d} \\
   & - c_{f - \mathit{ell} , i - 1 , i}^{up} + c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_a} \\
   & - c_{f , i - 1 , i}^{up} + c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 0 \tag{eq\_0060\_b} \\
   & c_{f - \mathit{ell} , i}^{up} + c_{f , i}^{up} - c_tilde_{f - \mathit{ell} , f , i}^{up} \leq 1 \tag{eq\_0060\_c} \\

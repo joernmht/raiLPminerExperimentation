@@ -15,7 +15,7 @@
 %@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
 %@ var a shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of service k at station i
 %@ var d shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of service k at station i
-%@ param s shape=S kind=vector domain=- :: Running time on segment between stations i-1 and i
+%@ param s shape=S,S kind=vector domain=- :: Running time on segment between stations i-1 and i
 %@ param e shape=S kind=vector domain=- :: Dwelling time at station i
 %@ var h shape=K domain=non_negative role=primary drole=- lo=- hi=- :: Headway between service k-1 and k
 %@ index R ordered=1 cyclic=0 :: Number of time intervals for passenger arrival rates
@@ -27,7 +27,7 @@
 %@ param pt shape=- kind=scalar domain=- :: Passenger arrival rate function
 %@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total waiting time objective
 %@ param T shape=R kind=vector domain=- :: Time point for interval r
-%@ param P shape=S,S,R kind=matrix domain=- :: Passenger arrival rate matrix
+%@ param P shape=S,S kind=matrix domain=- :: Passenger arrival rate matrix
 %@ index r ordered=1 cyclic=0 :: Time interval index
 %@ var Q shape=K,S,S domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting for service k at station i with destination j
 %@ param C shape=- kind=scalar domain=- :: Train capacity
@@ -93,7 +93,7 @@
 %@ con eq_0073 kind=linear domain=- indicator=- :: Linearization constraint (73)
 %@ con eq_0074 kind=linear domain=- indicator=- :: Linearization constraint (74)
 %@ con eq_0075 kind=linear domain=- indicator=- :: Linearization constraint (75)
-%@ var tau shape=- domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
+%@ var tau shape=K domain=continuous role=variable drole=variable lo=- hi=- :: renamed from Greek tau
 %@ param S_1 shape=- kind=scalar domain=- :: Number of short-turn services in the up direction
 %@ param S_2 shape=- kind=scalar domain=- :: Number of short-turn services in the down direction
 %@ var alpha shape=K domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of trains assigned to service k in the up direction
@@ -174,7 +174,6 @@
   & c_{k , i}^{b} \geq C - c_{k , i - 1} + c_{k , i}^{a} - M \cdot \mathit{psi}_{k , i} . \tag{eq\_0069} \\
   & \mathit{psi}_{k , i} > \frac{\left(C - c_{k , i - 1} + c_{k , i}^{a}\right) - w_{k , i}^{b}}{M} , \tag{eq\_0071} \\
   & \mathit{psi}_{k , i} \leq 1 + \frac{\left(C - c_{k , i - 1} + c_{k , i}^{a}\right) - w_{k , i}^{b}}{M} , \tag{eq\_0072} \\
-  & \mathit{psi}_{k , i} \in \left\{0 , 1\right\} . \tag{eq\_0073} \\
   & c_{k , i , j}^{b} = \mathit{phi}_{k , i , j} \cdot c_{k , i}^{b} , \tag{eq\_0074} \\
   & w_{k , i , j}^{b} = \mathit{phi}_{k , i , j} \cdot w_{k , i}^{b} . \tag{eq\_0075} \\
 \end{align}

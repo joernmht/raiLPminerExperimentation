@@ -46,11 +46,11 @@
 %@ param LB shape=- kind=scalar domain=- :: lower bound on makespan
 %@ param C shape=- kind=scalar domain=- :: makespan of master or subproblem
 %@ index S ordered=0 cyclic=0 :: set of earliest-ready blocks for minimum train composition
-%@ param LSA shape=Q,E kind=matrix domain=- :: left-side availability of resource at a stage
-%@ param RSA shape=Q,E kind=matrix domain=- :: right-side availability of resource at a stage
+%@ param LSA shape=- kind=matrix domain=- :: left-side availability of resource at a stage
+%@ param RSA shape=- kind=matrix domain=- :: right-side availability of resource at a stage
 %@ param body shape=- kind=scalar domain=- :: middle term in lower bound calculation
 %@ param head shape=- kind=scalar domain=- :: first term in lower bound calculation
-%@ param tail shape=L kind=vector domain=- :: last term in lower bound calculation
+%@ param tail shape=- kind=vector domain=- :: last term in lower bound calculation
 %@ param theta shape=L kind=vector domain=- :: tail time for outbound train
 %@ con eq_0003 kind=linear domain=- indicator=- :: each block assigned to at most one outbound train
 %@ con eq_0004 kind=linear domain=- indicator=- :: total weight of outbound train within required limits
@@ -119,8 +119,6 @@
   & \sum_{f \in F} \mathit{lambda}_{l , f} \geq r_{k , l} \forall l \in L , \forall k \in K \tag{eq\_0009} \\
   & r_{k , l} = 0 \forall l \in L , \forall k \in K \mid d_{k} \neq d_{l} \text{or} T_{k}^{\text{arr}} + t^{\text{dwe}} \geq T_{l}^{\text{dep}} \tag{eq\_0010} \\
   & \mathit{lambda}_{l , f} = 0 \forall l \in L , \forall f \in F \mid d_{f} \neq d_{l} \text{or} T_{f}^{\text{ava}} + t^{\text{pre}} \leq T_{l}^{\text{dep}} \tag{eq\_0011} \\
-  & r_{k , l} \in \left\{0 , 1\right\} \forall l \in L , \forall k \in K \tag{eq\_0012} \\
-  & \mathit{lambda}_{l , f} \in \left\{0 , 1\right\} \forall l \in L , \forall f \in F \tag{eq\_0013} \\
   & u_{j , a}^{'} \geq u_{j , a - 1}^{'} + p_{j , a}^{'} \forall j \in J , \forall a \in \left[2 , \left|A\right|\right] \tag{eq\_0014} \\
   & u_{k , b}^{' '} \geq u_{k , b - 1}^{' '} + p_{k , b}^{' '} \forall k \in K , \forall b \in \left[2 , \left|B\right|\right] \tag{eq\_0016} \\
   & u_{l , e}^{' ' '} \geq u_{l , e - 1}^{' ' '} + p_{l , e}^{' ' '} \forall l \in L , \forall e \in \left[2 , \left|E\right|\right] \tag{eq\_0017} \\
@@ -139,9 +137,6 @@
   & u_{jp , a}^{'} - p_{jp , a}^{'} \geq u_{j , a}^{'} - \mathcal{M} \cdot \left(2 + s_{j , jp , q_{a}} - \mathit{omega}_{j , a , q_{a}} - \mathit{omega}_{jp , a , q_{a}}\right) \forall a \in A , \forall q_{a} \in Q_{a} , \forall j , jp \in J : j > jp \tag{eq\_0034} \\
   & u_{kp , b}^{'} - p_{kp , b}^{'} \geq u_{k , b}^{' '} - \mathcal{M} \cdot \left(2 + s_{k , kp , q_{b}} - \mathit{omega}_{k , b , q_{b}} - \mathit{omega}_{kp , b , q_{b}}\right) \forall b \in B , \forall q_{b} \in Q_{b} , \forall k , kp \in K : k > kp \tag{eq\_0035} \\
   & u_{lp , e}^{'} - p_{lp , e}^{'} \geq u_{l , e}^{' ' '} - \mathcal{M} \cdot \left(2 + s_{l , lp , q_{e}} - \mathit{omega}_{l , e , q_{e}} - \mathit{omega}_{lp , e , q_{e}}\right) \forall e \in E , \forall q_{e} \in Q_{e} , \forall l , lp \in L : l > lp \tag{eq\_0036} \\
-  & u_{j , a}^{'} , u_{k , b}^{' '} , u_{l , e}^{' ' '} \in \mathcal{Z}^{+} \forall a \in A , b \in B , e \in E , j \in J , k \in K , l \in L \tag{eq\_0037} \\
-  & \mathit{omega}_{j , a , q_{a}} , \mathit{omega}_{k , b , q_{b}} , \mathit{omega}_{l , e , q_{e}} \in \left\{0 , 1\right\} \forall a \in A , b \in B , e \in E , j \in J , k \in K , l \in L , q_{a} \in Q_{a} , q_{b} \in Q_{b} , q_{e} \in Q_{E} \tag{eq\_0039} \\
-  & s_{j , jp , q_{a}} , s_{k , kp , q_{b}} , s_{l , lp , q_{e}} \in \left\{0 , 1\right\} \forall j , jp \in J , k , kp \in K , l , lp \in L , q_{a} \in Q_{a} , q_{b} \in Q_{b} , q_{e} \in Q_{E} \tag{eq\_0040} \\
   & \mathit{EndBeforeStart} \left(x_{j , a - 1} , x_{j , a}\right) \forall j \in J , \forall a \in \left[2 , \left|A\right|\right] \tag{eq\_0042} \\
   & \mathit{EndBeforeStart} \left(y_{k , b - 1} , y_{k , b}\right) \forall k \in K , \forall b \in \left[2 , \left|B\right|\right] \tag{eq\_0044} \\
   & \mathit{EndBeforeStart} \left(z_{l , e - 1} , z_{l , e}\right) \forall l \in L , \forall e \in \left[2 , \left|E\right|\right] \tag{eq\_0045} \\
@@ -164,6 +159,6 @@
   & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \left[\sum_{k \in K, l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right] \cdot \left[\underset{l \in L}{max} \left(z_{l , \left|E\right|}^{\mathit{varphi}} - \left(\underset{kp \in S_{l}^{\mathit{varphi}}}{max} \left(t_{kp}\right) + p_{l}^{' ' '}\right)\right)\right] \forall \mathit{varphi} > 0 , \mathit{varphi} < \mathit{tau} \tag{eq\_0071} \\
   & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \overset{0}{\overset{︷}{\overset{0}{\overset{︷}{\left[\sum_{k \in K, l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right]}} \cdot \left[C_{\text{RS}}^{\mathit{varphi}} - \underset{l \in L}{max} \left(\underset{kp \in H_{l}^{\mathit{varphi}}}{min} \left(t_{kp}\right) + p_{l}^{' ' '}\right)\right]}} \tag{eq\_0072} \\
   & C_{\text{TM}}^{\mathit{tau}} \geq C_{\text{RS}}^{\mathit{varphi}} - \overset{0}{\overset{︷}{\overset{0}{\overset{︷}{\left[\sum_{k \in K, l \in L : r_{k , l}^{\mathit{varphi}} = 1} \left(1 - r_{k , l}^{\mathit{tau}}\right)\right]}} \cdot \left[\underset{l \in L}{max} \left(z_{l , \left|E\right|}^{\mathit{varphi}} - \left(\underset{kp \in S_{l}^{\mathit{varphi}}}{max} \left(t_{kp}\right) + p_{l}^{' ' '}\right)\right)\right]}} \tag{eq\_0073} \\
-  & \mathit{LB}_{2} \left(e\right) = \frac{1}{\left|Q_{e}\right|} \left(\sum_{q_{e} \in Q_{e}} \text{LSA} \left(q_{e} , e\right) + \sum_{l \in L} p_{l , e}^{' ' '} + \sum_{q_{e} \in Q_{e}} \text{RSA} \left(q_{e} , e\right)\right) \tag{eq\_0075} \\
-  & \mathit{LB}_{3} \left(e\right) = \overset{\text{head}}{{\underset{l \in L}{min} \mathit{phi}_{l}}} + \overset{\text{body}}{\overset{︷}{\frac{\sum_{l \in L} p_{l , e}^{' ' '}}{\left|Q_{e}\right|}}} + \overset{\text{tail}}{{\underset{l \in L}{min} \mathit{theta}_{l}}} \tag{eq\_0076} \\
+  & \mathit{LB}_{2} e = \frac{1}{\left|Q_{e}\right|} \left(\sum_{q_{e} \in Q_{e}} \text{LSA} \left(q_{e} , e\right) + \sum_{l \in L} p_{l , e}^{' ' '} + \sum_{q_{e} \in Q_{e}} \text{RSA} \left(q_{e} , e\right)\right) \tag{eq\_0075} \\
+  & \mathit{LB}_{3} e = \overset{\text{head}}{{\underset{l \in L}{min} \mathit{phi}_{l}}} + \overset{\text{body}}{\overset{︷}{\frac{\sum_{l \in L} p_{l , e}^{' ' '}}{\left|Q_{e}\right|}}} + \overset{\text{tail}}{{\underset{l \in L}{min} \mathit{theta}_{l}}} \tag{eq\_0076} \\
 \end{align}

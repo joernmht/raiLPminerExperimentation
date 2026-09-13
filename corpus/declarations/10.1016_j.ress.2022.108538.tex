@@ -81,16 +81,20 @@
 %@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
 
 % unusable as an identifier, rename or drop: τ
-%@ param tau shape=A,T kind=matrix domain=- :: Travel time on arc (i,j) for train t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j,t): tau shape=A,T -> N,N,T
+%@ param tau shape=N,N,T kind=matrix domain=- :: Travel time on arc (i,j) for train t
 
 % h: classified as parameter during review
-%@ param h shape=A,T,T kind=matrix domain=- :: Headway time between trains t and m on arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j,t,m): h shape=A,T,T -> N,N,T,T
+%@ param h shape=N,N,T,T kind=matrix domain=- :: Headway time between trains t and m on arc (i,j)
 
 % s: classified as parameter during review
-%@ param s shape=A,T kind=matrix domain=- :: Capacity of arc (i,j) at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): s shape=A,T -> T
+%@ param s shape=T kind=matrix domain=- :: Capacity of arc (i,j) at time t
 
 % unusable as an identifier, rename or drop: δ
-%@ param delta shape=A,P kind=matrix domain=- :: Indicator if arc (i,j) is on path p
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j,p): delta shape=A,P -> N,N,P
+%@ param delta shape=N,N,P kind=matrix domain=- :: Indicator if arc (i,j) is on path p
 
 % Bound by a quantifier or big operator, so no declaration of their own: i, j, k, m, n, p, t
 % (If one of these is really an index family, add a %@ index line for it.)

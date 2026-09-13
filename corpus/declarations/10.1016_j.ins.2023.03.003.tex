@@ -66,7 +66,8 @@
 %@ param G shape=- kind=scalar domain=- :: Planned speed grade of train i at block section k from previous time horizon
 
 % g: classified as variable during review
-%@ var g shape=- domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,k): g shape=- -> T,B
+%@ var g shape=T,B domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
 
 % D: classified as variable during review
 %@ var D shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i stops at station n
@@ -78,7 +79,8 @@
 %@ index Tr ordered=0 cyclic=0 :: Set of tracks at a station
 
 % y: classified as parameter during review
-%@ param y shape=- kind=scalar domain=- :: Planned departure time of train i from station n
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,n): y shape=- -> T,N
+%@ param y shape=T,N kind=scalar domain=- :: Planned departure time of train i from station n
 
 % fori: classified as index during review
 %@ index fori ordered=0 cyclic=0 :: Loop index over trains

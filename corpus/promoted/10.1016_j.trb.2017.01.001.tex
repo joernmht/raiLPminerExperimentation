@@ -28,13 +28,13 @@
 %@ param Z shape=- kind=scalar domain=- :: Objective function value
 %@ param M shape=- kind=scalar domain=- :: Number of time intervals in planning horizon
 %@ param O shape=- kind=scalar domain=- :: Dummy origin station
-%@ param s shape=I,I kind=matrix domain=- :: Length of link (i,j)
+%@ param s shape=- kind=matrix domain=- :: Length of link (i,j)
 %@ param R shape=- kind=scalar domain=- :: Regenerative braking energy
 %@ param h shape=I,I kind=matrix domain=- :: Minimum headway between successive trains on link (i,j)
 %@ param d_bar shape=I kind=vector domain=- :: Maximum dwelling time at station i
 %@ param C shape=K kind=vector domain=- :: Loading capacity of train k
 %@ param N shape=- kind=scalar domain=- :: Set of nonnegative integer variables (N+)
-%@ param G shape=U,T kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
+%@ param G shape=U kind=matrix domain=- :: Utilized regenerative energy at substation u in time interval t
 %@ param constraints shape=- kind=scalar domain=- :: Set of constraints
 %@ index U ordered=0 cyclic=0 :: Set of power supply substations
 %@ con eq_0004 kind=linear domain=- indicator=- :: Nonnegativity of waiting and boarding passenger counts
@@ -69,32 +69,29 @@
 %@ param d_underline shape=I kind=vector domain=- :: Minimum dwell time at station i
 %@ param t_0 shape=- kind=scalar domain=- :: Initial timestamp of the planning horizon
 \begin{align}
-  & \begin{matrix}W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot n_{t}^{i} ,\end{matrix} \tag{eq\_0004} \\
-  & \begin{matrix}n_{t}^{i} = n_{t - \mathit{delta}}^{i} + \sum_{i \leq j \leq 2 I} p_{i j} \left(t\right) \cdot \mathit{delta} - b_{t}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , i \in \mathcal{I} ,\end{matrix} \tag{eq\_0005} \\
-  & \begin{matrix}b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i tp t}^{k} \cdot b_{m a x}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , tp = t - \mathit{delta} , i \in \mathcal{I} ,\end{matrix} \tag{eq\_0006} \\
-  & \begin{matrix}n_{t}^{i} , b_{t}^{i} \geq 0 , \forall t \in \mathcal{T} , i \in \mathcal{I} .\end{matrix} \tag{eq\_0007} \\
-  & d_{t}^{i} = \sum_{i \leq j \leq 2 I} p_{i j} \left(t\right) \cdot \mathit{delta} , \forall t \in \mathcal{T} , i \in \mathcal{I} \tag{eq\_0008} \\
-  & \begin{matrix}W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) ,\end{matrix} \tag{eq\_0009} \\
-  & \begin{matrix}n_{t}^{i} = n_{t - \mathit{delta}}^{i} + d_{t}^{i} - b_{t}^{i} .\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix}n_{t}^{i} = n_{t_{0}}^{i} + \sum_{t_bar \in \left(t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\end{matrix} \tag{eq\_0014} \\
-  & \begin{matrix}\sum_{t_bar \in \left[t_{0} , t\right]} b_{t_bar}^{i} \leq n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} d_{t_bar}^{i} , \forall t \in \mathcal{T} , i \in \mathcal{I} .\end{matrix} \tag{eq\_0015} \\
-  & \begin{matrix}T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} t \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} ,\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix}T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} tp \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} .\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix}(\text{ETS}) \underset{\mathbf{x} , \mathbf{b}}{min} Z_{1} \left(\mathbf{x} , \mathbf{b}\right) = w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) + w_{E} \sum_{k \in \mathcal{K}, \left(i , j , t , tp\right) \in \mathcal{A}} E_{k} \left(i , j , t , tp\right) x_{i j t tp}^{k}\end{matrix} \tag{eq\_0022} \\
-  & \begin{matrix} \text{s}.\text{t}. \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} x_{i j t tp}^{k} - \sum_{\left(j , i , tp , t\right) \in \mathcal{A}} x_{j i tp t}^{k} = \begin{cases} 1 & i = O , t = t_{0} , \\ - 1 & i = D , t = t_{0} + M \cdot \mathit{delta} , \\ 0 & \text{otherwise} , \end{cases} \forall k \in \mathcal{K}\end{matrix} \tag{eq\_0023} \\
-  & \begin{matrix} & T \cdot E_{2 I , D}^{k} + T \cdot R_{k} \leq T \cdot D_{O 1}^{k + K_{p}} , \forall k , k + K_{p} \in \mathcal{K}\end{matrix} \tag{eq\_0024} \\
-  & \begin{matrix} & T \cdot D_{I \left(I + 1\right)}^{k} - T \cdot E_{I \left(I + 1\right)}^{k} = T \cdot A_{k} , \forall k \in \mathcal{K}\end{matrix} \tag{eq\_0025} \\
-  & \begin{matrix} & T \cdot E_{i j}^{k - 1} + h_{i j} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0026} \\
-  & \begin{matrix} & T \cdot D_{i j}^{k - 1} + h_{i j} \leq T \cdot D_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0027} \\
-  & \begin{matrix} & T \cdot D_{jp i}^{k} + \left(d_underline\right)_{i} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(jp , i\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0028} \\
-  & \begin{matrix} & T \cdot E_{i j}^{k} - \left(d_bar\right)_{i} \leq T \cdot D_{jp i}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(jp , i\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0029} \\
-  & \begin{matrix} & T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} t \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0030} \\
-  & \begin{matrix} & T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} tp \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}\end{matrix} \tag{eq\_0031} \\
-  & \begin{matrix} & b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i tp t}^{k} \cdot b_{m a x}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T} \backslash \left\{t_{0}\right\} , tp = t - \mathit{delta}\end{matrix} \tag{eq\_0032} \\
-  & \begin{matrix} & \sum_{t_bar \in \left[t_{0} , t\right]} b_{t_bar}^{i} \leq n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} d_{t_bar}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T}\end{matrix} \tag{eq\_0033} \\
-  & \begin{matrix} & \sum_{ip \in \left[1 , i\right], t \in \mathcal{T}} \left[\sum_{j > i}^{2 I} \mathit{delta} \cdot p_{ip j} \left(t + \mathit{delta}\right) \sum_{t_tilde \in \left[t_{0} , t\right], tp \in \mathcal{T}} \left(x_{ip \left(ip + 1\right) t_tilde tp}^{k - 1} - x_{ip \left(ip + 1\right) t_tilde tp}^{k}\right)\right] \leq C_{k} , \\ & \forall i \in \mathcal{I} , k \in \mathcal{K} \backslash \left\{1\right\}\end{matrix} \tag{eq\_0034} \\
-  & \begin{matrix} & x_{i j t tp}^{k} \in \left\{0 , 1\right\} , \forall \left(i , j , t , tp\right) \in \mathcal{A} , k \in \mathcal{K}\end{matrix} \tag{eq\_0035} \\
-  & \begin{matrix} & b_{t}^{i} \in \mathcal{N}^{+} , \forall i \in \mathcal{I} , t \in \mathcal{T} .\end{matrix} \tag{eq\_0036} \\
-  \begin{matrix}\begin{matrix}\quad & & \underset{\mathbf{x} , \mathbf{b}}{min} Z \left(\mathbf{x} , \mathbf{b}\right) = w_{E} \left[\sum_{k \in \mathcal{K}, \left(i , j , t , tp\right) \in \mathcal{A}} E_{k} \left(i , j , t , tp\right) x_{i j t tp}^{k} - \sum_{t \in \mathcal{T}^{M}, u \in \mathcal{U}} G_{u} \left(t\right)\right] \\ & + w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) \\ & \text{s}.\text{t}. \text{constraints} \left(19\right) - \left(32\right) .\end{matrix}\end{matrix} \tag{eq\_0040} \\
+  &  W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot n_{t}^{i} ,  \tag{eq\_0004} \\
+  &  n_{t}^{i} = n_{t - \mathit{delta}}^{i} + \sum_{i \leq j \leq 2 I} p_{i j} \cdot t \cdot \mathit{delta} - b_{t}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , i \in \mathcal{I} ,  \tag{eq\_0005} \\
+  &  b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i tp t}^{k} \cdot b_{m a x}^{i} , \forall t \in \mathcal{T} \backslash \left\{t_{0}\right\} , tp = t - \mathit{delta} , i \in \mathcal{I} ,  \tag{eq\_0006} \\
+  & d_{t}^{i} = \sum_{i \leq j \leq 2 I} p_{i j} \cdot t \cdot \mathit{delta} , \forall t \in \mathcal{T} , i \in \mathcal{I} \tag{eq\_0008} \\
+  &  W \cdot T = \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) ,  \tag{eq\_0009} \\
+  &  n_{t}^{i} = n_{t - \mathit{delta}}^{i} + d_{t}^{i} - b_{t}^{i} .  \tag{eq\_0013} \\
+  &  n_{t}^{i} = n_{t_{0}}^{i} + \sum_{t_bar \in \left(t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)  \tag{eq\_0014} \\
+  &  \sum_{t_bar \in \left[t_{0} , t\right]} b_{t_bar}^{i} \leq n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} d_{t_bar}^{i} , \forall t \in \mathcal{T} , i \in \mathcal{I} .  \tag{eq\_0015} \\
+  &  T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} t \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} ,  \tag{eq\_0016} \\
+  &  T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} tp \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} .  \tag{eq\_0017} \\
+  &  (\text{ETS}) \underset{\mathbf{x} , \mathbf{b}}{min} Z_{1} \left(\mathbf{x} , \mathbf{b}\right) = w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \cdot \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) + w_{E} \sum_{k \in \mathcal{K}, \left(i , j , t , tp\right) \in \mathcal{A}} E_{k} \left(i , j , t , tp\right) x_{i j t tp}^{k}  \tag{eq\_0022} \\
+  &  \text{s}.\text{t}. \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} x_{i j t tp}^{k} - \sum_{\left(j , i , tp , t\right) \in \mathcal{A}} x_{j i tp t}^{k} = \begin{cases} 1 & i = O , t = t_{0} , \\ - 1 & i = D , t = t_{0} + M \cdot \mathit{delta} , \\ 0 & \text{otherwise} , \end{cases} \forall k \in \mathcal{K}  \tag{eq\_0023} \\
+  &  & T \cdot E_{2 I , D}^{k} + T \cdot R_{k} \leq T \cdot D_{O 1}^{k + K_{p}} , \forall k , k + K_{p} \in \mathcal{K}  \tag{eq\_0024} \\
+  &  & T \cdot D_{I \left(I + 1\right)}^{k} - T \cdot E_{I \left(I + 1\right)}^{k} = T \cdot A_{k} , \forall k \in \mathcal{K}  \tag{eq\_0025} \\
+  &  & T \cdot E_{i j}^{k - 1} + h_{i j} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}  \tag{eq\_0026} \\
+  &  & T \cdot D_{i j}^{k - 1} + h_{i j} \leq T \cdot D_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K} \backslash \left\{1\right\}  \tag{eq\_0027} \\
+  &  & T \cdot D_{jp i}^{k} + d_underline_{i} \leq T \cdot E_{i j}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(jp , i\right) \in \mathcal{S} , k \in \mathcal{K}  \tag{eq\_0028} \\
+  &  & T \cdot E_{i j}^{k} - d_bar_{i} \leq T \cdot D_{jp i}^{k} , \forall \left(i , j\right) \in \mathcal{S} , \left(jp , i\right) \in \mathcal{S} , k \in \mathcal{K}  \tag{eq\_0029} \\
+  &  & T \cdot E_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} t \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}  \tag{eq\_0030} \\
+  &  & T \cdot D_{i j}^{k} = \sum_{\left(i , j , t , tp\right) \in \mathcal{A}} tp \cdot x_{i j t tp}^{k} , \forall \left(i , j\right) \in \mathcal{S} , k \in \mathcal{K}  \tag{eq\_0031} \\
+  &  & b_{t}^{i} \leq \sum_{k \in \mathcal{K}} x_{i i tp t}^{k} \cdot b_{m a x}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T} \backslash \left\{t_{0}\right\} , tp = t - \mathit{delta}  \tag{eq\_0032} \\
+  &  & \sum_{t_bar \in \left[t_{0} , t\right]} b_{t_bar}^{i} \leq n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} d_{t_bar}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T}  \tag{eq\_0033} \\
+  &  & \sum_{ip \in \left[1 , i\right], t \in \mathcal{T}} \left[\sum_{j > i}^{2 I} \mathit{delta} \cdot p_{ip j} \left(t + \mathit{delta}\right) \sum_{t_tilde \in \left[t_{0} , t\right], tp \in \mathcal{T}} \left(x_{ip \left(ip + 1\right) t_tilde tp}^{k - 1} - x_{ip \left(ip + 1\right) t_tilde tp}^{k}\right)\right] \leq C_{k} , \\ & \forall i \in \mathcal{I} , k \in \mathcal{K} \backslash \left\{1\right\}  \tag{eq\_0034} \\
+  \min_{\mathbf{x}\quad & , \mathbf{b}} Z \left(\mathbf{x} , \mathbf{b}\right) = w_{E} \left[\sum_{k \in \mathcal{K}, \left(i , j , t , tp\right) \in \mathcal{A}} E_{k} \left(i , j , t , tp\right) x_{i j t tp}^{k} - \sum_{t \in \mathcal{T}^{M}, u \in \mathcal{U}} G_{u} \cdot t\right] + w_{T} \sum_{i \in \mathcal{I}} \underset{t \in \mathcal{T} \backslash \left\{t_{0}\right\}}{\sum} \mathit{delta} \left(n_{t_{0}}^{i} + \sum_{t_bar \in \left[t_{0} , t\right]} \left(d_{t_bar}^{i} - b_{t_bar}^{i}\right)\right) \text{s}.\text{t}. \text{constraints} \left(19\right) - \left(32\right) . \tag{eq\_0040} \\
   & b_{t}^{i} \leq b_{m a x}^{i} , \forall i \in \mathcal{I} , t \in \mathcal{T} . \tag{eq\_0046} \\
 \end{align}

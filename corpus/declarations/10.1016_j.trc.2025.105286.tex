@@ -98,7 +98,8 @@
 %@ param lim shape=- kind=scalar domain=- :: Limit operator
 
 % x: classified as variable during review
-%@ var x shape=n domain=continuous role=primary drole=- lo=- hi=- :: Decision variable (headway, route, fleet size)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): x shape=n -> -
+%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Decision variable (headway, route, fleet size)
 
 % unusable as an identifier, rename or drop: γ
 % Z: classified as parameter during review
@@ -127,14 +128,16 @@
 %@ param arg shape=- kind=scalar domain=- :: Argument of the maximum
 
 % s: classified as variable during review
-%@ var s shape=n domain=continuous role=primary drole=- lo=- hi=- :: State of the system
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s shape=n -> -
+%@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: State of the system
 
 % Q: classified as variable during review
 %@ var Q shape=- domain=continuous role=primary drole=- lo=- hi=- :: Action-value function
 
 % unusable as an identifier, rename or drop: ω
 % o: classified as variable during review
-%@ var o shape=n domain=continuous role=primary drole=- lo=- hi=- :: Observation
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o shape=n -> -
+%@ var o shape=- domain=continuous role=primary drole=- lo=- hi=- :: Observation
 
 % G: classified as parameter during review
 %@ param G shape=- kind=scalar domain=- :: Gate in LSTM
@@ -161,7 +164,8 @@
 %@ param Tanh shape=- kind=scalar domain=- :: Hyperbolic tangent function
 
 % c: classified as variable during review
-%@ var c shape=n domain=continuous role=primary drole=- lo=- hi=- :: Memory vector in LSTM
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): c shape=n -> -
+%@ var c shape=- domain=continuous role=primary drole=- lo=- hi=- :: Memory vector in LSTM
 
 % memory: classified as parameter during review
 %@ param memory shape=- kind=scalar domain=- :: Memory vector
@@ -275,7 +279,8 @@
 %@ var W_total shape=n domain=continuous role=auxiliary drole=- lo=- hi=- :: total passenger waiting time
 %@ param alpha shape=- kind=scalar domain=- :: weight parameter
 %@ var b shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: allocation fraction
-%@ param beta shape=- kind=scalar domain=- :: passenger arrival rate function
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): beta shape=- -> I
+%@ param beta shape=I kind=scalar domain=- :: passenger arrival rate function
 %@ param beta_1 shape=- kind=scalar domain=- :: coefficient in speed function
 %@ param beta_2 shape=- kind=scalar domain=- :: coefficient in speed function
 %@ param beta_3 shape=- kind=scalar domain=- :: coefficient in speed function

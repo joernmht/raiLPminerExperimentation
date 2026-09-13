@@ -215,7 +215,22 @@
     {
       "name": "eq_0008_a",
       "description": "",
-      "quantifiers": [],
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
       "comparator": "le",
       "lhs": [],
       "rhs": [
@@ -250,7 +265,22 @@
     {
       "name": "eq_0008_b",
       "description": "",
-      "quantifiers": [],
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
       "comparator": "le",
       "lhs": [
         {
@@ -294,102 +324,28 @@
       "indicator": null
     },
     {
-      "name": "eq_0010",
-      "description": "Consistency: a train departs if passengers are assigned to board at that interval",
-      "quantifiers": [],
-      "comparator": "ge",
-      "lhs": [
+      "name": "eq_0022",
+      "description": "Occupancy cannot exceed train capacity CAP",
+      "quantifiers": [
         {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "t",
-              "expr": "u+p-1",
-              "offset": -1,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "y",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "u",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "P",
-              "expr": "p",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0024",
-      "description": "Peak/off-peak headway selection: x_t forces either N_Peak or N_Off headway",
-      "quantifiers": [],
-      "comparator": "ge",
-      "lhs": [
-        {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "t",
-              "expr": "t+N_Peak",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
         },
         {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "t",
-              "expr": "t+N_Off",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
         }
       ],
-      "rhs": [
+      "comparator": "le",
+      "lhs": [
         {
-          "ref": "x",
+          "ref": "q",
           "ref_kind": "variable",
           "bindings": [
             {
@@ -397,8 +353,26 @@
               "expr": "t",
               "offset": 0,
               "modulo": null
+            },
+            {
+              "index": "s",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
             }
           ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "CAP",
+          "ref_kind": "parameter",
+          "bindings": [],
           "coefficient": 1.0,
           "sign": 1,
           "role": "rhs",
@@ -406,14 +380,22 @@
           "operator_over": []
         }
       ],
-      "kind": "headway",
+      "kind": "capacity",
       "domain_class": null,
       "indicator": null
     },
     {
       "name": "eq_0026",
       "description": "Peak and off-peak headways are not selected simultaneously when N_Off != 2*N_Peak",
-      "quantifiers": [],
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "Tpo",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
       "comparator": "le",
       "lhs": [
         {
@@ -488,7 +470,9 @@
         "sign": 1,
         "role": "objective",
         "operator": "sum",
-        "operator_over": []
+        "operator_over": [
+          "T"
+        ]
       }
     ],
     "combination": "sum"

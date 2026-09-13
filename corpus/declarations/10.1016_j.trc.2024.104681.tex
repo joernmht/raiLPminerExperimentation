@@ -64,7 +64,8 @@
 %@ var c shape=K,J domain=integer role=primary drole=- lo=- hi=- :: Number of carriages coupled to metro train k on line j.
 
 % n: classified as variable during review
-%@ var n shape=K,S,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): n shape=K,S,J -> -
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
 
 % E: classified as index during review
 %@ index E ordered=0 cyclic=0 :: Set of events in railway network.

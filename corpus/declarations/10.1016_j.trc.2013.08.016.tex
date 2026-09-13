@@ -46,7 +46,8 @@
 %@ var x shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative boarding indicator for train j at station u at time t.
 
 % D: classified as variable during review
-%@ var D shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes u): D shape=u,t -> j
+%@ var D shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
 
 % c: classified as parameter during review
 %@ param c shape=- kind=scalar domain=- :: Train capacity (maximum passengers on board).
@@ -67,7 +68,8 @@
 %@ param h shape=- kind=scalar domain=- :: Minimum safety headway between consecutive trains.
 
 % A: classified as variable during review
-%@ var A shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes u): A shape=u,t -> j
+%@ var A shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
 
 % P: classified as parameter during review
 %@ param P shape=u,v,t kind=matrix domain=- :: Time-dependent passenger demand from station u to v at time t.

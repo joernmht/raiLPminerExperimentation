@@ -1,0 +1,2124 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.tre.2022.102942",
+  "name": "Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances",
+  "family": "milp",
+  "description": "Mined from Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances (Transportation Research Part E Logistics and Transportation Review, 2022).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.tre.2022.102942",
+    "reference": "Real-time optimization of train regulation and passenger flow control for urban rail transit network under frequent disturbances",
+    "author": "Yin Yuan; Shukai Li; Lixing Yang; Ziyou Gao",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "I",
+      "description": "Set of stations on a line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "J",
+      "description": "Set of trains on a line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "Set of lines in the network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "X",
+      "description": "Set of lines connecting to a given line at a transfer station",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "U",
+      "description": "Set of transfer stations on a line",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "A",
+      "description": "Scheduled arrival time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "D",
+      "description": "Scheduled departure time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "S",
+      "description": "Nominal dwell time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "R",
+      "description": "Nominal running time between stations i-1 and i for train j on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "H",
+      "description": "Nominal headway between trains j-1 and j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "w",
+      "description": "Disturbance in dwell or running time",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Start time of operations",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Platform capacity at station i on line l",
+      "shape": [
+        "L",
+        "I"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large positive number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Transfer walking time from line l' to line l at station i",
+      "shape": [
+        "L",
+        "I",
+        "L"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Train capacity of train j on line l",
+      "shape": [
+        "L",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "us",
+      "description": "Bounds for u^s",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ur",
+      "description": "Bounds for u^r",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "cp",
+      "description": "Capacity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "hmin",
+      "description": "Minimum headway",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "N",
+      "description": "Cardinality of J_l",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_0",
+      "description": "initial time reference",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "transfer proportion parameter",
+      "shape": [
+        "L",
+        "U",
+        "X",
+        "J"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta",
+      "description": "transfer time parameter",
+      "shape": [
+        "L",
+        "I"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda",
+      "description": "passenger arrival rate",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ur_max",
+      "description": "upper bound on u_r",
+      "shape": [
+        "L"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ur_min",
+      "description": "lower bound on u_r",
+      "shape": [
+        "L"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "us_max",
+      "description": "upper bound on u_s",
+      "shape": [
+        "L"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "us_min",
+      "description": "lower bound on u_s",
+      "shape": [
+        "L"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_1",
+      "description": "weight for timetable deviation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_2",
+      "description": "weight for headway deviation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_3",
+      "description": "weight for waiting time component",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_4",
+      "description": "weight for left-behind passengers",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_5",
+      "description": "weight for staying passengers",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_6",
+      "description": "weight for transfer passengers",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_7",
+      "description": "weight for passenger accumulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_8",
+      "description": "weight for dwell time control",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "xi_9",
+      "description": "weight for speed control",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "a",
+      "description": "Actual arrival time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Actual departure time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "s",
+      "description": "Actual dwell time of train j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "r",
+      "description": "Actual running time between stations i-1 and i for train j on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u",
+      "description": "Control action for dwell or running time",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "h",
+      "description": "Actual departure headway between trains j-1 and j at station i on line l",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "p",
+      "description": "Number of passengers in various states (waiting, boarding, etc.)",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "g",
+      "description": "Number of transfer passengers from train j' of line l' to platform i of line l for train j",
+      "shape": [
+        "L",
+        "I",
+        "J",
+        "L",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating possible connection between trains",
+      "shape": [
+        "L",
+        "I",
+        "J",
+        "L",
+        "J"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating effective connection between trains",
+      "shape": [
+        "L",
+        "I",
+        "J",
+        "L",
+        "J"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "F",
+      "description": "Objective function value",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "F1",
+      "description": "objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F2",
+      "description": "objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F3",
+      "description": "objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F4",
+      "description": "objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F_1",
+      "description": "first objective component (timetable deviation)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F_2",
+      "description": "second objective component (passenger waiting time)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F_3",
+      "description": "third objective component (passenger accumulation risk)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "F_4",
+      "description": "fourth objective component (control effort)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "h_2",
+      "description": "squared headway auxiliary variable",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_al",
+      "description": "passengers alighting from train",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_ar",
+      "description": "passengers arriving at station",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_bt",
+      "description": "passengers boarding train",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_ep",
+      "description": "passengers entering platform",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_on",
+      "description": "passengers on train",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_sp",
+      "description": "passengers staying on platform",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_st",
+      "description": "passengers left behind",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_wp",
+      "description": "passengers waiting on platform",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "p_wt",
+      "description": "total passenger waiting time",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "u_r",
+      "description": "train regulation control (dwell time adjustment)",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u_s",
+      "description": "train regulation control (speed adjustment)",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w_r",
+      "description": "disturbance on dwell time",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "w_s",
+      "description": "disturbance on speed",
+      "shape": [
+        "L",
+        "I",
+        "J"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0001",
+      "description": "Scheduled departure time equals scheduled arrival time plus nominal dwell time",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "D",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "A",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "S",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005",
+      "description": "Actual arrival time satisfies train dynamics at first and subsequent stations",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Actual running time equals nominal running time plus control and disturbance",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "S",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "u_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "w_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010_a",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "us_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010_b",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "u_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "us_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0016",
+      "description": "Nonnegativity of passengers allowed to enter platform",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "p_sp",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "p_wp",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p_ep",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019",
+      "description": "Platform capacity constraint",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "p_ep",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "p_wp",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0027",
+      "description": "Boarding passengers limited by capacity",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "p_st",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "p_wt",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p_bt",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0032_b",
+      "description": "",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "F",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "F1",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "F2",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "F3",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "F4",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0035",
+      "description": "Objective term for accumulation risk",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "F_3",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "p_ar",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "xi_7",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "L",
+            "I",
+            "J"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0042_lo",
+      "description": "Binary constraint on connection variables",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "ur_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u_r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0042_up",
+      "description": "Binary constraint on connection variables",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "u_r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "ur_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_lo",
+      "description": "Bounds on running time control actions (overall)",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "us_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_up",
+      "description": "Bounds on running time control actions (overall)",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "u_s",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "us_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total objective F = F1 + F2 + F3 + F4 (train deviations, passenger waiting, accumulation risk, control effort)",
+    "terms": [
+      {
+        "ref": "F",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

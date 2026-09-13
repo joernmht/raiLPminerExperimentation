@@ -9,20 +9,23 @@
 %@ prov date :: 2026-06-21
 %@ obj sense=max name=objective combination=sum :: Maximize total transporting profit (total revenue minus total travel cost).
 %@ var I shape=- domain=integer role=primary drole=- lo=- hi=- :: Service interval time between stations m and m' at time t.
-%@ param M shape=- kind=big_m domain=continuous :: Large positive constant (big-M) used in linking and linearization constraints.
+% declaration fixed: param M: domain=continuous -> -
+%@ param M shape=- kind=big_m domain=- :: Large positive constant (big-M) used in linking and linearization constraints.
 %@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value of the optimization model (total transporting profit).
 %@ index F ordered=0 cyclic=0 :: Set of all trains.
 %@ var a shape=- domain=integer role=primary drole=- lo=- hi=- :: Arrival time of train f at cell (i,j) at time t.
 %@ var r shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f stops at station m for OD pair (m,m').
-%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f selects stopping pattern s.
+%@ var x shape=F,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f selects stopping pattern s.
 %@ index S ordered=0 cyclic=0 :: Set of stopping patterns for train f.
 %@ var u shape=- domain=binary role=primary drole=- lo=- hi=- :: Actual usage of cell (i,j) by train f at time t.
 %@ index p ordered=0 cyclic=0 :: Passenger OD pair index.
-%@ param q shape=- kind=scalar domain=continuous :: Demand function for OD pair p as a function of service interval time.
+% declaration fixed: param q: domain=continuous -> -
+%@ param q shape=- kind=scalar domain=- :: Demand function for OD pair p as a function of service interval time.
 %@ index A ordered=0 cyclic=0 :: Set of arcs in the state-space-time network for train f.
 %@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train f uses arc (i,j,t,t',w,w') in the state-space-time network.
 %@ index P ordered=0 cyclic=0 :: Set of all passenger OD pairs.
-%@ param c shape=- kind=scalar domain=continuous :: Cost of train f using arc (i,j,t,t',w,w').
+% declaration fixed: param c: domain=continuous -> -
+%@ param c shape=- kind=scalar domain=- :: Cost of train f using arc (i,j,t,t',w,w').
 %@ var L shape=- domain=continuous role=primary drole=- lo=- hi=- :: Lagrangian subproblem objective for team g.
 %@ con eq_0001 kind=big_m domain=- indicator=- :: Service interval time upper bound with big-M linking train stopping indicators.
 %@ con eq_0002 kind=big_m domain=- indicator=- :: Service interval time lower bound with big-M linking train stopping indicators.
@@ -62,8 +65,8 @@
 %@ con eq_0044 kind=linear domain=- indicator=- :: Additional stopping pattern compatibility constraint in the integrated train service plan model.
 \begin{align}
   & I_{m , mp , t} \leq I_{m , mp , t - 1} + 1 + \sum_{f \in F_{g}} z_{f}^{m , mp , t} \cdot M_tilde , \forall t , m , mp , g \tag{eq\_0001} \\
-  & \begin{matrix}I_{m , mp , t} \geq I_{m , mp , t - 1} + 1 - \sum_{f \in F_{g}} z_{f}^{m , mp , t} \cdot M_tilde , \forall t , m , mp , g\end{matrix} \tag{eq\_0002} \\
-  & \begin{matrix}I_{m , mp , t} \leq \left(1 - \sum_{f \in F_{g}} z_{f}^{m , mp , t}\right) M_tilde + 1 , \forall t , m , mp , g\end{matrix} \tag{eq\_0003} \\
+  &  I_{m , mp , t} \geq I_{m , mp , t - 1} + 1 - \sum_{f \in F_{g}} z_{f}^{m , mp , t} \cdot M_tilde , \forall t , m , mp , g  \tag{eq\_0002} \\
+  &  I_{m , mp , t} \leq \left(1 - \sum_{f \in F_{g}} z_{f}^{m , mp , t}\right) M_tilde + 1 , \forall t , m , mp , g  \tag{eq\_0003} \\
   & I_{m , mp , t} \geq \left(\sum_{f \in F_{g}} z_{f}^{m , mp , t} - 1\right) M_tilde + 1 , \forall t , m , mp , g \tag{eq\_0004} \\
   & z_{f}^{m , mp , t} \leq \sum_{t} \left(a_{f}^{i , j , t} - a_{f}^{i , j , t - 1}\right) + \left(1 - r_{f}^{m , mp}\right) M_tilde , \forall f , m , mp , t \tag{eq\_0005} \\
   & z_{f}^{m , mp , t} \geq \sum_{t} \left(a_{f}^{i , j , t} - a_{f}^{i , j , t - 1}\right) + \left(r_{f}^{m , mp} - 1\right) M_tilde , \forall f , m , mp , t \tag{eq\_0006} \\
@@ -90,12 +93,12 @@
   & \sum_{f \in F} u_{f}^{i , j , t} \leq \mathit{pi}_{i , j , t} , \forall i , j , t \tag{eq\_0027} \\
   & a_{f}^{i , j , t - 1} \leq a_{f}^{i , j , t} , \forall f , i , j , t \tag{eq\_0028} \\
   & d_{f}^{i , j , t - 1} \leq d_{f}^{i , j , t} , \forall f , i , j , t \tag{eq\_0029} \\
-  & \begin{aligned}(\text{P3}) \text{max} \text{z} & = & \sum_{g, f \in F_{g}, p, p_hat \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{p_hat , f} - \sum_{g, f \in F_{g}, \left(i , j , t , tp , w , wp\right) \in A_{f}} c_{f}^{i , j , t , tp , w , wp} \cdot y_{f}^{i , j , t , tp , w , wp} \\ & & + \sum_{p} \mathit{alpha}_{p} \cdot \left(\underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , tp , w , wp\right) \in \mathit{psi}_{p , f}} y_{f}^{i , j , t , tp , w , wp} - 1\right) + \sum_{i , j , t} \mathit{beta}_{i , j , t} \cdot \left(\sum_{f \in F} u_{f}^{i , j , t} - \mathit{pi}_{i , j , t}\right)\end{aligned} \tag{eq\_0030} \\
-  & \begin{aligned}L_{g} & = & \sum_{f \in F_{g}, \left(i , j , t , tp , w , wp\right) \in A_{f}} c_{f}^{i , j , t , tp , w , wp} \cdot y_{f}^{i , j , t , tp , w , wp} - \sum_{f \in F_{g}, p, p_hat \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{p_hat , f} \\ & & - \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , tp , w , wp\right) \in \mathit{psi}_{p , f}} \mathit{alpha}_{p} \cdot y_{f}^{i , j , t , tp , w , wp} - \sum_{f \in F_{g}, i , j , t} \mathit{beta}_{i , j , t} \cdot u_{f}^{i , j , t}\end{aligned} \tag{eq\_0032} \\
+  &  (\text{P3}) \text{max} \text{z} & = & \sum_{g, f \in F_{g}, p, p_hat \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{p_hat , f} - \sum_{g, f \in F_{g}, \left(i , j , t , tp , w , wp\right) \in A_{f}} c_{f}^{i , j , t , tp , w , wp} \cdot y_{f}^{i , j , t , tp , w , wp} \\ & & + \sum_{p} \mathit{alpha}_{p} \cdot \left(\underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , tp , w , wp\right) \in \mathit{psi}_{p , f}} y_{f}^{i , j , t , tp , w , wp} - 1\right) + \sum_{i , j , t} \mathit{beta}_{i , j , t} \cdot \left(\sum_{f \in F} u_{f}^{i , j , t} - \mathit{pi}_{i , j , t}\right)  \tag{eq\_0030} \\
+  &  L_{g} & = & \sum_{f \in F_{g}, \left(i , j , t , tp , w , wp\right) \in A_{f}} c_{f}^{i , j , t , tp , w , wp} \cdot y_{f}^{i , j , t , tp , w , wp} - \sum_{f \in F_{g}, p, p_hat \in p} \mathit{delta}_{p , f} \cdot \partial_{p} \cdot \mathit{theta}_{p_hat , f} \\ & & - \underset{f \in F_{g_{p}}}{\sum} \sum_{\left(i , j , t , tp , w , wp\right) \in \mathit{psi}_{p , f}} \mathit{alpha}_{p} \cdot y_{f}^{i , j , t , tp , w , wp} - \sum_{f \in F_{g}, i , j , t} \mathit{beta}_{i , j , t} \cdot u_{f}^{i , j , t}  \tag{eq\_0032} \\
   \max\quad & \sum_{g, f \in F_{g}, p_hat} \mathit{delta} _{p_hat , f}^{'} \cdot \mathit{theta}_{p_hat , f} - \sum_{g, f \in F_{g}, \mathit{iota}} c_{f}^{\mathit{iota}} \cdot \mathit{nu}_{f}^{\mathit{iota}} \tag{eq\_0039} \\
   & \sum_{\mathit{iota}} \mathit{nu}_{f}^{\mathit{iota}} = 1 , \forall f \tag{eq\_0040} \\
   & r_{p_hat , f , fp , \mathit{iota} , iotap} \leq \sum_{f , fp, \mathit{iota} , iotap} \mathit{nu}_{f}^{\mathit{iota}} \cdot \mathit{nu}_{fp}^{iotap} \cdot \mathit{sigma}_{p_hat , iotap} , \forall p_hat \tag{eq\_0041} \\
   & \mathit{delta} _{p_hat , fp}^{'} = \sum_{f , \mathit{iota} , iotap} \mathit{nu}_{fp}^{iotap} \cdot \mathit{sigma}_{p_hat , iotap} \cdot r_{p_hat , f , fp , \mathit{iota} , iotap} , \forall p_hat , fp \tag{eq\_0042} \\
   & \sum_{p_hat} \mathit{delta} _{p_hat , f}^{'} \leq \mathit{zeta}_{f} , \forall f \tag{eq\_0043} \\
-  & \begin{matrix}\mathit{nu}_{f}^{\mathit{iota}} + \mathit{nu}_{fp}^{iotap} \leq 1 ,^{'} f , fp , \left(\mathit{iota} , iotap\right) \in \mathit{gamma}\end{matrix} \tag{eq\_0044} \\
+  &  \mathit{nu}_{f}^{\mathit{iota}} + \mathit{nu}_{fp}^{iotap} \leq 1 ,^{'} f , fp , \left(\mathit{iota} , iotap\right) \in \mathit{gamma}  \tag{eq\_0044} \\
 \end{align}

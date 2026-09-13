@@ -30,7 +30,8 @@
 %@ index i ordered=0 cyclic=0 :: Index for stations in the urban rail transit network
 
 % c: classified as parameter during review
-%@ param c shape=E kind=vector :: Cost of arc in the passenger space-time-state network; includes equity state transition cost and transportation/stopping/waiting cost
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): c shape=E -> -
+%@ param c shape=- kind=vector :: Cost of arc in the passenger space-time-state network; includes equity state transition cost and transportation/stopping/waiting cost
 
 % x: classified as index during review
 %@ index x ordered=0 cyclic=0 :: Index for passenger commodities (individual passengers)
@@ -60,7 +61,8 @@
 %@ param arr shape=- kind=scalar :: Arrival time of train commodity q
 
 % cap: classified as parameter during review
-%@ param cap shape=i kind=vector :: Capacity of platform at station i (also used as train capacity on arcs)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): cap shape=i -> -
+%@ param cap shape=- kind=vector :: Capacity of platform at station i (also used as train capacity on arcs)
 
 % M: classified as index during review
 %@ index M ordered=0 cyclic=0 :: Set of equity states, representing the number of missed trains experienced by a passenger

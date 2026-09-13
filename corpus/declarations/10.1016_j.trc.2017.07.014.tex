@@ -127,7 +127,8 @@
 %@ var t_alpha_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of alpha TSP action at intersection s, cycle k
 %@ var t_beta_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of beta TSP action at intersection s, cycle k
 %@ var t_gamma_sk shape=- kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of gamma TSP action at intersection s, cycle k
-%@ var t_sk shape=S,K kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of TSP action at intersection s, cycle k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes w): t_sk shape=S,K -> W
+%@ var t_sk shape=W kind=continuous domain=non_negative role=auxiliary drole=- lo=- hi=- :: duration of TSP action at intersection s, cycle k
 %@ param tau shape=S,W kind=scalar domain=- :: weight coefficient for TSP action duration
 %@ param theta_max shape=S kind=scalar domain=- :: maximum dwell time at station s
 %@ param theta_min shape=S kind=scalar domain=- :: minimum dwell time at station s
@@ -136,4 +137,5 @@
 %@ var u_beta_sk shape=- kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for beta TSP action at intersection s, cycle k
 %@ var u_gamma shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for gamma TSP action at intersection s, cycle k
 %@ param u_gamma_sk shape=- kind=scalar domain=- :: binary indicator for gamma TSP action at intersection s, cycle k
-%@ var u_sk shape=S,K kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for TSP action at intersection s, cycle k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes w): u_sk shape=S,K -> W
+%@ var u_sk shape=W kind=binary domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for TSP action at intersection s, cycle k

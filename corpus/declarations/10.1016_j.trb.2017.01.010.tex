@@ -47,7 +47,8 @@
 % unusable as an identifier, rename or drop: β
 %
 % x: classified as variable during review
-%@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: State vector combining departure time and passenger load
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j): x shape=- -> j
+%@ var x shape=j domain=continuous role=primary drole=- lo=- hi=- :: State vector combining departure time and passenger load
 %
 % A: classified as parameter during review
 %@ param A shape=- kind=matrix domain=- :: System matrix for joint departure-time and passenger-load dynamics
@@ -65,13 +66,15 @@
 %@ var u_bar shape=- domain=continuous role=primary drole=- lo=- hi=- :: Control vector combining train regulation and passenger flow control
 %
 % T: classified as parameter during review
-%@ param T shape=- kind=matrix domain=- :: Nominal departure time of train i from station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j): T shape=- -> j
+%@ param T shape=j kind=matrix domain=- :: Nominal departure time of train i from station j
 %
 % L: classified as parameter during review
 %@ param L shape=- kind=matrix domain=- :: Nominal passenger load of train i between stations j and j+1
 %
 % e: classified as variable during review
-%@ var e shape=- domain=continuous role=primary drole=- lo=- hi=- :: Error vector of departure time and passenger load deviations from nominal
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j): e shape=- -> j
+%@ var e shape=j domain=continuous role=primary drole=- lo=- hi=- :: Error vector of departure time and passenger load deviations from nominal
 %
 % X: classified as variable during review
 %@ var X shape=- domain=continuous role=primary drole=- lo=- hi=- :: State vector of joint dynamic model in matrix form

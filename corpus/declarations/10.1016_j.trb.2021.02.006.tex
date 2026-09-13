@@ -27,13 +27,15 @@
 %@ obj sense=min name=objective combination=sum :: Minimize weighted perceived travel and waiting time over all OD-pairs
 
 % L: classified as variable during review
-%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,k): L shape=- -> V,OD
+%@ var L shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
 
 % T: classified as index during review
 %@ index T ordered=0 cyclic=0 :: Time period (cycle length) of the periodic timetable
 
 % W: classified as variable during review
-%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,k): W shape=- -> V,OD
+%@ var W shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
 
 % Y: classified as variable during review
 %@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
@@ -85,13 +87,16 @@
 %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
 
 % l: classified as parameter during review
-%@ param l shape=- kind=scalar domain=- :: Lower bound for linearization of Y_v^k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,k): l shape=- -> V,OD
+%@ param l shape=V,OD kind=scalar domain=- :: Lower bound for linearization of Y_v^k
 
 % M: classified as parameter during review
-%@ param M shape=- kind=scalar domain=- :: Big-M constant for linearization
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,k): M shape=- -> V,OD
+%@ param M shape=V,OD kind=scalar domain=- :: Big-M constant for linearization
 
 % z: classified as variable during review
-%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,vp,r,k): z shape=- -> V,V,R,OD
+%@ var z shape=V,V,R,OD domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
 
 % Ȳ: classified as parameter during review
 %@ param Ybar shape=- kind=scalar domain=- :: Upper bound on perceived travel time for route

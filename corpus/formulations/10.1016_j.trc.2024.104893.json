@@ -1,0 +1,1346 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2024.104893",
+  "name": "A data-driven mixed-integer linear programming approach for real-time rescheduling of urban rail transit under rolling stock faults",
+  "family": "milp",
+  "description": "Mined from A data-driven mixed-integer linear programming approach for real-time rescheduling of urban rail transit under rolling stock faults (Transportation Research Part C Emerging Technologies, 2024).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2024.104893",
+    "reference": "A data-driven mixed-integer linear programming approach for real-time rescheduling of urban rail transit under rolling stock faults",
+    "author": "Boyi Su; Andrea D’Ariano; Shuai Su; Zhikai Wang; Tao Tang; Tao Tang",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "N",
+      "description": "Set of train services (planned and emergency, upstream and downstream).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations on the urban rail transit line.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "e",
+      "description": "Set of emergency train services.",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "t",
+      "description": "Duration of the primary delay caused by the rolling stock fault.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large positive constant used in big-M reformulations.",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "q",
+      "description": "Minimum and maximum dwell time bounds at stations.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "g",
+      "description": "Minimum and maximum running time bounds in segments.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum headway time between consecutive train services at the same station.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Minimum turnaround time for rolling stock at turnaround stations.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "Minimum time for backup rolling stock to reach the main track from the depot.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Number of backup rolling stocks allocated to the depot connected with station s.",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "r",
+      "description": "Number of initially available turnaround tracks connected with station s.",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "a_bar",
+      "description": "Planned arrival time of train n at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_bar",
+      "description": "Planned departure time of train n from station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "epsilon",
+      "description": "Small positive constant for linearization.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "g_max",
+      "description": "Maximum headway between consecutive stations.",
+      "shape": [
+        "S",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "g_min",
+      "description": "Minimum headway between consecutive stations.",
+      "shape": [
+        "S",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "Minimum headway between trains at the same station.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_tilde_max",
+      "description": "Maximum headway deviation.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l_min",
+      "description": "Minimum time before start of service.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_1",
+      "description": "Weight for deviation objective.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_2",
+      "description": "Weight for cancellation objective.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_3",
+      "description": "Weight for variation objective.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_4",
+      "description": "Weight for backup objective.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "q_max",
+      "description": "Maximum dwell time.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "q_min",
+      "description": "Minimum dwell time.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s_tilde",
+      "description": "Fault station index.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_duration",
+      "description": "Duration of delay.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_start",
+      "description": "Start time of service.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_acc",
+      "description": "Acceleration time penalty.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_dec",
+      "description": "Deceleration time penalty.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_res",
+      "description": "Rescue time.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_min",
+      "description": "Minimum turn-around time.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "a",
+      "description": "Rescheduled arrival time of train service n at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n",
+      "description": "Train service index used in variable subscripts.",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Rescheduled departure time of train service n at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary indicator of whether station s is in the operation zone of train service n.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "p",
+      "description": "Binary indicator of consecutive train services at a turnaround station.",
+      "shape": [
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary indicator of stop-skipping at station s by train service n.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "Objective function value for the weighted sum of performance indicators.",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "v",
+      "description": "Auxiliary variable for headway variation at turnaround stations.",
+      "shape": [
+        "N",
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_backup",
+      "description": "Objective term for backup rolling stock utilization.",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_cancel",
+      "description": "Objective term for cancelled train services.",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_deviation",
+      "description": "Objective term for timetable deviation.",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_variation",
+      "description": "Objective term for headway variation.",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "a_tilde",
+      "description": "Absolute deviation of arrival time.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "beta",
+      "description": "Backup rolling stock utilization indicator.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "beta_1",
+      "description": "Backup rolling stock utilization indicator for downstream direction.",
+      "shape": [
+        "N"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "d_tilde",
+      "description": "Absolute deviation of departure time.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "delta",
+      "description": "Scenario indicator for delay.",
+      "shape": [],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "indicator",
+      "domain_role": null
+    },
+    {
+      "name": "gamma",
+      "description": "Order indicator for arrival/departure times.",
+      "shape": [
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "gamma_tilde",
+      "description": "Linearization auxiliary variable for gamma.",
+      "shape": [
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "h_tilde",
+      "description": "Headway deviation auxiliary variable.",
+      "shape": [
+        "N",
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "pi",
+      "description": "Number of trains turning at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "psi_end",
+      "description": "Number of trains ending at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "psi_start",
+      "description": "Number of trains starting at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "rho",
+      "description": "Cancellation indicator auxiliary variable.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "sigma",
+      "description": "Number of trains arriving at station s.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "v_tilde",
+      "description": "Linearization auxiliary variable for variation.",
+      "shape": [
+        "N",
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "varepsilon",
+      "description": "Scenario indicator for out-of-service.",
+      "shape": [],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "indicator",
+      "domain_role": null
+    },
+    {
+      "name": "varphi",
+      "description": "Order indicator for emergency trains.",
+      "shape": [
+        "N",
+        "N"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "vartheta",
+      "description": "Backup rolling stock utilization indicator.",
+      "shape": [
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "vartheta_1",
+      "description": "Backup rolling stock utilization indicator for upstream direction.",
+      "shape": [
+        "N"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "xi",
+      "description": "Turn-back decision variable.",
+      "shape": [
+        "N",
+        "N",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0096_a",
+      "description": "Linearization of the product term in the train service order definition.",
+      "quantifiers": [
+        {
+          "index": "n_tilde",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n_tilde + 1",
+              "offset": 1,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n_tilde",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0096_b",
+      "description": "Linearization of the product term in the train service order definition.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n_tilde + 1",
+              "offset": 1,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n_tilde",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0116_b",
+      "description": "Linearization of the downstream headway-variation objective product.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "a_tilde",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "a_bar",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0116_c",
+      "description": "Linearization of the downstream headway-variation objective product.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "a_tilde",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a_bar",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0116_d",
+      "description": "Linearization of the downstream headway-variation objective product.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "d_tilde",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d_bar",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0116_e",
+      "description": "Linearization of the downstream headway-variation objective product.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "d_tilde",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d_bar",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0117_b",
+      "description": "Linearization of the headway-variation absolute-value term for downstream services.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "rho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0117_c",
+      "description": "Linearization of the headway-variation absolute-value term for downstream services.",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "rho",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "n",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted sum of timetable deviation, service cancellation, headway variation, and backup rolling stock usage.",
+    "terms": [
+      {
+        "ref": "Z_deviation",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_1",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Z_cancel",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_2",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Z_variation",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_3",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Z_backup",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_4",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

@@ -59,13 +59,15 @@
 
 %@ index k ordered=0 cyclic=0 :: Index for units
 
-%@ param l shape=- kind=scalar domain=- :: Length or distance parameter
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): l shape=- -> K
+%@ param l shape=K kind=scalar domain=- :: Length or distance parameter
 
 %@ var f shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual departure time of composition c from station s on deadheading arc a
 
 %@ var g shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual arrival time of composition c at station s on deadheading arc a
 
-%@ param n shape=- kind=scalar domain=- :: Number of units or trips
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes u): n shape=- -> U
+%@ param n shape=U kind=scalar domain=- :: Number of units or trips
 
 % unusable as an identifier, rename or drop: ρ
 % unusable as an identifier, rename or drop: ϖ

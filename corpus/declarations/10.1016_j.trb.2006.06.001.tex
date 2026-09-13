@@ -141,7 +141,11 @@
 %@ var xend shape=- domain=continuous role=variable drole=- lo=- hi=- :: end time
 %@ param binitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial b
 %@ param einitial shape=- domain=- role=parameter drole=- lo=- hi=- :: initial e
-%@ param gtrain shape=- domain=- role=parameter drole=- lo=- hi=- :: train capacity g
-%@ param gtrack shape=- domain=- role=parameter drole=- lo=- hi=- :: track capacity g
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): gtrain shape=- -> T
+%@ param gtrain shape=T domain=- role=parameter drole=- lo=- hi=- :: train capacity g
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j,t): gtrack shape=- -> B,P
+%@ param gtrack shape=B,P domain=- role=parameter drole=- lo=- hi=- :: track capacity g
 %@ param gconn shape=- domain=- role=parameter drole=- lo=- hi=- :: connection time g
 %@ param Econn shape=- domain=- role=set drole=- lo=- hi=- :: connection set
+% --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---
+%@ index B ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)

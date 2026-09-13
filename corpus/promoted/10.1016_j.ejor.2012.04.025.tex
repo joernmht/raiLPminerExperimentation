@@ -18,10 +18,10 @@
 %@ param Sta shape=- kind=scalar domain=- :: Station of an inspection node
 %@ index s ordered=0 cyclic=0 :: Index for inspection nodes
 %@ param FinishIns shape=- kind=scalar domain=- :: Completion time of inspection
-%@ param H shape=- kind=scalar domain=- :: Set of tasks assignable to a locomotive after a given node
-%@ param N shape=- kind=scalar domain=- :: Set of tasks between inspections in a path
+%@ param H shape=K kind=scalar domain=- :: Set of tasks assignable to a locomotive after a given node
+%@ param N shape=P kind=scalar domain=- :: Set of tasks between inspections in a path
 %@ param n shape=- kind=scalar domain=- :: Number of inspections in a path
-%@ param c shape=- kind=scalar domain=- :: Cost of a path for a locomotive
+%@ param c shape=P,K kind=scalar domain=- :: Cost of a path for a locomotive
 %@ var x shape=K,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is selected for locomotive k
 %@ index K ordered=0 cyclic=0 :: Set of locomotives
 %@ index P ordered=0 cyclic=0 :: Set of feasible paths for a locomotive
@@ -63,28 +63,27 @@
 %@ con eq_0024_b kind=linear domain=- indicator=- :: Branch-and-cut feasibility constraint for fully enumerated paths (opposite branch)
 %@ index I_ell ordered=0 cyclic=0 :: Set of tasks covered up to iteration ell
 %@ index I_hat_ell ordered=0 cyclic=0 :: Set of deadhead train tasks covered up to iteration ell
-%@ param a_bk_tp shape=K,B,T kind=scalar domain=- :: Coefficient indicating whether path p of locomotive k uses depot b in time span t
-%@ param a_ip shape=I,P kind=scalar domain=- :: Coefficient indicating whether path p covers task i
+%@ param a_bk_tp shape=- kind=scalar domain=- :: Coefficient indicating whether path p of locomotive k uses depot b in time span t
+%@ param a_ip shape=K kind=scalar domain=- :: Coefficient indicating whether path p covers task i
 %@ var i_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for arrival station/time of first task in precedence
 %@ var i_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for departure station/time of second task in precedence
 %@ var x_bar shape=P,K domain=binary role=auxiliary drole=- lo=- hi=- :: Incumbent solution value for path p of locomotive k
 %@ var y_bar shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Incumbent objective value
-%@ var z_bk shape=K,B,T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of locomotives of type k using depot b in time span t
+%@ var z_bk shape=T domain=non_negative role=auxiliary drole=- lo=- hi=- :: Number of locomotives of type k using depot b in time span t
 \begin{align}
-  & \mathtt{Arr} \underline \mathtt{sta} \left(k\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i\right) \tag{eq\_0001\_a} \\
-  & \mathtt{Ready} \underline \mathtt{time} \left(k\right) + \mathtt{Buf} \underline \mathtt{time} \left(\mathtt{Arr} \underline \mathtt{sta} \left(k\right)\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i\right) \tag{eq\_0001\_b} \\
+  & \mathtt{Arr} \underline \mathtt{sta} k = \mathtt{Dep} \underline \mathtt{sta} i \tag{eq\_0001\_a} \\
+  & \mathtt{Ready} \underline \mathtt{time} k + \mathtt{Buf} \underline \mathtt{time} \left(\mathtt{Arr} \underline \mathtt{sta} k\right) \leq \mathtt{Dep} \underline \mathtt{time} i \tag{eq\_0001\_b} \\
   & \mathtt{Arr} \underline \mathtt{sta} \left(i_{1}\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i_{2}\right) \tag{eq\_0002\_a} \\
   & \mathtt{Arr} \underline \mathtt{time} \left(i_{1}\right) + \mathtt{Buf} \underline \mathtt{time} \left(\mathtt{Arr} \underline \mathtt{sta} \left(i_{1}\right)\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i_{2}\right) \tag{eq\_0002\_b} \\
-  & \mathtt{Sta} \left(s\right) = \mathtt{Dep} \underline \mathtt{sta} \left(i\right) \tag{eq\_0003\_a} \\
-  & \mathtt{FinishIns} \underline \mathtt{time} \left(s\right) \leq \mathtt{Dep} \underline \mathtt{time} \left(i\right) \tag{eq\_0003\_b} \\
+  & \mathtt{Sta} s = \mathtt{Dep} \underline \mathtt{sta} i \tag{eq\_0003\_a} \\
+  & \mathtt{FinishIns} \underline \mathtt{time} s \leq \mathtt{Dep} \underline \mathtt{time} i \tag{eq\_0003\_b} \\
   & H^{k} \left(s_{m}\right) \supseteq N^{p} \left(s_{m} , s_{m + 1}\right) \forall m \in \left\{0 , \ldots , n - 1\right\} \tag{eq\_0006\_a} \\
   & H^{k} \left(s_{n}\right) \supseteq N^{p} \left(s_{n}\right) \tag{eq\_0006\_b} \\
   \min\quad & \sum_{k \in K, p \in P^{k}} c_{p}^{k} \cdot x_{p}^{k} \tag{eq\_0007} \\
-  & \text{subject to} \sum_{k \in K, p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} = 1 \forall i \in I \cup D , \tag{eq\_0008} \\
+  & \sum_{k \in K, p \in P^{k}} a_{\mathit{ip}}^{k} \cdot x_{p}^{k} = 1 \forall i \in I \cup D , \tag{eq\_0008} \\
   & \sum_{k \in K, p \in P^{k}} a_{i_hat p}^{k} \cdot x_{p}^{k} \leq 2 \forall i_hat \in I_hat , \tag{eq\_0009} \\
   & \sum_{p \in P^{k}} x_{p}^{k} = 1 \forall k \in K , \tag{eq\_0010} \\
   & \sum_{k \in K, p \in P^{k}} a_{\mathit{tp}}^{\mathit{bk}} \cdot x_{p}^{k} \leq L_{t}^{b} \forall b \in B \forall t \in T , \tag{eq\_0011} \\
-  & x_{p}^{k} \in \left\{0 , 1\right\} \forall k \in K \forall p \in P^{k} . \tag{eq\_0012} \\
   & \text{find} k \in K \cdot p \in P^{k} \tag{eq\_0021\_a} \\
   & \text{such that} c_{p}^{k} - \sum_{i \in I \cup I_hat \cup D} a_{\mathit{ip}}^{k} \cdot \mathit{lambda}_{i} - \mathit{mu}^{k} - \sum_{b \in B, t \in T} a_{\mathit{tp}}^{\mathit{bk}} \cdot \mathit{nu}_{t}^{b} < 0 \tag{eq\_0021\_b} \\
   & I_{\mathit{ell} + 1} := I_{\mathit{ell}} \cup \left\{i \in I \cup D \left|\right. \sum_{k \in K, p \in P_{\mathit{ell}}^{k}} a_{\mathit{ip}}^{k} \cdot x_bar_{p}^{k} + y_bar > 1\right\} \tag{eq\_0023\_a} \\

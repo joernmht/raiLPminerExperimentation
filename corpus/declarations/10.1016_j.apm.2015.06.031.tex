@@ -138,9 +138,12 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.apm.2015.06.031.json (deterministic fill-in list); pending human confirmation.
 %@ param Gamma shape=- kind=scalar domain=- :: Upper bound on the number of trains that can be rescheduled
-%@ var a_i1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train i at station 1
-%@ var a_in shape=O domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of outbound train i at station n
-%@ var a_j1 shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train j at station 1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): a_i1 shape=I -> -
+%@ var a_i1 shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train i at station 1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): a_in shape=O -> -
+%@ var a_in shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of outbound train i at station n
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): a_j1 shape=I -> -
+%@ var a_j1 shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of inbound train j at station 1
 %@ param h_0 shape=- kind=scalar domain=- :: Minimum headway between consecutive trains
 %@ param h_ad shape=I,O domain=- kind=matrix :: Minimum headway from arrival to departure at crossover stations
 %@ param h_da shape=I,O domain=- kind=matrix :: Minimum headway from departure to arrival at crossover stations

@@ -58,7 +58,10 @@
 %@ con eq_0001_c kind=linear domain=- indicator=- :: alternative constraint
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2006.02.005.json (deterministic fill-in list); pending human confirmation.
-%@ param a_hk shape=i,j kind=scalar domain=- :: minimum time separation for alternative constraint pair (h,k)
-%@ param a_ij shape=i,j kind=scalar domain=- :: minimum time separation for alternative constraint pair (i,j)
-%@ param f_ij shape=i,j kind=scalar domain=- :: minimum time separation for precedence constraint (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): a_hk shape=i,j -> -
+%@ param a_hk shape=- kind=scalar domain=- :: minimum time separation for alternative constraint pair (h,k)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): a_ij shape=i,j -> -
+%@ param a_ij shape=- kind=scalar domain=- :: minimum time separation for alternative constraint pair (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): f_ij shape=i,j -> -
+%@ param f_ij shape=- kind=scalar domain=- :: minimum time separation for precedence constraint (i,j)
 %@ var t_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: start time of the first event

@@ -103,7 +103,8 @@
 %@ param E shape=- kind=scalar domain=- :: Energy consumption
 
 % e: classified as variable during review
-%@ var e shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption over a segment at a time
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): e shape=- -> S
+%@ var e shape=S domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption over a segment at a time
 
 % unusable as an identifier, rename or drop: η
 % unusable as an identifier, rename or drop: σ
@@ -114,7 +115,8 @@
 %@ param w shape=- kind=scalar domain=- :: Weight for objective components
 
 % F: classified as variable during review
-%@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Contribution function in dynamic programming
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): F shape=- -> S
+%@ var F shape=S domain=non_negative role=primary drole=- lo=- hi=- :: Contribution function in dynamic programming
 
 % unusable as an identifier, rename or drop: Ψ
 % Bound by a quantifier or big operator, so no declaration of their own: i, l, s, t, u, τ

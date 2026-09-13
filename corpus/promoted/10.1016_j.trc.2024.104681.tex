@@ -20,7 +20,7 @@
 %@ param Z shape=D kind=vector domain=- :: Maximum fleet size of rolling stock in depot d.
 %@ var v shape=D,J domain=integer role=primary drole=- lo=- hi=- :: Fleet size of rolling stock assigned to line j from depot d.
 %@ var c shape=K,J domain=integer role=primary drole=- lo=- hi=- :: Number of carriages coupled to metro train k on line j.
-%@ var n shape=K,S,J domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (boarding, waiting, residual capacity, alighting, remaining) for metro train k at station s on line j.
 %@ index E ordered=0 cyclic=0 :: Set of events in railway network.
 %@ index I ordered=0 cyclic=0 :: Set of railway lines.
 %@ param N shape=P kind=vector domain=- :: Number of passengers in passenger group p.
@@ -126,7 +126,7 @@
   & w_{k , s + 1}^{j} - w_{k , s}^{j} = T_{k , s , j}^{\text{run}} + T_{k , s + 1 , j}^{\text{dwell}} , \forall k \in \mathcal{K}_{j} , s , s + 1 \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0001} \\
   & w_{k + 1 , s}^{j} - w_{k , s}^{j} \geq h_{j}^{\text{min}} , \forall k , k + 1 \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0003} \\
   & w_{k + 1 , s}^{j} - w_{k , s}^{j} \leq h_{j}^{\text{max}} , \forall k , k + 1 \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0004} \\
-  & b_{k , s , \mathit{tau}}^{j} = \left\{\begin{matrix} 1 - d_{k , s , \mathit{tau}}^{j} , & \forall k = 1 , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \\ d_{k - 1 , s , \mathit{tau}}^{j} - d_{k , s , \mathit{tau}}^{j} , & \forall k \in \mathcal{K}_{j} \backslash \left\{1\right\} , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \end{matrix}\right \tag{eq\_0005} \\
+  & b_{k , s , \mathit{tau}}^{j} = \left\{ 1 - d_{k , s , \mathit{tau}}^{j} , & \forall k = 1 , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \\ d_{k - 1 , s , \mathit{tau}}^{j} - d_{k , s , \mathit{tau}}^{j} , & \forall k \in \mathcal{K}_{j} \backslash \left\{1\right\} , s \in \mathcal{S}_{j} , j \in \mathcal{J} , \mathit{tau} \in \mathcal{T} \right \tag{eq\_0005} \\
   & w_{k , s}^{j} = d_{k , s , 1}^{j} + \sum_{\mathit{tau} \in \mathcal{T} \backslash \left\{1\right\}} \mathit{tau} \cdot \left(d_{k , s , \mathit{tau}}^{j} - d_{k , s , \mathit{tau} - 1}^{j}\right) , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0006} \\
   & d_{k , s , \mathit{tau} - 1}^{j} - d_{k , s , \mathit{tau}}^{j} \leq 0 . \forall \mathit{tau} , \mathit{tau} - 1 \in \mathcal{T} , k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0007} \\
   & \sum_{j \in \mathcal{J}_{d}} v_{d}^{j} \leq Z_{d}^{\text{max}} , \forall d \in \mathcal{D} \tag{eq\_0008} \\
@@ -134,10 +134,10 @@
   & c_{j}^{\text{min}} \leq c_{k}^{j} \leq c_{j}^{\text{max}} . \forall k \in \mathcal{K}_{j} , j \in \mathcal{J} \tag{eq\_0011} \\
   & n \cdot b_{k , s}^{j} = n \cdot w_{k , s}^{j} , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0012} \\
   & n \cdot b_{k , s}^{j} \leq n \cdot c_{k , s}^{j} , \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} , j \in \mathcal{J} \tag{eq\_0014} \\
-  & n \cdot w_{k , s}^{j} = \left\{\begin{matrix} \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot r_{p , e}^{i} \cdot \mathit{varphi}_{k , e , s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0015} \\
-  & n \cdot c_{k , s}^{j} = \left\{\begin{matrix} c_{k}^{j} \cdot D^{\text{met}} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ c_{k}^{j} \cdot D^{\text{met}} - n \cdot r_{k s - 1}^{j} + n a_{k , s}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0016} \\
-  & n a_{k , s}^{j} = \left\{\begin{matrix} 0 , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ Q_{s}^{j} \cdot n \cdot r_{k , s - 1}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0017} \\
-  & n \cdot r_{k , s}^{j} = \left\{\begin{matrix} n \cdot b_{k , s}^{j} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ n \cdot r_{k , s - 1}^{j} + n \cdot b_{k , s}^{j} - n a_{k , s}^{j} . & \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} \backslash \left\{1\right\} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0018} \\
+  & n \cdot w_{k , s}^{j} = \left\{ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot r_{p , e}^{i} \cdot \mathit{varphi}_{k , e , s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \right \tag{eq\_0015} \\
+  & n \cdot c_{k , s}^{j} = \left\{ c_{k}^{j} \cdot D^{\text{met}} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ c_{k}^{j} \cdot D^{\text{met}} - n \cdot r_{k s - 1}^{j} + n a_{k , s}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \right \tag{eq\_0016} \\
+  & n a_{k , s}^{j} = \left\{ 0 , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ Q_{s}^{j} \cdot n \cdot r_{k , s - 1}^{j} , & \forall s \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \right \tag{eq\_0017} \\
+  & n \cdot r_{k , s}^{j} = \left\{ n \cdot b_{k , s}^{j} , & \forall s = 1 , k \in \mathcal{K}_{j} , j \in \mathcal{J} \\ n \cdot r_{k , s - 1}^{j} + n \cdot b_{k , s}^{j} - n a_{k , s}^{j} . & \forall k \in \mathcal{K}_{j} , s \in \mathcal{S}_{j} \backslash \left\{1\right\} , j \in \mathcal{J} \right \tag{eq\_0018} \\
   & d_{k , sp , taup}^{j} - d_{k , s , \mathit{tau}}^{j} = 0 , \forall \mathit{tau} , taup \in \mathcal{T} : taup = \mathit{tau} + \sum_{s^{' '} = 1}^{sp - 1} \left(T_{k , s^{' '} , j}^{\text{run}} + T_{k , s^{' '} , j}^{\text{dwell}}\right) , s = 1 , sp \in \mathcal{S}_{j} \backslash \left\{1\right\} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \tag{eq\_0019} \\
   & t_{e}^{i} - q_{e}^{i} \geq 0 , \forall e \in E_{i}^{c r} , i \in \mathcal{I} \tag{eq\_0020} \\
   & t_{e}^{i} - q_{e}^{i} = 0 , \forall e \in E_{i} \backslash E_{i}^{c r} , i \in \mathcal{I} \tag{eq\_0022} \\
@@ -183,11 +183,10 @@
   & \underset{e \in E_{i s}^{\text{arr}}}{\sum} \mathit{varphi}_{k , e , s}^{i j} = 3 \leq \frac{L_bar_{s}^{i j} - L_underline_{s}^{i j}}{h_{j}^{\text{min}}} + 1 \tag{eq\_0070} \\
   & \sum_{k \in \mathcal{K}_{j}} varphi_tilde_{k , e , s}^{i j} = 1 , \forall e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0073} \\
   & \sum_{k \in Y_{j}} \mathit{varphi}_{k , e , s}^{i j} = 1 \text{or} \sum_{k \in Y_{j}} \mathit{varphi}_{k , e , s}^{i j} = 0 \tag{eq\_0075} \\
-  & n \cdot w_{k , s}^{j} = \left\{\begin{matrix} \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot \mathit{beta}_{p e k s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \end{matrix}\right \tag{eq\_0076} \\
+  & n \cdot w_{k , s}^{j} = \left\{ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} + \underset{e \in E_{i s}^{\text{arr}}}{\sum} \sum_{p \in \mathcal{P}_{i}} N_{p} \cdot \mathit{beta}_{p e k s}^{i j} \cdot R_{s}^{i j} , & \forall s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \\ \sum_{\mathit{tau} \in \mathcal{T}} b_{k , s , \mathit{tau}}^{j} \cdot n_{s , \mathit{tau} , j}^{\text{arr}} , & \forall s \in \mathcal{S}_{j} , k \in \mathcal{K}_{j} , j \in \mathcal{J} \right \tag{eq\_0076} \\
   & \mathit{beta}_{p e k s}^{i j} \leq r_{p , e}^{i} \tag{eq\_0078\_a} \\
   & \mathit{beta}_{p e k s}^{i j} \leq \mathit{varphi}_{k , e , s}^{i j} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K}_{j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0078\_b} \\
   & \mathit{beta}_{p e k s}^{i j} \geq r_{p , e}^{i} + \mathit{varphi}_{k , e , s}^{i j} - 1 \tag{eq\_0078\_c} \\
-  & \mathit{beta}_{p e k s}^{i j} \in \left\{0 , 1\right\} . \tag{eq\_0078\_d} \\
   & \mathit{varphi}_{k , e , s}^{i j} \leq y_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_a} \\
   & \mathit{varphi}_{k , e , s}^{i j} \leq z_{k , e , s}^{i j} , \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_b} \\
   & \mathit{varphi}_{k , e , s}^{i j} \geq y_{k , e , s}^{i j} + z_{k , e , s}^{i j} - 1 . \forall e \in E_{i s}^{\text{arr}} , k \in \mathcal{K}_{j} , s \in \mathcal{V}_{i j} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0079\_c} \\
@@ -195,14 +194,11 @@
   & \mathit{gamma}_{p e}^{i} \leq M_{6} \cdot r_{p , e}^{i} \tag{eq\_0082\_a} \\
   & \mathit{gamma}_{p e}^{i} \leq t_{e}^{i} , \forall p \in \mathcal{P}_{i} , e \in E_{i d_{p}}^{\text{arr}} , i \in \mathcal{I} \tag{eq\_0082\_b} \\
   & \mathit{gamma}_{p e}^{i} \geq t_{e}^{i} - M_{6} \left(1 - r_{p , e}^{i}\right) \tag{eq\_0082\_c} \\
-  & \mathit{gamma}_{p e}^{i} \geq 0 . \tag{eq\_0082\_d} \\
   & F^{\text{tra}} = \sum_{i \in \mathcal{I}, j \in \mathcal{J}, k \in \mathcal{K}_{j}, s \in \mathcal{V}_{i j}, p \in \mathcal{P}_{i}} \underset{e \in E_{i s}^{\text{arr}}}{\sum} N_{p} \cdot \left(mu_hat_{p e k s}^{i j} - {\mathit{mu}}_{p e k s}^{i j}\right) \cdot R_{s}^{i j} \tag{eq\_0083} \\
   & mu_hat_{p e k s}^{i j} \leq M_{6} \mathit{beta}_{p e k s}^{i j} \tag{eq\_0085\_a} \\
   & mu_hat_{p e k s}^{i j} \leq w_{k , s}^{j} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0085\_b} \\
   & mu_hat_{p e k s}^{i j} \geq w_{k , s}^{j} - M_{6} \left(1 - \mathit{beta}_{p e k s}^{i j}\right) \tag{eq\_0085\_c} \\
-  & mu_hat_{p e k s}^{i j} \geq 0 . \tag{eq\_0085\_d} \\
   & {\mathit{mu}}_{p e k s}^{i j} \leq M_{6} \mathit{beta}_{p e k s}^{i j} \tag{eq\_0086\_a} \\
   & {\mathit{mu}}_{p e k s}^{i j} \leq t_{e}^{i} , \forall p \in \mathcal{P}_{i} , e \in E_{i s}^{\text{arr}} , s \in \mathcal{V}_{i j} , k \in \mathcal{K} , i \in \mathcal{I} , j \in \mathcal{J} \tag{eq\_0086\_b} \\
   & {\mathit{mu}}_{p e k s}^{i j} \geq t_{e}^{i} - M_{6} \left(1 - \mathit{beta}_{p e k s}^{i j}\right) \tag{eq\_0086\_c} \\
-  & {\mathit{mu}}_{p e k s}^{i j} \geq 0 . \tag{eq\_0086\_d} \\
 \end{align}

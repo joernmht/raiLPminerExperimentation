@@ -12,15 +12,19 @@
 %@ index E ordered=0 cyclic=0 :: Set of events (arrivals and departures)
 %@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating cancellation of train service t
 %@ index T ordered=0 cyclic=0 :: Set of train services
-%@ param D shape=E kind=vector domain=continuous :: Maximum allowed deviation for event e
-%@ param M shape=- kind=big_m domain=continuous :: Large positive constants (M1, M2)
+% declaration fixed: param D: domain=continuous -> -
+%@ param D shape=E kind=vector domain=- :: Maximum allowed deviation for event e
+% declaration fixed: param M: domain=continuous -> -
+%@ param M shape=- kind=big_m domain=- :: Large positive constants (M1, M2)
 %@ index q ordered=0 cyclic=0 :: Scheduled time of event e
 %@ var x shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Actual time of event e
 %@ index H ordered=0 cyclic=0 :: Disruption start and end times
 %@ index A ordered=0 cyclic=0 :: Set of activities (train, headway, etc.)
-%@ param L shape=A kind=vector domain=continuous :: Minimum duration of activity a
+% declaration fixed: param L: domain=continuous -> -
+%@ param L shape=A kind=vector domain=- :: Minimum duration of activity a
 %@ index B ordered=0 cyclic=0 :: Set of order activity pairs
-%@ param C shape=S kind=vector domain=integer :: Station capacity (down/up)
+% declaration fixed: param C: domain=integer -> -
+%@ param C shape=S kind=vector domain=- :: Station capacity (down/up)
 %@ index S ordered=0 cyclic=0 :: Set of stations
 %@ index p ordered=0 cyclic=0 :: Subset of train services for balance constraints
 %@ index PP ordered=0 cyclic=0 :: Set of train service subset pairs
@@ -88,8 +92,8 @@
 %@ param omega_up shape=S,H kind=scalar domain=- :: Number of up direction trains already in station s at disruption start
 %@ var varphi shape=A domain=binary role=primary drole=- lo=- hi=- :: 1 if activity a is selected for station headway, 0 otherwise
 \begin{align}
-  \begin{aligned}\quad & & min \\ & \sum_{t \in T} \mathit{gamma}_{t} \cdot y_{t} + \sum_{e \in E} \mathit{mu}_{e}^{+} d_{e}^{+} + \underset{e \in E^{\mathit{arr}}}{\sum} \mathit{mu}_{e}^{-} d_{e}^{-}\end{aligned} \tag{eq\_0001} \\
-  & \begin{aligned} & \text{subject to} \\ & y_{t_{e}} \left(M_{1} + D_{e}\right) - D_{e} \leq x_{e} - q_{e} \leq M_{1} \forall e \in E\end{aligned} \tag{eq\_0002} \\
+  \min\quad & \sum_{t \in T} \mathit{gamma}_{t} \cdot y_{t} + \sum_{e \in E} \mathit{mu}_{e}^{+} d_{e}^{+} + \underset{e \in E^{\mathit{arr}}}{\sum} \mathit{mu}_{e}^{-} d_{e}^{-} \tag{eq\_0001} \\
+  &  & \text{subject to} \\ & y_{t_{e}} \left(M_{1} + D_{e}\right) - D_{e} \leq x_{e} - q_{e} \leq M_{1} \forall e \in E  \tag{eq\_0002} \\
   & x_{e} \geq q_{e} \forall e \in E^{\mathit{dep}} \tag{eq\_0003} \\
   & d_{e}^{+} \geq x_{e} - q_{e} - M_{1} \cdot y_{t_{e}} \forall e \in E \tag{eq\_0004} \\
   & d_{e}^{-} \geq q_{e} - x_{e} \forall e \in E^{\mathit{arr}} \tag{eq\_0005} \\
@@ -97,7 +101,6 @@
   & d_{e}^{-} \leq D_{e} \forall e \in E^{\mathit{arr}} \tag{eq\_0007} \\
   & x_{e} = q_{e} \forall e \in E : q_{e} < H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0008} \\
   & y_{t_{e}} = 0 \forall t_{e} \in T , e \in E_{s_{t_{e}}^{o}}^{\mathit{dep}} : q_{e} < H_{\mathit{dis}}^{\mathit{start}} \tag{eq\_0009} \\
-  & y_{t} \in \left\{0 , 1\right\} \forall t \in T \tag{eq\_0010} \\
   & x_{e} , d_{e}^{+} , d_{e}^{-} \geq 0 \forall e \in E \tag{eq\_0011} \\
   & x_{f} - x_{e} \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{train}} \tag{eq\_0012} \\
   & \mathit{lambda}_{a} + \mathit{lambda}_{ap} = 1 \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land ap = \left(f , e\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0014} \\
@@ -111,14 +114,14 @@
   & x_{f} - x_{e} + M_{2} \cdot \left(1 - \mathit{varphi}_{a}\right) \geq L_{a} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{station}} \tag{eq\_0024} \\
   & \sum_{t \in p} y_{t} - \sum_{t \in pp} y_{t} \leq \mathit{delta} \forall \left(p , pp\right) \in \mathit{PP} \tag{eq\_0025} \\
   & \sum_{t \in pp} y_{t} - \sum_{t \in p} y_{t} \leq \mathit{delta} \forall \left(p , pp\right) \in \mathit{PP} \tag{eq\_0026} \\
-  & \begin{aligned} & \mathit{lambda}_{a} \geq \mathit{varphi}_{ap} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , ap = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , ep \in E_{s}^{\mathit{dep}} , t_{e} = t_{ep} , f \in E_{s}^{\mathit{arr}} , s \in S_bar\end{aligned} \tag{eq\_0027} \\
+  &  & \mathit{lambda}_{a} \geq \mathit{varphi}_{ap} \forall a = \left(e , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , ap = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{station}} \\ & e \in E_{s}^{\mathit{arr}} , ep \in E_{s}^{\mathit{dep}} , t_{e} = t_{ep} , f \in E_{s}^{\mathit{arr}} , s \in S_bar  \tag{eq\_0027} \\
   & x_{e} \geq H_{\mathit{dis}}^{\mathit{end}} \forall e \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{e} \leq H_{\mathit{dis}}^{\mathit{end}} , t_{e} \in T^{\mathit{down}} \tag{eq\_0028} \\
   & x_{e} \geq H_{\mathit{dis}}^{\mathit{end}} \forall e \in E_{s_{l}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{e} \leq H_{\mathit{dis}}^{\mathit{end}} , t_{e} \in T^{\mathit{up}} \tag{eq\_0029} \\
   & x_{f} - x_{e} \leq L_{a}^{\mathit{max}} \forall a = \left(e , f\right) \in A_{\mathit{train}}^{\mathit{run}} , s_{f} \leq s_{k} , t_{e} \in T_{\mathit{dis}}^{\mathit{down}} \tag{eq\_0030} \\
   & x_{f} - x_{e} \leq L_{a}^{\mathit{max}} \forall a = \left(e , f\right) \in A_{\mathit{train}}^{\mathit{run}} , s_{f} \geq s_{l} , t_{e} \in T_{\mathit{dis}}^{\mathit{up}} \tag{eq\_0031} \\
-  & \begin{aligned} & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{k}}^{\mathit{arr}} , f \in E_{s_{l}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & ep \in E_{s_{l}}^{\mathit{dep}} , a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{ep} , t_{e} , t_{f} \in T^{\mathit{up}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}\end{aligned} \tag{eq\_0033} \\
+  &  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{k}}^{\mathit{arr}} , f \in E_{s_{l}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & ep \in E_{s_{l}}^{\mathit{dep}} , a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{ep} , t_{e} , t_{f} \in T^{\mathit{up}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}  \tag{eq\_0033} \\
   & \mathit{lambda}_{a} + \mathit{lambda}_{ap} = 1 \forall a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land ap = \left(f , ep\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0034} \\
-  & \begin{aligned} & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{l}}^{\mathit{arr}} , f \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & ep \in E_{s_{k}}^{\mathit{dep}} , a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{ep} , t_{e} , t_{f} \in T^{\mathit{down}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}\end{aligned} \tag{eq\_0035} \\
+  &  & x_{f} - x_{e} + M_{2} \left(1 - \mathit{lambda}_{a}\right) + M_{2} \left(1 - \mathit{chi}_{f}^{d}\right) \geq 0 \forall e \in E_{s_{l}}^{\mathit{arr}} , f \in E_{s_{k}}^{\mathit{dep}} : H_{\mathit{dis}}^{\mathit{start}} \leq q_{f} \leq H_{\mathit{dis}}^{\mathit{end}} , \\ & ep \in E_{s_{k}}^{\mathit{dep}} , a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} , t_{e} \neq t_{f} , t_{e} = t_{ep} , t_{e} , t_{f} \in T^{\mathit{down}} , \left(s_{k} , s_{l}\right) \in \mathit{Seg}  \tag{eq\_0035} \\
   & \mathit{lambda}_{a} + \mathit{lambda}_{ap} = 1 \forall a = \left(ep , f\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \land ap = \left(f , ep\right) \in A_{\mathit{head}}^{\mathit{track} , 1} \tag{eq\_0036} \\
   & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} + \left|\mathit{omega}_{s , h_{0}}^{\mathit{down}}\right| \leq C_{s}^{\mathit{down}} - 1 \forall s \in S_bar , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{down}} \tag{eq\_0039} \\
   & \sum_{a = \left(e , f\right) \in A_{s , f}^{1}} \mathit{lambda}_{a} - \sum_{a = \left(e , f\right) \in A_{s , f}^{2}} \mathit{varphi}_{a} + \left|\mathit{omega}_{s , h_{0}}^{\mathit{up}}\right| \leq C_{s}^{\mathit{up}} - 1 \forall s \in S_bar , f \in E_{s}^{\mathit{arr}} : q_{f} \geq H_{\mathit{dis}}^{\mathit{start}} \land t_{f} \in T^{\mathit{up}} \tag{eq\_0040} \\

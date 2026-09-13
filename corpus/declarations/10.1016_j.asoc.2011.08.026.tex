@@ -52,7 +52,8 @@
 %@ param precedes shape=- kind=scalar domain=- :: precedence relation
 
 % P̄: classified as parameter during review
-%@ param P_bar shape=- kind=scalar domain=- :: upper bound of fuzzy due date
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): P_bar shape=- -> P
+%@ param P_bar shape=P kind=scalar domain=- :: upper bound of fuzzy due date
 
 % l: classified as parameter during review
 %@ param l shape=- kind=scalar domain=- :: planned completion time of job
@@ -146,7 +147,8 @@
 %@ var lambda shape=- domain=continuous role=variable drole=- lo=- hi=- :: Lagrange multiplier
 %@ var pi shape=- domain=continuous role=variable drole=- lo=- hi=- :: potential variable
 %@ var z_prime shape=- domain=continuous role=variable drole=- lo=- hi=- :: auxiliary binary variable prime
-%@ param P_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of P
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): P_under shape=- -> P
+%@ param P_under shape=P domain=real role=coefficient drole=- lo=- hi=- :: lower bound of P
 %@ param q_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of q
 %@ param d_under shape=- domain=real role=coefficient drole=- lo=- hi=- :: lower bound of d
 %@ index u_prime shape=- domain=- role=index drole=- lo=- hi=- :: primed station index

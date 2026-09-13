@@ -110,7 +110,8 @@
 %@ index A_dwell ordered=0 cyclic=0 :: Set of dwell activity arcs
 %@ index A_run ordered=0 cyclic=0 :: Set of run activity arcs
 %@ index E_arr ordered=0 cyclic=0 :: Set of arrival events
-%@ param N_s_tracks shape=S kind=scalar domain=- :: Number of tracks at station s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): N_s_tracks shape=S -> -
+%@ param N_s_tracks shape=- kind=scalar domain=- :: Number of tracks at station s
 %@ var d_plus shape=E domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Positive delay of event j
 %@ param d_plus_max shape=- kind=scalar domain=- :: Maximum allowed positive delay
 %@ param dwell_s shape=M kind=scalar domain=- :: Scheduled dwell time for train line m

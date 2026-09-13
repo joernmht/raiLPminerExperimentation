@@ -30,7 +30,8 @@
 %@ param d shape=- kind=scalar domain=- :: Weight coefficient for T1 (total delay) in the objective function.
 %
 % t: classified as variable during review
-%@ var t shape=N,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival/departure time of train at station.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=N,S -> -
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival/departure time of train at station.
 %
 % M: classified as parameter during review
 %@ param M shape=- kind=big_m domain=- :: Large positive number used for linearizing big-M constraints.
@@ -50,7 +51,8 @@
 % unusable as an identifier, rename or drop: τ
 % unusable as an identifier, rename or drop: ω
 % Z: classified as variable during review
-%@ var Z shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train type or auxiliary variable.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j,s): Z shape=N -> N,N,S
+%@ var Z shape=N,N,S domain=binary role=primary drole=- lo=- hi=- :: Binary indicator for train type or auxiliary variable.
 %
 % x: classified as variable during review
 %@ var x shape=N,N,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival/departure order of two trains at a station.

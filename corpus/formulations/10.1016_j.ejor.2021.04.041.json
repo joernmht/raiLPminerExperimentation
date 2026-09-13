@@ -1,0 +1,350 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.ejor.2021.04.041",
+  "name": "A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing",
+  "family": "milp",
+  "description": "Mined from A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing (European Journal of Operational Research, 2021).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.ejor.2021.04.041",
+    "reference": "A column-generation-based matheuristic for periodic and symmetric train timetabling with integrated passenger routing",
+    "author": "Bernardo Martin-Iradi; Stefan Røpke",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "Q",
+      "description": "Set of possible line group paths.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "Set of lines.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Station index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "U",
+      "description": "Set of arrival nodes at station i for arc a.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "u",
+      "description": "Arrival node in U_i^a.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Node in time-space graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "Set of departure nodes at station i for arc a.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "w",
+      "description": "Departure node in W_i^a.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of time instants.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "t",
+      "description": "Time instant.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of single-track segments.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of arcs in train graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "d",
+      "description": "Direction index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "h",
+      "description": "Station index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Y",
+      "description": "Set of trains.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of nodes in line graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "D",
+      "description": "Set of directions.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of commodities.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "o",
+      "description": "Origin node for commodity k.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Vbar",
+      "description": "Set of nodes in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Abar",
+      "description": "Set of arcs in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_bar",
+      "description": "Set of arcs in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V_bar",
+      "description": "Set of nodes in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_minus",
+      "description": "Set of incoming arcs to a node in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_plus",
+      "description": "Set of outgoing arcs from a node in passenger routing graph.",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "Cost of choosing a group of line paths q.",
+      "shape": [
+        "Q"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "f",
+      "description": "Flow on arc a for commodity k.",
+      "shape": [
+        "K",
+        "A"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating if timetabling arc a is used.",
+      "shape": [
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Passenger travel time for commodity k.",
+      "shape": [
+        "K"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "Binary variable indicating whether line group path q is selected.",
+      "shape": [
+        "Q"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "pi_1",
+      "description": "Dual variable associated with commodity k in Benders optimality cut.",
+      "shape": [
+        "K"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "pi_2",
+      "description": "Dual variable associated with commodity k in Benders optimality cut.",
+      "shape": [
+        "K"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "pi_4",
+      "description": "Dual variable associated with commodity k and arc a in Benders optimality cut.",
+      "shape": [
+        "K",
+        "A_bar"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0004",
+      "description": "Minimum headway between consecutive arrivals at each station for each direction.",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total path length of selected line group paths.",
+    "terms": [
+      {
+        "ref": "lambda",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "Q",
+            "expr": "q",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "Q"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

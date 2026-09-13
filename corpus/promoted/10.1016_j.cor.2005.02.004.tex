@@ -13,7 +13,7 @@
 %@ param u shape=M kind=vector domain=- :: Upper bounds for interval constraints
 %@ param ell shape=M kind=vector domain=- :: Lower bounds for interval constraints
 %@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integral phase shift vector
-%@ param B shape=N,M kind=matrix domain=- :: Incidence matrix of the graph
+%@ param B shape=- kind=matrix domain=- :: Incidence matrix of the graph
 %@ param TEx shape=- kind=matrix domain=- :: Matrix product T times E times relaxed phase shift x
 %@ param TI shape=- kind=matrix domain=- :: Identity matrix scaled by T on the M-N subspace
 %@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Relaxed phase shift vector
@@ -23,10 +23,10 @@
 %@ param Ex shape=- kind=matrix domain=- :: Matrix E times relaxed phase shift x
 %@ param c shape=M kind=vector domain=- :: Circuit vector
 %@ param U shape=- kind=scalar domain=- :: Operator mapping circuits to U(c)=(1/T)(u^T c^+ - l^T c^-)
-%@ param l shape=M kind=vector domain=- :: Lower bounds (alternative notation)
+%@ param l shape=- kind=vector domain=- :: Lower bounds (alternative notation)
 %@ param e shape=M kind=vector domain=- :: Unit vector selecting an arc
 %@ param TU shape=- kind=scalar domain=- :: T times operator U
-%@ param Tc shape=M kind=vector domain=- :: T times circuit vector c
+%@ param Tc shape=- kind=vector domain=- :: T times circuit vector c
 %@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for implicit equalities
 %@ var z shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Dual variables for circuit rays
 %@ param F shape=- kind=matrix domain=- :: Matrix F = I - (B2^{-1}B1)^T
@@ -41,7 +41,7 @@
 %@ index i ordered=0 cyclic=0 :: Index for arcs or events
 %@ param u_hat shape=- kind=vector domain=- :: Upper bounds for phase shifts
 %@ param ell_hat shape=- kind=vector domain=- :: Lower bounds for phase shifts
-%@ param TEp shape=M kind=vector domain=- :: T times E times integral phase shift p
+%@ param TEp shape=- kind=vector domain=- :: T times E times integral phase shift p
 %@ param p_bar shape=- kind=vector domain=- :: Upper bound for phase shift vector p
 %@ param Z shape=- kind=scalar domain=- :: Set of integers
 %@ param epsilon shape=- kind=scalar domain=- :: Tolerance
@@ -88,17 +88,17 @@
   & \frac{1}{T} \left(I - \left(\right. B_tilde_{2}^{- 1} B_tilde_{1} \left.\right)^{\top}\right) \left(\mathit{ell} + u\right) - x \in Lambda_bar , \tag{eq\_0016} \\
   & \mathit{tau}_{i} - \mathit{tau}_{j} = \mathit{ell}_{} - T \left(\right. \mathit{Ex} \left.\right)_{} \tag{eq\_0017} \\
   & \mathit{tau}_{i} - \mathit{tau}_{j} = u_{} - T \left(\right. \mathit{Ex} \left.\right)_{} . \tag{eq\_0018} \\
-  & U \left(c\right) = \frac{1}{T} \left(u^{\top} \cdot c^{+} - l^{\top} \cdot c^{-}\right) , \tag{eq\_0019} \\
+  & U \cdot c = \frac{1}{T} \left(u^{\top} \cdot c^{+} - l^{\top} \cdot c^{-}\right) , \tag{eq\_0019} \\
   & \mathit{ell} - \mathit{TEx} \leq B_tilde^{\top} \mathit{tau} \leq u - \mathit{TEx} . \tag{eq\_0021} \\
   & e_{}^{\top} \cdot B_tilde^{\top} \mathit{tau} \leq e_{}^{\top} \left(u - \mathit{TEx}\right) if c_{} = 1 , \tag{eq\_0022} \\
   & - e_{}^{\top} \cdot B_tilde^{\top} \mathit{tau} \leq - e_{}^{\top} \left(\mathit{ell} - \mathit{TEx}\right) if c_{} = - 1 . \tag{eq\_0023} \\
-  & \left(\right. c^{+} - c^{-} \left.\right)^{\top} B_tilde^{\top} \mathit{tau} \leq \left(\right. c^{+} \left.\right)^{\top} \left(u - \mathit{TEx}\right) - \left(\right. c^{-} \left.\right)^{\top} \left(\mathit{ell} - \mathit{TEx}\right) = \mathit{TU} \left(c\right) - \mathit{Tc}^{\top} \cdot \mathit{Ex} = 0 . \tag{eq\_0024} \\
+  & \left(\right. c^{+} - c^{-} \left.\right)^{\top} B_tilde^{\top} \mathit{tau} \leq \left(\right. c^{+} \left.\right)^{\top} \left(u - \mathit{TEx}\right) - \left(\right. c^{-} \left.\right)^{\top} \left(\mathit{ell} - \mathit{TEx}\right) = \mathit{TU} \cdot c - \mathit{Tc}^{\top} \cdot \mathit{Ex} = 0 . \tag{eq\_0024} \\
   & \left(\right. c^{+} - c^{-} \left.\right)^{\top} B_tilde^{\top} \mathit{tau} = c^{\top} \cdot B_tilde^{\top} \mathit{tau} = 0 , \tag{eq\_0025} \\
   & y_{1}^{\top} \left(u - \mathit{TEx}\right) - y_{2}^{\top} \left(l - \mathit{TEx}\right) = 0 \tag{eq\_0026\_a} \\
   & y_{1}^{\top} \cdot B_tilde^{\top} - y_{2}^{\top} \cdot B_tilde^{\top} = 0 \tag{eq\_0026\_b} \\
   & z_{1}^{\top} \left(u - \mathit{TEx}\right) - z_{2}^{\top} \left(\mathit{ell} - \mathit{TEx}\right) \geq 0 , \tag{eq\_0028} \\
   & \left(\right. c^{+} \left.\right)^{\top} \left(u - \mathit{TEx}\right) - \left(\right. c^{-} \left.\right)^{\top} \left(\mathit{ell} - \mathit{TEx}\right) = 0 \tag{eq\_0029} \\
-  & c^{\top} \cdot \mathit{Ex} = \frac{1}{T} \left(u^{\top} \cdot c^{+} - \mathit{ell}^{\top} \cdot c^{-}\right) = U \left(c\right) . \tag{eq\_0030} \\
+  & c^{\top} \cdot \mathit{Ex} = \frac{1}{T} \left(u^{\top} \cdot c^{+} - \mathit{ell}^{\top} \cdot c^{-}\right) = U \cdot c . \tag{eq\_0030} \\
   & x_underline = \frac{1}{T} F \cdot z_underline , \tag{eq\_0042} \\
   & \begin{pmatrix} B_tilde_{1}^{\top} & \mathit{TI}_{M - N} \\ B_tilde_{2}^{\top} & 0 \end{pmatrix}^{- 1} z_underline \tag{eq\_0044} \\
   & \begin{pmatrix} B_tilde_{1}^{\top} & \mathit{TI}_{M - N} \\ B_tilde_{2}^{\top} & 0 \end{pmatrix}^{- 1} = \begin{pmatrix} 0 & \left(B_tilde_{2}^{- 1}\right)^{\top} \\ \frac{1}{T} I_{M - N} & - \frac{1}{T} \left(B_tilde_{2}^{- 1} B_tilde_{1}\right)^{\top} \end{pmatrix} \tag{eq\_0045} \\

@@ -23,7 +23,7 @@
 %@ index J ordered=0 cyclic=0 :: Set of rolling stock types
 %@ param M shape=- kind=big_m domain=- :: Large positive constant for linearization
 %@ param Cbar shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 1
-%@ param C shape=j kind=vector domain=- :: Initial number of rolling stocks in depot 2
+%@ param C shape=- kind=vector domain=- :: Initial number of rolling stocks in depot 2
 %@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total passenger waiting time
 %@ var R shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total fixed costs of online services
 %@ var F shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
@@ -106,18 +106,18 @@
   & t_{\left|N_bar\right| , 1}^{a} \geq t_bar^{\left(l a\right)} \tag{eq\_0003\_b} \\
   & t_{1 , \left|S\right| + 1}^{a} = t_underline^{\left(f i\right)} \tag{eq\_0004\_a} \\
   & t_{\left|N_underline\right| , \left|S\right| + 1}^{a} \geq t_underline^{\left(l a\right)} \tag{eq\_0004\_b} \\
-  & t_{l , k}^{a} = \sum_{t \in T} t \cdot \left[z_{l , k} \left(t\right) - z_{l , k} \left(t - 1\right)\right] , \forall l \in N_bar , k \in S_bar , t , t - 1 \in T \text{or} \forall l \in N_underline , k \in S_underline , t , t - 1 \in T . \tag{eq\_0005} \\
-  & z_{l , k} \left(t - 1\right) \leq z_{l , k} \left(t\right) , \forall l \in N_bar , k \in S_bar , t , t - 1 \in T \text{or} \forall l \in N_underline , k \in S_underline , t , t - 1 \in T . \tag{eq\_0008} \\
+  & t_{l , k}^{a} = \sum_{t \in T} t \cdot \left[z_{l , k} \cdot t - z_{l , k} \left(t - 1\right)\right] , \forall l \in N_bar , k \in S_bar , t , t - 1 \in T \text{or} \forall l \in N_underline , k \in S_underline , t , t - 1 \in T . \tag{eq\_0005} \\
+  & z_{l , k} \left(t - 1\right) \leq z_{l , k} \cdot t , \forall l \in N_bar , k \in S_bar , t , t - 1 \in T \text{or} \forall l \in N_underline , k \in S_underline , t , t - 1 \in T . \tag{eq\_0008} \\
   & h_{m i n} \leq t_{l , 1}^{a} - t_{l - 1 , 1}^{a} \leq h_{m a x} , \forall l , l - 1 \in N_bar , \tag{eq\_0009} \\
   & h_{m i n} \leq t_{l , \left|S\right| + 1}^{a} - t_{l - 1 , \left|S\right| + 1}^{a} \leq h_{m a x} , \forall l , l - 1 \in N_underline , \tag{eq\_0010} \\
-  & P_{k}^{w a} \left(t\right) = \sum_{\mathit{tau} = 1}^{t} \mathit{eta}_{k} \left(\mathit{tau}\right) - \sum_{\mathit{tau} = 1}^{t} P_{k}^{i n} \left(\mathit{tau}\right) , \forall k \in S_bar , t \in T \text{or} \forall k \in S_underline , t \in T . \tag{eq\_0011} \\
-  & P_{k}^{w a} \left(t\right) \geq 0 , \forall k \in S_bar , t \in T \text{or} \forall k \in S_underline , t \in T . \tag{eq\_0012} \\
-  & \sum_{t \in T} \mathit{eta}_{k} \left(t\right) = \sum_{t \in T} P_{k}^{i n} \left(t\right) , \forall k \in S_bar \text{or} \forall k \in S_underline . \tag{eq\_0013} \\
-  & P_{l , k , s}^{b o} = \sum_{t \in T} b_{l , k} \left(t\right) \cdot P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) , \forall l \in N_bar , k < s \in S_bar \text{or} \forall l \in N_underline , k < s \in S_underline . \tag{eq\_0014} \\
+  & P_{k}^{w a} \cdot t = \sum_{\mathit{tau} = 1}^{t} \mathit{eta}_{k} \mathit{tau} - \sum_{\mathit{tau} = 1}^{t} P_{k}^{i n} \mathit{tau} , \forall k \in S_bar , t \in T \text{or} \forall k \in S_underline , t \in T . \tag{eq\_0011} \\
+  & P_{k}^{w a} \cdot t \geq 0 , \forall k \in S_bar , t \in T \text{or} \forall k \in S_underline , t \in T . \tag{eq\_0012} \\
+  & \sum_{t \in T} \mathit{eta}_{k} t = \sum_{t \in T} P_{k}^{i n} \cdot t , \forall k \in S_bar \text{or} \forall k \in S_underline . \tag{eq\_0013} \\
+  & P_{l , k , s}^{b o} = \sum_{t \in T} b_{l , k} \cdot t \cdot P_{k}^{i n} \cdot t \cdot \mathit{delta}_{k , s} t , \forall l \in N_bar , k < s \in S_bar \text{or} \forall l \in N_underline , k < s \in S_underline . \tag{eq\_0014} \\
   & P_{l , k}^{b o} = \sum_{s > k} P_{l , k , s}^{b o} , \forall l \in N_bar , k < s \in S_bar \text{or} \forall l \in N_underline , k < s \in S_underline . \tag{eq\_0015} \\
   & P_{l , k}^{a l} = \sum_{v < k} P_{l , v , k}^{b o} , \forall l \in N_bar , v < k \in S_bar \text{or} \forall l \in N_underline , v < k \in S_underline . \tag{eq\_0016} \\
-  & \sum_{t \in T} P_{k}^{i n} \left(t\right) = \sum_{l \in N_bar} P_{l , k}^{b o} , \forall k \in S_bar . \tag{eq\_0021} \\
-  & \sum_{t \in T} P_{k}^{i n} \left(t\right) = \sum_{l \in N_underline} P_{l , k}^{b o} , \forall k \in S_underline . \tag{eq\_0022} \\
+  & \sum_{t \in T} P_{k}^{i n} \cdot t = \sum_{l \in N_bar} P_{l , k}^{b o} , \forall k \in S_bar . \tag{eq\_0021} \\
+  & \sum_{t \in T} P_{k}^{i n} \cdot t = \sum_{l \in N_underline} P_{l , k}^{b o} , \forall k \in S_underline . \tag{eq\_0022} \\
   & \sum_{j \in J} y_{l , j} = 1 , \forall l \in N_underline \text{or} l \in N_bar . \tag{eq\_0023} \\
   & 0 \leq \sum_{l \in N_underline} \mathit{gamma}_{l , lp} \leq 1 , \forall lp \in N_bar . \tag{eq\_0024} \\
   & \mathit{alpha}_{lp} = \sum_{l \in N_underline} \mathit{gamma}_{l , lp} , \forall lp \in N_bar . \tag{eq\_0025} \\
@@ -135,38 +135,38 @@
   & t_{l , \left|S\right| + 1}^{a} - t_{lp , \left|S\right|}^{d} \leq t_{m a x}^{\left(r o l l\right)} + M \cdot \left(1 - \mathit{gamma}_{lp , l}\right) , \forall l \in N_underline , lp \in N_bar . \tag{eq\_0037} \\
   & CN_bar_{j} + \sum_{l \in N_underline} \left(1 - \mathit{beta}_{l}\right) \cdot y_{l , j} \cdot z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)}\right) - \sum_{lp \in N_bar} \left(1 - \mathit{alpha}_{lp}\right) \cdot y_{lp , j} \cdot z_{lp , 1} \left(t + t_bar^{\left(l e\right)}\right) \geq 0 , \tag{eq\_0038} \\
   & CN_underline_{j} + \sum_{lp \in N_bar} \left(1 - \mathit{beta}_{lp}\right) \cdot y_{lp , j} \cdot z_{lp , \left|S\right|} \left(t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)}\right) - \sum_{l \in N_underline} \left(1 - \mathit{alpha}_{l}\right) \cdot y_{l , j} \cdot z_{l , \left|S\right| + 1} \left(t + t_underline^{\left(l e\right)}\right) \geq 0 , \tag{eq\_0040} \\
-  & W \cdot T = \sum_{t \in T, k \in S_bar \cup S_underline} P_{k}^{w a} \left(t\right) \cdot t_{u n i t} . \tag{eq\_0042} \\
+  & W \cdot T = \sum_{t \in T, k \in S_bar \cup S_underline} P_{k}^{w a} \cdot t \cdot t_{u n i t} . \tag{eq\_0042} \\
   & C \cdot R = \sum_{j \in J, l \in N_bar \cup N_underline} y_{l , j} \cdot M_{j}^{c o s t} . \tag{eq\_0043} \\
   & C \cdot S = \sum_{l \in N_bar \cup N_underline} \left[\left(1 - \mathit{alpha}_{l}\right) \cdot M^{o u t}\right] . \tag{eq\_0044} \\
-  \min\quad & \mathit{lambda}_{1} \cdot \sum_{t \in T, k \in S_bar \cup S_underline} P_{k}^{w a} \left(t\right) \cdot t_{u n i t} + \mathit{lambda}_{2} \cdot \left(\sum_{j \in J, l \in N_bar \cup N_underline} y_{l , j} \cdot M_{j}^{c o s t} + \sum_{l \in N_bar \cup N_underline} \left[\left(1 - \mathit{alpha}_{l}\right) \cdot M^{o u t}\right]\right) \tag{eq\_0045} \\
-  & P_{l , k , s}^{b o} = \sum_{t \in T} \mathit{omega}_{l , k , s} \left(t\right) , \forall l \in N_bar , k < s \in S_bar o r \forall l \in N_underline , k < s \in S_underline . \tag{eq\_0046} \\
-  & 0 \leq \mathit{omega}_{l , k , s} \left(t\right) \leq M \cdot b_{l , k} \left(t\right) \tag{eq\_0047\_a} \\
-  & \mathit{omega}_{l , k , s} \left(t\right) \leq P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) \tag{eq\_0047\_b} \\
-  & \mathit{omega}_{l , k , s} \left(t\right) \geq P_{k}^{i n} \left(t\right) \cdot \mathit{delta}_{k , s} \left(t\right) - M \cdot \left(1 - b_{l , k} \left(t\right)\right) \tag{eq\_0047\_c} \\
-  & CN_bar_{j} + \sum_{l \in N_underline} psi_underline_{l , j} \left(t\right) - \sum_{lp \in N_bar} zeta_bar_{lp , j} \left(t\right) \geq 0 , \forall j \in J , t , t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)} , t + t_bar^{\left(l e\right)} \in T . \tag{eq\_0049} \\
+  \min\quad & \mathit{lambda}_{1} \cdot \sum_{t \in T, k \in S_bar \cup S_underline} P_{k}^{w a} \cdot t \cdot t_{u n i t} + \mathit{lambda}_{2} \cdot \left(\sum_{j \in J, l \in N_bar \cup N_underline} y_{l , j} \cdot M_{j}^{c o s t} + \sum_{l \in N_bar \cup N_underline} \left[\left(1 - \mathit{alpha}_{l}\right) \cdot M^{o u t}\right]\right) \tag{eq\_0045} \\
+  & P_{l , k , s}^{b o} = \sum_{t \in T} \mathit{omega}_{l , k , s} t , \forall l \in N_bar , k < s \in S_bar o r \forall l \in N_underline , k < s \in S_underline . \tag{eq\_0046} \\
+  & 0 \leq \mathit{omega}_{l , k , s} t \leq M \cdot b_{l , k} \cdot t \tag{eq\_0047\_a} \\
+  & \mathit{omega}_{l , k , s} t \leq P_{k}^{i n} \cdot t \cdot \mathit{delta}_{k , s} t \tag{eq\_0047\_b} \\
+  & \mathit{omega}_{l , k , s} t \geq P_{k}^{i n} \cdot t \cdot \mathit{delta}_{k , s} t - M \cdot \left(1 - b_{l , k} \cdot t\right) \tag{eq\_0047\_c} \\
+  & CN_bar_{j} + \sum_{l \in N_underline} psi_underline_{l , j} t - \sum_{lp \in N_bar} zeta_bar_{lp , j} t \geq 0 , \forall j \in J , t , t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)} , t + t_bar^{\left(l e\right)} \in T . \tag{eq\_0049} \\
   & phi_underline_{l , j} \leq 1 - \mathit{beta}_{l} \tag{eq\_0050\_a} \\
   & phi_underline_{l , j} \leq y_{l , j} \tag{eq\_0050\_b} \\
   & phi_underline_{l , j} \geq y_{l , j} - \mathit{beta}_{l} \tag{eq\_0050\_c} \\
-  & psi_underline_{l , j} \left(t\right) \leq phi_underline_{l , j} \tag{eq\_0050\_d} \\
-  & psi_underline_{l , j} \left(t\right) \leq z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)}\right) \tag{eq\_0050\_e} \\
-  & psi_underline_{l , j} \left(t\right) \geq phi_underline_{l , j} + z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)}\right) - 1 \tag{eq\_0050\_f} \\
+  & psi_underline_{l , j} t \leq phi_underline_{l , j} \tag{eq\_0050\_d} \\
+  & psi_underline_{l , j} t \leq z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)}\right) \tag{eq\_0050\_e} \\
+  & psi_underline_{l , j} t \geq phi_underline_{l , j} + z_{l , 2 \left|S\right|} \left(t - t_{l , 2 \left|S\right|}^{w} - t_underline^{\left(r e\right)}\right) - 1 \tag{eq\_0050\_f} \\
   & pi_bar_{lp , j} \leq 1 - \mathit{alpha}_{lp} \tag{eq\_0050\_g} \\
   & pi_bar_{lp , j} \leq y_{lp , j} \tag{eq\_0050\_h} \\
   & pi_bar_{lp , j} \geq y_{lp , j} - \mathit{alpha}_{lp} \tag{eq\_0050\_i} \\
-  & zeta_bar_{lp , j} \left(t\right) \leq pi_bar_{lp , j} \tag{eq\_0050\_j} \\
-  & zeta_bar_{lp , j} \left(t\right) \leq z_{lp , 1} \left(t + t_bar^{\left(l e\right)}\right) \tag{eq\_0050\_k} \\
-  & zeta_bar_{lp , j} \left(t\right) \geq pi_bar_{lp , j} + z_{lp , 1} \left(t + t_bar^{\left(l e\right)}\right) - 1 \tag{eq\_0050\_l} \\
-  & CN_underline_{j} + \sum_{lp \in N_bar} psi_bar_{lp , j} \left(t\right) - \sum_{l \in N_underline} zeta_underline_{l , j} \left(t\right) \geq 0 , \forall j \in J , t , t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)} , t + t_underline^{\left(l e\right)} \in T . \tag{eq\_0052} \\
+  & zeta_bar_{lp , j} t \leq pi_bar_{lp , j} \tag{eq\_0050\_j} \\
+  & zeta_bar_{lp , j} t \leq z_{lp , 1} \left(t + t_bar^{\left(l e\right)}\right) \tag{eq\_0050\_k} \\
+  & zeta_bar_{lp , j} t \geq pi_bar_{lp , j} + z_{lp , 1} \left(t + t_bar^{\left(l e\right)}\right) - 1 \tag{eq\_0050\_l} \\
+  & CN_underline_{j} + \sum_{lp \in N_bar} psi_bar_{lp , j} t - \sum_{l \in N_underline} zeta_underline_{l , j} t \geq 0 , \forall j \in J , t , t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)} , t + t_underline^{\left(l e\right)} \in T . \tag{eq\_0052} \\
   & phi_bar_{lp , j} \leq 1 - \mathit{beta}_{lp} \tag{eq\_0053\_a} \\
   & phi_bar_{lp , j} \leq y_{lp , j} \tag{eq\_0053\_b} \\
   & phi_bar_{lp , j} \geq y_{lp , j} - \mathit{beta}_{lp} \tag{eq\_0053\_c} \\
-  & psi_bar_{lp , j} \left(t\right) \leq phi_bar_{lp , j} \tag{eq\_0053\_d} \\
-  & psi_bar_{lp , j} \left(t\right) \leq z_{lp , \left|S\right|} \left(t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)}\right) \tag{eq\_0053\_e} \\
-  & psi_bar_{lp , j} \left(t\right) \geq phi_bar_{lp , j} + z_{lp , \left|S\right|} \left(t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)}\right) - 1 \tag{eq\_0053\_f} \\
+  & psi_bar_{lp , j} t \leq phi_bar_{lp , j} \tag{eq\_0053\_d} \\
+  & psi_bar_{lp , j} t \leq z_{lp , \left|S\right|} \left(t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)}\right) \tag{eq\_0053\_e} \\
+  & psi_bar_{lp , j} t \geq phi_bar_{lp , j} + z_{lp , \left|S\right|} \left(t - t_{lp , \left|S\right|}^{w} - t_bar^{\left(r e\right)}\right) - 1 \tag{eq\_0053\_f} \\
   & pi_underline_{l , j} \leq 1 - \mathit{alpha}_{l} \tag{eq\_0053\_g} \\
   & pi_underline_{l , j} \leq y_{l , j} \tag{eq\_0053\_h} \\
   & pi_underline_{l , j} \geq y_{l , j} - \mathit{alpha}_{l} \tag{eq\_0053\_i} \\
-  & zeta_underline_{l , j} \left(t\right) \leq pi_underline_{l , j} \tag{eq\_0053\_j} \\
-  & zeta_underline_{l , j} \left(t\right) \leq z_{l , \left|S\right| + 1} \left(t + t_underline^{\left(l e\right)}\right) \tag{eq\_0053\_k} \\
-  & zeta_underline_{l , j} \left(t\right) \geq pi_underline_{l , j} + z_{l , \left|S\right| + 1} \left(t + t_underline^{\left(l e\right)}\right) - 1 \tag{eq\_0053\_l} \\
+  & zeta_underline_{l , j} t \leq pi_underline_{l , j} \tag{eq\_0053\_j} \\
+  & zeta_underline_{l , j} t \leq z_{l , \left|S\right| + 1} \left(t + t_underline^{\left(l e\right)}\right) \tag{eq\_0053\_k} \\
+  & zeta_underline_{l , j} t \geq pi_underline_{l , j} + z_{l , \left|S\right| + 1} \left(t + t_underline^{\left(l e\right)}\right) - 1 \tag{eq\_0053\_l} \\
 \end{align}

@@ -1,5 +1,31 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [
+    {
+      "name": "cap",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "mandatory",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "mix",
+      "kind": "param",
+      "declared": 2,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    }
+  ],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "A",
@@ -44,14 +70,19 @@
   "used": [
     "T",
     "cap",
+    "conflict",
     "f_max",
     "g_max",
     "gamma",
     "k",
+    "mandatory",
     "mix",
     "p",
+    "plan",
+    "pool",
     "t",
     "u",
+    "variables",
     "x",
     "y",
     "z"
@@ -84,11 +115,53 @@
     "X",
     "Y",
     "Z",
-    "delta_minus",
-    "delta_plus"
+    "delta"
   ],
-  "missing": {},
-  "missing_index": [],
+  "missing": {
+    "conflict": {
+      "rows": [
+        "eq_0001",
+        "eq_0010"
+      ],
+      "roles": {
+        "symbol": 2
+      },
+      "arities": {
+        "0": 2
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "plan": {
+      "rows": [
+        "eq_0001"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "pool": {
+      "rows": [
+        "eq_0001"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    }
+  },
+  "missing_index": [
+    "delta"
+  ],
   "shape_mismatch": [
     {
       "name": "t",
@@ -133,12 +206,6 @@
       "declared": 2
     },
     {
-      "name": "p",
-      "row": "eq_0012",
-      "written": 3,
-      "declared": 2
-    },
-    {
       "name": "t",
       "row": "eq_0013",
       "written": 1,
@@ -179,20 +246,12 @@
       "row": "eq_0022",
       "written": 1,
       "declared": 2
-    },
-    {
-      "name": "t",
-      "row": "eq_0023",
-      "written": 1,
-      "declared": 2
     }
   ],
   "unresolved_script": [],
-  "declared_unused": [
-    "mandatory",
-    "variables"
-  ],
+  "declared_unused": [],
   "family_as_symbol": {},
   "paper_key": "10.1016_j.trc.2022.103805",
-  "sidecar": true
+  "sidecar": true,
+  "shape_fixes_applied": 3
 }

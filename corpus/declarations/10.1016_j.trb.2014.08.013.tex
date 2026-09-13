@@ -48,7 +48,8 @@
 %@ var y shape=M domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k is used
 
 % l: classified as parameter during review
-%@ param l shape=S kind=vector domain=continuous :: Distance between stations i and i+1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,i): l shape=S -> S,S
+%@ param l shape=S,S kind=vector domain=continuous :: Distance between stations i and i+1
 
 % n: classified as index during review
 %@ index n ordered=0 cyclic=0 :: Last station index

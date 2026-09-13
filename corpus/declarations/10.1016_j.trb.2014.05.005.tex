@@ -156,6 +156,7 @@
 %@ var d_bar shape=E_s domain=continuous role=auxiliary drole=- lo=- hi=- :: Cumulative departure flow variable on edge (i,j) for train f
 %@ var delta shape=E_o,T domain=continuous role=auxiliary drole=- lo=- hi=- :: Difference in cumulative arrival flow between consecutive time points
 %@ index mp ordered=0 cyclic=0 :: Index for paths in the capacity constraint
-%@ var theta shape=E_o,E_o domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator for ordering of trains on shared edges
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): theta shape=E_o,E_o -> -
+%@ var theta shape=- domain=binary role=indicator drole=- lo=- hi=- :: Binary indicator for ordering of trains on shared edges
 %@ param w_max shape=E_o kind=scalar domain=- :: Maximum waiting time on edge (i,j) for train f
 %@ param w_min shape=E_o kind=scalar domain=- :: Minimum waiting time on edge (i,j) for train f

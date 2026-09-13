@@ -8,7 +8,8 @@
 %@ prov author :: Jintang Shi; Haodong Li; Pieter Vansteenwegen
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total operating cost of all EMUs over the time-space network.
-%@ param c shape=A,e kind=matrix domain=continuous :: Cost of traversing arc u->v for train e.
+% declaration fixed: param c: domain=continuous -> -
+%@ param c shape=A,e kind=matrix domain=- :: Cost of traversing arc u->v for train e.
 %@ var x shape=A,e domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating if train e uses arc u->v.
 %@ index A ordered=0 cyclic=0 :: Set of all arcs in the time-space network.
 %@ index E ordered=0 cyclic=0 :: Set of trains (EMUs).
@@ -26,11 +27,15 @@
 %@ index B ordered=0 cyclic=0 :: Set of critical switches.
 %@ var R shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Resource usage violation for relaxed constraints.
 %@ var Z shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Objective function value.
-%@ param other shape=- kind=scalar domain=continuous :: Other cost term in the modified arc-cost expression.
+% declaration fixed: param other: domain=continuous -> -
+%@ param other shape=- kind=scalar domain=- :: Other cost term in the modified arc-cost expression.
 %@ index k ordered=0 cyclic=0 :: Iteration index.
-%@ param D shape=A kind=vector domain=continuous :: Modified cost coefficient for ADMM on arc u->v.
-%@ param c_bar shape=A,e kind=matrix domain=continuous :: Modified arc cost including Lagrangian penalties.
-%@ param Constant shape=- kind=scalar domain=continuous :: Constant term in linearization.
+% declaration fixed: param D: domain=continuous -> -
+%@ param D shape=A kind=vector domain=- :: Modified cost coefficient for ADMM on arc u->v.
+% declaration fixed: param c_bar: domain=continuous -> -
+%@ param c_bar shape=- kind=matrix domain=- :: Modified arc cost including Lagrangian penalties.
+% declaration fixed: param Constant: domain=continuous -> -
+%@ param Constant shape=- kind=scalar domain=- :: Constant term in linearization.
 %@ var F shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Function in linearization.
 %@ con eq_0002 kind=linear domain=- indicator=- :: Flow balance at source: each train starts exactly once.
 %@ con eq_0003 kind=linear domain=- indicator=- :: Flow balance at destination: each train ends exactly once.
@@ -64,7 +69,7 @@
 %@ con eq_0033 kind=linear domain=- indicator=- :: Auxiliary constraint from the linearization procedure.
 \begin{align}
   \min\quad & \sum_{e \in E, u \rightarrow v \in A^{e}} c_{u \rightarrow v}^{e} \cdot x_{u \rightarrow v}^{e} \tag{eq\_0001} \\
-  & s . t \sum_{v : o_bar \rightarrow v \in A} x_{o_bar , v}^{e} = 1 , \forall e \in E \tag{eq\_0002} \\
+  & \sum_{v : o_bar \rightarrow v \in A} x_{o_bar , v}^{e} = 1 , \forall e \in E \tag{eq\_0002} \\
   & \sum_{u : u \rightarrow d_bar \in A} x_{u , d_bar}^{e} = 1 , \forall e \in E \tag{eq\_0003} \\
   & \sum_{u : u \rightarrow v \in A} x_{u , v}^{e} - \sum_{w : v \rightarrow w \in A} x_{v , w}^{e} = 0 , \forall v \in V \backslash \left\{o_bar , d_bar\right\} , \forall e \in E \tag{eq\_0004} \\
   & \sum_{u , v \in A^{e} \cap A_{p l a t}^{e} : t_{u} < a_{e} + 5} x_{u , v}^{e} = 1 , \forall e \in E \tag{eq\_0005} \\
@@ -74,13 +79,12 @@
   & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} \leq 1 , \forall n \in N^{2} \backslash N^{i n t - t r a} , t = 0 , 1 , \hdots , T_{n}^{'} \tag{eq\_0009} \\
   & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e} \leq 1 , \forall n \in N^{1} \backslash N^{i n t - t r a} , t = 0 , 1 , \hdots , T_{n}^{'} \tag{eq\_0010} \\
   & \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} \leq 1 , \forall b \in B , t = 0 , 1 , \hdots , T_{b}^{'} \tag{eq\_0011} \\
-  & x_{u , v}^{e} \in \left\{0 , 1\right\} \forall u \rightarrow v \in A , e \in E \tag{eq\_0012} \\
   & R_{\mathit{nt}}^{1} = \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} - 1 , \forall n \in N^{2} \backslash N^{i n t - t r a} , t \in T_{n}^{'} ; \tag{eq\_0014} \\
   & R_{\mathit{bt}}^{3} = \sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} - 1 , \forall b \in B , t \in T_{b}^{'} \tag{eq\_0015} \\
   & Z_{L R} = \sum_{e \in E} \left[Z_{L R}^{e}\right] - \sum_{n} \left[\mathit{lambda}_{n}\right] \tag{eq\_0016} \\
   & Z_{L R}^{e} = \sum_{u \rightarrow v \in A^{e}} c_{u , v}^{e} \cdot x_{u , v}^{e} + \sum_{n \in N^{2} \backslash N^{i n t - t r a}, t \in T_{n}^{'}} \mathit{lambda}_{\mathit{nt}}^{1} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{n \in N^{1} \backslash N^{i n t - t r a}, t \in T_{n}^{'}} \mathit{lambda}_{\mathit{nt}}^{2} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e} + \sum_{b \in B, t \in T_{b}^{'}} \mathit{lambda}_{\mathit{bt}}^{3} \cdot \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e} \tag{eq\_0017} \\
-  & Z_{L R}^{e} = \sum_{u \rightarrow v \in A^{e}} \left(c_tilde\right)_{u , v}^{e} x_{u , v}^{e} \tag{eq\_0018} \\
-  & \left(c_tilde\right)_{u , v}^{e} = \left\{\begin{matrix} c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}} \mathit{lambda}_{\mathit{nt}}^{2} + \sum_{b , t : u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}} \mathit{lambda}_{\mathit{bt}}^{3} \forall u \rightarrow v \in A^{s h u} \\ c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} \forall u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o} \\ c_{u , v}^{e} \cdot \mathit{other} \end{matrix}\right \tag{eq\_0019} \\
+  & Z_{L R}^{e} = \sum_{u \rightarrow v \in A^{e}} c_tilde_{u , v}^{e} x_{u , v}^{e} \tag{eq\_0018} \\
+  & c_tilde_{u , v}^{e} = \left\{ c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}} \mathit{lambda}_{\mathit{nt}}^{2} + \sum_{b , t : u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}} \mathit{lambda}_{\mathit{bt}}^{3} \forall u \rightarrow v \in A^{s h u} \\ c_{u , v}^{e} + \sum_{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} \mathit{lambda}_{\mathit{nt}}^{1} \forall u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o} \\ c_{u , v}^{e} \cdot \mathit{other} \right \tag{eq\_0019} \\
   & \mathit{lambda}_{\mathit{nt}}^{1 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{nt}}^{1 , k} + \mathit{beta}_{1}^{k} \cdot R_{\mathit{nt}}^{1} / \left(k + 1\right)\right\} \tag{eq\_0020} \\
   & \mathit{lambda}_{\mathit{nt}}^{2 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{nt}}^{2 , k} + \mathit{beta}_{2}^{k} \cdot R_{\mathit{nt}}^{2} / \left(k + 1\right)\right\} \tag{eq\_0021} \\
   & \mathit{lambda}_{\mathit{bt}}^{3 , k + 1} = m a x \left\{0 , \mathit{lambda}_{\mathit{bt}}^{3 , k} + \mathit{beta}_{3}^{k} \cdot R_{\mathit{bt}}^{3} / \left(k + 1\right)\right\} \tag{eq\_0022} \\
@@ -88,9 +92,9 @@
   & D_{u \rightarrow v}^{2} = \underset{n , t : u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} \left\{\mathit{lambda}_{\mathit{nt}}^{1} + m a x \left[0 , \frac{\mathit{rho}_{1}}{2} \left(2 \left(\sum_{ep \in E \backslash e} \underset{app \in A_{\mathit{nt}}^{1}}{\sum} x_{app}^{ep}\right) - 1\right)\right]\right\} \forall u \rightarrow v \in A^{d w e} \cup A^{s e r} \cup A^{s t o} \tag{eq\_0025} \\
   & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left(\sum_{e \in E} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{it}}^{1}}{\sum} x_{u , v}^{e} - 1 + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1 + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right)^{2} + \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1 + s_{\mathit{nt}}^{1}\right)^{2} + 2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1 + s_{\mathit{nt}}^{1}\right) \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} \tag{eq\_0026} \\
   & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep}\right) + 2 \cdot s_{\mathit{nt}}^{1} - 1\right] + \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1 + s_{\mathit{nt}}^{1}\right)^{2} \tag{eq\_0027} \\
-  & F \left(s\right) = s^{2} + 2 \cdot s \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1\right) + \mathit{Constant} . \tag{eq\_0028} \\
-  & F^{*} \left(s\right) = F \left(s = 0\right) = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant} \tag{eq\_0029} \\
-  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left\{\begin{matrix} \left(\sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant} , \sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep} \geq 1 , \\ 0 , \sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep} = 0 \end{matrix}\right \tag{eq\_0030} \\
+  & F \cdot s = s^{2} + 2 \cdot s \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e} + \sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep} - 1\right) + \mathit{Constant} . \tag{eq\_0028} \\
+  & F^{*} \cdot s = F \left(s = 0\right) = \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant} \tag{eq\_0029} \\
+  & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = \left\{ \left(\sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant} , \sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep} \geq 1 , \\ 0 , \sum_{ep \in E \backslash e} \sum_{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}} x_{u , v}^{ep} = 0 \right \tag{eq\_0030} \\
   & \left(R_{\mathit{nt}}^{1} + s_{\mathit{nt}}^{1}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{1}}{\sum} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0031} \\
   & \left(R_{\mathit{nt}}^{2} + s_{\mathit{nt}}^{2}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{nt}}^{2}}{\sum} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0032} \\
   & \left(R_{\mathit{bt}}^{3} + s_{\mathit{bt}}^{3}\right)^{2} = m a x \left\{0 , \left(\underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{e}\right) \left[2 \left(\sum_{ep \in E \backslash e} \underset{u \rightarrow v \in A^{e} \cap A_{\mathit{bt}}}{\sum} x_{u , v}^{ep}\right) - 1\right] + \mathit{Constant}\right\} \tag{eq\_0033} \\

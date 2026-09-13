@@ -1,0 +1,624 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.apm.2016.06.040",
+  "name": "Train timetabling for an urban rail transit line using a Lagrangian relaxation approach",
+  "family": "milp",
+  "description": "Mined from Train timetabling for an urban rail transit line using a Lagrangian relaxation approach (Applied Mathematical Modelling, 2016).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.apm.2016.06.040",
+    "reference": "Train timetabling for an urban rail transit line using a Lagrangian relaxation approach",
+    "author": "Erfan Hassannayebi; Seyed Hessameddin Zegordi; Masoud Yaghini",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "D",
+      "description": "Number of train services on path f",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "m",
+      "description": "Number of stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of paths (inbound and outbound)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "train index set",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Kpair",
+      "description": "consecutive train index pairs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Arc",
+      "description": "consecutive station index pairs per direction",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Sta",
+      "description": "station indices per direction",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "T",
+      "description": "Planning horizon length",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum headway between trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R",
+      "description": "Running time from station k to k+1 on path f",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C",
+      "description": "Train capacity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Minimum layover time at terminal",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "LP",
+      "description": "Label of the linear programming surrogate model",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dwell",
+      "description": "dwell time bound",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Df",
+      "description": "number of stations",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda",
+      "description": "passenger arrival rate for train k on path f",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu",
+      "description": "Lagrangian multiplier vector",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "H_rk1",
+      "description": "coefficient for train k on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "H_rk2",
+      "description": "coefficient for train k on path 2",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "L_rk1",
+      "description": "coefficient for train k on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "L_rk2",
+      "description": "coefficient for train k on path 2",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_k1",
+      "description": "arrival rate for train k on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_k2",
+      "description": "arrival rate for train k on path 2",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu_r1",
+      "description": "multiplier for train r on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu_r1f",
+      "description": "multiplier for train r on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_r1",
+      "description": "multiplier for train r on path 1",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_r2",
+      "description": "multiplier for train r on path 2",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b_1",
+      "description": "boarding passengers at station r on path f",
+      "shape": [
+        "Sta",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b_r1",
+      "description": "boarding passengers at station r",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b_r1f",
+      "description": "boarding passengers at station r on path f",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_1",
+      "description": "departure time variable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_2",
+      "description": "departure time variable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_2_1",
+      "description": "departure time variable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_Df",
+      "description": "departure time of last train on path f",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta_Df",
+      "description": "delay of last train on path f",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dwell_max",
+      "description": "maximum dwell time",
+      "shape": [
+        "Kpair",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dwell_min",
+      "description": "minimum dwell time",
+      "shape": [
+        "Kpair",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "minimum headway",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "n_1",
+      "description": "number of passengers on train",
+      "shape": [
+        "Sta",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "n_r1",
+      "description": "number of passengers on train",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_min",
+      "description": "minimum turnaround time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "w_Df",
+      "description": "waiting time of last train on path f",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "w_max",
+      "description": "maximum waiting time",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "w_min",
+      "description": "minimum waiting time",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "d",
+      "description": "Departure time of train r at station k on path f",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Number of passengers waiting at station k for train r on path f",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Total passenger waiting time",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "b",
+      "description": "Number of passengers boarding train r at station k on path f",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n",
+      "description": "Number of passengers on train r after departing station k on path f",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u",
+      "description": "Lagrangian multiplier for vehicle circulation constraint",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "H",
+      "description": "Headway between train r and r+1 at station k on path f",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "L",
+      "description": "Linearized waiting time term in Lagrangian objective",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "Lagrangian objective function value",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "AWT",
+      "description": "Average waiting time per passenger",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "S",
+      "description": "Linear surrogate performance measure",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "delta",
+      "description": "delay variable",
+      "shape": [
+        "Sta",
+        "K",
+        "F"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "tau",
+      "description": "total time variable",
+      "shape": [
+        "Sta",
+        "K",
+        "F"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "varphi",
+      "description": "train ordering indicator",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "indicator",
+      "domain_role": null
+    },
+    {
+      "name": "Z_LR",
+      "description": "Lagrangian relaxation objective",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_1_LR",
+      "description": "Lagrangian relaxation objective for path 1",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_2_LR",
+      "description": "Lagrangian relaxation objective for path 2",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0013",
+      "description": "Initial load at first station equals boarding passengers",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "Sta",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "n_1",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "Sta",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "b_1",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "Sta",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize average waiting time per passenger",
+    "terms": [
+      {
+        "ref": "AWT",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -27,10 +27,12 @@
 %@ obj sense=max name=objective combination=sum :: Maximize operator profit while maintaining epsilon level of passenger satisfaction
 
 % k: classified as parameter during review
-%@ param k shape=- kind=scalar domain=- :: Length of line ℓ in kilometers
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes ell): k shape=- -> L
+%@ param k shape=L kind=scalar domain=- :: Length of line ℓ in kilometers
 
 % e: classified as parameter during review
-%@ param e shape=- kind=scalar domain=- :: Ticket price on segment s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes s): e shape=- -> S
+%@ param e shape=S kind=scalar domain=- :: Ticket price on segment s
 
 % f: classified as parameter during review
 %@ param f shape=- kind=scalar domain=- :: Train driver salary per kilometer
@@ -57,7 +59,8 @@
 %@ param VOT shape=- kind=scalar domain=- :: Value of time
 
 % n: classified as parameter during review
-%@ param n shape=- kind=scalar domain=- :: Number of passengers in group i at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,t): n shape=- -> I,T
+%@ param n shape=I,T kind=scalar domain=- :: Number of passengers in group i at time t
 
 % unusable as an identifier, rename or drop: ε
 % I: classified as index during review
@@ -70,10 +73,12 @@
 %@ index P ordered=0 cyclic=0 :: Set of paths
 
 % x: classified as variable during review
-%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,t,p): x shape=- -> I,T,P
+%@ var x shape=I,T,P domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p
 
 % y: classified as variable during review
-%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p, line ℓ, train v
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): y shape=- -> I
+%@ var y shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary decision if passenger group i,t uses path p, line ℓ, train v
 
 % d: classified as variable during review
 %@ var d shape=- domain=integer role=primary drole=- lo=- hi=- :: Departure time of train v on line ℓ
@@ -85,7 +90,8 @@
 %@ param c shape=- kind=scalar domain=- :: Cycle length in minutes
 
 % z: classified as variable during review
-%@ var z shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable for cyclicity constraints
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes v,ell): z shape=- -> V,L
+%@ var z shape=V,L domain=integer role=primary drole=- lo=- hi=- :: Integer variable for cyclicity constraints
 
 % q: classified as parameter during review
 %@ param q shape=- kind=scalar domain=- :: Train capacity
@@ -97,13 +103,15 @@
 %@ param N shape=- kind=scalar domain=- :: Set of natural numbers
 
 % a: classified as parameter during review
-%@ param a shape=- kind=scalar domain=- :: Preferred arrival time of passenger group i at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,t): a shape=- -> I,T
+%@ param a shape=I,T kind=scalar domain=- :: Preferred arrival time of passenger group i at time t
 
 % b: classified as parameter during review
 %@ param b shape=- kind=scalar domain=- :: Boarding time for passenger group i, path p, line ℓ
 
 % r: classified as parameter during review
-%@ param r shape=- kind=scalar domain=- :: Riding time for passenger group i, path p, line ℓ
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): r shape=- -> I
+%@ param r shape=I kind=scalar domain=- :: Riding time for passenger group i, path p, line ℓ
 
 % unusable as an identifier, rename or drop: δ
 % unusable as an identifier, rename or drop: γ
@@ -115,7 +123,8 @@
 
 % unusable as an identifier, rename or drop: β
 % u: classified as parameter during review
-%@ param u shape=- kind=scalar domain=- :: Number of transfers for passenger group i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): u shape=- -> I
+%@ param u shape=I kind=scalar domain=- :: Number of transfers for passenger group i
 
 % h: classified as parameter during review
 %@ param h shape=- kind=scalar domain=- :: Planning horizon
@@ -169,3 +178,5 @@
 %@ param varepsilon shape=- kind=scalar domain=- :: Passenger satisfaction level
 %@ var z_v1 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 60-minute headway indicator
 %@ var z_v2 shape=L domain=binary role=indicator drole=- lo=- hi=- :: 120-minute headway indicator
+% --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---
+%@ index T ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)

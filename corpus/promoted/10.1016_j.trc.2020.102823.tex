@@ -10,7 +10,7 @@
 %@ obj sense=min name=objective combination=sum :: Minimize total cancellation cost plus weighted train travel time.
 %@ param C shape=- kind=scalar domain=- :: Cancellation cost per train.
 %@ param Z shape=- kind=scalar domain=- :: Objective function value.
-%@ param c shape=F,A kind=matrix domain=- :: Cost coefficient for arc g used by train f.
+%@ param c shape=F kind=matrix domain=- :: Cost coefficient for arc g used by train f.
 %@ var x shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train f uses arc g.
 %@ index A ordered=0 cyclic=0 :: Set of all arcs in the space-time network.
 %@ index F ordered=0 cyclic=0 :: Set of trains.
@@ -86,9 +86,6 @@
   & \sum_{f \left|\right. g \in A_{f}} \left(x_{g}^{f} + y_{g}^{f}\right) \leq 1 \forall g \in A^{\mathit{st}} \tag{eq\_0019} \\
   & \frac{\sum_{g \in A_{f}} x_{g}^{f}}{U_{2}} + \mathit{theta}_{f} \leq 1 \forall f \in F \tag{eq\_0020} \\
   & \sum_{g \in A_{f}} x_{g}^{f} + \mathit{theta}_{f} \geq 1 \forall f \in F \tag{eq\_0021} \\
-  & x_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A \tag{eq\_0022} \\
-  & y_{g}^{f} \in \left\{0 , 1\right\} \forall f \in F , \forall g \in A^{\mathit{st}} \tag{eq\_0023} \\
-  & \mathit{theta}_{f} \in \left\{0 , 1\right\} \forall f \in F \tag{eq\_0024} \\
   & R_{1}^{g} = \sum_{\left(ip , jp , tp , taup\right) \in \mathit{psi}_{g}^{a}, f \left|\right. \left(ip , jp , tp , taup\right) \in A_{f}} x_{ip , jp , tp , taup}^{f} - 1 \tag{eq\_0026\_a} \\
   & R_{2}^{i , t , k} = \sum_{tp \in \left[t , t + T_{k}^{r} + T^{r}\right)} \underset{\left(i , jp , tp , taup\right) \in \mathit{delta}_{i , tp}^{+}}{\sum} \sum_{f \left|\right. \left(i , jp , tp , taup\right) \in A_{f}} x_{i , jp , tp , taup}^{f} - 1 \tag{eq\_0026\_b} \\
   & R_{3}^{j , \mathit{tau} , k} = \sum_{taup \in \left[\mathit{tau} , \mathit{tau} + T_{k}^{r} + T^{r}\right)} \underset{\left(ip , j , tp , taup\right) \in \mathit{delta}_{j , taup}^{-}}{\sum} \sum_{f \left|\right. \left(ip , j , tp , taup\right) \in A_{f}} x_{ip , j , tp , taup}^{f} - 1 \tag{eq\_0026\_c} \\

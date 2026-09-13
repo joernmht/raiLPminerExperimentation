@@ -17,10 +17,10 @@
 %@ param p shape=i kind=vector domain=- :: processing time of operation i
 %@ param E shape=- kind=scalar domain=- :: set of arcs in graph G
 %@ index Z ordered=0 cyclic=0 :: set of integers
-%@ param b shape=i kind=vector domain=- :: successor or self for blocking/non-blocking
+%@ param b shape=- kind=vector domain=- :: successor or self for blocking/non-blocking
 %@ index l ordered=0 cyclic=0 :: occurrence index for operations
 %@ var alpha shape=- domain=non_negative role=primary drole=- lo=- hi=- :: cycle time
-%@ param M shape=i kind=vector domain=- :: machine assigned to operation i
+%@ param M shape=- kind=vector domain=- :: machine assigned to operation i
 %@ var K shape=i,j domain=binary role=primary drole=- lo=- hi=- :: binary variable for order of operations on same machine
 %@ index T ordered=0 cyclic=0 :: set of generic operations
 %@ con eq_0002 kind=linear domain=- indicator=- :: periodicity: t(i;k+1) >= t(i;k) + p_i
@@ -37,6 +37,16 @@
 %@ index ip shape=- domain=- role=index drole=- lo=- hi=-
 %@ param pb shape=- domain=- role=parameter drole=- lo=- hi=-
 \begin{align}
+  & t \left(i ; k\right) + L_{i j} \leq t \left(j ; k + H_{i j}\right) \tag{eq\_0002} \\
+  & t \left(i ; k + 1\right) \geq t \left(i ; k\right) + p_{i} . \tag{eq\_0004} \\
+  & t \left(i ; k\right) + L_{i j} \leq t \left(j ; k + H_{i j}\right) \text{for}\textrm{ }\text{all}\textrm{ } \left(i , j\right) \in E \textrm{ }\text{and}\textrm{ } k \in \mathcal{Z} . \tag{eq\_0005} \\
+  & t \left(b \cdot i , l\right) + p_{i}^{b} \leq t \left(ip , k\right) . \tag{eq\_0008} \\
+  & t \left(b \cdot i ; k\right) + p_{i}^{b} \leq t \left(i ; k + 1\right) \tag{eq\_0010} \\
   \min\quad & \mathit{alpha} \tag{eq\_0011} \\
+  & t_{ip} - t_{i} \geq p_{i} - \mathit{alpha} \cdot H_{i ip} \left(i , ip\right) \in E \tag{eq\_0012} \\
+  & t_{ip} - t_{b \left(i\right)} \geq p_{i}^{b} - \mathit{alpha} \cdot K_{b \left(i\right) ip} \cdot i , ip \in T , i \neq ip , M \cdot i = M \cdot ip \tag{eq\_0014} \\
   & K_{b_i,ip} + K_{b_{ip},i} = 1 \qquad \forall i,ip \in T,\ i \neq ip,\ M_i = M_{ip} \tag{eq\_0015} \\
+  & K_{b \left(i\right) ip} , K_{b \left(ip\right) i} \in \mathcal{Z} i , ip \in T , i \neq ip , M \cdot i = M \cdot ip . \tag{eq\_0016} \\
+  & t_{i} + L_{i j} - \mathit{alpha} \cdot H_{i j} \leq t_{j} \left(i , j\right) \in E \tag{eq\_0018} \\
+  & t_{i} + p_{i} \leq t_{i} + \mathit{alpha} \cdot i \in T . \tag{eq\_0020} \\
 \end{align}

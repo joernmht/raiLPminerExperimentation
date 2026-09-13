@@ -75,16 +75,19 @@
 %@ param M shape=- kind=big_m :: Large positive constant
 
 % t: classified as variable during review
-%@ var t shape=F,E,S domain=non_negative role=primary :: Travel and dwell time of train f on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f): t shape=F,E,S -> F
+%@ var t shape=F domain=non_negative role=primary :: Travel and dwell time of train f on arc (i,j) in scenario s
 
 % FT: classified as parameter during review
-%@ param FT shape=F,E,S kind=matrix :: Free flow travel time of train f on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f): FT shape=F,E,S -> F
+%@ param FT shape=F kind=matrix :: Free flow travel time of train f on arc (i,j) in scenario s
 
 % w: classified as parameter during review
 %@ param w shape=F,E,S kind=matrix :: Minimum or maximum dwell time of train f on arc (i,j) in scenario s
 
 % o: classified as variable during review
-%@ var o shape=F,F,E,S domain=binary role=primary :: Binary ordering variable: 1 if train f precedes f' on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o shape=F,F,E,S -> -
+%@ var o shape=- domain=binary role=primary :: Binary ordering variable: 1 if train f precedes f' on arc (i,j) in scenario s
 
 % unusable as an identifier, rename or drop: δ
 % g: classified as parameter during review
@@ -100,19 +103,24 @@
 %@ index P ordered=0 cyclic=0 :: Set of maintenance works on an arc
 
 % l: classified as variable during review
-%@ var l shape=P,F,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p precedes train f on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): l shape=P,F,E,S -> P
+%@ var l shape=P domain=binary role=primary :: Binary variable: 1 if maintenance work p precedes train f on arc (i,j) in scenario s
 
 % mh: classified as parameter during review
-%@ param mh shape=P,E kind=matrix :: Safety time interval required after/before maintenance work p on arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): mh shape=P,E -> P
+%@ param mh shape=P kind=matrix :: Safety time interval required after/before maintenance work p on arc (i,j)
 
 % MT: classified as variable during review
-%@ var MT shape=P,E,S domain=non_negative role=primary :: Duration of maintenance work p on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): MT shape=P,E,S -> P
+%@ var MT shape=P domain=non_negative role=primary :: Duration of maintenance work p on arc (i,j) in scenario s
 
 % y: classified as variable during review
-%@ var y shape=P,E,S domain=binary role=primary :: Binary variable: 1 if maintenance work p is paired with previous work on arc (i,j) in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): y shape=P,E,S -> P
+%@ var y shape=P domain=binary role=primary :: Binary variable: 1 if maintenance work p is paired with previous work on arc (i,j) in scenario s
 
 % My: classified as parameter during review
-%@ param My shape=- kind=big_m :: Large positive constant used in pairing constraints
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): My shape=- -> P
+%@ param My shape=P kind=big_m :: Large positive constant used in pairing constraints
 
 % T: classified as parameter during review
 %@ param T shape=- kind=scalar :: Time horizon
@@ -155,5 +163,7 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2017.12.010.json (deterministic fill-in list); pending human confirmation.
 %@ param D shape=f kind=scalar domain=- :: Destination node of train f
-%@ param w_max shape=f,i,j,s kind=scalar domain=- :: Maximum travel time on arc (i,j) for train f in scenario s
-%@ param w_min shape=f,i,j,s kind=scalar domain=- :: Minimum travel time on arc (i,j) for train f in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f): w_max shape=f,i,j,s -> F
+%@ param w_max shape=F kind=scalar domain=- :: Maximum travel time on arc (i,j) for train f in scenario s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f): w_min shape=f,i,j,s -> F
+%@ param w_min shape=F kind=scalar domain=- :: Minimum travel time on arc (i,j) for train f in scenario s

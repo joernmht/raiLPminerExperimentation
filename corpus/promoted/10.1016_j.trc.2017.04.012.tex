@@ -34,14 +34,11 @@
 %@ con eq_0011 kind=linear domain=- indicator=- :: Binary variable y_k^p is 0 or 1 for all passengers and paths
 %@ con eq_0012 kind=linear domain=- indicator=- :: Binary variable z_j is 0 or 1 for all stopping patterns
 \begin{align}
-  \min\quad & c \left(x\right) + d \left(y\right) + e \left(z\right) \tag{eq\_0001} \\
-  & \text{subject to} z \in \mathcal{Z} \tag{eq\_0002} \\
+  \min\quad & c \cdot x + d \cdot y + e \cdot z \tag{eq\_0001} \\
   & x \in \mathcal{X}_{z} \tag{eq\_0003} \\
-  & s . t . x \in \bar{\mathcal{X}}_{z} \tag{eq\_0006} \\
+  & x \in \bar{\mathcal{X}}_{z} \tag{eq\_0006} \\
   & \sum_{j \in \mathcal{J}_{t}} z_{j} = 1 \forall t \in \mathcal{T} \tag{eq\_0007} \\
   & \sum_{k \in K^{p}} y_{k}^{p} = 1 \forall p \in \mathcal{P} \tag{eq\_0008} \\
   & \sum_{k \in K^{p} \cap L^{j}} y_{k}^{p} + z_{j} \leq 1 \forall p \in \mathcal{P} , \text{and} \forall j \in \mathcal{J} \tag{eq\_0009} \\
   & \sum_{p \in \mathcal{P}, k \in K_{t}^{p}} y_{k}^{p} \leq \sum_{g \in \mathcal{G}_{t}} x_{t , g} \cdot \mathit{Cap}_{g} \forall t \in \mathcal{T} \tag{eq\_0010} \\
-  & y_{k}^{p} \in \left\{0 , 1\right\} \forall p \in \mathcal{P} \text{and} \forall k \in K^{p} \tag{eq\_0011} \\
-  & z_{j} \in \left\{0 , 1\right\} \forall j \in \mathcal{J} \tag{eq\_0012} \\
 \end{align}

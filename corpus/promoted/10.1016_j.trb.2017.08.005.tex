@@ -17,11 +17,11 @@
 %@ index T ordered=1 cyclic=0 :: Planning time horizon
 %@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train f of period-type w from section (i,j)
 %@ var G shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total travel time)
-%@ param c shape=A kind=vector domain=- :: Cost (travel time) of arc a
+%@ param c shape=- kind=vector domain=- :: Cost (travel time) of arc a
 %@ index A ordered=0 cyclic=0 :: Set of all arcs in the directed graph
 %@ index W ordered=0 cyclic=0 :: Set of period-types
 %@ index R ordered=0 cyclic=0 :: Set of origin nodes for a period-type
-%@ param F shape=E,W kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
+%@ param F shape=- kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
 %@ index S ordered=0 cyclic=0 :: Set of stations
 %@ index D ordered=0 cyclic=0 :: Set of departure arcs
 %@ index J ordered=0 cyclic=0 :: Set of junction stations
@@ -66,7 +66,7 @@
   & a_{w , f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot x_{w , f} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; \left(i , j\right) \in E_{w} \tag{eq\_0001} \\
   & d_{w , f} \left(i , j\right) = \sum_{t = 1}^{T} t \cdot x_{w , f} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; \left(i , j\right) , \left(j , ip\right) \in E_{w} \tag{eq\_0002} \\
   & T_{w} = \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(u_{r_{w} , j}^{t} , v_{r_{w} , j}^{t}\right) , \forall w ; \left(r_{w} , j\right) \in E_{w} \tag{eq\_0003} \\
-  \min\quad & \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{a \in A_{w}} x_{w , f} \left(a\right) \cdot c \left(a\right) \tag{eq\_0004} \\
+  \min\quad & \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{a \in A_{w}} x_{w , f} a \cdot c a \tag{eq\_0004} \\
   & \sum_{t = 1}^{T} t \cdot x_{w , f + 2} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) + \sum_{t = 1}^{T} t \cdot x_{w , f} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) = 2 \cdot \sum_{t = 1}^{T} t \cdot x_{w , f + 1} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} - 2 ; \left(i , j\right) \in E_{w} \tag{eq\_0005} \\
   & \sum_{t = 1}^{T} t \cdot x_{w , f + 2} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) + \sum_{t = 1}^{T} t \cdot x_{w , f} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) = 2 \cdot \sum_{t = 1}^{T} t \cdot x_{w , f + 1} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} - 2 ; \left(i , j\right) , \left(j , ip\right) \in E_{w} \tag{eq\_0006} \\
   & \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(u_{i , j}^{t} , v_{i , j}^{t}\right) = \sum_{t = 1}^{T} t \cdot x_{w , 2} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) - \sum_{t = 1}^{T} t \cdot x_{w , 1} \left(v_{i , j}^{t} , u_{j , ip}^{t}\right) , \forall w ; \left(i , j\right) , \left(j , ip\right) \in E_{w} \tag{eq\_0007} \\
@@ -79,10 +79,10 @@
   & \sum_{\mathit{tau} = t}^{t + D T_{i , j} - 1} \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , ip\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , ip}^{\mathit{tau}}\right) \leq 1 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0014} \\
   & \sum_{\mathit{tau} = t}^{t + H_{j} - 1} \sum_{\left(i , j\right) \in \left({E}\right)_{j}, w = 1} ^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) , \left(j , ip\right) \in E_{w}} x_{w , f} \left(v_{i , j}^{\mathit{tau}} , u_{j , ip}^{\mathit{tau}}\right) \leq 1 , \forall j \in J \cdot S ; t = 1 , 2 , \hdots T \tag{eq\_0015} \\
   & \sum_{w = 1}^{W} \sum_{f = 1}^{m_{w}} \sum_{\left(i , j\right) \in E_{w}} x_{w , f} \left(u_{i , j}^{t} , u_{i , j}^{t + 1}\right) \leq \mathit{cap}_{i} , \forall i \in S ; t = 1 , 2 , \hdots T - 1 \tag{eq\_0016} \\
-  & \sum_{n \in N_{w}^{r}, a \in A_hat \left(n\right)} x_{w , f} \left(a\right) = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0017} \\
-  & \sum_{a \in A_hat \left(n\right)} x_{w , f} \left(a\right) = \sum_{a \in {A} \left(n\right)} x_{w , f} \left(a\right) , \forall w ; f = 1 , 2 , \hdots , m_{w} ; n \in N_{w} / \left(N_{w}^{r} \cup N_{w}^{s}\right) \tag{eq\_0018} \\
-  & \sum_{n \in N_{w}^{s}, a \in {A} \left(n\right)} x_{w , f} \left(a\right) = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0019} \\
-  & s . t \mathit{alpha} \left(i , j , t\right) \geq 0 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0025} \\
+  & \sum_{n \in N_{w}^{r}, a \in A_hat \left(n\right)} x_{w , f} a = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0017} \\
+  & \sum_{a \in A_hat \left(n\right)} x_{w , f} a = \sum_{a \in {A} \left(n\right)} x_{w , f} a , \forall w ; f = 1 , 2 , \hdots , m_{w} ; n \in N_{w} / \left(N_{w}^{r} \cup N_{w}^{s}\right) \tag{eq\_0018} \\
+  & \sum_{n \in N_{w}^{s}, a \in {A} \left(n\right)} x_{w , f} a = 1 , \forall w ; f = 1 , 2 , \hdots , m_{w} \tag{eq\_0019} \\
+  & \mathit{alpha} \left(i , j , t\right) \geq 0 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0025} \\
   & \mathit{beta} \left(i , j , t\right) \geq 0 , \forall \left(i , j\right) \in E ; t = 1 , 2 , \hdots T \tag{eq\_0026} \\
   & \mathit{beta} \mathit{gamma} \left(i , t\right) \geq 0 , \forall i \in S ; t = 1 , 2 , \hdots T - 1 \tag{eq\_0027} \\
   & \mathit{delta} \left(j , t\right) \geq 0 , \forall j \in J \cdot S ; t = 1 , 2 , \hdots T \tag{eq\_0028} \\

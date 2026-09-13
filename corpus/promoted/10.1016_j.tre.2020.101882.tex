@@ -9,7 +9,7 @@
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total itinerary cost over all OD pairs and itineraries
 %@ var t shape=n,s domain=continuous role=primary :: Scheduled time of train at station (arrival/departure)
-%@ var Delta shape=n,R domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
+%@ var Delta shape=- domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
 %@ param D shape=R kind=vector :: Demand for OD pair R
 %@ var F shape=- domain=continuous role=primary :: Objective function value (total itinerary cost)
 %@ index I ordered=0 cyclic=0 :: Set of itineraries for OD pair R
@@ -22,9 +22,9 @@
 %@ param h shape=- kind=scalar :: Minimum headway between trains
 %@ index n ordered=0 cyclic=0 :: Train index
 %@ index s ordered=0 cyclic=0 :: Station index
-%@ param stopping shape=n,s kind=matrix :: Indicator if train stops at station
+%@ param stopping shape=- kind=matrix :: Indicator if train stops at station
 %@ index train ordered=0 cyclic=0 :: Train index (same as n)
-%@ param non shape=n,s kind=matrix :: Indicator for non-stopping train
+%@ param non shape=- kind=matrix :: Indicator for non-stopping train
 %@ index P ordered=0 cyclic=0 :: Set of platforms
 %@ var x shape=R,I domain=continuous role=primary :: Itinerary time components (wait, walk, etc.)
 %@ con eq_0018 kind=linear :: Connects schedule differences with scheduled and ideal times for OD pair and train
@@ -56,7 +56,7 @@
   & t_{n s_{n}^{t 1}}^{D} - t_{\mathit{nr}}^{I} - \mathit{Delta} \cdot t_{\mathit{nr}}^{+} + \mathit{Delta} \cdot t_{\mathit{nr}}^{-} = 0 , \tag{eq\_0018} \\
   & \mathit{Delta} \cdot t_{\mathit{nr}}^{+} \geq 0 , \tag{eq\_0019} \\
   & \mathit{Delta} \cdot t_{\mathit{nr}}^{-} \geq 0 , \tag{eq\_0020} \\
-  \min\quad & \underset{r \in \mathbf{\mathit{R}}}{\sum} \underset{i \in \mathbf{\mathit{I}}_{r}}{\sum} \mathit{Prob}_{r} \left(i\right) \cdot D_{r} \cdot u_{\mathit{ri}} , \tag{eq\_0021} \\
+  \min\quad & \underset{r \in \mathbf{\mathit{R}}}{\sum} \underset{i \in \mathbf{\mathit{I}}_{r}}{\sum} \mathit{Prob}_{r} i \cdot D_{r} \cdot u_{\mathit{ri}} , \tag{eq\_0021} \\
   & T_{l}^{d e p} \leq t_{\mathit{ns}}^{D} \leq T_{l}^{a r r} , \tag{eq\_0023} \\
   & T_{l}^{d e p} \leq t_{\mathit{ns}}^{A} \leq T_{l}^{a r r} . \tag{eq\_0024} \\
   & t_{np s}^{A} + h \leq t_{\mathit{ns}}^{A} + \left(1 - b_{np n s}\right) \cdot M , \tag{eq\_0025} \\
@@ -65,7 +65,7 @@
   & \left(b '\right)_{np n s} + \left(b '\right)_{n np s} = 1 , \tag{eq\_0028} \\
   & \left(b '\right)_{np n s} - b_{np n sp} = 0 , \tag{eq\_0029} \\
   & t_{np s}^{D} + h \leq t_{\mathit{ns}}^{A} + \left(3 - b_{\mathit{np}}^{T r} - b_{np p}^{T r} - b_{np n s}\right) \cdot M , \tag{eq\_0031} \\
-  & \left\{\begin{matrix} \sum_{p \in \mathbf{\mathit{P}}_{s}^{2}} b_{\mathit{np}}^{T r} + b_{\mathit{ns}}^{T r *} = 1 , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = b_{\mathit{ns}}^{T r *} , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = 1 , & \text{for} \text{stopping} \text{train} n \end{matrix}\right , \tag{eq\_0032} \\
+  & \left\{ \sum_{p \in \mathbf{\mathit{P}}_{s}^{2}} b_{\mathit{np}}^{T r} + b_{\mathit{ns}}^{T r *} = 1 , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = b_{\mathit{ns}}^{T r *} , & \text{for} \text{non}-\text{stopping} \text{train} n \\ \sum_{p \in \mathbf{\mathit{P}}_{s}^{1}} b_{\mathit{np}}^{T r} = 1 , & \text{for} \text{stopping} \text{train} n \right , \tag{eq\_0032} \\
   & D_{\mathit{sl}}^{m i n} \leq t_{\mathit{ns}}^{D} - t_{\mathit{ns}}^{A} . \tag{eq\_0033} \\
   & 0 \leq t_{\mathit{ns}}^{D} - t_{\mathit{ns}}^{A} . \tag{eq\_0034} \\
   & T_{\mathit{lv}}^{r u n} \leq t_{n sp}^{A} - t_{\mathit{ns}}^{D} , \tag{eq\_0035} \\

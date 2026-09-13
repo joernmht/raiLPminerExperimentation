@@ -84,11 +84,13 @@
 %@ param b shape=- kind=scalar domain=- :: Minimum time interval between departures
 
 % d: classified as parameter during review
-%@ param d shape=- kind=scalar domain=- :: Minimum time between consecutive departures
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): d shape=- -> S
+%@ param d shape=S kind=scalar domain=- :: Minimum time between consecutive departures
 
 % unusable as an identifier, rename or drop: Δ
 % c: classified as parameter during review
-%@ param c shape=- kind=scalar domain=- :: Travel time constant
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): c shape=- -> S
+%@ param c shape=S kind=scalar domain=- :: Travel time constant
 
 % q: classified as parameter during review
 %@ param q shape=- kind=scalar domain=- :: Number of time instants
@@ -128,8 +130,10 @@
 %@ index delta_plus ordered=0 cyclic=0 :: Set of arcs leaving a node in the train-specific network
 %@ param Delta shape=- kind=scalar domain=- :: Time difference between two nodes
 %@ param alpha shape=- kind=scalar domain=- :: Auxiliary parameter for station capacity
-%@ param b_jk shape=- kind=scalar domain=- :: Minimum headway time between trains j and k at station i
-%@ param b_kj shape=- kind=scalar domain=- :: Minimum headway time between trains k and j at station i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): b_jk shape=- -> S
+%@ param b_jk shape=S kind=scalar domain=- :: Minimum headway time between trains j and k at station i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): b_kj shape=- -> S
+%@ param b_kj shape=S kind=scalar domain=- :: Minimum headway time between trains k and j at station i
 %@ param beta shape=- kind=scalar domain=- :: Cumulative arrival count parameter
 %@ param lambda_ip shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time p
 %@ param lambda_it shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time t

@@ -44,7 +44,8 @@
 %@ param M shape=- kind=big_m domain=- :: Large number, set to train capacity
 %
 % y: classified as variable during review
-%@ var y shape=K,L,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,l): y shape=K,L,E -> K,L
+%@ var y shape=K,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
 %
 % T: classified as index during review
 %@ index T ordered=0 cyclic=0 :: Set of time periods

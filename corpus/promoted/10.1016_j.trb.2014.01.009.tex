@@ -10,7 +10,7 @@
 %@ obj sense=min name=objective combination=sum :: Minimize delays, rescheduling costs, and cancellation costs across the considered recovery models.
 %@ var t shape=- domain=continuous role=primary drole=- lo=- hi=- :: Starting time of operation i.
 %@ index F ordered=0 cyclic=0 :: Set of fixed arcs in alternative graph.
-%@ param f shape=- kind=scalar domain=- :: Processing time of operation i or setup time between conflicting operations i and j.
+%@ param f shape=T kind=scalar domain=- :: Processing time of operation i or setup time between conflicting operations i and j.
 %@ index A ordered=0 cyclic=0 :: Set of alternative arcs in alternative graph.
 %@ index h ordered=0 cyclic=0 :: Successor operation of operation j in a pair of conflicting operations.
 %@ index k ordered=0 cyclic=0 :: Index for operations, completions, or train unit types.
@@ -19,14 +19,14 @@
 %@ param Mx shape=- kind=scalar domain=- :: Product of M and binary variable x used in linearization.
 %@ index R ordered=0 cyclic=0 :: Set of trips.
 %@ index C ordered=0 cyclic=0 :: Set of compositions.
-%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating that composition c is changed to composition c' at the end of trip r.
-%@ param I shape=- kind=scalar domain=- :: Initial inventory of train unit type m in station s.
+%@ var z shape=R,C,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating that composition c is changed to composition c' at the end of trip r.
+%@ param I shape=S,M kind=scalar domain=- :: Initial inventory of train unit type m in station s.
 %@ index S ordered=0 cyclic=0 :: Set of stations.
 %@ param a shape=- kind=scalar domain=- :: Coefficient indicating task coverage or inventory change.
 %@ index m ordered=0 cyclic=0 :: Train unit type.
 %@ index s ordered=0 cyclic=0 :: Station.
 %@ var d shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Non-negative off-balance of train unit type m in station s at the end of the day.
-%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether task i is canceled (1) or covered (0).
+%@ var y shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether task i is canceled (1) or covered (0).
 %@ index D ordered=0 cyclic=0 :: Set of crew members.
 %@ index K ordered=0 cyclic=0 :: Set of possible completions for crew member j.
 %@ index T ordered=0 cyclic=0 :: Set of tasks.
@@ -49,7 +49,7 @@
 %@ param fty shape=- kind=scalar domain=- :: Fixed cost or penalty parameter associated with crew duty assignment (fty).
 %@ param I_0 shape=S,m kind=scalar domain=- :: Initial inventory of train units of type m at station s.
 %@ param Mx_jk shape=- kind=scalar domain=- :: Big-M constant for disjunctive constraint indexed by pair (j,k).
-%@ param a_ij shape=T,D,K kind=scalar domain=- :: Coefficient of crew assignment variable x_{j,k} in task coverage constraint for task i.
+%@ param a_ij shape=K kind=scalar domain=- :: Coefficient of crew assignment variable x_{j,k} in task coverage constraint for task i.
 %@ param d_minus shape=S,m kind=scalar domain=- :: Downward deviation (decrease) in train unit inventory at station s for type m.
 %@ param d_plus shape=S,m kind=scalar domain=- :: Upward deviation (increase) in train unit inventory at station s for type m.
 %@ param f_hk shape=- kind=scalar domain=- :: Minimum headway or processing time between operations h and k.
@@ -57,22 +57,20 @@
 %@ param sigma shape=- kind=scalar domain=- :: Successor function mapping an operation to its successor in the fixed arc set.
 %@ param x_0 shape=R,C kind=scalar domain=- :: Initial (nominal) assignment of train units to trips and compositions.
 %@ var x_jk shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable for crew assignment or disjunctive arc selection indexed by pair (j,k).
+%@ index M ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)
 \begin{align}
-  & subject to t_{\mathit{sigma} \left(i\right)} \geq t_{i} + f_{i} \left(i , \mathit{sigma} \left(i\right)\right) \in F \tag{eq\_0002} \\
+  & t_{\mathit{sigma} \left(i\right)} \geq t_{i} + f_{i} \left(i , \mathit{sigma} i\right) \in F \tag{eq\_0002} \\
   & \left(t_{k} \geq t_{h} + f_{\mathit{hk}}\right) \vee \left(t_{j} \geq t_{i} + f_{\mathit{ij}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0003} \\
   & t_{k} \geq t_{h} + f_{\mathit{hk}} - M \left(1 - x_{\mathit{jk}}\right) \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0004} \\
   & t_{j} \geq t_{i} + f_{\mathit{ij}} - \mathit{Mx}_{\mathit{jk}} \left(\left(i , j\right) , \left(h , k\right)\right) \in A \tag{eq\_0005} \\
-  & subject to \sum_{c \in C} x_{r , c} = 1 r \in R \tag{eq\_0007} \\
+  & \sum_{c \in C} x_{r , c} = 1 r \in R \tag{eq\_0007} \\
   & x_{r , c} = \sum_{cp \in C} z_{r , c , cp} r \in \mathcal{R} , c \in C \tag{eq\_0008} \\
   & x_{rp , cp} = \sum_{c \in C} z_{r , c , cp} \left(r , rp\right) \in \mathcal{R} , cp \in C \tag{eq\_0009} \\
   & I_{s , m}^{0} + \sum_{rp \in R_{s , r}, c \in C} a_{s , rp , c , m} \cdot x_{rp , c} \geq 0 \cdot s \in S , r \in R , m \in M \tag{eq\_0010} \\
   & I_{s , m}^{0} + \sum_{r \in R, c \in C} a_{s , r , c , m} \cdot x_{r , c} = i_{s , m}^{\infty} s \in S , m \in M \tag{eq\_0011} \\
   & i_{s , m}^{\infty} = I_{s , m}^{\infty} + d_{s , m}^{+} - d_{s , m}^{-} \cdot s \in S , m \in M \tag{eq\_0012} \\
   & x_{r , c} = x_{r , c}^{0} r \in R_{\mathit{tau}} , c \in C \tag{eq\_0013} \\
-  & x_{r , c} \in \left\{0 , 1\right\} r \in R , c \in C \tag{eq\_0014} \\
   \min\quad & \sum_{j \in D, k \in K_{j}} c_{j}^{k} x_{j}^{k} + \sum_{i \in T} f_{i} \cdot y_{i} \tag{eq\_0015} \\
-  & subject to \sum_{j \in D, k \in K_{j}} a_{\mathit{ij}}^{k} \cdot x_{j}^{k} + y_{i} \geq 1 , \forall i \in T \tag{eq\_0016} \\
+  & \sum_{j \in D, k \in K_{j}} a_{\mathit{ij}}^{k} \cdot x_{j}^{k} + y_{i} \geq 1 , \forall i \in T \tag{eq\_0016} \\
   & \sum_{k \in K_{j}} x_{j}^{k} = 1 \forall j \in D \tag{eq\_0017} \\
-  & x_{j}^{k} \in \left\{0 , 1\right\} \forall j \in D \forall k \in K_{j} \tag{eq\_0018} \\
-  & y_{i} \in \left\{0 , 1\right\} \forall i \in T \tag{eq\_0019} \\
 \end{align}

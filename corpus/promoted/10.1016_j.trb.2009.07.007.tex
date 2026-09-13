@@ -8,7 +8,7 @@
 %@ prov author :: Valentina Cacchiani; Alberto Caprara; Paolo Toth
 %@ prov date :: 2026-06-21
 %@ obj sense=max name=objective combination=sum :: Maximize total profit of assigning extra freight trains to routes
-%@ param p shape=T,R kind=matrix :: Profit of assigning train j to route r
+%@ param p shape=- kind=matrix :: Profit of assigning train j to route r
 %@ var x shape=T,R domain=binary role=primary :: Binary variable indicating if train j uses route r
 %@ index R ordered=0 cyclic=0 :: Set of routes for train j
 %@ index T ordered=0 cyclic=0 :: Set of trains
@@ -45,7 +45,4 @@
 \begin{align}
   \max\quad & \sum_{j \in \mathcal{T}_{2}, r \in \mathcal{R}^{j}} p \cdot x_{j,r} \tag{eq\_0006} \\
   & \sum_{r \in \mathit{delta}_{j,\mathit{sigma}}^{+}} x_{j,r} = 1 \qquad \forall j \in T_{\mathit{one}} \tag{eq\_0008} \\
-  & \sum_{r \in \mathit{delta}_{j,v}^{-}} x_{j,r} = \sum_{r \in \mathit{delta}_{j,v}^{+}} x_{j,r} \qquad \forall j \in T, v \in V^{j} \setminus \mathit{ST} \tag{eq\_0009} \\
-  & z_{j,v} = \sum_{r \in \mathit{delta}_{j,v}^{-}} x_{j,r} \qquad \forall j \in T, v \in V^{j} \setminus \mathit{ST} \tag{eq\_0010} \\
-  & y_{v} = \sum_{j \in T : v \in V^{j}} z_{j,v} \qquad \forall v \in V \setminus \mathit{ST} \tag{eq\_0011} \\
 \end{align}

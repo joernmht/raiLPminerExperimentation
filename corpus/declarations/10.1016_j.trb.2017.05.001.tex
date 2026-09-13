@@ -15,7 +15,8 @@
 %@ index t ordered=0 cyclic=0 :: Time argument in Arr/Dep functions; also subscript in last-train departure time t_l^R.
 
 % Arr: classified as parameter during review
-%@ param Arr shape=- kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,l): Arr shape=- -> S,L
+%@ param Arr shape=S,L kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
 
 % L: classified as index during review
 %@ index L ordered=0 cyclic=0 :: Set of subway lines, L = {1,...,ϒ}.
@@ -36,7 +37,8 @@
 %@ param Dep shape=- kind=scalar :: Departure time of the last train from station k on line l, Dep_k^l(t_l^R), Eq. (2).
 
 % Tra: classified as parameter during review
-%@ param Tra shape=- kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): Tra shape=- -> S
+%@ param Tra shape=S kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
 
 % p: classified as index during review
 %@ index p ordered=0 cyclic=0 :: Passenger demand coefficient p_{ll'k} (number of transferring passengers).
@@ -45,7 +47,8 @@
 %@ index w ordered=0 cyclic=0 :: Minimum connection time w_{ll'k} for last-train transfer passengers.
 
 % H: classified as parameter during review
-%@ param H shape=- kind=scalar :: Headway of trains on line l' during last-train service period.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes lp): H shape=- -> L
+%@ param H shape=L kind=scalar :: Headway of trains on line l' during last-train service period.
 
 % M: classified as parameter during review
 %@ param M shape=- kind=big_m :: Big positive penalty for unsuccessful connection.

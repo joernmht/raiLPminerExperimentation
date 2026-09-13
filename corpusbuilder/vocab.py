@@ -158,6 +158,63 @@ class Use:
     arity: int
     role: str  # "coefficient" | "symbol"
     unresolved_script: str | None = None
+    #: The subscript's index letters, offsets stripped (``i + 1`` -> ``i``).
+    pieces: tuple[str, ...] = ()
+
+
+_LETTER_FAMILY_RE = re.compile(
+    r"(\\mathit\{[^{}]*\}|[A-Za-z]\w*)\s*\\in\s*"
+    r"(?:\\mathcal\{([A-Za-z]\w*)\}|\\mathit\{([A-Za-z]\w*)\}|([A-Za-z][A-Za-z0-9]*(?:_(?!\{)[A-Za-z0-9]+)*))"
+)
+
+
+def _sub_pieces(sub: str | None) -> tuple[str, ...]:
+    if not sub or not sub.startswith("{"):
+        return (sub,) if sub else ()
+    out: list[str] = []
+    for piece in _split_top_commas_str(sub[1:-1]):
+        q = piece.strip()
+        m = re.fullmatch(r"(\\mathit\{[^{}]*\}|[A-Za-z]\w*)\s*[+-]\s*\d+", q)
+        if m:
+            q = m.group(1)
+        if re.fullmatch(r"[A-Za-z](?:\s+[A-Za-z])+", q):
+            out.extend(q.split())
+        else:
+            out.append(_plain(q))
+    return tuple(out)
+
+
+def _split_top_commas_str(inner: str) -> list[str]:
+    out: list[str] = []
+    depth = 0
+    cur: list[str] = []
+    for ch in inner:
+        if ch in "{(":
+            depth += 1
+        elif ch in "})":
+            depth -= 1
+        if ch == "," and depth == 0:
+            out.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+    out.append("".join(cur))
+    return out
+
+
+def doc_with_sidecar(promoted_text: str, sidecar_text: str) -> str:
+    """The assembled document with its header replaced by the CURRENT sidecar
+    (promote embeds the sidecar at assembly time; a later edit of the sidecar
+    must be what the audit sees)."""
+    body_at = promoted_text.find("\\begin{align}")
+    head, body = (
+        (promoted_text[:body_at], promoted_text[body_at:]) if body_at >= 0 else ("", promoted_text)
+    )
+    kept = [
+        ln for ln in head.splitlines() if not re.match(r"\s*%@\s*(index|param|var|obj|con)\b", ln)
+    ]
+    decl = [ln for ln in sidecar_text.splitlines() if ln.strip().startswith("%@")]
+    return "\n".join(kept + decl) + "\n" + body
 
 
 def _rows(body: str) -> list[tuple[str, str]]:
@@ -216,6 +273,7 @@ def scan_document(text: str) -> dict:
                     arity=_arity(m.group(2)),
                     role=role,
                     unresolved_script=("^" + m.group(3)) if m.group(3) else None,
+                    pieces=_sub_pieces(m.group(2)),
                 )
             )
 
@@ -268,7 +326,13 @@ def scan_document(text: str) -> dict:
 
     unused = sorted((set(declared.params) | set(declared.variables)) - used_names)
     missing_index = sorted(f for f in families if f not in declared.indices)
+    letter_families: dict[str, set[str]] = {}
+    for m in _LETTER_FAMILY_RE.finditer(body):
+        fam = m.group(2) or m.group(3) or m.group(4)
+        letter_families.setdefault(_plain(m.group(1)), set()).add(fam)
+    shape_fixes = shape_repairs(uses, declared, letter_families)
     return {
+        "shape_fixes": shape_fixes,
         "rewrite_rules_version": REWRITE_RULES_VERSION,
         "declared": {
             "index": sorted(declared.indices),
@@ -285,6 +349,95 @@ def scan_document(text: str) -> dict:
         "declared_unused": unused,
         "family_as_symbol": dict(sorted(family_as_symbol.items())),
     }
+
+
+def shape_repairs(
+    uses: list[Use], declared: Declared, letter_families: dict[str, set[str]]
+) -> list[dict]:
+    """Shapes the formulas decide: a declared param/var whose EVERY written
+    use carries the same index letters, each bound to exactly one family in
+    the document, gets that family tuple as its shape. Mixed arities, unbound
+    letters or a letter with two families leave the declaration alone."""
+    by_name: dict[str, set[tuple[str, ...]]] = {}
+    for u in uses:
+        if u.name in declared.params or u.name in declared.variables:
+            by_name.setdefault(u.name, set()).add(u.pieces)
+    fixes: list[dict] = []
+    for name, spellings in sorted(by_name.items()):
+        if len(spellings) != 1:
+            continue
+        (pieces,) = spellings
+        declared_arity = (
+            declared.params.get(name) if name in declared.params else declared.variables.get(name)
+        )
+        if len(pieces) == (declared_arity or 0):
+            continue
+        fams: list[str] = []
+        for letter in pieces:
+            options = letter_families.get(letter, set())
+            if len(options) != 1:
+                break
+            fams.append(next(iter(options)))
+        else:
+            fixes.append(
+                {
+                    "name": name,
+                    "kind": "param" if name in declared.params else "var",
+                    "declared": declared_arity,
+                    "written": list(pieces),
+                    "shape": fams,
+                    "new_index": [f for f in fams if f not in declared.indices],
+                }
+            )
+    return fixes
+
+
+def apply_shape_fixes(sidecar_path: Path, fixes: list[dict]) -> int:
+    """Rewrite the sidecar's ``shape=`` values in place, each change announced
+    by a comment line; families the formulas bind but the sidecar never
+    declared are added. Returns the number of lines changed."""
+    if not fixes:
+        return 0
+    text = sidecar_path.read_text(encoding="utf-8")
+    lines = text.splitlines()
+    out: list[str] = []
+    changed = 0
+    by_name = {f["name"]: f for f in fixes}
+    for ln in lines:
+        m = re.match(r"^(\s*%@\s*(?:param|var)\s+)([A-Za-z_]\w*)(\s.*)$", ln)
+        if m and m.group(2) in by_name and re.search(r"\bshape=\S+", m.group(3)):
+            fix = by_name[m.group(2)]
+            new_shape = ",".join(fix["shape"]) if fix["shape"] else "-"
+            old = re.search(r"\bshape=(\S+)", m.group(3)).group(1)
+            out.append(
+                f"% shape fixed by corpusbuilder.vocab (deterministic: every use writes "
+                f"{','.join(fix['written']) or 'no index'}): {fix['name']} shape={old} -> {new_shape}"
+            )
+            out.append(
+                m.group(1)
+                + m.group(2)
+                + re.sub(r"\bshape=\S+", f"shape={new_shape}", m.group(3), count=1)
+            )
+            changed += 1
+        else:
+            out.append(ln)
+    added: list[str] = []
+    seen: set[str] = set()
+    for fix in fixes:
+        for fam in fix["new_index"]:
+            if fam not in seen:
+                seen.add(fam)
+                added.append(
+                    f"%@ index {fam} ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)"
+                )
+    if added:
+        out.append(
+            "% --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---"
+        )
+        out.extend(added)
+    if changed or added:
+        sidecar_path.write_text("\n".join(out) + "\n", encoding="utf-8", newline="\n")
+    return changed + len(added)
 
 
 def suggestion_block(key: str, audit: dict) -> str:
@@ -333,9 +486,13 @@ def check_all(
     out_dir: Path = VOCAB_DIR,
     only: set[str] | None = None,
     write: bool = True,
+    fix_shapes: bool = False,
     progress=None,
 ) -> dict:
-    """Audit every assembled candidate document; return the corpus report."""
+    """Audit every assembled candidate document; return the corpus report.
+
+    ``fix_shapes`` applies :func:`shape_repairs` to the sidecars in place.
+    """
     docs = sorted(p for p in promoted_dir.glob("*.tex") if not p.name.endswith(".stub.tex"))
     keys = [p.stem for p in docs if not only or p.stem in only]
     papers: dict[str, dict] = {}
@@ -343,9 +500,14 @@ def check_all(
         if progress is not None:
             progress(i, len(keys), key)
         text = (promoted_dir / f"{key}.tex").read_text(encoding="utf-8")
+        sidecar_path = declarations_dir / f"{key}.tex"
+        if sidecar_path.exists():
+            text = doc_with_sidecar(text, sidecar_path.read_text(encoding="utf-8"))
         audit = scan_document(text)
         audit["paper_key"] = key
-        audit["sidecar"] = (declarations_dir / f"{key}.tex").exists()
+        audit["sidecar"] = sidecar_path.exists()
+        if fix_shapes and write and audit["sidecar"] and audit["shape_fixes"]:
+            audit["shape_fixes_applied"] = apply_shape_fixes(sidecar_path, audit["shape_fixes"])
         papers[key] = audit
         if write:
             out_dir.mkdir(parents=True, exist_ok=True)
@@ -380,6 +542,8 @@ def build_report(papers: dict[str, dict]) -> dict:
         "shape_mismatch_papers": sum(1 for a in papers.values() if a["shape_mismatch"]),
         "unresolved_script_papers": sum(1 for a in papers.values() if a["unresolved_script"]),
         "missing_index_papers": sum(1 for a in papers.values() if a["missing_index"]),
+        "shape_fix_candidates": sum(len(a.get("shape_fixes", [])) for a in papers.values()),
+        "shape_fixes_applied": sum(a.get("shape_fixes_applied", 0) for a in papers.values()),
         "most_common_missing": names.most_common(20),
         "per_paper": [
             {
@@ -413,6 +577,8 @@ def render_report_md(report: dict) -> str:
         f"- papers with a shape mismatch: {report['shape_mismatch_papers']}"
         f" · with an unresolved script: {report['unresolved_script_papers']}"
         f" · with an undeclared index family: {report['missing_index_papers']}",
+        f"- shapes the formulas decide: {report['shape_fix_candidates']} candidates"
+        f" · applied to sidecars this run: {report['shape_fixes_applied']}",
         "",
         "## Most common missing names",
         "",
@@ -445,6 +611,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out", type=Path, default=VOCAB_DIR, help="per-paper output dir")
     parser.add_argument("--only", action="append", default=[], metavar="PAPER_KEY")
     parser.add_argument("--dry-run", action="store_true", help="report only; write nothing")
+    parser.add_argument(
+        "--fix-shapes",
+        action="store_true",
+        help="rewrite sidecar shapes the formulas decide (every use writes the same bound "
+        "letters); each change is announced by a comment line in the sidecar",
+    )
     args = parser.parse_args(argv)
 
     from corpusbuilder import factory
@@ -456,6 +628,7 @@ def main(argv: list[str] | None = None) -> int:
             out_dir=args.out,
             only=set(args.only) or None,
             write=not args.dry_run,
+            fix_shapes=args.fix_shapes,
             progress=lambda done, total, key: beat(done=done, total=total, note=key),
         )
     if not args.dry_run:

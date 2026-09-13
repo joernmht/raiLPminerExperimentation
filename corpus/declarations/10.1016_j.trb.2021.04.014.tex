@@ -42,7 +42,8 @@
 %@ index i ordered=0 cyclic=0 :: Index for trains
 
 % s: classified as parameter during review
-%@ param s shape=I,J kind=matrix domain=- :: Dwelling time of train i at station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s shape=I,J -> -
+%@ param s shape=- kind=matrix domain=- :: Dwelling time of train i at station j
 
 % x: classified as variable during review
 %@ var x shape=I,J domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train i stops at station j
@@ -75,7 +76,8 @@
 %@ var c shape=I,J domain=non_negative role=primary drole=- lo=- hi=- :: Available capacity of train i when leaving station j
 
 % g: classified as parameter during review
-%@ param g shape=K kind=vector domain=- :: Number of passengers in group k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): g shape=K -> -
+%@ param g shape=- kind=vector domain=- :: Number of passengers in group k
 
 % C: classified as parameter during review
 %@ param C shape=- kind=scalar domain=- :: Train capacity

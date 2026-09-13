@@ -1,0 +1,437 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2016.11.007",
+  "name": "Optimizing train operational plan in an urban rail corridor based on the maximum headway function",
+  "family": "milp",
+  "description": "Mined from Optimizing train operational plan in an urban rail corridor based on the maximum headway function (Transportation Research Part C Emerging Technologies, 2016).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2016.11.007",
+    "reference": "Optimizing train operational plan in an urban rail corridor based on the maximum headway function",
+    "author": "Feng Shi; Shuo Zhao; Zhou Zhao; Pu Wang; Michael G.H. Bell",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "s",
+      "description": "Station index in the set S.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations on the corridor.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Index for down-direction train trips.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Index for up-direction train trips.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "I",
+      "description": "index set for i from 1 to n",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "J",
+      "description": "index set for j from 1 to n",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "I_after",
+      "description": "index set for i from C^B+1 to n",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "F",
+      "description": "Maximum headway function for direction D or U.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Time variable for capacity constraints.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "n",
+      "description": "Number of train trips in each direction.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C",
+      "description": "Parking capacity at terminal (C^A or C^B).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "constraints",
+      "description": "Set of constraints (7)-(16) in model M1.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M_hat",
+      "description": "Set of feasible train-trip pair connections at terminal with yard.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Assignment of up-direction to down-direction train trips.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "trains",
+      "description": "Unit for capacity C^B.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau",
+      "description": "headway parameter",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C_A",
+      "description": "Maximum number of trains that can be simultaneously in service on the corridor.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C_B",
+      "description": "Number of trains based at the terminal with a yard.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "F_D",
+      "description": "Maximum headway function for down-direction departures.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "F_U",
+      "description": "Maximum headway function for up-direction departures.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "sigma",
+      "description": "Binary indicator whether a train stops at station s_k.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_D",
+      "description": "Down-direction departure time window bounds (L = latest start, E = earliest end).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_U",
+      "description": "Up-direction departure time window bounds (L = latest start, E = earliest end).",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_A",
+      "description": "Minimum turnaround time at the terminal without a yard.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_B",
+      "description": "Minimum turnaround time at the terminal with a yard.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_min",
+      "description": "Minimum required headway between consecutive train trips.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "description": "Departure time of down-direction train trip i.",
+      "shape": [
+        "i"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Departure time of up-direction train trip j.",
+      "shape": [
+        "j"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "Objective value representing total number of train trips.",
+      "shape": [],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Number of trains parking at terminal s_A at time t.",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0004",
+      "description": "Definition of maximum headway function F_D(x_i) during off-peak hours.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "i",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "i",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "F_D",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "tau_min",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Latest acceptable departure time of the first up-direction train trip.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "i",
+              "expr": "i + 1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "i",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "tau_min",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0012",
+      "description": "Earliest acceptable departure time of the last down-direction train trip.",
+      "quantifiers": [
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "j",
+              "expr": "j + 1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "j",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "tau_min",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize the number of train trips 2n in the train departure profile model (M1).",
+    "terms": [
+      {
+        "ref": "n",
+        "ref_kind": "parameter",
+        "bindings": [],
+        "coefficient": 2.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -39,7 +39,8 @@
 %@ index A ordered=0 cyclic=0 :: Set of space-time arcs in the network
 
 % x: classified as variable during review
-%@ var x shape=K,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): x shape=K,A -> -
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable equal to 1 if train k uses space-time arc a (macro or micro)
 
 % K: classified as index during review
 %@ index K ordered=0 cyclic=0 :: Set of trains
@@ -59,7 +60,8 @@
 % unusable as an identifier, rename or drop: Ψ
 
 % d: classified as variable during review
-%@ var d shape=K,I,J,T domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): d shape=K,I,J,T -> -
+%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Departure resource occupation variable; equal to 1 if departure headway resource is occupied
 
 % G: classified as index during review
 %@ index G ordered=0 cyclic=0 :: Coupling set between macro and micro nodes
@@ -68,7 +70,8 @@
 %@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total cost)
 
 % c: classified as parameter during review
-%@ param c shape=K,A kind=matrix domain=- :: Cost of using space-time arc a by train k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): c shape=K,A -> -
+%@ param c shape=- kind=matrix domain=- :: Cost of using space-time arc a by train k
 
 % Bound by a quantifier or big operator, so no declaration of their own: a, k, τ
 % (If one of these is really an index family, add a %@ index line for it.)

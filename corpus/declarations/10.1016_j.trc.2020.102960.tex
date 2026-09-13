@@ -60,7 +60,8 @@
 %@ param w shape=I,U kind=matrix domain=- :: Dwell time bounds for train i at station u
 
 % y: classified as variable during review
-%@ var y shape=I,U domain=binary role=primary drole=- lo=- hi=- :: Binary stopping variable indicating if train i stops at station u
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): y shape=I,U -> I
+%@ var y shape=I domain=binary role=primary drole=- lo=- hi=- :: Binary stopping variable indicating if train i stops at station u
 
 % U: classified as index during review
 %@ index U ordered=0 cyclic=0 :: Set of all stations
@@ -69,7 +70,8 @@
 %@ index a ordered=0 cyclic=0 :: Arc index
 
 % e: classified as variable during review
-%@ var e shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Total number of times arc a selected by all trains except i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): e shape=I,A -> I
+%@ var e shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Total number of times arc a selected by all trains except i
 
 % L: classified as variable during review
 %@ var L shape=I domain=continuous role=primary drole=- lo=- hi=- :: Augmented Lagrangian subproblem objective for train i
@@ -78,10 +80,12 @@
 %@ param rho shape=- kind=scalar domain=- :: Quadratic penalty parameter
 
 % vi: classified as variable during review
-%@ var vi shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual for train i and arc a
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): vi shape=I,A -> -
+%@ var vi shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual for train i and arc a
 
 % vio: classified as variable during review
-%@ var vio shape=I,A domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual (alternative notation) for train i and arc a
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): vio shape=I,A -> I
+%@ var vio shape=I domain=non_negative role=primary drole=- lo=- hi=- :: Primal residual (alternative notation) for train i and arc a
 
 %@ param gamma shape=- kind=scalar domain=- :: Threshold parameter for penalty update
 %@ param theta shape=- kind=scalar domain=- :: Increment for penalty parameter

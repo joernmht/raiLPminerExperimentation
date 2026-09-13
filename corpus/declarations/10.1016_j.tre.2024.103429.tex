@@ -27,13 +27,15 @@
 %@ obj sense=min name=objective combination=sum :: Minimize expected cost of train rescheduling across all perturbation scenarios
 
 % d: classified as parameter during review
-%@ param d shape=- kind=scalar domain=- :: Occurrence of perturbation scenario
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes omega): d shape=- -> Omega
+%@ param d shape=Omega kind=scalar domain=- :: Occurrence of perturbation scenario
 
 % f: classified as parameter during review
 %@ param f shape=- kind=scalar domain=- :: Cost function of train rescheduling under scenario
 
 % p: classified as parameter during review
-%@ param p shape=- kind=scalar domain=- :: Probability of scenario
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes omega): p shape=- -> Omega
+%@ param p shape=Omega kind=scalar domain=- :: Probability of scenario
 
 % x: classified as variable during review
 %@ var x shape=- domain=continuous role=primary drole=- lo=- hi=- :: Decision variables for train rescheduling

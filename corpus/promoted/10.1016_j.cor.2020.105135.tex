@@ -14,11 +14,13 @@
 %@ index L ordered=0 cyclic=0 :: Set of speed limitation sections
 %@ index THETA ordered=0 cyclic=0 :: Set of scenarios
 %@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted normalized positive/negative arrival delays, departure delays, and dwelling plan change penalty
-%@ param Y shape=T,S kind=matrix domain=binary :: Binary parameter indicating scheduled dwelling or virtual station
-%@ param tau shape=T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
+% declaration fixed: param Y: domain=binary -> -
+%@ param Y shape=T,S kind=matrix domain=- :: Binary parameter indicating scheduled dwelling or virtual station
+%@ param tau shape=T,T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
 %@ param omega shape=T,S kind=matrix domain=- :: Predictive disturbance for dwelling or running time (renamed from ω)
 %@ param M shape=- kind=big_m domain=- :: Large positive number for linearization
-%@ param Z shape=T,E kind=matrix domain=binary :: Binary parameter indicating train type
+% declaration fixed: param Z: domain=binary -> -
+%@ param Z shape=- kind=matrix domain=- :: Binary parameter indicating train type
 %@ param H shape=L,S kind=matrix domain=- :: Speed limitation time horizon
 %@ param Td shape=T,S kind=matrix domain=- :: Planned departure time of train i at station s
 %@ param C shape=S kind=vector domain=- :: Capacity of station s
@@ -28,7 +30,7 @@
 %@ param gamma shape=- kind=scalar domain=- :: Weight for departure delay (renamed from γ)
 %@ param delta shape=- kind=scalar domain=- :: Weight for dwelling plan change penalty (renamed from δ)
 %@ param g shape=- kind=scalar domain=- :: Function representing constraint violation
-%@ param P shape=THETA kind=vector domain=- :: Probability of scenario
+%@ param P shape=- kind=vector domain=- :: Probability of scenario
 %@ param epsilon shape=- kind=scalar domain=- :: Small positive constant for linearization (renamed from ε)
 %@ param m shape=- kind=scalar domain=- :: Lower bound for linearization
 %@ param Mu shape=- kind=scalar domain=- :: Upper bound for linearization
@@ -36,7 +38,7 @@
 %@ var u shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or order of arrival/departure
 %@ var ta shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time of train i at station s
 %@ var td shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time of train i from station s
-%@ var x shape=T,T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
 %@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
 %@ var da shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Positive or negative arrival delay
 %@ var dd shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure delay
@@ -99,9 +101,9 @@
   & \mathit{dd}_{i , s} = \left(\mathit{td}_{i , s} - \mathit{Td}_{i , s}\right) Y_{i , s}^{1} , s \in S_{i} , i \in T . \tag{eq\_0024} \\
   & J_{4} = \sum_{i, s \in S_{i}} u_{i , s}^{d} . \tag{eq\_0025} \\
   \min\quad & \mathit{alpha} \frac{J_{1} - J_{1 , min}}{J_{1 , max} - J_{1 , min}} + \mathit{beta} \frac{J_{2} - J_{2 , min}}{J_{2 , max} - J_{2 , min}} + \mathit{gamma} \frac{J_{3} - J_{3 , min}}{J_{3 , max} - J_{3 , min}} + \mathit{delta} \frac{J_{4} - J_{4 , min}}{J_{4 , max} - J_{4 , min}} , \tag{eq\_0026} \\
-  & \left\{\begin{matrix} & f_{l , \mathit{varphi}} = g_{2} \left(x , \mathit{omega} , \mathit{varphi}\right) , \\ & f_{l , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) \\ \end{matrix}\right \tag{eq\_0036} \\
-  & \left\{\begin{matrix} & \sum_{\mathit{varphi} \in theta_bar_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = \left(Y_{i , s}^{1} + u_{i , s}^{d}\right) \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{3 , \mathit{varphi}} = \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} - \mathit{tau}_{\mathit{max} , i , s} - \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{4 , \mathit{varphi}} = \mathit{tau}_{\mathit{min} , i , s} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{3 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{4 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \end{matrix}\right \tag{eq\_0037} \\
-  & \left\{\begin{matrix} & \sum_{\mathit{varphi} \in theta_bar_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = Y_{i , s}^{1} \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \end{matrix}\right \tag{eq\_0038} \\
-  & \left\{\begin{matrix} & f \left(x\right) \leq M \left(1 - u\right) , \\ & f \left(x\right) \geq \mathit{epsilon} + \left(m - \mathit{epsilon}\right) u \end{matrix}\right \tag{eq\_0045} \\
-  & \left\{\begin{matrix} & Z \leq \mathit{Mu} , \\ & Z \geq \mathit{mu} , \\ & Z \leq f \left(x\right) - m \left(1 - u\right) , \\ & Z \geq f \left(x\right) - M \left(1 - u\right) . \end{matrix}\right \tag{eq\_0046} \\
+  & \left\{ & f_{l , \mathit{varphi}} = g_{2} \left(x , \mathit{omega} , \mathit{varphi}\right) , \\ & f_{l , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) \\ \right \tag{eq\_0036} \\
+  & \left\{ & \sum_{\mathit{varphi} \in theta_bar_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = \left(Y_{i , s}^{1} + u_{i , s}^{d}\right) \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{3 , \mathit{varphi}} = \mathit{ta}_{i , s + 1} - \mathit{td}_{i , s} - \mathit{tau}_{\mathit{max} , i , s} - \mathit{omega}_{r , i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{4 , \mathit{varphi}} = \mathit{tau}_{\mathit{min} , i , s} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{3 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{4 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \right \tag{eq\_0037} \\
+  & \left\{ & \sum_{\mathit{varphi} \in theta_bar_{k}} P \left(\mathit{varphi}\right) I_{\mathit{varphi}} \geq \mathit{alpha}_{0} \\ & f_{1 , \mathit{varphi}} = Y_{i , s}^{1} \left(\mathit{tau}_{d , i , s} + \mathit{omega}_{d , i , s}\right) - \mathit{td}_{i , s} + \mathit{ta}_{i , s} , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} = \sum_{e} Z_{i}^{e} \cdot \mathit{tau}_{r , i , s}^{e} + \mathit{omega}_{r , i , s} - \mathit{ta}_{i , s + 1} + \mathit{td}_{i , s} , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{1 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \\ & f_{2 , \mathit{varphi}} \leq M \left(1 - I_{\mathit{varphi}}\right) , s , s + 1 \in S_{i} , i \in T , \mathit{varphi} \in theta_bar_{k} \right \tag{eq\_0038} \\
+  & \left\{ & f \left(x\right) \leq M \left(1 - u\right) , \\ & f \left(x\right) \geq \mathit{epsilon} + \left(m - \mathit{epsilon}\right) u \right \tag{eq\_0045} \\
+  & \left\{ & Z \leq \mathit{Mu} , \\ & Z \geq \mathit{mu} , \\ & Z \leq f \left(x\right) - m \left(1 - u\right) , \\ & Z \geq f \left(x\right) - M \left(1 - u\right) . \right \tag{eq\_0046} \\
 \end{align}

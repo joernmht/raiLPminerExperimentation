@@ -154,7 +154,8 @@
 %@ param h_bar shape=- domain=- role=- drole=- lo=- hi=- :: average headway parameter
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cie.2025.111244.json (deterministic fill-in list); pending human confirmation.
-%@ var Delta shape=B,s domain=continuous role=auxiliary drole=- lo=- hi=- :: Deviation in departure time for train b at station s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Delta shape=B,s -> -
+%@ var Delta shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Deviation in departure time for train b at station s
 %@ param F_max shape=- kind=scalar domain=- :: Maximum traction force
 %@ var P_hat_supply shape=B,Y,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Adjusted power supply from substation y to train b over interval (i,i+1)
 %@ var P_subs shape=B,Y,S,D,D,I domain=continuous role=auxiliary drole=- lo=- hi=- :: Power supplied from substation y to train b between stations s and s+1 over interval (i,i+1)

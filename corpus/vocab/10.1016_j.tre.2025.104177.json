@@ -1,5 +1,15 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [
+    {
+      "name": "Ca",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    }
+  ],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "A",
@@ -35,7 +45,9 @@
     ]
   },
   "used": [
+    "A_drive",
     "A_pax",
+    "A_track",
     "A_train",
     "C",
     "Ca",
@@ -68,10 +80,12 @@
     "omega_2",
     "omega_3",
     "omega_4",
+    "others",
     "tau_1",
     "tau_2",
     "u",
     "u_bar",
+    "u_bar_cancel",
     "u_cancel",
     "varphi",
     "w",
@@ -79,8 +93,8 @@
   ],
   "bound": [
     "F",
-    "F_0",
     "K",
+    "P",
     "a",
     "ap",
     "f",
@@ -91,19 +105,29 @@
   ],
   "families": [
     "A",
-    "A_arr",
-    "A_dep",
-    "A_drive",
-    "A_pas",
-    "A_tra",
-    "A_track",
     "E",
+    "K",
     "P",
     "Phi",
+    "Pilde",
     "Q",
     "R"
   ],
   "missing": {
+    "A_drive": {
+      "rows": [
+        "eq_0033",
+        "eq_0034"
+      ],
+      "roles": {
+        "symbol": 2
+      },
+      "arities": {
+        "0": 2
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
     "A_pax": {
       "rows": [
         "eq_0029",
@@ -117,6 +141,20 @@
       },
       "arities": {
         "0": 6
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "A_track": {
+      "rows": [
+        "eq_0033",
+        "eq_0034"
+      ],
+      "roles": {
+        "symbol": 3
+      },
+      "arities": {
+        "0": 3
       },
       "kind": "?",
       "evidence": "position only"
@@ -240,7 +278,7 @@
         "symbol": 2
       },
       "arities": {
-        "0": 2
+        "2": 2
       },
       "kind": "?",
       "evidence": "position only"
@@ -441,6 +479,19 @@
       "kind": "?",
       "evidence": "position only"
     },
+    "u_bar_cancel": {
+      "rows": [
+        "eq_0038"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "1": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
     "u_cancel": {
       "rows": [
         "eq_0005",
@@ -489,13 +540,8 @@
     }
   },
   "missing_index": [
-    "A_arr",
-    "A_dep",
-    "A_drive",
-    "A_pas",
-    "A_tra",
-    "A_track",
-    "Phi"
+    "Phi",
+    "Pilde"
   ],
   "shape_mismatch": [
     {
@@ -651,8 +697,7 @@
   ],
   "unresolved_script": [],
   "declared_unused": [
-    "Z",
-    "others"
+    "Z"
   ],
   "family_as_symbol": {
     "L": 1,
@@ -661,5 +706,6 @@
     "W": 1
   },
   "paper_key": "10.1016_j.tre.2025.104177",
-  "sidecar": true
+  "sidecar": true,
+  "shape_fixes_applied": 1
 }

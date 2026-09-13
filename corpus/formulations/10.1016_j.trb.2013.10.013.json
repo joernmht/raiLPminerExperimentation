@@ -1,0 +1,762 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2013.10.013",
+  "name": "Optimal train routing and scheduling for managing traffic perturbations in complex junctions",
+  "family": "milp",
+  "description": "Mined from Optimal train routing and scheduling for managing traffic perturbations in complex junctions (Transportation Research Part B Methodological, 2013).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2013.10.013",
+    "reference": "Optimal train routing and scheduling for managing traffic perturbations in complex junctions",
+    "author": "Paola Pellegrini; Grégory Marlière; Joaquín Rodríguez",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "t",
+      "description": "Train index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tc",
+      "description": "Track-circuit index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of routes",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "TC",
+      "description": "Set of track-circuits",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "c",
+      "description": "Connection relation between trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Turnaround/join/split relation between trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tp",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tc0",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tcinf",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "k",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "tcEnd",
+      "description": "end track circuit",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "being",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "by",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "in",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s",
+      "description": "Function returning successor track-circuit",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "starts",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "time",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "utilized",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "which",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "e",
+      "description": "Function indicating if track-circuit is in extreme block section",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ends",
+      "description": "Word in definition, not a model symbol",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "init",
+      "description": "Earliest start time for train t",
+      "shape": [
+        "t"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "Mx",
+      "description": "Upper bound for occupation start time of train t on route r",
+      "shape": [
+        "t",
+        "R"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "rt",
+      "description": "Running time on track-circuit for a given train type (depends on route, train type, and track-circuit)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "pt",
+      "description": "Preceding track-circuit function for route r and track-circuit tc",
+      "shape": [
+        "R",
+        "TC"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "ms",
+      "description": "Minimum separation time between train t and train t'",
+      "shape": [
+        "t",
+        "t"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "p",
+      "description": "Preceding track-circuit function for route r and track-circuit tc",
+      "shape": [
+        "R",
+        "TC"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "sched",
+      "description": "Scheduled completion time for train t",
+      "shape": [
+        "t"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "bs",
+      "description": "Block section of track-circuit tc along route r",
+      "shape": [
+        "R",
+        "TC"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "PL",
+      "description": "Set of platforms",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ref",
+      "description": "Reference track-circuit for a given track-circuit and route",
+      "shape": [
+        "R",
+        "TC"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large constant for disjunctive constraints",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "My",
+      "description": "Large constant for disjunctive constraints (alternative)",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "ct",
+      "description": "Clearing time on track-circuit (depends on route, train type, and track-circuit)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rel",
+      "description": "Release time for a block section",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "ty",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "conn",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "incomp",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "for",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "predecessor indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "sigma",
+      "description": "successor indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho",
+      "description": "reference indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "piStart",
+      "description": "p start indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "sigEnd",
+      "description": "s end indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu",
+      "description": "tc in TC^r indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "phi",
+      "description": "condition eq21",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "psi",
+      "description": "condition eq22",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "theta",
+      "description": "condition eq17",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "cond",
+      "description": "condition eq25/26",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "fo",
+      "description": "follow-on headway",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "inc",
+      "description": "precedence indicator",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "U",
+      "description": "Utilization time of a track-circuit by a train",
+      "shape": [
+        "t",
+        "tc"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "D",
+      "description": "Maximum secondary delay suffered by any train",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "o",
+      "description": "Start time of occupation of track-circuit tc by train t on route r",
+      "shape": [
+        "t",
+        "R",
+        "TC"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary route choice indicator for train t on route r",
+      "shape": [
+        "t",
+        "R"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Delay suffered by train t in track-circuit tc along route r",
+      "shape": [
+        "t",
+        "R",
+        "TC"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "eU",
+      "description": "End time of utilization of track-circuit tc by train t",
+      "shape": [
+        "t",
+        "tc"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "sU",
+      "description": "Start time of utilization of track-circuit tc by train t",
+      "shape": [
+        "t",
+        "tc"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "ul",
+      "description": "Utilization length of track-circuit tc by train t on route r",
+      "shape": [
+        "t",
+        "R",
+        "TC"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary ordering variable for track-circuit utilization between trains",
+      "shape": [
+        "t",
+        "t",
+        "tc"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0010",
+      "description": "Constraint (5): train cannot start occupying a track-circuit without spending running time in the preceding one",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tc",
+          "over": "TC",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "o",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "TC",
+              "expr": "tc",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "init",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Constraint (6): exactly one route is used by each train",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tc",
+          "over": "TC",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "o",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "TC",
+              "expr": "tc",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Mx",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013",
+      "description": "Constraint (8): secondary delay of a train at completion",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "R"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total secondary delay suffered by trains (alternative objective: minimize maximum secondary delay D)",
+    "terms": [
+      {
+        "ref": "D",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

@@ -60,7 +60,8 @@
 %@ index T ordered=0 cyclic=0 :: Set of time intervals
 
 % c: classified as parameter during review
-%@ param c shape=- kind=scalar domain=- :: Capacity of train type k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): c shape=- -> K
+%@ param c shape=K kind=scalar domain=- :: Capacity of train type k
 
 % y: classified as variable during review
 %@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train j is assigned type k in direction up/dn
@@ -82,7 +83,8 @@
 %@ var EA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption in acceleration phase for train j at time t
 
 % M: classified as parameter during review
-%@ param M shape=- kind=scalar domain=- :: Mass of empty train type k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): M shape=- -> K
+%@ param M shape=K kind=scalar domain=- :: Mass of empty train type k
 
 % m: classified as parameter during review
 %@ param m shape=- kind=scalar domain=- :: Average mass per passenger
@@ -116,7 +118,8 @@
 %@ var CR shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Regular energy cost
 
 % PD: classified as parameter during review
-%@ param PD shape=- kind=scalar domain=- :: Capacitance of k-type train
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): PD shape=- -> K
+%@ param PD shape=K kind=scalar domain=- :: Capacitance of k-type train
 
 % fb: classified as parameter during review
 %@ param fb shape=- kind=scalar domain=- :: Basic energy price

@@ -40,20 +40,20 @@
 %@ param Q_I shape=- kind=scalar domain=- :: First-stage objective function value
 %@ param Q_II shape=- kind=scalar domain=- :: Second-stage objective function value
 %@ param W_1 shape=- kind=scalar domain=- :: Number of scenarios in stage 1
-%@ var X_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: First-stage decisions in stage 1
-%@ var Y_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: Second-stage decisions in stage 1
+%@ var X_1 shape=- domain=continuous role=primary drole=- lo=- hi=- :: First-stage decisions in stage 1
+%@ var Y_1 shape=- domain=continuous role=primary drole=- lo=- hi=- :: Second-stage decisions in stage 1
 %@ param beta shape=c kind=scalar domain=- :: Weight of cancellation cost
 %@ index w_1 ordered=0 cyclic=0 :: Scenario index in stage 1
 \begin{align}
-  \min\quad & Q^{I} \left(X\right) + E_{w} \left[min Q^{II} \left(Y \left(w\right)\right)\right] , \tag{eq\_0001} \\
-  & s.t. X \in Z^{I} , \tag{eq\_0003} \\
-  & Y \left(w\right) \in Z^{II} \left(X , w\right) , w \in \left\{1 , \ldots , W\right\} \tag{eq\_0004} \\
-  & Q^{I} \left(X\right) = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e} \in X} c_{e} + \sum_{e \in E_{ar} : d_{e} \in X} d_{e} , \tag{eq\_0007} \\
-  & Q^{II} \left(Y \left(w\right)\right) = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e}^{w} \in Y \left(w\right)} c_{e}^{w} + \sum_{e \in E_{ar} : d_{e}^{w} \in Y \left(w\right)} d_{e}^{w} , w \in \left\{1 , \ldots , W\right\} , \tag{eq\_0009} \\
-  & s.t. X_{1} \left(w_{1 , n}\right) \in Z_{1}^{I} \left(w_{1 , n}\right) , n \in \left\{1 , \ldots , W_{1}\right\} , \tag{eq\_0012} \\
+  \min\quad & Q^{I} \cdot X + E_{w} \left[min Q^{II} \left(Y \cdot w\right)\right] , \tag{eq\_0001} \\
+  & X \in Z^{I} , \tag{eq\_0003} \\
+  & Y \cdot w \in Z^{II} \left(X , w\right) , w \in \left\{1 , \ldots , W\right\} \tag{eq\_0004} \\
+  & Q^{I} \cdot X = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e} \in X} c_{e} + \sum_{e \in E_{ar} : d_{e} \in X} d_{e} , \tag{eq\_0007} \\
+  & Q^{II} \left(Y \cdot w\right) = \mathit{beta}_{c} \sum_{e \in E_{ar} : c_{e}^{w} \in Y \left(w\right)} c_{e}^{w} + \sum_{e \in E_{ar} : d_{e}^{w} \in Y \left(w\right)} d_{e}^{w} , w \in \left\{1 , \ldots , W\right\} , \tag{eq\_0009} \\
+  & X_{1} \left(w_{1 , n}\right) \in Z_{1}^{I} \left(w_{1 , n}\right) , n \in \left\{1 , \ldots , W_{1}\right\} , \tag{eq\_0012} \\
   & Y_{1} \left(w_{1 , n}\right) \in Z_{1}^{II} \left(X_{1} \left(w_{1 , n}\right) , w_{1 , n}\right) , n \in \left\{1 , \ldots , W_{1}\right\} , \tag{eq\_0013} \\
   & X_{1} \left(w_{1 , n}\right) = X_{1} \left(w_{1 , m}\right) , n , m \in \left\{1 , \ldots , W_{1}\right\} : n \neq m , \tag{eq\_0014} \\
-  & s.t. X_{k} \left(w_{k , n}\right) \in Z_{k}^{I} \left(w_{k , n}\right) , n \in \left\{1 , \ldots , W_{k}\right\} , \tag{eq\_0019} \\
+  & X_{k} \left(w_{k , n}\right) \in Z_{k}^{I} \left(w_{k , n}\right) , n \in \left\{1 , \ldots , W_{k}\right\} , \tag{eq\_0019} \\
   & Y_{k} \left(w_{k , n}\right) \in Z_{k}^{II} \left(X_{k} \left(w_{k , n}\right) , w_{k , n}\right) , n \in \left\{1 , \ldots , W_{k}\right\} , \tag{eq\_0020} \\
   & X_{k} \left(w_{k , n}\right) = X_{k} \left(w_{k , m}\right) , n , m \in \left\{1 , \ldots , W_{k}\right\} : n \neq m , \tag{eq\_0021} \\
 \end{align}

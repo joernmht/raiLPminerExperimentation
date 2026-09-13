@@ -27,13 +27,15 @@
 %@ obj sense=min name=objective combination=sum :: Minimize total running time and passenger cost.
 
 % t: classified as variable during review
-%@ var t shape=n,s domain=non_negative role=primary drole=- lo=- hi=- :: Arrival/departure times at stations.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=n,s -> -
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival/departure times at stations.
 
 % T: classified as parameter during review
 %@ param T shape=- kind=scalar domain=- :: Various time parameters (running, headway, dwell, etc.).
 
 % ifb: classified as variable during review
-%@ var ifb shape=n,n,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for departure order.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes nnps): ifb shape=n,n,s -> n
+%@ var ifb shape=n domain=binary role=primary drole=- lo=- hi=- :: Binary variable for departure order.
 
 % b: classified as variable during review
 %@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variables for order, track, line, path.
@@ -157,12 +159,15 @@
 %@ con eq_0058_c kind=linear domain=- indicator=- :: Non-negativity and sign conditions in the equilibrium system (part c).
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2020.102925.json (deterministic fill-in list); pending human confirmation.
-%@ param Lambda_Transfer_qn shape=Q,N kind=scalar domain=- :: Transfer predecessor train for path q at train n.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Lambda_Transfer_qn shape=Q,N -> -
+%@ param Lambda_Transfer_qn shape=- kind=scalar domain=- :: Transfer predecessor train for path q at train n.
 %@ var Pi_Capacity shape=N domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable for capacity constraint of train n.
 %@ param T_Arrival shape=L kind=scalar domain=- :: Latest arrival time for line l.
 %@ param T_Depart shape=L kind=scalar domain=- :: Earliest departure time for line l.
-%@ param T_Dmax_sl shape=L,S kind=scalar domain=- :: Maximum dwell time for line l at station s.
-%@ param T_Dmin_sl shape=L,S kind=scalar domain=- :: Minimum dwell time for line l at station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): T_Dmax_sl shape=L,S -> -
+%@ param T_Dmax_sl shape=- kind=scalar domain=- :: Maximum dwell time for line l at station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): T_Dmin_sl shape=L,S -> -
+%@ param T_Dmin_sl shape=- kind=scalar domain=- :: Minimum dwell time for line l at station s.
 %@ param T_H shape=- kind=scalar domain=- :: Minimum headway time between trains.
 %@ param T_Lmin shape=L kind=scalar domain=- :: Minimum line separation time for line l.
 %@ param T_Platform shape=P,P kind=scalar domain=- :: Walking time between platforms.
@@ -182,22 +187,30 @@
 %@ param e shape=- kind=scalar domain=- :: Dummy parameter from extraction.
 %@ param h shape=- kind=scalar domain=- :: Dummy parameter from extraction.
 %@ var i_Wait shape=Q domain=continuous role=auxiliary drole=- lo=- hi=- :: Indicator of waiting for path q.
-%@ var ifb_Line shape=N,N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train n and np are on the same line.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes nnp): ifb_Line shape=N,N -> N
+%@ var ifb_Line shape=N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train n and np are on the same line.
 %@ var ifb_Track shape=N domain=binary role=indicator drole=- lo=- hi=- :: 1 if train n uses a track.
 %@ param j shape=- kind=scalar domain=- :: Dummy parameter from extraction.
 %@ var lambda shape=N,S,S domain=continuous role=auxiliary drole=- lo=- hi=- :: Dual variable for capacity constraint on train n from s to sp.
 %@ param n_Origin shape=Q kind=scalar domain=- :: Origin train for path q.
 %@ param ns shape=- kind=scalar domain=- :: Dummy parameter from extraction.
 %@ param s_Alight shape=Q,N kind=scalar domain=- :: Alighting station for path q on train n.
-%@ param s_Alight_qn shape=Q,N kind=scalar domain=- :: Alighting station for path q on train n.
-%@ param s_Board_qn shape=Q,N kind=scalar domain=- :: Boarding station for path q on train n.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s_Alight_qn shape=Q,N -> -
+%@ param s_Alight_qn shape=- kind=scalar domain=- :: Alighting station for path q on train n.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s_Board_qn shape=Q,N -> -
+%@ param s_Board_qn shape=- kind=scalar domain=- :: Boarding station for path q on train n.
 %@ param s_Destination shape=L kind=scalar domain=- :: Destination station for line l.
 %@ param s_Origin shape=L kind=scalar domain=- :: Origin station for line l.
 %@ var t_Arrival shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train n at station s.
-%@ var t_Arrival_ns shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train n at station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_Arrival_ns shape=N,S -> -
+%@ var t_Arrival_ns shape=- domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train n at station s.
 %@ var t_Departure shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train n from station s.
-%@ var t_Departure_ns shape=N,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train n from station s.
-%@ var t_Wait_qn shape=Q,N domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time for path q on train n.
-%@ var t_Walk shape=Q,N,N domain=continuous role=auxiliary drole=- lo=- hi=- :: Walking time for path q between trains n and np.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_Departure_ns shape=N,S -> -
+%@ var t_Departure_ns shape=- domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train n from station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_Wait_qn shape=Q,N -> -
+%@ var t_Wait_qn shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time for path q on train n.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes qnpn): t_Walk shape=Q,N,N -> Q
+%@ var t_Walk shape=Q domain=continuous role=auxiliary drole=- lo=- hi=- :: Walking time for path q between trains n and np.
 %@ param x shape=- kind=scalar domain=- :: Dummy parameter from extraction.
-%@ param xi_Downstream_ns shape=N,S kind=scalar domain=- :: Downstream station of train n at station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): xi_Downstream_ns shape=N,S -> -
+%@ param xi_Downstream_ns shape=- kind=scalar domain=- :: Downstream station of train n at station s.

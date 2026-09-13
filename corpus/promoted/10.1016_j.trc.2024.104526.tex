@@ -24,11 +24,11 @@
 %@ param sup shape=- kind=scalar domain=- :: Supremum operator for worst-case distribution
 %@ var v shape=G,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arc selection in multi-commodity flow
 %@ var x shape=A,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train arc selection
-%@ var y shape=B,E,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
+%@ var y shape=B domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
 %@ param epsilon shape=- kind=scalar domain=- :: Delay scenario
 %@ index A ordered=0 cyclic=0 :: Set of trains
 %@ index B ordered=0 cyclic=0 :: Set of maintenance windows
-%@ param end shape=- kind=scalar domain=- :: End time of expected start-time window
+%@ param end shape=B kind=scalar domain=- :: End time of expected start-time window
 %@ param star shape=- kind=scalar domain=- :: Start time of expected start-time window
 %@ param varsigma shape=- kind=scalar domain=- :: Fluctuation vector for probability distribution
 %@ index p ordered=0 cyclic=0 :: Probability distribution vector
@@ -48,7 +48,7 @@
 %@ var s shape=Q,T domain=continuous role=primary drole=- lo=- hi=- :: Relaxation variable for capacity constraint
 %@ param theta shape=- kind=scalar domain=- :: Penalty parameter for ADMM
 %@ var lambda shape=Q domain=continuous role=primary drole=- lo=- hi=- :: Lagrange multiplier for cross-resolution consistency
-%@ var mu shape=Q,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
+%@ var mu shape=Q,T,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
 %@ param rho shape=- kind=scalar domain=- :: Penalty parameter for ADMM
 %@ param R shape=- kind=scalar domain=- :: Set of real numbers
 %@ param cons shape=- kind=scalar domain=- :: Constant value of fixed variable in subproblem
@@ -117,17 +117,15 @@
   & 1 - z_{k} \prod_{l \in L} \mathit{omega}_{l , k} \geq \mathit{gamma}_{i , ip , k} , \forall k \in K , \left(i , ip\right) \in Q \tag{eq\_0011} \\
   & \prod_{l \in L_{n e s}} \mathit{omega}_{l , k} \geq \mathit{gamma}_{i , ip , k} , \forall k \in K , \left(i , ip\right) \in Q \tag{eq\_0012} \\
   & \sum_{\left(i , ip\right) \in Q, k \in K, l \in L} \mathit{gamma}_{i , ip , k} \cdot \mathit{omega}_{l , k} \geq N_{u m a} \tag{eq\_0013} \\
-  & \sum_{i , t : \left(i , ip , t , tp\right) \in E_{g}} v_{g} \left(i , ip , t , tp\right) - \sum_{i , t : \left(ip i , tp , t\right) \in E_{g}} v_{g} \left(ip , i , tp , t\right) = \left\{\begin{matrix} - 1 ip = \mathit{ori}_{g} , tp = \mathit{star}_{g} \\ 1 ip = \mathit{des}_{g} , tp = T_{\mathit{max}} \\ 0 o t h e r w i s \cdot e \end{matrix}\right , \forall g \in G \tag{eq\_0014} \\
+  & \sum_{i , t : \left(i , ip , t , tp\right) \in E_{g}} v_{g} \left(i , ip , t , tp\right) - \sum_{i , t : \left(ip i , tp , t\right) \in E_{g}} v_{g} \left(ip , i , tp , t\right) = \left\{ - 1 ip = \mathit{ori}_{g} , tp = \mathit{star}_{g} \\ 1 ip = \mathit{des}_{g} , tp = T_{\mathit{max}} \\ 0 o t h e r w i s \cdot e \right , \forall g \in G \tag{eq\_0014} \\
   & \sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) \leq 1 , \forall \left(j , jp\right) \in Q , tpp \in T \tag{eq\_0015} \\
   & \mathit{gamma}_{i , ip , k} = \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right) , \forall \left(i , ip\right) \in Q , k \in K \tag{eq\_0017} \\
-  & \mathit{gamma}_{i , ip , k} \in \left\{0 , 1\right\} , \forall \left(i , ip\right) \in Q , k \in K \tag{eq\_0018} \\
   & x_{a} \left(i , ip , t , tp\right) \in \left\{0 , 1\right\} , \forall \left(i , ip , t , tp\right) \in E_{a} , a \in A \tag{eq\_0019} \\
   & y_{b} \left(i , ip , t , tp , k\right) \in \left\{0 , 1\right\} , \forall \left(i , ip , t , tp\right) \in E_{b} , b \in B \tag{eq\_0020} \\
   & sup_{\mathbf{p} \in P} \left\{\mathcal{E}_{\mathbf{p}} \left[\right. Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} = \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{g \in G, \left(i , ip , t , tp\right) \in E_{g}} h_{\mathit{kappa}} \left(i , ip , t , tp\right) v_{g} \left(i , ip , t , tp\right) \tag{eq\_0021} \\
   & \mathbf{p} = \mathit{argmax}_{\mathbf{p} \in P} \sum_{\left(\mathit{kappa} \in \mathit{Theta} ; p\right)_{\mathit{kappa} \in} \mathbf{p}} p_{\mathit{kappa}} \sum_{g \in G, \left(i , ip , t , tp\right) \in E_{g}} h_{\mathit{kappa}} \left(i , ip , t , tp\right) v_{g} \left(i , ip , t , tp\right) \tag{eq\_0024} \\
   & \mathit{min} Z_{3} = \left(\mathit{alpha}_{1} \cdot Z_{1} + \mathit{alpha}_{2} \cdot Z\right)_{2} + \sum_{\left(i , ip\right) \in Q, k \in K} \mathit{lambda}_{i , ip} \left(\mathit{gamma}_{i , ip , k} - \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right)\right) + \frac{\mathit{vartheta}}{2} \sum_{\left(i , ip\right) \in Q, k \in K} \left(\parallel \mathit{gamma}_{i , ip , k} - \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right) \parallel\right)_{2}^{2} + \sum_{\left(j , jp\right) \in Q, tpp \in T} \mathit{mu}_{j , jp , tpp} \left[\sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) - 1\right] + \frac{\mathit{rho}}{2} \sum_{\left(j , jp\right) \in Q, tpp \in T} \left(\parallel \sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) + s_{j , jp , tpp} - 1 \parallel\right)_{2}^{2} \tag{eq\_0025} \\
   & \mathit{lambda}_{i , ip} \in R , \forall \left(i , ip\right) \in Q \tag{eq\_0026} \\
-  & \mathit{mu}_{j , jp , tpp} \geq 0 , \forall \left(j , jp\right) \in Q , tpp \in T \tag{eq\_0027} \\
   & 0 \leq s_{j , jp , tpp} \leq 1 , \forall \left(j , jp\right) \in Q , tpp \in T \tag{eq\_0028} \\
   & \mathit{lambda}_{i , ip}^{n + 1} = \mathit{lambda}_{i , ip}^{n} + \mathit{vartheta} \sum_{k \in K} \left(\left(\right. \mathit{gamma}\right)_{i , ip , k} - \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right) \left.\right) , \forall \left(i , ip\right) \in Q \tag{eq\_0029} \\
   & \mathit{mu}_{j , jp , tpp}^{n + 1} = m a x \left\{0 , \mathit{mu}_{j , jp , tpp}^{n} + \mathit{rho} \left[\sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) - 1\right]\right\} , \forall \left(j , jp\right) \in Q , tpp \in T \tag{eq\_0030} \\
@@ -137,7 +135,7 @@
   & \mathit{min} Z_{4} = \sum_{\left(i , ip\right) \in Q, k \in K} \left(\left[\mathit{lambda}_{i , ip} + \frac{\mathit{vartheta}}{2} - \mathit{cons}_{1 , i , ip k} \mathit{vartheta} + \mathit{alpha}_{1} \left(\left(\right. \mathit{pen}\right)_{k} + \mathit{pen}_{k}^{'}\right)\right] \mathit{gamma}_{i , ip , k} + \sum_{\left(i , ip\right) \in Q, k \in K} \left(\frac{\mathit{vartheta}}{2} - \mathit{lambda}_{i , ip}\right) \mathit{cons}_{1 , i , ip , k} \tag{eq\_0034} \\
   & \mathit{min} Z_{5} = \mathit{alpha}_{2} \cdot Z_{2} + \sum_{\left(i , ip\right) \in Q, k \in K} \mathit{lambda}_{i , ip} \left(\mathit{cons}_{2 , i , ip , k} - \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right)\right) + \frac{\mathit{vartheta}}{2} \sum_{\left(i , ip\right) \in Q, k \in K} \left(\parallel \mathit{cons}_{2 , i , ip , k} - \sum_{\left(i , ip , t , tp\right) \in E_{b}} y_{b} \left(i , ip , t , tp , k\right) \parallel\right)_{2}^{2} + \sum_{\left(j , jp\right) \in Q, tpp \in T} \mathit{mu}_{j , jp , tpp} \left[\sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) - 1\right] + \frac{\mathit{rho}}{2} \sum_{\left(j , jp\right) \in G, tpp \in T} \left(\parallel \sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) + s_{j , jp , tpp} - 1 \parallel\right)_{2}^{2} \tag{eq\_0035} \\
   & \left(\parallel \sum_{g \in G, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) + s_{j , jp , tpp} - 1 \parallel\right)_{2}^{2} \tag{eq\_0036} \\
-  & = \left\{\begin{matrix} \sum_{\left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) \left(2 \cdot n_{g} - 1\right) + \left(n_{g} - 1\right)^{2} n_{g} \geq 1 \\ 0 \cdot n_{g} = 0 \end{matrix}\right \tag{eq\_0037} \\
+  & = \left\{ \sum_{\left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) \left(2 \cdot n_{g} - 1\right) + \left(n_{g} - 1\right)^{2} n_{g} \geq 1 \\ 0 \cdot n_{g} = 0 \right \tag{eq\_0037} \\
   & n_{g} = \sum_{g \in Gp, \left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) \tag{eq\_0038} \\
   & Z_{5}^{a} = \sum_{\left(i , ip , t , tp\right) \in E_{a}} \mathit{varphi}_{a} \left(i , ip , t , tp\right) x_{a} \left(i , ip , t , tp\right) + \frac{1}{2} \mathit{rho} \sum_{\left(j , jp\right) \in Q, tpp \in T} \left(n_{a} - 1\right)^{2} - \sum_{\left(j , jp\right) \in Q, tpp \in T} \mathit{mu}_{j , jp , tpp} \tag{eq\_0039} \\
   & Z_{5}^{b} = \sum_{\left(i , ip , t , tp\right) \in E_{b}} \mathit{varphi}_{b} \left(i , ip , t , tp\right) y_{b} \left(i , ip , t , tp , k\right) + \frac{1}{2} \mathit{rho} \sum_{\left(j , jp\right) \in Q, tpp \in T} \left(n_{b} - 1\right)^{2} - \sum_{\left(j , jp\right) \in Q, tpp \in T} \mathit{mu}_{j , jp , tpp} + \left(\frac{\mathit{vartheta}}{2} + \mathit{lambda}_{i , ip}\right) \mathit{cons}_{2 , i , ip , k} \tag{eq\_0040} \\
@@ -151,8 +149,8 @@
   & = \sum_{\left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) \left(\left(2 \cdot n\right)_{g} + 2 \cdot s_{j , jp , tpp} - 1\right) + \left(n_{g} + s_{j , jp , tpp} - 1\right)^{2} \tag{eq\_0050} \\
   & L_{s_{j , jp , tpp}} = s_{j , jp , tpp}^{2} + 2 \cdot s_{j , jp , tpp} \left[\sum_{\left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) + n_{g} - 1\right] + P \tag{eq\_0051} \\
   & s_{j , jp , tpp}^{*} = 1 - \sum_{\left(i , ip , t , tp\right) \in \mathit{xi} \left(j , jp , tpp\right)} v_{g} \left(i , ip , t , tp\right) - n_{g} \tag{eq\_0052} \\
-  & \left(\mathit{sup}\right)_{\mathbf{p} \in P} \left\{\right. \mathcal{E}_{\mathbf{p}} \left[Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} = \mathit{min}_{\mathit{delta} , \mathit{gamma} , \mathit{varrho}} \mathbf{P}_{0}^{T} \left(\left[\right. Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right] + ϖ\right)^{T} \mathit{gamma} + ϖ^{T} \mathit{varrho} \tag{eq\_0055} \\
-  & \mathbf{e} \mathit{delta} - \mathit{gamma} + \mathit{varrho} = \mathbf{Q} \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \tag{eq\_0057} \\
-  & = \left(m a x\right)_{\mathbf{p} \in P} \mathbf{p}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \tag{eq\_0059} \\
-  & = \mathbf{p}_{0}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) + \left(m a x\right)_{ϛ} \left\{\right. ϛ^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \left|\right. \mathbf{e}^{T} ϛ = 0 , \left|\left|ϛ\right|\right|_{\infty} \leq ϖ \left.\right\} \tag{eq\_0060} \\
+  & \left(\mathit{sup}\right)_{\mathbf{p} \in P} \left\{\right. \mathcal{E}_{\mathbf{p}} \left[Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right) \left.\right)\right]\right\} = \mathit{min}_{\mathit{delta} , \mathit{gamma} , \mathit{varrho}} \mathbf{P}_{0}^{T} \left(\left[\right. Q \left(\mathbf{v} , \mathit{epsilon} \mathit{kappa} \left.\right)\right] + ϖ\right)^{T} \mathit{gamma} + ϖ^{T} \mathit{varrho} \tag{eq\_0055} \\
+  & \mathbf{e} \mathit{delta} - \mathit{gamma} + \mathit{varrho} = \mathbf{Q} \left(\mathbf{v} , \mathit{epsilon} \mathit{kappa}\right) \tag{eq\_0057} \\
+  & = \left(m a x\right)_{\mathbf{p} \in P} \mathbf{p}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \mathit{kappa}\right) \tag{eq\_0059} \\
+  & = \mathbf{p}_{0}^{T} Q \left(\mathbf{v} , \mathit{epsilon} \mathit{kappa}\right) + \left(m a x\right)_{ϛ} \left\{\right. ϛ^{T} Q \left(\mathbf{v} , \mathit{epsilon} \left(\mathit{kappa}\right)\right) \left|\right. \mathbf{e}^{T} ϛ = 0 , \left|\left|ϛ\right|\right|_{\infty} \leq ϖ \left.\right\} \tag{eq\_0060} \\
 \end{align}

@@ -16,7 +16,7 @@
 %@ param r shape=J,N kind=matrix :: Running time of running level n on section j
 %@ index N ordered=1 cyclic=0 :: Set of running levels
 %@ param T shape=- kind=scalar :: Minimum and maximum turnaround time bounds at terminal stations
-%@ param h shape=- kind=scalar :: Minimum and maximum headway bounds
+%@ param h shape=M,I,N kind=scalar :: Minimum and maximum headway bounds
 %@ index p ordered=0 cyclic=0 :: Peak hour subset
 %@ var x shape=I,J,K domain=binary role=primary :: Binary indicator that departure time of service i at station j lies in time interval k
 %@ index K ordered=1 cyclic=0 :: Set of time intervals
@@ -173,7 +173,7 @@
   & \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} = 1 , \tag{eq\_0021} \\
   & \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} \cdot t_{k - 1} \leq d_{i , j}^{up} \leq \sum_{k \in \mathcal{K}} x_{i , j , k}^{up} \cdot t_{k} , \forall i \in \mathcal{I} , j \in \mathcal{J} . \tag{eq\_0022} \\
   & f_{deviation} = \sum_{i \in \mathcal{I} / \left\{1\right\}} \mid d_{i , 1}^{up} - d_{i - 1 , 1}^{up} - \sum_{k \in \mathcal{K}} x_{i , 1 , k}^{up} \cdot H_{k} \mid . \tag{eq\_0023} \\
-  & f_{variation}^{up} = \sum_{\begin{matrix}i \in \mathcal{I} / \left\{1\right\} , \\ j \in \mathcal{J} '\end{matrix}} \mid \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right) + 1} \mid , \tag{eq\_0024} \\
+  & f_{variation}^{up} = \sum_{ i \in \mathcal{I} / \left\{1\right\} , \\ j \in \mathcal{J} ' } \mid \left(d_{i , j}^{up} - d_{i - 1 , j}^{up}\right) - \frac{d_{min \left(i + i_{2} , I\right) , j}^{up} - d_{max \left(i - i_{1} , 2\right) - 1 , j}^{up}}{min \left(i + i_{2} , I\right) - max \left(i - i_{1} , 2\right) + 1} \mid , \tag{eq\_0024} \\
   & f_{variation} = f_{variation}^{up} + f_{variation}^{dn} . \tag{eq\_0025} \\
   & f_{\mathit{zeta}} = \sum_{i \in \mathcal{I}} \mathit{zeta}_{i} . \tag{eq\_0026} \\
   & f_{energy} = \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{J\right\}, n \in \mathcal{N}} E_{j , n}^{up} \mathit{beta}_{i , j , n}^{up} + \sum_{i \in \mathcal{I}, j \in \mathcal{J} / \left\{1\right\}, n \in \mathcal{N}} E_{j , n}^{dn} \mathit{beta}_{i , j , n}^{dn} , \tag{eq\_0027} \\
@@ -204,7 +204,6 @@
   & f_bar \geq f \tag{eq\_0045\_a} \\
   & f_bar \geq - f \tag{eq\_0045\_b} \\
   & \mathit{Theta}_{i , i '}^{up} \leq t_{end} \cdot \mathit{theta}_{i , i '} \tag{eq\_0046\_a} \\
-  & \mathit{Theta}_{i , i '}^{up} \geq 0 \tag{eq\_0046\_b} \\
   & \mathit{Theta}_{i , i '}^{up} \leq a_{i ' , 1}^{up} \tag{eq\_0046\_c} \\
   & \mathit{Theta}_{i , i '}^{up} \geq a_{i ' , 1}^{up} - t_{end} \left(1 - \mathit{theta}_{i , i '}\right) \tag{eq\_0046\_d} \\
   & L_{i , j , m}^{up} \leq \mathit{alpha}_{i , j , m}^{up} \tag{eq\_0047\_a} \\

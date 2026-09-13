@@ -61,7 +61,8 @@
 %@ param T shape=- kind=scalar domain=- :: Earliest and latest departure time bounds T_l^min and T_l^max for the last train in line l.
 
 % Tra: classified as parameter during review
-%@ param Tra shape=- kind=scalar domain=- :: Walking time from line l to line l' at station k, or from the subway platform to the bus platform.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): Tra shape=- -> S
+%@ param Tra shape=S kind=scalar domain=- :: Walking time from line l to line l' at station k, or from the subway platform to the bus platform.
 
 % M: classified as parameter during review
 %@ param M shape=- kind=scalar domain=- :: Large positive constant used in big-M linearizations.
@@ -119,7 +120,8 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.omega.2018.04.003.json (deterministic fill-in list); pending human confirmation.
 %@ param Delta_B shape=S,S kind=scalar domain=- :: Bus travel time adjustment between station i and station j.
-%@ param Delta_R shape=L,L kind=scalar domain=- :: Difference in arrival times between lines l and lp at station k.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes kllp): Delta_R shape=L,L -> L
+%@ param Delta_R shape=L kind=scalar domain=- :: Difference in arrival times between lines l and lp at station k.
 %@ param Dep_max shape=L kind=scalar domain=- :: Maximum departure time for line l.
 %@ param Dep_min shape=L kind=scalar domain=- :: Minimum departure time for line l.
 %@ param H_R shape=L kind=scalar domain=- :: Headway of line lp for rail-to-rail transfers.

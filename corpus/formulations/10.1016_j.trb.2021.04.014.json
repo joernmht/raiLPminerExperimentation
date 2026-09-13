@@ -1,0 +1,1238 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2021.04.014",
+  "name": "Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach",
+  "family": "milp",
+  "description": "Mined from Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach (Transportation Research Part B Methodological, 2021).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2021.04.014",
+    "reference": "Mitigating unfairness in urban rail transit operation: A mixed-integer linear programming approach",
+    "author": "Yinghui Wu; Hai Yang; Shuo Zhao; Pan Shang",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "I",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "J",
+      "description": "Set of stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Index for trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of passenger groups",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K_hat",
+      "description": "Set of passenger groups boarding at station j",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "r",
+      "description": "Summation index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Khat",
+      "description": "set K-hat",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "a",
+      "description": "Arrival time of train i at station j",
+      "shape": [
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "s",
+      "description": "Dwelling time of train i at station j",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "tau",
+      "description": "Running time between stations j and j+1",
+      "shape": [
+        "J"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large number for linearization, bound by maximum difference of departure times and passenger arrival times",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Arrival time of passenger group k at station o_k",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "g",
+      "description": "Number of passengers in group k",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "C",
+      "description": "Train capacity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "A",
+      "description": "Departure time of first train from origin",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "S",
+      "description": "Cumulative dwelling time of train i up to station j",
+      "shape": [
+        "I",
+        "J"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Origin station of train k",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "e",
+      "description": "Destination station of train k",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "jmax",
+      "description": "Cardinality of J",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "imax",
+      "description": "Cardinality of I",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "hmin",
+      "description": "Minimum headway",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "hmax",
+      "description": "Maximum headway",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "n",
+      "description": "cardinality of J",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "m",
+      "description": "cardinality of I",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "I_last",
+      "description": "I_last",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "J_last",
+      "description": "J_last",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_max",
+      "description": "maximum headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "minimum headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "d",
+      "description": "Departure time of train i from station j",
+      "shape": [
+        "I",
+        "J"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating if train i stops at station j",
+      "shape": [
+        "I",
+        "J"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating if passenger group k boards train i",
+      "shape": [
+        "K",
+        "I"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating if passenger group k can board train i",
+      "shape": [
+        "K",
+        "I"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "c",
+      "description": "Available capacity of train i when leaving station j",
+      "shape": [
+        "I",
+        "J"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "eta",
+      "description": "Maximum waiting time (unfairness index)",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Waiting time of passenger group k",
+      "shape": [
+        "K"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0001",
+      "description": "Departure time definition: d_ij = a_ij + s_ij x_ij",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "s",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0003_a",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "hmin",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "\\left(i + 1\\right)",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0003_b",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "\\left(i + 1\\right)",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "hmax",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0004",
+      "description": "Each passenger group boards exactly one train",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "I"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005",
+      "description": "Boarding requires train stops at passenger origin station",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "o_{k}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0006",
+      "description": "Boarding requires train stops at passenger destination station",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "e_{k}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Boarding implies eligibility: y_ki <= z_ki",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0012",
+      "description": "Available capacity of train i at origin station",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "1",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "C",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "g",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Khat"
+          ]
+        }
+      ],
+      "kind": "capacity",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013",
+      "description": "Capacity balance for train i leaving station j",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j-1",
+              "offset": -1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "g",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "g",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Khat"
+          ]
+        }
+      ],
+      "kind": "capacity",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014_a",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014_b",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "J",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "J",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "C",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0020",
+      "description": "Maximum unfairness bound: eta >= w_k",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "eta",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "w",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize the maximum waiting time (unfairness index) over all passenger groups.",
+    "terms": [
+      {
+        "ref": "eta",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "sum"
+  }
+}

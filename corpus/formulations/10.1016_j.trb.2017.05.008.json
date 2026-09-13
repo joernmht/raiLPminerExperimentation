@@ -1,0 +1,828 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2017.05.008",
+  "name": "A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system",
+  "family": "milp",
+  "description": "Mined from A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system (Transportation Research Part B Methodological, 2017).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2017.05.008",
+    "reference": "A train rescheduling model integrating speed management during disruptions of high-speed traffic under a quasi-moving block system",
+    "author": "Peijuan Xu; Francesco Corman; Qiyuan Peng; Xiaojie Luan",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "T",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of block sections for each train",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Index for block sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of consecutive section pairs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of all block sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B",
+      "description": "Set of speed levels",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "w",
+      "description": "Set of switches",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of entrance arcs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "D",
+      "description": "Set of departure sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Bbar",
+      "description": "Set of speed levels for train t (maximum)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of alternative arcs for train ordering",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Sbar",
+      "description": "Set of sections impacted by disruption",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "G",
+      "description": "Set of sections in disruption area",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "sw",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "AD",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "vartheta",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Next",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B2",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B_diff",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "end",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "eta",
+      "description": "",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Far",
+      "description": "pairs with absolute difference > 1",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B1",
+      "description": "Singleton braking level 1",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B_pair",
+      "description": "Forbidden braking level pairs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Dplus",
+      "description": "Successor positions",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B_1",
+      "description": "Singleton braking level 1",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B_2",
+      "description": "Set of speed levels for braking pair",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S_bar",
+      "description": "Set of sections impacted by disruption",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "Planned total travel time for train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "d",
+      "description": "Dwell time at station for train t",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "e",
+      "description": "Planned entry time of train t at section s",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Big-M constant",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "W",
+      "description": "Start and end times of disruption",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "dt",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Dt",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "DtPrev",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "pt",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "omega0",
+      "description": "",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "deltat",
+      "description": "Time increment",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dtprev",
+      "description": "Previous time increment",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "planned",
+      "description": "Planned time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "W_1",
+      "description": "Big-M constant for speed adaptation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "W_2",
+      "description": "Big-M constant for speed adaptation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta",
+      "description": "Minimum headway time for section",
+      "shape": [
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "y",
+      "description": "Secondary delay of train t (positive part)",
+      "shape": [
+        "T"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Indicator if train t passes after disruption start",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "xbar",
+      "description": "Indicator if train t passes before disruption end",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "beta",
+      "description": "Speed level selection variable",
+      "shape": [
+        "B",
+        "T",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "Train ordering variable for alternative arcs",
+      "shape": [
+        "T",
+        "T",
+        "S",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "mu",
+      "description": "Train ordering variable for speed-dependent arcs",
+      "shape": [
+        "T",
+        "T",
+        "vartheta"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "omega",
+      "description": "Entry time of train into section",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "omega_end",
+      "description": "Exit time of train from last section",
+      "shape": [
+        "T"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x_bar",
+      "description": "Speed adaptation indicator variable",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0015",
+      "description": "Each section assigned exactly one speed level",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "beta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "B",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Bbar"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017",
+      "description": "Maximum speed level 1 near stops",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "AD",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "AD",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "B",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "beta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "B",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018",
+      "description": "Indicator that train passes after disruption start",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "omega",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "W_1",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0025",
+      "description": "Disruption area ordering definition",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "f_eta",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "f_eta",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "mu",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "vartheta",
+              "expr": "vartheta_eta",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "omega",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "f_eta",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "omega",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "f_eta",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total secondary delay of trains",
+    "terms": [
+      {
+        "ref": "y",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "t",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "T"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

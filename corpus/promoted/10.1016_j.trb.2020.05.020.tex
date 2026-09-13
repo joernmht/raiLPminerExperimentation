@@ -86,21 +86,13 @@
   & \sum_{c \in C^{P u s h} : a \in A_{c}} x_{c a} \geq 1 \forall a \in A^{\text{Push}} , \tag{eq\_0005} \\
   & \sum_{c \in C : a \in A_{c}} x_{c a} \geq 1 \forall a \in A^{\text{Task}} , \tag{eq\_0006} \\
   & x_{c a} + y_{c a} \leq r_{c a} \cdot K \forall a \in A^{\text{Train}} , c \in C : a \in A_{c} , \tag{eq\_0007} \\
-  & r_{c a} + r_{c_hat a} \leq 1 \forall c \in C , c_hat \in \left(C_hat\right)_{c} , a \in A^{\text{Train}} \cap A_{c} \cap A_{c_hat} , \tag{eq\_0008} \\
+  & r_{c a} + r_{c_hat a} \leq 1 \forall c \in C , c_hat \in C_hat_{c} , a \in A^{\text{Train}} \cap A_{c} \cap A_{c_hat} , \tag{eq\_0008} \\
   & u_{l} = \sum_{c \in C : l \in L_{c}} \underset{a \in A^{\text{Sink}} \cap A_{c}}{\sum} y_{c a} \forall l \in L , \tag{eq\_0009} \\
   & u_{l} - s_{l} \leq B_{l} \forall l \in L , \tag{eq\_0010} \\
   & \sum_{c \in C} y_{c a} \leq v_{a} \cdot K \forall a \in A^{\text{Connect}} , \tag{eq\_0011} \\
   & \underset{a \in A_{i}^{\text{Out}}}{\sum} v_{a} = 1 \forall i \in N^{\text{Arrival}} , \tag{eq\_0012} \\
   & \underset{a \in A_{i}^{\text{In}}}{\sum} v_{a} = 1 \forall i \in N^{\text{Departure}} , \tag{eq\_0013} \\
   & \sum_{c \in C} y_{c a} - 1 \leq w_{a} \cdot K \forall a \in A^{\text{Bust}} , \tag{eq\_0014} \\
-  & x_{c a} \in \mathcal{N} \forall c \in C , a \in A^{\text{Train}} \cap A_{c} , \tag{eq\_0015} \\
-  & x_{c a} \in \mathcal{N} \forall c \in C , a \in A^{\text{Light}} \cap A_{c} , \tag{eq\_0016} \\
-  & y_{c a} \in \mathcal{N} \forall c \in C , a \in A_{c} \backslash A^{\text{Light}} , \tag{eq\_0017} \\
-  & r_{c a} \in \left\{0 , 1\right\} \forall c \in C , a \in A^{\text{Train}} \cap A_{c} , \tag{eq\_0018} \\
-  & v_{a} \in \left\{0 , 1\right\} \forall a \in A^{\text{Connect}} , \tag{eq\_0019} \\
-  & w_{a} \in \left\{0 , 1\right\} \forall a \in A^{\text{Bust}} , \tag{eq\_0020} \\
-  & u_{l} \in \mathcal{R}^{+} \forall c \in C , \tag{eq\_0021} \\
-  & s_{l} \in \mathcal{N} \forall c \in C . \tag{eq\_0022} \\
   & x_{c a} = 0 \forall c \in C \backslash L , a \in A_{c} , \tag{eq\_0023} \\
   & y_{c a} = 0 \forall c \in C \backslash L , a \in A_{c} . \tag{eq\_0024} \\
   & \sum_{c \in C : a \in A_{c}} x_{c a} \leq 1 \forall a \in A^{\text{Train}} , \tag{eq\_0025} \\
@@ -108,6 +100,6 @@
   & x_{l a} = x_{l a} + x_{c a} \forall c \in C \backslash L , l \in L_{c} , a \in A_{c} \tag{eq\_0027} \\
   & y_{l a} = y_{l a} + y_{c a} \forall c \in C \backslash L , l \in L_{c} , a \in A_{c} \tag{eq\_0028} \\
   & y_{c a} = 0 \forall a \in A^{\text{Change}} , c \in C : a \in A_{c} . \tag{eq\_0029} \\
-  & x_{c a} = 0 \forall a \in A^{\text{Light}} \backslash \left(A_hat\right)^{\text{Light}} , c \in C : a \in A_{c} \tag{eq\_0030} \\
+  & x_{c a} = 0 \forall a \in A^{\text{Light}} \backslash A_hat^{\text{Light}} , c \in C : a \in A_{c} \tag{eq\_0030} \\
   & x_{c e} = x_{c f} \forall \left(e , f\right) \in M , c \in C : e \in A_{c} , f \in A_{c} \tag{eq\_0031} \\
 \end{align}

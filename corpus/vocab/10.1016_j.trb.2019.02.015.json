@@ -1,5 +1,23 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [
+    {
+      "name": "head",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "tail",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    }
+  ],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "A",
@@ -75,12 +93,18 @@
     ]
   },
   "used": [
+    "A_de_head",
+    "A_odturn",
+    "A_turn",
     "Delta_acce_ap",
     "Delta_dece_ap",
     "E_NMdelay",
+    "E_de",
+    "E_odturn",
+    "E_turn",
+    "E_turn_de",
     "L",
     "L_ap",
-    "M_2",
     "N",
     "N_p_st",
     "N_st",
@@ -121,36 +145,70 @@
   ],
   "bound": [
     "D",
-    "E_turn_ar",
-    "E_turn_de",
+    "E",
     "M_1",
-    "TR_turn",
+    "M_2",
+    "TR",
     "a",
     "e",
     "e_1",
     "e_2",
+    "en",
     "ep",
     "epp",
+    "ex",
     "r"
   ],
   "families": [
-    "A_ar_de_head",
-    "A_ar_head",
-    "A_de_ar_head",
-    "A_de_head",
-    "A_dwell",
-    "A_odturn",
-    "A_pass",
-    "A_plan_odturn",
-    "A_run",
-    "A_station",
-    "A_turn",
-    "E_ar",
-    "E_de",
-    "E_odturn_ar",
-    "E_odturn_de"
+    "A",
+    "E",
+    "E_ar"
   ],
-  "missing": {},
+  "missing": {
+    "E_odturn": {
+      "rows": [
+        "eq_0054",
+        "eq_0065",
+        "eq_0066"
+      ],
+      "roles": {
+        "symbol": 3
+      },
+      "arities": {
+        "2": 3
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "E_turn": {
+      "rows": [
+        "eq_0013",
+        "eq_0054",
+        "eq_0066"
+      ],
+      "roles": {
+        "symbol": 3
+      },
+      "arities": {
+        "2": 3
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "E_turn_de": {
+      "rows": [
+        "eq_0013"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    }
+  },
   "missing_index": [],
   "shape_mismatch": [],
   "unresolved_script": [
@@ -174,15 +232,21 @@
     "D",
     "Delta",
     "M",
+    "M_2",
     "w",
     "z"
   ],
   "family_as_symbol": {
+    "A_de_head": 2,
+    "A_odturn": 6,
+    "A_turn": 2,
     "E_NMdelay": 1,
+    "E_de": 5,
     "ap": 13,
     "app": 8,
     "t": 66
   },
   "paper_key": "10.1016_j.trb.2019.02.015",
-  "sidecar": true
+  "sidecar": true,
+  "shape_fixes_applied": 2
 }

@@ -19,7 +19,7 @@
 %@ param P shape=S,S kind=matrix domain=- :: Passenger demand between stations i and j
 %@ param q shape=S,S kind=matrix domain=- :: Minimum number of trains serving OD pair (i,j) before optimization
 %@ param M shape=- kind=big_m domain=- :: Large number, set to train capacity
-%@ var y shape=K,L,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
+%@ var y shape=K,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k with pattern l uses space-time arc (i,i',t,t')
 %@ index T ordered=0 cyclic=0 :: Set of time periods
 %@ param d shape=K kind=vector domain=- :: Destination station of train k
 %@ param dep shape=K kind=vector domain=- :: Departure time of train k at origin
@@ -59,10 +59,8 @@
   & \sum_{k \in K} p_{i j}^{k} \leq P_{i j} , \forall i , j \in S , i < j \tag{eq\_0009} \\
   & \sum_{k \in K, l \in L_{k}} x_{k}^{l} \cdot \mathit{theta}_{l}^{i} \cdot \mathit{theta}_{l}^{j} \geq q_{i j}^{o} , \forall i , j \in S , i < j \tag{eq\_0010} \\
   & p_{i j}^{k} \leq M \sum_{l \in L_{k}} x_{k}^{l} \cdot \mathit{theta}_{l}^{i} \cdot \mathit{theta}_{l}^{i} , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0011} \\
-  & \sum_{i , t : \left(i , ip , t , tp\right) \in E_{k}} y_{k}^{l} \left(i , ip , t , tp\right) - \sum_{i , t : \left(ip , i , tp , t\right) \in E_{k}} y_{k}^{l} \left(ip , i , tp , t\right) = \left\{\begin{matrix} - 1 ip = o_{k} , tp = \mathit{dep}_{k}^{s} \\ 1 ip = d_{k} , tp = T \\ 0 \cdot o t h \cdot e \cdot r \cdot w i s \cdot e \end{matrix}\right \forall k \in K , l \in L \tag{eq\_0012} \\
+  & \sum_{i , t : \left(i , ip , t , tp\right) \in E_{k}} y_{k}^{l} \left(i , ip , t , tp\right) - \sum_{i , t : \left(ip , i , tp , t\right) \in E_{k}} y_{k}^{l} \left(ip , i , tp , t\right) = \left\{ - 1 ip = o_{k} , tp = \mathit{dep}_{k}^{s} \\ 1 ip = d_{k} , tp = T \\ 0 \cdot o t h \cdot e \cdot r \cdot w i s \cdot e \right \forall k \in K , l \in L \tag{eq\_0012} \\
   & \sum_{k \in K, l \in L_{k}, \left(i , ip , t , tp\right) \in \mathit{phi} \left(j , jp , \mathit{tau}\right)} y_{k}^{l} \left(i , ip , t , tp\right) \leq 1 , \forall \left(j , jp\right) \in G^{' '} , \mathit{tau} \in T \tag{eq\_0013} \\
   & \sum_{t , tp : \left(i , ip , t , tp\right) \in E_{k}} y_{k}^{l} \left(i , ip , t , tp\right) = x_{k}^{l} , \forall k \in K , l \in L , \left(i , ip\right) \in G_{k}^{' '} \tag{eq\_0014} \\
-  & x_{k}^{l} \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} \tag{eq\_0015} \\
   & y_{k}^{l} \left(i , ip , t , tp\right) \in \left\{0 , 1\right\} , \forall k \in K , l \in L_{k} , \left(i , ip , t , tp\right) \in E_{k} \tag{eq\_0016} \\
-  & p_{i j}^{k} \geq 0 , \forall k \in K , \forall i , j \in S , i < j \tag{eq\_0017} \\
 \end{align}

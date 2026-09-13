@@ -26,10 +26,10 @@
 %@ param O shape=T kind=vector domain=- :: Origin node of train t
 %@ param D shape=T kind=vector domain=- :: Destination node of train t
 %@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
-%@ param tau shape=A,T kind=matrix domain=- :: Travel time on arc (i,j) for train t
-%@ param h shape=A,T,T kind=matrix domain=- :: Headway time between trains t and m on arc (i,j)
-%@ param s shape=A,T kind=matrix domain=- :: Capacity of arc (i,j) at time t
-%@ param delta shape=A,P kind=matrix domain=- :: Indicator if arc (i,j) is on path p
+%@ param tau shape=N,N,T kind=matrix domain=- :: Travel time on arc (i,j) for train t
+%@ param h shape=N,N,T,T kind=matrix domain=- :: Headway time between trains t and m on arc (i,j)
+%@ param s shape=T kind=matrix domain=- :: Capacity of arc (i,j) at time t
+%@ param delta shape=N,N,P kind=matrix domain=- :: Indicator if arc (i,j) is on path p
 %@ con eq_0004 kind=flow_balance domain=- indicator=- :: Flow continuity for train t at node i
 %@ con eq_0006 kind=linear domain=- indicator=- :: Number of starting nodes equals number of ending nodes for each train t
 %@ con eq_0007 kind=linear domain=- indicator=- :: Original origin of train t is a starting node
@@ -56,7 +56,7 @@
 %@ param c_delay shape=T kind=scalar domain=- :: Cost coefficient for delay at time t
 \begin{align}
   \max\quad & \sum_{k \in K, p \in P^{k}} 1 / c_{p}^{k} \cdot d_{k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} c_{c a n c e l}^{t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}, \left(i , j\right) \in A} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T, i \in N} c_{d e l a y}^{t} \cdot \left(T_{A_bar , i}^{t} - T_{A , i}^{t}\right) \tag{eq\_0002} \\
-  & \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \left\{\begin{matrix} - o_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{a}\textrm{ }\text{starting}\textrm{ }\text{node} \\ d_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{an}\textrm{ }\text{ending}\textrm{ }\text{node} \\ 0 , \text{otherwise} \end{matrix}\right \forall t \in T , i \in N^{t} \tag{eq\_0004} \\
+  & \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \left\{ - o_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{a}\textrm{ }\text{starting}\textrm{ }\text{node} \\ d_{i}^{t} , \text{if}\textrm{ }\text{node}\textrm{ }\text{i}\textrm{ }\text{is}\textrm{ }\text{an}\textrm{ }\text{ending}\textrm{ }\text{node} \\ 0 , \text{otherwise} \right \forall t \in T , i \in N^{t} \tag{eq\_0004} \\
   & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0006} \\
   & o_{i}^{t} = 1 \forall t \in T , i = N \left(O_{t}\right) \tag{eq\_0007} \\
   & d_{i}^{t} = 1 \forall t \in T , i = N \left(D_{t}\right) \tag{eq\_0008} \\
@@ -75,6 +75,5 @@
   & T_{A_bar , i}^{t} - T_{D_bar , i}^{t} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0021} \\
   & \sum_{p \in P^{k}} \mathit{delta}_{i j}^{p} \cdot d_{k} \cdot f_{p}^{k} \leq \sum_{t \in T} s^{t} \cdot x_{i j}^{t} \forall \left(i , j\right) \in A \tag{eq\_0022} \\
   & \sum_{p \in P^{k}} f_{p}^{k} \leq 1 \forall k \in K \tag{eq\_0023} \\
-  & x_{i j}^{t} , o_{i}^{t} , d_{i}^{t} \in \left\{0 , 1\right\} \forall t \in T , n \in N^{t} \tag{eq\_0024} \\
   & f_{p}^{k} = \left[0 , 1\right] \forall k \in K , p \in P^{k} \tag{eq\_0025} \\
 \end{align}

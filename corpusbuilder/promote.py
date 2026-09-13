@@ -81,7 +81,7 @@ from railpminer import _lp2graph  # noqa: F401
 from corpusbuilder.algebra import declared_names, declared_products
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex, normalize_objective_head
-from corpusbuilder.symbols import binder_roles, paper_evidence
+from corpusbuilder.symbols import binder_roles, domain_declaration, paper_evidence
 from lp2graph import loads as load_formulation
 from lp2graph.mining import REWRITE_RULES_VERSION
 from lp2graph.mining.corpusmgr import PRIORITY_CELLS, QUALITY_TIERS
@@ -458,8 +458,64 @@ def _declaration_lines(text: str) -> list[str]:
         head = line[2:].strip().split()
         if head and head[0] in generated:
             continue
+        line, fix = _normalize_declaration_line(line)
+        if fix:
+            out.append(f"% declaration fixed: {fix}")
         out.append(line)
     return out
+
+
+#: ``ParameterDomainClass`` of lp2graph.core.model: a parameter's ``domain=`` is a
+#: semantic class, not a number domain. Sidecars written by the assist stage
+#: put variable-style domains here (``continuous``, ``real``); those are
+#: metadata errors that would veto the whole document at validation.
+_PARAM_DOMAIN_CLASSES = frozenset(
+    {
+        "cost_weight",
+        "time_duration",
+        "capacity",
+        "demand",
+        "network_structure",
+        "penalty_bigM",
+        "count_limit",
+        "unclassified",
+    }
+)
+_VAR_DOMAIN_SYNONYMS = {
+    "real": "continuous",
+    "nonneg": "non_negative",
+    "nonnegative": "non_negative",
+    "non-negative": "non_negative",
+    "positive": "non_negative",
+    "bool": "binary",
+    "boolean": "binary",
+    "int": "integer",
+}
+
+
+def _normalize_declaration_line(line: str) -> tuple[str, str]:
+    """Deterministic metadata repair of one ``%@`` line, with a note.
+
+    Only values that cannot change the algebra are touched: a parameter's
+    ``domain=`` outside the semantic class vocabulary becomes ``-`` (unknown),
+    a variable's ``domain=`` spelled as a synonym becomes the canonical word.
+    Anything else is left for the parser to refuse by name.
+    """
+    head = line[2:].strip().split()
+    if len(head) < 2 or head[0] not in ("param", "var"):
+        return line, ""
+    m = re.search(r"\bdomain=(\S+)", line)
+    if not m:
+        return line, ""
+    value = m.group(1)
+    if head[0] == "param" and value != "-" and value not in _PARAM_DOMAIN_CLASSES:
+        return line.replace(m.group(0), "domain=-", 1), f"param {head[1]}: domain={value} -> -"
+    if head[0] == "var" and value in _VAR_DOMAIN_SYNONYMS:
+        new = _VAR_DOMAIN_SYNONYMS[value]
+        return line.replace(
+            m.group(0), f"domain={new}", 1
+        ), f"var {head[1]}: domain={value} -> {new}"
+    return line, ""
 
 
 def declared_family(declarations: str) -> str:
@@ -531,6 +587,11 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
         normalized, _prov = normalize_latex(latex, source="corpusbuilder.promote/assemble")
         return declared_products(normalized, names)
 
+    def _constraint_latex(latex: str) -> str:
+        # "s.t." / "subject to" left in front of the first constraint by the
+        # extraction is a section marker, never algebra
+        return _row_latex(_ST_PREFIX.sub("", latex, count=1))
+
     lines.append(rf"\begin{{{_ALIGN}}}")
     for row in rows:
         tag = row.name.replace("_", r"\_")
@@ -540,10 +601,18 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
             operator, rest = body.split(None, 1) if " " in body else (body, "")
             lines.append(rf"  {operator}\quad & {rest.strip()} \tag{{{tag}}} \\")
         else:
-            lines.append(rf"  & {_row_latex(row.latex)} \tag{{{tag}}} \\")
+            lines.append(rf"  & {_constraint_latex(row.latex)} \tag{{{tag}}} \\")
     lines.append(rf"\end{{{_ALIGN}}}")
     return "\n".join(lines) + "\n"
 
+
+#: ``s.t.`` / ``subject to`` (also ``\text{s.t.}``, ``\mathrm{s.t.}``, ``s . t .``)
+#: at the head of a constraint row, with an optional colon.
+_ST_PREFIX = re.compile(
+    r"^\s*(?:\\(?:text|mathrm|textrm|mathit)\s*\{\s*)?"
+    r"(?:s\s*\.\s*t\s*\.?|subject\s+to)\s*\}?\s*:?\s*",
+    re.IGNORECASE,
+)
 
 #: One declaration line per kind, with the facts a stub cannot know left as ``?``.
 _KIND_LINE = {
@@ -723,6 +792,11 @@ class Outcome:
     #: per-row parser message), empty for full promotions.
     rows_included: int = 0
     rows_excluded: tuple[dict, ...] = ()
+    #: Domain-declaration rows absorbed into the sidecar instead of parsed.
+    rows_absorbed: tuple[str, ...] = ()
+    #: Row-level probe (``--partial``): objective_ok, rows_probed, rows_ok,
+    #: row_failures by class — measured for EVERY paper, promoted or not.
+    coverage: dict | None = None
 
     @property
     def category(self) -> str | None:
@@ -748,9 +822,89 @@ class Outcome:
                 "rows_excluded": len(self.rows_excluded),
                 "excluded": list(self.rows_excluded),
             }
+        if self.rows_absorbed:
+            out["absorbed_declaration_rows"] = list(self.rows_absorbed)
+        if self.coverage is not None:
+            out["coverage"] = self.coverage
         if self.written:
             out["written"] = list(self.written)
         return out
+
+
+#: ``outside_grammar`` parser messages -> failure class. Order matters: the
+#: superscript test must run before the generic "trailing" test.
+GRAMMAR_CLASSES: tuple[tuple[str, str], ...] = (
+    ("trailing '^{", "superscript after subscript"),
+    ("trailing '", "juxtaposed factor / residue"),
+    ("chained relation with", "chain: 3+ comparators"),
+    ("mixed-direction or equality chained", "chain: mixed / equality"),
+    ("cannot serve as an index family", "label subscript"),
+    ("not a declared variable or parameter", "undeclared symbol (vocabulary)"),
+    ("not a declared parameter", "undeclared coefficient (vocabulary)"),
+    ("quantifier over a subscripted index set", "quantifier: subscripted set"),
+    ("binder over a subscripted index set", "binder: subscripted set"),
+    ("tuple quantifier", "quantifier: tuple"),
+    ("tuple binder", "binder: tuple"),
+    ("range binder", "binder: range"),
+    ("clause not understood", "quantifier: clause not understood"),
+    ("string_pattern_mismatch", "parenthesised / text residue"),
+    ("could not convert string to float", "non-numeric coefficient"),
+    ("subscripted coefficient", "subscripted-coef shape mismatch"),
+    ("names the variable", "variable x variable (nonlinear)"),
+    ("unbalanced braces", "unbalanced braces"),
+    ("no comparator", "no comparator"),
+    ("frac", "frac"),
+)
+
+
+def classify_failure(detail: str | None) -> str:
+    """The failure class of one parser message (``"other"`` when none matches)."""
+    text = detail or ""
+    for needle, label in GRAMMAR_CLASSES:
+        if needle in text:
+            return label
+    return "other"
+
+
+def absorb_declaration_rows(rows: list[Row]) -> tuple[list[Row], tuple[str, ...]]:
+    """Split off the rows that only declare a variable's domain.
+
+    ``x_{i} \\in \\{0, 1\\}`` or ``t_{i} \\ge 0`` is a declaration, not a
+    constraint: the sidecar carries it as ``domain=``. Such rows have no
+    comparator the grammar could parse and used to veto the paper; they are
+    absorbed here and recorded in the provenance, never silently dropped.
+    """
+    kept: list[Row] = []
+    absorbed: list[str] = []
+    for row in rows:
+        if not row.is_objective and domain_declaration(row.latex):
+            absorbed.append(row.name)
+        else:
+            kept.append(row)
+    return kept, tuple(absorbed)
+
+
+def synthetic_objective_row(declarations: str) -> Row | None:
+    """A guaranteed-canonical objective over the first declared variable, used
+    ONLY to probe constraint rows when the paper's own objective fails."""
+    for m in re.finditer(r"^\s*%@\s*var\s+([A-Za-z_]\w*)\s+shape=(\S+)", declarations, re.M):
+        name, shape = m.group(1), m.group(2)
+        if shape == "-":
+            return Row(
+                name="probe_objective", latex=rf"\min {name}", is_objective=True, formula_id="probe"
+            )
+        families = [f for f in shape.split(",") if f]
+        if not families or any(not re.fullmatch(r"[A-Za-z_]\w*", f) for f in families):
+            continue
+        idx = [f"i{k}" for k in range(len(families))]
+        binders = ", ".join(rf"{i} \in \mathcal{{{f}}}" for i, f in zip(idx, families, strict=True))
+        return Row(
+            name="probe_objective",
+            latex=rf"\min \sum_{{{binders}}} {name}_{{{', '.join(idx)}}}",
+            is_objective=True,
+            formula_id="probe",
+        )
+    return None
 
 
 def entry_id_for(paper_key: str) -> str:
@@ -790,6 +944,8 @@ def promote_paper(
     dirs["declarations"] = declarations_dir
     entry_id = entry_id_for(decisions.paper_key)
     rows, counts = rows_for(dossier, decisions)
+    rows, absorbed = absorb_declaration_rows(rows)
+    coverage: dict | None = None
 
     def fail(cause: str, detail: str = "", written: tuple[str, ...] = ()) -> Outcome:
         return Outcome(
@@ -801,6 +957,8 @@ def promote_paper(
             counts=counts,
             rows=len(rows),
             written=written,
+            rows_absorbed=absorbed,
+            coverage=coverage,
         )
 
     decided = sum(counts.get(s, 0) for s in TERMINAL_STATUSES)
@@ -862,35 +1020,60 @@ def promote_paper(
         # the provenance carries ``partial`` so no reader can mistake it.
         objective_rows = [r for r in rows if r.is_objective]
 
-        def _row_ok(row: Row) -> tuple[bool, str]:
-            doc = assemble(dossier, [*objective_rows, row], declarations, entry_id=entry_id)
+        def _row_ok(row: Row, base: list[Row]) -> tuple[bool, str]:
+            doc = assemble(dossier, [*base, row], declarations, entry_id=entry_id)
             probe = ingest_latex(doc, source=f"probe/{entry_id}")
             if probe.ok:
                 return True, ""
             return False, _oneline("; ".join(f.message for f in probe.failures))[:200]
 
         obj_doc = assemble(dossier, objective_rows, declarations, entry_id=entry_id)
-        if ingest_latex(obj_doc, source=f"probe/{entry_id}").ok:
-            kept: list[Row] = list(objective_rows)
-            dropped: list[dict] = []
+        obj_probe = ingest_latex(obj_doc, source=f"probe/{entry_id}")
+        objective_ok = obj_probe.ok
+        # Measurement for every paper: when the paper's own objective fails,
+        # a synthetic objective over a declared variable lets the constraint
+        # rows be probed anyway (never promoted with it, only counted).
+        probe_base: list[Row] | None = objective_rows if objective_ok else None
+        if probe_base is None:
+            synthetic = synthetic_objective_row(declarations)
+            if synthetic is not None:
+                syn_doc = assemble(dossier, [synthetic], declarations, entry_id=entry_id)
+                if ingest_latex(syn_doc, source=f"probe/{entry_id}").ok:
+                    probe_base = [synthetic]
+        kept: list[Row] = list(objective_rows)
+        dropped: list[dict] = []
+        if probe_base is not None:
             for row in rows:
                 if row.is_objective:
                     continue
-                ok, why = _row_ok(row)
+                ok, why = _row_ok(row, probe_base)
                 if ok:
                     kept.append(row)
                 else:
                     dropped.append({"name": row.name, "formula_id": row.formula_id, "error": why})
-            if len(kept) > len(objective_rows):
-                subset_doc = assemble(dossier, kept, declarations, entry_id=entry_id)
-                subset = ingest_latex(subset_doc, source=f"corpus/promoted/{entry_id}.tex")
-                if subset.ok:
-                    result = subset
-                    document = subset_doc
-                    excluded = tuple(dropped)
-                    if write:
-                        tex_path = dirs["promoted"] / f"{entry_id}.tex"
-                        tex_path.write_text(document, encoding="utf-8", newline="\n")
+        coverage = {
+            "objective_ok": objective_ok,
+            "objective_error": ""
+            if objective_ok
+            else _oneline("; ".join(f.message for f in obj_probe.failures))[:200],
+            "rows_probed": (len(kept) - len(objective_rows) + len(dropped))
+            if probe_base is not None
+            else 0,
+            "rows_ok": len(kept) - len(objective_rows) if probe_base is not None else 0,
+            "row_failures": dict(
+                sorted(Counter(classify_failure(d["error"]) for d in dropped).items())
+            ),
+        }
+        if objective_ok and len(kept) > len(objective_rows):
+            subset_doc = assemble(dossier, kept, declarations, entry_id=entry_id)
+            subset = ingest_latex(subset_doc, source=f"corpus/promoted/{entry_id}.tex")
+            if subset.ok:
+                result = subset
+                document = subset_doc
+                excluded = tuple(dropped)
+                if write:
+                    tex_path = dirs["promoted"] / f"{entry_id}.tex"
+                    tex_path.write_text(document, encoding="utf-8", newline="\n")
     if not result.ok:
         stage = result.failures[0].stage
         cause = {
@@ -913,6 +1096,8 @@ def promote_paper(
     load_formulation(payload, source=entry_id)
 
     record = provenance_record(dossier, cell, entry_id=entry_id)
+    if absorbed:
+        record["declaration_rows"] = list(absorbed)
     if excluded:
         record["partial"] = {
             "rows_total": len(rows),
@@ -944,6 +1129,8 @@ def promote_paper(
         paper_key=decisions.paper_key,
         entry_id=entry_id,
         promoted=True,
+        rows_absorbed=absorbed,
+        coverage=coverage,
         counts=counts,
         rows=len(rows),
         written=tuple(written_paths),
@@ -1008,8 +1195,33 @@ def build_report(outcomes: list[Outcome], unrecognised: dict[str, int]) -> dict:
             by_category[CAUSES[outcome.cause][0]] += 1
 
     promoted = [o for o in outcomes if o.promoted]
+    probed = [o for o in outcomes if o.coverage and o.coverage["rows_probed"]]
+    row_failures: Counter[str] = Counter()
+    for o in outcomes:
+        if o.coverage:
+            row_failures.update(o.coverage["row_failures"])
+    shares = sorted(o.coverage["rows_ok"] / o.coverage["rows_probed"] for o in probed)
+    rows_probed = sum(o.coverage["rows_probed"] for o in probed)
+    rows_ok = sum(o.coverage["rows_ok"] for o in probed)
+    row_coverage = (
+        {
+            "papers_probed": len(probed),
+            "objective_ok": sum(1 for o in outcomes if o.coverage and o.coverage["objective_ok"]),
+            "rows_probed": rows_probed,
+            "rows_ok": rows_ok,
+            "rows_ok_share": round(rows_ok / rows_probed, 4) if rows_probed else 0.0,
+            "median_paper_share": round(shares[len(shares) // 2], 4) if shares else 0.0,
+            "papers_half_or_more": sum(1 for x in shares if x >= 0.5),
+            "papers_all_rows": sum(1 for x in shares if x == 1.0),
+            "row_failures": dict(row_failures.most_common()),
+            "absorbed_declaration_rows": sum(len(o.rows_absorbed) for o in outcomes),
+        }
+        if any(o.coverage for o in outcomes)
+        else None
+    )
     return {
         "schema_version": PROMOTION_SCHEMA,
+        "row_coverage": row_coverage,
         "derived_from": "corpus/decisions/*.json + corpus/dossiers/*.json + corpus/declarations/*.tex",
         "rewrite_rules_version": REWRITE_RULES_VERSION,
         "papers_with_decisions": len(outcomes),
@@ -1061,6 +1273,25 @@ def render_report_md(report: dict) -> str:
             "Files of papers that did not promote in this run; the corpus directory "
             "now equals this report."
         )
+
+    rc = report.get("row_coverage")
+    if rc:
+        lines += [
+            "",
+            "## Row coverage (every accepted row probed on its own)",
+            "",
+            f"- papers probed: **{rc['papers_probed']}** · objective row parses: "
+            f"**{rc['objective_ok']}**",
+            f"- constraint rows parsing with their header: **{rc['rows_ok']} / {rc['rows_probed']}** "
+            f"({100 * rc['rows_ok_share']:.1f}%) · median per paper "
+            f"{100 * rc['median_paper_share']:.0f}% · papers with >= half: "
+            f"{rc['papers_half_or_more']} · all rows: {rc['papers_all_rows']}",
+            f"- domain-declaration rows absorbed into the sidecar: {rc['absorbed_declaration_rows']}",
+            "",
+            "| failing rows by class | rows |",
+            "| --- | ---: |",
+        ]
+        lines += [f"| {k} | {v} |" for k, v in rc["row_failures"].items()]
 
     lines += ["", "## Failures by cause", ""]
     if report["failures_by_cause"]:

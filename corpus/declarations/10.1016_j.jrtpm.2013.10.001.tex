@@ -78,7 +78,10 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.jrtpm.2013.10.001.json (deterministic fill-in list); pending human confirmation.
 %@ index N_STOP ordered=0 cyclic=0 :: Set of stop operations in the alternative graph
-%@ param My_ij shape=i,j kind=scalar domain=- :: Big-M parameter for alternative arc (i,j)
-%@ param f_hk shape=h,k kind=scalar domain=- :: Fixed arc weight for alternative arc (h,k)
-%@ param f_ij shape=i,j kind=scalar domain=- :: Fixed arc weight for fixed arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): My_ij shape=i,j -> -
+%@ param My_ij shape=- kind=scalar domain=- :: Big-M parameter for alternative arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): f_hk shape=h,k -> -
+%@ param f_hk shape=- kind=scalar domain=- :: Fixed arc weight for alternative arc (h,k)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): f_ij shape=i,j -> -
+%@ param f_ij shape=- kind=scalar domain=- :: Fixed arc weight for fixed arc (i,j)
 %@ var Z_DELAY shape=- domain=continuous role=primary drole=- lo=- hi=- :: Total weighted passenger delay objective

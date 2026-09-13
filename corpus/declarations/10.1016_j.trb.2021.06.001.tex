@@ -87,5 +87,7 @@
 %@ param o_bar shape=- kind=scalar domain=- :: Origin vertex in the time-space network
 %@ param xi shape=K kind=scalar domain=- :: Cost coefficient for train k on arc u->v
 %@ param zeta shape=R kind=scalar domain=- :: Cost coefficient for passenger group r on arc u->v
-%@ var x_uv shape=A,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train k uses arc u->v
-%@ var y_uv shape=A,R domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow variable for group r on arc u->v
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): x_uv shape=A,K -> K
+%@ var x_uv shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train k uses arc u->v
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes r): y_uv shape=A,R -> R
+%@ var y_uv shape=R domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow variable for group r on arc u->v

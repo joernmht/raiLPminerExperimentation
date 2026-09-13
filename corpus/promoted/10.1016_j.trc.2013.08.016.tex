@@ -15,14 +15,14 @@
 %@ var y shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative arrival indicator for train j at station u at time t.
 %@ var z shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative departure indicator for train j at station u at time t.
 %@ var x shape=u,j,t domain=binary role=primary drole=- lo=- hi=- :: Binary cumulative boarding indicator for train j at station u at time t.
-%@ var D shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
+%@ var D shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of departure passengers at station u up to time t.
 %@ param c shape=- kind=scalar domain=- :: Train capacity (maximum passengers on board).
 %@ var TA shape=u,j domain=non_negative role=primary drole=- lo=- hi=- :: Arrival time of train j at station u.
 %@ index TD ordered=1 cyclic=0 :: Departure time of train j at station u, used as a time index.
 %@ param r shape=u kind=vector domain=- :: Section running time between stations u-1 and u.
 %@ param s shape=u kind=vector domain=- :: Dwell time at station u.
 %@ param h shape=- kind=scalar domain=- :: Minimum safety headway between consecutive trains.
-%@ var A shape=u,t domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
+%@ var A shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Cumulative number of arrival passengers at station u up to time t.
 %@ param P shape=u,v,t kind=matrix domain=- :: Time-dependent passenger demand from station u to v at time t.
 %@ index N ordered=1 cyclic=0 :: Number of stations in one direction (total 2N stations).
 %@ index R ordered=1 cyclic=0 :: Set of discrete time points in the operation horizon.
@@ -84,29 +84,29 @@
 %@ con eq_0042 kind=linear domain=- indicator=- :: Safety headway maintained when moving a train departure backward (Eq. 37).
 %@ con eq_0043 kind=linear domain=- indicator=- :: Loading period unchanged when moving a train departure backward (Eq. 38).
 \begin{align}
-  & y_{j}^{u} \left(t\right) \geq z_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0004} \\
-  & x_{j}^{u} \left(t + 1\right) \geq z_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0005} \\
-  & x_{j - 1}^{u} \left(t\right) \geq x_{j}^{u} \left(t\right) \forall u , j , t \tag{eq\_0006} \\
-  & D^{u} \left(t\right) - D^{u} \left(t - 1\right) \leq c \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j , t \tag{eq\_0007} \\
+  & y_{j}^{u} \cdot t \geq z_{j}^{u} \cdot t \forall u , j , t \tag{eq\_0004} \\
+  & x_{j}^{u} \left(t + 1\right) \geq z_{j}^{u} \cdot t \forall u , j , t \tag{eq\_0005} \\
+  & x_{j - 1}^{u} \cdot t \geq x_{j}^{u} \cdot t \forall u , j , t \tag{eq\_0006} \\
+  & D^{u} \cdot t - D^{u} \left(t - 1\right) \leq c \cdot \left[z_{j}^{u} \cdot t - z_{j}^{u} \left(t - 1\right)\right] \forall u , j , t \tag{eq\_0007} \\
   & \mathit{TA}_{j}^{u} = \mathit{TD}_{j}^{u - 1} + r^{u - 1} \forall u \geq 2 , j \tag{eq\_0010} \\
   & \mathit{TD}_{j}^{u} = \mathit{TA}_{j}^{u} + s^{u} \forall u , j \tag{eq\_0011} \\
   & \mathit{TD}_{j}^{1} - \mathit{TD}_{j - 1}^{1} \geq h \forall j \geq 2 \tag{eq\_0012} \\
-  & A^{u} \left(t\right) = \sum_{v = u + 1}^{2 N} \sum_{tp = 0}^{t} P^{u , v} \left(tp\right) \forall u , t \tag{eq\_0013} \\
-  & A^{u} \left(t\right) \geq D^{u} \left(t\right) \forall u , t \tag{eq\_0014} \\
-  & x_{j}^{u} \left(t\right) \geq x_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0015} \\
-  & y_{j}^{u} \left(t\right) \geq y_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0016} \\
-  & z_{j}^{u} \left(t\right) \geq z_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0017} \\
-  & \mathit{TA}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[y_{j}^{u} \left(t\right) - y_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0018} \\
-  & \mathit{TD}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[z_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0019} \\
-  & V_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \left(t\right) \cdot \left[x_{j}^{u} \left(t\right) - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0020} \\
-  & R_{j}^{u} = R_{j}^{u - 1} + \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \left(t\right) \cdot \left[x_{j - 1}^{u} \left(t\right) - x_{j}^{u} \left(t\right)\right] - \sum_{up = 1}^{u - 1} \sum_{t \in \mathfrak{R}} P^{up , u} \left(t\right) \cdot \left[x_{j - 1}^{up} \left(t\right) - x_{j}^{up} \left(t\right)\right] \forall u \geq 1 , j \geq 1 \tag{eq\_0021\_a} \\
+  & A^{u} \cdot t = \sum_{v = u + 1}^{2 N} \sum_{tp = 0}^{t} P^{u , v} tp \forall u , t \tag{eq\_0013} \\
+  & A^{u} \cdot t \geq D^{u} \cdot t \forall u , t \tag{eq\_0014} \\
+  & x_{j}^{u} \cdot t \geq x_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0015} \\
+  & y_{j}^{u} \cdot t \geq y_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0016} \\
+  & z_{j}^{u} \cdot t \geq z_{j}^{u} \left(t - 1\right) \forall u , j , t \tag{eq\_0017} \\
+  & \mathit{TA}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[y_{j}^{u} \cdot t - y_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0018} \\
+  & \mathit{TD}_{j}^{u} = \sum_{t \in \mathfrak{R}} t \cdot \left[z_{j}^{u} \cdot t - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0019} \\
+  & V_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \cdot t \cdot \left[x_{j}^{u} \cdot t - z_{j}^{u} \left(t - 1\right)\right] \forall u , j \tag{eq\_0020} \\
+  & R_{j}^{u} = R_{j}^{u - 1} + \sum_{v = u + 1}^{2 N} \sum_{t \in \mathfrak{R}} P^{u , v} \cdot t \cdot \left[x_{j - 1}^{u} \cdot t - x_{j}^{u} \cdot t\right] - \sum_{up = 1}^{u - 1} \sum_{t \in \mathfrak{R}} P^{up , u} \cdot t \cdot \left[x_{j - 1}^{up} \cdot t - x_{j}^{up} \cdot t\right] \forall u \geq 1 , j \geq 1 \tag{eq\_0021\_a} \\
   & R_{j}^{0} = 0 \tag{eq\_0021\_b} \\
   & R_{j}^{u} \leq c \forall u , j \tag{eq\_0022} \\
-  \min\quad & \sum_{u, t \in \mathfrak{R}} \left[A^{u} \left(t\right) - D^{u} \left(t\right)\right] + \mathit{beta} \cdot \sum_{u, j} V_{j}^{u} \tag{eq\_0023} \\
-  & B_{j}^{u , v} = \sum_{t \in \left(L_{j - 1}^{u} , L_{j}^{u}\right]} P^{u , v} \left(t\right) for u = 1 , 2 , \ldots , 2 \cdot N - 1 ; v = u + 1 , u + 2 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0024} \\
+  \min\quad & \sum_{u, t \in \mathfrak{R}} \left[A^{u} \cdot t - D^{u} \cdot t\right] + \mathit{beta} \cdot \sum_{u, j} V_{j}^{u} \tag{eq\_0023} \\
+  & B_{j}^{u , v} = \sum_{t \in \left(L_{j - 1}^{u} , L_{j}^{u}\right]} P^{u , v} \cdot t for u = 1 , 2 , \ldots , 2 \cdot N - 1 ; v = u + 1 , u + 2 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0024} \\
   & O_{j}^{u} = \sum_{up = 1}^{u - 1} B_{j}^{up , u} for u = 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K . \tag{eq\_0025} \\
   & I_{j}^{u} = \sum_{v = u + 1}^{2 N} B_{j}^{u . v} for u = 1 , 2 , \ldots , 2 \cdot N - 1 ; j = 1 , 2 , \ldots , K . \tag{eq\_0026} \\
-  & W_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \left(L_{j - 1}^{u} , \mathit{TD}_{j}^{u}\right]} P^{u , v} \left(t\right) for u = 1 , 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0027} \\
+  & W_{j}^{u} = \sum_{v = u + 1}^{2 N} \sum_{t \in \left(L_{j - 1}^{u} , \mathit{TD}_{j}^{u}\right]} P^{u , v} \cdot t for u = 1 , 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K ; L_{j = 0}^{u} = 0 . \tag{eq\_0027} \\
   & R_{j}^{u} = min \left\{c , R_{j}^{u - 1} - O_{j}^{u} + W_{j}^{u}\right\} for u = 1 , 2 , \ldots , 2 \cdot N - 1 , j = 1 , 2 , \ldots , K \tag{eq\_0028\_a} \\
   & R_{j}^{0} = 0 . \tag{eq\_0028\_b} \\
   & R_{j}^{u} = R_{j}^{u - 1} + I_{j}^{u} - O_{j}^{u} for u = 2 , 3 , \ldots , 2 \cdot N ; j = 1 , 2 , \ldots , K . \tag{eq\_0029} \\
@@ -119,7 +119,7 @@
   & W_{K}^{u} \leq c - X_{K}^{u - 1} + O_{K}^{u} for u = 1 , 2 , \ldots , 2 \cdot N - 1 . \tag{eq\_0034} \\
   & \mathit{TD}_{j + 1} - \left(\mathit{TD}_{j} + \mathit{rho}\right) \geq h \tag{eq\_0037} \\
   & R_{j} + \mathit{Omega} \left(j , \mathit{rho}\right) \leq c \tag{eq\_0038} \\
-  & \sum_{t \in \left(L_{j + g} , \mathit{TD}_{j + g}\right]} P \left(t\right) \geq \mathit{Omega} \left(j , \mathit{rho}\right) for g = 1 , 2 , \hdots , G - 1 \tag{eq\_0039} \\
+  & \sum_{t \in \left(L_{j + g} , \mathit{TD}_{j + g}\right]} P \cdot t \geq \mathit{Omega} \left(j , \mathit{rho}\right) for g = 1 , 2 , \hdots , G - 1 \tag{eq\_0039} \\
   & \left(\mathit{TD}_{j} - \mathit{rho}\right) - \mathit{TD}_{j - 1} \geq h \tag{eq\_0040} \\
   & \mathit{TD}_{j} - \mathit{rho} \geq L_{j} \tag{eq\_0041} \\
   & \mathit{rho}_{\mathit{opt}} = min \left\{\right. \mathit{TD}_{j + 1} - \mathit{TD}_{j} - h , max \left\{\right. \mathit{rho} \left|\right. R_{j} + \sum_{t \in \left(\mathit{TD}_{j} , \mathit{TD}_{j} + \mathit{rho}\right]} P \left(t\right) \leq c \left.\right\} \left.\right\} \tag{eq\_0042} \\

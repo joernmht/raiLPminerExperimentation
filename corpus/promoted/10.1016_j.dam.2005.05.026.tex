@@ -26,8 +26,8 @@
 %@ param k shape=- kind=scalar domain=- :: Station capacity or train index
 %@ param integer shape=- kind=scalar domain=- :: Keyword indicating integrality constraint
 %@ param b shape=- kind=scalar domain=- :: Minimum time interval between departures
-%@ param d shape=- kind=scalar domain=- :: Minimum time between consecutive departures
-%@ param c shape=- kind=scalar domain=- :: Travel time constant
+%@ param d shape=S kind=scalar domain=- :: Minimum time between consecutive departures
+%@ param c shape=S kind=scalar domain=- :: Travel time constant
 %@ param q shape=- kind=scalar domain=- :: Number of time instants
 %@ con eq_0003 kind=linear domain=- indicator=- :: At most one selected arc leaving the source node for each train
 %@ con eq_0004 kind=linear domain=- indicator=- :: Flow conservation at intermediate nodes for each train
@@ -54,8 +54,8 @@
 %@ index delta_plus ordered=0 cyclic=0 :: Set of arcs leaving a node in the train-specific network
 %@ param Delta shape=- kind=scalar domain=- :: Time difference between two nodes
 %@ param alpha shape=- kind=scalar domain=- :: Auxiliary parameter for station capacity
-%@ param b_jk shape=- kind=scalar domain=- :: Minimum headway time between trains j and k at station i
-%@ param b_kj shape=- kind=scalar domain=- :: Minimum headway time between trains k and j at station i
+%@ param b_jk shape=S kind=scalar domain=- :: Minimum headway time between trains j and k at station i
+%@ param b_kj shape=S kind=scalar domain=- :: Minimum headway time between trains k and j at station i
 %@ param beta shape=- kind=scalar domain=- :: Cumulative arrival count parameter
 %@ param lambda_ip shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time p
 %@ param lambda_it shape=- kind=scalar domain=- :: Arrival indicator parameter for station i and time t
@@ -72,7 +72,6 @@
   & \sum_{w \in U^{i} : w \succeq u , \mathit{Delta} \left(u , w\right) < a_{i}} y_{w} \leq 1 , i \in S \backslash \left\{1\right\} , u \in U^{i} , \tag{eq\_0007} \\
   & \sum_{w \in W^{i} : w \succeq v , \mathit{Delta} \left(v , w\right) < d_{i}} y_{w} \leq 1 , i \in S \backslash \left\{s\right\} , v \in W^{i} , \tag{eq\_0008} \\
   & \sum_{w \in W^{i} \cap V^{j} : w \preceq v} z_{\mathit{jw}} + \sum_{w \in U^{i + 1} \cap V^{j} : w \succeq u} z_{\mathit{jw}} + \sum_{w \in W^{i} \cap V^{k} : w \succeq v} z_{\mathit{kw}} + \sum_{w \in U^{i + 1} \cap V^{k} : w \preceq u} z_{\mathit{kw}} \leq 3 , i \in S \backslash \left\{s\right\} , j , k \in T , j \neq k , i , i + 1 \in S^{j} \cup S^{k} , v \in W^{i} , u \in U^{i + 1} , \tag{eq\_0009} \\
-  & x_{a} \geq 0 , a \in A , \tag{eq\_0010} \\
   & x_{a} \cdot integer , a \in A . \tag{eq\_0011} \\
   & b_{i}^{\mathit{jk}} := max \left\{d_{i} , a_{i + 1} + t_{j} - t_{k}\right\} \tag{eq\_0014} \\
   & \sum_{w \in W^{i} \cap V^{j} : v_{1} \preceq w \prec v_{2}} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{j} : w \succeq v_{2} , \mathit{Delta} \left(v_{2} , w\right) < b_{i}^{\mathit{kj}}}{\sum} z_{\mathit{jw}} + \underset{w \in W^{i} \cap V^{k} : w \succeq v_{2} , \mathit{Delta} \left(v_{1} , w\right) < b_{i}^{\mathit{jk}}}{\sum} z_{\mathit{kw}} \leq 1 , i \in S \backslash \left\{s\right\} , j , k \in T , j \neq k , i , i + 1 \in S^{j} \cap S^{k} , v_{1} , v_{2} \in W^{i} , v_{1} \preceq v_{2} , \mathit{Delta} \left(v_{1} , v_{2}\right) < b_{i}^{\mathit{jk}} . \tag{eq\_0015} \\

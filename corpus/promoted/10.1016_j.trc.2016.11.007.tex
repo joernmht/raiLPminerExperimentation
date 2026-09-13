@@ -43,7 +43,8 @@
 %@ con eq_0028_b kind=linear domain=- indicator=- :: Parking capacity constraint at terminal with a yard.
 %@ con eq_0028_c kind=linear domain=- indicator=- :: Definition of v(t), number of down-direction train trips that have left terminal s_A by time t.
 %@ con eq_0028_d kind=linear domain=- indicator=- :: Equivalent parking capacity constraint at terminal with a yard expressed with w(t).
-%@ param tau shape=- domain=continuous role=parameter drole=- lo=- hi=- :: headway parameter
+% declaration fixed: param tau: domain=continuous -> -
+%@ param tau shape=- domain=- role=parameter drole=- lo=- hi=- :: headway parameter
 %@ index I shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for i from 1 to n
 %@ index J shape=set domain=integer role=index drole=- lo=1 hi=n :: index set for j from 1 to n
 %@ index I_after shape=set domain=integer role=index drole=- lo=C^{B}+1 hi=n :: index set for i from C^B+1 to n
@@ -58,24 +59,8 @@
 %@ param tau_B shape=- kind=scalar domain=- :: Minimum turnaround time at the terminal with a yard.
 %@ param tau_min shape=- kind=scalar domain=- :: Minimum required headway between consecutive train trips.
 \begin{align}
-  & \mathit{sigma}^{s_{k}} \left(x_{i + 1}\right) = 0 , s_{k} \in S \backslash \left\{s_{B}\right\} \tag{eq\_0003} \\
+  \min\quad & 2 \cdot n \tag{eq\_0017} \\
   & F^{\text{D}} \left(x_{i}\right) = \mathit{tau}_{\text{min}} \tag{eq\_0004} \\
-  & x_{1} \le t_{L}^{D} \tag{eq\_0007} \\
-  & y_{1} \le t_{L}^{U} \tag{eq\_0008} \\
-  & x_{n} \ge t_{E}^{D} \tag{eq\_0009} \\
-  & y_{n} \ge t_{E}^{U} \tag{eq\_0010} \\
   & x_{i + 1} - x_{i} \ge tau_{min} \qquad \forall i \in I \setminus \{n\} \tag{eq\_0011} \\
   & y_{j + 1} - y_{j} \ge tau_{min} \qquad \forall j \in J \setminus \{n\} \tag{eq\_0012} \\
-  & x_{i + 1} - x_{i} \leq F^{\text{D}} \left(x_{i}\right) , i = 1 , 2 , \ldots , n - 1 \tag{eq\_0013} \\
-  & y_{j + 1} - y_{j} \leq F^{\text{U}} \left(y_{j}\right) , j = 1 , 2 , \ldots , n - 1 \tag{eq\_0014} \\
-  & y_{j} \ge x_{j} + tau_{s_{A},s_{B}} + tau^{B} \qquad \forall j \in J \tag{eq\_0015} \\
-  & x_{i} + tau_{s_{A},s_{B}} \ge y_{i - C^{B}} \qquad \forall i \in I_after \tag{eq\_0016} \\
-  \min\quad & 2 \cdot n \tag{eq\_0017} \\
-  & y_{j} + \mathit{tau} \left(s_{A} , s_{B}\right) + \mathit{tau}^{A} \leq x_{i} , \left(j , i\right) \in M_hat \tag{eq\_0018} \\
-  & \left|\right. \left\{\right. \left(j , i\right) \left|y_{j} + \mathit{tau} \left(s_{A} , s_{B}\right) \leq t \leq x_{i} , \left(j , i\right) \in M \left.\right\}\right| \leq C^{A} , t = y_{1} + \mathit{tau} \left(s_{A} , s_{B}\right) , y_{2} + \mathit{tau} \left(s_{A} , s_{B}\right) , \ldots , y_{n} + \mathit{tau} \left(s_{A} , s_{B}\right) \tag{eq\_0019} \\
-  & w \left(t\right) \leq C^{A} , t = y_{j_{n - r + 1}} + \mathit{tau} \left(s_{A} , s_{B}\right) , y_{j_{n - r + 2}} + \mathit{tau} \left(s_{A} , s_{B}\right) , \ldots , y_{j_{n}} + \mathit{tau} \left(s_{A} , s_{B}\right) \tag{eq\_0027} \\
-  & \mathit{tau} \left(s_{A} , s_{B}\right) = 58 \text{min} , \mathit{tau}^{B} = 2 \text{min} \tag{eq\_0028\_a} \\
-  & C^{B} = 2 \text{trains} \tag{eq\_0028\_b} \\
-  & t_{\text{L}}^{\text{D}} = 06 : 00 \tag{eq\_0028\_c} \\
-  & t_{\text{L}}^{\text{U}} = 07 : 00 \tag{eq\_0028\_d} \\
 \end{align}

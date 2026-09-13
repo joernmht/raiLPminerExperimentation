@@ -16,8 +16,8 @@
 %@ index j ordered=1 cyclic=0 :: Station index (destination of arc).
 %@ index k ordered=0 cyclic=0 :: Train index.
 %@ index s ordered=1 cyclic=0 :: Time index (arrival time).
-%@ param o shape=k kind=vector domain=- :: Origin station of train k.
-%@ param q shape=k kind=vector domain=- :: Destination station of train k.
+%@ param o shape=- kind=vector domain=- :: Origin station of train k.
+%@ param q shape=- kind=vector domain=- :: Destination station of train k.
 %@ param v shape=i,j kind=matrix domain=- :: Minimum number of trains serving passengers from i to j.
 %@ param w shape=i kind=vector domain=- :: Minimum and maximum stopping times at station i.
 %@ param u shape=i kind=vector domain=- :: Number of sidetracks at station i.
@@ -31,22 +31,22 @@
 %@ con eq_0009 kind=linear domain=- indicator=- :: Arrival headway: trains arriving at station j must be separated by at least h minutes.
 %@ con eq_0010 kind=linear domain=- indicator=- :: Station capacity: number of waiting trains at station i at time t cannot exceed sidetracks u_i.
 %@ con eq_0011 kind=linear domain=- indicator=- :: No overtaking: two trains cannot use the same single-track section within conflicting time windows.
-%@ param alpha shape=k kind=scalar domain=- :: Weight coefficient for train k in the profit function.
-%@ param beta shape=k kind=scalar domain=- :: Weight coefficient for train k in the profit function.
-%@ var pi shape=k domain=continuous role=primary drole=- lo=- hi=- :: Profit of train k.
-%@ param pi_max shape=k kind=scalar domain=- :: Maximum possible profit of train k.
+%@ param alpha shape=- kind=scalar domain=- :: Weight coefficient for train k in the profit function.
+%@ param beta shape=- kind=scalar domain=- :: Weight coefficient for train k in the profit function.
+%@ var pi shape=- domain=continuous role=primary drole=- lo=- hi=- :: Profit of train k.
+%@ param pi_max shape=- kind=scalar domain=- :: Maximum possible profit of train k.
 %@ param w_max shape=i kind=scalar domain=- :: Maximum dwell time at station i.
 %@ param w_min shape=i kind=scalar domain=- :: Minimum dwell time at station i.
 \begin{align}
-  & \mathit{pi} \left(k\right) = \mathit{pi}^{max} \left(k\right) - \left[\mathit{alpha} \left(k\right) \cdot \sum_{i, s, t} x_{i , i}^{t , s} \left(k\right)\right] - \left[\mathit{beta} \left(k\right) \cdot \sum_{i} y_{o \left(k\right) , i} \left(k\right)\right] \forall k \tag{eq\_0001} \\
-  \text{Z}_{1}\quad & = max \sum_{k} \mathit{pi} \left(k\right) \tag{eq\_0002} \\
-  & \sum_{s, j} x_{i , j}^{t , s} \left(k\right) - \sum_{s, j} x_{j , i}^{s , t} \left(k\right) = \left\{\begin{matrix} 1 & i = o \left(k\right) , t = t_{o} \left(k\right) \\ - 1 & i = q \left(k\right) , t = t_{q} \left(k\right) \\ 0 & \text{otherwise} \end{matrix}\right \forall k , i , t \tag{eq\_0003} \\
-  & y_{o \left(k\right) , i} \left(k\right) = 0 \cdot i \leq o \left(k\right) \text{or} i > q \left(k\right) \forall k \tag{eq\_0004} \\
-  & \sum_{k} y_{i , j} \left(k\right) \geq v_{i , j} \forall i , j , i \neq j \tag{eq\_0005} \\
-  & \sum_{s, t} x_{i , i}^{t , s} \left(k\right) \leq w_{i}^{max} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0006} \\
-  & \sum_{s, t} x_{i , i}^{t , s} \left(k\right) \geq w_{i}^{min} \cdot y_{o \left(k\right) , i} \left(k\right) \forall i , k \tag{eq\_0007} \\
-  & \sum_{k, j, s, t \in \left(tp , tp + f\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall i , tp \tag{eq\_0008} \\
-  & \sum_{k, i, t, s \in \left(tp , tp + h\right)} x_{i , j}^{t , s} \left(k\right) \leq 1 \forall j , tp \tag{eq\_0009} \\
-  & \sum_{k, s} x_{i , i}^{t , s} \left(k\right) \leq u_{i} \forall i , t \tag{eq\_0010} \\
-  & x_{i , j}^{tp , tp + l_{i , j} \left(k\right)} \left(k\right) + \sum_{s \in \left[tp , tp + l_{i , j} \left(k\right)\right], t \in \left[tp , tp + l_{i , j} \left(k\right)\right]} x_{i , j}^{t , s} \left(kp\right) \leq 1 \forall i , j , k , kp , tp \tag{eq\_0011} \\
+  & \mathit{pi} \cdot k = \mathit{pi}^{max} \cdot k - \left[\mathit{alpha} \cdot k \cdot \sum_{i, s, t} x_{i , i}^{t , s} \cdot k\right] - \left[\mathit{beta} \cdot k \cdot \sum_{i} y_{o \left(k\right) , i} \cdot k\right] \forall k \tag{eq\_0001} \\
+  \text{Z}_{1}\quad & = max \sum_{k} \mathit{pi} \cdot k \tag{eq\_0002} \\
+  & \sum_{s, j} x_{i , j}^{t , s} \cdot k - \sum_{s, j} x_{j , i}^{s , t} \cdot k = \left\{ 1 & i = o \left(k\right) , t = t_{o} \left(k\right) \\ - 1 & i = q \left(k\right) , t = t_{q} \left(k\right) \\ 0 & \text{otherwise} \right \forall k , i , t \tag{eq\_0003} \\
+  & y_{o \left(k\right) , i} \cdot k = 0 \cdot i \leq o \cdot k \text{or} i > q \cdot k \forall k \tag{eq\_0004} \\
+  & \sum_{k} y_{i , j} \cdot k \geq v_{i , j} \forall i , j , i \neq j \tag{eq\_0005} \\
+  & \sum_{s, t} x_{i , i}^{t , s} \cdot k \leq w_{i}^{max} \cdot y_{o \left(k\right) , i} \cdot k \forall i , k \tag{eq\_0006} \\
+  & \sum_{s, t} x_{i , i}^{t , s} \cdot k \geq w_{i}^{min} \cdot y_{o \left(k\right) , i} \cdot k \forall i , k \tag{eq\_0007} \\
+  & \sum_{k, j, s, t \in \left(tp , tp + f\right)} x_{i , j}^{t , s} \cdot k \leq 1 \forall i , tp \tag{eq\_0008} \\
+  & \sum_{k, i, t, s \in \left(tp , tp + h\right)} x_{i , j}^{t , s} \cdot k \leq 1 \forall j , tp \tag{eq\_0009} \\
+  & \sum_{k, s} x_{i , i}^{t , s} \cdot k \leq u_{i} \forall i , t \tag{eq\_0010} \\
+  & x_{i , j}^{tp , tp + l_{i , j} \left(k\right)} \cdot k + \sum_{s \in \left[tp , tp + l_{i , j} \left(k\right)\right], t \in \left[tp , tp + l_{i , j} \left(k\right)\right]} x_{i , j}^{t , s} kp \leq 1 \forall i , j , k , kp , tp \tag{eq\_0011} \\
 \end{align}

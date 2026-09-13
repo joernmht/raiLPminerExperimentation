@@ -20,7 +20,7 @@
 %@ param M shape=- kind=scalar :: Large constant for big-M constraints
 %@ index l ordered=0 cyclic=0 :: Train index (used in constraints)
 %@ var y shape=K,K domain=binary role=primary :: Binary variable indicating train precedence
-%@ param p shape=Q,U kind=matrix :: Passenger arrival rate at platform u in time interval i
+%@ param p shape=- kind=matrix :: Passenger arrival rate at platform u in time interval i
 %@ var b shape=Q,K,U domain=binary role=primary :: Auxiliary binary variable for passenger accumulation
 %@ var c shape=K,U domain=non_negative role=primary :: Residual capacity of train
 %@ var w shape=K,U domain=non_negative role=primary :: Number of waiting passengers
@@ -77,7 +77,7 @@
   & d_{l}^{(E_bar)_{a}} - \overset{\rightarrow}{d_{j}^{(E_bar)_{a}}} \geq H_{m i n} + M \left(y^{j l} - 1\right) , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_a} \\
   & \overset{\leftarrow}{d_{j}^{(S_bar)_{a}}} - a_{l}^{E_{a}} \geq \mathit{Theta}_{c} - M \cdot y^{j l} , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_b} \\
   & d_{l}^{(E_bar)_{a}} - \overset{\rightarrow}{a_{j}^{(S_bar)_{a}}} \geq \mathit{Theta}_{c} + M \left(y^{j l} - 1\right) , l \in \mathbf{\mathcal{K}}_{L} , j \in \mathbf{\mathcal{K}}_{B} \tag{eq\_0007\_c} \\
-  & \begin{matrix}p \cdot b_{k}^{u} \leq R_{b} \cdot s_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot w_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot c_{k}^{u} ,\end{matrix} \left.\right\} u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0012} \\
+  &  p \cdot b_{k}^{u} \leq R_{b} \cdot s_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot w_{k}^{u} , \\ p \cdot b_{k}^{u} \leq p \cdot c_{k}^{u} , \left.\right\} u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0012} \\
   & f_{w} = \underset{k \in \mathbf{\mathcal{K}}}{\sum} \underset{u \in \mathbf{\mathcal{U}}}{\sum} \left(p \cdot w_{k}^{u} - p \cdot b_{k}^{u}\right) \tag{eq\_0014} \\
   \min\quad & \mathit{lambda}_{w} \cdot f_{w} + \mathit{lambda}_{h} \cdot f_{h} \tag{eq\_0016} \\
   & d_{k}^{u} = \sum_{i = 1}^{Q} T_{i} \cdot z_{i}^{k , u} + x_{i}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0017} \\
@@ -96,6 +96,5 @@
   & p \cdot w_{k}^{u , r} \geq \left[p \cdot w_{k - 1}^{u , r} - p \cdot b_{k - 1}^{u , r} + p \left(d_{k - 1}^{u} , d_{k}^{u} , u\right)\right] - M \cdot z_{Q}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \backslash \left\{1 , K + 1\right\} , r \in \mathbf{\mathcal{R}} \tag{eq\_0041} \\
   & u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \backslash \left\{1 , K + 1\right\} , r \in \mathbf{\mathcal{R}} \tag{eq\_0043\_a} \\
   & b_{i}^{k , u} = \sum_{j = 1}^{i} z_{j}^{k , u} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0043\_b} \\
-  & z_{i}^{k , u} \in \left\{0 , 1\right\} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} , i \in \mathbf{\mathcal{Q}} \tag{eq\_0047} \\
   & d_{k}^{u} , a_{k}^{u} , p \cdot b_{k}^{u , r} , p \cdot w_{k}^{u , r} \in \text{I} \text{R}_{+} , u \in \mathbf{\mathcal{U}} , k \in \mathbf{\mathcal{K}} \tag{eq\_0048} \\
 \end{align}

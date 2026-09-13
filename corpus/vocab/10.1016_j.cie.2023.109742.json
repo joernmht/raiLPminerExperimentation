@@ -1,5 +1,6 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "I",
@@ -54,13 +55,13 @@
     "a_bar",
     "alpha",
     "beta",
+    "constraints",
     "d",
     "d_bar",
     "delta",
     "gamma",
     "h",
     "h_min",
-    "k_star",
     "m",
     "m_b",
     "m_u",
@@ -73,6 +74,7 @@
     "r",
     "s",
     "sigma",
+    "submodel",
     "t_end",
     "t_start",
     "tau",
@@ -84,9 +86,11 @@
   ],
   "bound": [
     "i",
+    "i_star",
     "ip",
     "j",
     "k",
+    "k_star",
     "kp",
     "q",
     "t",
@@ -265,32 +269,19 @@
       "kind": "?",
       "evidence": "position only"
     },
-    "k_star": {
-      "rows": [
-        "eq_0004"
-      ],
-      "roles": {
-        "symbol": 1
-      },
-      "arities": {
-        "0": 1
-      },
-      "kind": "?",
-      "evidence": "position only"
-    },
     "m_b": {
       "rows": [
         "eq_0020",
         "eq_0023"
       ],
       "roles": {
-        "symbol": 2
+        "coefficient": 2
       },
       "arities": {
         "1": 2
       },
-      "kind": "?",
-      "evidence": "position only"
+      "kind": "param",
+      "evidence": "always a coefficient"
     },
     "m_u": {
       "rows": [
@@ -298,13 +289,13 @@
         "eq_0024"
       ],
       "roles": {
-        "symbol": 2
+        "coefficient": 2
       },
       "arities": {
         "1": 2
       },
-      "kind": "?",
-      "evidence": "position only"
+      "kind": "param",
+      "evidence": "always a coefficient"
     },
     "n_a": {
       "rows": [
@@ -578,12 +569,10 @@
   "unresolved_script": [],
   "declared_unused": [
     "E",
-    "constraints",
     "master",
     "model",
     "pt",
     "service",
-    "submodel",
     "train"
   ],
   "family_as_symbol": {},

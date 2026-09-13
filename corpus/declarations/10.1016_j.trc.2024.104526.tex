@@ -41,11 +41,13 @@
 %@ param sup shape=- kind=scalar domain=- :: Supremum operator for worst-case distribution
 %@ var v shape=G,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arc selection in multi-commodity flow
 %@ var x shape=A,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for train arc selection
-%@ var y shape=B,E,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes b): y shape=B,E,K -> B
+%@ var y shape=B domain=binary role=primary drole=- lo=- hi=- :: Binary variable for maintenance arc selection
 %@ param epsilon shape=- kind=scalar domain=- :: Delay scenario
 %@ index A ordered=0 cyclic=0 :: Set of trains
 %@ index B ordered=0 cyclic=0 :: Set of maintenance windows
-%@ param end shape=- kind=scalar domain=- :: End time of expected start-time window
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes b): end shape=- -> B
+%@ param end shape=B kind=scalar domain=- :: End time of expected start-time window
 %@ param star shape=- kind=scalar domain=- :: Start time of expected start-time window
 %@ param varsigma shape=- kind=scalar domain=- :: Fluctuation vector for probability distribution
 %@ index p ordered=0 cyclic=0 :: Probability distribution vector
@@ -65,7 +67,8 @@
 %@ var s shape=Q,T domain=continuous role=primary drole=- lo=- hi=- :: Relaxation variable for capacity constraint
 %@ param theta shape=- kind=scalar domain=- :: Penalty parameter for ADMM
 %@ var lambda shape=Q domain=continuous role=primary drole=- lo=- hi=- :: Lagrange multiplier for cross-resolution consistency
-%@ var mu shape=Q,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j,jp,tpp): mu shape=Q,T -> Q,T,T
+%@ var mu shape=Q,T,T domain=non_negative role=primary drole=- lo=- hi=- :: Lagrange multiplier for capacity constraint
 %@ param rho shape=- kind=scalar domain=- :: Penalty parameter for ADMM
 %@ param R shape=- kind=scalar domain=- :: Set of real numbers
 %@ param cons shape=- kind=scalar domain=- :: Constant value of fixed variable in subproblem

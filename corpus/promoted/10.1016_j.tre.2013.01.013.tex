@@ -63,11 +63,11 @@
 %@ index fty ordered=0 cyclic=0 :: Set of fleet types (alternative notation)
 %@ param alpha shape=T kind=scalar domain=- :: Maximum number of trains that can be scheduled at time t
 %@ param beta shape=T kind=scalar domain=- :: Maximum number of trains that can be scheduled at time t (second parameter)
-%@ param chi shape=- kind=scalar domain=- :: Coefficient in objective function
+%@ param chi shape=M kind=scalar domain=- :: Coefficient in objective function
 %@ param delta shape=- kind=scalar domain=- :: Coefficient in objective function
 %@ param epsilon shape=S,T,C,C kind=scalar domain=- :: Number of passengers transferring between compositions
 %@ param gamma shape=S,T,T kind=scalar domain=- :: Number of passengers waiting at station s from time tp to t
-%@ param kappa shape=- kind=scalar domain=- :: Coefficient in objective function
+%@ param kappa shape=L kind=scalar domain=- :: Coefficient in objective function
 %@ param lambda shape=- kind=scalar domain=- :: Coefficient in objective function
 %@ param mu shape=S,T,T kind=scalar domain=- :: Number of passengers transferring at station s from time tp to t
 %@ param rho shape=S,T,C kind=scalar domain=- :: Number of passengers arriving at station s at time t for composition c
@@ -76,8 +76,8 @@
 \begin{align}
   \min\quad & \sum_{\mathit{ell} \in L, c \in C} \mathit{oc}_{c} \cdot \mathit{km}_{\mathit{ell}} \cdot x_{\mathit{ell} , c} + \sum_{s , sp \in \mathit{SC}, t \in T, c \in C} \mathit{oc}_{c} \cdot \mathit{km}_{s , sp} \cdot \mathit{em}_{s , sp , t}^{c} + \sum_{s \in \mathit{Sc}, t \in T, c , cp \in C} \mathit{vartheta}_{s , t} \cdot \mathit{cc}_{s , t}^{c , cp} + \sum_{\mathit{ell} \in L^{p}} \mathit{canc}_{\mathit{ell}} \cdot y_{\mathit{ell}} + \sum_{a \in A, \mathit{tau} \in T} \mathit{dpc}_{a , \mathit{tau}} \cdot \mathit{dp}_{a , \mathit{tau}} + \sum_{\mathit{ell} \in L^{p}, c \in C} \mathit{kappa}_{\mathit{ell}} \left|x_{\mathit{ell} , c} - x_hat_{\mathit{ell} , c}\right| + \sum_{s , sp , t \in S , T, c \in C} \mathit{lambda}_{t} \left|\mathit{em}_{s , sp , t}^{c} - \mathit{em}_hat_{s , sp , t}^{c}\right| \tag{eq\_0005} \\
   & \sum_{\mathit{ell} \in L} \underset{\genfrac{}{}{0pt}{}{t 1 \in \mathit{LCS}_{\mathit{ell} , s} :}{t 1 \geq t , t 1 \leq t + h}}{\sum} \sum_{c \in C} x_{\mathit{ell} , c} \leq 1 \forall s \in S , t \in T \tag{eq\_0006} \\
-  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{alpha}_{t} \forall a \in \mathit{INO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \leq t \leq \mathit{at}_{\mathit{as}_{a}} \left(\mathit{ell}\right) \tag{eq\_0007} \\
-  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{beta}_{t} \forall a \in \mathit{ISO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \leq t \leq \mathit{at}_{\mathit{as}_{a}} \left(\mathit{ell}\right) \tag{eq\_0008} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{alpha}_{t} \forall a \in \mathit{INO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \mathit{ell} \leq t \leq \mathit{at}_{\mathit{as}_{a}} \mathit{ell} \tag{eq\_0007} \\
+  & \sum_{c \in C} x_{\mathit{ell} , c} \leq \mathit{beta}_{t} \forall a \in \mathit{ISO} , t \in \mathit{IT} , \mathit{ell} \in L_{a} : \mathit{dt}_{\mathit{ds}_{a}} \mathit{ell} \leq t \leq \mathit{at}_{\mathit{as}_{a}} \mathit{ell} \tag{eq\_0008} \\
   & \mathit{alpha}_{t} + \mathit{beta}_{t} \leq \mathit{ain}_{t} \forall t \in \mathit{IT} \tag{eq\_0009} \\
   & \sum_{\mathit{ell} \in L_{a}} \underset{\genfrac{}{}{0pt}{}{t \in T :}{\mathit{dt}_{\mathit{ds}_{a}} \left(\mathit{ell}\right) \subset \mathit{tau}}}{\sum} \sum_{c \in C} \mathit{cap}_{c} \cdot x_{\mathit{ell} , c} \geq \mathit{pf}_{a , \mathit{tau}} - \mathit{dp}_{a , \mathit{tau}} \forall a \in A , \mathit{tau} \in \mathit{TD}_{a} \tag{eq\_0010} \\
   & \sum_{c \in C} x_{\mathit{ell} , c} + y_{\mathit{ell}} = 1 \forall \mathit{ell} \in L^{p} \tag{eq\_0011} \\

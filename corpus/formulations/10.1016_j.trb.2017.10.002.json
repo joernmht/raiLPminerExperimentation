@@ -1,0 +1,529 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2017.10.002",
+  "name": "A microscopic model for optimal train short-turnings during complete blockages",
+  "family": "milp",
+  "description": "Mined from A microscopic model for optimal train short-turnings during complete blockages (Transportation Research Part B Methodological, 2017).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2017.10.002",
+    "reference": "A microscopic model for optimal train short-turnings during complete blockages",
+    "author": "Nadjla Ghaemi; Oded Cats; Rob M.P. Goverde",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "V",
+      "description": "Set of all train services",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Index for train services",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Pair",
+      "description": "Set of pairs of services for short-turning",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Index for scheduled departure in a line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "l",
+      "description": "Index for line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of routes for a service",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "H",
+      "description": "Set of short-turning stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "Set of platforms",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Index for track sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "f",
+      "description": "Function indicating rolling stock connection",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "p",
+      "description": "Previous track section function",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of track sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "q",
+      "description": "Reservation track section function",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "I",
+      "description": "Set of interlocking sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "O",
+      "description": "Set of open track sections",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "M",
+      "description": "Big M constant",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Running, clearance, or release time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b_e",
+      "description": "earliest time train service v can leave track section s",
+      "shape": [
+        "V",
+        "s"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta",
+      "description": "minimum time difference between consecutive services v and v_hat",
+      "shape": [
+        "V",
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "omega_c",
+      "description": "penalty weight for cancelling service v",
+      "shape": [
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "omega_d",
+      "description": "penalty weight for delaying service v",
+      "shape": [
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s_0",
+      "description": "reference track section for short-turning",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_c",
+      "description": "constant time for coupling/decoupling",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_run",
+      "description": "running time of service v on route r up to track section s",
+      "shape": [
+        "V",
+        "R",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_a",
+      "description": "scheduled arrival time of service v",
+      "shape": [
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "tau_d",
+      "description": "scheduled departure time of service v",
+      "shape": [
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "theta_min",
+      "description": "minimum headway time between services v and vp",
+      "shape": [
+        "V",
+        "V"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "c",
+      "description": "Binary variable indicating cancellation of service",
+      "shape": [
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Delay of service",
+      "shape": [
+        "V"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "e",
+      "description": "Entrance time of train on track section",
+      "shape": [
+        "V",
+        "R",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating route selection",
+      "shape": [
+        "R",
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "b",
+      "description": "Start or end blocking time",
+      "shape": [
+        "V",
+        "S"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable for ordering trains on track section",
+      "shape": [
+        "V",
+        "V",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "1 if pair of services is short-turned at a station",
+      "shape": [
+        "Pair"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "indicator",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0011",
+      "description": "Each running service selects exactly one route; cancelled services select no route",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "R"
+          ]
+        },
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "Compute arrival delay as actual arrival minus scheduled arrival for running services",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "e",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s_{D}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "R"
+          ]
+        },
+        {
+          "ref": "tau_a",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "c",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "tau_a",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted sum of delays and cancelled services",
+    "terms": [
+      {
+        "ref": "c",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "V",
+            "expr": "v",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "omega_c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "V"
+        ]
+      },
+      {
+        "ref": "d",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "V",
+            "expr": "v",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "omega_d",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "V"
+        ]
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

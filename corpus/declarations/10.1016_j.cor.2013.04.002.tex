@@ -68,7 +68,11 @@
 %@ var z_int shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: integer period offset
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cor.2013.04.002.json (deterministic fill-in list); pending human confirmation.
-%@ param Tz_ij shape=A kind=scalar domain=- :: modulo parameter for activity (i,j) in the periodic timetabling model
-%@ param l_ij shape=A kind=scalar domain=- :: lower bound on the duration of activity (i,j)
-%@ param u_ij shape=A kind=scalar domain=- :: upper bound on the duration of activity (i,j)
-%@ param w_ij shape=A kind=scalar domain=- :: weight (passenger flow) on activity (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Tz_ij shape=A -> -
+%@ param Tz_ij shape=- kind=scalar domain=- :: modulo parameter for activity (i,j) in the periodic timetabling model
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): l_ij shape=A -> -
+%@ param l_ij shape=- kind=scalar domain=- :: lower bound on the duration of activity (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): u_ij shape=A -> -
+%@ param u_ij shape=- kind=scalar domain=- :: upper bound on the duration of activity (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): w_ij shape=A -> -
+%@ param w_ij shape=- kind=scalar domain=- :: weight (passenger flow) on activity (i,j)

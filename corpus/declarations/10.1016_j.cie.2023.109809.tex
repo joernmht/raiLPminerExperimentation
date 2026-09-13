@@ -36,7 +36,8 @@
 %@ index Y ordered=0 cyclic=0 :: Set of lines in the rail transit network
 
 % w: classified as variable during review
-%@ var w shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k in period n is dispatched on line l
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,n): w shape=- -> Phi,Lambda
+%@ var w shape=Phi,Lambda domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train k in period n is dispatched on line l
 
 % unusable as an identifier, rename or drop: Λ
 % unusable as an identifier, rename or drop: Φ
@@ -44,7 +45,8 @@
 %@ index Z ordered=0 cyclic=0 :: Set of integers
 
 % c: classified as parameter during review
-%@ param c shape=- kind=scalar domain=- :: Index for cyclic period
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,n): c shape=- -> Phi,Lambda
+%@ param c shape=Phi,Lambda kind=scalar domain=- :: Index for cyclic period
 
 % td: classified as variable during review
 %@ var td shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train departs at specific time interval
@@ -125,7 +127,8 @@
 %@ param N shape=- kind=scalar domain=- :: Number of periods
 
 % TTR: classified as parameter during review
-%@ param TTR shape=- kind=scalar domain=- :: Transfer time at station
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes lp,ip): TTR shape=- -> Y,Omega
+%@ param TTR shape=Y,Omega kind=scalar domain=- :: Transfer time at station
 
 % S: classified as parameter during review
 %@ param S shape=- kind=scalar domain=- :: Passenger arrival rate
@@ -242,5 +245,11 @@
 %@ param pb shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Passenger boarding parameter
 %@ param pf shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Passenger flow parameter
 %@ param TW shape=- domain=continuous role=parameter drole=- lo=- hi=- :: Transfer waiting time parameter
-%@ var ztdc shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: Integer auxiliary for tdc
-%@ var trt shape=- domain=continuous role=variable drole=- lo=- hi=- :: Train running time variable
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,n): ztdc shape=- -> Phi,Lambda
+%@ var ztdc shape=Phi,Lambda domain=integer role=auxiliary drole=- lo=- hi=- :: Integer auxiliary for tdc
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,n): trt shape=- -> Phi,Lambda
+%@ var trt shape=Phi,Lambda domain=continuous role=variable drole=- lo=- hi=- :: Train running time variable
+% --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---
+%@ index Omega ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)
+%@ index Phi ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)
+%@ index Lambda ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)

@@ -1,0 +1,606 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.cie.2019.04.031",
+  "name": "A flexible metro train scheduling approach to minimize energy cost and passenger waiting time",
+  "family": "milp",
+  "description": "Mined from A flexible metro train scheduling approach to minimize energy cost and passenger waiting time (Computers & Industrial Engineering, 2019).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.cie.2019.04.031",
+    "reference": "A flexible metro train scheduling approach to minimize energy cost and passenger waiting time",
+    "author": "Pengli Mo; Lixing Yang; Yanhui Wang; Jianguo Qi",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "d",
+      "description": "Index for potential services (trains) in the set N",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Set of potential services (trains) in a direction",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "u",
+      "description": "Index for stations or segments",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of stations in one direction",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of time intervals",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of train types",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N_bar",
+      "description": "Set of potential services (trains) in the up direction",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N_underline",
+      "description": "Set of potential services (trains) in the down direction",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S_bar",
+      "description": "Set of stations in the up direction",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "h",
+      "description": "Headway bounds h_min and h_max between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s",
+      "description": "Dwelling time at station u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "P",
+      "description": "Passenger demand from station u to v at time t",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Capacity of train type k",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "CT",
+      "description": "Initial number of k-type inventory trains in depot",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Mass of empty train type k",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "m",
+      "description": "Average mass per passenger",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "vs",
+      "description": "Final speed of acceleration phase on segment u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R",
+      "description": "Davis equation coefficients R0, R1, R2",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "f",
+      "description": "Unit resistance in cruising phase on segment u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "vt",
+      "description": "Original speed of braking phase on segment u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "fe",
+      "description": "Time-dependent energy price",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "PD",
+      "description": "Capacitance of k-type train",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "fb",
+      "description": "Basic energy price",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "CT_bar",
+      "description": "Cycle time for up direction trains of type k",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "CT_underline",
+      "description": "Cycle time for down direction trains of type k",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R_0",
+      "description": "Constant coefficient in train resistance formula",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R_1",
+      "description": "Linear coefficient in train resistance formula",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R_2",
+      "description": "Quadratic coefficient in train resistance formula",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_tilde_down",
+      "description": "Minimum total travel time for down direction",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_tilde_up",
+      "description": "Minimum total travel time for up direction",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "eta",
+      "description": "Energy efficiency coefficient",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_max",
+      "description": "Maximum headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "Minimum headway between consecutive trains",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_1",
+      "description": "Weight for passenger waiting time in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_2",
+      "description": "Weight for energy cost in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "r",
+      "description": "Running time on segment u",
+      "shape": [
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "sigma",
+      "description": "Time offset between up and down direction schedules",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_ab",
+      "description": "Acceleration time on segment u",
+      "shape": [
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_bc",
+      "description": "Braking time on segment u",
+      "shape": [
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t_cd",
+      "description": "Coasting time on segment u",
+      "shape": [
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "a",
+      "description": "Arrival time of train j at station u",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Q",
+      "description": "Number of passengers remaining in train j after departing station u",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable: 1 if train j departs station u before time t",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable: 1 if train j is assigned type k in direction up/dn",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "e",
+      "description": "Binary indicator: 1 if service j is effective in direction up/dn",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "W",
+      "description": "Total passenger waiting time",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "EA",
+      "description": "Energy consumption in acceleration phase for train j at time t",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "EB",
+      "description": "Energy consumption in cruising phase for train j at time t",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "EC",
+      "description": "Energy consumption in coasting phase (always zero)",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "ED",
+      "description": "Regenerative energy in braking phase for train j at time t",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "CR",
+      "description": "Regular energy cost",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "CB",
+      "description": "Basic energy cost",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "Objective function value",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d_1",
+      "description": "Departure time of up direction train j from first station",
+      "shape": [
+        "N_bar"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "e_dn",
+      "description": "Arrival time of down direction train j at last station",
+      "shape": [
+        "N_underline"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "e_up",
+      "description": "Arrival time of up direction train j at last station",
+      "shape": [
+        "N_bar"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_dn",
+      "description": "1 if down direction train j is of type k",
+      "shape": [
+        "N_underline",
+        "K"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_up",
+      "description": "1 if up direction train j is of type k",
+      "shape": [
+        "N_bar",
+        "K"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z_1",
+      "description": "1 if up direction train j is the first service",
+      "shape": [
+        "N_bar"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0039",
+      "description": "Objective function Z = λ1·W + λ2·(CR+CB)",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "W",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": "lambda_1",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "CR",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": "lambda_2",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "CB",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": "lambda_2",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted sum of passenger waiting time and total energy cost (λ1·W + λ2·(CR+CB))",
+    "terms": [
+      {
+        "ref": "W",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_1",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "CR",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_2",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "CB",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "lambda_2",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

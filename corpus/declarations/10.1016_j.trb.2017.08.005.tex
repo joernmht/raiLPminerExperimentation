@@ -54,7 +54,8 @@
 %@ var G shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value (total travel time)
 
 % c: classified as parameter during review
-%@ param c shape=A kind=vector domain=- :: Cost (travel time) of arc a
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): c shape=A -> -
+%@ param c shape=- kind=vector domain=- :: Cost (travel time) of arc a
 
 % A: classified as index during review
 %@ index A ordered=0 cyclic=0 :: Set of all arcs in the directed graph
@@ -66,7 +67,8 @@
 %@ index R ordered=0 cyclic=0 :: Set of origin nodes for a period-type
 
 % F: classified as parameter during review
-%@ param F shape=E,W kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): F shape=E,W -> -
+%@ param F shape=- kind=matrix domain=- :: Minimum travel time in section (i,j) for period-type w
 
 % S: classified as index during review
 %@ index S ordered=0 cyclic=0 :: Set of stations

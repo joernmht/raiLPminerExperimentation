@@ -30,17 +30,17 @@
 %@ con eq_0011 kind=linear domain=- indicator=- :: Main line headway at origin (cycle end)
 %@ con eq_0012 kind=linear domain=- indicator=- :: Main line headway: express train after local train
 %@ con eq_0013 kind=linear domain=- indicator=- :: Main line headway: local train after express train
-%@ var MY_st shape=s,t domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary variable in headway constraint
-%@ var Y_st shape=s,t domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for headway constraint
+%@ var MY_st shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: auxiliary variable in headway constraint
+%@ var Y_st shape=- domain=binary role=indicator drole=- lo=- hi=- :: binary indicator for headway constraint
 %@ param w_1 shape=- kind=scalar domain=- :: weight coefficient for cycle interval in objective
 %@ param w_2 shape=- kind=scalar domain=- :: weight coefficient for total dwell time in objective
 \begin{align}
   \min\quad & w_{1} \cdot \mathit{Interval} + w_{2} \cdot \sum_{s = 1}^{S} D_{s} \tag{eq\_0006} \\
-  & \text{Subject to} D_{s} \geq \mathit{dMin}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0007} \\
+  & D_{s} \geq \mathit{dMin}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0007} \\
   & \sum_{s = 1}^{S} D_{s} \leq \mathit{dMax} \tag{eq\_0008} \\
   & \mathit{Interval} \geq D_{s} + \mathit{hStation}_{s} \forall s : 1 \leq s \leq S \tag{eq\_0009} \\
   & \mathit{Delta} \geq \mathit{hTrack} \tag{eq\_0010} \\
   & \mathit{Interval} - \mathit{Delta} \geq \mathit{hTrack} \tag{eq\_0011} \\
-  & \begin{aligned} & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} + \mathit{MY}_{\mathit{st}} \geq \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr}\end{aligned} \tag{eq\_0012} \\
-  & \begin{aligned} & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} - M \left(1 - Y_{\mathit{st}}\right) \leq - \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr} .\end{aligned} \tag{eq\_0013} \\
+  &  & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} + \mathit{MY}_{\mathit{st}} \geq \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr}  \tag{eq\_0012} \\
+  &  & \left[\left(t - 1\right) \mathit{Interval} + \mathit{Delta}\right] - \sum_{q = 1}^{s} D_{q} - M \left(1 - Y_{\mathit{st}}\right) \leq - \mathit{hTrack} \\ & \forall s : 1 \leq s \leq S , \forall t : 1 \leq t \leq \mathit{maxExpr} .  \tag{eq\_0013} \\
 \end{align}

@@ -56,5 +56,7 @@
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trb.2009.05.004.json (deterministic fill-in list); pending human confirmation.
 %@ param t_0 shape=- kind=scalar domain=- :: Reference time at the start of the scheduling horizon
-%@ param w_hk shape=h,k kind=scalar domain=- :: Minimum time separation between events h and k
-%@ param w_ij shape=i,j kind=scalar domain=- :: Minimum time separation between events i and j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): w_hk shape=h,k -> -
+%@ param w_hk shape=- kind=scalar domain=- :: Minimum time separation between events h and k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): w_ij shape=i,j -> -
+%@ param w_ij shape=- kind=scalar domain=- :: Minimum time separation between events i and j

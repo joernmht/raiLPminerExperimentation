@@ -15,7 +15,7 @@
 %@ param D shape=- kind=scalar domain=- :: Minimum dwell time at a station
 %@ param M shape=- kind=scalar domain=- :: Sufficiently large positive constant
 %@ param B shape=- kind=scalar domain=- :: Minimum back-turning time
-%@ param s shape=- kind=scalar domain=- :: Maximum number of skipped stations per service
+%@ param s shape=S kind=scalar domain=- :: Maximum number of skipped stations per service
 %@ var w shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting at station i for service k
 %@ var n shape=S,N domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers on service k at station i
 %@ param pt shape=- kind=scalar domain=- :: Passenger flow parameter (possibly OD matrix)
@@ -105,11 +105,11 @@
   & x_{k , i} \cdot x_{k , j} + x_{k + 1 , i} \cdot x_{k + 1 , j} + x_{k + 2 , i} \cdot x_{k + 2 , j} \geq 1 , \text{for} k , k + 1 , k + 2 \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i , j \in \mathbf{N}_{k} . \tag{eq\_0012} \\
   & x_{k , i} + x_{k + 1 , i} + x_{k + 2 , i} \geq 2 , \text{for} k , k + 1 , k + 2 \in \mathbf{S}_{E} \cup \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0013} \\
   & x_{k , ip} \cdot x_{k , jp} + x_{k + 1 , ip} \cdot x_{k + 1 , jp} + x_{k + 2 , ip} \cdot x_{k + 2 , jp} = 0 . \tag{eq\_0014} \\
-  & \begin{matrix}x_{k , ip} \cdot x_{k , jp} = 0 ,\end{matrix} \tag{eq\_0015} \\
-  & \begin{matrix}x_{k + 1 , ip} \cdot x_{k + 1 , jp} = 0 ,\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix}x_{k + 2 , ip} \cdot x_{k + 2 , jp} = 0 .\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix}x_{k , ip} + x_{k + 1 , ip} + x_{k + 2 , ip} \geq 2 ,\end{matrix} \tag{eq\_0018} \\
-  & \begin{matrix}x_{k , jp} + x_{k + 1 , jp} + x_{k + 2 , jp} \geq 2 .\end{matrix} \tag{eq\_0019} \\
+  &  x_{k , ip} \cdot x_{k , jp} = 0 ,  \tag{eq\_0015} \\
+  &  x_{k + 1 , ip} \cdot x_{k + 1 , jp} = 0 ,  \tag{eq\_0016} \\
+  &  x_{k + 2 , ip} \cdot x_{k + 2 , jp} = 0 .  \tag{eq\_0017} \\
+  &  x_{k , ip} + x_{k + 1 , ip} + x_{k + 2 , ip} \geq 2 ,  \tag{eq\_0018} \\
+  &  x_{k , jp} + x_{k + 1 , jp} + x_{k + 2 , jp} \geq 2 .  \tag{eq\_0019} \\
   & x_{k , ip} + x_{k + 1 , ip} + x_{k + 2 , ip} \leq 1 . \tag{eq\_0020} \\
   & x_{k , ip} \cdot x_{k , j} + x_{k + 1 , ip} \cdot x_{k + 1 , j} + x_{k + 2 , ip} \cdot x_{k + 2 , j} \geq 1 , \text{for} j \neq ip . \tag{eq\_0021} \\
   & w_{k , i} = \sum_{j \in \mathbf{N}_{k} , j > i} w_{k , i , j} , \text{for} k \in \mathbf{S}_{F} , \text{and} i \in \mathbf{N}_{k} . \tag{eq\_0022} \\
@@ -139,12 +139,10 @@
   & n_{k , i}^{b} \geq C - n_{k , i - 1} + n_{k , i}^{a} - M \cdot \mathit{mu}_{k , i} \tag{eq\_0045\_d} \\
   & \mathit{mu}_{k , i} > \frac{\left(C - n_{k , i - 1} + n_{k , i}^{a}\right) - w_{k , i}^{b}}{M} \tag{eq\_0047\_a} \\
   & \mathit{mu}_{k , i} \leq 1 + \frac{\left(C - n_{k , i - 1} + n_{k , i}^{a}\right) - w_{k , i}^{b}}{M} \tag{eq\_0047\_b} \\
-  & \mathit{mu}_{k , i} \in \left\{0 , 1\right\} . \tag{eq\_0047\_c} \\
   & z_{k , i , j} \geq \frac{x_{k , i} - \sum_{i < h \leq j} x_{k , h} - 0.5}{j - i + 1} \tag{eq\_0048\_a} \\
   & z_{k , i , j} \leq 1 + \frac{x_{k , i} - \sum_{i < h \leq j} x_{k , h} - 0.5}{j - i + 1} \tag{eq\_0048\_b} \\
-  & z_{k , i , j} \in \left\{0 , 1\right\} . \tag{eq\_0048\_c} \\
   & n_{k , i , j}^{b} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} \cdot w_{k , i , j}^{b} = \frac{w_{k , i , j}^{b}}{w_{k , i}^{b}} \cdot n_{k , i}^{b} , \tag{eq\_0049} \\
-  & \begin{matrix}n_{k , i , j}^{b} \leq w_{k , i , j}^{b} ,\end{matrix} \tag{eq\_0050} \\
+  &  n_{k , i , j}^{b} \leq w_{k , i , j}^{b} ,  \tag{eq\_0050} \\
   & \mathit{beta}_{k , i , j} = \frac{\mathit{Std} \cdot w_underline_{k , i , j}}{\mathit{Std} \cdot w_underline_{k , i}} . \tag{eq\_0052} \\
   & \frac{n_{k , i , j}^{b}}{w_{k , i , j}^{b}} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} , \text{or} \tag{eq\_0058\_a} \\
   & n_{k , i , j}^{b} = \frac{n_{k , i}^{b}}{w_{k , i}^{b}} \cdot w_{k , i , j}^{b} \tag{eq\_0058\_b} \\

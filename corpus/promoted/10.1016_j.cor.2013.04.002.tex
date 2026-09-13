@@ -24,13 +24,11 @@
 %@ var piInt shape=- domain=integer role=auxiliary drole=- lo=0 hi=- :: auxiliary integer copy of pi
 %@ var zInt shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: auxiliary integer copy of z
 %@ var z_int shape=- domain=integer role=auxiliary drole=- lo=- hi=- :: integer period offset
-%@ param Tz_ij shape=A kind=scalar domain=- :: modulo parameter for activity (i,j) in the periodic timetabling model
-%@ param l_ij shape=A kind=scalar domain=- :: lower bound on the duration of activity (i,j)
-%@ param u_ij shape=A kind=scalar domain=- :: upper bound on the duration of activity (i,j)
-%@ param w_ij shape=A kind=scalar domain=- :: weight (passenger flow) on activity (i,j)
+%@ param Tz_ij shape=- kind=scalar domain=- :: modulo parameter for activity (i,j) in the periodic timetabling model
+%@ param l_ij shape=- kind=scalar domain=- :: lower bound on the duration of activity (i,j)
+%@ param u_ij shape=- kind=scalar domain=- :: upper bound on the duration of activity (i,j)
+%@ param w_ij shape=- kind=scalar domain=- :: weight (passenger flow) on activity (i,j)
 \begin{align}
   \min\quad & \sum_{\left(i , j\right) \in \mathcal{A}} w_{\mathit{ij}} \left(\mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tz}_{\mathit{ij}}\right) \tag{eq\_0003} \\
   & l_{\mathit{ij}} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + \mathit{Tz}_{\mathit{ij}} \leq u_{\mathit{ij}} \left(i , j\right) \in \mathcal{A} \tag{eq\_0004} \\
-  & pi_i \ge 0 \qquad \forall i \in \mathcal{E} \tag{eq\_0005} \\
-  & z_{\mathit{ij}} \in \mathcal{Z} \left(i , j\right) \in \mathcal{A} \tag{eq\_0006} \\
 \end{align}

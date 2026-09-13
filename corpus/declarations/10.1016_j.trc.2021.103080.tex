@@ -160,8 +160,10 @@
 %@ param tr shape=- domain=- role=- drole=- lo=- hi=- :: Train of event
 %@ param t shape=- domain=- role=- drole=- lo=- hi=- :: Time
 %@ index ep shape=- domain=- role=- drole=- lo=- hi=- :: primed event index
-%@ param t_start shape=- domain=- role=- drole=- lo=- hi=- :: earliest allowed time
-%@ param t_end shape=- domain=- role=- drole=- lo=- hi=- :: latest allowed time
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): t_start shape=- -> N
+%@ param t_start shape=N domain=- role=- drole=- lo=- hi=- :: earliest allowed time
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i): t_end shape=- -> N
+%@ param t_end shape=N domain=- role=- drole=- lo=- hi=- :: latest allowed time
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.trc.2021.103080.json (deterministic fill-in list); pending human confirmation.
 %@ index A_run ordered=0 cyclic=0 :: Set of run activities.

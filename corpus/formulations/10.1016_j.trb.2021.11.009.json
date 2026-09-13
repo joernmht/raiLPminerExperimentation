@@ -1,0 +1,460 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2021.11.009",
+  "name": "Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism",
+  "family": "milp",
+  "description": "Mined from Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism (Transportation Research Part B Methodological, 2021).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2021.11.009",
+    "reference": "Integrated line planning and train timetabling through price-based cross-resolution feedback mechanism",
+    "author": "Yongxiang Zhang; Qiyuan Peng; Gongyuan Lu; Qingwei Zhong; Xu Yan; Xuesong Zhou",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "L",
+      "description": "Set of lines",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of frequencies for a line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of patterns for a line",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Index for stations or sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "D",
+      "description": "Set of destination stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "O",
+      "description": "Set of origin stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of space-time arcs in master network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Cycle length",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Q",
+      "description": "Number of cycles in extended schedule",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "G",
+      "description": "Set of sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of real numbers",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Tpp",
+      "description": "Set of time offsets for track capacity constraints",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "phi",
+      "description": "Mapping from section and time offset to space-time arcs",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "p",
+      "description": "Minimum number of trains required for each OD pair",
+      "shape": [
+        "O",
+        "D"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "d",
+      "description": "Destination station of a train",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "dep",
+      "description": "Departure time of a train",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Origin station of a train",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "b",
+      "description": "First train of a line-frequency combination",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Modified arc usage cost in the extended train space-time network",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "Tp",
+      "description": "Time offset parameter",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha_1",
+      "description": "Weight for first objective component",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha_2",
+      "description": "Weight for second objective component",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha_3",
+      "description": "Weight for third objective component",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c_hat",
+      "description": "Cost parameter for train k on space-time arc",
+      "shape": [
+        "K",
+        "E"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "e",
+      "description": "Constant in flow conservation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma",
+      "description": "Step size for dual update",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Constant in flow conservation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_n",
+      "description": "Previous iteration Lagrangian multiplier",
+      "shape": [
+        "G",
+        "K",
+        "S"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "mu_n",
+      "description": "Previous iteration multiplier for track capacity",
+      "shape": [
+        "G",
+        "Tpp"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "r",
+      "description": "Train index mapping for cycles",
+      "shape": [
+        "K",
+        "Q"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho",
+      "description": "Penalty parameter for ADMM",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "Z",
+      "description": "Objective function value",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable for line frequency and pattern selection",
+      "shape": [
+        "L",
+        "F",
+        "S"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable for master train schedule arc selection",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable for extended train schedule arc selection",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Auxiliary variable for capacity constraint",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_1",
+      "description": "First objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_2",
+      "description": "Second objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z_3",
+      "description": "Third objective component",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "Lagrangian multiplier for cross-resolution consistency",
+      "shape": [
+        "G",
+        "K",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "mu",
+      "description": "Lagrangian multiplier for track capacity",
+      "shape": [
+        "G",
+        "Tpp"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005",
+      "description": "Each line selects at most one frequency and pattern (Eq. 5)",
+      "quantifiers": [
+        {
+          "index": "l",
+          "over": "L",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "F",
+            "S"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize the weighted sum of the three objective items in Eq. (1)",
+    "terms": [
+      {
+        "ref": "Z_1",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "alpha_1",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Z_2",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "alpha_2",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      },
+      {
+        "ref": "Z_3",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": "alpha_3",
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

@@ -10,7 +10,7 @@
 %@ obj sense=max name=objective combination=sum :: Maximize total demand captured by the railway over all O/D pairs
 %@ index C ordered=0 cyclic=0 :: Cycle in the event-activity network
 %@ var x shape=A domain=continuous role=primary drole=- lo=- hi=- :: Time span between events for each arc a in A
-%@ param Pq shape=- kind=scalar domain=- :: Product of period P and integer cycle variable q_C
+%@ param Pq shape=C kind=scalar domain=- :: Product of period P and integer cycle variable q_C
 %@ index A ordered=0 cyclic=0 :: Set of arcs in the event-activity network
 %@ param l shape=A kind=vector domain=- :: Lower bound on arc time variable x_a
 %@ param u shape=A kind=vector domain=- :: Upper bound on arc time variable x_a
@@ -22,7 +22,7 @@
 %@ index P ordered=0 cyclic=0 :: Period of the regular timetable
 %@ var t shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Trip time for an O/D pair on its predefined path
 %@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total captured demand)
-%@ var lambda shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Captured demand for an O/D pair
+%@ var lambda shape=OD domain=continuous role=primary drole=- lo=- hi=- :: Captured demand for an O/D pair
 %@ index S ordered=0 cyclic=0 :: Set of stations (origins/destinations)
 %@ param tbar shape=S,S kind=matrix domain=- :: Upper bound on trip time for an O/D pair
 %@ con eq_0001 kind=linear domain=- indicator=- :: Trip time definition: t_od = sum_{a in P_od} x_a
@@ -37,10 +37,12 @@
 %@ con eq_0019_a kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at lower trip time
 %@ con eq_0019_b kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at upper/inflection trip time
 %@ con eq_0019_c kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by secant between extreme trip times
-%@ param tlow shape=- domain=- role=parameter drole=- lo=- hi=- :: Lower bound on t_{o,d}
+%@ param tlow shape=OD domain=- role=parameter drole=- lo=- hi=- :: Lower bound on t_{o,d}
 %@ index OD
-%@ param Cplus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: positive arcs of cycle C
-%@ param Cminus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: negative arcs of cycle C
+% declaration fixed: param Cplus: domain=set -> -
+%@ param Cplus shape=\mathcal{C} domain=- role=auxiliary drole=- lo=- hi=- :: positive arcs of cycle C
+% declaration fixed: param Cminus: domain=set -> -
+%@ param Cminus shape=\mathcal{C} domain=- role=auxiliary drole=- lo=- hi=- :: negative arcs of cycle C
 %@ var v shape=\mathcal{C} domain=integer role=auxiliary drole=- lo=- hi=- :: integer auxiliary for q
 %@ var tup shape=\mathcal{OD} domain=continuous role=auxiliary drole=- lo=- hi=- :: upper bound on travel time
 \begin{align}

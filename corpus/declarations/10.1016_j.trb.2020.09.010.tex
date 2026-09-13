@@ -33,7 +33,8 @@
 % d: classified as index during review
 %@ index d ordered=0 cyclic=0 :: Destination station of train i
 % t: classified as parameter during review
-%@ param t shape=V kind=vector domain=continuous :: Time of vertex v
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=V -> -
+%@ param t shape=- kind=vector domain=continuous :: Time of vertex v
 % w: classified as parameter during review
 %@ param w shape=P,S kind=matrix domain=continuous :: Dwell time of path p at station s
 % S: classified as index during review
@@ -43,7 +44,8 @@
 % o: classified as index during review
 %@ index o ordered=0 cyclic=0 :: Origin station of train i
 % x: classified as variable during review
-%@ var x shape=P,I domain=binary role=primary drole=- lo=0 hi=1 :: 1 if path p is selected for train i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): x shape=P,I -> P
+%@ var x shape=P domain=binary role=primary drole=- lo=0 hi=1 :: 1 if path p is selected for train i
 % I: classified as index during review
 %@ index I ordered=0 cyclic=0 :: Set of trains
 % P: classified as index during review
@@ -61,7 +63,8 @@
 % Cap: classified as parameter during review
 %@ param Cap shape=I kind=vector domain=non_negative :: Capacity of train i
 % R: classified as parameter during review
-%@ param R shape=P,I kind=matrix domain=continuous :: Reduced cost of path p for train i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): R shape=P,I -> -
+%@ param R shape=- kind=matrix domain=continuous :: Reduced cost of path p for train i
 % unusable as an identifier, rename or drop: α
 % unusable as an identifier, rename or drop: β
 % unusable as an identifier, rename or drop: φ
@@ -72,7 +75,8 @@
 % unusable as an identifier, rename or drop: γ
 % unusable as an identifier, rename or drop: ξ
 % Z: classified as variable during review
-%@ var Z shape=S,V domain=continuous role=auxiliary drole=- lo=- hi=- :: Value function for vertex v at station s in dynamic programming
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Z shape=S,V -> -
+%@ var Z shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Value function for vertex v at station s in dynamic programming
 % f: classified as variable during review
 %@ var f shape=I,S domain=binary role=auxiliary drole=- lo=0 hi=1 :: 1 if train i stops at station s
 % r: classified as parameter during review

@@ -60,7 +60,8 @@
 %@ param w shape=- kind=scalar domain=- :: Dwell time bounds and weight in objective
 
 % A: classified as parameter during review
-%@ param A shape=- kind=scalar domain=- :: Arrival headway times between train types
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): A shape=- -> I,I
+%@ param A shape=I,I kind=scalar domain=- :: Arrival headway times between train types
 
 % H: classified as parameter during review
 %@ param H shape=- kind=scalar domain=- :: Headway times (arrival/departure) between train types
@@ -75,7 +76,8 @@
 %@ index j ordered=0 cyclic=0 :: Train index (secondary)
 
 % D: classified as parameter during review
-%@ param D shape=- kind=scalar domain=- :: Departure headway times between train types
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): D shape=- -> I,I
+%@ param D shape=I,I kind=scalar domain=- :: Departure headway times between train types
 
 % W: classified as parameter during review
 %@ param W shape=- kind=scalar domain=- :: Operation time window bounds (lower and upper)

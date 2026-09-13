@@ -32,13 +32,15 @@
 %@ index T ordered=0 cyclic=0 :: Set of time intervals
 %@ index n ordered=0 cyclic=0 :: Last station index
 %@ index p ordered=0 cyclic=0 :: Last time interval index
-%@ param d shape=S,S,T kind=matrix domain=- :: Demand: number of passengers arriving at station i at time t destined for j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes ij): d shape=S,S,T -> S
+%@ param d shape=S kind=matrix domain=- :: Demand: number of passengers arriving at station i at time t destined for j
 %@ index t ordered=0 cyclic=0 :: Time interval index
 %@ var u shape=S,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers boarding train leaving station i at time t
 %@ var x shape=S,M,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable: 1 if train k leaves station i at time t
 %@ index M ordered=0 cyclic=0 :: Set of trains
 %@ index m ordered=0 cyclic=0 :: Last train index
-%@ var tx shape=S,M domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from station i (continuous)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,i,t): tx shape=S,M -> M,S,T
+%@ var tx shape=M,S,T domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train k from station i (continuous)
 %@ param l shape=S,S kind=matrix domain=- :: Distance between stations i and j
 %@ var s shape=S,M domain=non_negative role=primary drole=- lo=- hi=- :: Inverse of speed of train k when leaving station i
 %@ var w shape=S,M domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train k at station i
@@ -72,14 +74,20 @@
 %@ con eq_0024 kind=linear domain=- indicator=- :: LF3: lower bound on departure time from station i+1
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.cor.2013.11.003.json (deterministic fill-in list); pending human confirmation.
-%@ param d_ij shape=S,S kind=big_m domain=- :: demand from station i to station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): d_ij shape=S,S -> T
+%@ param d_ij shape=T kind=big_m domain=- :: demand from station i to station j
 %@ param h_min shape=- kind=scalar domain=- :: minimum headway between consecutive trains
-%@ param l_ij shape=S,S kind=scalar domain=- :: travel time from station i to station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): l_ij shape=S,S -> -
+%@ param l_ij shape=- kind=scalar domain=- :: travel time from station i to station j
 %@ param l_in shape=- kind=scalar domain=- :: travel time from station i to last station n
 %@ param s_max shape=- kind=scalar domain=- :: maximum dwell time at a station
 %@ param s_min shape=- kind=scalar domain=- :: minimum dwell time at a station
-%@ var tx_ki shape=M,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station i
-%@ var tx_kj shape=M,S,T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): tx_ki shape=M,S,T -> T
+%@ var tx_ki shape=T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): tx_kj shape=M,S,T -> T
+%@ var tx_kj shape=T domain=continuous role=auxiliary drole=- lo=- hi=- :: cumulative departure time variable for train k at station j
 %@ param w_min shape=- kind=scalar domain=- :: minimum waiting time at a station
-%@ var x_k1 shape=M,T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station 1 at time t
-%@ var x_ki shape=M,S,T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station i at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): x_k1 shape=M,T -> T
+%@ var x_k1 shape=T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station 1 at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): x_ki shape=M,S,T -> T
+%@ var x_ki shape=T domain=binary role=primary drole=- lo=- hi=- :: binary variable indicating train k departs station i at time t

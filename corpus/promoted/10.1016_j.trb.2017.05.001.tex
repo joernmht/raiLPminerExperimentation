@@ -10,17 +10,17 @@
 %@ obj sense=min name=objective combination=sum :: Minimize total transfer connection time for last train passengers, weighted by passenger demand p_{ll'k}.
 %@ index l ordered=0 cyclic=0 :: Subway line index, l ∈ L.
 %@ index t ordered=0 cyclic=0 :: Time argument in Arr/Dep functions; also subscript in last-train departure time t_l^R.
-%@ param Arr shape=- kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
+%@ param Arr shape=S,L kind=scalar :: Arrival time of the last train at station k on line l, Arr_k^l(t_l^R), Eq. (1).
 %@ index L ordered=0 cyclic=0 :: Set of subway lines, L = {1,...,ϒ}.
 %@ index S ordered=0 cyclic=0 :: Set of station positions on a line, S(l).
 %@ index k ordered=0 cyclic=0 :: Station index, k ∈ S(l) ∩ S(l').
 %@ param t_hat shape=- kind=scalar :: Dwell time of the last train at station s on line l (constant t̂_s^l).
 %@ param t_bar shape=- kind=scalar :: Running time of the last train between consecutive stations s-1 and s on line l (constant t̄_{s-1,s}^l).
 %@ param Dep shape=- kind=scalar :: Departure time of the last train from station k on line l, Dep_k^l(t_l^R), Eq. (2).
-%@ param Tra shape=- kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
+%@ param Tra shape=S kind=scalar :: Transfer walking time from line l platform to line l' platform at transfer station k, Tra_{k}^{ll'}.
 %@ index p ordered=0 cyclic=0 :: Passenger demand coefficient p_{ll'k} (number of transferring passengers).
 %@ index w ordered=0 cyclic=0 :: Minimum connection time w_{ll'k} for last-train transfer passengers.
-%@ param H shape=- kind=scalar :: Headway of trains on line l' during last-train service period.
+%@ param H shape=L kind=scalar :: Headway of trains on line l' during last-train service period.
 %@ param M shape=- kind=big_m :: Big positive penalty for unsuccessful connection.
 %@ var x shape=l,l,k domain=binary role=primary :: Binary variable indicating whether passengers can successfully transfer from line l to line l' at station k (1 if yes, 0 otherwise).
 %@ var y shape=l,l,k domain=integer role=primary :: Non-negative integer variable for number of trains running to station k before the last train on the target line that the last train passengers can transfer.
@@ -48,18 +48,16 @@
 %@ param T_min shape=l kind=scalar domain=- :: Lower bound on last-train departure time for line l.
 %@ var t_R shape=l domain=continuous role=primary drole=- lo=- hi=- :: Last-train departure time for line l.
 \begin{align}
-  & \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(t_bar\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k - 1} \left(t_hat\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L , \text{and} \tag{eq\_0001} \\
-  & \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} \left(t_bar\right)_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k} \left(t_hat\right)_{s}^{l} \forall k \in S \left(l\right) , \forall l \in L . \tag{eq\_0002} \\
-  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) = \mathit{Dep}_{k}^{lp} \left(t_{lp}^{R}\right) - \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) - \mathit{Tra}_{k}^{l lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L , \tag{eq\_0003} \\
+  & \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} t_bar_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k - 1} t_hat_{s}^{l} \forall k \in S \cdot l , \forall l \in L , \text{and} \tag{eq\_0001} \\
+  & \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) = t_{l}^{R} + \sum_{s = 1}^{k} t_bar_{\left(s - 1\right) s}^{l} + \sum_{s = 1}^{k} t_hat_{s}^{l} \forall k \in S \cdot l , \forall l \in L . \tag{eq\_0002} \\
+  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) = \mathit{Dep}_{k}^{lp} \left(t_{lp}^{R}\right) - \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) - \mathit{Tra}_{k}^{l lp} \forall k \in S \cdot l \cap S lp , \forall l , lp \in L , \tag{eq\_0003} \\
   \min\quad & \sum_{\forall l \in L, \forall lp \in L, k \in S \left(l\right) \cap S \left(lp\right)} \left[p_{l lp}^{k} \cdot w_{l lp}^{k} \left(t_{l}^{R} , t_{lp}^{R}\right)\right] \tag{eq\_0006} \\
-  & w_{l lp}^{k} \left(t_{l}^{R} , t_{lp}^{R}\right) = t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) - y_{l lp}^{k} \cdot H_{lp} + \left(1 - x_{l lp}^{k}\right) \cdot M \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0007} \\
-  & M \cdot \left(x_{l lp}^{k} - 1\right) \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M \cdot x_{l lp}^{k} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0008} \\
-  & \left[t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp}\right] - 1 \leq y_{l lp}^{k} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0009} \\
-  & x_{l lp}^{k} \in \left\{0 , 1\right\} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0010} \\
-  & y_{l lp}^{k} \in \mathcal{Z}^{+} \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l , lp \in L \tag{eq\_0011} \\
-  & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Dep}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0012} \\
-  & \mathit{Arr}_{min}^{l} \leq \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Arr}_{max}^{l} \forall k \in S \left(l\right) , \forall l \in L \tag{eq\_0013} \\
+  & w_{l lp}^{k} \left(t_{l}^{R} , t_{lp}^{R}\right) = t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) - y_{l lp}^{k} \cdot H_{lp} + \left(1 - x_{l lp}^{k}\right) \cdot M \forall k \in S \cdot l \cap S lp , \forall l , lp \in L \tag{eq\_0007} \\
+  & M \cdot \left(x_{l lp}^{k} - 1\right) \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M \cdot x_{l lp}^{k} \forall k \in S \cdot l \cap S lp , \forall l , lp \in L \tag{eq\_0008} \\
+  & \left[t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp}\right] - 1 \leq y_{l lp}^{k} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) / H_{lp} \forall k \in S \cdot l \cap S lp , \forall l , lp \in L \tag{eq\_0009} \\
+  & \mathit{Dep}_{min}^{l} \leq \mathit{Dep}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Dep}_{max}^{l} \forall k \in S \cdot l , \forall l \in L \tag{eq\_0012} \\
+  & \mathit{Arr}_{min}^{l} \leq \mathit{Arr}_{k}^{l} \left(t_{l}^{R}\right) \leq \mathit{Arr}_{max}^{l} \forall k \in S \cdot l , \forall l \in L \tag{eq\_0013} \\
   & T_{l}^{min} \leq t_{l}^{R} \leq T_{l}^{max} \forall l \in L \tag{eq\_0014} \\
-  & \mathit{Dep}_{min}^{lp} - \mathit{Arr}_{max}^{l} - \mathit{Tra}_{k}^{l lp} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq \mathit{Dep}_{max}^{lp} - \mathit{Arr}_{min}^{l} - \mathit{Tra}_{k}^{l lp} , \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l \in L \tag{eq\_0015} \\
-  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M_{0} , \forall k \in S \left(l\right) \cap S \left(lp\right) , \forall l \in L \tag{eq\_0016} \\
+  & \mathit{Dep}_{min}^{lp} - \mathit{Arr}_{max}^{l} - \mathit{Tra}_{k}^{l lp} \leq t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq \mathit{Dep}_{max}^{lp} - \mathit{Arr}_{min}^{l} - \mathit{Tra}_{k}^{l lp} , \forall k \in S \cdot l \cap S lp , \forall l \in L \tag{eq\_0015} \\
+  & t_{k l lp}^{R} \left(t_{l}^{R} , t_{lp}^{R}\right) \leq M_{0} , \forall k \in S \cdot l \cap S lp , \forall l \in L \tag{eq\_0016} \\
 \end{align}

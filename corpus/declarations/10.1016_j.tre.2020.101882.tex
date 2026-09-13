@@ -30,7 +30,8 @@
 %@ var t shape=n,s domain=continuous role=primary :: Scheduled time of train at station (arrival/departure)
 
 % Δ: unusable as an identifier, renamed to Delta
-%@ var Delta shape=n,R domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Delta shape=n,R -> -
+%@ var Delta shape=- domain=non_negative role=primary :: Schedule difference (positive/negative) for OD pair and train
 
 % D: classified as parameter during review
 %@ param D shape=R kind=vector :: Demand for OD pair R
@@ -69,13 +70,15 @@
 %@ index s ordered=0 cyclic=0 :: Station index
 
 % stopping: classified as parameter during review
-%@ param stopping shape=n,s kind=matrix :: Indicator if train stops at station
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): stopping shape=n,s -> -
+%@ param stopping shape=- kind=matrix :: Indicator if train stops at station
 
 % train: classified as index during review
 %@ index train ordered=0 cyclic=0 :: Train index (same as n)
 
 % non: classified as parameter during review
-%@ param non shape=n,s kind=matrix :: Indicator for non-stopping train
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): non shape=n,s -> -
+%@ param non shape=- kind=matrix :: Indicator for non-stopping train
 
 % P: classified as index during review
 %@ index P ordered=0 cyclic=0 :: Set of platforms

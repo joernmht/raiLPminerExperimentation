@@ -51,7 +51,8 @@
 %@ index L ordered=0 cyclic=0 :: Set of nodes (train paths or overtaking combinations)
 %
 % c: classified as variable during review
-%@ var c shape=L,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): c shape=L,L -> -
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
 %
 % y: classified as variable during review
 %@ var y shape=L domain=integer role=primary drole=- lo=- hi=- :: Routing sequence number of node l
@@ -84,10 +85,12 @@
 %@ param t shape=- kind=scalar domain=- :: Dwelling times (t_k^1, t_k^2) and running times (t_{k,k+1}^v)
 %
 % α: classified as variable during review; renamed to alpha because α is not a usable identifier
-%@ var alpha shape=V,V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): alpha shape=V,V,K -> -
+%@ var alpha shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
 %
 % m: classified as parameter during review
-%@ param m shape=- kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k,k): m shape=- -> K,K
+%@ param m shape=K,K kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
 %
 % o: classified as parameter during review
 %@ param o shape=- kind=scalar domain=- :: Time-space resources occupied between nodes or boundaries
@@ -169,8 +172,10 @@
 %@ param T_1 shape=- kind=scalar domain=- :: Lower bound on departure times
 %@ param T_2 shape=- kind=scalar domain=- :: Upper bound on arrival times
 %@ var a_n shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time at last station for each train
-%@ var alphap shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for arrival order between trains at station
-%@ var alphapp shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for departure order between trains at station
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): alphap shape=V,V,K -> -
+%@ var alphap shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator for arrival order between trains at station
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): alphapp shape=V,V,K -> -
+%@ var alphapp shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator for departure order between trains at station
 %@ var d_1 shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time from first station for each train
 %@ param h_1 shape=K kind=vector domain=- :: Headway time before departure at station
 %@ param h_2 shape=K kind=vector domain=- :: Headway time after arrival at station
@@ -181,10 +186,14 @@
 %@ param h_pa shape=- kind=scalar domain=- :: Minimum headway time for departure-arrival (alternative)
 %@ param h_pd shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
 %@ param h_pp shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
-%@ var o_1 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var o_2 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var o_3 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var s_4 shape=V,V domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for resource usage
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o_1 shape=L -> -
+%@ var o_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o_2 shape=L -> -
+%@ var o_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o_3 shape=L -> -
+%@ var o_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s_4 shape=V,V -> -
+%@ var s_4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for resource usage
 %@ param t_1 shape=K kind=vector domain=- :: Dwell time at station
 %@ param t_2 shape=K kind=vector domain=- :: Dwell time at station (alternative)
 %@ var z_1 shape=- domain=continuous role=primary drole=max :: Objective: maximize number of trains

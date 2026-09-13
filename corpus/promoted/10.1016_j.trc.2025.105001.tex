@@ -21,10 +21,10 @@
 %@ var z shape=N domain=integer role=primary drole=- lo=- hi=- :: Number of (un)couplings before/after serving trip i
 %@ index D ordered=0 cyclic=0 :: Set of depots
 %@ index k ordered=0 cyclic=0 :: Index for units
-%@ param l shape=- kind=scalar domain=- :: Length or distance parameter
+%@ param l shape=K kind=scalar domain=- :: Length or distance parameter
 %@ var f shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual departure time of composition c from station s on deadheading arc a
 %@ var g shape=c,A,S domain=integer role=primary drole=- lo=- hi=- :: Actual arrival time of composition c at station s on deadheading arc a
-%@ param n shape=- kind=scalar domain=- :: Number of units or trips
+%@ param n shape=U kind=scalar domain=- :: Number of units or trips
 %@ index c ordered=0 cyclic=0 :: Index for compositions
 %@ param pt shape=- kind=scalar domain=- :: Origin depot of duty
 %@ index B ordered=0 cyclic=0 :: Set of unit types at depot
@@ -134,7 +134,7 @@
   & L_{k}^{dead} = \sum_{c \in C_{k}, a \in A_{c}^{dead}} l_{a}^{dead} \cdot x_{a}^{c} , \forall k \in K , \tag{eq\_0004} \\
   & F_{k} = \sum_{c \in C_{k}, a \in A_{c}^{on}} f_{a , p_{i_{a}^{-}}^{des}}^{c} , \forall k \in K , \tag{eq\_0006} \\
   & G_{k} = \sum_{c \in C_{k}, a \in A_{c}^{off}} g_{a , p_{i_{a}^{+}}^{ori}}^{c} , \forall k \in K , \tag{eq\_0008} \\
-  & \sum_{c \in C_{k}, a \in A_{c , i}^{-}} x_{a}^{c} - \sum_{c \in C_{k}, a \in A_{c , i}^{+}} x_{a}^{c} = \left\{\begin{matrix} 1 , & i = n_{k}^{ori} \\ - 1 , & i = n_{sink} \\ 0 , & otherwise \end{matrix}\right , \forall k \in K , \forall i \in N_{k} , \tag{eq\_0010} \\
+  & \sum_{c \in C_{k}, a \in A_{c , i}^{-}} x_{a}^{c} - \sum_{c \in C_{k}, a \in A_{c , i}^{+}} x_{a}^{c} = \left\{ 1 , & i = n_{k}^{ori} \\ - 1 , & i = n_{sink} \\ 0 , & otherwise \right , \forall k \in K , \forall i \in N_{k} , \tag{eq\_0010} \\
   & \sum_{c \in C, a \in A_{c , i}^{+}, k \in K_{c}} \mathit{rho}_{k} x_{a}^{c} \leq ϖ_{i} , \forall i \in N^{trip} , \tag{eq\_0011} \\
   & \sum_{c \in C, a \in A_{c , i}^{+}} x_{a}^{c} + y_{i} \geq 1 , \forall i \in N^{t r i p} , \tag{eq\_0012} \\
   & \sum_{c \in C_{a}} x_{a}^{c} \leq 1 , \forall a \in A_{1} , \tag{eq\_0013} \\
@@ -153,7 +153,7 @@
   & f_{a , p_{i_{a}^{-}}^{des}}^{c} \geq a_{i_{a}^{-} , p_{i_{a}^{-}}^{des}} x_{a}^{c} + \left(x_{a}^{c} - z_{c , a}^{-}\right) v_{p_{i_{a}^{-}}^{des}}^{con} + z_{c , a}^{-} \cdot v_{p_{i_{a}^{-}}^{des}}^{unc} , \forall c \in C , \forall a \in A_{c}^{dead , con} \cup A_{c}^{off} , \tag{eq\_0027} \\
   & \mathit{tau}_{q}^{min} x_{a}^{c} \leq g_{a , s_{q}^{+}}^{c} - f_{a , s_{q}^{-}}^{c} \leq \mathit{tau}_{q}^{max} x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall q \in Q_{a} , \tag{eq\_0028} \\
   & 0 \leq f_{a , s}^{c} - g_{a , s}^{c} \leq v_{s}^{max} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall s \in S_{a} \backslash \left\{p_{i_{a}^{-}}^{des} , p_{i_{a}^{+}}^{ori}\right\} , \tag{eq\_0029} \\
-  & g_{a , p_{i_{a}^{+}}^{ori}}^{c} \leq \left\{\begin{matrix} d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} - \left(x_{a}^{c} - z_{c , a}^{+}\right) v_{p_{i_{a}^{+}}^{ori}}^{con} - z_{c , a}^{+} \cdot v_{p_{i_{a}^{+}}^{ori}}^{cou} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} \\ d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{off} \end{matrix}\right , \tag{eq\_0030} \\
+  & g_{a , p_{i_{a}^{+}}^{ori}}^{c} \leq \left\{ d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} - \left(x_{a}^{c} - z_{c , a}^{+}\right) v_{p_{i_{a}^{+}}^{ori}}^{con} - z_{c , a}^{+} \cdot v_{p_{i_{a}^{+}}^{ori}}^{cou} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} \\ d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} \cdot x_{a}^{c} , \forall c \in C , \forall a \in A_{c}^{off} \right , \tag{eq\_0030} \\
   & G_{k} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0031} \\
   & \sum_{\left(i , ip\right) \in P_{a}^{q}} \left(d_{i , s_{q}^{-}} + \mathit{Delta}_{s_{q}^{-}}^{d}\right) \mathit{varepsilon}_{a , q}^{i , ip} \leq \sum_{c \in C_{a}} f_{a , s_{q}^{-}}^{c} \leq \sum_{\left(i , ip\right) \in P_{a}^{q}} \left(d_{ip , s_{q}^{-}} - \mathit{Delta}_{s_{q}^{-}}^{d}\right) \mathit{varepsilon}_{a , q}^{i , ip} , \forall a \in A^{dead} , \forall q \in Q_{a} , \tag{eq\_0032} \\
   & \sum_{\left(i , ip\right) \in P_{a}^{q}} \left(e_{i , s_{q}^{+}} + \mathit{Delta}_{s_{q}^{+}}^{a}\right) \mathit{varepsilon}_{a , q}^{i , ip} \leq \sum_{c \in C_{a}} g_{a , s_{q}^{+}}^{c} \leq \sum_{\left(i , ip\right) \in P_{a}^{q}} \left(e_{ip , s_{q}^{+}} - \mathit{Delta}_{s_{q}^{+}}^{a}\right) \mathit{varepsilon}_{a , q}^{i , ip} , \forall a \in A^{dead} , \forall q \in Q_{a} , \tag{eq\_0034} \\
@@ -175,32 +175,23 @@
   & G_{k} - \sum_{s \in D_{1}, t r \in T R_{s}, h \in H_{s , t r}} m_{s , t r , h}^{start} \mathit{chi}_{k , s}^{t r , h} \leq M \left(1 - \sum_{s \in D_{1}} \mathit{varphi}_{s}^{k}\right) , \forall k \in K , \tag{eq\_0061} \\
   & \mathit{delta}_{k} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0063} \\
   & \mathit{delta}_{k} \geq \sum_{s \in D_{1}, t r \in T R_{s}, h \in H_{s , t r}} m_{s , t r , h}^{end} \mathit{chi}_{k , s}^{t r , h} , \forall k \in K , \tag{eq\_0064} \\
-  & \begin{matrix}\mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{kp \in K} \mathit{chi}_{kp , s}^{t r , hp} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , hp}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall s \in D_{1} , \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , hp \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} ,\end{matrix} \tag{eq\_0065} \\
+  &  \mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{kp \in K} \mathit{chi}_{kp , s}^{t r , hp} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , hp}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall s \in D_{1} , \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , hp \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} ,  \tag{eq\_0065} \\
   & \sum_{k \in K} \mathit{vartheta}_{k} \cdot \mathit{varphi}_{s}^{k} \leq n_{s}^{mm} , \forall s \in D_{1} , \tag{eq\_0066} \\
   & \sum_{k \in K, hp \in H_{s , t r , h}^{c}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , hp} \leq \mathit{ell}_{s , t r} - \sum_{k \in K} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h} , \forall s \in D_{1} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0067} \\
   & + \sum_{k \in K, s \in D_{1}} \mathit{beta}_{k , s}^{0} \mathit{varphi}_{s}^{k} + \mathit{beta}_{1} \sum_{i \in N^{trip}} z_{i} + \mathit{beta}_{2} \sum_{k \in K} \mathit{lambda}_{k}^{unit} L_{k}^{dead} + \mathit{beta}_{3} \sum_{k \in K} \left(G_{k} - F_{k}\right) \tag{eq\_0070} \\
-  & x_{a}^{c} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c} , \tag{eq\_0073} \\
-  & y_{i} \in \left\{0 , 1\right\} , \forall i \in N^{trip} , \tag{eq\_0074} \\
   & z_{i} \in \left\{0 , 1 , 2\right\} , \forall i \in N^{trip} , \tag{eq\_0075} \\
-  & \mathit{gamma}_{u}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \forall u \in U , \tag{eq\_0076} \\
-  & \mathit{varphi}_{s}^{k} \in \left\{0 , 1\right\} , \forall k \in K , \forall s \in D_{1} , \tag{eq\_0077} \\
-  & L_{k}^{trip} , L_{k}^{dead} \geq 0 , \forall k \in K , \tag{eq\_0078} \\
   & f_{a , s}^{c} , g_{a , s}^{c} \in Z^{+} , \forall c \in C , \forall a \in A_{c}^{dead} , \forall s \in S_{a} , \tag{eq\_0079} \\
   & z_{c , a}^{-} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c}^{dead,con} \cup A_{c}^{off} , \tag{eq\_0080} \\
   & z_{c , a}^{+} \in \left\{0 , 1\right\} , \forall c \in C , \forall a \in A_{c}^{on} \cup A_{c}^{dead,con} , \tag{eq\_0081} \\
-  & \mathit{varepsilon}_{a , q}^{i , ip} \in \left\{0 , 1\right\} , \forall a \in A^{dead} , \forall q \in Q_{a} , \forall \left(i , ip\right) \in P_{a}^{q} , \tag{eq\_0082} \\
-  & w_{a , ap}^{q} \in \left\{0 , 1\right\} , \forall q \in Q , \forall \left(a , ap\right) \in \mathcal{A}_{q}^{dead} , \tag{eq\_0083} \\
   & N_{t , s}^{arr , dead} , N_{t , s}^{dep , dead} \in Z^{+} , \forall s \in S \backslash D , \forall t \in T_{s} , \tag{eq\_0084} \\
   & F_{k} , G_{k} \in Z^{+} , \forall k \in K . \tag{eq\_0085} \\
-  & \mathit{chi}_{k , s}^{t r , h} \in \left\{0 , 1\right\} , \forall k \in K , \forall s \in D_{1} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0089} \\
   & \mathit{delta}_{k} \in Z^{+} , \forall k \in K , \tag{eq\_0090} \\
-  & s . t . \sum_{t r \in T R_{s}, h \in H_{s , t r}} \mathit{chi}_{k , s}^{t r , h} = 1 , \forall k \in K_{s} , \tag{eq\_0093} \\
+  & \sum_{t r \in T R_{s}, h \in H_{s , t r}} \mathit{chi}_{k , s}^{t r , h} = 1 , \forall k \in K_{s} , \tag{eq\_0093} \\
   & G_bar_{k} - \sum_{t r \in T R_{s}, h \in H_{s , t r}} m_{s , t r , h}^{start} \mathit{chi}_{k , s}^{t r , h} \leq 0 , \forall k \in K_{s} , \tag{eq\_0094} \\
   & \mathit{delta}_{k} \leq \sum_{u \in U} d_{u}^{duty} gamma_bar_{u}^{k} , \forall k \in K_{s} , \tag{eq\_0095} \\
   & \mathit{delta}_{k} \geq \sum_{t r \in T R_{s}, h \in H_{s , t r}} m_{s , t r , h}^{end} \mathit{chi}_{k , s}^{t r , h} , \forall k \in K_{s} , \tag{eq\_0096} \\
-  & \begin{matrix}\mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{kp \in K} \mathit{chi}_{kp , s}^{t r , hp} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , hp}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , hp \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} \cap K_{s} ,\end{matrix} \tag{eq\_0097} \\
+  &  \mathit{delta}_{k} \geq \left(\mathit{chi}_{k , s}^{t r , h} + \sum_{kp \in K} \mathit{chi}_{kp , s}^{t r , hp} - 1\right) \cdot max \left\{m_{s , t r , h}^{end} , m_{s , t r , hp}^{end}\right\} - M \left(1 - \mathit{chi}_{k , s}^{t r , h}\right) , \\ \forall t r \in \left(T \cdot R\right)_{s}^{1} , \forall h \in H_{s , t r} , hp \in H_{s , t r , h}^{c} , \forall k \in K_{s , t r}^{h} \cap K_{s} ,  \tag{eq\_0097} \\
   & \sum_{k \in K_{s}, hp \in H_{s , t r , h}^{c}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , hp} \leq \mathit{ell}_{s , t r} - \sum_{k \in K_{s}} \mathit{rho}_{k} \mathit{chi}_{k , s}^{t r , h} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0098} \\
-  & \mathit{chi}_{k , s}^{t r , h} \in \left\{0 , 1\right\} , \forall k \in K_{s} , \forall t r \in T \cdot R_{s} , \forall h \in H_{s , t r} , \tag{eq\_0099} \\
   & \mathit{delta}_{k} \in Z^{+} , \forall k \in K_{s} . \tag{eq\_0100} \\
   & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{x_bar_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \underset{\genfrac{}{}{0pt}{}{u \in U :}{gamma_bar_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) \geq 1 , \tag{eq\_0101} \\
   & \sum_{c \in C} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{x_hat_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \sum_{k \in K} \underset{\genfrac{}{}{0pt}{}{u \in U :}{gamma_hat_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) + \sum_{k \in K} \underset{\genfrac{}{}{0pt}{}{s \in D_{1} :}{varphi_hat_{s}^{k} = 0}}{\sum} \mathit{varphi}_{s}^{k} \geq 1 . \tag{eq\_0104} \\
@@ -208,12 +199,12 @@
   & 1 - x_{a}^{c} \geq 1 , \tag{eq\_0106} \\
   & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{x_hat_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) \geq 1 , \tag{eq\_0107} \\
   & \sum_{c \in C_{k}} \underset{\genfrac{}{}{0pt}{}{a \in A_{c}^{nv} :}{x_hat_{a}^{c} = 1}}{\sum} \left(1 - x_{a}^{c}\right) + \underset{\genfrac{}{}{0pt}{}{u \in U :}{gamma_hat_{u}^{k} = 1}}{\sum} \left(1 - \mathit{gamma}_{u}^{k}\right) + \underset{\genfrac{}{}{0pt}{}{s \in D_{1} :}{varphi_hat_{s}^{k} = 0}}{\sum} \mathit{varphi}_{s}^{k} \geq 1 . \tag{eq\_0108} \\
-  & F_{k}^{ap} = \left\{\begin{matrix} \sum_{c \in C_{k}, a \in A_{c}^{on}} \left(d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} - v_{p_{i_{a}^{+}}^{ori}}^{con} - r_{k , a}^{dead}\right) x_{a}^{c} , d_{k}^{unit} \geq \mathit{sigma}_{1} \\ \sum_{c \in C_{k}, a \in A_{c}^{on}} d_{k}^{unit} \cdot x_{a}^{c} , d_{k}^{unit} < \mathit{sigma}_{1} \end{matrix}\right , \forall k \in K . \tag{eq\_0109} \\
+  & F_{k}^{ap} = \left\{ \sum_{c \in C_{k}, a \in A_{c}^{on}} \left(d_{i_{a}^{+} , p_{i_{a}^{+}}^{ori}} - v_{p_{i_{a}^{+}}^{ori}}^{con} - r_{k , a}^{dead}\right) x_{a}^{c} , d_{k}^{unit} \geq \mathit{sigma}_{1} \\ \sum_{c \in C_{k}, a \in A_{c}^{on}} d_{k}^{unit} \cdot x_{a}^{c} , d_{k}^{unit} < \mathit{sigma}_{1} \right , \forall k \in K . \tag{eq\_0109} \\
   & G_{k}^{ap} = \sum_{c \in C_{k}, a \in A_{c}^{off}} \left(e_{i_{a}^{-} , p_{i_{a}^{-}}^{des}} + v_{p_{i_{a}^{-}}^{des}}^{con} + r_{k , a}^{dead}\right) x_{a}^{c} , \forall k \in K . \tag{eq\_0111} \\
   & G_{k}^{ap} \leq \sum_{u \in U} d_{u}^{duty} \mathit{gamma}_{u}^{k} , \forall k \in K , \tag{eq\_0113} \\
   & G_{k}^{ap} - F_{k}^{ap} \leq r_{k} , \forall k \in K , \tag{eq\_0114} \\
   & G_{k}^{ap} - F_{k}^{ap} + \sum_{u \in U} r_{u}^{duty} \mathit{gamma}_{u}^{k} \leq r_{k} + R_{\mathit{xi}_{k}} \cdot \sum_{k \in K, s \in D_{1}} \mathit{varphi}_{s}^{k} , \forall k \in K . \tag{eq\_0116} \\
   & \mathit{theta}_{k} \geq \mathit{beta}_{3} \cdot \left(G_{k}^{ap} - F_{k}^{ap}\right) , \forall k \in K . \tag{eq\_0117} \\
   & L_{k}^{trip} + L_{k}^{dead} \leq L_{kp}^{trip} + L_{kp}^{dead} , \forall c \in C^{cou} , k , kp \in K_{c} : k < kp . \tag{eq\_0118} \\
-  & \begin{matrix}\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \cdot \sum_{c \in C, a \in A_{c}^{nv} : x_hat_{a}^{c} = 1} \left(1 - x_bar_{a}^{c}\right) \\ \leq \mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \leq L \cdot B 0 ,\end{matrix} \tag{eq\_0119} \\
+  &  \mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \cdot \sum_{c \in C, a \in A_{c}^{nv} : x_hat_{a}^{c} = 1} \left(1 - x_bar_{a}^{c}\right) \\ \leq \mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - \left(\mathit{psi} \left(\hat{\mathbf{\mathit{x}}} , \hat{\mathbf{\mathit{\mathit{gamma}}}} , \hat{\mathbf{\mathit{\mathit{varphi}}}}\right) - L \cdot B 0\right) \leq L \cdot B 0 ,  \tag{eq\_0119} \\
 \end{align}

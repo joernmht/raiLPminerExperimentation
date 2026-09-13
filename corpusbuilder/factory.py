@@ -41,6 +41,8 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+from corpusbuilder.promote import classify_failure
+
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
 OUTPUTS = ROOT / "outputs"
@@ -74,27 +76,6 @@ LANES: tuple[dict[str, str], ...] = (
     {"id": "hitl", "name": "Human in the loop", "sub": "verdicts · corrections · symbol kinds"},
     {"id": "llm", "name": "LLM-assisted", "sub": "non-deterministically sourced, parser-gated"},
     {"id": "val", "name": "Validation & analysis", "sub": "round-trip · solvers · similarity"},
-)
-
-#: ``outside_grammar`` detail strings -> failure class. Order matters: the
-#: superscript test must run before the generic "trailing" test. This is the
-#: exact rule set the 2026-09-10 status pass used, so the bins match its
-#: numbers.
-_GRAMMAR_CLASSES: tuple[tuple[str, str], ...] = (
-    ("trailing '^{", "superscript after subscript"),
-    ("trailing '", "juxtaposed factor / residue"),
-    ("chained relation with", "chain: 3+ comparators"),
-    ("mixed-direction or equality chained", "chain: mixed / equality"),
-    ("cannot serve as an index family", "label subscript"),
-    # rewrite-2026.09.0: the codec refuses undeclared symbols by name; the
-    # folded spellings (t_arr, v_c) the sidecars do not declare yet land here.
-    ("not a declared variable or parameter", "undeclared symbol (vocabulary)"),
-    ("not a declared parameter", "undeclared coefficient (vocabulary)"),
-    ("string_pattern_mismatch", "parenthesised / text residue"),
-    ("could not convert string to float", "non-numeric coefficient"),
-    ("subscripted coefficient", "subscripted-coef shape mismatch"),
-    ("unbalanced braces", "unbalanced braces"),
-    ("no comparator", "no comparator"),
 )
 
 
@@ -310,12 +291,8 @@ def _pct(part: int | None, whole: int | None) -> str:
 
 
 def classify_detail(detail: str | None) -> str:
-    """Map an ``outside_grammar`` detail string to its failure class."""
-    d = detail or ""
-    for needle, label in _GRAMMAR_CLASSES:
-        if needle in d:
-            return label
-    return "other"
+    """Failure class of a parser message (shared with corpusbuilder.promote)."""
+    return classify_failure(detail)
 
 
 def failure_bins(promotion: dict | None) -> list[dict]:

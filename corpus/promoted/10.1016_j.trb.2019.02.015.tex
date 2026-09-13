@@ -26,8 +26,8 @@
 %@ param Delta shape=A kind=vector domain=- :: Acceleration/deceleration time adjustment for run activity a
 %@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary short-turn station selection for event e
 %@ index TR ordered=0 cyclic=0 :: Set of trains
-%@ param tail shape=A kind=vector domain=- :: Tail event of activity a
-%@ param head shape=A kind=vector domain=- :: Head event of activity a
+%@ param tail shape=- kind=vector domain=- :: Tail event of activity a
+%@ param head shape=- kind=vector domain=- :: Head event of activity a
 %@ var n shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary occupancy indicator between arrival events e and e'
 %@ var p shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary platform-track requirement for arrival event e
 %@ param w shape=E kind=vector domain=- :: Passenger-dependent weight for delay/cancellation/skip/add decisions
@@ -153,81 +153,80 @@
 %@ param z_board shape=E_ar kind=scalar domain=- :: Number of passengers boarding at a departure event
 %@ param z_pass shape=E_ar kind=scalar domain=- :: Number of passengers passing through an arrival event
 \begin{align}
-  & \begin{matrix} & M_{1} \cdot c_{e} \leq x_{e} - o_{e} \leq M_{1} , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0001} \\
-  & \begin{matrix} & x_{e} - o_{e} = d_{e} + M_{1} \cdot c_{e} , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0002} \\
-  & \begin{matrix} & d_{e} \geq 0 , e \in E_{\text{ar}} \cup E_{\text{de}} ,\end{matrix} \tag{eq\_0003} \\
-  & \begin{matrix} & d_{e} \leq D , e \in \left(E_{\text{ar}} \cup E_{\text{de}}\right) \backslash E^{\text{NMdelay}} ,\end{matrix} \tag{eq\_0004} \\
+  &  & M_{1} \cdot c_{e} \leq x_{e} - o_{e} \leq M_{1} , e \in E_{\text{ar}} \cup E_{\text{de}} ,  \tag{eq\_0001} \\
+  &  & x_{e} - o_{e} = d_{e} + M_{1} \cdot c_{e} , e \in E_{\text{ar}} \cup E_{\text{de}} ,  \tag{eq\_0002} \\
+  &  & d_{e} \leq D , e \in \left(E_{\text{ar}} \cup E_{\text{de}}\right) \backslash E^{\text{NMdelay}} ,  \tag{eq\_0004} \\
   & x_{e} \geq t_{\text{end}} \left(1 - c_{e}\right) , e \in E_{\text{de}} , s \cdot t_{e} = s \cdot t_{\text{en}}^{d r_{e}} \tag{eq\_0005\_a} \\
   & t_{\text{start}} \leq o_{e} < t_{\text{end}} \tag{eq\_0005\_b} \\
-  & \begin{matrix} & c_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} ,\end{matrix} \tag{eq\_0006} \\
-  & \begin{matrix} & x_{e} - o_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} .\end{matrix} \tag{eq\_0007} \\
-  & \begin{matrix} & c_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R ,\end{matrix} \tag{eq\_0008} \\
-  & \begin{matrix} & x_{e} - o_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R .\end{matrix} \tag{eq\_0009} \\
-  & \begin{matrix} & c_{ep} = 0 , \left(e , ep\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R ,\end{matrix} \tag{eq\_0010} \\
-  & \begin{matrix} & x_{ep} - o_{ep} = 0 , \left(e , ep\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R .\end{matrix} \tag{eq\_0011} \\
-  & \begin{matrix} & c_{ep} - c_{e} = 0 , \left(e , ep\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0012} \\
-  & \begin{matrix} & c_{ep} - c_{e} = 0 , \left(e , ep\right) \in A_{\text{station}} , e \notin E_{\text{ar}}^{\text{turn}} , ep \notin E_{\text{de}}^{\text{turn}} .\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix} & x_{ep} - x_{e} \geq o_{ep} - o_{e} , a = \left(e , ep\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0014} \\
-  & \begin{matrix} & x_{ep} - x_{e} \leq \left(1 + \mathit{lambda}\right) \left(o_{ep} - o_{e}\right) , a = \left(e , ep\right) \in A_{\text{run}} ,\end{matrix} \tag{eq\_0015} \\
-  & \begin{matrix} & x_{ep} - x_{e} \geq L_{a} + M_{2} \left(q_{e , ep} - 1\right) , a = \left(e , ep\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix} & q_{e , ep} + q_{ep , e} = 1 , \left(e , ep\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix} & q_{e_{1} , e_{1}^{'}} - q_{e_{2} , e_{2}^{'}} = 0 , \left(e_{1} , e_{1}^{'}\right) \in A_{\text{head}}^{\text{de}} , \left(e_{2} , e_{2}^{'}\right) \in A_{\text{head}}^{\text{ar}} , \left(e_{1} , e_{2}\right) \in A_{\text{run}} , \left(e_{1}^{'} , e_{2}^{'}\right) \in A_{\text{run}} .\end{matrix} \tag{eq\_0018} \\
-  & \begin{matrix} & x_{ep} - x_{e} \geq L_{a} + M_{2} \left(q_{e , ep} - 1\right) , a = \left(e , ep\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,\end{matrix} \tag{eq\_0019} \\
-  & \begin{matrix} & q_{e , ep} + q_{ep , e} = 1 , \left(e , ep\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,\end{matrix} \tag{eq\_0020} \\
-  & \begin{matrix} & x_{ep} - x_{epp} \geq L_{a} + M_{2} \left(q_{e , ep} - 1 - c_{e} - c_{ep} - c_{epp}\right) , a = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , \left(e , epp\right) \in A_{\text{station}} , N_{s t_{e}} = 2 ,\end{matrix} \tag{eq\_0021} \\
-  & \begin{matrix} & x_{ep} - x_{epp} \geq L_{a} + M_{2} \left(q_{e , ep} - 1 - c_{e} - c_{ep} - \left(1 - m_{ap}\right)\right) , a = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , ap = \left(e , epp\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , N_{s t_{e}} = 2 ,\end{matrix} \tag{eq\_0022} \\
-  & \begin{matrix} & s_{a} \leq 1 - c_{e} , a = \left(e , ep\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0023} \\
-  & \begin{matrix} & s_{a} \leq 1 - c_{ep} , a = \left(e , ep\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0024} \\
-  & \begin{matrix} & s_{a} \geq c_{e} , a = \left(e , ep\right) \in A_{pass} ,\end{matrix} \tag{eq\_0025} \\
-  & \begin{matrix} & s_{a} \geq c_{ep} , a = \left(e , ep\right) \in A_{pass} ,\end{matrix} \tag{eq\_0026} \\
-  & \begin{matrix} & x_{ep} - x_{e} \geq L_{a} \left(1 - s_{a} - c_{e} - c_{ep}\right) - M_{1} \cdot c_{e} , a = \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0027} \\
-  & \begin{matrix} & x_{ep} - x_{e} \leq M_{2} \left(1 - s_{a} + c_{e} + c_{ep}\right) , a = \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0028} \\
+  &  & c_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} ,  \tag{eq\_0006} \\
+  &  & x_{e} - o_{e} = 0 , e \in E_{\text{ar}} \cup E_{\text{de}} , o_{e} < t_{\text{start}} .  \tag{eq\_0007} \\
+  &  & c_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R ,  \tag{eq\_0008} \\
+  &  & x_{e} - o_{e} = 0 , e \in E_{\text{de}} , o_{e} \geq t_{\text{end}} + R .  \tag{eq\_0009} \\
+  &  & c_{ep} = 0 , \left(e , ep\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R ,  \tag{eq\_0010} \\
+  &  & x_{ep} - o_{ep} = 0 , \left(e , ep\right) \in A_{\text{run}} , o_{e} \geq t_{\text{end}} + R .  \tag{eq\_0011} \\
+  &  & c_{ep} - c_{e} = 0 , \left(e , ep\right) \in A_{\text{run}} .  \tag{eq\_0012} \\
+  &  & c_{ep} - c_{e} = 0 , \left(e , ep\right) \in A_{\text{station}} , e \notin E_{\text{ar}}^{\text{turn}} , ep \notin E_{\text{de}}^{\text{turn}} .  \tag{eq\_0013} \\
+  &  & x_{ep} - x_{e} \geq o_{ep} - o_{e} , a = \left(e , ep\right) \in A_{\text{run}} .  \tag{eq\_0014} \\
+  &  & x_{ep} - x_{e} \leq \left(1 + \mathit{lambda}\right) \left(o_{ep} - o_{e}\right) , a = \left(e , ep\right) \in A_{\text{run}} ,  \tag{eq\_0015} \\
+  &  & x_{ep} - x_{e} \geq L_{a} + M_{2} \left(q_{e , ep} - 1\right) , a = \left(e , ep\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,  \tag{eq\_0016} \\
+  &  & q_{e , ep} + q_{ep , e} = 1 , \left(e , ep\right) \in A_{\text{head}}^{\text{ar}} \cup A_{\text{head}}^{\text{de}} ,  \tag{eq\_0017} \\
+  &  & q_{e_{1} , e_{1}^{'}} - q_{e_{2} , e_{2}^{'}} = 0 , \left(e_{1} , e_{1}^{'}\right) \in A_{\text{head}}^{\text{de}} , \left(e_{2} , e_{2}^{'}\right) \in A_{\text{head}}^{\text{ar}} , \left(e_{1} , e_{2}\right) \in A_{\text{run}} , \left(e_{1}^{'} , e_{2}^{'}\right) \in A_{\text{run}} .  \tag{eq\_0018} \\
+  &  & x_{ep} - x_{e} \geq L_{a} + M_{2} \left(q_{e , ep} - 1\right) , a = \left(e , ep\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,  \tag{eq\_0019} \\
+  &  & q_{e , ep} + q_{ep , e} = 1 , \left(e , ep\right) \in A_{\text{head}}^{ar , de} , r_{s t_{e}} = 1 ,  \tag{eq\_0020} \\
+  &  & x_{ep} - x_{epp} \geq L_{a} + M_{2} \left(q_{e , ep} - 1 - c_{e} - c_{ep} - c_{epp}\right) , a = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , \left(e , epp\right) \in A_{\text{station}} , N_{s t_{e}} = 2 ,  \tag{eq\_0021} \\
+  &  & x_{ep} - x_{epp} \geq L_{a} + M_{2} \left(q_{e , ep} - 1 - c_{e} - c_{ep} - \left(1 - m_{ap}\right)\right) , a = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} , ap = \left(e , epp\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , N_{s t_{e}} = 2 ,  \tag{eq\_0022} \\
+  &  & s_{a} \leq 1 - c_{e} , a = \left(e , ep\right) \in A_{\text{dwell}} ,  \tag{eq\_0023} \\
+  &  & s_{a} \leq 1 - c_{ep} , a = \left(e , ep\right) \in A_{\text{dwell}} ,  \tag{eq\_0024} \\
+  &  & s_{a} \geq c_{e} , a = \left(e , ep\right) \in A_{pass} ,  \tag{eq\_0025} \\
+  &  & s_{a} \geq c_{ep} , a = \left(e , ep\right) \in A_{pass} ,  \tag{eq\_0026} \\
+  &  & x_{ep} - x_{e} \geq L_{a} \left(1 - s_{a} - c_{e} - c_{ep}\right) - M_{1} \cdot c_{e} , a = \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0027} \\
+  &  & x_{ep} - x_{e} \leq M_{2} \left(1 - s_{a} + c_{e} + c_{ep}\right) , a = \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0028} \\
   & x_{epp} - x_{ep} \geq L_{ap} - \mathit{Delta}_{ap}^{\text{acce}} \cdot s_{a} - \mathit{Delta}_{ap}^{\text{dece}} \cdot s_{app} , a = \left(e , ep\right) \in A_{\text{dwell}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{dwell}} \tag{eq\_0029\_a} \\
   & x_{epp} - x_{ep} \geq L_{ap} - \mathit{Delta}_{ap}^{\text{acce}} \cdot s_{a} , a = \left(e , ep\right) \in A_{\text{dwell}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} \tag{eq\_0029\_b} \\
   & x_{epp} - x_{ep} \geq L_{ap} - \mathit{Delta}_{ap}^{\text{dece}} \cdot s_{app} , a = \left(e , ep\right) \in A_{\text{odturn}}^{\text{plan}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{dwell}} \tag{eq\_0029\_c} \\
-  & \begin{matrix} & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) - \mathit{Delta}_{ap}^{\text{dece}} \cdot s_{app} , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{dwell}} ,\end{matrix} \tag{eq\_0030} \\
-  & \begin{matrix} & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} ,\end{matrix} \tag{eq\_0031} \\
-  & \begin{matrix} & x_{epp} - x_{ep} \geq L_{ap} - \mathit{Delta}_{ap}^{\text{acce}} \cdot s_{a} + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{\text{dwell}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0032} \\
-  & \begin{matrix} & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{\text{odturn}}^{\text{plan}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0033} \\
-  & \begin{matrix} & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,\end{matrix} \tag{eq\_0034} \\
-  & \begin{matrix} & c_{e} \leq c_{ep} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0035} \\
-  & \begin{matrix} & c_{ep} \leq c_{e} + y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0036} \\
-  & \begin{matrix} & c_{ep} \geq y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0037} \\
-  & \begin{matrix} & c_{ep} \leq c_{e} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0038} \\
-  & \begin{matrix} & c_{e} \leq c_{ep} + y_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0039} \\
-  & \begin{matrix} & c_{e} \geq y_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0040} \\
-  & \begin{matrix} & \sum_{e : t r_{e} = t r} y_{e} = c_{ep} , t r \in \mathit{TR}_{\text{turn}} , e \in E_{\text{ar}}^{\text{turn}} , ep \in E_{\text{de}} , t r_{ep} = t r , s \cdot t_{ep} = s_{\text{en}}^{d r_{ep}} ,\end{matrix} \tag{eq\_0041} \\
-  & \begin{matrix} & \underset{ep : t r_{ep} = t r}{\sum} y_{ep} = c_{e} , t r \in \mathit{TR}_{\text{turn}} , ep \in E_{\text{de}}^{\text{turn}} , e \in E_{\text{ar}} , t r_{e} = t r , s \cdot t_{e} = s_{\text{ex}}^{d r_{e}} ,\end{matrix} \tag{eq\_0042} \\
-  & \begin{matrix} & \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = c_{ep} - c_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0043} \\
-  & \begin{matrix} & \underset{a \in A_{\text{turn}} , \mathit{head} \left(a\right) = ep}{\sum} m_{a} = c_{e} - c_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0044} \\
-  & \begin{matrix} & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{ep} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , ep\right) \in A_{\text{turn}} .\end{matrix} \tag{eq\_0045} \\
-  & \begin{matrix} & \underset{a \in A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = 1 - c_{e} , e \in E_{\text{ar}}^{\text{odturn}} ,\end{matrix} \tag{eq\_0046} \\
-  & \begin{matrix} & \underset{a \in A_{\text{odturn}} , \mathit{head} \left(a\right) = ep}{\sum} m_{a} = 1 - c_{ep} , ep \in E_{\text{de}}^{\text{odturn}} ,\end{matrix} \tag{eq\_0047} \\
-  & \begin{matrix} & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{ep} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , ep\right) \in A_{\text{odturn}} .\end{matrix} \tag{eq\_0048} \\
-  & \begin{matrix} & n_{e , ep} \leq q_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,\end{matrix} \tag{eq\_0049} \\
-  & \begin{matrix} & x_{ep} - x_{epp} \geq M_{2} \left(q_{e , ep} - n_{e , ep} - 1\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,\end{matrix} \tag{eq\_0050} \\
-  & \begin{matrix} & x_{ep} - x_{epp} \leq M_{2} \left(q_{e , ep} - n_{e , ep}\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,\end{matrix} \tag{eq\_0051} \\
-  & \begin{matrix} & n_{e , ep} \leq 1 - c_{e} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,\end{matrix} \tag{eq\_0052} \\
-  & \begin{matrix} & n_{e , ep} \leq 1 - c_{ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .\end{matrix} \tag{eq\_0053} \\
-  & \begin{matrix} & n_{e , ep} \leq 1 - c_{epp} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0054} \\
-  & \begin{matrix} & n_{e , ep} \leq 1 - \left(c_{epp} - \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a}\right) , e \in E_{\text{ar}}^{\text{turn}} , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0055} \\
-  & \begin{matrix} & x_{ep} - \left(x_{epp} + L_{ap}\right) \geq M_{2} \left(q_{e , ep} - n_{e , ep} - 1 - c_{e} - c_{ep} - c_{epp}\right) , e , ep \in E_{\text{ar}} , \left(e , epp\right) \in A_{\text{station}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,\end{matrix} \tag{eq\_0056} \\
-  & \begin{matrix} & x_{ep} - \left(x_{epp} + L_{ap}\right) \leq M_{2} \left(q_{e , ep} - n_{e , ep} + c_{e} + c_{ep} + c_{epp}\right) , e , ep \in E_{\text{ar}} , \left(e , epp\right) \in A_{\text{station}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,\end{matrix} \tag{eq\_0057} \\
+  &  & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) - \mathit{Delta}_{ap}^{\text{dece}} \cdot s_{app} , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{dwell}} ,  \tag{eq\_0030} \\
+  &  & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} ,  \tag{eq\_0031} \\
+  &  & x_{epp} - x_{ep} \geq L_{ap} - \mathit{Delta}_{ap}^{\text{acce}} \cdot s_{a} + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{\text{dwell}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,  \tag{eq\_0032} \\
+  &  & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{\text{odturn}}^{\text{plan}} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,  \tag{eq\_0033} \\
+  &  & x_{epp} - x_{ep} \geq L_{ap} + \mathit{Delta}_{ap}^{\text{acce}} \left(1 - s_{a}\right) + \mathit{Delta}_{ap}^{\text{dece}} \left(1 - s_{app}\right) , a = \left(e , ep\right) \in A_{pass} , ap = \left(ep , epp\right) \in A_{\text{run}} , app = \left(epp , e^{'' '}\right) \in A_{pass} ,  \tag{eq\_0034} \\
+  &  & c_{e} \leq c_{ep} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0035} \\
+  &  & c_{ep} \leq c_{e} + y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0036} \\
+  &  & c_{ep} \geq y_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0037} \\
+  &  & c_{ep} \leq c_{e} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0038} \\
+  &  & c_{e} \leq c_{ep} + y_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0039} \\
+  &  & c_{e} \geq y_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0040} \\
+  &  & \sum_{e : t r_{e} = t r} y_{e} = c_{ep} , t r \in \mathit{TR}_{\text{turn}} , e \in E_{\text{ar}}^{\text{turn}} , ep \in E_{\text{de}} , t r_{ep} = t r , s \cdot t_{ep} = s_{\text{en}}^{d r_{ep}} ,  \tag{eq\_0041} \\
+  &  & \underset{ep : t r_{ep} = t r}{\sum} y_{ep} = c_{e} , t r \in \mathit{TR}_{\text{turn}} , ep \in E_{\text{de}}^{\text{turn}} , e \in E_{\text{ar}} , t r_{e} = t r , s \cdot t_{e} = s_{\text{ex}}^{d r_{e}} ,  \tag{eq\_0042} \\
+  &  & \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = c_{ep} - c_{e} , e \in E_{\text{ar}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0043} \\
+  &  & \underset{a \in A_{\text{turn}} , \mathit{head} \left(a\right) = ep}{\sum} m_{a} = c_{e} - c_{ep} , ep \in E_{\text{de}}^{\text{turn}} , \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0044} \\
+  &  & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{ep} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , ep\right) \in A_{\text{turn}} .  \tag{eq\_0045} \\
+  &  & \underset{a \in A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} = 1 - c_{e} , e \in E_{\text{ar}}^{\text{odturn}} ,  \tag{eq\_0046} \\
+  &  & \underset{a \in A_{\text{odturn}} , \mathit{head} \left(a\right) = ep}{\sum} m_{a} = 1 - c_{ep} , ep \in E_{\text{de}}^{\text{odturn}} ,  \tag{eq\_0047} \\
+  &  & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{ep} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , ep\right) \in A_{\text{odturn}} .  \tag{eq\_0048} \\
+  &  & n_{e , ep} \leq q_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,  \tag{eq\_0049} \\
+  &  & x_{ep} - x_{epp} \geq M_{2} \left(q_{e , ep} - n_{e , ep} - 1\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,  \tag{eq\_0050} \\
+  &  & x_{ep} - x_{epp} \leq M_{2} \left(q_{e , ep} - n_{e , ep}\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} \cup A_{\text{turn}} \cup A_{\text{odturn}} ,  \tag{eq\_0051} \\
+  &  & n_{e , ep} \leq 1 - c_{e} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,  \tag{eq\_0052} \\
+  &  & n_{e , ep} \leq 1 - c_{ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .  \tag{eq\_0053} \\
+  &  & n_{e , ep} \leq 1 - c_{epp} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} ,  \tag{eq\_0054} \\
+  &  & n_{e , ep} \leq 1 - \left(c_{epp} - \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a}\right) , e \in E_{\text{ar}}^{\text{turn}} , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} , \left(e , epp\right) \in A_{\text{station}} .  \tag{eq\_0055} \\
+  &  & x_{ep} - \left(x_{epp} + L_{ap}\right) \geq M_{2} \left(q_{e , ep} - n_{e , ep} - 1 - c_{e} - c_{ep} - c_{epp}\right) , e , ep \in E_{\text{ar}} , \left(e , epp\right) \in A_{\text{station}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,  \tag{eq\_0056} \\
+  &  & x_{ep} - \left(x_{epp} + L_{ap}\right) \leq M_{2} \left(q_{e , ep} - n_{e , ep} + c_{e} + c_{ep} + c_{epp}\right) , e , ep \in E_{\text{ar}} , \left(e , epp\right) \in A_{\text{station}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} ,  \tag{eq\_0057} \\
   & x_{ep} - \left(x_{epp} + L_{ap}\right) \geq M_{2} \left(q_{e , ep} - n_{e , ep} - 1 - c_{e} - c_{ep} - \left(1 - m_{a}\right)\right) , e , ep \in E_{\text{ar}} , a = \left(e , epp\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} \tag{eq\_0058} \\
   & x_{ep} - \left(x_{epp} + L_{ap}\right) \leq M_{2} \left(q_{e , ep} - n_{e , ep} + c_{e} + c_{ep} + 1 - m_{a}\right) , e , ep \in E_{\text{ar}} , a = \left(e , epp\right) \in A_{\text{turn}} \cup A_{\text{odturn}} , ap = \left(epp , ep\right) \in A_{\text{head}}^{\text{de} , \text{ar}} . \tag{eq\_0059} \\
-  & \begin{matrix} & M_{2} \left(q_{e , ep} - 1\right) \leq x_{ep} - x_{e} \leq M_{2} \cdot q_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , d r_{e} \neq d r_{ep} ,\end{matrix} \tag{eq\_0060} \\
-  & \begin{matrix} & q_{e , ep} + q_{ep , e} = 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , d r_{e} \neq d r_{ep} .\end{matrix} \tag{eq\_0061} \\
-  & \begin{matrix}\sum_{e} n_{e , ep} \leq N_{s t} - 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , s \cdot t = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,\end{matrix} \tag{eq\_0062} \\
-  & \begin{matrix}p_{e} \leq 1 - c_{e} , e \in E_{\text{ar}} .\end{matrix} \tag{eq\_0063} \\
-  & \begin{matrix}p_{e} \geq 1 - s_{a} - c_{e} - c_{ep} , e \in E_{\text{ar}} , a = \left(e , ep\right) \in A_{\text{station}} ,\end{matrix} \tag{eq\_0064} \\
-  & \begin{matrix} & p_{e} \geq \underset{a \in A_{\text{turn}} \cup A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}} .\end{matrix} \tag{eq\_0065} \\
-  & \begin{matrix} & p_{e} \leq 1 - s_{a} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , a = \left(e , ep\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0066} \\
-  & \begin{matrix} & p_{e} \leq 1 - s_{a} + \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} , a = \left(e , ep\right) \in A_{\text{station}} .\end{matrix} \tag{eq\_0067} \\
-  & \begin{matrix} & n_{e , ep}^{p} \leq n_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,\end{matrix} \tag{eq\_0068} \\
-  & \begin{matrix} & n_{e , ep}^{p} \leq p_{e} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,\end{matrix} \tag{eq\_0069} \\
-  & \begin{matrix} & n_{e , ep}^{p} \geq n_{e , ep} + p_{e} - 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .\end{matrix} \tag{eq\_0070} \\
-  & \begin{matrix} & \sum_{e} n_{e , ep}^{p} \leq \left(N_{s t} - 1\right) \left(1 - p_{ep}\right) + p_{ep} \left(N_{s t}^{p} - 1\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , s \cdot t = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .\end{matrix} \tag{eq\_0071} \\
-  \begin{matrix}\text{min}\quad & \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{delay}} \cdot d_{e} + \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{cancel}} \cdot c_{e} + \underset{a \in A_{\text{dwell}}}{\sum} w_{a}^{\text{skip}} \cdot s_{a} - \sum_{a \in A_{pass}} w_{a}^{\text{add}} \left(1 - s_{a}\right) .\end{matrix} \tag{eq\_0072} \\
+  &  & M_{2} \left(q_{e , ep} - 1\right) \leq x_{ep} - x_{e} \leq M_{2} \cdot q_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , d r_{e} \neq d r_{ep} ,  \tag{eq\_0060} \\
+  &  & q_{e , ep} + q_{ep , e} = 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , d r_{e} \neq d r_{ep} .  \tag{eq\_0061} \\
+  &  \sum_{e} n_{e , ep} \leq N_{s t} - 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , s \cdot t = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,  \tag{eq\_0062} \\
+  &  p_{e} \leq 1 - c_{e} , e \in E_{\text{ar}} .  \tag{eq\_0063} \\
+  &  p_{e} \geq 1 - s_{a} - c_{e} - c_{ep} , e \in E_{\text{ar}} , a = \left(e , ep\right) \in A_{\text{station}} ,  \tag{eq\_0064} \\
+  &  & p_{e} \geq \underset{a \in A_{\text{turn}} \cup A_{\text{odturn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}} .  \tag{eq\_0065} \\
+  &  & p_{e} \leq 1 - s_{a} , e \in E_{\text{ar}} \backslash \left(E_{\text{ar}}^{\text{turn}} \cup E_{\text{ar}}^{\text{odturn}}\right) , a = \left(e , ep\right) \in A_{\text{station}} .  \tag{eq\_0066} \\
+  &  & p_{e} \leq 1 - s_{a} + \underset{a \in A_{\text{turn}} , \mathit{tail} \left(a\right) = e}{\sum} m_{a} , e \in E_{\text{ar}}^{\text{turn}} , a = \left(e , ep\right) \in A_{\text{station}} .  \tag{eq\_0067} \\
+  &  & n_{e , ep}^{p} \leq n_{e , ep} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,  \tag{eq\_0068} \\
+  &  & n_{e , ep}^{p} \leq p_{e} , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} ,  \tag{eq\_0069} \\
+  &  & n_{e , ep}^{p} \geq n_{e , ep} + p_{e} - 1 , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .  \tag{eq\_0070} \\
+  &  & \sum_{e} n_{e , ep}^{p} \leq \left(N_{s t} - 1\right) \left(1 - p_{ep}\right) + p_{ep} \left(N_{s t}^{p} - 1\right) , e , ep \in E_{\text{ar}} , s \cdot t_{e} = s \cdot t_{ep} , s \cdot t = s \cdot t_{ep} , t r_{e} \neq t r_{ep} .  \tag{eq\_0071} \\
+  \min\quad & \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{delay}} \cdot d_{e} + \underset{e \in E_{\text{ar}}}{\sum} w_{e}^{\text{cancel}} \cdot c_{e} + \underset{a \in A_{\text{dwell}}}{\sum} w_{a}^{\text{skip}} \cdot s_{a} - \sum_{a \in A_{pass}} w_{a}^{\text{add}} \left(1 - s_{a}\right) . \tag{eq\_0072} \\
   & w_{e}^{\text{delay}} = z_{e}^{\text{alight}} + z_{e}^{\text{pass}} , e \in E_{\text{ar}} . \tag{eq\_0073} \\
   & w_{e}^{\text{cancel}} = \mathit{alpha} \left(z_{e}^{\text{alight}} + z_{e}^{\text{pass}}\right) , e \in E_{\text{ar}} , \tag{eq\_0074} \\
   & w_{a}^{\text{skip}} = \mathit{beta} \left(z_{e}^{\text{alight}} + z_{ep}^{\text{board}}\right) , a = \left(e , ep\right) \in A_{\text{dwell}} , \tag{eq\_0075} \\

@@ -45,7 +45,8 @@
 %@ index L ordered=0 cyclic=0 :: Set of railway lines.
 
 % mandatory: classified as parameter during review
-%@ param mandatory shape=L kind=vector domain=- :: Indicator whether line l is mandatory (1) or optional (0).
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): mandatory shape=L -> -
+%@ param mandatory shape=- kind=vector domain=- :: Indicator whether line l is mandatory (1) or optional (0).
 
 % x: classified as variable during review
 %@ var x shape=L,F,R domain=binary role=primary drole=- lo=- hi=- :: Binary selection of line pool candidate (l,f,r).
@@ -68,13 +69,15 @@
 %@ index I ordered=0 cyclic=0 :: Set of track sections in the infrastructure-aware route constraints.
 
 % cap: classified as parameter during review
-%@ param cap shape=R kind=vector domain=- :: Passenger capacity of vehicle composition r.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): cap shape=R -> -
+%@ param cap shape=- kind=vector domain=- :: Passenger capacity of vehicle composition r.
 
 % G: classified as index during review
 %@ index G ordered=0 cyclic=0 :: Set of rolling stock types.
 
 % mix: classified as parameter during review
-%@ param mix shape=G,R kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): mix shape=G,R -> -
+%@ param mix shape=- kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
 
 % C: classified as index during review
 %@ index C ordered=0 cyclic=0 :: Set of conflicts among line pool candidates.

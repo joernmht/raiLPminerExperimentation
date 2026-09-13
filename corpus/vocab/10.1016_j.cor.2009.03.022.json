@@ -1,5 +1,31 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [
+    {
+      "name": "Mg",
+      "kind": "param",
+      "declared": null,
+      "written": [
+        "a"
+      ],
+      "shape": [
+        "A"
+      ],
+      "new_index": []
+    },
+    {
+      "name": "Mz",
+      "kind": "param",
+      "declared": null,
+      "written": [
+        "a"
+      ],
+      "shape": [
+        "A"
+      ],
+      "new_index": []
+    }
+  ],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "A",
@@ -42,7 +68,11 @@
   },
   "used": [
     "A_drive",
+    "A_head",
+    "A_stop",
+    "A_transfer",
     "A_turn",
+    "A_underline",
     "A_underline_drive",
     "A_underline_head",
     "A_underline_stop",
@@ -62,6 +92,7 @@
     "T",
     "Tk",
     "Tz",
+    "V_underline",
     "activity",
     "before",
     "d",
@@ -93,13 +124,9 @@
   ],
   "families": [
     "A",
-    "A_head",
-    "A_stop",
-    "A_transfer",
-    "A_underline",
-    "N",
+    "Anderline",
     "V",
-    "V_underline",
+    "Vnderline",
     "Z"
   ],
   "missing": {
@@ -117,10 +144,63 @@
       "kind": "?",
       "evidence": "position only"
     },
+    "A_head": {
+      "rows": [
+        "eq_0003"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "A_stop": {
+      "rows": [
+        "eq_0003"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "A_transfer": {
+      "rows": [
+        "eq_0003"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
     "A_turn": {
       "rows": [
         "eq_0003",
         "eq_0024"
+      ],
+      "roles": {
+        "symbol": 2
+      },
+      "arities": {
+        "0": 2
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "A_underline": {
+      "rows": [
+        "eq_0005",
+        "eq_0007"
       ],
       "roles": {
         "symbol": 2
@@ -201,15 +281,28 @@
         "eq_0030"
       ],
       "roles": {
-        "symbol": 2
+        "coefficient": 2
       },
       "arities": {
         "0": 2
       },
+      "kind": "param",
+      "evidence": "always a coefficient"
+    },
+    "D_underline": {
+      "rows": [
+        "eq_0005"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
       "kind": "?",
       "evidence": "position only"
     },
-    "D_underline": {
+    "V_underline": {
       "rows": [
         "eq_0005"
       ],
@@ -264,7 +357,6 @@
         "eq_0009",
         "eq_0010",
         "eq_0011",
-        "eq_0012",
         "eq_0013",
         "eq_0017_a",
         "eq_0017_b",
@@ -272,15 +364,14 @@
         "eq_0023"
       ],
       "roles": {
-        "symbol": 23
+        "symbol": 22
       },
       "arities": {
         "0": 2,
-        "1": 21
+        "1": 20
       },
-      "kind": "var",
-      "domain": "non_negative",
-      "evidence": "domain row"
+      "kind": "?",
+      "evidence": "position only"
     },
     "pi_first": {
       "rows": [
@@ -314,15 +405,14 @@
         "eq_0023",
         "eq_0024",
         "eq_0025",
-        "eq_0026",
-        "eq_0028"
+        "eq_0026"
       ],
       "roles": {
-        "symbol": 10
+        "symbol": 9
       },
       "arities": {
         "0": 1,
-        "1": 9
+        "1": 8
       },
       "kind": "?",
       "evidence": "position only"
@@ -342,12 +432,8 @@
     }
   },
   "missing_index": [
-    "A_head",
-    "A_stop",
-    "A_transfer",
-    "A_underline",
-    "N",
-    "V_underline"
+    "Anderline",
+    "Vnderline"
   ],
   "shape_mismatch": [
     {
@@ -383,5 +469,6 @@
   ],
   "family_as_symbol": {},
   "paper_key": "10.1016_j.cor.2009.03.022",
-  "sidecar": true
+  "sidecar": true,
+  "shape_fixes_applied": 2
 }

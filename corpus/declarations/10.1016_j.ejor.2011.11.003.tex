@@ -126,7 +126,8 @@
 %@ param S shape=- kind=scalar domain=- :: Global amount of supplement time
 
 % s: classified as parameter during review
-%@ param s shape=- kind=scalar domain=- :: Time supplement variable
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p): s shape=- -> A
+%@ param s shape=A kind=scalar domain=- :: Time supplement variable
 
 % H: classified as parameter during review
 %@ param H shape=- kind=scalar domain=- :: Number of periods in a realization
@@ -242,10 +243,12 @@
 %@ var gamma shape=M domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Auxiliary variable for constraint i
 %@ var gamma_ij shape=- domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Slack variable for pair (i,j)
 %@ param l_ij shape=- kind=scalar domain=- :: Lower bound on time difference for pair (i,j)
-%@ var s_ij shape=- domain=non_negative role=slack drole=- lo=0 hi=- :: Slack variable for pair (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes omega): s_ij shape=- -> Omega
+%@ var s_ij shape=Omega domain=non_negative role=slack drole=- lo=0 hi=- :: Slack variable for pair (i,j)
 %@ param sigma shape=- kind=scalar domain=- :: Source node
 %@ param tau shape=- kind=scalar domain=- :: Sink node
 %@ param u_ij shape=- kind=scalar domain=- :: Upper bound on time difference for pair (i,j)
 %@ var v_tilde shape=- domain=continuous role=primary drole=- lo=- hi=- :: Adjusted event time
-%@ var x_it shape=- domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable for train i at time t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes r): x_it shape=- -> R
+%@ var x_it shape=R domain=binary role=primary drole=- lo=0 hi=1 :: Binary variable for train i at time t
 %@ param z_star shape=- kind=scalar domain=- :: Optimal objective value

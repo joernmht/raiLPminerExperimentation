@@ -16,7 +16,7 @@
 %@ index S ordered=0 cyclic=0 :: Set of stations
 %@ var h shape=L,V,S domain=continuous role=primary drole=- lo=- hi=- :: Headway between consecutive trains at station
 %@ param tau shape=L,R kind=matrix domain=- :: Short-turning time for line l at turnaround station r
-%@ param ift shape=L,V,S kind=vector domain=- :: Scheduled arrival/departure time (tilde notation)
+%@ param ift shape=- kind=vector domain=- :: Scheduled arrival/departure time (tilde notation)
 %@ param f shape=- kind=scalar domain=- :: Penalty value for unserved stations
 %@ con eq_0009 kind=linear domain=- indicator=- :: Dwell time: departure time equals arrival time plus dwell time
 %@ con eq_0010 kind=linear domain=- indicator=- :: Arrival time at station s equals departure from previous station plus sectional running time
@@ -53,7 +53,7 @@
 %@ param t_stop_min shape=- kind=scalar domain=- :: Minimum dwell time at a station
 %@ param t_tilde shape=- kind=scalar domain=- :: Planned (nominal) arrival or departure time
 \begin{align}
-  \min\quad & m i n \sum_{l \in L, v \in V, v_{r} \in V_{r}, r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - \left(t_tilde\right)_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - \left(t_tilde\right)_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
+  \min\quad & m i n \sum_{l \in L, v \in V, v_{r} \in V_{r}, r \in R} \left[\left(t_{l , v , e}^{\mathit{arr}} - t_tilde_{l , v , e}^{\mathit{arr}}\right) + \left(t_{l , v_{r} , r}^{\mathit{arr}} - t_tilde_{l , v_{r} , r}^{\mathit{arr}}\right)\right] \tag{eq\_0004} \\
   & t_{\text{l},\text{v},\text{s}}^{\mathit{dep}} = t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} + t_{\text{l},\text{v},\text{s}}^{\mathit{stop}} , \forall l \in L , v \in V , s \in S \tag{eq\_0009} \\
   & t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v},\text{s}-\text{1}}^{\mathit{dep}} + t_{\text{l},\text{v},[\text{s}-\text{1},\text{s}]}^{\mathit{run}} , \forall l \in L , v \in V , s \in S \tag{eq\_0010} \\
   & h_{\text{l},\text{v},\text{s}}^{\mathit{arr}} = t_{\text{l},\text{v}+\text{1},\text{s}}^{\mathit{arr}} - t_{\text{l},\text{v},\text{s}}^{\mathit{arr}} , \forall l \in L , v \in V , s \in S \tag{eq\_0011} \\
@@ -66,9 +66,9 @@
   & h_{\text{l},\text{v},\text{s}}^{\mathit{dep} - a r r} \geq h_{\text{min}} , \forall l \in L , v \in V , s \in S \tag{eq\_0018} \\
   & t_{l^{+} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{+} , r} = t_{l^{-} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{+} \in L^{+} , v \in V , r \in R , l^{-} \in L^{-} \tag{eq\_0019} \\
   & t_{l^{-} ,\text{v},\text{r}}^{\mathit{dep}} + \mathit{tau}_{l^{-} , r} = t_{l^{+} ,\text{v},\text{r}}^{\mathit{arr}} , \forall l^{-} \in L^{-} , v \in V , r \in R , l^{+} \in L^{+} \tag{eq\_0020} \\
-  & t_{l , v , e}^{\mathit{arr}} = \left(t_tilde\right)_{l , v , e}^{\mathit{arr}} , \mathit{ift}_{l , v , e}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} , \forall l \in L , v \in V , s \in S \tag{eq\_0021} \\
-  & t_{l , v , e}^{\mathit{dep}} = \left(t_tilde\right)_{l , v , e}^{\mathit{dep}} , \mathit{ift}_{l , v , e}^{\mathit{dep}} > t_{\mathit{break} ,}^{\mathit{end}} , \forall l \in L , v \in V , s \in S \tag{eq\_0022} \\
+  & t_{l , v , e}^{\mathit{arr}} = t_tilde_{l , v , e}^{\mathit{arr}} , \mathit{ift}_{l , v , e}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} , \forall l \in L , v \in V , s \in S \tag{eq\_0021} \\
+  & t_{l , v , e}^{\mathit{dep}} = t_tilde_{l , v , e}^{\mathit{dep}} , \mathit{ift}_{l , v , e}^{\mathit{dep}} > t_{\mathit{break} ,}^{\mathit{end}} , \forall l \in L , v \in V , s \in S \tag{eq\_0022} \\
   & t_{l , v , j}^{\mathit{dep}} > t_{\mathit{break}}^{\mathit{end}} \tag{eq\_0023\_a} \\
-  & i f \left(t_tilde\right)_{l , v , i}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} \tag{eq\_0023\_b} \\
-  & \left(t_tilde\right)_{l , v , j}^{\text{dep}} < t_{\mathit{break}}^{\mathit{end}} , \forall l \in L , v \in V , i \in S , j \in S \tag{eq\_0023\_c} \\
+  & \mathit{ift}_tilde_{l , v , i}^{\mathit{arr}} < t_{\mathit{break}}^{\mathit{start}} \tag{eq\_0023\_b} \\
+  & t_tilde_{l , v , j}^{\text{dep}} < t_{\mathit{break}}^{\mathit{end}} , \forall l \in L , v \in V , i \in S , j \in S \tag{eq\_0023\_c} \\
 \end{align}

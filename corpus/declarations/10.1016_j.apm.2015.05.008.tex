@@ -71,11 +71,16 @@
 %@ param T_Tra_sllp shape=- kind=scalar domain=- :: transfer walking time from line l to line lp at station s
 %@ param T_earliest shape=- kind=scalar domain=- :: earliest allowed departure time of first train
 %@ param T_latest shape=- kind=scalar domain=- :: latest allowed departure time of first train
-%@ var t_A_sl shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of first train of line l at station s
-%@ var t_D_slp shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of first train of line lp at station s
-%@ var t_Dw shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
-%@ var t_Dw_lk shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station k on line l
-%@ var t_Dw_ls shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_A_sl shape=L,S -> -
+%@ var t_A_sl shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: arrival time of first train of line l at station s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_D_slp shape=L,S -> -
+%@ var t_D_slp shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: departure time of first train of line lp at station s
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes lps): t_Dw shape=L,S -> L
+%@ var t_Dw shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_Dw_lk shape=L,S -> -
+%@ var t_Dw_lk shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station k on line l
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t_Dw_ls shape=L,S -> -
+%@ var t_Dw_ls shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: dwell time at station s on line l
 %@ var t_R shape=L,S domain=continuous role=auxiliary drole=- lo=- hi=- :: running time between consecutive stations on line l
 %@ var t_o shape=L domain=continuous role=primary drole=- lo=- hi=- :: departure time of first train of line l
 %@ var t_w_sllp shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: transfer waiting time for passengers transferring from line l to line lp at station s

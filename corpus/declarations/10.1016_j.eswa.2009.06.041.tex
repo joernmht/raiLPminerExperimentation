@@ -16,10 +16,12 @@
 %@ index j ordered=0 cyclic=0 :: Machine index
 
 % C: classified as variable during review
-%@ var C shape=i,j domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of job at position i on machine j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): C shape=i,j -> -
+%@ var C shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Completion time of job at position i on machine j
 
 % t: classified as parameter during review
-%@ param t shape=i,j kind=matrix domain=- :: Processing time of job at position i on machine j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=i,j -> -
+%@ param t shape=- kind=matrix domain=- :: Processing time of job at position i on machine j
 
 % n: classified as index during review
 %@ index n ordered=0 cyclic=0 :: Number of jobs

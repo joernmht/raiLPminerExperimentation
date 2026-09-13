@@ -11,26 +11,33 @@
 %@ index F ordered=0 cyclic=0 :: Set of trains
 %@ index p ordered=0 cyclic=0 :: Index for preceding cell in train path
 %@ index Y ordered=0 cyclic=0 :: Set of speed profile options for train f on cell (i,j)
-%@ param D shape=F,E kind=matrix :: Planned departure time for train f at cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): D shape=F,E -> F,E,E
+%@ param D shape=F,E,E kind=matrix :: Planned departure time for train f at cell (i,j)
 %@ param o shape=F kind=vector :: Origin node of train f
 %@ param c shape=F kind=vector :: Planned departure time of train f
 %@ param rho shape=F kind=vector :: Running direction of train f
 %@ param alpha shape=F,E kind=matrix :: Acceleration rate of train f on cell (i,j)
-%@ param beta shape=F,E kind=matrix :: Deceleration rate of train f on cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): beta shape=F,E -> F,E,E
+%@ param beta shape=F,E,E kind=matrix :: Deceleration rate of train f on cell (i,j)
 %@ param M shape=- kind=big_m :: Large positive constant for big-M constraints
 %@ param epsilon shape=- kind=tolerance :: Small positive constant to avoid division by zero
 %@ param y shape=F,E,Y kind=matrix :: Pre-generated speed profile vector for train f on cell (i,j) option b
 %@ var Z shape=- domain=continuous role=primary :: Total delay objective value
-%@ var d shape=F,E domain=continuous role=primary :: Departure time of train f from cell (i,j)
-%@ var w shape=F,E domain=continuous role=primary :: Dwell time of train f at cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): d shape=F,E -> F,E,E
+%@ var d shape=F,E,E domain=continuous role=primary :: Departure time of train f from cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): w shape=F,E -> F,E,E
+%@ var w shape=F,E,E domain=continuous role=primary :: Dwell time of train f at cell (i,j)
 %@ var v shape=F,E domain=continuous role=primary :: Speed of train f on cell (i,j)
 %@ var a shape=F,E domain=continuous role=primary :: Arrival time of train f at cell (i,j)
 %@ var L shape=F,E domain=continuous role=primary :: Distance traveled by train f in a phase on cell (i,j)
-%@ var g shape=F,E domain=continuous role=primary :: Safety time interval before train arrival on cell (i,j)
-%@ var h shape=F,E domain=continuous role=primary :: Safety time interval after train departure from cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): g shape=F,E -> F,E,E
+%@ var g shape=F,E,E domain=continuous role=primary :: Safety time interval before train arrival on cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): h shape=F,E -> F,E,E
+%@ var h shape=F,E,E domain=continuous role=primary :: Safety time interval after train departure from cell (i,j)
 %@ var tau shape=F,E domain=continuous role=primary :: Safety time components (setup, sight, reaction, approach, release, clear)
 %@ var sigma shape=F,E domain=continuous role=primary :: Cell occupancy time for train f on cell (i,j)
-%@ var delta shape=F,E domain=continuous role=primary :: Cell release time for train f on cell (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f,i,j): delta shape=F,E -> F,E,E
+%@ var delta shape=F,E,E domain=continuous role=primary :: Cell release time for train f on cell (i,j)
 %@ var theta shape=F,F,E domain=binary role=primary :: Binary order indicator for train pairs on cell (i,j)
 %@ var zeta shape=F,E domain=binary role=primary :: Binary speed indicator for train f on cell (i,j)
 %@ var varpi shape=F,E domain=continuous role=primary :: Square of speed of train f on cell (i,j)

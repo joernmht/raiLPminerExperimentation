@@ -29,7 +29,7 @@
 %@ var z shape=i,j domain=binary role=primary :: Binary modulo variable for event order
 %@ param h shape=i,j kind=matrix :: Minimum headway time
 %@ param r shape=i,j kind=matrix :: Minimum running time
-%@ var c shape=i,j domain=integer role=primary :: Integer variable for non-collision constraints
+%@ var c shape=i domain=integer role=primary :: Integer variable for non-collision constraints
 %@ param u shape=i,j kind=matrix :: Upper bound of dwell time
 %@ param d shape=i,j kind=matrix :: Minimum dwell time
 %@ var y shape=i,j domain=binary role=primary :: Binary variable for dwell time stretch
@@ -80,19 +80,14 @@
   \min\quad & \mathit{alpha} \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} \sum_{m = 1}^{N_{l} - 1} \left(C \cdot f_{l} - \sum_{i = 1}^{m} \sum_{j = m + 1}^{N_{l}} q_{s_{i} , s_{j}}^{l}\right) \cdot t_{s_{m} , s_{m + 1}}^{l} + \left(1 - \mathit{alpha}\right) \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} \sum_{i = 1}^{N_{l} - 1} \sum_{j = i + 1}^{N_{l}} t_{s_{i} , s_{j}}^{l} \cdot q_{s_{i} , s_{j}}^{l} + \mathit{beta} \cdot \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} x_{l} \tag{eq\_0001} \\
   & \underset{l \in \mathbf{\mathcal{L}}^{0}}{\sum} q_{s_{i} , s_{j}}^{l} = P_{s_{i} , s_{j}} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}} \tag{eq\_0005} \\
   & q_{s_{i} , s_{j}}^{l} \leq M \cdot v_{s_{i}}^{l} \cdot v_{s_{j}}^{l} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0006} \\
-  & q_{s_{i} , s_{j}}^{l} \in \mathcal{N} \forall s_{i} , s_{j} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0007} \\
   & \sum_{i = 1}^{m} \sum_{j = m + 1}^{N_{l}} q_{s_{i} , s_{j}}^{l} \leq \mathit{mu} \cdot C \cdot f_{l} \forall s_{m} \in \mathbf{\mathcal{S}}_{l} , l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0008} \\
   & f_{l} \leq f_{max} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0009} \\
-  & f_{l} \in \mathcal{N} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0010} \\
-  & x_{l} \in \left\{0 , 1\right\} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0011} \\
   & f_{l} / f_{max} \leq x_{l} \leq f_{l} \forall l \in \mathbf{\mathcal{L}}^{0} \tag{eq\_0012} \\
   & 0 \leq \mathit{pi}_{i} < T \forall i \in \mathbf{\mathcal{E}} \tag{eq\_0014} \\
-  & z_{i j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in \mathbf{\mathcal{A}} \tag{eq\_0015} \\
   & h_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq T - h_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0016} \\
   & r_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \mathit{theta} \cdot r_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{run} \tag{eq\_0017} \\
   & z_{i j} + z_{ip jp} + z_{i ip} + z_{j jp} = 2 \cdot c_{i ip j jp} \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0018} \\
   & 0 \leq c_{i ip j jp} \leq 2 \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0019} \\
-  & c_{i ip j jp} \in \mathcal{N} \left(i , j\right) , \left(ip , jp\right) \in \mathbf{\mathcal{A}}_{run} , \left(i , ip\right) , \left(j , jp\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0020} \\
   & \lfloor \frac{T}{f_{l}} \rfloor - \mathit{xi} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \leq \lceil \frac{T}{f_{l}} \rceil + \mathit{xi} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , l \in L \tag{eq\_0021} \\
   & \mathit{pi}_{n} - \mathit{pi}_{m} + z_{m n} \cdot T = \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T \forall \left(m , n\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{k}^{l}\right) , \left(i , j\right) \in \mathbf{\mathcal{A}}_{reg} \left(s_{1}^{l}\right) , k \in \left[2 , N\right] , l \in L \tag{eq\_0022} \\
   & - \mathit{delta}_{i j} \leq \mathit{pi}_{j} - \mathit{pi}_{i} + z_{i j} \cdot T - \mathit{phi}_{i j} \leq \mathit{delta}_{i j} \forall \left(i , j\right) \in \mathbf{\mathcal{A}}_{infra} \tag{eq\_0023} \\
@@ -102,7 +97,7 @@
   & \underset{\left(i , j\right) \in \mathbf{\mathcal{P}}_{l} , \left(i , j\right) \in \mathbf{\mathcal{A}}_{dwell}}{\sum} y_{i j} \leq O_{l}^{m a x} \forall l \in \mathbf{\mathcal{L}} \tag{eq\_0027} \\
   & u_{i j} = d_{i j} + \mathit{eta}_{i j} \cdot y_{i j} \tag{eq\_0028} \\
   & F \left(s_{i} , s_{j}\right) = \underset{l \in \mathbf{\mathcal{L}}}{\sum} f_{l} \cdot v_{s_{i}}^{l} \cdot v_{s_{j}}^{l} \tag{eq\_0031} \\
-  & \left(I_bar\right)_{s_{i} , s_{j}} = \frac{T}{F \left(s_{i} , s_{j}\right)} \tag{eq\_0032} \\
+  & I_bar_{s_{i} , s_{j}} = \frac{T}{F \left(s_{i} , s_{j}\right)} \tag{eq\_0032} \\
   & R \left(s_{i} , s_{j}\right) = \frac{1}{F \left(s_{i} , s_{j}\right)} \sum_{\mathit{tau} = 1}^{F \left(s_{i} , s_{j}\right)} \frac{\left|\right. I_{s_{i} , s_{j}}^{\mathit{tau} , taup} - \left(I_bar\right)_{s_{i} , s_{j}} \left|\right.}{\left(I_bar\right)_{s_{i} , s_{j}}} \tag{eq\_0033} \\
   & R = \frac{1}{N_{O D}} \underset{s_{i} \in \mathbf{\mathcal{S}}}{\sum} \underset{s_{j} \in \mathbf{\mathcal{S}} : i < j}{\sum} R \left(s_{i} , s_{j}\right) \tag{eq\_0034} \\
   & M_{V R} = \frac{V^{n} - V^{\star}}{V^{\star}} + \frac{R^{n} - R^{\star}}{R^{\star}} \tag{eq\_0035} \\

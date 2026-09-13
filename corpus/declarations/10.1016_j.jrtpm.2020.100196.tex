@@ -74,7 +74,9 @@
 %@ param Q_I shape=- kind=scalar domain=- :: First-stage objective function value
 %@ param Q_II shape=- kind=scalar domain=- :: Second-stage objective function value
 %@ param W_1 shape=- kind=scalar domain=- :: Number of scenarios in stage 1
-%@ var X_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: First-stage decisions in stage 1
-%@ var Y_1 shape=w_1 domain=continuous role=primary drole=- lo=- hi=- :: Second-stage decisions in stage 1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): X_1 shape=w_1 -> -
+%@ var X_1 shape=- domain=continuous role=primary drole=- lo=- hi=- :: First-stage decisions in stage 1
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Y_1 shape=w_1 -> -
+%@ var Y_1 shape=- domain=continuous role=primary drole=- lo=- hi=- :: Second-stage decisions in stage 1
 %@ param beta shape=c kind=scalar domain=- :: Weight of cancellation cost
 %@ index w_1 ordered=0 cyclic=0 :: Scenario index in stage 1

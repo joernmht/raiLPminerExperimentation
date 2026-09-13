@@ -86,18 +86,15 @@
   & d_{rp , j} - a_{r , j} \geq M \left(G_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0007} \\
   & a_{rp , i} - d_{r , i} \geq M \left(I_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0008} \\
   & a_{r , j} - d_{rp , j} \geq M \left(I_{r , rp , i , j} - 1\right) \forall r , rp \in R ; i , j \in B_{r} \cap B_{rp} \tag{eq\_0009} \\
-  & a , d \geq 0 \cdot I , F , G \in \left\{0 , 1\right\} . \tag{eq\_0010} \\
   & min \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , t\right) \in B^{r}}}{\sum} c_{i , t}^{r} \cdot x_{i , t}^{r} \tag{eq\_0011} \\
   & \sum_{\left(i , t\right) \in B^{r} \left|\right. i = o^{r}} x_{i , t}^{r} = 1 \forall r \in R \tag{eq\_0012} \\
   & x_{i , t}^{r} = \sum_{\left(k , l\right) \in \mathit{Phi}_{i , t}^{r}} x_{k , l}^{r} \forall r \in R ; \left(i , t\right) \in B^{r} \left|\right. i \neq d^{r} \tag{eq\_0014} \\
   & \sum_{\left(i , t\right) \in B^{r} \left|\right. i = d^{r}} x_{i , t}^{r} = 1 \forall r \in R \tag{eq\_0015} \\
   & \underset{\genfrac{}{}{0pt}{}{m \in R}{\left(k , l\right) \in B^{m} \cap \left(\mathit{Omega}_{i , t} \cup \left\{\left(i , t\right)\right\}\right)}}{\sum} x_{k , l}^{m} \leq 1 \forall \left(i , t\right) \in \underset{r \in R}{\cup} B^{r} \tag{eq\_0016} \\
-  & x \in \left\{0 , 1\right\} . \tag{eq\_0017} \\
   & max \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(p_{o}^{r} , j , u , v\right) \in \mathit{Psi}^{r}}}{\sum} \left(c_{p}^{r} + c_{e}^{r} \left(u - p_{e}^{r}\right)\right) x_{p_{o}^{r} , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(p_{d}^{r} , e^{r} , u , v\right) \in \mathit{Psi}^{r}}}{\sum} c_{l}^{r} \left(p_{l}^{r} - v\right) x_{p_{d}^{r} , e^{r} , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. i = j}}{\sum} c_{s}^{r} \cdot x_{i , j , u , v}^{r} . \tag{eq\_0018} \\
   & \sum_{\left(p_{o}^{r} , j , u , v\right) \in \mathit{Psi}^{r}} x_{p_{o}^{r} , j , u , v}^{r} \leq 1 \forall r \in R \tag{eq\_0020} \\
   & \sum_{\left(a , i , u , t\right) \in \mathit{Psi}^{r}} x_{a , i , u , t}^{r} = \sum_{\left(i , j , t , v\right) \in \mathit{Psi}^{r}} x_{i , j , t , v}^{r} \forall r \in R , \left\{\right. i \in B \left|\right. i \neq p_{o}^{r} \left.\right\} , t \in T \tag{eq\_0022} \\
   & \sum_{\left(p_{d}^{r} , e^{r} , u , v\right) \in \mathit{Psi}^{r}} x_{p_{d}^{r} , e^{r} , u , v}^{r} \leq 1 \forall r \in R \tag{eq\_0023} \\
-  & x \in \left\{0 , 1\right\} . \tag{eq\_0024} \\
   & \underset{\genfrac{}{}{0pt}{}{r \in R}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v}}{\sum} x_{i , j , u , v}^{r} \leq b_{t}^{i} \forall i \in B , t \in T \tag{eq\_0025} \\
   & \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{N}}{v \in \left\{t + 1 - \mathit{epsilon} , \ldots , t + 1 + \mathit{delta}\right\}}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. j = a + 1 , j \neq i}}{\sum} x_{i , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{S}}{v \in \left\{t + 1 - \mathit{epsilon} , \ldots , t + 1 + \mathit{delta}\right\}}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. j = a , j \neq i}}{\sum} x_{i , j , u , v}^{r} \leq \mathit{upsilon}_{t}^{a} \forall \left(a , t\right) \in Y \tag{eq\_0027} \\
   & \underset{\genfrac{}{}{0pt}{}{\genfrac{}{}{0pt}{}{r \in R^{N} \left|\right. h^{r} \geq 1}{a \in \left\{i - h , \ldots , i - 1\right\}}}{\left(a , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v , a \neq j}}{\sum} x_{a , j , u , v}^{r} + \underset{\genfrac{}{}{0pt}{}{r \in R^{N}}{\left(i , j , u , v\right) \in \mathit{Psi}^{r} \left|\right. u \leq t < v}}{\sum} x_{i , j , u , v}^{r} \leq b_{t}^{i} \forall i \in B , t \in T \tag{eq\_0028} \\
@@ -107,6 +104,4 @@
   \min\quad & \sum_{a \in A} w_{a} \cdot x_{a} \tag{eq\_0032} \\
   & \mathit{Gamma}^{T} x = T \cdot z \tag{eq\_0033} \\
   & l \leq x \leq u \tag{eq\_0035} \\
-  & z \in \mathcal{Z}^{\mathit{nu}} \tag{eq\_0036} \\
-  & x \in \mathcal{Z}^{\left|A\right|} . \tag{eq\_0037} \\
 \end{align}

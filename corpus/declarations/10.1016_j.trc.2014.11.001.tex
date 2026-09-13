@@ -42,7 +42,8 @@
 %@ var D shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Dwelling time of train q on line t at station j
 
 % L: classified as variable during review
-%@ var L shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train q on line t at station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes j): L shape=t,q,j -> j
+%@ var L shape=j domain=non_negative role=primary drole=- lo=- hi=- :: Departure time of train q on line t at station j
 
 % R: classified as variable during review
 %@ var R shape=t,q,j domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train q on line t from station j-1 to j
@@ -116,10 +117,12 @@
 %@ param L_tq_0 shape=- kind=scalar domain=- :: Departure time of train q on line t from the initial station
 %@ var R_tq shape=j domain=continuous role=auxiliary drole=- lo=- hi=- :: Running time of train q on line t between transfer stations j and j+1
 %@ var alpha_tq shape=tp,qp,j domain=binary role=indicator drole=- lo=- hi=- :: Binary variable indicating whether train q on line t arrives before train qp on line tp at transfer station j
-%@ param c_tq shape=tp,qp,j kind=scalar domain=- :: Weight coefficient for waiting time of transfer passengers
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes tpqpj): c_tq shape=tp,qp,j -> tp
+%@ param c_tq shape=tp kind=scalar domain=- :: Weight coefficient for waiting time of transfer passengers
 %@ param e_t shape=tp,j kind=scalar domain=- :: Minimum transfer time from line t to line tp at transfer station j
 %@ param h_tp shape=- kind=scalar domain=- :: Headway of line tp
 %@ param h_underline shape=t kind=scalar domain=- :: Minimum headway of line t
 %@ param r_bar_tq shape=j kind=scalar domain=- :: Maximum running time of train q on line t between transfer stations j and j+1
 %@ param r_underline_tq shape=j kind=scalar domain=- :: Minimum running time of train q on line t between transfer stations j and j+1
-%@ var w_tq shape=tp,qp,j domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time of passengers transferring from train q on line t to train qp on line tp at transfer station j
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes tpqpj): w_tq shape=tp,qp,j -> tp
+%@ var w_tq shape=tp domain=continuous role=auxiliary drole=- lo=- hi=- :: Waiting time of passengers transferring from train q on line t to train qp on line tp at transfer station j

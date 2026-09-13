@@ -33,7 +33,8 @@
 %@ param Z shape=- kind=scalar domain=- :: Objective function value.
 
 % c: classified as parameter during review
-%@ param c shape=F,A kind=matrix domain=- :: Cost coefficient for arc g used by train f.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes f): c shape=F,A -> F
+%@ param c shape=F kind=matrix domain=- :: Cost coefficient for arc g used by train f.
 
 % x: classified as variable during review
 %@ var x shape=F,A domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether train f uses arc g.

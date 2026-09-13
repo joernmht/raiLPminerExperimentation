@@ -33,7 +33,8 @@
 %@ var x shape=A domain=continuous role=primary drole=- lo=- hi=- :: Time span between events for each arc a in A
 
 % Pq: classified as parameter during review
-%@ param Pq shape=- kind=scalar domain=- :: Product of period P and integer cycle variable q_C
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes C): Pq shape=- -> C
+%@ param Pq shape=C kind=scalar domain=- :: Product of period P and integer cycle variable q_C
 
 % A: classified as index during review
 %@ index A ordered=0 cyclic=0 :: Set of arcs in the event-activity network
@@ -69,7 +70,8 @@
 %@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value (total captured demand)
 
 % unusable as an identifier, rename or drop: λ
-%@ var lambda shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Captured demand for an O/D pair
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes od): lambda shape=S,S -> OD
+%@ var lambda shape=OD domain=continuous role=primary drole=- lo=- hi=- :: Captured demand for an O/D pair
 
 % S: classified as index during review
 %@ index S ordered=0 cyclic=0 :: Set of stations (origins/destinations)
@@ -93,7 +95,8 @@
 %@ con eq_0019_a kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at lower trip time
 %@ con eq_0019_b kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by tangent at upper/inflection trip time
 %@ con eq_0019_c kind=linear domain=- indicator=- :: Piecewise-linear overestimate: captured demand bounded by secant between extreme trip times
-%@ param tlow shape=- domain=- role=parameter drole=- lo=- hi=- :: Lower bound on t_{o,d}
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes od): tlow shape=- -> OD
+%@ param tlow shape=OD domain=- role=parameter drole=- lo=- hi=- :: Lower bound on t_{o,d}
 %@ index OD
 %@ param Cplus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: positive arcs of cycle C
 %@ param Cminus shape=\mathcal{C} domain=set role=auxiliary drole=- lo=- hi=- :: negative arcs of cycle C

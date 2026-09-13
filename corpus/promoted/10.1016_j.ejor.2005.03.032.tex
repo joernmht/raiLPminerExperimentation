@@ -63,15 +63,17 @@
 %@ con eq_0029_b kind=linear domain=- indicator=- :: Split transition variable integrality (part b)
 %@ con eq_0030 kind=linear domain=- indicator=- :: Integrality of initial inventory in split case
 %@ var I0 shape=matrix domain=integer role=variable drole=- lo=0 hi=inf :: Initial inventory
-%@ param nu shape=vector domain=integer role=index drole=- lo=- hi=- :: Composition type of train t
-%@ param s shape=vector domain=integer role=index drole=- lo=- hi=- :: Station of train t
+% declaration fixed: param nu: domain=integer -> -
+%@ param nu shape=vector domain=- role=index drole=- lo=- hi=- :: Composition type of train t
+% declaration fixed: param s: domain=integer -> -
+%@ param s shape=vector domain=- role=index drole=- lo=- hi=- :: Station of train t
 %@ index Gammaplus shape=set domain=set role=index drole=- lo=- hi=- :: Positive length difference pairs
 %@ index Gammaminus shape=set domain=set role=index drole=- lo=- hi=- :: Negative length difference pairs
 %@ index Td shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying departure condition
 %@ index Ta shape=set domain=set role=index drole=- lo=- hi=- :: Trains satisfying arrival condition
 %@ index I_0 ordered=0 cyclic=0 :: Initial inventory of train units of type m at station s
 %@ var Z_Ut shape=T,P,P,P,P,P,P domain=binary role=auxiliary drole=- lo=- hi=- :: Assignment of compositions to consecutive trips in a combination
-%@ param beta shape=P kind=scalar domain=- :: Composition type indicator
+%@ param beta shape=- kind=scalar domain=- :: Composition type indicator
 %@ param ell shape=T kind=scalar domain=- :: Length of trip t
 \begin{align}
   \min\quad & F \tag{eq\_0001} \\
@@ -89,12 +91,6 @@
   & I_{t,m} = \mathit{I0}_{s_{t},m} - \sum_{t2 \in \mathit{Td}_{t}} C_{t2,m} + \sum_{t2 \in \mathit{Ta}_{t}} U_{t2,m} \qquad \forall t \in T, m \in M \tag{eq\_0011} \\
   & 0 \le X_{t,p} \qquad \forall t \in T, p \in P_{t} \tag{eq\_0012\_a} \\
   & X_{t,p} \le 1 \qquad \forall t \in T, p \in P_{t} \tag{eq\_0012\_b} \\
-  & N_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_a} \\
-  & C_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_b} \\
-  & U_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_c} \\
-  & I_{t,m} \ge 0 \qquad \forall t \in T, m \in M \tag{eq\_0013\_d} \\
-  & \mathit{I0}_{s,m} \ge 0 \qquad \forall s \in S, m \in M \tag{eq\_0014} \\
-  & Z_{t,p,p2} \ge 0 \qquad \forall t \in T, (p,p2) \in \mathit{Gamma}_{t} \tag{eq\_0015} \\
   & CKM = \sum_{t \in T, m \in M} \mathit{ell}_{t} \cdot c_{m} \cdot N_{t , m} , \tag{eq\_0016} \\
   & SKM = \sum_{t \in T, p \in P_{t}} \mathit{ell}_{t} \cdot s_{t , p} \cdot X_{t , p} . \tag{eq\_0017} \\
   & SHM = \sum_{t \in T} \underset{\genfrac{}{}{0pt}{}{\left(p , pp\right) \in \mathit{Gamma}_{t} :}{\mathit{beta} \left(p\right) \neq \mathit{beta} \left(pp\right)}}{\sum} Z_{t , p , pp} . \tag{eq\_0018} \\

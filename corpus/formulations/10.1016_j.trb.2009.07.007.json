@@ -137,10 +137,7 @@
     {
       "name": "p",
       "description": "Profit of assigning train j to route r",
-      "shape": [
-        "T",
-        "R"
-      ],
+      "shape": [],
       "kind": "matrix",
       "domain_class": null
     }
@@ -189,7 +186,15 @@
     {
       "name": "eq_0008",
       "description": "Exactly one path from origin for each fixed train j in T1",
-      "quantifiers": [],
+      "quantifiers": [
+        {
+          "index": "j",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
       "comparator": "eq",
       "lhs": [
         {
@@ -213,7 +218,9 @@
           "sign": 1,
           "role": "lhs",
           "operator": "sum",
-          "operator_over": []
+          "operator_over": [
+            "delta"
+          ]
         }
       ],
       "rhs": [
@@ -225,177 +232,6 @@
           "sign": 1,
           "role": "rhs",
           "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0009",
-      "description": "Flow conservation at intermediate nodes v for each train j",
-      "quantifiers": [],
-      "comparator": "eq",
-      "lhs": [
-        {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "R",
-              "expr": "r",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "sum",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "R",
-              "expr": "r",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "sum",
-          "operator_over": []
-        }
-      ],
-      "kind": "flow_balance",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0010",
-      "description": "Link z_jv to incoming arcs at node v for train j",
-      "quantifiers": [],
-      "comparator": "eq",
-      "lhs": [
-        {
-          "ref": "z",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "V",
-              "expr": "v",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "x",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "R",
-              "expr": "r",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "sum",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0011",
-      "description": "Link y_v to z_jv over all trains j visiting node v",
-      "quantifiers": [],
-      "comparator": "eq",
-      "lhs": [
-        {
-          "ref": "y",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "V",
-              "expr": "v",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "z",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "T",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "V",
-              "expr": "v",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "sum",
           "operator_over": []
         }
       ],

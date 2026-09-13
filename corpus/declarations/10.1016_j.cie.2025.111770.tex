@@ -36,7 +36,8 @@
 %@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (boarding, alighting, waiting)
 
 % W: classified as variable during review
-%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes s,t,u): W shape=- -> S,T,U
+%@ var W shape=S,T,U domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
 
 % t: classified as variable during review
 %@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time
@@ -80,26 +81,31 @@
 %@ param M shape=- kind=big_m domain=- :: Big-M constant
 
 % B: classified as variable during review
-%@ var B shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes l,s,u): B shape=- -> L,S,U
+%@ var B shape=L,S,U domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
 
 % O: classified as variable during review
-%@ var O shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes l,s,u): O shape=- -> L,S,U
+%@ var O shape=L,S,U domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
 
 % D: classified as parameter during review
 %@ param D shape=- kind=scalar domain=- :: Minimum boarding threshold
 
 % q: classified as variable during review
-%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes l,s,u): q shape=- -> L,S,U
+%@ var q shape=L,S,U domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
 
 % unusable as an identifier, rename or drop: η
 % PTA: classified as variable during review
 %@ var PTA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Transfer passenger flow
 
 % a: classified as variable during review
-%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes l,u): a shape=- -> L,U
+%@ var a shape=L,U domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
 
 % b: classified as variable during review
-%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes l,l,u): b shape=- -> L,L,U
+%@ var b shape=L,L,U domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
 
 % w: classified as variable during review
 %@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for transfer flow

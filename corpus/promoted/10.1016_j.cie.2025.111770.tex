@@ -11,7 +11,7 @@
 %@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective function value
 %@ param C shape=- kind=scalar domain=- :: Cost coefficients
 %@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger counts (boarding, alighting, waiting)
-%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
+%@ var W shape=S,T,U domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting count
 %@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure time
 %@ index S ordered=0 cyclic=0 :: Set of stations
 %@ index T ordered=0 cyclic=0 :: Set of time slots
@@ -25,13 +25,13 @@
 %@ param h shape=- kind=scalar domain=- :: Minimum headway
 %@ var I shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Boarding passengers
 %@ param M shape=- kind=big_m domain=- :: Big-M constant
-%@ var B shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
-%@ var O shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
+%@ var B shape=L,S,U domain=non_negative role=primary drole=- lo=- hi=- :: Total boarding passengers
+%@ var O shape=L,S,U domain=non_negative role=primary drole=- lo=- hi=- :: Onboard passengers
 %@ param D shape=- kind=scalar domain=- :: Minimum boarding threshold
-%@ var q shape=- domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
+%@ var q shape=L,S,U domain=binary role=primary drole=- lo=- hi=- :: Skip-stop binary decision
 %@ var PTA shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Transfer passenger flow
-%@ var a shape=- domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
-%@ var b shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
+%@ var a shape=L,U domain=binary role=primary drole=- lo=- hi=- :: Insertion indicator
+%@ var b shape=L,L,U domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary for both inserted
 %@ var w shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Auxiliary variable for transfer flow
 %@ con eq_0002 kind=linear domain=- indicator=- :: Passenger waiting time cost term (z1)
 %@ con eq_0003 kind=linear domain=- indicator=- :: Operational cost term (z2) for train insertion and schedule adjustment
@@ -98,18 +98,16 @@
   & \left|t_{l s}^{u} - t_{lp s}^{u}\right| \geq h_{min} , \forall u \in \mathcal{U} , l , lp \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s = s_{0} \tag{eq\_0007} \\
   & \sum_{t \in \mathcal{T}} x_{l t}^{u} \leq 1 , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} \tag{eq\_0008} \\
   & c \cdot t_{l}^{u} = t_{l s}^{u} - t_bar_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0009} \\
-  & c \cdot t_{l}^{u} \geq 0 , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \tag{eq\_0010} \\
   & c \cdot t_{l}^{u} = 0 , \forall u \in \mathcal{U} , l = l_{*} \tag{eq\_0011} \\
   & P \cdot I_{l s t}^{u} \leq M \cdot x_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0012} \\
   & P \cdot I_{l s t}^{u} \leq M \cdot x_bar_{l s t}^{u} , \forall u \in \mathcal{U}_{d} , l \in \mathcal{L}_{h} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0013} \\
   & P \cdot B_{l s}^{u} = \sum_{t \in \mathcal{T}} P \cdot I_{l s t}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \tag{eq\_0014} \\
-  & P \cdot B_{l s}^{u} \leq \left\{\begin{matrix} C \cdot A_{l}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ C \cdot V - P \cdot O_{l , s - 1}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \end{matrix}\right \tag{eq\_0015} \\
-  & P \cdot O_{l s}^{u} = \left\{\begin{matrix} C \cdot V - C \cdot A_{l}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ P \cdot O_{l , s - 1}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \end{matrix}\right \tag{eq\_0017} \\
+  & P \cdot B_{l s}^{u} \leq \left\{ C \cdot A_{l}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ C \cdot V - P \cdot O_{l , s - 1}^{u} + P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \right \tag{eq\_0015} \\
+  & P \cdot O_{l s}^{u} = \left\{ C \cdot V - C \cdot A_{l}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s = s_{0} \\ P \cdot O_{l , s - 1}^{u} + P \cdot B_{l s}^{u} - P \cdot A_{l s}^{u} & \forall u \in \mathcal{U} , l \in \mathcal{L} , s \in \mathcal{S} \backslash \left\{s_{0}\right\} \right \tag{eq\_0017} \\
   & P \cdot B_{l s}^{u} \geq D \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0018} \\
   & P \cdot B_{l s}^{u} \leq M \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0019} \\
   & P \cdot A_{l s}^{u} \leq M \cdot q_{l s}^{u} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{s} , s \in \mathcal{S} \tag{eq\_0020} \\
   & P \cdot W_{s t}^{u} = \sum_{tp = 0}^{t} \mathit{eta}_{s tp}^{u} - \sum_{l \in \mathcal{L}, tp = 0} ^{t} P \cdot I_{l s tp}^{u} , \forall u \in \mathcal{U} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0021} \\
-  & P \cdot W_{s t}^{u} \geq 0 , \forall u \in \mathcal{U} , s \in \mathcal{S} , t \in \mathcal{T} \tag{eq\_0022} \\
   & \mathit{eta}_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} = eta_bar_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} + \sum_{u \in \mathcal{U}_{d}, s \in \mathcal{S}_{d}, l \in \mathcal{L}_{h}} \mathit{PTA}_{l s sp}^{u up} \cdot x_bar_{l s t}^{u} + \sum_{u \in \mathcal{U}_{d}, s \in \mathcal{S}_{d}, l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} \mathit{PTA}_{l s sp}^{u up} \cdot x_{l s t}^{u} , \tag{eq\_0023} \\
   & \mathit{eta}_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} = eta_bar_{sp , \left(t + d t_{s sp}^{u up}\right)}^{up} + \sum_{u \in \mathcal{U}_{c}, s \in \mathcal{S}_{c}, l \in \mathcal{L}_{w} \cup \mathcal{L}_{s}} \mathit{PTA}_{l s sp}^{u up} \cdot x_{l s t}^{u} , \tag{eq\_0026} \\
   & t_{l s}^{u} - t_{l - 1 , s}^{u} \geq h_{min} , \forall u \in \mathcal{U} , l \in \mathcal{L}_{w} , s = s_{0} \tag{eq\_0033} \\
@@ -129,5 +127,4 @@
   & w_{l s sp t}^{u up} \leq M_{l s sp t}^{u up} \cdot x_{l s t}^{u} , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0047} \\
   & w_{l s sp t}^{u up} \geq \mathit{PTA}_{l s sp}^{u up} - M_{l s sp t}^{u up} \cdot \left(1 - x_{l s t}^{u}\right) , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0048} \\
   & w_{l s sp t}^{u up} \leq \mathit{PTA}_{l s sp}^{u up} , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0049} \\
-  & w_{l s sp t}^{u up} \geq 0 , \forall u \in \mathcal{U}_{c} , s \in \mathcal{S}_{c} , up \in \mathcal{U}_{d} , sp \in \mathcal{S}_{d} , l \in \mathcal{L}_{w} \cup \mathcal{L}_{s} , t \in \mathcal{T} \tag{eq\_0050} \\
 \end{align}

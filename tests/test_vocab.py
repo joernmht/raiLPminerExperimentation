@@ -92,7 +92,11 @@ def test_check_all_writes_per_paper_json_and_suggestions_deterministically(tmp_p
         _doc(r"\min \sum_{i \in \mathcal{I}, k \in \mathcal{K}} c_{i} \cdot x_{i, k}"),
         encoding="utf-8",
     )
-    (decl / "p1.tex").write_text("%@ var x shape=I\n", encoding="utf-8")
+    # the sidecar is what the audit sees (not the header promote embedded)
+    (decl / "p1.tex").write_text(
+        "\n".join(ln for ln in _HEADER.splitlines() if ln.startswith("%@")) + "\n",
+        encoding="utf-8",
+    )
 
     r1 = vocab.check_all(promoted_dir=promoted, declarations_dir=decl, out_dir=out)
     first = {p.name: p.read_bytes() for p in list(out.iterdir()) + list(decl.glob("*.vocab.tex"))}
@@ -122,3 +126,42 @@ def test_dry_run_writes_nothing(tmp_path: Path):
     )
     assert report["missing_names_total"] == 1
     assert not (tmp_path / "vocab").exists()
+
+
+def test_shapes_the_formulas_decide_are_repaired_with_a_note(tmp_path: Path):
+    header = """%@ meta id=p family=milp schema=0.1.0
+%@ index I ordered=0 cyclic=0 :: items
+%@ param w shape=- kind=scalar domain=- :: written w_{i,k} everywhere
+%@ param c shape=I kind=vector domain=- :: consistent
+%@ var x shape=I domain=binary role=primary drole=- lo=- hi=- :: written x_{i} everywhere
+%@ var y shape=I domain=binary role=primary drole=- lo=- hi=- :: mixed arities
+%@ obj sense=min name=objective combination=sum :: cost
+"""
+    body = (
+        "\\begin{align}\n"
+        r"  \min\quad & \sum_{i \in \mathcal{I}, k \in K} w_{i, k} \cdot x_{i} \tag{eq\_0001} \\"
+        + "\n"
+        r"  & w_{i, k} \cdot x_{i} + c_{i} \le y_{i} + y_{i, k} \forall i \in \mathcal{I}, k \in K \tag{eq\_0002} \\"
+        + "\n"
+        "\\end{align}\n"
+    )
+    promoted = tmp_path / "promoted"
+    decl = tmp_path / "declarations"
+    promoted.mkdir()
+    decl.mkdir()
+    (promoted / "p.tex").write_text(header + body, encoding="utf-8")
+    (decl / "p.tex").write_text(header, encoding="utf-8")
+    report = vocab.check_all(
+        promoted_dir=promoted, declarations_dir=decl, out_dir=tmp_path / "vocab", fix_shapes=True
+    )
+    assert report["shape_fix_candidates"] == 1  # w only: x is right, y is mixed, c is right
+    assert report["shape_fixes_applied"] == 2  # the shape line + the new family K
+    sidecar = (decl / "p.tex").read_text(encoding="utf-8")
+    assert "%@ param w shape=I,K kind=scalar" in sidecar
+    assert "% shape fixed by corpusbuilder.vocab" in sidecar
+    assert "%@ index K ordered=0 cyclic=0 :: family bound in the formulas" in sidecar
+    # the repaired sidecar is what the audit sees on the next run: no fix left
+    again = vocab.check_all(
+        promoted_dir=promoted, declarations_dir=decl, out_dir=tmp_path / "vocab", fix_shapes=True
+    )
+    assert again["shape_fix_candidates"] == 0

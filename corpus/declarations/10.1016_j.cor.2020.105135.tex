@@ -16,10 +16,12 @@
 %@ obj sense=min name=objective combination=weighted_sum :: Minimize weighted normalized positive/negative arrival delays, departure delays, and dwelling plan change penalty
 %
 %@ param Y shape=T,S kind=matrix domain=binary :: Binary parameter indicating scheduled dwelling or virtual station
-%@ param tau shape=T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes d,i,s): tau shape=T,S -> T,T,S
+%@ param tau shape=T,T,S kind=matrix domain=- :: Minimum running time, dwelling time, or headway (renamed from τ)
 %@ param omega shape=T,S kind=matrix domain=- :: Predictive disturbance for dwelling or running time (renamed from ω)
 %@ param M shape=- kind=big_m domain=- :: Large positive number for linearization
-%@ param Z shape=T,E kind=matrix domain=binary :: Binary parameter indicating train type
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): Z shape=T,E -> -
+%@ param Z shape=- kind=matrix domain=binary :: Binary parameter indicating train type
 %@ param H shape=L,S kind=matrix domain=- :: Speed limitation time horizon
 %@ param Td shape=T,S kind=matrix domain=- :: Planned departure time of train i at station s
 %@ param C shape=S kind=vector domain=- :: Capacity of station s
@@ -29,7 +31,8 @@
 %@ param gamma shape=- kind=scalar domain=- :: Weight for departure delay (renamed from γ)
 %@ param delta shape=- kind=scalar domain=- :: Weight for dwelling plan change penalty (renamed from δ)
 %@ param g shape=- kind=scalar domain=- :: Function representing constraint violation
-%@ param P shape=THETA kind=vector domain=- :: Probability of scenario
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): P shape=THETA -> -
+%@ param P shape=- kind=vector domain=- :: Probability of scenario
 %@ param epsilon shape=- kind=scalar domain=- :: Small positive constant for linearization (renamed from ε)
 %@ param m shape=- kind=scalar domain=- :: Lower bound for linearization
 %@ param Mu shape=- kind=scalar domain=- :: Upper bound for linearization
@@ -38,7 +41,8 @@
 %@ var u shape=T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for dwelling plan change or order of arrival/departure
 %@ var ta shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual arrival time of train i at station s
 %@ var td shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Actual departure time of train i from station s
-%@ var x shape=T,T,S domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): x shape=T,T,S -> -
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for arrival or departure order
 %@ var J shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Objective function value
 %@ var da shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Positive or negative arrival delay
 %@ var dd shape=T,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure delay

@@ -20,11 +20,11 @@
 %@ param A shape=- kind=scalar domain=- :: Planned arrival time of train i at block section k from previous time horizon
 %@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i occupies block section k at time t(delta)
 %@ param G shape=- kind=scalar domain=- :: Planned speed grade of train i at block section k from previous time horizon
-%@ var g shape=- domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
+%@ var g shape=T,B domain=integer role=primary drole=- lo=- hi=- :: Speed grade of train i at block section k
 %@ var D shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i stops at station n
 %@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Indicator that train i uses track c at block section k
 %@ index Tr ordered=0 cyclic=0 :: Set of tracks at a station
-%@ param y shape=- kind=scalar domain=- :: Planned departure time of train i from station n
+%@ param y shape=T,N kind=scalar domain=- :: Planned departure time of train i from station n
 %@ index fori ordered=0 cyclic=0 :: Loop index over trains
 %@ var x shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for temporary speed restriction constraints
 %@ param H shape=- kind=scalar domain=- :: Length of each rolling time horizon

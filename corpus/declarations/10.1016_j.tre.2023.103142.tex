@@ -54,7 +54,8 @@
 %@ var P shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers (various types) at station s for train q.
 
 % R: classified as parameter during review
-%@ param R shape=- kind=scalar domain=- :: Passenger arrival rate at station (or transfer rate).
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes s): R shape=- -> S
+%@ param R shape=S kind=scalar domain=- :: Passenger arrival rate at station (or transfer rate).
 
 % T: classified as parameter during review
 %@ param T shape=- kind=scalar domain=- :: Time period endpoint or time point parameter.
@@ -63,10 +64,12 @@
 %@ index H ordered=0 cyclic=0 :: Set of lines connected to transfer station s.
 
 % C: classified as variable during review
-%@ var C shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train q at station s.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes q,s): C shape=- -> Q,S
+%@ var C shape=Q,S domain=non_negative role=primary drole=- lo=- hi=- :: Remaining capacity of train q at station s.
 
 % W: classified as variable during review
-%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at station s for train q.
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes q,s): W shape=- -> Q,S
+%@ var W shape=Q,S domain=non_negative role=primary drole=- lo=- hi=- :: Passenger waiting time at station s for train q.
 
 % unusable as an identifier, rename or drop: λ
 % y: classified as variable during review

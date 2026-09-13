@@ -27,7 +27,8 @@
 %@ obj sense=min name=TT combination=sum :: Minimize total travel time TT
 
 % t: classified as variable during review
-%@ var t shape=K,S domain=non_negative role=primary drole=- lo=- hi=- :: Departure and arrival times of train k at station i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=K,S -> -
+%@ var t shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure and arrival times of train k at station i
 
 % TT: classified as variable during review
 %@ var TT shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Total travel time of all trains

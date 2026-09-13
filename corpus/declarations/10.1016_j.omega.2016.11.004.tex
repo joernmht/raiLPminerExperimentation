@@ -66,7 +66,8 @@
 %@ param Q shape=i,j,s kind=scalar domain=- :: Minimum dwell time between trains
 
 % b: classified as parameter during review
-%@ param b shape=i,s kind=scalar domain=- :: Lower bound for departure time
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): b shape=i,s -> -
+%@ param b shape=- kind=scalar domain=- :: Lower bound for departure time
 
 % w: classified as index during review
 %@ index w ordered=0 cyclic=0 :: Atomic movement index
@@ -78,13 +79,15 @@
 %@ param M shape=- kind=scalar domain=- :: Large constant
 
 % p: classified as variable during review
-%@ var p shape=i,j,s domain=continuous role=primary drole=- lo=- hi=- :: Deviation from desired departure time
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): p shape=i,j,s -> -
+%@ var p shape=- domain=continuous role=primary drole=- lo=- hi=- :: Deviation from desired departure time
 
 % c: classified as parameter during review
 %@ param c shape=- kind=scalar domain=- :: Objective function
 
 % o: classified as variable during review
-%@ var o shape=i,j,s domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of arrivals
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o shape=i,j,s -> -
+%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for ordering of arrivals
 
 % y: classified as variable during review
 %@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for disjunctive choice

@@ -86,7 +86,8 @@
 
 % unusable as an identifier, rename or drop: ρ
 % o: classified as parameter during review
-%@ param o shape=T kind=vector :: Original number of coupled/uncoupled units
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): o shape=T -> -
+%@ param o shape=- kind=vector :: Original number of coupled/uncoupled units
 
 % R: classified as parameter during review
 %@ param R shape=- kind=scalar :: Set of real numbers (domain indicator)
@@ -110,7 +111,8 @@
 %@ index A ordered=0 cyclic=0 :: Set of activities
 
 % q: classified as variable during review
-%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): q shape=A -> E,E
+%@ var q shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
 
 % P: classified as index during review
 %@ index P ordered=0 cyclic=0 :: Set of infrastructure points

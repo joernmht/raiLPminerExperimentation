@@ -29,7 +29,7 @@
 %@ var x shape=t domain=binary role=primary :: Binary train departure indicator at time t
 %@ param OD shape=PA,t kind=matrix :: Origin-destination demand per path and time
 %@ param K shape=- kind=scalar :: Number of physical trains
-%@ var A shape=- domain=non_negative role=primary :: Alighting passengers per door
+%@ var A shape=D domain=non_negative role=primary :: Alighting passengers per door
 %@ param m shape=- kind=scalar :: Lower bound of time difference in valid inequality
 %@ con eq_0003 kind=linear :: Minimum running time for event e
 %@ con eq_0005 kind=linear :: No cancellation of service events before disruption start
@@ -84,23 +84,23 @@
   & c_{e} \leq 0 , \forall e \in \mathcal{E} : t_bar_{e}^{d} \leq t_{s t a r t} \tag{eq\_0006} \\
   & t_{e}^{d} \geq \left(1 - c_{e}\right) t_{e n d} , \forall e \in \mathcal{E}^{\mathcal{D}} \tag{eq\_0007} \\
   & t_{e_bar}^{d} - t_{e}^{a} + \left(c_{e} + c_{e_bar}\right) \cdot M \geq T_{e , e_bar}^{D} , \forall e \in \mathcal{E} : \left(e , e_bar\right) \in \mathcal{P} \tag{eq\_0008} \\
-  & \left(c_{e} + c_{ep}\right) \cdot M + t_{ep}^{d} \geq t_{e}^{d} + T_{e , ep}^{H} , \forall e \in \mathcal{E} , ep \in H^{+} \left(e\right) \tag{eq\_0010} \\
+  & \left(c_{e} + c_{ep}\right) \cdot M + t_{ep}^{d} \geq t_{e}^{d} + T_{e , ep}^{H} , \forall e \in \mathcal{E} , ep \in H^{+} \cdot e \tag{eq\_0010} \\
   & \mathcal{E}^{S} = \mathcal{E}^{S^{+}} \cup \mathcal{E}^{S^{-}} \tag{eq\_0011} \\
   & \mathcal{E}^{T} = \mathcal{E}^{T^{+}} \cup \mathcal{E}^{T^{-}} \tag{eq\_0013} \\
-  & \mathcal{D}^{+} \left(e\right) = \left\{ep \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} \mid s_{e}^{d} = s_{ep}^{o}\right\} \tag{eq\_0014} \\
-  & \mathcal{D}^{-} \left(e\right) = \left\{ep \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} \mid s_{e}^{o} = s_{ep}^{d}\right\} \tag{eq\_0015} \\
+  & \mathcal{D}^{+} e = \left\{ep \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} \mid s_{e}^{d} = s_{ep}^{o}\right\} \tag{eq\_0014} \\
+  & \mathcal{D}^{-} e = \left\{ep \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} \mid s_{e}^{o} = s_{ep}^{d}\right\} \tag{eq\_0015} \\
   & \sum_{ep \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , ep} \leq 1 , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} \tag{eq\_0016} \\
   & \sum_{ep \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{ep , e} \leq 1 , \forall e \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} \tag{eq\_0018} \\
-  & \left(1 - \mathit{lambda}_{e , ep}\right) \cdot M + t_{ep}^{d} \geq t_{e}^{a} + T_{e , ep}^{T} , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} , ep \in \mathcal{D}^{+} \left(e\right) \tag{eq\_0019} \\
+  & \left(1 - \mathit{lambda}_{e , ep}\right) \cdot M + t_{ep}^{d} \geq t_{e}^{a} + T_{e , ep}^{T} , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} , ep \in \mathcal{D}^{+} e \tag{eq\_0019} \\
   & \sum_{ep \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , ep} + c_{e} \leq c_{e_bar} , \forall e \in \mathcal{E}^{S^{+}} : \left(e , e_bar\right) \in \mathcal{P} \tag{eq\_0020} \\
   & \sum_{ep \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{ep , e} + c_{e} \leq c_{e_underline} , \forall e \in \mathcal{E}^{S^{-}} : \left(e_underline , e\right) \in \mathcal{P} \tag{eq\_0022} \\
-  & \left(1 - \mathit{lambda}_{e , ep} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{a} \geq t_{ep}^{d} + T_{ep , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , ep \in \mathcal{D}^{+} \left(e\right) , e^{' '} \in H^{+} \left(e\right) \tag{eq\_0023} \\
-  & \left(1 - \mathit{lambda}_{e , ep} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{d} \geq t_{e}^{a} + T_{e , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , ep \in \mathcal{D}^{+} \left(e\right) , e^{' '} \in H^{+} \left(ep\right) \tag{eq\_0025} \\
+  & \left(1 - \mathit{lambda}_{e , ep} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{a} \geq t_{ep}^{d} + T_{ep , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , ep \in \mathcal{D}^{+} e , e^{' '} \in H^{+} \cdot e \tag{eq\_0023} \\
+  & \left(1 - \mathit{lambda}_{e , ep} + c_{e^{' '}}\right) \cdot M + t_{e^{' '}}^{d} \geq t_{e}^{a} + T_{e , e^{' '}}^{P} , \forall e \in \mathcal{E}^{S^{+}} , ep \in \mathcal{D}^{+} e , e^{' '} \in H^{+} ep \tag{eq\_0025} \\
   & \sum_{ep \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , ep} + \mathit{beta}_{e} \leq 1 , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0029} \\
   & \sum_{ep \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{ep , e} + \mathit{alpha}_{e} \leq 1 , \forall e \in \mathcal{E}^{T^{-}} \tag{eq\_0031} \\
   & \mathit{alpha}_{e} + \sum_{ep \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{ep , e} \geq 1 - c_{e} , \forall e \in \mathcal{E}^{T^{-}} \tag{eq\_0032} \\
   & \mathit{beta}_{e} + \sum_{ep \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , ep} \geq 1 - c_{e} , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0034} \\
-  & c_{e} + c_{ep} \leq 2 \cdot \left(1 - \mathit{lambda}_{e , ep}\right) , \forall e \in \mathcal{E}^{T^{+}} , ep \in \mathcal{D}^{+} \left(e\right) \tag{eq\_0035} \\
+  & c_{e} + c_{ep} \leq 2 \cdot \left(1 - \mathit{lambda}_{e , ep}\right) , \forall e \in \mathcal{E}^{T^{+}} , ep \in \mathcal{D}^{+} e \tag{eq\_0035} \\
   & \underset{ep \in \mathcal{E}^{T^{+}} : t_{ep}^{d} < t_{e}^{d}}{\sum} \mathit{alpha}_{ep} - \underset{e^{' '} \in \mathcal{E}^{T^{-}} : t_{e^{' '}}^{a} + T_{d e p o t} < t_{e}^{d}}{\sum} \mathit{beta}_{e^{' '}} \leq N_{t r a i n} + \sum_{d \in D} N_{a d d}^{d} , \forall e \in \mathcal{E}^{T^{+}} \tag{eq\_0036} \\
   & \mathit{gamma}_{e , ep} = 0 \Rightarrow t_{ep}^{a} + \left(1 - \mathit{beta}_{ep}\right) \cdot M + T_{d e p o t} \geq t_{e}^{d} \tag{eq\_0038} \\
   & t_{ep}^{a} + \left(1 - \mathit{beta}_{ep}\right) \cdot M + T_{d e p o t} - t_{e}^{d} \leq M_hat \cdot \left(1 - \mathit{gamma}_{e , ep}\right) \tag{eq\_0039} \\
@@ -121,7 +121,7 @@
   & t_{e}^{a} - t_bar_{e}^{a} \leq \left(1 - c_{e}\right) \cdot M , \forall e \in \mathcal{E} \tag{eq\_0071} \\
   & \sum_{ep \in \mathcal{D}^{+} \left(e\right)} \mathit{lambda}_{e , ep} \leq 1 - c_{e} , \forall e \in \mathcal{E}^{S^{+}} \cup \mathcal{E}^{T^{+}} , \tag{eq\_0080} \\
   & \sum_{ep \in \mathcal{D}^{-} \left(e\right)} \mathit{lambda}_{ep , e} \leq 1 - c_{e} , \forall e \in \mathcal{E}^{S^{-}} \cup \mathcal{E}^{T^{-}} . \tag{eq\_0082} \\
-  & t_{e}^{a} + T_{e , ep}^{T} - t_{ep}^{d} \geq m \cdot \mathit{Psi} + \mathit{epsilon} \cdot \left(1 - \mathit{Psi} \left(e\right)\right) , \forall e \in \mathcal{E}^{S^{+}} \tag{eq\_0083} \\
+  & t_{e}^{a} + T_{e , ep}^{T} - t_{ep}^{d} \geq m \cdot \mathit{Psi} + \mathit{epsilon} \cdot \left(1 - \mathit{Psi} e\right) , \forall e \in \mathcal{E}^{S^{+}} \tag{eq\_0083} \\
   & t_{e}^{a} \geq t_{ep}^{d} + T_{ep , e}^{P} \tag{eq\_0084} \\
   & t_{e}^{a} + T_{e , ep}^{T} - t_{ep}^{d} > T_{d e p o t} > 0 , \tag{eq\_0085} \\
   & t_{e}^{l a t e s t} \geq t_{e n d} - t_{s t a r t} + \underset{e , ep \in \mathcal{E}}{max} \left\{\left|t_{e}^{a} - t_{ep}^{d}\right|\right\} \tag{eq\_0086} \\

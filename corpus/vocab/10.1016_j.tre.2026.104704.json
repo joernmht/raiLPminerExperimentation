@@ -1,5 +1,61 @@
 {
-  "rewrite_rules_version": "rewrite-2026.09.1",
+  "shape_fixes": [
+    {
+      "name": "Q_backup",
+      "kind": "var",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "Q_cancel",
+      "kind": "var",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "Q_deviation",
+      "kind": "var",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "Q_variation",
+      "kind": "var",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    },
+    {
+      "name": "k",
+      "kind": "var",
+      "declared": null,
+      "written": [
+        "r",
+        "p"
+      ],
+      "shape": [
+        "R",
+        "P"
+      ],
+      "new_index": []
+    },
+    {
+      "name": "t_dur",
+      "kind": "param",
+      "declared": 1,
+      "written": [],
+      "shape": [],
+      "new_index": []
+    }
+  ],
+  "rewrite_rules_version": "rewrite-2026.09.4",
   "declared": {
     "index": [
       "J",
@@ -78,8 +134,10 @@
     ]
   },
   "used": [
+    "CVaR_alpha",
     "L",
     "M",
+    "MCVaR_alpha",
     "MP",
     "Q",
     "Q_backup",
@@ -88,11 +146,14 @@
     "Q_variation",
     "a",
     "a_bar",
-    "alpha",
     "c_min",
+    "constraints",
     "d",
     "d_bar",
     "delta",
+    "depot",
+    "dn",
+    "end",
     "f",
     "gamma",
     "h",
@@ -110,9 +171,12 @@
     "q_max",
     "q_min",
     "rho",
+    "s",
     "sigma",
     "sigma_enter",
     "sigma_leave",
+    "start",
+    "t",
     "t_acc",
     "t_dec",
     "t_delay",
@@ -121,7 +185,9 @@
     "t_start",
     "tau",
     "theta",
+    "turn",
     "u",
+    "up",
     "v",
     "varphi",
     "x",
@@ -129,11 +195,13 @@
     "z"
   ],
   "bound": [
+    "P",
     "i",
     "j",
     "n",
     "omega",
     "p",
+    "p_hat",
     "pp",
     "r",
     "r_tilde",
@@ -149,7 +217,132 @@
     "R",
     "S"
   ],
-  "missing": {},
+  "missing": {
+    "CVaR_alpha": {
+      "rows": [
+        "eq_0080"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "MCVaR_alpha": {
+      "rows": [
+        "eq_0080",
+        "eq_0081",
+        "eq_0083",
+        "eq_0084_b"
+      ],
+      "roles": {
+        "symbol": 6
+      },
+      "arities": {
+        "0": 6
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "depot": {
+      "rows": [
+        "eq_0087",
+        "eq_0088"
+      ],
+      "roles": {
+        "symbol": 8
+      },
+      "arities": {
+        "0": 8
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "dn": {
+      "rows": [
+        "eq_0001",
+        "eq_0002",
+        "eq_0042",
+        "eq_0054_a",
+        "eq_0054_b",
+        "eq_0054_c",
+        "eq_0054_e",
+        "eq_0064",
+        "eq_0074",
+        "eq_0075",
+        "eq_0077"
+      ],
+      "roles": {
+        "symbol": 15
+      },
+      "arities": {
+        "0": 15
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "end": {
+      "rows": [
+        "eq_0088"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "start": {
+      "rows": [
+        "eq_0087"
+      ],
+      "roles": {
+        "symbol": 1
+      },
+      "arities": {
+        "0": 1
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "turn": {
+      "rows": [
+        "eq_0087",
+        "eq_0088"
+      ],
+      "roles": {
+        "symbol": 2
+      },
+      "arities": {
+        "0": 2
+      },
+      "kind": "?",
+      "evidence": "position only"
+    },
+    "up": {
+      "rows": [
+        "eq_0042",
+        "eq_0054_a",
+        "eq_0054_b",
+        "eq_0054_c",
+        "eq_0054_e",
+        "eq_0064"
+      ],
+      "roles": {
+        "symbol": 13
+      },
+      "arities": {
+        "0": 13
+      },
+      "kind": "?",
+      "evidence": "position only"
+    }
+  },
   "missing_index": [
     "E"
   ],
@@ -160,22 +353,21 @@
     "E",
     "MCVaR",
     "a_plan",
+    "alpha",
     "c",
-    "constraints",
     "d_plan",
     "gamma_1",
     "o",
     "psi_1",
-    "r",
-    "s",
-    "t"
+    "r"
   ],
   "family_as_symbol": {
-    "m": 11,
+    "m": 3,
     "u": 12,
-    "x": 20,
-    "z": 17
+    "x": 18,
+    "z": 16
   },
   "paper_key": "10.1016_j.tre.2026.104704",
-  "sidecar": true
+  "sidecar": true,
+  "shape_fixes_applied": 6
 }

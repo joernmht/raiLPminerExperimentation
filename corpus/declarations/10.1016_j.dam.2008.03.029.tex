@@ -54,7 +54,8 @@
 %@ index Z ordered=0 cyclic=0 :: set of integers
 
 % b: classified as parameter during review
-%@ param b shape=i kind=vector domain=- :: successor or self for blocking/non-blocking
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): b shape=i -> -
+%@ param b shape=- kind=vector domain=- :: successor or self for blocking/non-blocking
 
 % l: classified as index during review
 %@ index l ordered=0 cyclic=0 :: occurrence index for operations
@@ -63,7 +64,8 @@
 %@ var alpha shape=- domain=non_negative role=primary drole=- lo=- hi=- :: cycle time
 
 % M: classified as parameter during review
-%@ param M shape=i kind=vector domain=- :: machine assigned to operation i
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): M shape=i -> -
+%@ param M shape=- kind=vector domain=- :: machine assigned to operation i
 
 % K: classified as variable during review
 %@ var K shape=i,j domain=binary role=primary drole=- lo=- hi=- :: binary variable for order of operations on same machine

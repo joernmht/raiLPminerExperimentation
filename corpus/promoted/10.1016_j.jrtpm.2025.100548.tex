@@ -16,7 +16,7 @@
 %@ var a shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train v at station k
 %@ var d shape=V,K domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train v at station k
 %@ index L ordered=0 cyclic=0 :: Set of nodes (train paths or overtaking combinations)
-%@ var c shape=L,L domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
+%@ var c shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc from l' to l is selected
 %@ var y shape=L domain=integer role=primary drole=- lo=- hi=- :: Routing sequence number of node l
 %@ var lambda shape=L,I domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node l is assigned sequence number i
 %@ index I ordered=0 cyclic=0 :: Set of possible routing sequence numbers
@@ -27,8 +27,8 @@
 %@ var theta shape=V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train v stops at station k
 %@ index n ordered=0 cyclic=0 :: Number of stations (last station index)
 %@ param t shape=- kind=scalar domain=- :: Dwelling times (t_k^1, t_k^2) and running times (t_{k,k+1}^v)
-%@ var alpha shape=V,V,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
-%@ param m shape=- kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
+%@ var alpha shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating overtaking relation between trains v and v' at station k
+%@ param m shape=K,K kind=scalar domain=- :: Weight for time-space resource calculation between stations k and k+1
 %@ param o shape=- kind=scalar domain=- :: Time-space resources occupied between nodes or boundaries
 %@ param O shape=- kind=scalar domain=- :: Total amount of time-space resources available on the timetable
 %@ param b shape=- kind=scalar domain=- :: Threshold for difference in number of stops
@@ -89,8 +89,8 @@
 %@ param T_1 shape=- kind=scalar domain=- :: Lower bound on departure times
 %@ param T_2 shape=- kind=scalar domain=- :: Upper bound on arrival times
 %@ var a_n shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Arrival time at last station for each train
-%@ var alphap shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for arrival order between trains at station
-%@ var alphapp shape=V,V,K domain=binary role=indicator drole=- lo=- hi=- :: Indicator for departure order between trains at station
+%@ var alphap shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator for arrival order between trains at station
+%@ var alphapp shape=- domain=binary role=indicator drole=- lo=- hi=- :: Indicator for departure order between trains at station
 %@ var d_1 shape=V domain=continuous role=auxiliary drole=- lo=- hi=- :: Departure time from first station for each train
 %@ param h_1 shape=K kind=vector domain=- :: Headway time before departure at station
 %@ param h_2 shape=K kind=vector domain=- :: Headway time after arrival at station
@@ -101,65 +101,65 @@
 %@ param h_pa shape=- kind=scalar domain=- :: Minimum headway time for departure-arrival (alternative)
 %@ param h_pd shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
 %@ param h_pp shape=- kind=scalar domain=- :: Minimum headway time for departure-departure (alternative)
-%@ var o_1 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var o_2 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var o_3 shape=L domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
-%@ var s_4 shape=V,V domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for resource usage
+%@ var o_1 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var o_2 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var o_3 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Time-space resource usage for node
+%@ var s_4 shape=- domain=continuous role=auxiliary drole=- lo=- hi=- :: Auxiliary variable for resource usage
 %@ param t_1 shape=K kind=vector domain=- :: Dwell time at station
 %@ param t_2 shape=K kind=vector domain=- :: Dwell time at station (alternative)
 %@ var z_1 shape=- domain=continuous role=primary drole=max :: Objective: maximize number of trains
 %@ var z_2 shape=- domain=continuous role=primary drole=min :: Objective: minimize total resource usage
 %@ var z_3 shape=- domain=continuous role=primary drole=min :: Objective: minimize total arrival time and penalty
 \begin{align}
-  & \begin{matrix}\mathit{max} z_{1} = \sum_{v \in V} x_{f \left(v\right)}\end{matrix} \tag{eq\_0006} \\
-  & \begin{matrix}a_{v}^{k} \leq T_{2} \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0007} \\
-  & \begin{matrix}d_{v}^{k} \geq T_{1} \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0008} \\
-  & \begin{matrix}\sum_{lp \in L} c \left(l , lp\right) = x_{l} - x_{l}^{''} \forall l \in L\end{matrix} \tag{eq\_0009} \\
-  & \begin{matrix}\sum_{lp \in L} c \left(lp , l\right) = x_{l} - x_{l}^{'} \forall l \in L\end{matrix} \tag{eq\_0010} \\
-  & \begin{matrix}\left(y_{l} - y_{lp} - 1\right) \cdot c \left(lp , l\right) = 0 \forall l , lp \in L\end{matrix} \tag{eq\_0011} \\
-  & \begin{matrix}y_{l} = \sum_{i \in I} \mathit{lambda}_{l}^{i} \cdot i \forall l \in L\end{matrix} \tag{eq\_0012} \\
-  & \begin{matrix}\sum_{i \in I} \mathit{lambda}_{l}^{i} = x_{l} \forall l \in L\end{matrix} \tag{eq\_0013} \\
-  & \begin{matrix}\sum_{l \in L_{r}, lp \notin L_{r} , L_{r + 1}} c \left(l , lp\right) = 0 \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0014} \\
-  & \begin{matrix}\sum_{l \in L_{r}, lp \notin L_{r - 1} , L_{r}} c \left(l , lp\right) = 0 \forall r \in R \backslash \left\{r_{1}\right\}\end{matrix} \tag{eq\_0015} \\
-  & \begin{matrix}\sum_{l \in L_{r}, lp \in L_{r + 1}} c \left(l , lp\right) + \sum_{l \in L_{r}} x_{l}^{''} \leq 1 \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0016} \\
-  & \begin{matrix}M \cdot x_{l} \geq \sum_{lp \in L_{r + 1}} x_{lp} \forall l \in L_{r} , \forall r \in R \backslash \left\{r_{2}\right\}\end{matrix} \tag{eq\_0017} \\
-  & \begin{matrix}a_{v}^{k + 1} = d_{v}^{k} + h_{1}^{k} \cdot \mathit{theta}_{v}^{k} + t_{k , k + 1}^{v} + h_{2}^{k + 1} \cdot \mathit{theta}_{v}^{k + 1} \forall v \in V , 1 \leq k \leq n - 1\end{matrix} \tag{eq\_0018} \\
+  &  \mathit{max} z_{1} = \sum_{v \in V} x_{f \left(v\right)}  \tag{eq\_0006} \\
+  &  a_{v}^{k} \leq T_{2} \forall v \in V , \forall k \in K  \tag{eq\_0007} \\
+  &  d_{v}^{k} \geq T_{1} \forall v \in V , \forall k \in K  \tag{eq\_0008} \\
+  &  \sum_{lp \in L} c \left(l , lp\right) = x_{l} - x_{l}^{''} \forall l \in L  \tag{eq\_0009} \\
+  &  \sum_{lp \in L} c \left(lp , l\right) = x_{l} - x_{l}^{'} \forall l \in L  \tag{eq\_0010} \\
+  &  \left(y_{l} - y_{lp} - 1\right) \cdot c \left(lp , l\right) = 0 \forall l , lp \in L  \tag{eq\_0011} \\
+  &  y_{l} = \sum_{i \in I} \mathit{lambda}_{l}^{i} \cdot i \forall l \in L  \tag{eq\_0012} \\
+  &  \sum_{i \in I} \mathit{lambda}_{l}^{i} = x_{l} \forall l \in L  \tag{eq\_0013} \\
+  &  \sum_{l \in L_{r}, lp \notin L_{r} , L_{r + 1}} c \left(l , lp\right) = 0 \forall r \in R \backslash \left\{r_{2}\right\}  \tag{eq\_0014} \\
+  &  \sum_{l \in L_{r}, lp \notin L_{r - 1} , L_{r}} c \left(l , lp\right) = 0 \forall r \in R \backslash \left\{r_{1}\right\}  \tag{eq\_0015} \\
+  &  \sum_{l \in L_{r}, lp \in L_{r + 1}} c \left(l , lp\right) + \sum_{l \in L_{r}} x_{l}^{''} \leq 1 \forall r \in R \backslash \left\{r_{2}\right\}  \tag{eq\_0016} \\
+  &  M \cdot x_{l} \geq \sum_{lp \in L_{r + 1}} x_{lp} \forall l \in L_{r} , \forall r \in R \backslash \left\{r_{2}\right\}  \tag{eq\_0017} \\
+  &  a_{v}^{k + 1} = d_{v}^{k} + h_{1}^{k} \cdot \mathit{theta}_{v}^{k} + t_{k , k + 1}^{v} + h_{2}^{k + 1} \cdot \mathit{theta}_{v}^{k + 1} \forall v \in V , 1 \leq k \leq n - 1  \tag{eq\_0018} \\
   & \left|\right. d_{v}^{k} - d_{vp}^{k} \left|\right. \geq \left(1 - \mathit{theta}_{vp}^{k}\right) \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{p p} + \mathit{theta}_{vp}^{k} \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{d p} + \tag{eq\_0019\_a} \\
   & \left(1 - \mathit{theta}_{vp}^{k}\right) \cdot \mathit{theta}_{v}^{k} \cdot h_{p d} + \mathit{theta}_{vp}^{k} \cdot \mathit{theta}_{v}^{k} \cdot h_{d d} \forall v , vp \in V , v \neq vp , \forall k \in K \tag{eq\_0019\_b} \\
   & \left|a_{v}^{k} - a_{vp}^{k}\right| \geq \left(1 - \mathit{theta}_{vp}^{k}\right) \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{p p} + \mathit{theta}_{vp}^{k} \cdot \left(1 - \mathit{theta}_{v}^{k}\right) \cdot h_{a p} + \tag{eq\_0020\_a} \\
   & \left(1 - \mathit{theta}_{vp}^{k}\right) \cdot \mathit{theta}_{v}^{k} \cdot h_{p a} + \mathit{theta}_{vp}^{k} \cdot \mathit{theta}_{v}^{k} \cdot h_{a a} \forall v , vp \in V , v \neq vp , \forall k \in K \tag{eq\_0020\_b} \\
-  & \begin{matrix}d_{v}^{k} = a_{v}^{k} + t_{k}^{1} \cdot \mathit{theta}_{v}^{k} + \left(t_{k}^{2} - t_{k}^{1}\right) \cdot \mathit{theta}_{v}^{k} \cdot \sum_{vp \in V} \mathit{alpha} \left(v , vp , k\right) \forall v \in V , \forall k \in K\end{matrix} \tag{eq\_0021} \\
-  & \begin{matrix}a_{vp}^{k} - a_{v}^{k} \geq - M \cdot \left(1 - alphap \left(v , vp , k\right)\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0022} \\
-  & \begin{matrix}a_{vp}^{k} - a_{v}^{k} \leq M \cdot alphap \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0023} \\
-  & \begin{matrix}d_{v}^{k} - d_{vp}^{k} \geq - M \cdot \left(1 - alphapp \left(v , vp , k\right)\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0024} \\
-  & \begin{matrix}d_{v}^{k} - d_{vp}^{k} \leq M \cdot alphapp \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0025} \\
-  & \begin{matrix}\mathit{alpha} \left(v , vp , k\right) \geq alphap \left(v , vp , k\right) + alphapp \left(v , vp , k\right) - 1 \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0026} \\
-  & \begin{matrix}\mathit{alpha} \left(v , vp , k\right) \leq alphap \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0027} \\
-  & \begin{matrix}\mathit{alpha} \left(v , vp , k\right) \leq alphapp \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K\end{matrix} \tag{eq\_0028} \\
-  & \begin{matrix}o_{1} \left(f \left(v\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{v}^{k} - T_{1} + a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) \in L_{n}\end{matrix} \tag{eq\_0029} \\
-  & \begin{matrix}o_{2} \left(f \left(v\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - d_{v}^{k} + T_{2} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) \in L_{n}\end{matrix} \tag{eq\_0030} \\
-  & \begin{matrix}o \left(f \left(v\right) , f \left(vp\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{vp}^{k} - d_{v}^{k} + a_{vp}^{k + 1} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f \left(v\right) , f \left(vp\right) \in L_{n}\end{matrix} \tag{eq\_0031} \\
-  & \begin{matrix}o_{1} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - T_{1} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0032} \\
-  & \begin{matrix}o_{2} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - \underset{v \in V_{l}}{max} d_{v}^{k} + T_{2} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0033} \\
-  & \begin{matrix}o \left(f \left(vp\right) , l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - d_{vp}^{k} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - a_{vp}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f \left(vp\right) \in L_{n}\end{matrix} \tag{eq\_0034} \\
-  & \begin{matrix}o \left(l , f \left(vp\right)\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{vp}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + a_{vp}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f \left(vp\right) \in L_{n}\end{matrix} \tag{eq\_0035} \\
-  & \begin{matrix}o \left(l , lp\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{lp}}{min} d_{v}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + \underset{v \in V_{lp}}{min} a_{v}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l , lp \in L_{g}\end{matrix} \tag{eq\_0036} \\
-  & \begin{matrix}o_{3} \left(l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{max} d_{v}^{k} - \underset{v \in V_{l}}{min} d_{v}^{k} + \underset{v \in V_{l}}{max} a_{v}^{k + 1} - \underset{v \in V_{l}}{min} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}\end{matrix} \tag{eq\_0037} \\
-  & \begin{matrix}\sum_{lp \in L, l \in L} o \left(l , lp\right) \cdot c \left(l , lp\right) + \sum_{l \in L} o_{1} \left(l\right) \cdot x_{l}^{'} + \sum_{l \in L} o_{2} \left(l\right) \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} \left(l\right) \cdot x_{l} \leq O\end{matrix} \tag{eq\_0038} \\
-  & \begin{matrix}\sum_{k \in K} \mathit{theta}_{v}^{k} - \sum_{k \in K} \mathit{theta}_{vp}^{k} \geq b \forall f \left(v\right) , f \left(vp\right) \in L_{r}\end{matrix} \tag{eq\_0039} \\
-  & \begin{matrix}d_{v}^{k} \leq d_{vp}^{k} \forall k \in K\end{matrix} \tag{eq\_0040} \\
-  & \begin{matrix}d_{v}^{1} = T_{1}\end{matrix} \tag{eq\_0041} \\
-  & \begin{matrix}a_{v}^{n} \geq a_{vp}^{n}\end{matrix} \tag{eq\_0042} \\
-  & \begin{matrix}d_{vp}^{k} - d_{v}^{k} = \mathit{chi}_{v vp}^{k} \forall k \in K\end{matrix} \tag{eq\_0043} \\
-  & \begin{matrix}a_{vp}^{k} - a_{v}^{k} = \mathit{psi}_{v vp}^{k} \forall k \in K\end{matrix} \tag{eq\_0044} \\
-  & \begin{matrix}o_{3} \left(l\right) = \underset{v , vp \in V_{r}}{max} s_{4} \left(v , vp\right) \forall l \in L_{r}\end{matrix} \tag{eq\_0045} \\
-  & \begin{matrix}a_{v}^{k} \leq a_{vp}^{k} \forall k \in K\end{matrix} \tag{eq\_0046} \\
-  & \begin{matrix}y_{l} - y_{lp} \geq c \left(lp , l\right) - M \cdot \left(1 - c \left(lp , l\right)\right) \forall l , lp \in L\end{matrix} \tag{eq\_0047} \\
-  & \begin{matrix}y_{l} - y_{lp} - 1 \leq M \cdot \left(1 - c \left(lp , l\right)\right) \forall l , lp \in L\end{matrix} \tag{eq\_0048} \\
-  \begin{matrix}min\quad & z_{2} = \sum_{lp \in L, l \in L} o \left(l , lp\right) \cdot c \left(l , lp\right) + \sum_{l \in L} o_{1} \left(l\right) \cdot x_{l}^{'} + \sum_{l \in L} o_{2} \left(l\right) \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} \left(l\right) \cdot x_{l}\end{matrix} \tag{eq\_0049} \\
-  & \begin{matrix}x_{l} = 1 \forall l \in L\end{matrix} \tag{eq\_0050} \\
-  & \begin{matrix}\mathit{min} z_{3} = \sum_{v \in V} a_{v}^{n} + \mathit{beta} \cdot \sum_{v \in V} \left(1 - x_{f \left(v\right)}\right)\end{matrix} \tag{eq\_0051} \\
-  & \begin{matrix}a_{v}^{k} \geq a_{vp}^{k} \cdot c \left(\left(f \left(v\right)\right)^{'} , f \left(v\right)\right) \forall v , vp \in V , \forall k \in K\end{matrix} \tag{eq\_0052} \\
-  & \begin{matrix}a_{v}^{n} - T_{2} \geq - M \cdot x_{f \left(v\right)} \forall v \in V\end{matrix} \tag{eq\_0053} \\
-  & \begin{matrix}a_{v}^{n} - T_{2} \leq M \cdot \left(1 - x_{f \left(v\right)}\right) \forall v \in V\end{matrix} \tag{eq\_0054} \\
+  &  d_{v}^{k} = a_{v}^{k} + t_{k}^{1} \cdot \mathit{theta}_{v}^{k} + \left(t_{k}^{2} - t_{k}^{1}\right) \cdot \mathit{theta}_{v}^{k} \cdot \sum_{vp \in V} \mathit{alpha} \left(v , vp , k\right) \forall v \in V , \forall k \in K  \tag{eq\_0021} \\
+  &  a_{vp}^{k} - a_{v}^{k} \geq - M \cdot \left(1 - alphap \left(v , vp , k\right)\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0022} \\
+  &  a_{vp}^{k} - a_{v}^{k} \leq M \cdot alphap \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0023} \\
+  &  d_{v}^{k} - d_{vp}^{k} \geq - M \cdot \left(1 - alphapp \left(v , vp , k\right)\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0024} \\
+  &  d_{v}^{k} - d_{vp}^{k} \leq M \cdot alphapp \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0025} \\
+  &  \mathit{alpha} \left(v , vp , k\right) \geq alphap \left(v , vp , k\right) + alphapp \left(v , vp , k\right) - 1 \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0026} \\
+  &  \mathit{alpha} \left(v , vp , k\right) \leq alphap \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0027} \\
+  &  \mathit{alpha} \left(v , vp , k\right) \leq alphapp \left(v , vp , k\right) \forall v , vp \in V , v \neq vp , \forall k \in K  \tag{eq\_0028} \\
+  &  o_{1} \left(f v\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{v}^{k} - T_{1} + a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall f v \in L_{n}  \tag{eq\_0029} \\
+  &  o_{2} \left(f v\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - d_{v}^{k} + T_{2} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f v \in L_{n}  \tag{eq\_0030} \\
+  &  o \left(f v , f vp\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{vp}^{k} - d_{v}^{k} + a_{vp}^{k + 1} - a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall f v , f vp \in L_{n}  \tag{eq\_0031} \\
+  &  o_{1} l = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - T_{1} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - T_{1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}  \tag{eq\_0032} \\
+  &  o_{2} l = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(T_{2} - \underset{v \in V_{l}}{max} d_{v}^{k} + T_{2} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}  \tag{eq\_0033} \\
+  &  o \left(f vp , l\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{min} d_{v}^{k} - d_{vp}^{k} + \underset{v \in V_{l}}{min} a_{v}^{k + 1} - a_{vp}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f vp \in L_{n}  \tag{eq\_0034} \\
+  &  o \left(l , f vp\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(d_{vp}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + a_{vp}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g} , \forall f vp \in L_{n}  \tag{eq\_0035} \\
+  &  o \left(l , lp\right) = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{lp}}{min} d_{v}^{k} - \underset{v \in V_{l}}{max} d_{v}^{k} + \underset{v \in V_{lp}}{min} a_{v}^{k + 1} - \underset{v \in V_{l}}{max} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l , lp \in L_{g}  \tag{eq\_0036} \\
+  &  o_{3} l = \frac{1}{2} \cdot \sum_{k = 1}^{n - 1} \left(\underset{v \in V_{l}}{max} d_{v}^{k} - \underset{v \in V_{l}}{min} d_{v}^{k} + \underset{v \in V_{l}}{max} a_{v}^{k + 1} - \underset{v \in V_{l}}{min} a_{v}^{k + 1}\right) \cdot m_{k , k + 1} \forall l \in L_{g}  \tag{eq\_0037} \\
+  &  \sum_{lp \in L, l \in L} o \left(l , lp\right) \cdot c \left(l , lp\right) + \sum_{l \in L} o_{1} l \cdot x_{l}^{'} + \sum_{l \in L} o_{2} l \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} l \cdot x_{l} \leq O  \tag{eq\_0038} \\
+  &  \sum_{k \in K} \mathit{theta}_{v}^{k} - \sum_{k \in K} \mathit{theta}_{vp}^{k} \geq b \forall f v , f vp \in L_{r}  \tag{eq\_0039} \\
+  &  d_{v}^{k} \leq d_{vp}^{k} \forall k \in K  \tag{eq\_0040} \\
+  &  d_{v}^{1} = T_{1}  \tag{eq\_0041} \\
+  &  a_{v}^{n} \geq a_{vp}^{n}  \tag{eq\_0042} \\
+  &  d_{vp}^{k} - d_{v}^{k} = \mathit{chi}_{v vp}^{k} \forall k \in K  \tag{eq\_0043} \\
+  &  a_{vp}^{k} - a_{v}^{k} = \mathit{psi}_{v vp}^{k} \forall k \in K  \tag{eq\_0044} \\
+  &  o_{3} l = \underset{v , vp \in V_{r}}{max} s_{4} \left(v , vp\right) \forall l \in L_{r}  \tag{eq\_0045} \\
+  &  a_{v}^{k} \leq a_{vp}^{k} \forall k \in K  \tag{eq\_0046} \\
+  &  y_{l} - y_{lp} \geq c \left(lp , l\right) - M \cdot \left(1 - c \left(lp , l\right)\right) \forall l , lp \in L  \tag{eq\_0047} \\
+  &  y_{l} - y_{lp} - 1 \leq M \cdot \left(1 - c \left(lp , l\right)\right) \forall l , lp \in L  \tag{eq\_0048} \\
+  \min\quad & \sum_{lp \in L, l \in L} o \left(l , lp\right) \cdot c \left(l , lp\right) + \sum_{l \in L} o_{1} l \cdot x_{l}^{'} + \sum_{l \in L} o_{2} l \cdot x_{l}^{''} + \sum_{l \in L_{g}} o_{3} l \cdot x_{l} \tag{eq\_0049} \\
+  &  x_{l} = 1 \forall l \in L  \tag{eq\_0050} \\
+  &  \mathit{min} z_{3} = \sum_{v \in V} a_{v}^{n} + \mathit{beta} \cdot \sum_{v \in V} \left(1 - x_{f \left(v\right)}\right)  \tag{eq\_0051} \\
+  &  a_{v}^{k} \geq a_{vp}^{k} \cdot c \left(\left(f v\right)^{'} , f v\right) \forall v , vp \in V , \forall k \in K  \tag{eq\_0052} \\
+  &  a_{v}^{n} - T_{2} \geq - M \cdot x_{f \left(v\right)} \forall v \in V  \tag{eq\_0053} \\
+  &  a_{v}^{n} - T_{2} \leq M \cdot \left(1 - x_{f \left(v\right)}\right) \forall v \in V  \tag{eq\_0054} \\
 \end{align}
