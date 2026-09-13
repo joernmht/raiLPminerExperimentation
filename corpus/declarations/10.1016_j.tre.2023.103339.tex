@@ -33,8 +33,10 @@
 %@ param T shape=- kind=scalar domain=- :: Length of time step for the absorption model
 %@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
 %@ param chi shape=p,q,e kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
-%@ param sta shape=p kind=vector domain=- :: Station corresponding to line platform p
-%@ param t shape=q,p kind=matrix domain=- :: Mean transfer time from line platform q to p
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): sta shape=p -> -
+%@ param sta shape=- kind=vector domain=- :: Station corresponding to line platform p
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=q,p -> -
+%@ param t shape=- kind=matrix domain=- :: Mean transfer time from line platform q to p
 %@ param gamma shape=p,k kind=matrix domain=- :: Mean time of trains from depot to line platform
 %@ param h shape=p kind=vector domain=- :: Minimum departure-arrival headway at line platform
 %@ param sigma shape=p,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
@@ -47,7 +49,8 @@
 %@ param A shape=- kind=scalar domain=- :: State matrix in MLD model
 %@ param D shape=- kind=scalar domain=- :: Matrix in MLD inequality constraints
 %@ param zeta shape=- kind=scalar domain=- :: Weighting factor for departure time deviation
-%@ param s shape=p kind=vector domain=- :: Station corresponding to line platform
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s shape=p -> -
+%@ param s shape=- kind=vector domain=- :: Station corresponding to line platform
 %@ var n shape=p,e,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
 %@ var C shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
 %@ var f shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
@@ -64,7 +67,8 @@
 %@ var E shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
 %@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Vector of optimized control inputs over horizon
 %@ var w shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
-%@ var delta shape=k,p domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for absorption transformation
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): delta shape=k,p -> -
+%@ var delta shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for absorption transformation
 %@ con eq_0001 kind=linear domain=- indicator=- :: Passenger arrival rate at line platform
 %@ con eq_0002 kind=linear domain=- indicator=- :: Passenger flow balance at line platform
 %@ con eq_0003 kind=linear domain=- indicator=- :: Passengers absorbed by trains at platform

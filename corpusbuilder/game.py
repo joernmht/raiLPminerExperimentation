@@ -946,6 +946,19 @@ def _has_obj_root(t) -> bool:
 # a formula that STARTS with min/max and carries an "s.t." / "subject to"
 # marker is an inline full-model block — its head is the objective
 _LEAD_MINMAX = re.compile(r"^\s*\\?(?:min|max|minimize|maximize)\b")
+#: Display-environment scaffolding and alignment residue an extracted objective
+#: row may still carry (``\begin{matrix} & & \mathbf{Minimize} Z ...``).
+_OBJ_WRAPPERS = re.compile(
+    r"\\(?:begin|end)\{(?:matrix|aligned|gathered|split|array)\}(?:\{[^{}]*\})?|&|\\\\"
+)
+_BOLD_WORD = re.compile(
+    r"\\(?:mathbf|textbf|boldsymbol)\s*\{\s*(?:\\(?:mathit|mathrm|text)\s*\{\s*)?"
+    r"((?:minimi[sz]e|maximi[sz]e|min|max))\s*\}?\s*\}",
+    re.IGNORECASE,
+)
+_PROBLEM_LABEL = re.compile(
+    r"^\s*(?:\\(?:mathbf|mathrm|text|textbf)\s*\{\s*P[A-Za-z0-9_]*\s*\}|\(\s*P[A-Za-z0-9_]*\s*\))\s*:?\s*"
+)
 _ST_MARKER = re.compile(r"\bs\s*\.\s*t\s*\.|subject\W{0,20}to\b", re.IGNORECASE)
 
 
@@ -968,7 +981,12 @@ def normalize_objective_head(latex: str) -> str:
     detecting a row as the objective and then assembling its raw word form
     hands the canonical parser a token it has no rule for.
     """
-    s = _MINMAX_GLUED.sub(r"\1 ", latex)
+    s = _OBJ_WRAPPERS.sub(" ", latex).strip()
+    # \mathbf{\mathit{Minimize}} / \mathbf{Minimize} / \textbf{min}: the word, unbolded
+    s = _BOLD_WORD.sub(lambda m: m.group(1), s)
+    # a problem label in front of the word (\mathbf{P} : Minimize, (P1) min)
+    s = _PROBLEM_LABEL.sub("", s, count=1)
+    s = _MINMAX_GLUED.sub(r"\1 ", s)
     # a spacing macro glued to the operator (\min\quad x) splits wrongly at
     # assembly time (operator token becomes "\min\quad"): drop the macro
     s = re.sub(r"^(\s*\\(?:min|max))(?:\\quad|\\;|\\,|\\ )\s*", r"\1 ", s)

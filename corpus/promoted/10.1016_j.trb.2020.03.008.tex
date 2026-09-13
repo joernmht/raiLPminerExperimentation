@@ -20,16 +20,16 @@
 %@ param O shape=- kind=scalar domain=- :: Origin node of a train service
 %@ param D shape=- kind=scalar domain=- :: Destination node of a train service
 %@ index A ordered=0 cyclic=0 :: Set of arcs in the infrastructure network
-%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
-%@ param CAP shape=- kind=scalar domain=- :: Capacity of arc (i,j)
+%@ var v shape=N,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
+%@ param CAP shape=N,N kind=scalar domain=- :: Capacity of arc (i,j)
 %@ param M shape=- kind=big_m domain=- :: Large constant for linearization
-%@ param h shape=- kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
+%@ param h shape=N,N,T,T kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
 %@ index K ordered=0 cyclic=0 :: Set of OD pairs
-%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
-%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
+%@ var y shape=P,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
+%@ var z shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
 %@ index P ordered=0 cyclic=0 :: Set of paths for OD pair k
-%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
-%@ param s shape=- kind=scalar domain=- :: Capacity of train t
+%@ var f shape=P,K domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
+%@ param s shape=T kind=scalar domain=- :: Capacity of train t
 %@ param C shape=- kind=scalar domain=- :: Cost coefficient
 %@ param c shape=- kind=scalar domain=- :: Cost factor or travel cost
 %@ param u shape=- kind=scalar domain=- :: Detour factor for cancellation cost
@@ -68,8 +68,9 @@
 %@ con eq_0033 kind=linear domain=- indicator=- :: Generalized train cancellation cost coefficient
 %@ con eq_0035 kind=linear domain=- indicator=- :: Relaxation of binary variables to continuous in [0,1]
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost condition for adding new passenger paths
+%@ index T ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)
 \begin{align}
-  & \begin{matrix}\sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \begin{cases} - o_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node} \\ d_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node} \\ 0 , \text{else} \end{cases} \forall t \in T , i \in N^{t}\end{matrix} \tag{eq\_0001} \\
+  &  \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \begin{cases} - o_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node} \\ d_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node} \\ 0 , \text{else} \end{cases} \forall t \in T , i \in N^{t}  \tag{eq\_0001} \\
   & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0002} \\
   & o_{i}^{t} = 1 \forall t \in T , i = N \left(O_{t}\right) \tag{eq\_0003} \\
   & d_{i}^{t} = 1 \forall t \in T , i = N \left(D_{t}\right) \tag{eq\_0004} \\
@@ -81,14 +82,12 @@
   & \sum_{j \in N^{t}} d_{j}^{t} \leq \sum_{\left(i , j\right) \in A^{t}} v_{i j} + 1 \forall t \in T \tag{eq\_0010} \\
   & \sum_{t \in T} x_{i j}^{t} \leq \mathit{CAP}_{i j} \left(1 - v_{i j}\right) \forall \left(i , j\right) \in A^{t} \tag{eq\_0011} \\
   & \sum_{\left(i , j\right) \in A} v_{i j} \leq n \tag{eq\_0012} \\
-  & x_{i j}^{t} , o_{i}^{t} , d_{i}^{t} , v_{i j} \in \left\{0 , 1\right\} \forall t \in T , n \in N^{t} \tag{eq\_0013} \\
   & T_{D_tilde , i}^{t} + \mathit{tau}_{i j}^{t} \leq T_{A_tilde , j}^{t} + M \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0014} \\
   & T_{D_tilde , i}^{t} + \mathit{tau}_{i j}^{t} x_{i j}^{t} \leq T_{A_tilde , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0015} \\
   & T_{D_tilde , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0016} \\
   & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} - M \cdot \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0017} \\
   & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
   & T_{D_tilde , i}^{t} \geq T_{D_tilde , i}^{m} + h_{i j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0019} \\
-  & T_{A_tilde , i} , T_{D_tilde , i} \geq 0 \forall t \in T , i \in N^{t} \tag{eq\_0020} \\
   & \sum_{p \in P^{k}} y_{p}^{k} + z_{k} \geq 1 \forall k \in K \tag{eq\_0021} \\
   & z_{k} \leq 1 - y_{p}^{k} \forall k \in K , p \in P^{k} \tag{eq\_0022} \\
   & y_{p}^{k} \geq 1 - \sum_{\left(i , j\right) \in A^{p}} v_{i j} \forall k \in K , p \in P^{k} \tag{eq\_0023} \\

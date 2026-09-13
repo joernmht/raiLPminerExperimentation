@@ -607,3 +607,104 @@ def test_stale_outputs_of_a_failed_paper_are_removed(workspace):
     assert len(report["removed_stale"]) == 3
     assert not any(path.exists() for path in stale)
     assert "## Stale outputs removed" in promote.render_report_md(report)
+
+
+def test_domain_declaration_rows_are_absorbed_not_parsed(workspace):
+    # A row that only states a variable's domain is a declaration: the sidecar
+    # carries it as domain=, so promote absorbs it and records it, and the
+    # paper still promotes.
+    var = re.search(r"^%@ var (\w+)", workspace["declarations"], re.M).group(1)
+    dossier = workspace["dossier"]
+    rows = [*workspace["rows"], rf"{var}_{{k}} \in \left\{{0 , 1\right\}}"]
+    dossier = Dossier(
+        source=dossier.source,
+        formulas=[
+            FormulaRecord(id=f"eq-{i:04d}", latex=row, method=ExtractionMethod.mathml)
+            for i, row in enumerate(rows)
+        ],
+    )
+    dossier.save(workspace["dirs"]["dossiers"])
+    _write_decisions(
+        workspace,
+        _game_export(dossier.key, [{"id": f.id, "status": "accepted"} for f in dossier.formulas]),
+    )
+    report = _promote(workspace)
+    (paper,) = report["papers"]
+    assert paper["promoted"], paper
+    last = f"eq_{len(rows) - 1:04d}"
+    assert paper["absorbed_declaration_rows"] == [last]
+    record = json.loads(
+        (workspace["dirs"]["provenance"] / f"{paper['entry_id']}.json").read_text(encoding="utf-8")
+    )
+    assert record["declaration_rows"] == [last]
+
+
+def test_partial_probes_every_row_even_when_the_objective_fails(workspace):
+    dossier = workspace["dossier"]
+    decisions = [{"id": f.id, "status": "accepted"} for f in dossier.formulas]
+    # the objective formula is the first row; corrupt it with an undeclared symbol
+    decisions[0] = {
+        "id": dossier.formulas[0].id,
+        "status": "corrected",
+        "parts": [r"\min \sum_{q \in \mathcal{Q}} zz_{q}"],
+    }
+    _write_decisions(workspace, _game_export(dossier.key, decisions))
+    dirs = workspace["dirs"]
+    report = promote_all(
+        decisions_dir=dirs["decisions"],
+        dossiers_dir=dirs["dossiers"],
+        declarations_dir=dirs["declarations"],
+        out_dirs={k: dirs[k] for k in ("formulations", "provenance", "promoted")},
+        write=False,
+        partial=True,
+    )
+    (paper,) = report["papers"]
+    assert not paper["promoted"]
+    cov = paper["coverage"]
+    assert cov["objective_ok"] is False
+    assert "zz" in cov["objective_error"]
+    n_constraints = len(dossier.formulas) - 1
+    assert cov["rows_probed"] == n_constraints
+    assert cov["rows_ok"] == n_constraints  # every constraint row is canonical
+    assert cov["row_failures"] == {}
+    rc = report["row_coverage"]
+    assert rc["papers_probed"] == 1 and rc["objective_ok"] == 0
+    assert rc["rows_ok"] == rc["rows_probed"] == n_constraints
+    assert "## Row coverage" in promote.render_report_md(report)
+
+
+def test_declaration_metadata_is_repaired_with_a_note(workspace):
+    from corpusbuilder.promote import _declaration_lines
+
+    lines = _declaration_lines(
+        "%@ param c shape=- kind=scalar domain=continuous :: cost\n"
+        "%@ var x shape=- domain=real role=primary :: choice\n"
+        "%@ var y shape=- domain=binary role=primary :: keep\n"
+        "%@ param w shape=- kind=scalar domain=cost_weight :: keep\n"
+    )
+    assert lines == [
+        "% declaration fixed: param c: domain=continuous -> -",
+        "%@ param c shape=- kind=scalar domain=- :: cost",
+        "% declaration fixed: var x: domain=real -> continuous",
+        "%@ var x shape=- domain=continuous role=primary :: choice",
+        "%@ var y shape=- domain=binary role=primary :: keep",
+        "%@ param w shape=- kind=scalar domain=cost_weight :: keep",
+    ]
+
+
+def test_objective_wrappers_bold_words_and_st_markers_are_stripped():
+    from corpusbuilder.game import normalize_objective_head
+
+    assert normalize_objective_head(
+        r"\begin{matrix} & & \mathbf{\mathit{Minimize}} Z \\ & & = \sum_{i} c_{i} x_{i} \end{matrix}"
+    ).startswith(r"\min Z")
+    assert normalize_objective_head(
+        r"\mathbf{P} : \text{Minimize} \sum_{i} c_{i} x_{i}"
+    ).startswith(r"\min")
+    assert (
+        promote._ST_PREFIX.sub("", r"s . t . \sum_{i} x_{i} \le 1", count=1)
+        == r"\sum_{i} x_{i} \le 1"
+    )
+    assert promote._ST_PREFIX.sub("", r"\text{s.t.}: x \le 1", count=1) == r"x \le 1"
+    assert promote._ST_PREFIX.sub("", r"subject to x \le 1", count=1) == r"x \le 1"
+    assert promote._ST_PREFIX.sub("", r"t_{s} \le 1", count=1) == r"t_{s} \le 1"

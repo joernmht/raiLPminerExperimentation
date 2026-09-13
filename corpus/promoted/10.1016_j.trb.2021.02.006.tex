@@ -8,9 +8,9 @@
 %@ prov author :: Gert-Jaap Polinder; Marie Schmidt; Dennis Huisman
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize weighted perceived travel and waiting time over all OD-pairs
-%@ var L shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
+%@ var L shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Length of time slice for OD-pair k and event v
 %@ index T ordered=0 cyclic=0 :: Time period (cycle length) of the periodic timetable
-%@ var W shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
+%@ var W shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
 %@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
 %@ index OD ordered=0 cyclic=0 :: Set of origin-destination pairs
 %@ index V ordered=0 cyclic=0 :: Set of events (departure times) for each OD-pair
@@ -26,9 +26,9 @@
 %@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
 %@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
 %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
-%@ param l shape=- kind=scalar domain=- :: Lower bound for linearization of Y_v^k
-%@ param M shape=- kind=scalar domain=- :: Big-M constant for linearization
-%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
+%@ param l shape=V,OD kind=scalar domain=- :: Lower bound for linearization of Y_v^k
+%@ param M shape=V,OD kind=scalar domain=- :: Big-M constant for linearization
+%@ var z shape=V,V,R,OD domain=binary role=primary drole=- lo=- hi=- :: Binary variable for selecting route and event in linearization
 %@ param Ybar shape=- kind=scalar domain=- :: Upper bound on perceived travel time for route
 %@ con eq_0012 kind=linear domain=- indicator=- :: Objective function
 %@ con eq_0013 kind=linear domain=- indicator=- :: Activity duration from periodic event times and modulo integer
@@ -65,17 +65,14 @@
   \min\quad & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}} L_{v}^{k} \cdot \left(\mathit{gamma}_{w} \cdot W_{v}^{k} + Y_{v}^{k}\right) \tag{eq\_0011} \\
   & \text{s}.\text{t}. y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \forall \left(i , j\right) \in A \tag{eq\_0012} \\
   & \mathit{ell}_{i j} \leq y_{i j} \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0013} \\
-  & Y_{r} = \sum_{a \in r} \left(y_{a} + \mathit{gamma}_{t} \cdot 1_{t} \left(a\right)\right) \forall r \in \mathcal{R} \tag{eq\_0014} \\
+  & Y_{r} = \sum_{a \in r} \left(y_{a} + \mathit{gamma}_{t} \cdot 1_{t} a\right) \forall r \in \mathcal{R} \tag{eq\_0014} \\
   & L_{v}^{k} = \underset{vp \in V^{k} \backslash \left\{v\right\}}{min} \left\{\mathit{pi}_{v} - \mathit{pi}_{vp} + T \mathit{alpha}_{vp , v}\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0015} \\
   & \mathit{alpha}_{v , vp} + \mathit{alpha}_{vp , v} = 1 \forall k \in \mathcal{OD} , v \in V^{k} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0016} \\
   & W_{v}^{k} = \frac{1}{2} L_{v}^{k} \forall k \in \mathcal{OD} , \forall v \in V^{k} \tag{eq\_0017} \\
   & Y_{v}^{k} = \underset{vp \in V^{k}}{min} \underset{r \in \mathcal{R}_{vp}^{k}}{min} \left\{Y_{r} + \mathit{gamma}_{w} \cdot \left(\mathit{pi}_{vp} - \mathit{pi}_{v} + T \mathit{alpha}_{v , vp}\right)\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0018} \\
   & L_{v}^{k} \in \left[0 , T\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0019} \\
   & W_{v}^{k} \in \left[0 , T / 2\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0020} \\
-  & Y_{r} , Y_{v}^{k} \in \mathcal{R}_{\geq 0} \forall r \in \mathcal{R} , k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0021} \\
   & \mathit{pi}_{v} \in \left\{0 , \ldots , T - 1\right\} \forall v \in V \tag{eq\_0022} \\
-  & p_{i j} \in \mathcal{Z}_{\geq 0} \forall \left(i , j\right) \in A \tag{eq\_0023} \\
-  & \mathit{alpha}_{v , vp} \in \left\{0 , 1\right\} \forall k \in \mathcal{OD} , v \in V^{k} , vp \in V^{k} \backslash \left\{v\right\} . \tag{eq\_0024} \\
   & Q_{v , vp} = \mathit{pi}_{vp} - \mathit{pi}_{v} + T \mathit{alpha}_{v , vp} . \tag{eq\_0025} \\
   & L_{v}^{k} \leq Q_{vp , v} \forall k \in \mathcal{OD} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0026} \\
   & \sum_{v \in V^{k}} L_{v}^{k} = T . \forall k \in \mathcal{OD} \tag{eq\_0027} \\
@@ -93,5 +90,4 @@
   & M_{v}^{k} = \mathit{gamma}_{w} \cdot T + \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_bar\right)_{r}\right\} - \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_underline\right)_{r}\right\} , \tag{eq\_0046} \\
   & \sum_{v \in V^{k}} \frac{d_{k}}{T} \cdot L_{v}^{k} \cdot W_{v}^{k} \geq d_{k} \cdot \frac{T}{2 \left|\right. V^{k} \left|\right.} . \tag{eq\_0047} \\
   & \text{s}.\text{t}. \sum_{v \in V^{k}} L_{v}^{k} = T \tag{eq\_0049} \\
-  & L_{v}^{k} \geq 0 \forall v \in V^{k} . \tag{eq\_0050} \\
 \end{align}

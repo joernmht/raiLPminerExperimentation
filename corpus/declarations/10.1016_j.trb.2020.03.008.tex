@@ -63,36 +63,43 @@
 %@ index A ordered=0 cyclic=0 :: Set of arcs in the infrastructure network
 
 % v: classified as variable during review
-%@ var v shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): v shape=- -> N,N
+%@ var v shape=N,N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if arc (i,j) is disrupted
 
 % CAP: classified as parameter during review
-%@ param CAP shape=- kind=scalar domain=- :: Capacity of arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j): CAP shape=- -> N,N
+%@ param CAP shape=N,N kind=scalar domain=- :: Capacity of arc (i,j)
 
 % M: classified as parameter during review
 %@ param M shape=- kind=big_m domain=- :: Large constant for linearization
 
 % unusable as an identifier, rename or drop: τ
 % h: classified as parameter during review
-%@ param h shape=- kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes i,j,t,m): h shape=- -> N,N,T,T
+%@ param h shape=N,N,T,T kind=scalar domain=- :: Headway time between trains t and m on arc (i,j)
 
 % K: classified as index during review
 %@ index K ordered=0 cyclic=0 :: Set of OD pairs
 
 % y: classified as variable during review
-%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p,k): y shape=- -> P,K
+%@ var y shape=P,K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if path p is used for OD pair k
 
 % z: classified as variable during review
-%@ var z shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes k): z shape=- -> K
+%@ var z shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if OD pair k is disconnected
 
 % P: classified as index during review
 %@ index P ordered=0 cyclic=0 :: Set of paths for OD pair k
 
 % unusable as an identifier, rename or drop: δ
 % f: classified as variable during review
-%@ var f shape=- domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes p,k): f shape=- -> P,K
+%@ var f shape=P,K domain=continuous role=primary drole=- lo=- hi=- :: Fraction of demand on path p for OD pair k
 
 % s: classified as parameter during review
-%@ param s shape=- kind=scalar domain=- :: Capacity of train t
+% shape fixed by corpusbuilder.vocab (deterministic: every use writes t): s shape=- -> T
+%@ param s shape=T kind=scalar domain=- :: Capacity of train t
 
 % C: classified as parameter during review
 %@ param C shape=- kind=scalar domain=- :: Cost coefficient
@@ -150,3 +157,5 @@
 %@ con eq_0033 kind=linear domain=- indicator=- :: Generalized train cancellation cost coefficient
 %@ con eq_0035 kind=linear domain=- indicator=- :: Relaxation of binary variables to continuous in [0,1]
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost condition for adding new passenger paths
+% --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---
+%@ index T ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)

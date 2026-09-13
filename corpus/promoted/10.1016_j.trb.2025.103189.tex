@@ -26,7 +26,7 @@
 %@ index Cprime ordered=0 cyclic=0 :: Set of successor compositions
 %@ var z shape=T,C,Cprime domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
 %@ param pt shape=T kind=vector :: Original planned composition for trip t
-%@ param o shape=T kind=vector :: Original number of coupled/uncoupled units
+%@ param o shape=- kind=vector :: Original number of coupled/uncoupled units
 %@ param R shape=- kind=scalar :: Set of real numbers (domain indicator)
 %@ param D shape=- kind=scalar :: End of time horizon in minutes
 %@ index E ordered=0 cyclic=0 :: Set of events
@@ -34,7 +34,7 @@
 %@ var X shape=N domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if shunting movement is canceled
 %@ var v shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Time of event
 %@ index A ordered=0 cyclic=0 :: Set of activities
-%@ var q shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
+%@ var q shape=E,E domain=binary role=primary drole=- lo=- hi=- :: Binary variable for order of events
 %@ index P ordered=0 cyclic=0 :: Set of infrastructure points
 %@ var d shape=E domain=continuous role=primary drole=- lo=- hi=- :: Deviation from original event time
 %@ var a shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Absolute deviation of event time
@@ -112,14 +112,8 @@
   & I_{m , \text{off}}^{s} \geq I_{m , \text{end}}^{s} - i_{m , \text{end}}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0013} \\
   & I_{m , \text{off}}^{s} \geq i_{m , \text{end}}^{s} - I_{m , \text{end}}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0014} \\
   & I_{m , 0}^{s} = i_{m , 0}^{s} \forall s \in \mathcal{S} , m \in M \tag{eq\_0015} \\
-  & x_{p_{0}^{t}}^{t} = 1 \forall t \in \mathcal{T} : \mathit{tau}_{\text{d}} \left(t\right) \leq \mathit{tau}_{\text{disr}} \tag{eq\_0016} \\
-  & c_{m}^{t} , u_{m}^{t} , I_{m}^{t} \in \mathcal{R}^{+} \forall t \in \mathcal{T} , m \in M \tag{eq\_0017} \\
-  & I_{m , 0}^{s} , I_{m , \text{end}}^{s} , I_{m , \text{off}}^{s} \in \mathcal{R}^{+} \forall s \in \mathcal{S} , m \in M \tag{eq\_0018} \\
-  & n \cdot c_{t} , n \cdot u_{t} \in \mathcal{R}^{+} \forall t \in \mathcal{T} \tag{eq\_0019} \\
-  & x_{c}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} , c \in \mathcal{C}_{t} \tag{eq\_0020} \\
-  & z_{c , cp}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} , \left(c , cp\right) \in \mathit{Gamma}_{t} \tag{eq\_0021} \\
-  & p_{\text{diff}}^{t} \in \left\{0 , 1\right\} \forall t \in \mathcal{T} \tag{eq\_0022} \\
-  & s.t. 0 \leq v_{j} \leq D \left(1 - X_{n}\right) \forall n \in N , \forall j \in E_{n} \tag{eq\_0025} \\
+  & x_{p_{0}^{t}}^{t} = 1 \forall t \in \mathcal{T} : \mathit{tau}_{\text{d}} t \leq \mathit{tau}_{\text{disr}} \tag{eq\_0016} \\
+  & 0 \leq v_{j} \leq D \left(1 - X_{n}\right) \forall n \in N , \forall j \in E_{n} \tag{eq\_0025} \\
   & l_{i , j} \left(1 - X_{n}\right) \leq v_{j} - v_{i} \leq u_{i , j} \left(1 - X_{n}\right) \forall n \in N , \forall \left(i , j\right) \in A_{\text{drive}}^{n} \cup A_{\text{dwell}}^{n} \tag{eq\_0026} \\
   & l_{i , j} \left(1 - X_{m} - X_{n}\right) \leq v_{j} - v_{i} + q_{i , j} \cdot D \leq u_{i , j} \left(1 - X_{m} - X_{n}\right) + D \left(X_{m} + X_{n}\right) \tag{eq\_0027} \\
   & \forall \left(i , j\right) \in A_{\text{shunt}} , i \in E_{m} , j \in E_{n} , m , n \in N \tag{eq\_0028} \\
@@ -131,8 +125,4 @@
   & a_{j} \geq d_{j} \forall j \in E \tag{eq\_0034} \\
   & a_{j} \geq - d_{j} \forall j \in E \tag{eq\_0035} \\
   & X_{n} = 0 \forall n \in N^{T} \tag{eq\_0036} \\
-  & v_{j} , a_{j} \in \mathcal{R}^{+} \forall j \in E \tag{eq\_0037} \\
-  & d_{j} \in \mathcal{R} \forall j \in E \tag{eq\_0038} \\
-  & q_{i , j} \in \left\{0 , 1\right\} \forall \left(i , j\right) \in A \tag{eq\_0039} \\
-  & X_{n} \in \left\{0 , 1\right\} \forall n \in N \tag{eq\_0040} \\
 \end{align}
