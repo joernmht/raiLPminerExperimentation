@@ -158,3 +158,19 @@ def test_foreign_endpoint_gets_its_own_key_and_no_deepseek_fields(monkeypatch):
     monkeypatch.delenv("ASSIST_BASE_URL")
     assert assist._api_key() == "ds-secret"
     assert assist._stage_extras("v") == {"thinking": {"type": "disabled"}}
+
+
+def test_shape_letters_are_repaired_to_families_before_validation():
+    from corpusbuilder.assist import repair_vocab_shapes
+
+    reply = {
+        "declarations_add": [
+            "%@ var t_arr shape=i,k domain=continuous role=primary :: t",
+            "%@ param w shape=i,q kind=vector domain=- :: w",
+        ],
+        "unsure": [],
+    }
+    out = repair_vocab_shapes(reply, {"i": ["I"], "k": ["K"], "q": ["Q", "R"]})
+    assert out["declarations_add"][0].startswith("%@ var t_arr shape=I,K ")
+    # q is bound to two families: left for validation to refuse
+    assert out["declarations_add"][1].startswith("%@ param w shape=I,q ")

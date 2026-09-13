@@ -46,6 +46,15 @@ def _load(path: Path, default):
 # any other — a formula ruled a re-print of one already in the corpus — and must
 # not be lost from the flow just because it is not accept/correct/reject.
 HITL_STATUSES = ("accepted", "corrected", "rejected", "duplicate")
+#: Who decided: a file exported by ``corpusbuilder.assist`` carries
+#: ``source: "corpusbuilder.assist <model>"``; the review game and the review
+#: view export no source field, and a person pressed their buttons.
+DECISION_SOURCES = ("human", "assist")
+
+
+def decision_source(payload: dict) -> str:
+    source = str(payload.get("source") or "")
+    return "assist" if source.startswith("corpusbuilder.assist") else "human"
 
 
 def _iter_decisions(payload: dict):
@@ -85,26 +94,31 @@ def hitl_tally(decision_files, formulas_total: int) -> dict[str, object]:
     counting only what the files contain under-reports the work outstanding.
     Statuses outside :data:`HITL_STATUSES` are reported, never dropped.
     """
-    latest: dict[tuple[str, str], str] = {}
+    latest: dict[tuple[str, str], tuple[str, str]] = {}
     for path in sorted(str(p) for p in decision_files):
-        for paper, fid, status in _iter_decisions(
-            json.loads(Path(path).read_text(encoding="utf-8"))
-        ):
-            latest[(paper, fid)] = status
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+        source = decision_source(payload)
+        for paper, fid, status in _iter_decisions(payload):
+            latest[(paper, fid)] = (status, source)
 
     counts: dict[str, int] = dict.fromkeys(HITL_STATUSES, 0)
+    by_source: dict[str, dict[str, int]] = {
+        src: dict.fromkeys(HITL_STATUSES, 0) for src in DECISION_SOURCES
+    }
     unrecognised: dict[str, int] = {}
-    for status in latest.values():
+    for status, source in latest.values():
         if status == "unreviewed":
             continue
         if status in counts:
             counts[status] += 1
+            by_source[source][status] += 1
         else:
             unrecognised[status] = unrecognised.get(status, 0) + 1
 
     decided = sum(counts.values()) + sum(unrecognised.values())
     tally: dict[str, object] = dict(counts)
     tally["unreviewed"] = max(0, formulas_total - decided)
+    tally["by_source"] = by_source
     if unrecognised:
         tally["unrecognised_status"] = dict(sorted(unrecognised.items()))
     return tally
@@ -239,7 +253,9 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
 ## Included
 - Source papers with ≥1 recoverable formulation (**M**): **{inc["source_papers"]}**
 - Candidate formulations extracted (**N**, pre-review): **{inc["candidate_formulations"]}**
-- HITL review: accepted {h["accepted"]} · corrected {h["corrected"]} · duplicate {h["duplicate"]} · rejected {h["rejected"]} · unreviewed {h["unreviewed"]}{_unrec}
+- Review verdicts (all sources): accepted {h["accepted"]} · corrected {h["corrected"]} · duplicate {h["duplicate"]} · rejected {h["rejected"]} · unreviewed {h["unreviewed"]}{_unrec}
+- of which HUMAN (review game / view): accepted {h["by_source"]["human"]["accepted"]} · corrected {h["by_source"]["human"]["corrected"]} · duplicate {h["by_source"]["human"]["duplicate"]} · rejected {h["by_source"]["human"]["rejected"]}
+- of which ASSISTED (corpusbuilder.assist, model-decided, pending confirmation): accepted {h["by_source"]["assist"]["accepted"]} · corrected {h["by_source"]["assist"]["corrected"]} · duplicate {h["by_source"]["assist"]["duplicate"]} · rejected {h["by_source"]["assist"]["rejected"]}
 - Per-cell P1–P5 distribution: _pending domain/activity classification step_
 """
     (CORPUS / "prisma.md").write_text(md, encoding="utf-8", newline="\n")
@@ -264,10 +280,22 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.prisma`. Freeze date: {fl
                 cmd("prismaExclTierThree", r["reports_excluded"]["awaiting_tier3_pdf"]),
                 cmd("prismaInclPapers", inc["source_papers"]),
                 cmd("prismaInclFormulations", inc["candidate_formulations"]),
-                cmd("prismaHitlAccepted", h["accepted"]),
-                cmd("prismaHitlCorrected", h["corrected"]),
-                cmd("prismaHitlDuplicate", h["duplicate"]),
-                cmd("prismaHitlRejected", h["rejected"]),
+                # HITL = decided by a person (review game / review view). The
+                # model-decided verdicts (corpusbuilder.assist) are the
+                # \prismaAssist* macros; \prismaAll* is the union. A count
+                # labelled HITL in the paper must come from the Hitl macros.
+                cmd("prismaHitlAccepted", h["by_source"]["human"]["accepted"]),
+                cmd("prismaHitlCorrected", h["by_source"]["human"]["corrected"]),
+                cmd("prismaHitlDuplicate", h["by_source"]["human"]["duplicate"]),
+                cmd("prismaHitlRejected", h["by_source"]["human"]["rejected"]),
+                cmd("prismaAssistAccepted", h["by_source"]["assist"]["accepted"]),
+                cmd("prismaAssistCorrected", h["by_source"]["assist"]["corrected"]),
+                cmd("prismaAssistDuplicate", h["by_source"]["assist"]["duplicate"]),
+                cmd("prismaAssistRejected", h["by_source"]["assist"]["rejected"]),
+                cmd("prismaAllAccepted", h["accepted"]),
+                cmd("prismaAllCorrected", h["corrected"]),
+                cmd("prismaAllDuplicate", h["duplicate"]),
+                cmd("prismaAllRejected", h["rejected"]),
                 cmd("prismaHitlUnreviewed", h["unreviewed"]),
             ]
         )

@@ -141,3 +141,47 @@ def test_tally_is_deterministic_regardless_of_file_argument_order(tmp_path) -> N
         ),
     ]
     assert hitl_tally(files, 10) == hitl_tally(list(reversed(files)), 10)
+
+
+def test_verdicts_are_split_by_who_decided(tmp_path):
+    human = _write(
+        tmp_path,
+        "game_decisions_2026-09-13.json",
+        {
+            "schema_version": "game-decisions-1",
+            "formula_decisions": [
+                {"paper_key": "p1", "decisions": [{"id": "eq-1", "status": "accepted"}]}
+            ],
+        },
+    )
+    assisted = _write(
+        tmp_path,
+        "p2.json",
+        {
+            "schema_version": "game-decisions-3",
+            "source": "corpusbuilder.assist deepseek-v4-flash",
+            "formula_decisions": [
+                {
+                    "paper_key": "p2",
+                    "decisions": [
+                        {"id": "eq-1", "status": "accepted"},
+                        {"id": "eq-2", "status": "rejected"},
+                    ],
+                }
+            ],
+        },
+    )
+    tally = hitl_tally([human, assisted], formulas_total=10)
+    assert tally["accepted"] == 2 and tally["rejected"] == 1
+    assert tally["by_source"]["human"] == {
+        "accepted": 1,
+        "corrected": 0,
+        "rejected": 0,
+        "duplicate": 0,
+    }
+    assert tally["by_source"]["assist"] == {
+        "accepted": 1,
+        "corrected": 0,
+        "rejected": 1,
+        "duplicate": 0,
+    }
