@@ -333,7 +333,7 @@ def test_missing_artifacts_degrade_gracefully(tmp_path) -> None:
     empty.mkdir()
     data = factory.snapshot(empty, outputs=None, paper_dir=None)
     st = _by_id(data)
-    assert len(st) == 18
+    assert len(st) == 20  # discovery + index stations added 2026-09-17
     assert st["promote"]["count"] == "— / —"
     assert data["gate"]["bins"] == [] and data["snapshot_of"] is None
     assert all(not s["artifact"]["present"] for s in data["stations"] if s.get("artifact"))
