@@ -20,7 +20,8 @@ def _payload() -> dict:
 
 def test_page_payload_carries_text_maths_tables_and_indices() -> None:
     p = _payload()
-    assert p["schema_version"] == "discover-page-1" and p["paper"]["key"] == "p"
+    assert p["schema_version"] == "discover-page-2" and p["paper"]["key"] == "p"
+    assert set(p["roles"]) == set(p["maths"]) and p["roles"]["m-0001"]["role"] == "definition"
     assert [s[0] for s in p["paras"][1]["segments"]].count("m") == 3
     assert p["maths"]["m-0003"]["where"] == "display" and p["maths"]["m-0003"]["eq"] == "eq-0001"
     assert p["statements"] == ["m-0002"]
@@ -33,7 +34,7 @@ def test_build_page_and_index_are_deterministic(tmp_path: Path) -> None:
     p = _payload()
     a = discovergame.build_page(p, tmp_path / "p.html").read_text(encoding="utf-8")
     b = discovergame.build_page(p, tmp_path / "p2.html").read_text(encoding="utf-8")
-    assert a == b and "discover-decisions-1" in a and "Set of trains" in a and 'id="data"' in a
+    assert a == b and "discover-decisions-2" in a and "Set of trains" in a and 'id="data"' in a
     assert "<\\/" in a or "</script>" not in json.dumps(p)  # payload cannot close the script tag
     idx = discovergame.build_index(
         [
@@ -55,8 +56,8 @@ def test_build_page_and_index_are_deterministic(tmp_path: Path) -> None:
     assert '"key":"p"' in idx and "discover/" in idx
 
 
-def test_load_decisions_merges_last_wins_and_validates(tmp_path: Path) -> None:
-    a = {
+def test_load_decisions_merges_v1_and_v2_last_wins_and_validates(tmp_path: Path) -> None:
+    v1 = {
         "schema_version": "discover-decisions-1",
         "paper_key": "p",
         "formulas": {"m-0002": "formula", "eq-0001": "not"},
@@ -64,36 +65,55 @@ def test_load_decisions_merges_last_wins_and_validates(tmp_path: Path) -> None:
         "indices": {"i": {"verdict": "index", "family": "I"}},
         "families": {"I": {"verdict": "family", "rename": ""}},
     }
-    b = {
-        "schema_version": "discover-decisions-1",
+    v2 = {
+        "schema_version": "discover-decisions-2",
         "paper_key": "p",
-        "formulas": {"eq-0001": "formula"},
-        "spans": [{"para": 1, "text": "x = 1"}, {"para": 2, "text": "y = 2"}],
+        "roles": {
+            "eq-0001": {"role": "formula", "span": None, "source": "human"},
+            "m-0007": {
+                "role": "definition",
+                "span": {
+                    "para": 3,
+                    "start": 0,
+                    "end": 9,
+                    "text": "Let x be.",
+                    "position": "around",
+                    "source": "human",
+                },
+                "source": "human",
+            },
+        },
+        "marks": [{"para": 1, "text": "x = 1"}, {"para": 2, "text": "y = 2"}],
         "indices": {"i": {"verdict": "not", "family": ""}},
         "families": {},
     }
-    (tmp_path / "1.json").write_text(json.dumps(a), encoding="utf-8")
-    (tmp_path / "2.json").write_text(json.dumps(b), encoding="utf-8")
+    (tmp_path / "1.json").write_text(json.dumps(v1), encoding="utf-8")
+    (tmp_path / "2.json").write_text(json.dumps(v2), encoding="utf-8")
     merged = discovergame.load_decisions(list(tmp_path.glob("*.json")))
     m = merged["p"]
-    assert m["formulas"] == {"m-0002": "formula", "eq-0001": "formula"}
+    assert (
+        m["roles"]["m-0002"]["role"] == "formula" and m["roles"]["eq-0001"]["role"] == "formula"
+    )  # v2 wins over v1's "not"
+    assert m["roles"]["m-0007"]["span"]["text"] == "Let x be."
     assert (
         m["indices"]["i"]["verdict"] == "not"
-        and len(m["spans"]) == 2
+        and len(m["marks"]) == 2
         and m["files"] == ["1.json", "2.json"]
     )
     s = discovergame.summarize_decisions(merged)
-    assert s == {
-        "papers": 1,
-        "formulas_marked": 2,
-        "formulas_rejected": 0,
-        "spans": 2,
-        "letters_confirmed": 0,
-        "letters_rejected": 1,
-        "families_confirmed": 1,
-    }
-    bad = dict(a, schema_version="vocab-decisions-1")
+    assert (
+        s["papers"] == 1
+        and s["formulas"] == 2
+        and s["definitions"] == 1
+        and s["definitions_span_by_human"] == 1
+        and s["marks"] == 2
+    )
+    assert s["letters_rejected"] == 1 and s["families_confirmed"] == 1
+    bad = dict(v1, schema_version="vocab-decisions-1")
     (tmp_path / "3.json").write_text(json.dumps(bad), encoding="utf-8")
     with pytest.raises(ValueError):
         discovergame.load_decisions([tmp_path / "3.json"])
-    assert discovergame.validate_export(dict(a, indices={"i": {"verdict": "maybe"}}))
+    assert discovergame.validate_export(dict(v2, roles={"m-1": {"role": "maybe"}}))
+    assert discovergame.validate_export(
+        dict(v2, roles={"m-1": {"role": "definition", "span": {"para": 1}}})
+    )
