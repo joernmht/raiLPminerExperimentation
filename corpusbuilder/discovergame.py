@@ -424,12 +424,12 @@ def summarize_decisions(merged: dict[str, dict]) -> dict:
 
 # -- templates --------------------------------------------------------------
 
-_STYLE = r"""
-:root{
+_STYLE = r""":root{
   --page1:#f3f7f8;--page2:#e7f1f1;--ink:#0c1f3a;--muted:#566782;
   --card:#ffffff;--card2:#f1f8f8;--line:#d6e6e7;--track:#e6f0f0;
   --accent:#0A777F;--accent2:#2F57B2;--good:#0A777F;--good-soft:#e6f4f4;
   --warn:#C85000;--warn-soft:#fbeada;--bad:#D20F41;--bad-soft:#fae3e9;--tier3:#7369BE;--tier3-soft:#ece9fa;
+  --def:#2e8b57;--def-soft:#e7f5ec;--cur:#ffd54a;--cur-soft:#fff3c4;
   --shadow:0 1px 3px rgba(12,40,50,.08),0 6px 18px rgba(12,40,50,.05);
 }
 @media (prefers-color-scheme:dark){:root{
@@ -437,140 +437,100 @@ _STYLE = r"""
   --card:#0c2766;--card2:#10307c;--line:#2a4a92;--track:#001a55;
   --accent:#36b8bf;--accent2:#7aa2ff;--good:#36b8bf;--good-soft:#0d3350;
   --warn:#f0922e;--warn-soft:#3a2a17;--bad:#ff667e;--bad-soft:#43102a;--tier3:#a98bf0;--tier3-soft:#2a2350;
-  --shadow:0 1px 3px rgba(0,0,0,.4);}
-  .brandlogo svg text,.brandlogo svg path{fill:#fff !important}
-}
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:linear-gradient(180deg,var(--page1),var(--page2));background-attachment:fixed;color:var(--ink);
-  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:12px 16px 40px;max-width:1080px;margin:0 auto}
+  --def:#5fcf8f;--def-soft:#0f3a26;--cur:#ffca28;--cur-soft:#4a3d10;
+  --shadow:0 1px 3px rgba(0,0,0,.4);}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--page1);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;overflow:hidden}
+#top{background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:calc(6px + env(safe-area-inset-top)) 12px 8px;max-height:44vh;overflow:auto;z-index:5}
+#mid{overflow:auto;padding:10px 14px 30px;background:var(--page2);-webkit-overflow-scrolling:touch}
+#bottom{background:var(--card);border-top:1px solid var(--line);padding:8px 10px calc(10px + env(safe-area-inset-bottom));z-index:5}
+@media (min-width:900px){body{max-width:960px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+.rounds{display:flex;gap:4px;overflow-x:auto;padding-bottom:4px}
+.rounds button{flex:1 0 auto;font:inherit;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--card2);color:var(--muted);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.rounds button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.rounds .n{font-weight:400;opacity:.85}
+.bar{height:5px;border-radius:4px;background:var(--track);overflow:hidden;margin:4px 0 6px}.bar>span{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.topgrid{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
+.topbtns{display:flex;flex-direction:column;gap:6px}
+.topbtns button{font:inherit;font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:10px;padding:6px 8px;min-width:44px}
+#menu{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-top:1px dashed var(--line);padding-top:8px}
+#menu button{font:inherit;font-size:13px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 10px}
+#menu button.bad{color:var(--bad);border-color:var(--bad)}
+.pk{font-size:11.5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all;flex-basis:100%}
+.kicker{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:800}
+.big{font-size:30px;font-weight:800;letter-spacing:-.01em;margin:2px 0}.big .arrow{color:var(--muted);font-weight:400}.big .q{color:var(--warn)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.itex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px;overflow-x:auto;padding:4px 0;max-height:16vh;overflow-y:auto}
+.itex mjx-container{margin:2px 0 !important;font-size:115%}
+.prop{font-size:13.5px;margin-top:2px}.prop b.you{color:var(--accent2)}
+.prop b.r-formula{color:var(--accent)}.prop b.r-definition{color:var(--def)}.prop b.r-index{color:var(--tier3)}.prop b.r-domain{color:var(--accent2)}.prop b.r-mention,.prop b.r-other{color:var(--muted)}
+.ev{font-size:12.5px;color:var(--muted)}.pad{padding:20px 0;text-align:center}
+.span{background:var(--def-soft);border-left:4px solid var(--def);border-radius:0 8px 8px 0;padding:6px 8px;margin-top:6px}
+.deftext{font-size:13.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.walk{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px}
+.walk button{font:inherit;font-weight:800;border:1.5px solid var(--accent);background:var(--card);color:var(--accent);border-radius:10px;padding:4px 14px;min-width:52px}
+.walk input{font:inherit;font-size:13px;padding:6px 9px;border:1.5px solid var(--line);border-radius:10px;background:var(--card2);color:var(--ink);width:100%}
+.flag{display:inline-block;font-size:10.5px;border-radius:999px;padding:0 6px;border:1px solid var(--line);color:var(--muted)}.flag.warn{border-color:var(--warn);color:var(--warn)}
+.done{font-size:22px;font-weight:800;padding:8px 0}
+h4.sec{font-size:14px;margin:16px 0 4px;color:var(--accent2)}h3.sec{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px}
+p.para{margin:0 0 10px;line-height:1.85;font-size:15px}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin:0 1px;background:var(--card);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;vertical-align:baseline}
+.chip mjx-container{margin:0 !important;font-size:105%}
+.chip.r-formula{border-color:var(--accent);background:var(--good-soft)}.chip.r-definition{border-color:var(--def);background:var(--def-soft)}.chip.r-index{border-color:var(--tier3);background:var(--tier3-soft)}.chip.r-domain{border-color:var(--accent2)}.chip.r-mention{border-style:dashed}.chip.r-other{opacity:.7}
+.chip.h{box-shadow:inset 0 0 0 2px currentColor}
+.disp{display:block;border-left:4px solid var(--accent);background:var(--card);border-radius:0 10px 10px 0;padding:6px 10px;margin:8px 0;overflow-x:auto}
+.disp.r-definition{border-left-color:var(--def)}.disp.r-other{border-left-color:var(--muted);opacity:.7}
+.disp .eqid{font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted)}.disp .tex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;white-space:pre-wrap;word-break:break-all}
+.hasL{background:var(--cur-soft) !important;border-color:var(--cur) !important}
+.cur{background:var(--cur) !important;color:#111 !important;border-color:#b58900 !important;box-shadow:0 0 0 4px rgba(255,213,74,.45);animation:pulse 1.2s ease-in-out 3}
+.disp.cur{background:var(--cur-soft) !important;border-left:6px solid var(--cur) !important;color:inherit !important;box-shadow:0 0 0 3px var(--cur)}
+@keyframes pulse{0%{box-shadow:0 0 0 2px rgba(255,213,74,.8)}50%{box-shadow:0 0 0 10px rgba(255,213,74,.15)}100%{box-shadow:0 0 0 4px rgba(255,213,74,.45)}}
+mark.defspan{background:var(--def-soft);color:inherit;border-bottom:2px solid var(--def);padding:0 1px}
+.chip.in-span{box-shadow:0 0 0 2px var(--def)}
+table.grid{border-collapse:collapse;width:100%;font-size:13px}table.grid th,table.grid td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}table.grid th{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.notation td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid1{display:grid;grid-template-columns:1fr}
+.dec{font:inherit;font-size:14px;font-weight:800;border:2px solid var(--line);background:var(--card2);color:var(--ink);border-radius:14px;min-height:50px;padding:6px 6px;cursor:pointer;line-height:1.2}
+.dec.big{min-height:56px;font-size:16px;background:var(--accent);border-color:var(--accent);color:#fff}
+.dec.glow{border-color:var(--accent);box-shadow:0 0 0 3px rgba(10,119,127,.25)}
+.dec.on{background:var(--ink);border-color:var(--ink);color:var(--card)}
+.dec.ok{color:var(--accent)}.dec.ok.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.dec.bad{color:var(--bad)}.dec.bad.on{background:var(--bad);border-color:var(--bad);color:#fff}
+.dec.mid{color:var(--muted)}.dec.mid.on{background:var(--muted);border-color:var(--muted);color:#fff}
+.dec.r-formula{color:var(--accent)}.dec.r-definition{color:var(--def)}.dec.r-index{color:var(--tier3)}.dec.r-domain{color:var(--accent2)}.dec.r-mention,.dec.r-other{color:var(--muted)}
+.dec.r-formula.on{background:var(--accent);border-color:var(--accent);color:#fff}.dec.r-definition.on{background:var(--def);border-color:var(--def);color:#fff}.dec.r-index.on{background:var(--tier3);border-color:var(--tier3);color:#fff}.dec.r-domain.on{background:var(--accent2);border-color:var(--accent2);color:#fff}.dec.r-mention.on,.dec.r-other.on{background:var(--muted);border-color:var(--muted);color:#fff}
+.fams{display:flex;gap:6px;overflow-x:auto;margin-top:8px;padding-bottom:2px}
+.dec.fam{min-height:40px;font-size:13px;border-radius:999px;padding:4px 12px;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+#pill{position:fixed;left:50%;bottom:calc(128px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:8px;z-index:9;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:var(--shadow)}
+#pill button{font:inherit;font-size:13px;font-weight:800;border:0;border-radius:999px;padding:8px 12px;background:var(--def);color:#fff}
+#pill #markSel{background:var(--accent)}
+#toast{position:fixed;left:50%;bottom:calc(140px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0c1f3a;color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:10}
+#toast.show{opacity:1}@media (prefers-color-scheme:dark){#toast{background:#eaf1ff;color:#00103a}}
+.hidden{display:none !important}
+.tex.raw{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+"""
+
+_INDEX_STYLE = r"""
+:root{--page1:#f3f7f8;--ink:#0c1f3a;--muted:#566782;--card:#fff;--card2:#f1f8f8;--line:#d6e6e7;--accent:#0A777F;--accent2:#2F57B2;--warn:#C85000;--warn-soft:#fbeada;--shadow:0 1px 3px rgba(12,40,50,.08)}
+@media (prefers-color-scheme:dark){:root{--page1:#00103a;--ink:#eaf1ff;--muted:#a0b4d8;--card:#0c2766;--card2:#10307c;--line:#2a4a92;--accent:#36b8bf;--accent2:#7aa2ff;--warn:#f0922e;--warn-soft:#3a2a17}.brandlogo svg text,.brandlogo svg path{fill:#fff !important}}
+*{box-sizing:border-box}body{margin:0;padding:12px 16px 40px;background:var(--page1);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;max-width:1080px;margin:0 auto}
 .brandlogo{margin:2px 0 10px}.brandlogo svg{height:28px;width:auto;display:block}
 .proto{background:var(--warn-soft);color:var(--warn);border:1.5px solid var(--warn);border-radius:10px;padding:5px 10px;font-size:12px;font-weight:650;margin:0 0 10px;text-align:center}
-.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}
-h1{font-size:20px;margin:4px 0 2px;font-weight:800;letter-spacing:-.01em}
-.sub,.pk{color:var(--muted);font-size:13px}.pk{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;word-break:break-all}
-a{color:var(--accent2)}
-.tools{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-button{font:inherit;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 11px;cursor:pointer;font-weight:700;font-size:13px}
-button.on{background:var(--accent);border-color:var(--accent);color:#fff}
-button.bad.on{background:var(--bad);border-color:var(--bad)}
-button.mid.on{background:var(--muted);border-color:var(--muted)}
-.tabs{display:flex;gap:6px;margin:8px 0 12px;flex-wrap:wrap;position:sticky;top:0;background:var(--page1);padding:6px 0;z-index:5}
-.tabs button{border-radius:999px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-top:12px}
-.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--muted);margin:6px 0 10px}
-.legend span{display:inline-flex;align-items:center;gap:5px}
-h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px;font-weight:700}
-h4.sec{font-size:15px;margin:18px 0 4px;color:var(--accent2)}
-p.para{margin:0 0 10px;line-height:1.75}
-.chip{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 5px;margin:0 1px;background:var(--card2);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;cursor:default;vertical-align:baseline}
-.chip.c-statement{border-color:var(--warn);background:var(--warn-soft);cursor:pointer}
-.chip.c-operator{border-color:var(--tier3);background:var(--tier3-soft);cursor:pointer}
-.chip.c-expr{cursor:pointer}
-.chip.c-symbol{border-style:dashed}
-.chip.f-formula{outline:2px solid var(--good);outline-offset:1px}
-.chip.f-not{text-decoration:line-through;opacity:.55}
-.chip mjx-container{margin:0 !important;font-size:105%}
-.disp{display:block;border-left:4px solid var(--accent);background:var(--card2);border-radius:0 10px 10px 0;padding:6px 10px;margin:8px 0;overflow-x:auto}
-.disp.f-not{border-left-color:var(--bad);opacity:.6;text-decoration:line-through}
-.disp .eqid{font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
-.disp .tex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;white-space:pre-wrap;word-break:break-all}
-.disp .eqid button{padding:2px 8px;font-size:11px}
-.tex.raw{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-table.grid{border-collapse:collapse;width:100%;font-size:13px}
-table.grid th,table.grid td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
-table.grid th{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-td.mono,span.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-tr.v-index td.mono{color:var(--accent)}tr.v-alias td.mono{color:var(--tier3)}tr.v-candidate td.mono{color:var(--warn)}
-tr.h-not td{opacity:.5;text-decoration:line-through}
-input[type=text]{font:inherit;font-size:13px;padding:4px 7px;border:1.5px solid var(--line);border-radius:8px;background:var(--card2);color:var(--ink);width:110px}
-input.wide{width:100%}
-.ev{font-size:12px;color:var(--muted)}
-.rowref{display:inline-block;font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:0 7px;margin:1px 2px;cursor:pointer}
-.stmt{border-top:1px solid var(--line);padding:8px 0;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start}
-.stmt .ctx{font-size:13px;color:var(--muted)}
-.stmt .ctx b{color:var(--ink);font-weight:600}
-.btns{display:flex;gap:6px;flex-wrap:wrap}
-#selbar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:9;box-shadow:var(--shadow)}
-#selbar button{background:var(--accent);color:#fff;border-color:var(--accent)}
-#toast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);background:#0c1f3a;color:#fff;padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:10}
-#toast.show{opacity:1}
-@media (prefers-color-scheme:dark){#toast{background:#eaf1ff;color:#00103a}}
-.hidden{display:none !important}
-.counter{font-size:12.5px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
-.notation td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.flag{display:inline-block;font-size:10.5px;border-radius:999px;padding:0 6px;border:1px solid var(--line);color:var(--muted);margin-left:4px}
-.flag.warn{border-color:var(--warn);color:var(--warn)}
-.kbd{font-size:11.5px;color:var(--muted);margin-top:8px}
-
-header.top{margin-bottom:8px}.brandrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.brandrow .proto{margin:0;flex:1}
-.tools .grow{flex:1}
-.split{display:grid;grid-template-columns:minmax(0,3fr) minmax(340px,2fr);gap:14px;align-items:start}
-.pane{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
-.pane.side{position:sticky;top:8px;max-height:calc(100vh - 16px);overflow:auto}
-.handle{display:none}
-.stabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px;position:sticky;top:-14px;background:var(--card);padding:6px 0;z-index:3}
-.stabs button{border-radius:999px;padding:5px 10px}
-.roleCount{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:0 8px;margin-right:4px}
-.chip.r-formula{border-color:var(--accent);background:var(--good-soft);cursor:pointer}
-.chip.r-definition{border-color:#2e8b57;background:#e7f5ec;cursor:pointer}
-.chip.r-index{border-color:var(--tier3);background:var(--tier3-soft);cursor:pointer}
-.chip.r-domain{border-color:var(--accent2);background:#e8eefc;cursor:pointer}
-.chip.r-mention{border-style:dashed;cursor:pointer}
-.chip.r-other{opacity:.7;cursor:pointer}
-@media (prefers-color-scheme:dark){.chip.r-definition{background:#0f3a26}.chip.r-domain{background:#1a2a5c}}
-.chip.h{box-shadow:inset 0 0 0 2px currentColor}
-.chip.sel,.disp.sel{outline:3px solid var(--accent2);outline-offset:2px}
-.chip.in-span{box-shadow:0 0 0 2px #2e8b57}
-.chip.hasL,.disp.hasL{background:#fff3c4}
-@media (prefers-color-scheme:dark){.chip.hasL,.disp.hasL{background:#4a3d10}}
-mark.defspan{background:#d9f2e3;color:inherit;border-radius:3px;padding:0 1px}
-@media (prefers-color-scheme:dark){mark.defspan{background:#1e5a3a}}
-.disp{cursor:pointer}.disp.r-definition{border-left-color:#2e8b57}.disp.r-other{border-left-color:var(--muted);opacity:.7}.disp.h .rolebadge{font-weight:800}
-.rolebadge{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:0 7px}
-.dhead{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.dtex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;overflow-x:auto;padding:6px 0;border-bottom:1px solid var(--line);margin-bottom:6px}
-.btns.roles button{border-radius:999px;padding:5px 10px;font-size:12.5px}
-button.rb.on{color:#fff;background:var(--muted);border-color:var(--muted)}button.rb.on.r-formula{background:var(--accent);border-color:var(--accent)}button.rb.on.r-definition{background:#2e8b57;border-color:#2e8b57}button.rb.on.r-index{background:var(--tier3);border-color:var(--tier3)}button.rb.on.r-domain{background:var(--accent2);border-color:var(--accent2)}
-button.rb.hh{box-shadow:0 0 0 2px var(--ink)}
-.defbox{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:6px 0}
-.deftext{font-size:13.5px;line-height:1.5}
-.qi{border-top:1px solid var(--line);padding:6px 0}.qi .btns{margin-top:4px}.qi .btns button{padding:3px 8px;font-size:12px}
-td.nowrap{white-space:nowrap}button.walk{padding:2px 7px;font-size:12px}
-#letters td.btns button,#families td.btns button{padding:3px 7px;font-size:12px}
-@media (max-width:999px){
-  .split{display:block}
-  .pane.side{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:none;height:52vh;transform:translateY(calc(100% - 44px));transition:transform .25s;border-radius:14px 14px 0 0;z-index:8;padding-top:0}
-  .pane.side.open{transform:none}
-  .handle{display:block;position:sticky;top:0;background:var(--accent);color:#fff;font-weight:800;text-align:center;padding:10px;margin:0 -16px 8px;border-radius:14px 14px 0 0;cursor:pointer;z-index:4}
-  .stabs{top:44px}
-  body{padding-bottom:60px}
-  #selbar{bottom:56px}
-}
-.frow{border-top:1px solid var(--line);padding:8px 0}
-.frow .fid{font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted)}
-.frow .ftex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;overflow-x:auto;padding:4px 0}
-.lchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-button.lchip{border-radius:999px;padding:3px 9px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:700}
-button.lchip small{font-weight:400;color:var(--muted);margin-left:4px}
-button.lchip.v-index{border-color:var(--accent);color:var(--accent)}
-button.lchip.v-alias{border-color:var(--tier3);color:var(--tier3)}
-button.lchip.v-candidate,button.lchip.v-juxtaposed,button.lchip.v-label{border-color:var(--warn);color:var(--warn)}
-button.lchip.h-index{background:var(--accent);border-color:var(--accent);color:#fff}
-button.lchip.h-not{background:var(--bad);border-color:var(--bad);color:#fff;text-decoration:line-through}
-button.lchip.h-unsure{background:var(--muted);border-color:var(--muted);color:#fff}
-button.lchip.h-index small,button.lchip.h-not small,button.lchip.h-unsure small{color:#fff}
-button.fam{padding:3px 7px;font-size:12px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}h1{font-size:20px;margin:4px 0 2px}.sub{color:var(--muted);font-size:13px}a{color:var(--accent2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);margin-top:12px;overflow-x:auto}
+table.grid{border-collapse:collapse;width:100%;font-size:13px}table.grid th,table.grid td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}table.grid th{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.ev{font-size:12px;color:var(--muted)}.prog{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
 """
 
 TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔎</text></svg>">
-<title>Discovery round — __KEY__</title>
+<title>Discovery run — __KEY__</title>
 <style>__STYLE__</style>
 <script>
 window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]], packages: {"[+]": ["ams"]}}, svg: {fontCache: "global"}, startup: {typeset: false}};
@@ -578,46 +538,29 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
 </head>
 <body>
-<header class="top">
-  <div class="brandrow"><div class="brandlogo">__LOGO__</div><div class="proto">working prototype — discovery round: deterministic marks, human decisions</div></div>
-  <div class="eyebrow">Discovery round · <a href="../discover.html">worklist</a></div>
-  <h1 id="title"></h1>
-  <div class="pk" id="pk"></div>
-  <div class="counter" id="counter"></div>
-  <div class="tools">
-    <button id="prevBtn" title="previous element">◂</button><button id="nextBtn" title="next element">▸</button><button id="nextOpenBtn" title="next undecided candidate">▸ next open</button>
-    <span class="grow"></span>
-    <button id="exportBtn">⬇ Export</button>
+<header id="top">
+  <div class="rounds" id="rounds"></div>
+  <div class="bar"><span id="barFill"></span></div>
+  <div class="topgrid">
+    <div id="item"></div>
+    <div class="topbtns"><button id="menuBtn" title="menu">☰</button><button id="undoBtn" title="undo">↶</button><button id="skipBtn" title="skip">skip ▸</button></div>
+  </div>
+  <div id="menu" class="hidden">
+    <div class="pk" id="pk"></div>
+    <button id="exportBtn">⬇ Export decisions</button>
     <button id="importBtn">⬆ Import</button><input type="file" id="importFile" accept="application/json" class="hidden">
-    <button id="undoBtn">↶ Undo</button>
-    <button id="clearBtn" class="bad">✕ Clear</button>
+    <button id="clearBtn" class="bad">✕ Clear this paper</button>
+    <a href="../discover.html">← worklist</a>
   </div>
 </header>
-<div class="split">
-  <main class="pane" id="textPane">
-    <div class="legend">
-      <span><span class="chip r-formula">formula</span></span><span><span class="chip r-definition">definition</span></span><span><span class="chip r-index">index</span></span><span><span class="chip r-domain">domain</span></span><span><span class="chip r-mention">mention</span></span><span><span class="chip r-other">other</span></span>
-      <span class="ev">click an element to decide it in the side pane · select text to cite it as the definition or mark a formula</span>
-    </div>
-    <div id="text"></div>
-    <h3>Notation tables and definition lists</h3>
-    <div id="tables"></div>
-  </main>
-  <aside class="pane side" id="sidePane">
-    <div class="handle" id="handle"><span id="handleText">▲ Details &amp; indices</span></div>
-    <nav class="stabs"><button data-s="details" class="on">Details</button><button data-s="idx">Indices</button><button data-s="open">Open items <span id="openCount"></span></button></nav>
-    <section id="s-details"><div id="detail" class="ev">Click a formula or a symbol in the text.</div></section>
-    <section id="s-idx" class="hidden">
-      <div class="ev">Every index-like letter with the rule that decided it. ◂ ▸ walks the formulas that carry the letter; edit the family to re-assign (same family name = same family).</div>
-      <table class="grid" id="letters"></table>
-      <h3>Families</h3>
-      <table class="grid" id="families"></table>
-      <div class="ev" id="declared"></div>
-    </section>
-    <section id="s-open" class="hidden"><div id="open"></div></section>
-  </aside>
-</div>
-<div id="selbar" class="hidden"><button id="useSel">✎ cite selection as the definition</button><button id="markSel">＋ mark selection as formula</button></div>
+<main id="mid">
+  <div id="text"></div>
+  <h3 class="sec">Notation tables and definition lists</h3>
+  <div id="tables"></div>
+  <div class="ev pad">end of paper</div>
+</main>
+<div id="pill" class="hidden"><button id="useSel">✎ cite selection</button><button id="markSel">＋ formula</button></div>
+<footer id="bottom"><div id="decide"></div></footer>
 <div id="toast"></div>
 <script id="data" type="application/json">__DATA__</script>
 <script>
@@ -626,157 +569,171 @@ const D = JSON.parse(document.getElementById("data").textContent);
 const KEY = D.paper.key;
 const LSK = "discover:state:v2:" + KEY, LSK1 = "discover:state:v1:" + KEY;
 const ROLES = ["formula", "definition", "index", "domain", "mention", "other"];
+const ROUNDS = [["indices", "Indices"], ["defs", "Definitions"], ["forms", "Formulas"], ["families", "Families"]];
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1600); }
-function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, sel: null}; }
+function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1400); }
+function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, sel: null, round: "indices", pos: {}}; }
 function migrate(v1){ const s = fresh(); for (const [id, v] of Object.entries(v1.formulas || {})) s.roles[id] = {role: v === "not" ? "other" : "formula"}; s.marks = (v1.spans || []).map(x => ({para: x.para, text: x.text, latex: x.latex || x.text})); s.indices = v1.indices || {}; s.families = v1.families || {}; return s; }
-function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles) return s; const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
-function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } paintCounter(); }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles){ if (!s.round) s.round = "indices"; if (!s.pos) s.pos = {}; return s; } const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
+function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } }
 let S = load();
 const undoStack = [];
 function snap(){ undoStack.push(JSON.stringify(S)); if (undoStack.length > 300) undoStack.shift(); }
-function undo(){ const u = undoStack.pop(); if (!u){ toast("nothing to undo"); return; } S = JSON.parse(u); save(); paintAll(); toast("undone"); }
 
-/* ---------- element order, plain text, roles ---------- */
+/* ---------- data helpers ---------- */
 const IDS = Object.keys(D.maths).sort();
 const EQ2M = {}; for (const id of IDS){ const m = D.maths[id]; if (m.where === "display" && m.eq) EQ2M[m.eq] = id; }
 const PARA = {}; for (const p of D.paras) PARA[p.i] = p;
 function plainOf(p){ let out = ""; for (const s of p.segments) out += s[0] === "t" ? s[1] : "⟨" + (D.maths[s[1]] ? D.maths[s[1]].latex : "") + "⟩"; return out; }
-function paraOf(id){ const m = D.maths[id]; return (m.where === "inline" || m.where === "display") && m.block !== undefined ? PARA[m.block] : null; }
 function proposed(id){ return D.roles[id] || {role: "other", rule: "", span: null}; }
 function roleOf(id){ const h = S.roles[id]; return h ? h.role : proposed(id).role; }
 function decided(id){ return !!S.roles[id]; }
-function spanOf(id){ const h = S.roles[id]; if (h && h.span) return h.span; const p = proposed(id); return p.span || null; }
-function candidate(id){ const r = proposed(id).role; return r === "definition" || (r === "formula" && D.maths[id].where === "inline"); }
+function spanOf(id){ const h = S.roles[id]; if (h && h.span) return h.span; return proposed(id).span || null; }
+function letterState(l){ const e = D.indices.letters[l] || {}; const h = S.indices[l] || {}; return {e, h, fam: h.family !== undefined && h.family !== "" ? h.family : (e.family || "")}; }
+function rowsWith(l){ const out = []; for (const [k, r] of Object.entries(D.indices.rows || {})) if (r.letters && r.letters[l] !== undefined){ const id = k.startsWith("eq-") ? EQ2M[k] : k; if (id && D.maths[id]) out.push(id); } return out.sort(); }
+const FAMS = Object.keys(D.indices.families).sort((a, b) => Object.values(D.indices.families[b].letters || {}).reduce((x, y) => x + y, 0) - Object.values(D.indices.families[a].letters || {}).reduce((x, y) => x + y, 0));
 
-/* ---------- header ---------- */
-$("title").textContent = D.paper.title || KEY;
-$("pk").innerHTML = esc(KEY) + (D.paper.year ? " · " + esc(D.paper.year) : "") + (D.paper.venue ? " · " + esc(D.paper.venue) : "") + (D.paper.doi ? ' · <a href="https://doi.org/' + esc(D.paper.doi) + '" target="_blank" rel="noopener">doi</a>' : "");
-function paintCounter(){
-  const c = {}; for (const id of IDS){ const r = roleOf(id); c[r] = (c[r] || 0) + 1; }
-  const dec = Object.keys(S.roles).length, li = Object.keys(S.indices).length, nl = Object.keys(D.indices.letters).length;
-  $("counter").innerHTML = ROLES.map(r => '<span class="roleCount r-' + r + '">' + r + " " + (c[r] || 0) + "</span>").join("") + '<span><b>you:</b> ' + dec + "/" + IDS.length + " elements · " + li + "/" + nl + " letters · " + S.marks.length + " by hand</span>";
-  const open = openItems(); $("openCount").textContent = open.letters.length + open.defs.length + open.forms.length ? "(" + (open.letters.length + open.defs.length + open.forms.length) + ")" : "";
-}
+/* ---------- queue ---------- */
+const VORDER = {candidate: 0, label: 1, juxtaposed: 2, alias: 3, index: 4};
+const Q = {
+  indices: Object.keys(D.indices.letters).sort((a, b) => ((VORDER[D.indices.letters[a].verdict] ?? 9) - (VORDER[D.indices.letters[b].verdict] ?? 9)) || a.localeCompare(b)),
+  defs: IDS.filter(id => proposed(id).role === "definition" && D.maths[id].where === "inline"),
+  forms: IDS.filter(id => proposed(id).role === "formula" && D.maths[id].where === "inline"),
+  families: Object.keys(D.indices.families).sort(),
+};
+function isDone(round, item){ return round === "indices" ? !!S.indices[item] : round === "families" ? !!S.families[item] : decided(item); }
+function doneCount(round){ return Q[round].filter(it => isDone(round, it)).length; }
+function pos(){ const p = S.pos[S.round]; return p === undefined ? -1 : p; }
+function current(){ const list = Q[S.round]; const p = pos(); return p >= 0 && p < list.length ? list[p] : null; }
+function nextOpen(from){ const list = Q[S.round]; for (let i = from + 1; i < list.length; i++) if (!isDone(S.round, list[i])) return i; for (let i = 0; i <= Math.min(from, list.length - 1); i++) if (!isDone(S.round, list[i])) return i; return -1; }
+function goTo(i){ S.pos[S.round] = i; save(); paintAll(true); }
+function setRound(r){ S.round = r; if (S.pos[r] === undefined || S.pos[r] < 0) S.pos[r] = nextOpen(-1); save(); paintAll(true); }
+let adhoc = null; // an element tapped in the text outside the queue
 
-/* ---------- text pane ---------- */
-function chipHTML(id, inSpan){
-  const m = D.maths[id]; if (!m) return "";
-  return '<span class="chip r-' + roleOf(id) + (decided(id) ? " h" : "") + (S.sel === id ? " sel" : "") + (inSpan ? " in-span" : "") + '" data-id="' + id + '" title="' + esc(id + " · " + m.cls + " · " + proposed(id).rule) + '"><span class="tex" data-tex="' + esc(m.show || m.latex) + '">' + esc(m.show || m.latex) + '</span></span>';
-}
-function dispHTML(id){
-  const m = D.maths[id]; if (!m) return "";
-  const label = (m.eq ? m.eq : "not in the dossier") + (m.tag ? " " + m.tag : "") + (m.dups && m.dups.length ? " (also " + m.dups.join(", ") + ")" : "");
-  return '<span class="disp r-' + roleOf(id) + (decided(id) ? " h" : "") + (S.sel === id ? " sel" : "") + '" id="d-' + (m.eq || id) + '" data-id="' + id + '"><span class="eqid"><span>' + esc(label) + '</span><span class="rolebadge">' + esc(roleOf(id)) + '</span></span><div class="tex" data-tex="' + esc(m.show || m.latex) + '" data-display="1">' + esc(m.show || m.latex) + '</div></span>';
-}
+/* ---------- text ---------- */
+function chipHTML(id, inSpan){ const m = D.maths[id]; if (!m) return ""; return '<span class="chip r-' + roleOf(id) + (decided(id) ? " h" : "") + (inSpan ? " in-span" : "") + '" data-id="' + id + '"><span class="tex" data-tex="' + esc(m.show || m.latex) + '">' + esc(m.show || m.latex) + '</span></span>'; }
+function dispHTML(id){ const m = D.maths[id]; if (!m) return ""; return '<span class="disp r-' + roleOf(id) + (decided(id) ? " h" : "") + '" data-id="' + id + '"><span class="eqid">' + esc((m.eq || "not in the dossier") + (m.tag ? " " + m.tag : "")) + '</span><div class="tex" data-tex="' + esc(m.show || m.latex) + '" data-display="1">' + esc(m.show || m.latex) + '</div></span>'; }
 function paraHTML(p, mark){
   let inner = "", pos = 0;
   for (const s of p.segments){
-    if (s[0] === "t"){
-      const t = s[1], a = pos, b = pos + t.length;
-      if (mark && mark.end > a && mark.start < b){
-        const ms = Math.max(mark.start, a) - a, me = Math.min(mark.end, b) - a;
-        inner += esc(t.slice(0, ms)).replace(/ ¶ /g, "<br>") + '<mark class="defspan">' + esc(t.slice(ms, me)) + "</mark>" + esc(t.slice(me)).replace(/ ¶ /g, "<br>");
-      } else inner += esc(t).replace(/ ¶ /g, "<br>");
+    if (s[0] === "t"){ const t = s[1], a = pos, b = pos + t.length;
+      if (mark && mark.end > a && mark.start < b){ const ms = Math.max(mark.start, a) - a, me = Math.min(mark.end, b) - a; inner += esc(t.slice(0, ms)).replace(/ ¶ /g, "<br>") + '<mark class="defspan">' + esc(t.slice(ms, me)) + "</mark>" + esc(t.slice(me)).replace(/ ¶ /g, "<br>"); }
+      else inner += esc(t).replace(/ ¶ /g, "<br>");
       pos = b;
-    } else {
-      const len = ("⟨" + (D.maths[s[1]] ? D.maths[s[1]].latex : "") + "⟩").length;
-      const inSpan = !!(mark && mark.start <= pos && pos + len <= mark.end);
-      inner += s[0] === "m" ? chipHTML(s[1], inSpan) : dispHTML(s[1]);
-      pos += len;
-    }
+    } else { const len = ("⟨" + (D.maths[s[1]] ? D.maths[s[1]].latex : "") + "⟩").length; const inSpan = !!(mark && mark.start <= pos && pos + len <= mark.end); inner += s[0] === "m" ? chipHTML(s[1], inSpan) : dispHTML(s[1]); pos += len; }
   }
   return '<p class="para" data-i="' + p.i + '">' + (p.region === "abstract" ? "<b>Abstract.</b> " : "") + inner + "</p>";
 }
-let markedPara = null;
-function markFor(p){ if (S.sel === null) return null; const m = D.maths[S.sel]; if (!m || m.block !== p.i) return null; if (roleOf(S.sel) !== "definition") return null; const sp = spanOf(S.sel); return sp && sp.para === p.i ? sp : null; }
-function paintText(){
-  let html = "", lastSec = null;
-  for (const p of D.paras){
-    if (p.section !== lastSec){ lastSec = p.section; if (p.section) html += '<h4 class="sec">' + esc(p.section) + "</h4>"; }
-    html += paraHTML(p, markFor(p));
-  }
-  $("text").innerHTML = html;
-}
+function focusId(){ if (adhoc) return adhoc; if (S.round === "defs" || S.round === "forms") return current(); return null; }
+function markFor(p){ const id = focusId(); if (!id) return null; const m = D.maths[id]; if (!m || roleOf(id) !== "definition") return null; const sp = spanOf(id); return sp && sp.para === p.i ? sp : null; }
+function paintText(){ let html = "", lastSec = null; for (const p of D.paras){ if (p.section !== lastSec){ lastSec = p.section; if (p.section) html += '<h4 class="sec">' + esc(p.section) + "</h4>"; } html += paraHTML(p, markFor(p)); } $("text").innerHTML = html; }
 function repaintPara(i){ const p = PARA[i]; if (!p) return; const el = document.querySelector('p.para[data-i="' + i + '"]'); if (!el) return; const tmp = document.createElement("div"); tmp.innerHTML = paraHTML(p, markFor(p)); el.replaceWith(tmp.firstChild); typeset(document.querySelector('p.para[data-i="' + i + '"]')); }
-function refreshEl(id){ const m = D.maths[id]; if (m.block !== undefined && PARA[m.block]){ repaintPara(m.block); } else { document.querySelectorAll('[data-id="' + id + '"]').forEach(el => { el.className = el.className.replace(/\br-\w+/, "r-" + roleOf(id)).replace(/ h\b/, "") + (decided(id) ? " h" : ""); }); } }
-
-/* ---------- selection of an element ---------- */
-function select(id, scroll){
-  const prev = S.sel; S.sel = id; save();
-  if (prev !== null && D.maths[prev] && D.maths[prev].block !== undefined) repaintPara(D.maths[prev].block);
-  if (id !== null && D.maths[id] && D.maths[id].block !== undefined) repaintPara(D.maths[id].block);
-  document.querySelectorAll(".sel").forEach(el => el.classList.remove("sel"));
-  if (id !== null) document.querySelectorAll('[data-id="' + id + '"]').forEach(el => el.classList.add("sel"));
-  paintDetails(); showSide("details");
-  if (scroll && id !== null){ const el = document.querySelector('#textPane [data-id="' + id + '"]'); if (el && el.scrollIntoView) el.scrollIntoView({block: "center"}); }
+function refreshEl(id){ const m = D.maths[id]; if (m.block !== undefined && PARA[m.block]) repaintPara(m.block); else document.querySelectorAll('[data-id="' + id + '"]').forEach(el => { el.className = el.className.replace(/\br-\w+/, "r-" + roleOf(id)).replace(/ h\b/, "") + (decided(id) ? " h" : ""); }); }
+let lastMarked = null, walk = {letter: null, i: 0};
+function light(ids, curId){
+  document.querySelectorAll(".cur, .hasL").forEach(el => el.classList.remove("cur", "hasL"));
+  ids.forEach(id => document.querySelectorAll('#mid [data-id="' + id + '"]').forEach(el => el.classList.add("hasL")));
+  if (curId) document.querySelectorAll('#mid [data-id="' + curId + '"]').forEach(el => el.classList.add("cur"));
+  const el = curId ? document.querySelector('#mid [data-id="' + curId + '"]') : null;
+  if (el && el.scrollIntoView) el.scrollIntoView({block: "center"});
 }
-$("textPane").addEventListener("click", e => {
-  const el = e.target.closest("[data-id]"); if (!el) return;
-  select(el.dataset.id, false);
-});
-function step(dir){ const i = S.sel === null ? -1 : IDS.indexOf(S.sel); let j = i + dir; while (j >= 0 && j < IDS.length && D.maths[IDS[j]].where === "other") j += dir; if (j < 0 || j >= IDS.length){ toast("end"); return; } select(IDS[j], true); }
-function nextOpen(){ const i = S.sel === null ? -1 : IDS.indexOf(S.sel); for (let j = i + 1; j < IDS.length; j++){ if (candidate(IDS[j]) && !decided(IDS[j])){ select(IDS[j], true); return; } } toast("no open candidate after this one"); }
-$("prevBtn").addEventListener("click", () => step(-1)); $("nextBtn").addEventListener("click", () => step(1)); $("nextOpenBtn").addEventListener("click", nextOpen);
+function cellHTML(text, ids){ let k = 0; return esc(text).replace(/⟨([^⟨⟩]*)⟩/g, (_, t) => { const id = ids && ids[k] ? ids[k] : null; k++; return id ? chipHTML(id, false) : '<span class="tex" data-tex="' + t + '">' + t + "</span>"; }); }
+function paintTables(){ let html = ""; for (const t of D.tables){ html += "<h4 class='sec'>" + esc(t.label || t.id) + " · " + esc(t.caption) + "</h4><table class='grid notation'>"; for (const r of t.rows) html += "<tr>" + r.cells.map((c, ci) => (r.header ? "<th>" : "<td>") + cellHTML(c, r.maths ? r.maths[ci] : null) + (r.header ? "</th>" : "</td>")).join("") + "</tr>"; html += "</table>"; } if (D.deflists.length){ html += "<h4 class='sec'>Definition list</h4><table class='grid notation'>" + D.deflists.map(it => "<tr><td>" + cellHTML(it.term, it.term_maths) + "</td><td>" + cellHTML(it.def, it.def_maths) + "</td></tr>").join("") + "</table>"; } $("tables").innerHTML = html || '<div class="ev">no notation table detected in this paper</div>'; }
+$("mid").addEventListener("click", e => { const el = e.target.closest("[data-id]"); if (!el) return; adhoc = el.dataset.id; paintAll(false); light([], adhoc); });
 
-/* ---------- details pane ---------- */
-function setRole(id, role){
-  snap(); const cur = S.roles[id] || {};
-  if (cur.role === role) delete S.roles[id]; else S.roles[id] = {role: role, span: cur.span};
-  save(); refreshEl(id); paintDetails(); paintOpen(); toast(id + (S.roles[id] ? " → " + role : " cleared"));
+/* ---------- top card ---------- */
+function citation(sp){ if (!sp) return ""; if (sp.table) return sp.table + " · row " + sp.row; if (sp.deflist !== undefined) return "definition list · item " + sp.deflist; return "paragraph " + sp.para + " · chars " + sp.start + "–" + sp.end; }
+function binderText(b){ if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + "…" + (b.hi || "?") + (b.family ? " (" + b.family + ")" : ""); return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?"); }
+function evShort(e){ const p = []; if (e.bound_rows) p.push("bound " + e.bound_rows + "×"); if (e.capped && Object.keys(e.capped).length) p.push("capped by " + Object.keys(e.capped).join("/")); if (e.prose_rows) p.push("prose " + e.prose_rows + "×"); if (e.table_rows) p.push("table"); if (e.sub_rows) p.push("in " + e.sub_rows + " rows"); const fams = Object.entries(e.families || {}); if (fams.length > 1) p.push("ranges over " + fams.map(([f, n]) => f + "×" + n).join(", ")); const av = Object.entries(e.alias_votes || {}); if (av.length) p.push("position votes " + av.map(([f, n]) => f + "×" + n).join(", ")); return p.join(" · "); }
+function paintRounds(){
+  $("rounds").innerHTML = ROUNDS.map(([r, label]) => '<button data-r="' + r + '" class="' + (S.round === r ? "on" : "") + '">' + label + ' <span class="n">' + doneCount(r) + "/" + Q[r].length + "</span></button>").join("");
+  const total = ROUNDS.reduce((a, [r]) => a + Q[r].length, 0), done = ROUNDS.reduce((a, [r]) => a + doneCount(r), 0);
+  $("barFill").style.width = (total ? Math.round(100 * done / total) : 0) + "%";
 }
-function citation(sp){ if (!sp) return ""; if (sp.table) return KEY + " · " + sp.table + " · row " + sp.row; if (sp.deflist !== undefined) return KEY + " · definition list · item " + sp.deflist; return KEY + " · paragraph " + sp.para + " · chars " + sp.start + "–" + sp.end; }
-function binderText(b){ if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + " … " + (b.hi || "?") + (b.family ? " (family " + b.family + ")" : " (no family)"); return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?"); }
-const OPENV = new Set(["candidate", "juxtaposed", "label"]);
-function letterState(l){ const e = D.indices.letters[l] || {}; const h = S.indices[l] || {}; return {e, h, fam: h.family !== undefined && h.family !== "" ? h.family : (e.family || "?"), open: h.verdict ? h.verdict === "unsure" : (!e.verdict || OPENV.has(e.verdict))}; }
-function lchipHTML(l, role){ const st = letterState(l); return '<button class="lchip v-' + esc(st.e.verdict || "none") + (st.h.verdict ? " h-" + esc(st.h.verdict) : "") + '" data-l="' + esc(l) + '" title="' + esc((st.e.rule || "no rule") + (st.e.desc ? " · " + st.e.desc : "")) + '">' + esc(l) + " → " + esc(st.fam) + "<small>" + esc(role || "") + (st.e.verdict ? " · " + esc(st.e.verdict) : "") + "</small></button>" + '<button class="fam" data-f="' + esc(l) + '" title="set the family of ' + esc(l) + '">✎</button>'; }
-function rowKeyOf(id){ const m = D.maths[id]; return m.where === "display" ? (m.eq || null) : id; }
-function paintDetails(){
-  const id = S.sel; const box = $("detail");
-  if (id === null || !D.maths[id]){ box.innerHTML = '<div class="ev">Click a formula or a symbol in the text.</div>'; return; }
-  const m = D.maths[id], pr = proposed(id), role = roleOf(id), h = S.roles[id];
-  let html = '<div class="dhead"><span class="mono">' + esc(id) + (m.eq ? " = " + esc(m.eq) : "") + '</span> <span class="ev">' + esc(m.where + " · " + m.cls) + '</span></div>';
-  html += '<div class="dtex tex" data-tex="' + esc(m.show || m.latex) + '"' + (m.where === "display" ? ' data-display="1"' : "") + ">" + esc(m.show || m.latex) + "</div>";
-  html += '<div class="ev">proposed: <b>' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (pr.note ? ' · <span class="flag warn">' + esc(pr.note) + "</span>" : "") + (h ? ' · <b>yours: ' + esc(h.role) + "</b>" : "") + "</div>";
-  html += '<div class="btns roles">' + ROLES.map(r => '<button data-role="' + r + '" class="rb r-' + r + (role === r ? " on" : "") + (h && h.role === r ? " hh" : "") + '">' + r + "</button>").join("") + "</div>";
-  if (role === "definition"){
-    const sp = spanOf(id);
-    html += '<h3>Citable definition</h3>';
-    if (sp) html += '<div class="defbox"><div class="deftext">' + esc(sp.text) + '</div><div class="ev">' + esc(citation(sp)) + " · defining words " + esc(sp.position || "?") + " the element · source <b>" + esc(sp.source || "rule") + "</b></div></div>";
-    else html += '<div class="ev">no span proposed — select the defining sentence in the text and press “cite selection”.</div>';
-    html += '<div class="btns"><button id="resetSpan"' + (h && h.span ? "" : " disabled") + '>↺ back to the proposed span</button></div>';
+function paintTop(){
+  const id = adhoc, it = current(); let html = "";
+  if (id){
+    const m = D.maths[id], pr = proposed(id), h = S.roles[id];
+    html += '<div class="kicker">tapped in the text · <span class="mono">' + esc(id) + (m.eq ? " = " + esc(m.eq) : "") + "</span> · " + esc(m.where + " · " + m.cls) + '</div>';
+    html += '<div class="itex tex" data-tex="' + esc(m.show || m.latex) + '"' + (m.where === "display" ? ' data-display="1"' : "") + ">" + esc(m.show || m.latex) + "</div>";
+    html += propLine(pr, h ? h.role : null);
+    if (roleOf(id) === "definition") html += spanLine(spanOf(id));
+    html += lettersLine(id);
+  } else if (!it){
+    html += '<div class="done">' + (Q[S.round].length ? "🎉 round complete" : "nothing to decide in this round") + '<div class="ev">' + (nextRoundWithOpen() ? "next: " + ROUNDS.find(x => x[0] === nextRoundWithOpen())[1] : "all rounds done — export your decisions (☰)") + "</div></div>";
+  } else if (S.round === "indices"){
+    const st = letterState(it), e = st.e; const ids = rowsWith(it); const famDesc = st.fam && D.indices.families[st.fam] ? D.indices.families[st.fam].desc : "";
+    html += '<div class="kicker">index letter ' + (pos() + 1) + " of " + Q.indices.length + "</div>";
+    html += '<div class="big mono">' + esc(it) + ' <span class="arrow">→</span> ' + (st.fam ? esc(st.fam) : '<span class="q">?</span>') + "</div>";
+    html += '<div class="prop">proposed: <b>' + esc(e.verdict || "?") + "</b> (" + esc(e.rule || "no rule") + ")" + (e.family ? " · family " + esc(e.family) : "") + (famDesc ? ' · <i>' + esc(famDesc.slice(0, 70)) + "</i>" : "") + (e.desc ? ' · paper: “' + esc(e.desc.slice(0, 60)) + "”" : "") + (st.h.verdict ? ' · <b class="you">yours: ' + esc(st.h.verdict) + (st.h.family ? " → " + esc(st.h.family) : "") + "</b>" : "") + "</div>";
+    html += '<div class="ev">' + esc(evShort(e)) + "</div>";
+    html += '<div class="walk">' + (ids.length ? '<button id="wPrev">◂</button><span>formula ' + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length + '</span><button id="wNext">▸</button>' : '<span class="ev">no formula carries it in a subscript</span>') + "</div>";
+  } else if (S.round === "families"){
+    const f = D.indices.families[it], h = S.families[it] || {};
+    html += '<div class="kicker">family ' + (pos() + 1) + " of " + Q.families.length + "</div>";
+    html += '<div class="big mono">' + esc(it) + (f.cap ? ' <span class="flag">range 1..' + esc(it) + "</span>" : "") + "</div>";
+    html += '<div class="prop">letters: <span class="mono">' + esc(Object.entries(f.letters || {}).map(([l, n]) => l + "×" + n).join(", ") || "-") + "</span> · " + (f.declared_as ? "declared as " + esc(f.declared_as) : '<span class="flag warn">not declared</span>') + (f.desc ? ' · paper: “' + esc(f.desc.slice(0, 80)) + "”" : "") + (h.verdict ? ' · <b class="you">yours: ' + esc(h.verdict) + "</b>" : "") + "</div>";
+    html += '<div class="walk"><input type="text" id="renameInp" placeholder="same as… (rename)" value="' + esc(h.rename || "") + '"></div>';
+  } else {
+    const m = D.maths[it], pr = proposed(it), h = S.roles[it];
+    html += '<div class="kicker">' + (S.round === "defs" ? "definition candidate " : "inline formula candidate ") + (pos() + 1) + " of " + Q[S.round].length + ' · <span class="mono">' + esc(it) + "</span></div>";
+    html += '<div class="itex tex" data-tex="' + esc(m.show || m.latex) + '">' + esc(m.show || m.latex) + "</div>";
+    html += propLine(pr, h ? h.role : null);
+    if (roleOf(it) === "definition") html += spanLine(spanOf(it));
   }
-  const rk = rowKeyOf(id); const row = rk && D.indices.rows ? D.indices.rows[rk] : null;
-  if (row){
-    html += "<h3>Index letters in this formula</h3>";
-    html += row.binders.length ? '<div class="ev">binds: ' + esc(row.binders.map(binderText).join(" · ")) + "</div>" : '<div class="ev">no binder in this row</div>';
-    const letters = Object.entries(row.letters).sort((a, b) => (a[1] === "binder" ? 0 : 1) - (b[1] === "binder" ? 0 : 1) || a[0].localeCompare(b[0]));
-    html += '<div class="lchips">' + letters.map(([l, r]) => lchipHTML(l, r)).join("") + "</div>";
-  }
-  box.innerHTML = html; typeset(box);
+  $("item").innerHTML = html; typeset($("item"));
+  const wp = $("wPrev"), wn = $("wNext"); if (wp) wp.addEventListener("click", () => walkTo(-1)); if (wn) wn.addEventListener("click", () => walkTo(1));
+  const ri = $("renameInp"); if (ri) ri.addEventListener("change", () => { snap(); const cur = S.families[it] || {verdict: "family"}; S.families[it] = {verdict: cur.verdict, rename: ri.value.trim()}; save(); paintRounds(); });
 }
-$("detail").addEventListener("click", e => {
-  const id = S.sel; if (id === null) return;
-  const rb = e.target.closest("button.rb"); if (rb){ setRole(id, rb.dataset.role); return; }
-  if (e.target.closest("#resetSpan")){ snap(); if (S.roles[id]) delete S.roles[id].span; save(); repaintPara(D.maths[id].block); paintDetails(); return; }
-  const f = e.target.closest("button.fam"); if (f){ editFamily(f.dataset.f); return; }
-  const b = e.target.closest("button.lchip"); if (b) cycleLetter(b.dataset.l);
-});
+function propLine(pr, yours){ return '<div class="prop">proposed: <b class="r-' + esc(pr.role) + '">' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (pr.note ? ' · <span class="flag warn">' + esc(pr.note) + "</span>" : "") + (yours ? ' · <b class="you">yours: ' + esc(yours) + "</b>" : "") + "</div>"; }
+function spanLine(sp){ if (!sp) return '<div class="ev">no defining sentence proposed — select it in the text, then “cite selection”</div>'; return '<div class="span"><span class="deftext">“' + esc(sp.text) + '”</span><div class="ev">' + esc(citation(sp)) + " · words " + esc(sp.position || "?") + " · source <b>" + esc(sp.source || "rule") + "</b></div></div>"; }
+function lettersLine(id){ const m = D.maths[id]; const rk = m.where === "display" ? (m.eq || null) : id; const row = rk && D.indices.rows ? D.indices.rows[rk] : null; if (!row) return ""; const letters = Object.keys(row.letters).sort(); return '<div class="ev">' + (row.binders.length ? "binds: " + esc(row.binders.map(binderText).join(" · ")) + " · " : "") + "letters: " + letters.map(l => { const st = letterState(l); return '<span class="mono">' + esc(l) + "→" + esc(st.fam || "?") + "</span>"; }).join(", ") + "</div>"; }
+function nextRoundWithOpen(){ const i = ROUNDS.findIndex(x => x[0] === S.round); for (let k = 1; k <= ROUNDS.length; k++){ const r = ROUNDS[(i + k) % ROUNDS.length][0]; if (Q[r].some(it => !isDone(r, it))) return r; } return null; }
+function walkTo(dir){ const it = current(); if (!it || S.round !== "indices") return; const ids = rowsWith(it); if (!ids.length) return; if (walk.letter !== it){ walk = {letter: it, i: 0}; } walk.i = (walk.i + dir + ids.length) % ids.length; light(ids, ids[walk.i]); paintTop(); }
 
-/* ---------- selection → citation / formula ---------- */
+/* ---------- bottom: decisions only ---------- */
+function paintBottom(){
+  const id = adhoc, it = current(); let html = "";
+  const roleBtns = (cur, pr) => '<div class="grid3">' + ROLES.map(r => '<button class="dec r-' + r + (cur === r ? " on" : "") + (pr === r ? " glow" : "") + '" data-role="' + r + '">' + (pr === r ? "✓ " : "") + r + "</button>").join("") + "</div>";
+  if (id){ html = roleBtns(S.roles[id] ? S.roles[id].role : null, proposed(id).role); }
+  else if (!it){ const nr = nextRoundWithOpen(); html = '<div class="grid1">' + (nr ? '<button class="dec big" id="nextRound">▸ ' + esc(ROUNDS.find(x => x[0] === nr)[1]) + "</button>" : '<button class="dec big" id="exportNow">⬇ export decisions</button>') + "</div>"; }
+  else if (S.round === "indices"){
+    const st = letterState(it); const chips = FAMS.slice(0, 5);
+    html = '<div class="grid3"><button class="dec ok glow" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec bad" data-v="not">✗ not an index</button><button class="dec mid" data-v="unsure">? unsure</button></div>';
+    html += '<div class="fams">' + chips.map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
+  } else if (S.round === "families"){
+    html = '<div class="grid3"><button class="dec ok glow" data-fv="family">✓ family</button><button class="dec bad" data-fv="not">✗ not</button><button class="dec mid" data-fv="unsure">? unsure</button></div>';
+  } else { html = roleBtns(S.roles[it] ? S.roles[it].role : null, proposed(it).role); }
+  $("decide").innerHTML = html;
+}
+function advance(){ adhoc = null; const i = nextOpen(pos()); S.pos[S.round] = i; save(); setTimeout(() => paintAll(true), 120); }
+function decideRole(id, role){ snap(); const cur = S.roles[id] || {}; S.roles[id] = {role: role, span: cur.span}; save(); refreshEl(id); toast(role); if (adhoc){ adhoc = null; paintAll(false); } else advance(); }
+function decideLetter(l, verdict, fam){ snap(); const st = letterState(l); S.indices[l] = {verdict: verdict, family: fam !== undefined ? fam : (st.fam || "")}; save(); toast(l + " → " + verdict + (S.indices[l].family ? " " + S.indices[l].family : "")); advance(); }
+$("decide").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.id === "nextRound"){ setRound(nextRoundWithOpen()); return; }
+  if (b.id === "exportNow"){ exportJSON(); return; }
+  const id = adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null);
+  if (b.dataset.role && id){ decideRole(id, b.dataset.role); return; }
+  const it = current();
+  if (S.round === "indices" && it){
+    if (b.dataset.v){ decideLetter(it, b.dataset.v); return; }
+    if (b.dataset.fam){ let f = b.dataset.fam; if (f === "…"){ f = window.prompt ? window.prompt("family of " + it + " (the set it ranges over)", letterState(it).fam) : null; if (f === null || f === undefined) return; f = String(f).trim(); } decideLetter(it, "index", f); return; }
+  }
+  if (S.round === "families" && it && b.dataset.fv){ snap(); const ren = $("renameInp") ? $("renameInp").value.trim() : ""; S.families[it] = {verdict: b.dataset.fv, rename: ren}; save(); toast(it + " → " + b.dataset.fv); advance(); }
+});
+$("rounds").addEventListener("click", e => { const b = e.target.closest("button[data-r]"); if (b){ adhoc = null; setRound(b.dataset.r); } });
+$("skipBtn").addEventListener("click", () => { if (adhoc){ adhoc = null; paintAll(true); return; } const i = nextOpen(pos()); if (i < 0 || i === pos()){ toast("nothing else open here"); return; } goTo(i); });
+$("undoBtn").addEventListener("click", () => { const u = undoStack.pop(); if (!u){ toast("nothing to undo"); return; } S = JSON.parse(u); save(); paintAll(true); toast("undone"); });
+$("menuBtn").addEventListener("click", () => $("menu").classList.toggle("hidden"));
+
+/* ---------- selection → cite / mark ---------- */
 function plainOffset(paraEl, node, offset){
-  let pos = 0;
-  const walker = document.createTreeWalker(paraEl, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null);
-  let cur = walker.nextNode();
+  let pos = 0; const walker = document.createTreeWalker(paraEl, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null); let cur = walker.nextNode();
   while (cur){
     if (cur === node) return pos + (cur.nodeType === 3 ? offset : 0);
-    if (cur.nodeType === 1 && cur.dataset && cur.dataset.id){
-      if (cur.contains(node)) return pos;
-      pos += ("⟨" + D.maths[cur.dataset.id].latex + "⟩").length;
-      // skip the chip's subtree
-      let nxt = walker.nextNode(); while (nxt && cur.contains(nxt)) nxt = walker.nextNode(); cur = nxt; continue;
-    }
+    if (cur.nodeType === 1 && cur.dataset && cur.dataset.id){ if (cur.contains(node)) return pos; pos += ("⟨" + D.maths[cur.dataset.id].latex + "⟩").length; let nxt = walker.nextNode(); while (nxt && cur.contains(nxt)) nxt = walker.nextNode(); cur = nxt; continue; }
     if (cur.nodeType === 3) pos += cur.nodeValue.length;
     if (cur.nodeType === 1 && cur.tagName === "BR") pos += 3;
     cur = walker.nextNode();
@@ -785,112 +742,23 @@ function plainOffset(paraEl, node, offset){
 }
 function selectionInfo(){
   const sel = window.getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount) return null;
-  const r = sel.getRangeAt(0);
-  const anc = r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentElement;
+  const r = sel.getRangeAt(0); const anc = r.commonAncestorContainer.nodeType === 1 ? r.commonAncestorContainer : r.commonAncestorContainer.parentElement;
   const p = anc && anc.closest ? anc.closest("p.para") : null; if (!p) return null;
-  const a = plainOffset(p, r.startContainer, r.startOffset), b = plainOffset(p, r.endContainer, r.endOffset);
-  if (b - a < 2) return null;
-  const plain = plainOf(PARA[parseInt(p.dataset.i, 10)]);
-  return {para: parseInt(p.dataset.i, 10), start: a, end: b, text: plain.slice(a, b), raw: sel.toString()};
+  const a = plainOffset(p, r.startContainer, r.startOffset), b = plainOffset(p, r.endContainer, r.endOffset); if (b - a < 2) return null;
+  const pi = parseInt(p.dataset.i, 10); return {para: pi, start: a, end: b, text: plainOf(PARA[pi]).slice(a, b)};
 }
-document.addEventListener("selectionchange", () => { const info = selectionInfo(); $("selbar").classList.toggle("hidden", !info); $("useSel").disabled = !(info && S.sel !== null); });
+document.addEventListener("selectionchange", () => { const info = selectionInfo(); $("pill").classList.toggle("hidden", !info); });
+function citeTarget(){ return adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null); }
 $("useSel").addEventListener("click", () => {
-  const info = selectionInfo(); if (!info || S.sel === null) return;
-  const id = S.sel, m = D.maths[id]; const plain = plainOf(PARA[info.para]);
-  const span = {para: info.para, start: info.start, end: info.end, text: info.text, position: m.block === info.para && spanOf(id) ? spanOf(id).position : "around", source: "human"};
-  snap(); S.roles[id] = {role: "definition", span: span}; save();
-  window.getSelection().removeAllRanges(); $("selbar").classList.add("hidden");
-  repaintPara(info.para); if (m.block !== info.para) repaintPara(m.block); refreshEl(id); paintDetails(); paintOpen(); toast("cited: " + info.text.slice(0, 40));
+  const info = selectionInfo(); const id = citeTarget(); if (!info || !id){ toast("pick the element first (tap it), then select its definition"); return; }
+  const m = D.maths[id]; snap(); S.roles[id] = {role: "definition", span: {para: info.para, start: info.start, end: info.end, text: info.text, position: (m.block === info.para && spanOf(id)) ? spanOf(id).position : "around", source: "human"}}; save();
+  window.getSelection().removeAllRanges(); $("pill").classList.add("hidden"); refreshEl(id); if (m.block !== info.para) repaintPara(info.para); paintTop(); paintBottom(); paintRounds(); toast("cited");
 });
-$("markSel").addEventListener("click", () => {
-  const info = selectionInfo(); if (!info) return;
-  snap(); S.marks.push({para: info.para, start: info.start, end: info.end, text: info.text, latex: info.text}); save(); paintOpen(); window.getSelection().removeAllRanges(); $("selbar").classList.add("hidden"); toast("marked as formula: " + info.text.slice(0, 40));
-});
-
-/* ---------- indices pane ---------- */
-const ORDER = {index: 0, alias: 1, candidate: 2, label: 3, juxtaposed: 4};
-const FOCUS = {};
-function rowsWith(l){ const out = []; for (const [k, r] of Object.entries(D.indices.rows || {})) if (r.letters && r.letters[l] !== undefined){ const id = k.startsWith("eq-") ? EQ2M[k] : k; if (id && D.maths[id]) out.push(id); } return out.sort(); }
-function focusLetter(l, dir){ const ids = rowsWith(l); if (!ids.length){ toast(l + ": no formula carries it"); return; } let i = FOCUS[l] === undefined ? (dir < 0 ? ids.length - 1 : 0) : (FOCUS[l] + dir + ids.length) % ids.length; FOCUS[l] = i; document.querySelectorAll(".hasL").forEach(el => el.classList.remove("hasL")); ids.forEach(id => document.querySelectorAll('#textPane [data-id="' + id + '"]').forEach(el => el.classList.add("hasL"))); select(ids[i], true); toast(l + ": formula " + (i + 1) + " of " + ids.length); }
-function evHTML(e){ const parts = []; if (e.bound_rows) parts.push("bound " + e.bound_rows + "×"); if (e.capped && Object.keys(e.capped).length) parts.push("capped by " + Object.keys(e.capped).join("/")); if (e.prose_rows) parts.push("prose " + e.prose_rows + "×"); if (e.table_rows) parts.push("table" + (e.desc ? ": “" + e.desc.slice(0, 40) + "”" : "")); if (e.sub_rows) parts.push("subscript in " + e.sub_rows + " rows"); const fams = Object.entries(e.families || {}); if (fams.length > 1) parts.push('<span class="flag warn">' + fams.map(([f, n]) => f + "×" + n).join(", ") + "</span>"); const av = Object.entries(e.alias_votes || {}); if (av.length) parts.push("position votes " + av.map(([f, n]) => f + "×" + n).join(", ")); return parts.join(" · "); }
-function paintLetters(){
-  const names = Object.keys(D.indices.letters).sort((a, b) => ((ORDER[D.indices.letters[a].verdict] ?? 9) - (ORDER[D.indices.letters[b].verdict] ?? 9)) || a.localeCompare(b));
-  let html = "<tr><th>letter</th><th>rule</th><th>family</th><th>evidence</th><th>walk</th><th>verdict</th></tr>";
-  for (const n of names){
-    const e = D.indices.letters[n]; const h = S.indices[n] || {}; const fam = h.family !== undefined ? h.family : (e.family || "");
-    html += '<tr class="v-' + e.verdict + (h.verdict === "not" ? " h-not" : "") + '" data-n="' + esc(n) + '"><td class="mono">' + esc(n) + '</td><td class="ev">' + esc(e.verdict) + '<br><span class="flag">' + esc(e.rule || "") + '</span></td><td><input type="text" data-fam="' + esc(n) + '" value="' + esc(fam) + '" placeholder="family"></td><td class="ev">' + evHTML(e) + '</td><td class="nowrap"><button class="walk" data-w="' + esc(n) + '" data-d="-1">◂</button><button class="walk" data-w="' + esc(n) + '" data-d="1">▸</button></td><td class="btns"><button data-v="index"' + (h.verdict === "index" ? ' class="on"' : "") + '>✓</button><button data-v="not" class="bad' + (h.verdict === "not" ? " on" : "") + '">✗</button><button data-v="unsure" class="mid' + (h.verdict === "unsure" ? " on" : "") + '">?</button></td></tr>';
-  }
-  $("letters").innerHTML = html;
-  const fams = Object.values(D.indices.families).sort((a, b) => a.name.localeCompare(b.name));
-  let fh = "<tr><th>family</th><th>letters</th><th>declared</th><th>the paper says</th><th>rename</th><th>verdict</th></tr>";
-  for (const f of fams){ const h = S.families[f.name] || {}; fh += '<tr' + (h.verdict === "not" ? ' class="h-not"' : "") + ' data-f="' + esc(f.name) + '"><td class="mono">' + esc(f.name) + (f.cap ? ' <span class="flag">range</span>' : "") + '</td><td class="mono">' + Object.entries(f.letters || {}).map(([l, n]) => l + "×" + n).join(", ") + '</td><td class="ev">' + (f.declared_as ? "as " + esc(f.declared_as) : '<span class="flag warn">new</span>') + '</td><td class="ev">' + esc(f.desc || "") + '</td><td><input type="text" data-ren="' + esc(f.name) + '" value="' + esc(h.rename || "") + '" placeholder="same as…"></td><td class="btns"><button data-v="family"' + (h.verdict === "family" ? ' class="on"' : "") + '>✓</button><button data-v="not" class="bad' + (h.verdict === "not" ? " on" : "") + '">✗</button><button data-v="unsure" class="mid' + (h.verdict === "unsure" ? " on" : "") + '">?</button></td></tr>'; }
-  $("families").innerHTML = fh;
-  const dl = D.indices.declared_index || [], asl = D.indices.declared_index_are_letters || [];
-  $("declared").textContent = dl.length ? "sidecar declares %@ index: " + dl.join(", ") + (asl.length ? " — dummy letters among them: " + asl.join(", ") : "") : "no %@ index lines in the sidecar yet";
-}
-function cycleLetter(l){ snap(); const cur = (S.indices[l] || {}).verdict; const fam = (S.indices[l] || {}).family; const next = !cur ? "index" : cur === "index" ? "not" : cur === "not" ? "unsure" : null; if (next) S.indices[l] = {verdict: next, family: fam !== undefined ? fam : ((D.indices.letters[l] || {}).family || "")}; else delete S.indices[l]; save(); paintLetters(); paintDetails(); paintOpen(); toast(l + (next ? " → " + next : " cleared")); }
-function editFamily(l){ const cur = S.indices[l] || {}; const v = window.prompt ? window.prompt("family of " + l + " (the set it ranges over)", cur.family !== undefined ? cur.family : ((D.indices.letters[l] || {}).family || "")) : null; if (v === null || v === undefined) return; snap(); S.indices[l] = {verdict: cur.verdict || "index", family: String(v).trim()}; save(); paintLetters(); paintDetails(); paintOpen(); }
-$("letters").addEventListener("click", e => {
-  const wb = e.target.closest("button.walk"); if (wb){ focusLetter(wb.dataset.w, parseInt(wb.dataset.d, 10)); return; }
-  const b = e.target.closest("button[data-v]"); if (!b) return;
-  const n = b.closest("tr").dataset.n; snap(); const cur = S.indices[n] || {}; const fam = b.closest("tr").querySelector("input[data-fam]").value.trim();
-  if (cur.verdict === b.dataset.v) delete S.indices[n]; else S.indices[n] = {verdict: b.dataset.v, family: fam};
-  save(); paintLetters(); paintDetails(); paintOpen();
-});
-$("letters").addEventListener("change", e => { const inp = e.target.closest("input[data-fam]"); if (!inp) return; snap(); const n = inp.dataset.fam; const cur = S.indices[n] || {verdict: "index"}; S.indices[n] = {verdict: cur.verdict, family: inp.value.trim()}; save(); paintLetters(); paintDetails(); });
-$("families").addEventListener("click", e => { const b = e.target.closest("button[data-v]"); if (!b) return; const f = b.closest("tr").dataset.f; snap(); const cur = S.families[f] || {}; const ren = b.closest("tr").querySelector("input[data-ren]").value.trim(); if (cur.verdict === b.dataset.v) delete S.families[f]; else S.families[f] = {verdict: b.dataset.v, rename: ren}; save(); paintLetters(); });
-$("families").addEventListener("change", e => { const inp = e.target.closest("input[data-ren]"); if (!inp) return; snap(); const f = inp.dataset.ren; const cur = S.families[f] || {verdict: "family"}; S.families[f] = {verdict: cur.verdict, rename: inp.value.trim()}; save(); paintLetters(); });
-
-/* ---------- open items ---------- */
-function openItems(){
-  const letters = Object.keys(D.indices.letters).filter(l => letterState(l).open).sort();
-  const defs = IDS.filter(id => proposed(id).role === "definition" && D.maths[id].where === "inline" && !decided(id));
-  const forms = IDS.filter(id => proposed(id).role === "formula" && D.maths[id].where === "inline" && !decided(id));
-  return {letters, defs, forms};
-}
-function quick(id){ const m = D.maths[id]; return '<div class="qi" data-id="' + id + '"><span class="chip r-' + proposed(id).role + '"><span class="tex" data-tex="' + esc(m.show || m.latex) + '">' + esc(m.show || m.latex) + '</span></span> <span class="ev">' + esc((spanOf(id) && spanOf(id).text ? spanOf(id).text : (m.near || []).join(", ")).slice(0, 110)) + '</span><div class="btns"><button class="q" data-role="definition">definition</button><button class="q" data-role="formula">formula</button><button class="q" data-role="mention">mention</button><button class="q" data-role="other">other</button><button class="show">show</button></div></div>'; }
-function paintOpen(){
-  const o = openItems();
-  let html = "<h3>Undecided letters (" + o.letters.length + ")</h3><div class='lchips'>" + (o.letters.map(l => lchipHTML(l, "")).join("") || '<span class="ev">none</span>') + "</div>";
-  html += "<h3>Definition candidates (" + o.defs.length + ")</h3>" + (o.defs.slice(0, 40).map(quick).join("") || '<div class="ev">none open</div>') + (o.defs.length > 40 ? '<div class="ev">… ' + (o.defs.length - 40) + " more; use ▸ next open</div>" : "");
-  html += "<h3>Inline formula candidates (" + o.forms.length + ")</h3>" + (o.forms.slice(0, 40).map(quick).join("") || '<div class="ev">none open</div>');
-  html += "<h3>Marked by hand (" + S.marks.length + ")</h3>" + (S.marks.map((s, i) => '<div class="qi"><div class="ev">paragraph ' + s.para + ' · “' + esc(s.text.slice(0, 100)) + '”</div><input type="text" class="wide" data-i="' + i + '" value="' + esc(s.latex || s.text) + '" placeholder="LaTeX"><div class="btns"><button class="bad" data-rm="' + i + '">✕ remove</button></div></div>').join("") || '<div class="ev">nothing yet — select text in the paper and press “mark selection as formula”</div>');
-  $("open").innerHTML = html; typeset($("open"));
-}
-$("open").addEventListener("click", e => {
-  const rm = e.target.closest("button[data-rm]"); if (rm){ snap(); S.marks.splice(parseInt(rm.dataset.rm, 10), 1); save(); paintOpen(); return; }
-  const f = e.target.closest("button.fam"); if (f){ editFamily(f.dataset.f); return; }
-  const lc = e.target.closest("button.lchip"); if (lc){ cycleLetter(lc.dataset.l); return; }
-  const qi = e.target.closest(".qi[data-id]"); if (!qi) return;
-  const id = qi.dataset.id;
-  if (e.target.closest("button.show")){ select(id, true); return; }
-  const q = e.target.closest("button.q"); if (q){ S.sel = id; setRole(id, q.dataset.role); }
-});
-$("open").addEventListener("change", e => { const inp = e.target.closest("input[data-i]"); if (!inp) return; snap(); S.marks[parseInt(inp.dataset.i, 10)].latex = inp.value; save(); });
-
-/* ---------- tables ---------- */
-function cellHTML(text, ids){ let k = 0; return esc(text).replace(/⟨([^⟨⟩]*)⟩/g, (_, t) => { const id = ids && ids[k] ? ids[k] : null; k++; return id ? chipHTML(id, false) : '<span class="tex" data-tex="' + t + '">' + t + "</span>"; }); }
-function paintTables(){
-  let html = "";
-  for (const t of D.tables){ html += "<h4 class='sec'>" + esc(t.label || t.id) + " · " + esc(t.caption) + "</h4><table class='grid notation'>"; for (const r of t.rows) html += "<tr>" + r.cells.map((c, ci) => (r.header ? "<th>" : "<td>") + cellHTML(c, r.maths ? r.maths[ci] : null) + (r.header ? "</th>" : "</td>")).join("") + "</tr>"; html += "</table>"; }
-  if (D.deflists.length){ html += "<h4 class='sec'>Definition list</h4><table class='grid notation'>" + D.deflists.map(it => "<tr><td>" + cellHTML(it.term, it.term_maths) + "</td><td>" + cellHTML(it.def, it.def_maths) + "</td></tr>").join("") + "</table>"; }
-  $("tables").innerHTML = html || '<div class="ev">no notation table detected in this paper</div>';
-}
-
-/* ---------- side pane + mobile sheet ---------- */
-function showSide(name){ document.querySelectorAll(".stabs button").forEach(b => b.classList.toggle("on", b.dataset.s === name)); ["details","idx","open"].forEach(n => $("s-" + n).classList.toggle("hidden", n !== name)); if (name === "idx") typeset($("s-idx")); if (name === "open") typeset($("s-open")); }
-document.querySelectorAll(".stabs button").forEach(b => b.addEventListener("click", () => { showSide(b.dataset.s); $("sidePane").classList.add("open"); }));
-$("handle").addEventListener("click", () => { const open = $("sidePane").classList.toggle("open"); $("handleText").textContent = open ? "▼ Details & indices" : "▲ Details & indices"; });
+$("markSel").addEventListener("click", () => { const info = selectionInfo(); if (!info) return; snap(); S.marks.push({para: info.para, start: info.start, end: info.end, text: info.text, latex: info.text}); save(); window.getSelection().removeAllRanges(); $("pill").classList.add("hidden"); toast("marked as formula: " + info.text.slice(0, 30)); });
 
 /* ---------- typesetting ---------- */
 const typesetDone = new WeakSet();
-function typeset(root){
-  if (!window.MathJax || !MathJax.typesetPromise) return;
-  const els = Array.from((root || document).querySelectorAll(".tex")).filter(el => !typesetDone.has(el));
-  if (!els.length) return;
-  els.forEach(el => { typesetDone.add(el); const tex = el.dataset.tex || ""; el.textContent = (el.dataset.display ? "\\[" : "\\(") + tex + (el.dataset.display ? "\\]" : "\\)"); });
-  MathJax.typesetPromise(els).catch(() => els.forEach(el => { el.textContent = el.dataset.tex || ""; el.classList.add("raw"); }));
-}
+function typeset(root){ if (!window.MathJax || !MathJax.typesetPromise) return; const els = Array.from((root || document).querySelectorAll(".tex")).filter(el => !typesetDone.has(el)); if (!els.length) return; els.forEach(el => { typesetDone.add(el); const tex = el.dataset.tex || ""; el.textContent = (el.dataset.display ? "\\[" : "\\(") + tex + (el.dataset.display ? "\\]" : "\\)"); }); MathJax.typesetPromise(els).catch(() => els.forEach(el => { el.textContent = el.dataset.tex || ""; el.classList.add("raw"); })); }
 function whenMathJax(fn){ let n = 0; const t = setInterval(() => { if (window.MathJax && MathJax.typesetPromise){ clearInterval(t); fn(); } else if (++n > 50) clearInterval(t); }, 200); }
 
 /* ---------- export / import ---------- */
@@ -904,19 +772,29 @@ function importJSON(text){
   snap();
   if (obj.schema_version === "discover-decisions-1"){ const m = migrate(obj); Object.assign(S.roles, m.roles); for (const x of m.marks) if (!S.marks.some(y => y.para === x.para && y.text === x.text)) S.marks.push(x); Object.assign(S.indices, m.indices); Object.assign(S.families, m.families); }
   else { for (const [id, v] of Object.entries(obj.roles || {})) S.roles[id] = {role: v.role, span: v.span && v.span.source === "human" ? v.span : undefined}; for (const x of obj.marks || []) if (!S.marks.some(y => y.para === x.para && y.text === x.text)) S.marks.push(x); Object.assign(S.indices, obj.indices || {}); Object.assign(S.families, obj.families || {}); }
-  save(); paintAll(); toast("imported (last wins)"); return 1;
+  save(); paintAll(true); toast("imported (last wins)"); return 1;
 }
 $("exportBtn").addEventListener("click", exportJSON);
 $("importBtn").addEventListener("click", () => $("importFile").click());
 $("importFile").addEventListener("change", e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => importJSON(String(r.result)); r.readAsText(f); e.target.value = ""; });
-$("undoBtn").addEventListener("click", undo);
-$("clearBtn").addEventListener("click", () => { if (!confirm("Clear every decision for this paper?")) return; snap(); S = fresh(); save(); paintAll(); });
-document.addEventListener("keydown", e => { if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return; if (e.key === "ArrowRight" || e.key === "j") step(1); else if (e.key === "ArrowLeft" || e.key === "k") step(-1); else if (e.key === "n") nextOpen(); else if (S.sel !== null && /^[1-6]$/.test(e.key)) setRole(S.sel, ROLES[parseInt(e.key, 10) - 1]); });
+$("clearBtn").addEventListener("click", () => { if (!confirm("Clear every decision for this paper?")) return; snap(); S = fresh(); save(); paintAll(true); });
+document.addEventListener("keydown", e => { if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return; const id = adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null); if (/^[1-6]$/.test(e.key) && id) decideRole(id, ROLES[parseInt(e.key, 10) - 1]); else if (e.key === "ArrowRight") $("skipBtn").click(); else if (e.key === "ArrowLeft" && S.round === "indices") walkTo(-1); else if (e.key === "i" && S.round === "indices" && current()) decideLetter(current(), "index"); else if (e.key === "x" && S.round === "indices" && current()) decideLetter(current(), "not"); });
 
-function paintAll(){ paintText(); paintTables(); paintLetters(); paintDetails(); paintOpen(); paintCounter(); document.querySelectorAll(".sel").forEach(el => el.classList.remove("sel")); if (S.sel !== null) document.querySelectorAll('[data-id="' + S.sel + '"]').forEach(el => el.classList.add("sel")); typeset($("textPane")); }
-paintAll();
+/* ---------- paint ---------- */
+function paintAll(scroll){
+  $("pk").innerHTML = esc(KEY) + (D.paper.title ? " · " + esc(D.paper.title.slice(0, 80)) : "");
+  if (S.pos[S.round] === undefined || S.pos[S.round] < 0) S.pos[S.round] = nextOpen(-1);
+  paintRounds(); paintText(); paintTables(); paintTop(); paintBottom();
+  const it = current();
+  if (adhoc) light([], adhoc);
+  else if (it && S.round === "indices"){ const ids = rowsWith(it); if (walk.letter !== it) walk = {letter: it, i: 0}; light(ids, ids[walk.i] || null); }
+  else if (it && (S.round === "defs" || S.round === "forms")) light([], it);
+  else light([], null);
+  typeset($("mid"));
+}
+paintAll(true);
 whenMathJax(() => typeset(document));
-window.__discover = {S: () => S, select, setRole, cycleLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, focusLetter, roleOf, spanOf, openItems};
+window.__discover = {S: () => S, Q, current, setRound, goTo, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
 </script>
 </body>
 </html>
@@ -950,7 +828,7 @@ document.getElementById("papers").innerHTML = html;
 </script>
 </body>
 </html>
-""".replace("__STYLE__", _STYLE)
+""".replace("__STYLE__", _INDEX_STYLE)
 
 
 # -- CLI --------------------------------------------------------------------
