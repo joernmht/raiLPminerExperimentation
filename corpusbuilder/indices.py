@@ -217,7 +217,35 @@ _TABLE_IN = re.compile(
     r"\b(?:in|of|over)\s+(?:the\s+)?(?:set\s+)?⟨([^⟩]{1,30})⟩|\b(?:in|of)\s+([A-Z][A-Za-z0-9_]{0,3})\b"
 )
 _NOT_FAMILY = frozenset(
-    ["Set", "Sets", "Parameter", "Parameters", "Variable", "Variables", "Index", "Indices", "Notation", "Symbol", "Symbols", "Decision", "Data", "Input", "Output", "Where", "Let", "Min", "Max", "Constraint", "Constraints", "Objective", "Model", "Table", "Number", "Time", "Cost"]
+    [
+        "Set",
+        "Sets",
+        "Parameter",
+        "Parameters",
+        "Variable",
+        "Variables",
+        "Index",
+        "Indices",
+        "Notation",
+        "Symbol",
+        "Symbols",
+        "Decision",
+        "Data",
+        "Input",
+        "Output",
+        "Where",
+        "Let",
+        "Min",
+        "Max",
+        "Constraint",
+        "Constraints",
+        "Objective",
+        "Model",
+        "Table",
+        "Number",
+        "Time",
+        "Cost",
+    ]
 )
 _CARD = re.compile(r"^\s*\|\s*(.+?)\s*\|\s*$")
 _DECL = re.compile(r"^\s*%@\s*(index|param|var)\s+([A-Za-z_]\w*)\b(.*)$")
@@ -380,26 +408,39 @@ def _letters_of(text: str) -> tuple[str, ...]:
     return tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", text) if is_letterish(t))
 
 
+def _cap_family(hi: str) -> str | None:
+    """The family a range cap names: ``T`` or ``|K|`` -> that symbol; ``3``, ``2N-1`` -> none."""
+    text = hi.strip()
+    card = _CARD.match(text)
+    if card:
+        text = card.group(1).strip()
+    if not re.fullmatch(
+        r"[A-Za-z][A-Za-z0-9]*(?:_(?:hat|bar|tilde|vec|dot|underline))?p*(?:_(?:\{[^{}]*\}|[A-Za-z0-9]))?",
+        text,
+    ):
+        return None
+    fam, _ = _family_of(text)
+    return fam
+
+
 def parse_binder(text: str, sup: str = "") -> list[Binding]:
     """Bindings named by one binder clause (already normalised)."""
     text = text.strip()
     out: list[Binding] = []
     m = _RANGE_EQ.match(text) or _RANGE_SET.match(text)
     if m and is_letterish(m.group(1)):
-        hi, _ = _family_of(m.group(3))
-        return [Binding((m.group(1),), hi, "range", m.group(2), m.group(3))]
+        return [Binding((m.group(1),), _cap_family(m.group(3)), "range", m.group(2), m.group(3))]
     m = _RANGE_LE.match(text)
     if m and is_letterish(m.group(2)):
-        hi, _ = _family_of(m.group(3))
-        return [Binding((m.group(2),), hi, "range", m.group(1), m.group(3))]
+        return [Binding((m.group(2),), _cap_family(m.group(3)), "range", m.group(1), m.group(3))]
     m = re.match(r"^\s*(\w+)\s*=\s*([^,\s]+)\s*$", text)
     if m and sup.strip() and is_letterish(m.group(1)):
-        hi, _ = _family_of(sup)
-        return [Binding((m.group(1),), hi, "range", m.group(2), sup.strip())]
+        return [Binding((m.group(1),), _cap_family(sup), "range", m.group(2), sup.strip())]
     for rm in _RANGE_EQ_G.finditer(text):
         if is_letterish(rm.group(1)):
-            hi, _ = _family_of(rm.group(3))
-            out.append(Binding((rm.group(1),), hi, "range", rm.group(2), rm.group(3)))
+            out.append(
+                Binding((rm.group(1),), _cap_family(rm.group(3)), "range", rm.group(2), rm.group(3))
+            )
     text = _RANGE_EQ_G.sub(" ", text)
     pending: list[str] = []
     for clause in _split_top(text):
@@ -409,8 +450,7 @@ def parse_binder(text: str, sup: str = "") -> list[Binding]:
             hi_text = m.group(3)
             lo_text = m.group(1) if m.re is _RANGE_LE else m.group(2)
             if is_letterish(letter):
-                hi, _ = _family_of(hi_text)
-                out.append(Binding((letter,), hi, "range", lo_text, hi_text))
+                out.append(Binding((letter,), _cap_family(hi_text), "range", lo_text, hi_text))
             pending = []
             continue
         mm = _MEMBER.match(clause)
@@ -577,6 +617,7 @@ class Letter:
     bound: Counter = field(default_factory=Counter)
     tuple_bound: Counter = field(default_factory=Counter)
     capped: Counter = field(default_factory=Counter)
+    cap_family: Counter = field(default_factory=Counter)
     prose: Counter = field(default_factory=Counter)
     table: Counter = field(default_factory=Counter)
     table_desc: str = ""
@@ -621,7 +662,9 @@ def analyse(
                 lt = L(letter)
                 _note_row(lt, row)
                 if b.kind == "range":
-                    lt.capped[b.family or b.hi or "?"] += 1
+                    lt.capped[b.hi or "?"] += 1
+                    if b.family:
+                        lt.cap_family[b.family] += 1
                     lt.lo = lt.lo or b.lo
                     counts["capped_bindings"] += 1
                 elif b.kind == "tuple":
@@ -636,6 +679,7 @@ def analyse(
                 if b.family:
                     fam_sub[b.family].update(b.family_sub)
 
+    rows_out: dict[str, dict] = {}
     rows_all: list[tuple[str, str]] = []
     for rid, latex in display_rows:
         rows_all.append((rid, normalise(latex)))
@@ -648,13 +692,32 @@ def analyse(
                 and rec.get("ok")
             ):
                 inline_rows.append((rec["id"], normalise(rec["latex"])))
+
+    def note_row(rid: str, bindings: list[Binding]) -> None:
+        entry = rows_out.setdefault(rid, {"binders": [], "letters": {}})
+        for b in bindings:
+            entry["binders"].append(
+                {
+                    "letters": list(b.letters),
+                    "family": b.family,
+                    "kind": b.kind,
+                    "lo": b.lo,
+                    "hi": b.hi,
+                }
+            )
+            for letter in b.letters:
+                entry["letters"][letter] = "binder"
+
     for rid, norm in rows_all:
-        take(binders_of(norm), rid, "binder")
+        bs = binders_of(norm)
+        take(bs, rid, "binder")
+        note_row(rid, bs)
     for rid, norm in inline_rows:
         bs = binders_of(norm)
         if not bs:  # a bare membership statement in the prose: "i \in I"
             bs = [b for b in parse_binder(norm) if b.family]
         take(bs, rid, "prose")
+        note_row(rid, bs)
 
     # subscript positions over every row (display + inline statements)
     for rid, norm in rows_all + inline_rows:
@@ -662,6 +725,8 @@ def analyse(
         seen_sup: set[str] = set()
         for use in subscript_uses(norm):
             lt = L(use.letter)
+            row_letters = rows_out.setdefault(rid, {"binders": [], "letters": {}})["letters"]
+            row_letters.setdefault(use.letter, "sup" if use.position == "sup" else "sub")
             if use.position == "sup":
                 if use.letter not in seen_sup:
                     lt.sup_rows += 1
@@ -743,10 +808,8 @@ def analyse(
             for fam, n in c.items():
                 if fam != "?":
                     votes[fam] += n
-        if lt.capped:
-            cap = lt.capped.most_common(1)[0][0]
-            if cap != "?":
-                votes[cap] += lt.capped[cap]
+        for fam, n in lt.cap_family.items():
+            votes[fam] += n
         if votes:
             fam = sorted(votes.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
             primary[name] = fam
@@ -754,7 +817,7 @@ def analyse(
     for name in sorted(letters):
         lt = letters[name]
         votes: Counter[str] = Counter()
-        for c in (lt.bound, lt.tuple_bound, lt.prose, lt.table, lt.capped):
+        for c in (lt.bound, lt.tuple_bound, lt.prose, lt.table, lt.cap_family):
             for fam, n in c.items():
                 if fam != "?":
                     votes[fam] += n
@@ -775,6 +838,9 @@ def analyse(
             )
         alias_votes: Counter[str] = Counter()
         alias_rule: dict[str, str] = {}
+        if verdict is None and lt.base[0].isupper() and lt.base not in GREEK:
+            # never bound anywhere and written in capitals: a label (t_{B}) or a set, not a dummy
+            verdict, rule, family = "label", "uppercase", None
         if verdict is None:
             if lt.base != name and lt.base in primary:  # decorated letter, base is bound
                 alias_votes[primary[lt.base]] += lt.sub_rows or 1
@@ -841,7 +907,7 @@ def analyse(
                 + entry["table_rows"]
                 + sum(lt.capped.values())
             )
-            if lt.capped and family in lt.capped:
+            if family in lt.cap_family:
                 fe["cap"] = True
     for fam in fam_desc:
         if fam not in families and fam not in declared["param"] and fam not in declared["var"]:
@@ -865,6 +931,7 @@ def analyse(
             "letters_juxtaposed": sum(
                 1 for e in out_letters.values() if e["verdict"] == "juxtaposed"
             ),
+            "letters_label": sum(1 for e in out_letters.values() if e["verdict"] == "label"),
             "letters_capped": sum(1 for e in out_letters.values() if e["capped"]),
             "letters_multi_family": sum(1 for e in out_letters.values() if e["multi_family"]),
             "families_found": len(found),
@@ -887,6 +954,11 @@ def analyse(
         "rules": dict(sorted(rules.items())),
         "letters": out_letters,
         "families": {k: families[k] for k in sorted(families)},
+        "rows": {
+            k: rows_out[k]
+            for k in sorted(rows_out)
+            if rows_out[k]["letters"] or rows_out[k]["binders"]
+        },
         "declared_index": sorted(declared_idx),
         "declared_index_are_letters": letters_named_as_index,
     }
@@ -984,6 +1056,7 @@ def render_report_md(report: dict) -> str:
         f"| alias (resolved by decoration or position rule) | {t.get('letters_alias', 0)} |",
         f"| candidate (subscript only, no family evidence) | {t.get('letters_candidate', 0)} |",
         f"| juxtaposed only (probably label fragments) | {t.get('letters_juxtaposed', 0)} |",
+        f"| capital letters never bound (labels such as t_B, or sets) | {t.get('letters_label', 0)} |",
         f"| capped (ranges over 1..N) | {t.get('letters_capped', 0)} |",
         f"| bound to more than one family | {t.get('letters_multi_family', 0)} |",
         "",
@@ -999,6 +1072,7 @@ def render_report_md(report: dict) -> str:
         "position",
         "subscript",
         "juxtaposed",
+        "uppercase",
     ):
         lines.append(f"| {rule} | {r.get(rule, 0)} |")
     lines += [

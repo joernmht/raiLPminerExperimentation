@@ -155,6 +155,7 @@ def page_payload(rec: dict, idx: dict | None, d: Dossier | None = None) -> dict:
             "declared_index": idx.get("declared_index", []),
             "declared_index_are_letters": idx.get("declared_index_are_letters", []),
             "counts": idx.get("counts", {}),
+            "rows": idx.get("rows", {}),
         },
     }
 
@@ -399,6 +400,20 @@ input.wide{width:100%}
 .flag{display:inline-block;font-size:10.5px;border-radius:999px;padding:0 6px;border:1px solid var(--line);color:var(--muted);margin-left:4px}
 .flag.warn{border-color:var(--warn);color:var(--warn)}
 .kbd{font-size:11.5px;color:var(--muted);margin-top:8px}
+.frow{border-top:1px solid var(--line);padding:8px 0}
+.frow .fid{font:11px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--muted)}
+.frow .ftex{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;overflow-x:auto;padding:4px 0}
+.lchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+button.lchip{border-radius:999px;padding:3px 9px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;font-weight:700}
+button.lchip small{font-weight:400;color:var(--muted);margin-left:4px}
+button.lchip.v-index{border-color:var(--accent);color:var(--accent)}
+button.lchip.v-alias{border-color:var(--tier3);color:var(--tier3)}
+button.lchip.v-candidate,button.lchip.v-juxtaposed,button.lchip.v-label{border-color:var(--warn);color:var(--warn)}
+button.lchip.h-index{background:var(--accent);border-color:var(--accent);color:#fff}
+button.lchip.h-not{background:var(--bad);border-color:var(--bad);color:#fff;text-decoration:line-through}
+button.lchip.h-unsure{background:var(--muted);border-color:var(--muted);color:#fff}
+button.lchip.h-index small,button.lchip.h-not small,button.lchip.h-unsure small{color:#fff}
+button.fam{padding:3px 7px;font-size:12px}
 """
 
 TEMPLATE = r"""<!DOCTYPE html>
@@ -431,6 +446,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
 <nav class="tabs">
   <button data-tab="text" class="on">Text with formulas</button>
   <button data-tab="idx">Indices</button>
+  <button data-tab="frows">Formulas × indices</button>
   <button data-tab="stmts">Statements in prose</button>
   <button data-tab="tables">Notation tables</button>
 </nav>
@@ -451,6 +467,11 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
   <h3>Families</h3>
   <table class="grid" id="families"></table>
   <div class="kbd" id="declared"></div>
+</section>
+<section id="tab-frows" class="card hidden">
+  <div class="sub">Every formula with the index letters found in it: what the binders bind (∑, ∀, ranges) and which letters sit in subscripts. Click a letter to decide it (✓ index → ✗ not → ? → clear); ✎ sets its family. A decision applies to the letter everywhere in this paper.</div>
+  <label class="ev"><input type="checkbox" id="onlyOpen"> only formulas with undecided letters (candidate / label / juxtaposed / unsure)</label>
+  <div id="frows"></div>
 </section>
 <section id="tab-stmts" class="card hidden">
   <div class="sub">Inline statements and operators in document order: the formulas the display-only extraction never saw. Mark what the pipeline must take.</div>
@@ -492,7 +513,7 @@ function paintCounter(){
 /* ---------- tabs ---------- */
 document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => {
   document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x === b));
-  ["text","idx","stmts","tables"].forEach(t => $("tab-" + t).classList.toggle("hidden", t !== b.dataset.tab));
+  ["text","idx","frows","stmts","tables"].forEach(t => $("tab-" + t).classList.toggle("hidden", t !== b.dataset.tab));
   typeset($("tab-" + b.dataset.tab));
 }));
 
@@ -625,7 +646,7 @@ $("letters").addEventListener("click", e => {
   const n = b.closest("tr").dataset.n; snap();
   const cur = S.indices[n] || {}; const fam = b.closest("tr").querySelector("input[data-fam]").value.trim();
   if (cur.verdict === b.dataset.v) delete S.indices[n]; else S.indices[n] = {verdict: b.dataset.v, family: fam};
-  save(); paintLetters();
+  save(); paintLetters(); paintFormulas();
 });
 $("letters").addEventListener("change", e => {
   const inp = e.target.closest("input[data-fam]"); if (!inp) return; snap();
@@ -646,9 +667,53 @@ function jump(row){
   const el = row.startsWith("eq-") ? $("d-" + row) : document.querySelector('.chip[data-id="' + row + '"]');
   if (!el){ toast(row + " is not on this page"); return; }
   document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x.dataset.tab === "text"));
-  ["text","idx","stmts","tables"].forEach(t => $("tab-" + t).classList.toggle("hidden", t !== "text"));
+  ["text","idx","frows","stmts","tables"].forEach(t => $("tab-" + t).classList.toggle("hidden", t !== "text"));
   if (el.scrollIntoView) el.scrollIntoView({block: "center"}); el.style.outline = "3px solid var(--accent2)"; setTimeout(() => el.style.outline = "", 1500);
 }
+
+/* ---------- formulas × indices ---------- */
+const OPEN = new Set(["candidate", "juxtaposed", "label"]);
+function letterState(l){ const e = D.indices.letters[l] || {}; const h = S.indices[l] || {}; return {e, h, fam: h.family !== undefined && h.family !== "" ? h.family : (e.family || "?"), open: h.verdict ? h.verdict === "unsure" : (!e.verdict || OPEN.has(e.verdict))}; }
+function lchipHTML(l, role){
+  const st = letterState(l);
+  return '<button class="lchip v-' + esc(st.e.verdict || "none") + (st.h.verdict ? " h-" + esc(st.h.verdict) : "") + '" data-l="' + esc(l) + '" title="' + esc((st.e.rule || "no rule") + (st.e.desc ? " · " + st.e.desc : "")) + '">' + esc(l) + ' → ' + esc(st.fam) + '<small>' + esc(role) + (st.e.verdict ? " · " + esc(st.e.verdict) : "") + '</small></button><button class="fam" data-f="' + esc(l) + '" title="set the family of ' + esc(l) + '">✎</button>';
+}
+function binderText(b){
+  if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + " … " + (b.hi || "?") + (b.family ? " (family " + b.family + ")" : " (no family: not a symbol)");
+  return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?");
+}
+function paintFormulas(){
+  const rows = D.indices.rows || {}; const only = $("onlyOpen").checked;
+  const order = [];
+  for (const id of Object.keys(D.maths).sort()){
+    const m = D.maths[id];
+    const key = m.where === "display" ? (m.eq || null) : (m.where === "inline" && (m.cls === "statement" || m.cls === "operator") ? id : null);
+    if (key && rows[key]) order.push([key, id]);
+  }
+  let html = "", shown = 0;
+  for (const [key, id] of order){
+    const m = D.maths[id]; const r = rows[key];
+    const letters = Object.entries(r.letters).sort((a, b) => (a[1] === "binder" ? 0 : 1) - (b[1] === "binder" ? 0 : 1) || a[0].localeCompare(b[0]));
+    if (only && !letters.some(([l]) => letterState(l).open)) continue;
+    shown++;
+    html += '<div class="frow" data-key="' + esc(key) + '"><div class="fid">' + esc(key) + (m.tag ? " " + esc(m.tag) : "") + (m.where === "inline" ? " · in the prose" : "") + ' <span class="rowref" data-row="' + esc(key) + '">show in text</span></div><div class="ftex tex" data-tex="' + esc(m.show || m.latex) + '"' + (m.where === "display" ? ' data-display="1"' : "") + '>' + esc(m.show || m.latex) + '</div>' + (r.binders.length ? '<div class="ev">binds: ' + esc(r.binders.map(binderText).join(" · ")) + "</div>" : '<div class="ev">no binder in this row</div>') + '<div class="lchips">' + letters.map(([l, role]) => lchipHTML(l, role)).join("") + "</div></div>";
+  }
+  $("frows").innerHTML = html || '<div class="ev">' + (only ? "no formula with undecided letters — done here" : "no formulas with index letters") + '</div>';
+  $("frows").dataset.shown = shown;
+}
+function cycleLetter(l){
+  snap(); const cur = (S.indices[l] || {}).verdict; const fam = (S.indices[l] || {}).family;
+  const next = !cur ? "index" : cur === "index" ? "not" : cur === "not" ? "unsure" : null;
+  if (next) S.indices[l] = {verdict: next, family: fam !== undefined ? fam : ((D.indices.letters[l] || {}).family || "")}; else delete S.indices[l];
+  save(); paintFormulas(); paintLetters(); toast(l + (next ? " → " + next : " cleared"));
+}
+$("frows").addEventListener("click", e => {
+  const ref = e.target.closest(".rowref"); if (ref){ jump(ref.dataset.row); return; }
+  const f = e.target.closest("button.fam");
+  if (f){ const l = f.dataset.f; const cur = S.indices[l] || {}; const v = window.prompt ? window.prompt("family of " + l + " (the set it ranges over)", cur.family !== undefined ? cur.family : ((D.indices.letters[l] || {}).family || "")) : null; if (v === null) return; snap(); S.indices[l] = {verdict: cur.verdict || "index", family: v.trim()}; save(); paintFormulas(); paintLetters(); return; }
+  const b = e.target.closest("button.lchip"); if (b) cycleLetter(b.dataset.l);
+});
+$("onlyOpen").addEventListener("change", () => { paintFormulas(); typeset($("tab-frows")); });
 
 /* ---------- notation tables ---------- */
 function cellHTML(text){
@@ -699,10 +764,10 @@ $("importFile").addEventListener("change", e => { const f = e.target.files[0]; i
 $("undoBtn").addEventListener("click", undo);
 $("clearBtn").addEventListener("click", () => { if (!confirm("Clear every decision for this paper?")) return; snap(); S = {formulas: {}, spans: [], indices: {}, families: {}, steps: []}; save(); paintAll(); });
 
-function paintAll(){ paintText(); paintStmts(); paintSpans(); paintLetters(); paintTables(); paintCounter(); typeset($("tab-text")); }
+function paintAll(){ paintText(); paintStmts(); paintSpans(); paintLetters(); paintFormulas(); paintTables(); paintCounter(); typeset($("tab-text")); }
 paintAll();
 whenMathJax(() => typeset($("tab-text")));
-window.__discover = {S: () => S, cycle, exportPayload, importJSON, jump, typeset};
+window.__discover = {S: () => S, cycle, cycleLetter, exportPayload, importJSON, jump, typeset, paintFormulas};
 </script>
 </body>
 </html>
