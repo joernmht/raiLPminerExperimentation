@@ -1,0 +1,131 @@
+"""corpusbuilder.indices — index letters and families, found deterministically."""
+
+from __future__ import annotations
+
+from corpusbuilder import indices
+
+
+def _b(latex: str) -> list[tuple]:
+    return [
+        (b.letters, b.family, b.kind, b.hi) for b in indices.binders_of(indices.normalise(latex))
+    ]
+
+
+def test_binder_pairs_in_every_spelling() -> None:
+    assert _b(r"\sum_{i \in I} c_{i} x_{ij} \quad \forall j \in J") == [
+        (("i",), "I", "member", None),
+        (("j",), "J", "member", None),
+    ]
+    assert _b(r"\underset{i \in \mathcal{I}}{\sum} x_i") == [(("i",), "I", "member", None)]
+    assert _b(r"\forall i, j \in I, i \neq j") == [(("i", "j"), "I", "member", None)]
+    assert _b(r"\forall (i, j) \in A, k \in K") == [
+        (("i", "j"), "A", "tuple", None),
+        (("k",), "K", "member", None),
+    ]
+    assert _b(r"\sum_{e \in E_{i}} x_e") == [(("e",), "E", "member", None)]
+
+
+def test_capped_ranges_become_range_bindings() -> None:
+    assert _b(r"\sum_{t=1}^{T} x_t") == [(("t",), "T", "range", "T")]
+    assert _b(r"\underset{t = 1}{\overset{T}{\sum}} x_{t}") == [(("t",), "T", "range", "T")]
+    assert _b(r"\forall t \in \{1, 2, \ldots, T\}") == [(("t",), "T", "range", "T")]
+    assert _b(r"\forall e \in E, 1 \le p \le P") == [
+        (("e",), "E", "member", None),
+        (("p",), "P", "range", "P"),
+    ]
+    assert _b(r"\forall i \in I, t = 1, \ldots, T") == [
+        (("t",), "T", "range", "T"),
+        (("i",), "I", "member", None),
+    ]
+
+
+def test_decorations_and_greek_normalise_to_lp2graph_names() -> None:
+    n = indices.normalise(r"x_{k'} + x_{\hat{k}} + x_{\overset{\land}{k}} + \lambda_{i} + θ_{j}")
+    assert "x_{kp}" in n and n.count("x_{k_hat}") == 2 and "lambda_{i}" in n and "theta_{j}" in n
+    assert indices.base_letter("k_hat") == "k" and indices.base_letter("kp") == "k"
+    assert indices.base_letter("theta") == "theta" and indices.base_letter("train") is None
+
+
+def test_subscript_positions_and_juxtaposed_letters() -> None:
+    uses = indices.subscript_uses(
+        indices.normalise(r"c_{i} x_{i j} + y_{k'} + z^{k}_{i+1, t} + T_{max}")
+    )
+    got = {(u.base, u.position, u.letter, u.juxtaposed) for u in uses}
+    assert ("c", "1", "i", False) in got and ("x", "2", "j", True) in got
+    assert (
+        ("y", "1", "kp", False) in got
+        and ("z", "2", "t", False) in got
+        and ("z", "sup", "k", False) in got
+    )
+    assert not any(u.base == "T" for u in uses)  # "max" is a label, not an index
+
+
+def test_analyse_resolves_aliases_by_decoration_and_position() -> None:
+    rows = [
+        ("eq-0001", r"\sum_{k \in K} x_{k} \le 1"),
+        ("eq-0002", r"x_{k'} + x_{k} \le 1 \quad \forall k \in K"),
+        ("eq-0003", r"y_{s, t} \ge 0 \quad \forall s \in S, t = 1, \ldots, T"),
+        ("eq-0004", r"y_{s, u} \le y_{s, t}"),
+        ("eq-0005", r"z_{d} \le 1"),
+        ("eq-0006", r"y_{s, u} \ge y_{s, t} - 1"),
+        ("eq-0007", r"z_{w} \le z_{d}"),
+        ("eq-0008", r"q_{w} \le q_{k}"),
+    ]
+    rec = indices.analyse(
+        rows, None, {"index": {"K": "", "k": ""}, "param": {"T": "periods"}, "var": {}}
+    )
+    L = rec["letters"]
+    assert L["k"]["verdict"] == "index" and L["k"]["family"] == "K" and L["k"]["rule"] == "binder"
+    assert (
+        L["kp"]["verdict"] == "alias"
+        and L["kp"]["family"] == "K"
+        and L["kp"]["rule"] == "decorated"
+    )
+    assert (
+        L["t"]["verdict"] == "index" and L["t"]["rule"] == "capped" and L["t"]["capped"] == {"T": 1}
+    )
+    assert L["u"]["verdict"] == "alias" and L["u"]["family"] == "T" and L["u"]["rule"] == "position"
+    assert L["d"]["verdict"] == "candidate" and L["d"]["family"] is None
+    # one shared position is not enough for an alias: the vote is kept as evidence only
+    assert L["w"]["verdict"] == "candidate" and L["w"]["alias_votes"] == {"K": 1}
+    fams = rec["families"]
+    assert (
+        fams["K"]["declared_as"] == "index"
+        and fams["T"]["declared_as"] == "param"
+        and fams["T"]["cap"]
+    )
+    assert rec["declared_index_are_letters"] == ["k"]
+    assert rec["counts"]["families_new"] == 2  # S and T
+    lines = indices.proposed_index_lines(rec)
+    assert any(line.startswith("%@ index T ") and "range 1..T" in line for line in lines)
+    assert not any(line.startswith("%@ index K ") for line in lines)
+
+
+def test_prose_and_table_evidence_bind_letters() -> None:
+    discovery = {
+        "maths": [
+            {
+                "id": "m-0001",
+                "where": "inline",
+                "cls": "statement",
+                "ok": True,
+                "latex": r"i \in \mathcal{I}",
+            }
+        ],
+        "tables": [
+            {
+                "id": "t-0001",
+                "notation": True,
+                "rows": [
+                    {"header": False, "symbol": "I", "desc": "Set of trains"},
+                    {"header": False, "symbol": "j", "desc": "Generic train in ⟨I⟩"},
+                ],
+            }
+        ],
+        "deflists": [],
+    }
+    rec = indices.analyse([("eq-0001", r"x_{i} + x_{j} \le 1")], discovery)
+    assert rec["letters"]["i"]["rule"] == "prose" and rec["letters"]["i"]["family"] == "I"
+    assert rec["letters"]["j"]["rule"] == "table" and rec["letters"]["j"]["family"] == "I"
+    assert rec["families"]["I"]["desc"] == "Set of trains"
+    assert sorted(rec["families"]["I"]["letters"]) == ["i", "j"]
