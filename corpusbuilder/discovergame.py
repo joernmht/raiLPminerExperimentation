@@ -151,10 +151,19 @@ def page_payload(
         for n, e in idx["letters"].items()
     }
     role_map = propose_roles(rec)
-    if model_spans:
-        for mid, span in model_spans.items():
-            if mid in role_map and role_map[mid]["role"] == "definition" and span:
-                role_map[mid]["span"] = span
+    for mid, span in (model_spans or {}).items():
+        if mid not in role_map or role_map[mid]["role"] != "definition":
+            continue
+        if span.get("defines") is False:
+            role_map[mid]["note"] = "model: not a definition"
+        elif span.get("text"):
+            role_map[mid]["span"] = {
+                k: span[k]
+                for k in ("para", "start", "end", "text", "position", "source")
+                if k in span
+            }
+            if span.get("differs_from_rule"):
+                role_map[mid]["note"] = "model refined the rule's sentence"
     return {
         "schema_version": PAGE_SCHEMA,
         "paper": _meta(d, rec),
@@ -185,7 +194,9 @@ def load_model_spans(key: str, definitions_dir: Path = DEFINITIONS_DIR) -> dict[
         return {}
     obj = json.loads(path.read_text(encoding="utf-8"))
     return {
-        k: v for k, v in (obj.get("spans") or {}).items() if isinstance(v, dict) and v.get("text")
+        k: v
+        for k, v in (obj.get("spans") or {}).items()
+        if isinstance(v, dict) and v.get("source") == "model"
     }
 
 
@@ -727,7 +738,7 @@ function paintDetails(){
   const m = D.maths[id], pr = proposed(id), role = roleOf(id), h = S.roles[id];
   let html = '<div class="dhead"><span class="mono">' + esc(id) + (m.eq ? " = " + esc(m.eq) : "") + '</span> <span class="ev">' + esc(m.where + " · " + m.cls) + '</span></div>';
   html += '<div class="dtex tex" data-tex="' + esc(m.show || m.latex) + '"' + (m.where === "display" ? ' data-display="1"' : "") + ">" + esc(m.show || m.latex) + "</div>";
-  html += '<div class="ev">proposed: <b>' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (h ? ' · <b>yours: ' + esc(h.role) + "</b>" : "") + "</div>";
+  html += '<div class="ev">proposed: <b>' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (pr.note ? ' · <span class="flag warn">' + esc(pr.note) + "</span>" : "") + (h ? ' · <b>yours: ' + esc(h.role) + "</b>" : "") + "</div>";
   html += '<div class="btns roles">' + ROLES.map(r => '<button data-role="' + r + '" class="rb r-' + r + (role === r ? " on" : "") + (h && h.role === r ? " hh" : "") + '">' + r + "</button>").join("") + "</div>";
   if (role === "definition"){
     const sp = spanOf(id);
