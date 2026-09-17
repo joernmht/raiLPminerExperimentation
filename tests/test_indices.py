@@ -129,3 +129,27 @@ def test_prose_and_table_evidence_bind_letters() -> None:
     assert rec["letters"]["j"]["rule"] == "table" and rec["letters"]["j"]["family"] == "I"
     assert rec["families"]["I"]["desc"] == "Set of trains"
     assert sorted(rec["families"]["I"]["letters"]) == ["i", "j"]
+
+
+def test_numeric_and_arithmetic_caps_name_no_family_and_capitals_are_labels() -> None:
+    rows = [
+        ("eq-0001", r"\sum_{i=1}^{3} x_{i} \le 1"),
+        ("eq-0002", r"\sum_{u=1}^{2N-1} y_{u} + \sum_{k=1}^{|K|} z_{k} \le 1"),
+        ("eq-0003", r"t_{i, B} \le t_{i, E} \quad \forall i \in I"),
+    ]
+    rec = indices.analyse(rows, None)
+    L = rec["letters"]
+    assert L["i"]["verdict"] == "index" and L["i"]["family"] == "I" and "3" not in rec["families"]
+    assert L["u"]["family"] is None and L["u"]["capped"] and "2N-1" not in rec["families"]
+    assert L["k"]["family"] == "K" and rec["families"]["K"]["cap"]
+    assert (
+        L["B"]["verdict"] == "label" and L["E"]["verdict"] == "label" and L["B"]["family"] is None
+    )
+    assert rec["rows"]["eq-0003"]["letters"] == {"i": "binder", "B": "sub", "E": "sub"}
+    assert rec["rows"]["eq-0002"]["binders"][1] == {
+        "letters": ["k"],
+        "family": "K",
+        "kind": "range",
+        "lo": "1",
+        "hi": "|K|",
+    }

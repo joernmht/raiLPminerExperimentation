@@ -68,12 +68,30 @@ function boot(path) {
   // rows jump to the text
   const ref = d.querySelector("#letters .rowref");
   if (ref) { ref.click(); ok(!d.getElementById("tab-text").classList.contains("hidden"), "indices: row reference jumps to the text tab"); }
+  // formulas × indices tab
+  const frows = d.querySelectorAll("#frows .frow");
+  ok(frows.length > 0 && frows.length === Object.keys(D.indices.rows || {}).filter(k => k.startsWith("eq-") ? Object.values(D.maths).some(m => m.eq === k) : !!D.maths[k]).length, "formulas: one block per row with index letters (" + frows.length + ")");
+  const lchip = d.querySelector("#frows button.lchip");
+  ok(!!lchip, "formulas: letter chips rendered");
+  if (lchip) {
+    const l = lchip.dataset.l;
+    delete w.__discover.S().indices[l];
+    lchip.click();
+    ok(w.__discover.S().indices[l] && w.__discover.S().indices[l].verdict === "index", "formulas: letter click decides index");
+    ok(d.querySelector('#letters tr[data-n="' + l + '"] button[data-v="index"]').classList.contains("on"), "formulas: the Indices tab mirrors the decision");
+    w.prompt = () => "ZZ2";
+    d.querySelector('#frows button.fam[data-f="' + l + '"]').click();
+    ok(w.__discover.S().indices[l].family === "ZZ2", "formulas: ✎ sets the family");
+    d.getElementById("onlyOpen").checked = true; d.getElementById("onlyOpen").dispatchEvent(new w.Event("change"));
+    ok(parseInt(d.getElementById("frows").dataset.shown, 10) <= frows.length, "formulas: open-only filter narrows");
+    d.getElementById("onlyOpen").checked = false; d.getElementById("onlyOpen").dispatchEvent(new w.Event("change"));
+  }
   // hand-marked span
   w.__discover.S().spans.push({ para: 3, text: "x(i,j) = 1", latex: "x_{ij} = 1" });
   // export contract
   const p = w.__discover.exportPayload();
   ok(p.schema_version === "discover-decisions-1" && p.paper_key === D.paper.key && p.labeller === "human", "export: schema, key, labeller");
-  ok(p.indices[n0].family === "ZZ" && p.spans.length === 1 && p.formulas[stmt ? stmt.dataset.id : ""] === "formula", "export: carries formulas, spans, indices");
+  ok(p.indices[n0] && p.spans.length === 1 && p.formulas[stmt ? stmt.dataset.id : ""] === "formula", "export: carries formulas, spans, indices");
   // import merges (last wins)
   const r = w.__discover.importJSON(JSON.stringify({ schema_version: "discover-decisions-1", paper_key: D.paper.key, formulas: { [stmt ? stmt.dataset.id : "m-0001"]: "not" }, spans: [{ para: 3, text: "x(i,j) = 1", latex: "x_{ij} = 1" }, { para: 5, text: "y = 2" }], indices: { [n0]: { verdict: "not", family: "" } }, families: {} }));
   ok(r === 1 && w.__discover.S().formulas[stmt ? stmt.dataset.id : "m-0001"] === "not" && w.__discover.S().indices[n0].verdict === "not", "import: last wins on formulas and indices");
