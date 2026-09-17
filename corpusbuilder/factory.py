@@ -419,6 +419,8 @@ def snapshot(
         corpus / "fingerprint" / "clusters.json",
         corpus / "prisma_macros.tex",
         corpus / "resolution_macros.tex",
+        corpus / "discovery.json",
+        corpus / "indices.json",
     ]
     cand = _load_json(corpus / "candidates.json") or {}
     snow = _load_json(corpus / "snowball_candidates.json") or {}
@@ -444,6 +446,12 @@ def snapshot(
     vocab_report = _load_json(corpus / "vocab.json") or {}
     n_vocab = _count("*.json", corpus / "vocab")
     vocab_live = bool(vocab_report) and n_vocab > 0
+    disc = _load_json(corpus / "discovery.json") or {}
+    disc_t = disc.get("totals") or {}
+    disc_live = bool(disc_t)
+    idx = _load_json(corpus / "indices.json") or {}
+    idx_t = idx.get("totals") or {}
+    idx_live = bool(idx_t)
     form_dir = corpus / "formulations"
     form_files = sorted(p.name for p in form_dir.glob("*.json")) if form_dir.exists() else []
     n_mined = sum(1 for n in form_files if n.startswith("10."))
@@ -680,6 +688,56 @@ def snapshot(
                 "corpus/vocab/*.json",
                 f"{_fmt(n_vocab)} fill-in lists" if vocab_live else "not built yet",
                 vocab_live,
+            ),
+        },
+        {
+            "id": "discovery",
+            "lane": "det",
+            "col": 8,
+            "row": 1,
+            "kind": "station" if disc_live else "planned",
+            "stage": "discovery",
+            "stereo": "«corpusbuilder.discover»",
+            "title": "Discovery (all maths)",
+            "role": "every math element: display · inline · tables",
+            "count": _fmt(disc_t.get("maths")) if disc_live else "planned",
+            "count_label": (
+                f"elements · {_fmt(disc_t.get('inline_statement'))} inline statements · "
+                f"{_fmt(disc_t.get('notation_tables'))} notation tables"
+                if disc_live
+                else "the text with every formula marked"
+            ),
+            "artifact": art(
+                "corpus/discovery.json",
+                f"{_fmt(disc.get('papers'))} papers" if disc_live else "not built yet",
+                disc_live,
+            ),
+        },
+        {
+            "id": "indices",
+            "lane": "det",
+            "col": 9,
+            "row": 1,
+            "kind": "station" if idx_live else "planned",
+            "stage": "indices",
+            "stereo": "«corpusbuilder.indices»",
+            "title": "Index discovery",
+            "role": "letters → families · decoration + position rules",
+            "count": (
+                f"{_fmt(idx_t.get('letters_index'))} + {_fmt(idx_t.get('letters_alias'))}"
+                if idx_live
+                else "planned"
+            ),
+            "count_label": (
+                f"index + alias letters · {_fmt(idx_t.get('families_found'))} families "
+                f"({_fmt(idx_t.get('families_new'))} undeclared)"
+                if idx_live
+                else "index letters and families per paper"
+            ),
+            "artifact": art(
+                "corpus/indices.json",
+                f"{_fmt(idx.get('papers'))} papers" if idx_live else "not built yet",
+                idx_live,
             ),
         },
         {
