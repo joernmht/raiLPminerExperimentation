@@ -192,8 +192,10 @@ def build_all(
     indices_dir: Path = INDICES,
     out_dir: Path = OUT_DIR,
     index_page: Path = INDEX_PAGE,
+    promotion_path: Path = CORPUS / "promotion.json",
 ) -> list[dict]:
     rows: list[dict] = []
+    stake = index_rows_at_stake(promotion_path)
     for d in included_dossiers(dossier_dir):
         rec = load_record(d.key, discovery_dir)
         if rec is None:
@@ -217,10 +219,42 @@ def build_all(
                 "letters_alias": ic.get("letters_alias", 0),
                 "letters_candidate": ic.get("letters_candidate", 0),
                 "families_new": ic.get("families_new", 0),
+                "rows_probed": stake.get(d.key, (0, 0))[0],
+                "at_stake": stake.get(d.key, (0, 0))[1],
             }
         )
+    # the worklist order: papers where confirmed indices could flip the most rows first
+    rows.sort(key=lambda r: (-r["at_stake"], -r["rows_probed"], r["key"]))
     build_index(rows, index_page)
     return rows
+
+
+#: Row-failure classes of ``promote --partial`` that confirmed indices and families can flip.
+INDEX_CLASSES = (
+    "quantifier: clause not understood",
+    "other",
+    "binder: range",
+    "binder: tuple",
+    "quantifier: tuple",
+    "quantifier: subscripted set",
+    "binder: subscripted set",
+)
+
+
+def index_rows_at_stake(promotion_path: Path) -> dict[str, tuple[int, int]]:
+    """``{paper_key: (rows probed, rows failing in an index-related class)}`` from the promotion report."""
+    if not promotion_path.exists():
+        return {}
+    report = json.loads(promotion_path.read_text(encoding="utf-8"))
+    out: dict[str, tuple[int, int]] = {}
+    for outcome in report.get("papers") or []:
+        cov = outcome.get("coverage") or {}
+        failures = cov.get("row_failures") or {}
+        out[outcome["paper_key"]] = (
+            int(cov.get("rows_probed") or 0),
+            sum(int(failures.get(c, 0)) for c in INDEX_CLASSES),
+        )
+    return out
 
 
 def zip_pages(
@@ -787,7 +821,7 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <div class="proto">working prototype — discovery round: deterministic marks, human decisions</div>
 <div class="eyebrow">Discovery round</div>
 <h1>Every paper, every formula</h1>
-<div class="sub">Open a paper to read its text with all mathematical elements marked, confirm the index letters and families, and export one decisions file per paper. Progress shown here comes from this browser's storage.</div>
+<div class="sub">Worklist order: papers where confirmed indices and families could flip the most rows come first ("rows at stake" = rows that fail in an index-related class of the last promotion run). Open a paper, decide its letters in "Formulas × indices", skim "Statements in prose", export. Progress comes from this browser's storage.</div>
 <div class="card"><table class="grid" id="papers"></table></div>
 <script id="rows" type="application/json">__ROWS__</script>
 <script>
@@ -795,8 +829,8 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 const R = JSON.parse(document.getElementById("rows").textContent).papers;
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 function prog(key){ try{ const s = JSON.parse(localStorage.getItem("discover:state:v1:" + key) || "null"); if (!s) return "—"; return Object.keys(s.formulas).length + " f · " + s.spans.length + " hand · " + Object.keys(s.indices).length + " idx"; }catch(e){ return "—"; } }
-let html = "<tr><th>paper</th><th>year</th><th>display</th><th>inline stmts</th><th>notation rows</th><th>index / alias / cand.</th><th>new families</th><th>progress</th></tr>";
-for (const r of R) html += '<tr><td><a href="discover/' + esc(r.key) + '.html">' + esc(r.key) + '</a><div class="ev">' + esc((r.title || "").slice(0, 90)) + '</div></td><td>' + esc(r.year || "") + '</td><td>' + r.display + '</td><td>' + r.statements + '</td><td>' + r.notation_rows + '</td><td>' + r.letters_index + " / " + r.letters_alias + " / " + r.letters_candidate + '</td><td>' + r.families_new + '</td><td class="prog">' + prog(r.key) + '</td></tr>';
+let html = "<tr><th>#</th><th>paper</th><th>year</th><th>rows at stake</th><th>display</th><th>inline stmts</th><th>notation rows</th><th>index / alias / cand.</th><th>new families</th><th>progress</th></tr>";
+R.forEach((r, i) => { html += '<tr><td class="ev">' + (i + 1) + '</td><td><a href="discover/' + esc(r.key) + '.html">' + esc(r.key) + '</a><div class="ev">' + esc((r.title || "").slice(0, 90)) + '</div></td><td>' + esc(r.year || "") + '</td><td><b>' + (r.at_stake || 0) + '</b> <span class="ev">of ' + (r.rows_probed || 0) + '</span></td><td>' + r.display + '</td><td>' + r.statements + '</td><td>' + r.notation_rows + '</td><td>' + r.letters_index + " / " + r.letters_alias + " / " + r.letters_candidate + '</td><td>' + r.families_new + '</td><td class="prog">' + prog(r.key) + '</td></tr>'; });
 document.getElementById("papers").innerHTML = html;
 </script>
 </body>
