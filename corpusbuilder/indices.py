@@ -484,6 +484,8 @@ def parse_binder(text: str, sup: str = "", words: frozenset[str] = frozenset()) 
             pending.extend(clause.split())
             continue
         pending = []  # a restriction ("i \ne j") ends the run of bare letters
+    if pending and not out:
+        out.append(Binding(tuple(pending), None, "member"))  # a bare dummy: \sum_{e}, \forall q
     return out
 
 
