@@ -552,6 +552,7 @@ TEMPLATE = r"""<!DOCTYPE html>
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔎</text></svg>">
 <title>Discovery run — __KEY__</title>
+<link rel="manifest" href="/manifest.webmanifest">
 <style>__STYLE__</style>
 <script>
 window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]"]], packages: {"[+]": ["ams"]}}, svg: {fontCache: "global"}, startup: {typeset: false}};
@@ -604,9 +605,22 @@ function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, label
 function migrate(v1){ const s = fresh(); for (const [id, v] of Object.entries(v1.formulas || {})) s.roles[id] = {role: v === "not" ? "other" : "formula"}; s.marks = (v1.spans || []).map(x => ({para: x.para, text: x.text, latex: x.latex || x.text})); s.indices = v1.indices || {}; s.families = v1.families || {}; return s; }
 function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles){ if (!s.round) s.round = "indices"; if (!s.pos) s.pos = {}; if (!s.labels) s.labels = {}; return s; } const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
 let storeFailed = false;
-function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); storeFailed = false; }catch(e){ if (!storeFailed) toast("this browser cannot store decisions for a file opened this way — export before you close the page"); storeFailed = true; } const b = $("unsaved"); if (b) b.classList.toggle("hidden", !storeFailed); }
+function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); storeFailed = false; }catch(e){ if (!storeFailed && !SERVED) toast("this browser cannot store decisions for a file opened this way — export before you close the page"); storeFailed = true; } const b = $("unsaved"); if (b) b.classList.toggle("hidden", !storeFailed || SERVED); pushState(); }
+const SERVED = /^https?:$/.test(location.protocol) && typeof fetch === "function";
 let S = load();
 const undoStack = [];
+let pushTimer = null;
+function pushState(){ if (!SERVED) return; clearTimeout(pushTimer); pushTimer = setTimeout(() => { fetch("/api/state/" + encodeURIComponent(KEY), {method: "PUT", headers: {"Content-Type": "application/json"}, body: JSON.stringify(S)}).then(r => { if (!r.ok) toast("server did not store the state"); }).catch(() => toast("server unreachable — decisions stay in this browser")); }, 600); }
+function pullState(){
+  if (!SERVED) return Promise.resolve(false);
+  return fetch("/api/state/" + encodeURIComponent(KEY)).then(r => r.ok ? r.json() : null).then(obj => {
+    const st = obj && obj.state; if (!st || !st.roles) return false;
+    const mine = Object.keys(S.roles).length + Object.keys(S.indices).length + Object.keys(S.families).length + S.marks.length;
+    const theirs = Object.keys(st.roles).length + Object.keys(st.indices || {}).length + Object.keys(st.families || {}).length + (st.marks || []).length;
+    if (theirs > mine){ S = {...fresh(), ...st}; save(); return true; }
+    return false;
+  }).catch(() => false);
+}
 function snap(){ undoStack.push(JSON.stringify(S)); if (undoStack.length > 300) undoStack.shift(); }
 
 /* ---------- data helpers ---------- */
@@ -813,6 +827,12 @@ function exportPayload(){ return {schema_version: "discover-decisions-2", paper_
 function exportJSON(){
   const name = "discover_decisions_" + KEY + "_" + new Date().toISOString().slice(0, 10) + ".json";
   const text = JSON.stringify(exportPayload(), null, 1);
+  if (SERVED){
+    fetch("/api/decisions/" + encodeURIComponent(KEY), {method: "POST", headers: {"Content-Type": "application/json"}, body: text})
+      .then(r => r.json().then(j => ({ok: r.ok, j}))).then(({ok, j}) => { if (ok) toast("sent to the machine: " + j.saved); else { toast("server refused: " + (j.error || "?") + " — downloading instead"); download(text, name); } })
+      .catch(() => { toast("server unreachable — downloading instead"); download(text, name); });
+    return;
+  }
   if (navigator.share && navigator.canShare && navigator.maxTouchPoints > 0){
     try{ const file = new File([text], name, {type: "application/json"}); if (navigator.canShare({files: [file]})){ navigator.share({files: [file], title: name}).then(() => toast("shared")).catch(() => download(text, name)); return; } }catch(e){}
   }
@@ -850,6 +870,7 @@ function paintAll(scroll){
   typeset($("mid"));
 }
 paintAll(true);
+pullState().then(changed => { if (changed){ paintAll(true); toast("continued from the machine's copy"); } });
 whenMathJax(() => typeset(document));
 window.__discover = {S: () => S, Q, current, setRound, goTo, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
 </script>
@@ -878,9 +899,10 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 "use strict";
 const R = JSON.parse(document.getElementById("rows").textContent).papers;
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-function prog(key){ try{ const s = JSON.parse(localStorage.getItem("discover:state:v1:" + key) || "null"); if (!s) return "—"; return Object.keys(s.formulas).length + " f · " + s.spans.length + " hand · " + Object.keys(s.indices).length + " idx"; }catch(e){ return "—"; } }
+function prog(key){ try{ const s = JSON.parse(localStorage.getItem("discover:state:v2:" + key) || localStorage.getItem("discover:state:v1:" + key) || "null"); if (!s) return "—"; return Object.keys(s.roles || s.formulas || {}).length + " roles · " + Object.keys(s.indices || {}).length + " letters · " + (s.marks || s.spans || []).length + " hand"; }catch(e){ return "—"; } }
+if (/^https?:$/.test(location.protocol) && typeof fetch === "function") fetch("/api/progress").then(r => r.json()).then(o => { const P = o.papers || {}; document.querySelectorAll("#papers tr[data-key]").forEach(tr => { const p = P[tr.dataset.key]; if (!p) return; const st = p.state; tr.querySelector(".prog").textContent = (st ? st.roles + " roles · " + st.indices + " letters · " + st.marks + " hand" : "—") + (p.exports ? " · " + p.exports + " export" + (p.exports > 1 ? "s" : "") + " on the machine" : ""); }); }).catch(() => {});
 let html = "<tr><th>#</th><th>paper</th><th>year</th><th>rows at stake</th><th>display</th><th>inline stmts</th><th>notation rows</th><th>index / alias / cand.</th><th>new families</th><th>progress</th></tr>";
-R.forEach((r, i) => { html += '<tr><td class="ev">' + (i + 1) + '</td><td><a href="discover/' + esc(r.key) + '.html">' + esc(r.key) + '</a><div class="ev">' + esc((r.title || "").slice(0, 90)) + '</div></td><td>' + esc(r.year || "") + '</td><td><b>' + (r.at_stake || 0) + '</b> <span class="ev">of ' + (r.rows_probed || 0) + '</span></td><td>' + r.display + '</td><td>' + r.statements + '</td><td>' + r.notation_rows + '</td><td>' + r.letters_index + " / " + r.letters_alias + " / " + r.letters_candidate + '</td><td>' + r.families_new + '</td><td class="prog">' + prog(r.key) + '</td></tr>'; });
+R.forEach((r, i) => { html += '<tr data-key="' + esc(r.key) + '"><td class="ev">' + (i + 1) + '</td><td><a href="discover/' + esc(r.key) + '.html">' + esc(r.key) + '</a><div class="ev">' + esc((r.title || "").slice(0, 90)) + '</div></td><td>' + esc(r.year || "") + '</td><td><b>' + (r.at_stake || 0) + '</b> <span class="ev">of ' + (r.rows_probed || 0) + '</span></td><td>' + r.display + '</td><td>' + r.statements + '</td><td>' + r.notation_rows + '</td><td>' + r.letters_index + " / " + r.letters_alias + " / " + r.letters_candidate + '</td><td>' + r.families_new + '</td><td class="prog">' + prog(r.key) + '</td></tr>'; });
 document.getElementById("papers").innerHTML = html;
 </script>
 </body>
