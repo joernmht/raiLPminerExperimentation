@@ -382,7 +382,9 @@ def _split_top(s: str, seps: str = ",") -> list[str]:
     return [p.strip() for p in out if p.strip()]
 
 
-def _family_of(text: str) -> tuple[str | None, tuple[str, ...]]:
+def _family_of(
+    text: str, words: frozenset[str] = frozenset()
+) -> tuple[str | None, tuple[str, ...]]:
     """The family symbol at the head of a set expression: ``N_i`` -> ("N", ("i",))."""
     text = _FAMILY_CUT.split(text.strip(), 1)[0].strip()
     card = _CARD.match(text)
@@ -398,9 +400,9 @@ def _family_of(text: str) -> tuple[str | None, tuple[str, ...]]:
         return None, ()
     fam = m.group(1)
     sub = m.group(2) or ""
-    subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if is_letterish(t))
+    subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if _is_index_token(t, words))
     _family_of.last_subset = _subset_label(
-        text[m.end(1) :]
+        text[m.end(1) :], words
     )  # side channel read by family_and_subset
     if (
         len(fam) > 1
@@ -418,23 +420,33 @@ def _is_index_token(t: str, words: frozenset[str]) -> bool:
     return is_letterish(t) or t in words
 
 
-def _subset_label(scripts: str) -> str | None:
-    """The word labels in a family's scripts: ``_{dwell}`` -> ``dwell``, ``^{plan}_{odturn}`` -> ``odturn_plan``."""
+def _subset_label(scripts: str, words: frozenset[str] = frozenset()) -> str | None:
+    """The word labels in a family's scripts: ``_{dwell}`` -> ``dwell``, ``^{plan}_{odturn}`` -> ``odturn_plan``.
+
+    Index letters and the paper's index names (``E_{de, st}``: st is the
+    station the set is indexed by) are not part of the label.
+    """
     sub = re.search(r"_\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
     sup = re.search(r"\^\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
-    words = []
-    for g in (sub, sup):
-        if g:
-            words += [
-                t for t in re.findall(r"[A-Za-z][A-Za-z0-9]*", g.group(1)) if not is_letterish(t)
-            ]
-    return "_".join(words) or None
+    labels = []
+    for g, is_sup in ((sub, False), (sup, True)):
+        if not g:
+            continue
+        text = g.group(1)
+        if is_sup:  # a spaced pair in a superscript qualifies the set ("t l", "d r"); in a subscript it indexes it
+            text = re.sub(r"(?<![A-Za-z])([a-z]) ([a-z])(?![A-Za-z])", r"\1\2", text)
+        labels += [
+            t for t in re.findall(r"[A-Za-z][A-Za-z0-9]*", text) if not _is_index_token(t, words)
+        ]
+    return "_".join(labels) or None
 
 
-def family_and_subset(text: str) -> tuple[str | None, tuple[str, ...], str | None]:
+def family_and_subset(
+    text: str, words: frozenset[str] = frozenset()
+) -> tuple[str | None, tuple[str, ...], str | None]:
     """``_family_of`` plus the subset label of the set expression."""
     _family_of.last_subset = None
-    fam, subs = _family_of(text)
+    fam, subs = _family_of(text, words)
     return fam, subs, getattr(_family_of, "last_subset", None)
 
 
@@ -494,7 +506,7 @@ def parse_binder(text: str, sup: str = "", words: frozenset[str] = frozenset()) 
         mm = _MEMBER.match(clause)
         if mm and "\\notin" not in clause:
             lhs, rhs = mm.group(1), mm.group(2)
-            fam, subs, subset = family_and_subset(rhs)
+            fam, subs, subset = family_and_subset(rhs, words)
             tm = _TUPLE.match(lhs.strip())
             if tm:
                 letters = _letters_of(tm.group(1), words)
@@ -582,8 +594,14 @@ class Use:
     run: str | None = None  # the glued word the letter was cut from ("st" in N_{st})
 
 
-def _pieces(sub: str, words: frozenset[str] = frozenset()) -> list[tuple[str, bool]]:
-    """Index tokens of one subscript group: letters, arithmetic on a letter, juxtaposed letters."""
+def _pieces(
+    sub: str, words: frozenset[str] = frozenset(), split_pairs: bool = True
+) -> list[tuple[str, bool]]:
+    """Index tokens of one subscript group: letters, arithmetic on a letter, juxtaposed letters.
+
+    ``split_pairs=False`` for the scripts of an index family (``E^{dis, tl, dr}``):
+    a glued pair there qualifies the set, it is never two dummies.
+    """
     out: list[tuple[str, bool]] = []
     for piece in _split_top(sub):
         p = piece.strip()
@@ -591,7 +609,7 @@ def _pieces(sub: str, words: frozenset[str] = frozenset()) -> list[tuple[str, bo
         if tm:
             p = tm.group(1)
             for t in _split_top(p):
-                out.extend(_pieces(t, words))
+                out.extend(_pieces(t, words, split_pairs))
             continue
         if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", p):
             if p in words:
@@ -601,7 +619,7 @@ def _pieces(sub: str, words: frozenset[str] = frozenset()) -> list[tuple[str, bo
                 continue  # a label word (end, max, st): part of the name, never an index
             if is_letterish(p):
                 out.append((p, False))
-            elif p.isalpha() and len(p) == 2 and p.islower():
+            elif split_pairs and p.isalpha() and len(p) == 2 and p.islower():
                 for ch in p:
                     out.append((ch, p))
             continue
@@ -623,13 +641,21 @@ def _pieces(sub: str, words: frozenset[str] = frozenset()) -> list[tuple[str, bo
             spaced_pair = (
                 "".join(toks) if len(toks) == 2 and all(len(t) == 1 for t in toks) else None
             )
+            if spaced_pair and not split_pairs:
+                continue  # "d r" in a family's script: a qualifier, not two letters
             for t in toks:
                 out.append((t, spaced_pair or (len(toks) > 1)))
     return out
 
 
-def subscript_uses(norm: str, words: frozenset[str] = frozenset()) -> list[Use]:
-    """Every (symbol, position, letter) in the subscripts and superscripts of one row."""
+def subscript_uses(
+    norm: str, words: frozenset[str] = frozenset(), families: frozenset[str] = frozenset()
+) -> list[Use]:
+    """Every (symbol, position, letter) in the subscripts and superscripts of one row.
+
+    ``families`` are the paper's index families: glued pairs in their scripts
+    are qualifiers (``E^{dr}``), not dummies.
+    """
     uses: list[Use] = []
     i = 0
     n = len(norm)
@@ -647,13 +673,14 @@ def subscript_uses(norm: str, words: frozenset[str] = frozenset()) -> list[Use]:
             name in GREEK and False
         ):
             continue
+        split = name not in families
         for group in sub:
-            for pos, (letter, jux) in enumerate(_pieces(group, words), 1):
+            for pos, (letter, jux) in enumerate(_pieces(group, words, split), 1):
                 uses.append(
                     Use(name, str(pos), letter, bool(jux), jux if isinstance(jux, str) else None)
                 )
         for group in sup:
-            for letter, jux in _pieces(group, words):
+            for letter, jux in _pieces(group, words, split):
                 uses.append(
                     Use(name, "sup", letter, bool(jux), jux if isinstance(jux, str) else None)
                 )
@@ -865,10 +892,17 @@ def analyse(
         note_row(rid, bs)
 
     # subscript positions over every row (display + inline statements)
+    family_names = frozenset(
+        f
+        for lt in letters.values()
+        for c in (lt.bound, lt.tuple_bound, lt.prose, lt.cap_family)
+        for f in c
+        if f != "?"
+    )
     for rid, norm in rows_all + inline_rows:
         seen_letters: set[str] = set()
         seen_sup: set[str] = set()
-        for use in subscript_uses(norm, words):
+        for use in subscript_uses(norm, words, family_names):
             lt = L(use.letter)
             row_letters = rows_out.setdefault(rid, {"binders": [], "letters": {}})["letters"]
             row_letters.setdefault(use.letter, "sup" if use.position == "sup" else "sub")

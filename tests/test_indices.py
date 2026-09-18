@@ -236,3 +236,19 @@ def test_direct_membership_beats_tuple_membership_for_a_letters_family() -> None
     assert L["e"]["family"] == "E"  # not A, although (e, e') in A twice
     assert L["ep"]["family"] == "A"  # nothing direct known about e': the tuple is all we have
     assert L["a"]["family"] == "A" and rec["families"]["A"]["subsets"] == {"run": 1, "dwell": 1}
+
+
+def test_qualifiers_in_a_family_script_are_labels_not_letters() -> None:
+    rows = [
+        ("eq-0001", r"N_{s t} \le 1 , s t_{e} = s t_{e^{'}} , s t = s t_{e^{'}}"),
+        (
+            "eq-0002",
+            r"x_{e^{'}} \le 1 \quad \forall e^{'} \in E_{\text{de} , s t}^{\text{dis} , t l , d r}",
+        ),
+        ("eq-0003", r"x_{e} \le 1 \quad \forall e \in E"),
+    ]
+    rec = indices.analyse(rows, None)
+    L, F = rec["letters"], rec["families"]
+    assert not {"d", "r", "t", "l"} & set(L)  # tl and dr qualify the set E; they are not dummies
+    assert L["ep"]["family"] == "E" and L["st"]["verdict"] == "index"
+    assert F["E"]["indexed_by"] == ["st"] and F["E"]["subsets"] == {"de_dis_tl_dr": 1}

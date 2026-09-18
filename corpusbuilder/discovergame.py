@@ -339,7 +339,7 @@ def validate_export(obj: dict) -> list[str]:
         if not isinstance(s_, dict) or "text" not in s_:
             problems.append(f"marks[{i}] has no text")
     for name, v in (obj.get("indices") or {}).items():
-        if not isinstance(v, dict) or v.get("verdict") not in ("index", "not", "unsure"):
+        if not isinstance(v, dict) or v.get("verdict") not in ("index", "not", "unsure", "label"):
             problems.append(f"indices[{name}] verdict")
     for name, v in (obj.get("families") or {}).items():
         if not isinstance(v, dict) or v.get("verdict") not in ("family", "not", "unsure"):
@@ -419,6 +419,10 @@ def summarize_decisions(merged: dict[str, dict]) -> dict:
         ),
         "letters_rejected": sum(
             sum(1 for v in m["indices"].values() if v["verdict"] == "not") for m in merged.values()
+        ),
+        "letters_label": sum(
+            sum(1 for v in m["indices"].values() if v["verdict"] == "label")
+            for m in merged.values()
         ),
         "families_confirmed": sum(
             sum(1 for v in m["families"].values() if v["verdict"] == "family")
@@ -504,7 +508,8 @@ mark.defspan{background:var(--def-soft);color:inherit;border-bottom:2px solid va
 .chip.in-span{box-shadow:0 0 0 2px var(--def)}
 table.grid{border-collapse:collapse;width:100%;font-size:13px}table.grid th,table.grid td{border-top:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}table.grid th{color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 .notation td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid1{display:grid;grid-template-columns:1fr}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.dec.lab2{color:var(--warn)}.dec.lab2.on{background:var(--warn);border-color:var(--warn);color:#fff}.grid1{display:grid;grid-template-columns:1fr}
 .dec{font:inherit;font-size:17px;font-weight:800;border:2px solid var(--line);background:var(--card2);color:var(--ink);border-radius:16px;min-height:66px;padding:8px 6px;cursor:pointer;line-height:1.2}
 .dec.big{min-height:66px;font-size:18px;background:var(--accent);border-color:var(--accent);color:#fff}
 .dec.glow{border-color:var(--accent);box-shadow:0 0 0 3px rgba(10,119,127,.25)}
@@ -668,7 +673,7 @@ $("mid").addEventListener("click", e => { const el = e.target.closest("[data-id]
 /* ---------- top card ---------- */
 function citation(sp){ if (!sp) return ""; if (sp.table) return sp.table + " · row " + sp.row; if (sp.deflist !== undefined) return "definition list · item " + sp.deflist; return "paragraph " + sp.para + " · chars " + sp.start + "–" + sp.end; }
 function binderText(b){ if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + "…" + (b.hi || "?") + (b.family ? " (" + b.family + ")" : ""); return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?") + (b.subset ? " [" + b.subset + "]" : ""); }
-function evShort(e){ const p = []; if (e.bound_rows) p.push("bound " + e.bound_rows + "×"); if (e.capped && Object.keys(e.capped).length) p.push("capped by " + Object.keys(e.capped).join("/")); if (e.prose_rows) p.push("prose " + e.prose_rows + "×"); if (e.table_rows) p.push("table"); if (e.sub_rows) p.push("in " + e.sub_rows + " rows"); const fams = Object.entries(e.families || {}); if (fams.length > 1) p.push("ranges over " + fams.map(([f, n]) => f + "×" + n).join(", ")); const av = Object.entries(e.alias_votes || {}); if (av.length) p.push("position votes " + av.map(([f, n]) => f + "×" + n).join(", ")); return p.join(" · "); }
+function evShort(e){ const p = []; if (e.bound_rows) p.push("bound " + e.bound_rows + "×"); if (e.capped && Object.keys(e.capped).length) p.push("capped by " + Object.keys(e.capped).join("/")); if (e.prose_rows) p.push("prose " + e.prose_rows + "×"); if (e.table_rows) p.push("table"); if (e.sub_rows) p.push("in " + e.sub_rows + " rows"); if (e.sup_rows) p.push("as superscript in " + e.sup_rows + " rows"); const fams = Object.entries(e.families || {}); if (fams.length > 1) p.push("ranges over " + fams.map(([f, n]) => f + "×" + n).join(", ")); const av = Object.entries(e.alias_votes || {}); if (av.length) p.push("position votes " + av.map(([f, n]) => f + "×" + n).join(", ")); return p.join(" · "); }
 function paintRounds(){
   $("rounds").innerHTML = ROUNDS.map(([r, label]) => '<button data-r="' + r + '" class="' + (S.round === r ? "on" : "") + '">' + label + ' <span class="n">' + doneCount(r) + "/" + Q[r].length + "</span></button>").join("");
   const total = ROUNDS.reduce((a, [r]) => a + Q[r].length, 0), done = ROUNDS.reduce((a, [r]) => a + doneCount(r), 0);
@@ -738,7 +743,7 @@ function paintBottom(){
   else if (!it){ const nr = nextRoundWithOpen(); html = '<div class="grid1">' + (nr ? '<button class="dec big" id="nextRound">▸ ' + esc(ROUNDS.find(x => x[0] === nr)[1]) + "</button>" : '<button class="dec big" id="exportNow">⬇ export decisions</button>') + "</div>"; }
   else if (S.round === "indices"){
     const st = letterState(it); const chips = FAMS.slice(0, 5);
-    html = '<div class="grid3"><button class="dec ok glow" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec bad" data-v="not">✗ not an index</button><button class="dec mid" data-v="unsure">? unsure</button></div>';
+    html = '<div class="grid2"><button class="dec ok' + (st.e.verdict === "label" ? "" : " glow") + '" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec lab2' + (st.e.verdict === "label" ? " glow" : "") + '" data-v="label">label (part of a name)</button><button class="dec bad" data-v="not">✗ not an index</button><button class="dec mid" data-v="unsure">? unsure</button></div>';
     html += '<div class="fams">' + chips.map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
     const runs = Object.keys(st.e.runs || {});
     if (runs.length) html += '<div class="fams">' + runs.map(r => '<button class="dec lab' + (S.labels[r] ? " on" : "") + '" data-lab="' + esc(r) + '">＋ “' + esc(r) + '” is a label word</button>').join("") + "</div>";
@@ -828,7 +833,7 @@ $("importBtn").addEventListener("click", () => $("importFile").click());
 $("importFile").addEventListener("change", e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => importJSON(String(r.result)); r.readAsText(f); e.target.value = ""; });
 $("labelBtn").addEventListener("click", () => { const v = window.prompt ? window.prompt("label word to add to the standard scanning list (e.g. end, max, st)", "") : null; if (!v) return; snap(); S.labels[String(v).trim().toLowerCase()] = true; save(); toast("proposed “" + String(v).trim() + "”"); });
 $("clearBtn").addEventListener("click", () => { if (!confirm("Clear every decision for this paper?")) return; snap(); S = fresh(); save(); paintAll(true); });
-document.addEventListener("keydown", e => { if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return; const id = adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null); if (/^[1-6]$/.test(e.key) && id) decideRole(id, ROLES[parseInt(e.key, 10) - 1]); else if (e.key === "ArrowRight") $("skipBtn").click(); else if (e.key === "ArrowLeft" && S.round === "indices") walkTo(-1); else if (e.key === "i" && S.round === "indices" && current()) decideLetter(current(), "index"); else if (e.key === "x" && S.round === "indices" && current()) decideLetter(current(), "not"); });
+document.addEventListener("keydown", e => { if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return; const id = adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null); if (/^[1-6]$/.test(e.key) && id) decideRole(id, ROLES[parseInt(e.key, 10) - 1]); else if (e.key === "ArrowRight") $("skipBtn").click(); else if (e.key === "ArrowLeft" && S.round === "indices") walkTo(-1); else if (e.key === "i" && S.round === "indices" && current()) decideLetter(current(), "index"); else if (e.key === "l" && S.round === "indices" && current()) decideLetter(current(), "label"); else if (e.key === "x" && S.round === "indices" && current()) decideLetter(current(), "not"); });
 
 /* ---------- paint ---------- */
 function paintAll(scroll){

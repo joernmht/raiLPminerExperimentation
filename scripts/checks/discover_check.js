@@ -48,10 +48,14 @@ function boot(path) {
   ok(X.S().indices[letter] && X.S().indices[letter].verdict === "index" && (!fam || X.S().indices[letter].family === fam), "decide: family chip records index + family");
   await sleep(200);
   ok(X.current() !== letter && X.isDone("indices", letter), "flow: auto-advances to the next open letter");
+  const lbl = X.current();
+  d.querySelector('#decide button[data-v="label"]').click();
+  ok(X.S().indices[lbl] && X.S().indices[lbl].verdict === "label", "decide: label records that the letter is part of a name");
+  await sleep(200);
   d.querySelector('#decide button[data-v="not"]').click();
   ok(X.S().indices[X.Q.indices.find(l => X.S().indices[l] && X.S().indices[l].verdict === "not")], "decide: ✗ records not-an-index");
   await sleep(200);
-  ok(d.getElementById("rounds").textContent.includes("2/" + X.Q.indices.length), "rounds: counter shows two decided letters");
+  ok(d.getElementById("rounds").textContent.includes("3/" + X.Q.indices.length), "rounds: counter shows three decided letters");
   // label proposals: a glued letter offers its run; the menu offers any word
   const glued = X.Q.indices.find(l => Object.keys(D.indices.letters[l].runs || {}).length);
   if (glued) { X.goTo(X.Q.indices.indexOf(glued)); const lb = d.querySelector("#decide button.lab"); ok(!!lb && d.getElementById("item").textContent.includes("written glued as"), "labels: glued letter shows its word and a proposal chip"); if (lb) { lb.click(); ok(X.S().labels[lb.dataset.lab] === true, "labels: chip records the proposal"); } }
