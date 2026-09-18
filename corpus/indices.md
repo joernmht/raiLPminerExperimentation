@@ -5,38 +5,38 @@ Deterministic; reads display rows, inline statements, notation tables and defini
 
 | letters | count |
 |---|---:|
-| index (bound, capped, prose or table evidence) | 1862 |
-| alias (resolved by decoration or position rule) | 303 |
-| candidate (subscript only, no family evidence) | 349 |
-| juxtaposed only (probably label fragments) | 83 |
-| capital letters never bound (labels such as t_B, or sets) | 525 |
+| index (bound, capped, prose or table evidence) | 1870 |
+| alias (resolved by decoration or position rule) | 300 |
+| candidate (subscript only, no family evidence) | 353 |
+| juxtaposed only (probably label fragments) | 66 |
+| capital letters never bound (labels such as t_B, or sets) | 536 |
 | capped (ranges over 1..N) | 303 |
-| bound to more than one family | 363 |
+| bound to more than one family | 364 |
 
 | rule that decided the family | letters |
 |---|---:|
-| binder | 1300 |
+| binder | 1302 |
 | capped | 204 |
-| prose | 308 |
+| prose | 307 |
 | table | 50 |
 | decorated | 71 |
-| position | 232 |
-| subscript | 349 |
-| juxtaposed | 83 |
-| uppercase | 476 |
-| glued word | 49 |
+| position | 229 |
+| subscript | 353 |
+| juxtaposed | 66 |
+| uppercase | 474 |
+| glued word | 62 |
 
 | families | count |
 |---|---:|
-| found | 1334 |
+| found | 1336 |
 | … with the paper's own description (notation table) | 549 |
-| … already declared as `%@ index` | 859 |
+| … already declared as `%@ index` | 861 |
 | … not declared at all | 475 |
 | … declared as a parameter instead (typically a cap N) | 26 |
-| declared `%@ index` lines that are dummy letters, not families | 369 |
-| declared `%@ index` families with no evidence found | 820 |
+| declared `%@ index` lines that are dummy letters, not families | 371 |
+| declared `%@ index` families with no evidence found | 816 |
 
-Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
+Bindings: binder 12494, capped 1250, tuple 4328, prose 4669, table 197.
 
 | paper | index | alias | candidate | families | described | declared-backed | new | letters → family |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
@@ -91,8 +91,8 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.ejor.2012.04.025 | 13 | 1 | 4 | 7 | 0 | 5 | 2 | H→K, b→B, e→E, i→I, i_hat→I_hat, i_hatp→I_hat, ip→I, j→E, k→K, p→P, s→E, t→T, tp→I_hat, v→E |
 | 10.1016_j.ejor.2015.12.006 | 6 | 1 | 2 | 1 | 0 | 1 | 0 | b→E, f→E, i→E, j→E, p→E, q→E, qp→? |
 | 10.1016_j.ejor.2017.04.057 | 6 | 1 | 1 | 3 | 0 | 3 | 0 | alpha→A, h→A, i→A, j→A, k→A, r→R, theta→Theta |
-| 10.1016_j.ejor.2020.03.034 | 2 | 0 | 0 | 2 | 2 | 1 | 1 | e→N, ep→A |
-| 10.1016_j.ejor.2021.02.059 | 23 | 1 | 1 | 6 | 0 | 4 | 2 | X→T, a→S, b→S, c→S, d→S, delta→X, e→P, f→P, g→P, i→S, ip→S, j→S, l→L, l_bar→L, lp→L, p→P, r→S, s→S, t→T, tau→T, tp→T, x→X, x_bar→X, xi→R |
+| 10.1016_j.ejor.2020.03.034 | 3 | 0 | 0 | 2 | 2 | 1 | 1 | RT→?, e→N, ep→A |
+| 10.1016_j.ejor.2021.02.059 | 24 | 1 | 1 | 6 | 0 | 4 | 2 | X→T, a→S, b→S, c→S, d→S, delta→X, e→P, f→P, g→P, i→S, ip→S, j→S, l→L, l_bar→L, lp→L, p→P, pi→?, r→S, s→S, t→T, tau→T, tp→T, x→X, x_bar→X, xi→R |
 | 10.1016_j.ejor.2021.04.041 | 15 | 1 | 0 | 13 | 0 | 11 | 2 | a→delta, alpha→R, d→D, e→E, h→S, i→S, j→Y, k→K, l→L, n→S, q→Q, s→S, t→T, u→U, v→V_bar, w→W |
 | 10.1016_j.ejor.2021.06.025 | 13 | 1 | 0 | 5 | 0 | 0 | 5 | beta→R, c→C, i→A, ip→A, j→A, jp→A, k→O, m→?, p→P, q→P, r→R, s→P, t_bar→P, t_hat→R |
 | 10.1016_j.ejor.2021.11.019 | 8 | 1 | 0 | 3 | 0 | 3 | 0 | c→S, i→S, j→S, k→K, l→K, m→S, n→S, r→R, rp→? |
@@ -143,7 +143,7 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.ress.2011.09.002 | 2 | 0 | 2 | 2 | 0 | 0 | 2 | i→S, j→D |
 | 10.1016_j.ress.2016.03.015 | 2 | 2 | 6 | 2 | 0 | 0 | 2 | i→N, k→N, v→V, vp→V |
 | 10.1016_j.ress.2021.108183 | 6 | 3 | 2 | 5 | 0 | 0 | 5 | M→E, X→X, e→N, i→n, j→N, k→r, m→n, n→n, p→n |
-| 10.1016_j.ress.2022.108515 | 5 | 3 | 2 | 8 | 6 | 4 | 4 | a→A, b→A, c→A, i→n, l→A, n→C, t→A, u→A |
+| 10.1016_j.ress.2022.108515 | 4 | 0 | 6 | 8 | 6 | 4 | 4 | ab→A, al→A, i→n, n→C |
 | 10.1016_j.ress.2022.108538 | 8 | 0 | 2 | 6 | 0 | 5 | 1 | R→R, i→A, j→A, k→K, m→T, n→N, p→P, t→T |
 | 10.1016_j.ress.2023.109400 | 9 | 2 | 1 | 15 | 11 | 5 | 10 | a→A, ap→A, e→E, ep→E, f→E, fp→E, o→E, p→P, s→S, t→T, w→T |
 | 10.1016_j.sftr.2025.101084 | 6 | 0 | 3 | 9 | 8 | 7 | 2 | d→D, f→F, n→N, p→P, r→R, t→T |
@@ -155,7 +155,7 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.trb.2009.05.004 | 5 | 4 | 0 | 2 | 0 | 1 | 1 | F→F, Fp→N, S→N, h→N, i→N, j→N, k→N, n→F, sigma→N |
 | 10.1016_j.trb.2009.07.007 | 11 | 0 | 0 | 10 | 6 | 5 | 5 | e→E, h→N, i→S, j→T, k→T, r→delta, sigma→G, tau→G, u→R, v→V, w→W |
 | 10.1016_j.trb.2010.09.001 | 4 | 3 | 2 | 2 | 0 | 2 | 0 | C→C, a→C, ap→C, d→S, dp→S, o→S, op→S |
-| 10.1016_j.trb.2013.10.013 | 3 | 1 | 0 | 2 | 0 | 2 | 0 | r→R, t→T, tp→T, tpp→T |
+| 10.1016_j.trb.2013.10.013 | 4 | 1 | 0 | 3 | 0 | 3 | 0 | r→R, t→T, tc→TC, tp→T, tpp→T |
 | 10.1016_j.trb.2014.01.009 | 7 | 2 | 3 | 5 | 0 | 5 | 0 | c→C, cp→C, h→T, i→T, j→D, k→K, r→R, rp→R, s→T |
 | 10.1016_j.trb.2014.05.005 | 8 | 2 | 1 | 3 | 1 | 3 | 0 | e→?, f→E, fp→E, i→E, j→E, k→E, m→Omega, mp→Omega, p→Omega, t→T |
 | 10.1016_j.trb.2014.08.013 | 8 | 1 | 3 | 6 | 0 | 2 | 4 | a→R, b→R, i→S, j→S, k→M, kp→Mp, s→M, t→T, tp→t |
@@ -181,8 +181,8 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.trb.2018.06.006 | 9 | 2 | 0 | 6 | 4 | 3 | 3 | b→Y, e→?, f→F, fp→F, i→E, j→E, k→E, p→E, t→E, x→F, x_tilde→chi |
 | 10.1016_j.trb.2018.09.001 | 5 | 2 | 1 | 3 | 0 | 2 | 1 | i→E, ip→E, j→E, jp→E, k→Z, m→N, n→N |
 | 10.1016_j.trb.2018.10.006 | 6 | 0 | 0 | 4 | 2 | 4 | 0 | i→I, ip→I, j→J, k→K, m→i, ℓ→? |
-| 10.1016_j.trb.2018.12.008 | 5 | 1 | 1 | 3 | 0 | 3 | 0 | S→S, r→R, r_tilde→Psi, rp→R, t→R, tp→R |
-| 10.1016_j.trb.2019.02.015 | 5 | 2 | 0 | 4 | 2 | 2 | 2 | D→E, a→A, ap→A, app→A, e→E, ep→E, epp→E |
+| 10.1016_j.trb.2018.12.008 | 6 | 1 | 1 | 4 | 0 | 4 | 0 | S→S, r→R, r_tilde→Psi, rp→R, t→R, tc→Q, tp→R |
+| 10.1016_j.trb.2019.02.015 | 7 | 2 | 0 | 4 | 2 | 2 | 2 | D→E, a→A, ap→A, app→A, dr→?, e→E, ep→E, epp→E, st→? |
 | 10.1016_j.trb.2019.02.017 | 15 | 4 | 4 | 9 | 5 | 4 | 5 | e→?, f→F, fp→F, g→?, i→A, i_tilde→A, j→A, k→A, k_tilde→A, m→A, p→F, p_hat→p, s→S, t→A, tp→A, tpp→A, w→A, wp→A, wpp→A |
 | 10.1016_j.trb.2019.05.002 | 6 | 0 | 2 | 3 | 0 | 3 | 0 | i→A, ip→A, j→A, jp→A, k→S, l→L |
 | 10.1016_j.trb.2019.06.010 | 7 | 2 | 0 | 4 | 4 | 4 | 0 | i→A, ip→A, j→A, jp→A, k→A, l→L, m→A, n→A, tau→? |
@@ -199,9 +199,9 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.trb.2020.09.010 | 13 | 4 | 0 | 13 | 10 | 5 | 8 | a→?, f→F, fp→Omega, h→K, i→I, i_bar→I, ip→I, k→K, kp→K, o→S, p→P, s→S, sp→S, spp→S, v→V, v_tilde→V, vp→Omega |
 | 10.1016_j.trb.2020.11.006 | 14 | 1 | 3 | 8 | 6 | 5 | 3 | a→A, ap→Phi, f→F, i→A, ip→A, j→A, jp→A, k→K, kp→K, p→P, r→A, t→A, tau→A, taup→A, tp→A |
 | 10.1016_j.trb.2021.02.006 | 10 | 1 | 0 | 6 | 4 | 6 | 0 | a→r, d→T, i→A, j→A, k→OD, pi→V, r→R, t→T, v→V, vp→V, w→T |
-| 10.1016_j.trb.2021.04.014 | 3 | 0 | 0 | 4 | 4 | 3 | 1 | i→I, j→J, k→K |
+| 10.1016_j.trb.2021.04.014 | 4 | 0 | 0 | 4 | 4 | 3 | 1 | i→I, j→J, k→K, ki→? |
 | 10.1016_j.trb.2021.05.009 | 6 | 2 | 7 | 5 | 2 | 3 | 2 | i→S, ip→S, k→S, l→L, lp→L, n→Q, t→T, tau→T |
-| 10.1016_j.trb.2021.06.001 | 14 | 3 | 0 | 9 | 0 | 5 | 4 | C→C, b→n, d→V, h→K, i→n, j→b, k→K, l→m, m→C, n→n, o→V, r→R, t→T, tp→T, u→A, v→A, w→A |
+| 10.1016_j.trb.2021.06.001 | 15 | 3 | 0 | 9 | 0 | 5 | 4 | C→C, b→n, d→V, h→K, i→n, it→?, j→b, k→K, l→m, m→C, n→n, o→V, r→R, t→T, tp→T, u→A, v→A, w→A |
 | 10.1016_j.trb.2021.08.003 | 7 | 1 | 1 | 5 | 4 | 5 | 0 | f→F, fp→F, g→G, gp→G, i→I, p→P, r→P, ℓ→L |
 | 10.1016_j.trb.2021.11.009 | 16 | 1 | 0 | 16 | 12 | 8 | 8 | f→F, i→E, ip→E, j→Gpp, jp→Gpp, k→Kp, kp→Kpp, l→L, lp→L, s→S, sp→S, t→E, tau→E, taup→E, taupp→Tpp, tp→E, vartheta→Q |
 | 10.1016_j.trb.2022.02.002 | 13 | 2 | 1 | 8 | 5 | 8 | 0 | e→E, f→F, g→A, gp→A, i→N, j→N, k→K, m→M, o→K, p→K, t→A, tau→A, v→V, vp→V, xi→psi |
@@ -239,7 +239,7 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.trc.2020.102925 | 10 | 2 | 0 | 6 | 2 | 6 | 0 | j→L, jp→L, l→L, lp→L, n→N, np→N, p→P, q→Q, r→R, s→S, sp→S, z→L |
 | 10.1016_j.trc.2020.102960 | 10 | 0 | 1 | 6 | 6 | 3 | 3 | a→A, ap→A, g→G, i→I, j→I, k→?, s→A, t→A, u→A, v→A |
 | 10.1016_j.trc.2021.102963 | 9 | 4 | 1 | 6 | 4 | 5 | 1 | Y→Y, a→N, b→K, e→T, f→F, fp→F, i→N, j→?, k→K, kp→K, l→N, omega→Omega, t→T |
-| 10.1016_j.trc.2021.103080 | 8 | 0 | 1 | 5 | 0 | 2 | 3 | a→A, e→E, ep→A, i→DIS, j→?, l→TL, s→ST, t→TL |
+| 10.1016_j.trc.2021.103080 | 8 | 0 | 1 | 5 | 0 | 2 | 3 | a→A, e→E, ep→A, i→DIS, j→?, s→ST, t→ST, tl→TL |
 | 10.1016_j.trc.2021.103170 | 7 | 4 | 1 | 4 | 4 | 0 | 4 | g→G, i→I, ip→I, j→J, k→J, p→J, q→J, r→J, t→?, u→J, v→J |
 | 10.1016_j.trc.2021.103209 | 6 | 1 | 1 | 5 | 4 | 5 | 0 | i→I, ip→I, j→J, k→K, m→M, n→N, zeta→I |
 | 10.1016_j.trc.2021.103368 | 12 | 0 | 6 | 11 | 0 | 1 | 10 | G→G, Gp→N, X→A, i→sp, j→J, k→K, p→P, pi→Pi, pip→Pip, s→S, sp→S, t→H |
@@ -264,7 +264,7 @@ Bindings: binder 12476, capped 1250, tuple 4328, prose 4667, table 197.
 | 10.1016_j.tre.2016.04.007 | 7 | 0 | 1 | 4 | 0 | 0 | 4 | d→D, e→E, i→A, j→A, k→A, l→A, o→O |
 | 10.1016_j.tre.2016.07.015 | 12 | 0 | 0 | 7 | 3 | 7 | 0 | a→A, ap→B, e→E, ep→E, f→E, fp→E, k→Seg, l→Seg, p→PP, s→Seg, sp→Seg, t→T |
 | 10.1016_j.tre.2017.06.001 | 7 | 0 | 0 | 5 | 0 | 4 | 1 | i→S, ip→S, j→S, k→K, m→i, x→chi, ℓ→k |
-| 10.1016_j.tre.2020.101882 | 6 | 3 | 0 | 5 | 1 | 4 | 1 | a→A, i→I, ip→I, n→T, np→T, p→P, r→R, s→R, sp→R |
+| 10.1016_j.tre.2020.101882 | 7 | 3 | 0 | 5 | 1 | 4 | 1 | a→A, i→I, ip→I, n→T, np→T, ns→?, p→P, r→R, s→R, sp→R |
 | 10.1016_j.tre.2021.102492 | 14 | 1 | 1 | 4 | 0 | 0 | 4 | a→psi, ap→psi, d→A, delta→A, i→A, j→A, k→K, kp→K, p→P, t→A, tau→psi, taup→psi, tp→A, u→A, up→A |
 | 10.1016_j.tre.2022.102622 | 7 | 1 | 1 | 7 | 5 | 6 | 1 | i→T, k→K, kp→K, p→R, q→R, s→S, u→I, v→O |
 | 10.1016_j.tre.2022.102942 | 7 | 2 | 3 | 7 | 1 | 4 | 3 | i→I, j→J, jp→J_hat, kappa→varphi, l→L, lp→X, omega→omega, varphi→varphi, vartheta→varphi |
