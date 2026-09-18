@@ -443,7 +443,15 @@ _STYLE = r""":root{
 html,body{margin:0;padding:0;height:100%}
 body{background:var(--page1);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;overflow:hidden}
 #top{background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:calc(8px + env(safe-area-inset-top)) 16px 12px;max-height:48vh;overflow:auto;z-index:5;text-align:center}
-#mid{overflow:auto;padding:10px 14px 30px;background:var(--page2);-webkit-overflow-scrolling:touch}
+#midwrap{position:relative;min-height:0}
+#mid{position:absolute;inset:0;overflow:auto;padding:10px 14px 30px;background:var(--page2);-webkit-overflow-scrolling:touch}
+#midwrap.walking #mid{padding-left:62px;padding-right:62px}
+.nav{position:absolute;top:0;bottom:0;width:54px;border:0;background:rgba(10,119,127,.16);color:var(--accent);font-size:38px;font-weight:800;z-index:4;cursor:pointer;padding:0}
+#navL{left:0;border-radius:0 16px 16px 0}#navR{right:0;border-radius:16px 0 0 16px}
+.nav:active{background:rgba(10,119,127,.35)}
+#walkbox{position:absolute;top:10px;right:62px;background:rgba(255,255,255,.6);color:var(--ink);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:700;z-index:4;opacity:.9}
+@media (prefers-color-scheme:dark){#walkbox{background:rgba(12,39,102,.6)}.nav{background:rgba(54,184,191,.16)}.nav:active{background:rgba(54,184,191,.35)}}
+#unsaved{margin-top:10px;font-size:14px;color:var(--warn);background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:6px 10px}
 #bottom{background:var(--card);border-top:1px solid var(--line);padding:16px 18px calc(20px + env(safe-area-inset-bottom));z-index:5;text-align:center}
 @media (min-width:900px){body{max-width:960px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}}
 .rounds{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;justify-content:safe center}
@@ -544,12 +552,17 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
   <div class="bar"><span id="barFill"></span></div>
   <div class="toprow"><div id="item"></div></div>
 </header>
-<main id="mid">
-  <div id="text"></div>
-  <h3 class="sec">Notation tables and definition lists</h3>
-  <div id="tables"></div>
-  <div class="ev pad">end of paper</div>
-</main>
+<div id="midwrap">
+  <main id="mid">
+    <div id="text"></div>
+    <h3 class="sec">Notation tables and definition lists</h3>
+    <div id="tables"></div>
+    <div class="ev pad">end of paper</div>
+  </main>
+  <button id="navL" class="nav hidden" title="previous formula with this letter">◂</button>
+  <button id="navR" class="nav hidden" title="next formula with this letter">▸</button>
+  <div id="walkbox" class="hidden"></div>
+</div>
 <div id="pill" class="hidden"><button id="useSel">✎ cite selection</button><button id="markSel">＋ formula</button></div>
 <footer id="bottom">
   <div id="menu" class="hidden">
@@ -561,6 +574,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
   </div>
   <div id="decide"></div>
   <div class="actions"><button id="menuBtn" title="menu">☰</button><button id="undoBtn" title="undo">↶ undo</button><button id="skipBtn" title="skip">skip ▸</button></div>
+  <div id="unsaved" class="hidden">⚠ not stored in this browser · export (☰) before closing</div>
 </footer>
 <div id="toast"></div>
 <script id="data" type="application/json">__DATA__</script>
@@ -577,7 +591,8 @@ function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("sho
 function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, sel: null, round: "indices", pos: {}}; }
 function migrate(v1){ const s = fresh(); for (const [id, v] of Object.entries(v1.formulas || {})) s.roles[id] = {role: v === "not" ? "other" : "formula"}; s.marks = (v1.spans || []).map(x => ({para: x.para, text: x.text, latex: x.latex || x.text})); s.indices = v1.indices || {}; s.families = v1.families || {}; return s; }
 function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles){ if (!s.round) s.round = "indices"; if (!s.pos) s.pos = {}; return s; } const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
-function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); }catch(e){ toast("⚠ could not save — export!"); } }
+let storeFailed = false;
+function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); storeFailed = false; }catch(e){ if (!storeFailed) toast("this browser cannot store decisions for a file opened this way — export before you close the page"); storeFailed = true; } const b = $("unsaved"); if (b) b.classList.toggle("hidden", !storeFailed); }
 let S = load();
 const undoStack = [];
 function snap(){ undoStack.push(JSON.stringify(S)); if (undoStack.length > 300) undoStack.shift(); }
@@ -669,7 +684,7 @@ function paintTop(){
     html += '<div class="big mono">' + esc(it) + ' <span class="arrow">→</span> ' + (st.fam ? esc(st.fam) : '<span class="q">?</span>') + "</div>";
     html += '<div class="prop">proposed: <b>' + esc(e.verdict || "?") + "</b> (" + esc(e.rule || "no rule") + ")" + (e.family ? " · family " + esc(e.family) : "") + (famDesc ? ' · <i>' + esc(famDesc.slice(0, 70)) + "</i>" : "") + (e.desc ? ' · paper: “' + esc(e.desc.slice(0, 60)) + "”" : "") + (st.h.verdict ? ' · <b class="you">yours: ' + esc(st.h.verdict) + (st.h.family ? " → " + esc(st.h.family) : "") + "</b>" : "") + "</div>";
     html += '<div class="ev">' + esc(evShort(e)) + "</div>";
-    html += '<div class="walk">' + (ids.length ? '<button id="wPrev">◂</button><span>formula ' + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length + '</span><button id="wNext">▸</button>' : '<span class="ev">no formula carries it in a subscript</span>') + "</div>";
+    if (!ids.length) html += '<div class="ev">no formula carries it in a subscript</div>';
   } else if (S.round === "families"){
     const f = D.indices.families[it], h = S.families[it] || {};
     html += '<div class="kicker">family ' + (pos() + 1) + " of " + Q.families.length + "</div>";
@@ -684,14 +699,21 @@ function paintTop(){
     if (roleOf(it) === "definition") html += spanLine(spanOf(it));
   }
   $("item").innerHTML = html; typeset($("item"));
-  const wp = $("wPrev"), wn = $("wNext"); if (wp) wp.addEventListener("click", () => walkTo(-1)); if (wn) wn.addEventListener("click", () => walkTo(1));
   const ri = $("renameInp"); if (ri) ri.addEventListener("change", () => { snap(); const cur = S.families[it] || {verdict: "family"}; S.families[it] = {verdict: cur.verdict, rename: ri.value.trim()}; save(); paintRounds(); });
 }
 function propLine(pr, yours){ return '<div class="prop">proposed: <b class="r-' + esc(pr.role) + '">' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (pr.note ? ' · <span class="flag warn">' + esc(pr.note) + "</span>" : "") + (yours ? ' · <b class="you">yours: ' + esc(yours) + "</b>" : "") + "</div>"; }
 function spanLine(sp){ if (!sp) return '<div class="ev">no defining sentence proposed — select it in the text, then “cite selection”</div>'; return '<div class="span"><span class="deftext">“' + esc(sp.text) + '”</span><div class="ev">' + esc(citation(sp)) + " · words " + esc(sp.position || "?") + " · source <b>" + esc(sp.source || "rule") + "</b></div></div>"; }
 function lettersLine(id){ const m = D.maths[id]; const rk = m.where === "display" ? (m.eq || null) : id; const row = rk && D.indices.rows ? D.indices.rows[rk] : null; if (!row) return ""; const letters = Object.keys(row.letters).sort(); return '<div class="ev">' + (row.binders.length ? "binds: " + esc(row.binders.map(binderText).join(" · ")) + " · " : "") + "letters: " + letters.map(l => { const st = letterState(l); return '<span class="mono">' + esc(l) + "→" + esc(st.fam || "?") + "</span>"; }).join(", ") + "</div>"; }
 function nextRoundWithOpen(){ const i = ROUNDS.findIndex(x => x[0] === S.round); for (let k = 1; k <= ROUNDS.length; k++){ const r = ROUNDS[(i + k) % ROUNDS.length][0]; if (Q[r].some(it => !isDone(r, it))) return r; } return null; }
-function walkTo(dir){ const it = current(); if (!it || S.round !== "indices") return; const ids = rowsWith(it); if (!ids.length) return; if (walk.letter !== it){ walk = {letter: it, i: 0}; } walk.i = (walk.i + dir + ids.length) % ids.length; light(ids, ids[walk.i]); paintTop(); }
+function walkTo(dir){ const it = current(); if (!it || S.round !== "indices" || adhoc) return; const ids = rowsWith(it); if (!ids.length) return; if (walk.letter !== it){ walk = {letter: it, i: 0}; } walk.i = (walk.i + dir + ids.length) % ids.length; light(ids, ids[walk.i]); paintWalk(); }
+function paintWalk(){
+  const it = current(); const ids = (!adhoc && it && S.round === "indices") ? rowsWith(it) : [];
+  const on = ids.length > 0;
+  $("navL").classList.toggle("hidden", !on); $("navR").classList.toggle("hidden", !on); $("walkbox").classList.toggle("hidden", !on);
+  $("midwrap").classList.toggle("walking", on);
+  if (on) $("walkbox").textContent = "formula " + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length;
+}
+$("navL").addEventListener("click", () => walkTo(-1)); $("navR").addEventListener("click", () => walkTo(1));
 
 /* ---------- bottom: decisions only ---------- */
 function paintBottom(){
@@ -765,7 +787,15 @@ function whenMathJax(fn){ let n = 0; const t = setInterval(() => { if (window.Ma
 /* ---------- export / import ---------- */
 function resolvedRoles(){ const out = {}; for (const [id, h] of Object.entries(S.roles)){ const sp = h.role === "definition" ? (h.span || proposed(id).span || null) : null; out[id] = {role: h.role, span: sp, source: sp ? (sp.source || "rule") : "human"}; } return out; }
 function exportPayload(){ return {schema_version: "discover-decisions-2", paper_key: KEY, exported: new Date().toISOString(), labeller: "human", roles: resolvedRoles(), marks: S.marks, indices: S.indices, families: S.families}; }
-function exportJSON(){ const blob = new Blob([JSON.stringify(exportPayload(), null, 1)], {type: "application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "discover_decisions_" + KEY + "_" + new Date().toISOString().slice(0, 10) + ".json"; document.body.appendChild(a); a.click(); a.remove(); toast("exported"); }
+function exportJSON(){
+  const name = "discover_decisions_" + KEY + "_" + new Date().toISOString().slice(0, 10) + ".json";
+  const text = JSON.stringify(exportPayload(), null, 1);
+  if (navigator.share && navigator.canShare && navigator.maxTouchPoints > 0){
+    try{ const file = new File([text], name, {type: "application/json"}); if (navigator.canShare({files: [file]})){ navigator.share({files: [file], title: name}).then(() => toast("shared")).catch(() => download(text, name)); return; } }catch(e){}
+  }
+  download(text, name);
+}
+function download(text, name){ const blob = new Blob([text], {type: "application/json"}); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); toast("exported"); }
 function importJSON(text){
   let obj; try{ obj = JSON.parse(text); }catch(e){ toast("not JSON"); return 0; }
   if (!obj || !/^discover-decisions-[12]$/.test(obj.schema_version || "")){ toast("not a discover-decisions file"); return 0; }
@@ -787,6 +817,8 @@ function paintAll(scroll){
   if (S.pos[S.round] === undefined || S.pos[S.round] < 0) S.pos[S.round] = nextOpen(-1);
   paintRounds(); paintText(); paintTables(); paintTop(); paintBottom();
   const it = current();
+  if (!adhoc && it && S.round === "indices" && walk.letter !== it) walk = {letter: it, i: 0};
+  paintWalk();
   if (adhoc) light([], adhoc);
   else if (it && S.round === "indices"){ const ids = rowsWith(it); if (walk.letter !== it) walk = {letter: it, i: 0}; light(ids, ids[walk.i] || null); }
   else if (it && (S.round === "defs" || S.round === "forms")) light([], it);
