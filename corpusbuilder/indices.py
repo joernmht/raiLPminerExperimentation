@@ -401,7 +401,10 @@ def _family_of(
     ]  # subscript and superscript in either order: E_{st}^{dr}, E^{dr}_{st}
     sub_m = re.search(r"_\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
     sup_m = re.search(r"\^\s*(\{[^{}]*\}|\S)", scripts)
-    sub = (sub_m.group(1) if sub_m else "") + " , " + (sup_m.group(1) if sup_m else "")
+    sup_text = sup_m.group(1) if sup_m else ""
+    # a spaced pair in a superscript is one qualifier ("t l"), not two index letters
+    sup_text = re.sub(r"(?<![A-Za-z])([a-z]) ([a-z])(?![A-Za-z])", r"\1\2", sup_text)
+    sub = (sub_m.group(1) if sub_m else "") + " , " + sup_text
     subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if _is_index_token(t, words))
     _family_of.last_subset = _subset_label(
         text[m.end(1) :], words
