@@ -392,14 +392,16 @@ def _family_of(
         text = card.group(1)
     if not text or text.startswith("{") or text.startswith("\\{") or text[0].isdigit():
         return None, ()
-    m = re.match(
-        r"^([A-Za-z][A-Za-z0-9]*(?:_(?:hat|bar|tilde|vec|dot|underline))?p*)(?:\s*\^\s*(\{[^{}]*\}|\S))?(?:\s*_\s*(\{[^{}]*\}|[A-Za-z0-9]))?",
-        text,
-    )
+    m = re.match(r"^([A-Za-z][A-Za-z0-9]*(?:_(?:hat|bar|tilde|vec|dot|underline))?p*)", text)
     if not m:
         return None, ()
     fam = m.group(1)
-    sub = (m.group(3) or "") + " , " + (m.group(2) or "")  # E_{st}^{dr}: indexed by st and by dr
+    scripts = text[
+        m.end(1) :
+    ]  # subscript and superscript in either order: E_{st}^{dr}, E^{dr}_{st}
+    sub_m = re.search(r"_\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
+    sup_m = re.search(r"\^\s*(\{[^{}]*\}|\S)", scripts)
+    sub = (sub_m.group(1) if sub_m else "") + " , " + (sup_m.group(1) if sup_m else "")
     subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if _is_index_token(t, words))
     _family_of.last_subset = _subset_label(
         text[m.end(1) :], words
