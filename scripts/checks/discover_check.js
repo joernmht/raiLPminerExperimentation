@@ -36,8 +36,10 @@ function boot(path) {
   if (carrying.length) {
     ok(d.querySelector("#mid .cur") && carrying.includes(d.querySelector("#mid .cur").dataset.id), "text: a formula carrying the letter is lit");
     const before = d.querySelector("#mid .cur").dataset.id;
-    X.walkTo(1);
+    ok(!d.getElementById("navL").classList.contains("hidden") && !d.getElementById("navR").classList.contains("hidden") && /formula 1 of \d+/.test(d.getElementById("walkbox").textContent), "walk: edge navigators and the counter box are shown over the text");
+    d.getElementById("navR").click();
     ok(carrying.length === 1 || d.querySelector("#mid .cur").dataset.id !== before, "walk: ▸ moves to the next formula carrying the letter");
+    ok(carrying.length === 1 || /formula 2 of/.test(d.getElementById("walkbox").textContent), "walk: the counter box follows");
   }
   // decide with a family chip → auto-advance
   const chip = d.querySelector("#decide button.fam[data-fam]:not([data-fam='…'])");
