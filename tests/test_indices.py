@@ -153,3 +153,27 @@ def test_numeric_and_arithmetic_caps_name_no_family_and_capitals_are_labels() ->
         "lo": "1",
         "hi": "|K|",
     }
+
+
+def test_standard_labels_and_glued_words_are_not_indices() -> None:
+    rows = [
+        ("eq-0001", r"t_{end} - t_{start} \le T_{max} \quad \forall e \in E"),
+        ("eq-0002", r"N_{st} + y_{e n d} + M_{qw} \le 1"),
+        ("eq-0003", r"x_{ij} \le 1 \quad \forall i \in I, j \in J"),
+        ("eq-0004", r"z_{ik} \le 1"),
+    ]
+    rec = indices.analyse(rows, None)
+    L = rec["letters"]
+    assert not {"n", "d", "s", "t"} & set(
+        L
+    )  # end/start/max/st are standard label words: skipped outright
+    assert (
+        L["q"]["verdict"] == "label"
+        and L["q"]["rule"] == "glued word"
+        and L["q"]["runs"] == {"qw": 1}
+    )
+    assert L["w"]["verdict"] == "label"  # an unlisted glued pair whose letters are bound nowhere
+    assert L["i"]["verdict"] == "index" and L["j"]["verdict"] == "index"
+    assert L["k"]["verdict"] == "juxtaposed" and L["k"]["runs"] == {
+        "ik": 1
+    }  # glued to the bound i: undecided

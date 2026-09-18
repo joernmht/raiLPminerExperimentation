@@ -86,6 +86,7 @@ def test_load_decisions_merges_v1_and_v2_last_wins_and_validates(tmp_path: Path)
         "marks": [{"para": 1, "text": "x = 1"}, {"para": 2, "text": "y = 2"}],
         "indices": {"i": {"verdict": "not", "family": ""}},
         "families": {},
+        "label_proposals": ["st", "end"],
     }
     (tmp_path / "1.json").write_text(json.dumps(v1), encoding="utf-8")
     (tmp_path / "2.json").write_text(json.dumps(v2), encoding="utf-8")
@@ -108,7 +109,11 @@ def test_load_decisions_merges_v1_and_v2_last_wins_and_validates(tmp_path: Path)
         and s["definitions_span_by_human"] == 1
         and s["marks"] == 2
     )
-    assert s["letters_rejected"] == 1 and s["families_confirmed"] == 1
+    assert (
+        s["letters_rejected"] == 1
+        and s["families_confirmed"] == 1
+        and s["label_proposals"] == ["end", "st"]
+    )
     bad = dict(v1, schema_version="vocab-decisions-1")
     (tmp_path / "3.json").write_text(json.dumps(bad), encoding="utf-8")
     with pytest.raises(ValueError):

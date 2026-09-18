@@ -144,6 +144,7 @@ def page_payload(
                 "bases",
                 "alias_votes",
                 "rows",
+                "runs",
                 "desc",
                 "multi_family",
             )
@@ -374,12 +375,16 @@ def load_decisions(paths: list[Path]) -> dict[str, dict]:
                 "marks": [],
                 "indices": {},
                 "families": {},
+                "label_proposals": [],
                 "files": [],
             },
         )
         m["roles"].update(obj.get("roles") or {})
         m["indices"].update(obj.get("indices") or {})
         m["families"].update(obj.get("families") or {})
+        for t in obj.get("label_proposals") or []:
+            if isinstance(t, str) and t and t not in m["label_proposals"]:
+                m["label_proposals"].append(t)
         seen = {(x.get("para"), x["text"]) for x in m["marks"]}
         for x in obj.get("marks") or []:
             if (x.get("para"), x["text"]) not in seen:
@@ -419,6 +424,7 @@ def summarize_decisions(merged: dict[str, dict]) -> dict:
             sum(1 for v in m["families"].values() if v["verdict"] == "family")
             for m in merged.values()
         ),
+        "label_proposals": sorted({t for m in merged.values() for t in m["label_proposals"]}),
     }
 
 
@@ -444,13 +450,12 @@ html,body{margin:0;padding:0;height:100%}
 body{background:var(--page1);color:var(--ink);font:17px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh;overflow:hidden}
 #top{background:var(--card);border-bottom:1px solid var(--line);box-shadow:var(--shadow);padding:calc(8px + env(safe-area-inset-top)) 16px 12px;max-height:48vh;overflow:auto;z-index:5;text-align:center}
 #midwrap{position:relative;min-height:0}
-#mid{position:absolute;inset:0;overflow:auto;padding:10px 14px 30px;background:var(--page2);-webkit-overflow-scrolling:touch}
-#midwrap.walking #mid{padding-left:62px;padding-right:62px}
-.nav{position:absolute;top:0;bottom:0;width:54px;border:0;background:rgba(10,119,127,.16);color:var(--accent);font-size:38px;font-weight:800;z-index:4;cursor:pointer;padding:0}
-#navL{left:0;border-radius:0 16px 16px 0}#navR{right:0;border-radius:16px 0 0 16px}
-.nav:active{background:rgba(10,119,127,.35)}
-#walkbox{position:absolute;top:10px;right:62px;background:rgba(255,255,255,.6);color:var(--ink);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:700;z-index:4;opacity:.9}
-@media (prefers-color-scheme:dark){#walkbox{background:rgba(12,39,102,.6)}.nav{background:rgba(54,184,191,.16)}.nav:active{background:rgba(54,184,191,.35)}}
+#mid{position:absolute;inset:0;overflow:auto;padding:10px 14px 110px;background:var(--page2);-webkit-overflow-scrolling:touch}
+#navs{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:18px;z-index:4}
+.nav{width:64px;height:64px;border-radius:50%;border:2px solid var(--accent);background:rgba(255,255,255,.82);color:var(--accent);font-size:32px;font-weight:800;cursor:pointer;padding:0;box-shadow:var(--shadow);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.nav:active{background:var(--accent);color:#fff}
+#walkbox{position:absolute;top:10px;right:14px;background:rgba(255,255,255,.6);color:var(--ink);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:14px;font-weight:700;z-index:4;opacity:.9}
+@media (prefers-color-scheme:dark){#walkbox{background:rgba(12,39,102,.6)}.nav{background:rgba(12,39,102,.8)}}
 #unsaved{margin-top:10px;font-size:14px;color:var(--warn);background:var(--warn-soft);border:1px solid var(--warn);border-radius:10px;padding:6px 10px}
 #bottom{background:var(--card);border-top:1px solid var(--line);padding:16px 18px calc(20px + env(safe-area-inset-bottom));z-index:5;text-align:center}
 @media (min-width:900px){body{max-width:960px;margin:0 auto;border-left:1px solid var(--line);border-right:1px solid var(--line)}}
@@ -510,6 +515,8 @@ table.grid{border-collapse:collapse;width:100%;font-size:13px}table.grid th,tabl
 .dec.r-formula{color:var(--accent)}.dec.r-definition{color:var(--def)}.dec.r-index{color:var(--tier3)}.dec.r-domain{color:var(--accent2)}.dec.r-mention,.dec.r-other{color:var(--muted)}
 .dec.r-formula.on{background:var(--accent);border-color:var(--accent);color:#fff}.dec.r-definition.on{background:var(--def);border-color:var(--def);color:#fff}.dec.r-index.on{background:var(--tier3);border-color:var(--tier3);color:#fff}.dec.r-domain.on{background:var(--accent2);border-color:var(--accent2);color:#fff}.dec.r-mention.on,.dec.r-other.on{background:var(--muted);border-color:var(--muted);color:#fff}
 .fams{display:flex;gap:10px;overflow-x:auto;margin-top:12px;padding-bottom:4px;justify-content:safe center}
+.dec.lab{min-height:44px;font-size:15px;border-radius:999px;padding:4px 14px;white-space:nowrap;color:var(--warn);border-color:var(--warn)}
+.dec.lab.on{background:var(--warn);color:#fff}
 .dec.fam{min-height:52px;font-size:17px;border-radius:999px;padding:6px 18px;white-space:nowrap;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 #pill{position:fixed;left:50%;bottom:calc(230px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;gap:8px;z-index:9;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px;box-shadow:var(--shadow)}
 #pill button{font:inherit;font-size:16px;font-weight:800;border:0;border-radius:999px;padding:12px 16px;background:var(--def);color:#fff}
@@ -559,8 +566,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
     <div id="tables"></div>
     <div class="ev pad">end of paper</div>
   </main>
-  <button id="navL" class="nav hidden" title="previous formula with this letter">◂</button>
-  <button id="navR" class="nav hidden" title="next formula with this letter">▸</button>
+  <div id="navs" class="hidden"><button id="navL" class="nav" title="previous formula with this letter">◂</button><button id="navR" class="nav" title="next formula with this letter">▸</button></div>
   <div id="walkbox" class="hidden"></div>
 </div>
 <div id="pill" class="hidden"><button id="useSel">✎ cite selection</button><button id="markSel">＋ formula</button></div>
@@ -569,6 +575,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
     <div class="pk" id="pk"></div>
     <button id="exportBtn">⬇ Export decisions</button>
     <button id="importBtn">⬆ Import</button><input type="file" id="importFile" accept="application/json" class="hidden">
+    <button id="labelBtn">＋ propose a label word</button>
     <button id="clearBtn" class="bad">✕ Clear this paper</button>
     <a href="../discover.html">← worklist</a>
   </div>
@@ -588,9 +595,9 @@ const ROUNDS = [["indices", "Indices"], ["defs", "Definitions"], ["forms", "Form
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 1400); }
-function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, sel: null, round: "indices", pos: {}}; }
+function fresh(){ return {roles: {}, marks: [], indices: {}, families: {}, labels: {}, sel: null, round: "indices", pos: {}}; }
 function migrate(v1){ const s = fresh(); for (const [id, v] of Object.entries(v1.formulas || {})) s.roles[id] = {role: v === "not" ? "other" : "formula"}; s.marks = (v1.spans || []).map(x => ({para: x.para, text: x.text, latex: x.latex || x.text})); s.indices = v1.indices || {}; s.families = v1.families || {}; return s; }
-function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles){ if (!s.round) s.round = "indices"; if (!s.pos) s.pos = {}; return s; } const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
+function load(){ try{ const s = JSON.parse(localStorage.getItem(LSK) || "null"); if (s && s.roles){ if (!s.round) s.round = "indices"; if (!s.pos) s.pos = {}; if (!s.labels) s.labels = {}; return s; } const v1 = JSON.parse(localStorage.getItem(LSK1) || "null"); if (v1 && v1.formulas) return migrate(v1); }catch(e){} return fresh(); }
 let storeFailed = false;
 function save(){ try{ localStorage.setItem(LSK, JSON.stringify(S)); storeFailed = false; }catch(e){ if (!storeFailed) toast("this browser cannot store decisions for a file opened this way — export before you close the page"); storeFailed = true; } const b = $("unsaved"); if (b) b.classList.toggle("hidden", !storeFailed); }
 let S = load();
@@ -684,6 +691,8 @@ function paintTop(){
     html += '<div class="big mono">' + esc(it) + ' <span class="arrow">→</span> ' + (st.fam ? esc(st.fam) : '<span class="q">?</span>') + "</div>";
     html += '<div class="prop">proposed: <b>' + esc(e.verdict || "?") + "</b> (" + esc(e.rule || "no rule") + ")" + (e.family ? " · family " + esc(e.family) : "") + (famDesc ? ' · <i>' + esc(famDesc.slice(0, 70)) + "</i>" : "") + (e.desc ? ' · paper: “' + esc(e.desc.slice(0, 60)) + "”" : "") + (st.h.verdict ? ' · <b class="you">yours: ' + esc(st.h.verdict) + (st.h.family ? " → " + esc(st.h.family) : "") + "</b>" : "") + "</div>";
     html += '<div class="ev">' + esc(evShort(e)) + "</div>";
+    const runs = Object.keys(e.runs || {});
+    if (runs.length) html += '<div class="ev">written glued as <span class="mono">' + runs.map(esc).join(", ") + "</span> — a label word, or two indices without a comma?</div>";
     if (!ids.length) html += '<div class="ev">no formula carries it in a subscript</div>';
   } else if (S.round === "families"){
     const f = D.indices.families[it], h = S.families[it] || {};
@@ -709,8 +718,7 @@ function walkTo(dir){ const it = current(); if (!it || S.round !== "indices" || 
 function paintWalk(){
   const it = current(); const ids = (!adhoc && it && S.round === "indices") ? rowsWith(it) : [];
   const on = ids.length > 0;
-  $("navL").classList.toggle("hidden", !on); $("navR").classList.toggle("hidden", !on); $("walkbox").classList.toggle("hidden", !on);
-  $("midwrap").classList.toggle("walking", on);
+  $("navs").classList.toggle("hidden", !on); $("walkbox").classList.toggle("hidden", !on);
   if (on) $("walkbox").textContent = "formula " + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length;
 }
 $("navL").addEventListener("click", () => walkTo(-1)); $("navR").addEventListener("click", () => walkTo(1));
@@ -725,6 +733,8 @@ function paintBottom(){
     const st = letterState(it); const chips = FAMS.slice(0, 5);
     html = '<div class="grid3"><button class="dec ok glow" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec bad" data-v="not">✗ not an index</button><button class="dec mid" data-v="unsure">? unsure</button></div>';
     html += '<div class="fams">' + chips.map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
+    const runs = Object.keys(st.e.runs || {});
+    if (runs.length) html += '<div class="fams">' + runs.map(r => '<button class="dec lab' + (S.labels[r] ? " on" : "") + '" data-lab="' + esc(r) + '">＋ “' + esc(r) + '” is a label word</button>').join("") + "</div>";
   } else if (S.round === "families"){
     html = '<div class="grid3"><button class="dec ok glow" data-fv="family">✓ family</button><button class="dec bad" data-fv="not">✗ not</button><button class="dec mid" data-fv="unsure">? unsure</button></div>';
   } else { html = roleBtns(S.roles[it] ? S.roles[it].role : null, proposed(it).role); }
@@ -742,6 +752,7 @@ $("decide").addEventListener("click", e => {
   const it = current();
   if (S.round === "indices" && it){
     if (b.dataset.v){ decideLetter(it, b.dataset.v); return; }
+    if (b.dataset.lab){ snap(); if (S.labels[b.dataset.lab]) delete S.labels[b.dataset.lab]; else S.labels[b.dataset.lab] = true; save(); paintBottom(); toast(S.labels[b.dataset.lab] ? "proposed “" + b.dataset.lab + "” for the standard label list" : "proposal withdrawn"); return; }
     if (b.dataset.fam){ let f = b.dataset.fam; if (f === "…"){ f = window.prompt ? window.prompt("family of " + it + " (the set it ranges over)", letterState(it).fam) : null; if (f === null || f === undefined) return; f = String(f).trim(); } decideLetter(it, "index", f); return; }
   }
   if (S.round === "families" && it && b.dataset.fv){ snap(); const ren = $("renameInp") ? $("renameInp").value.trim() : ""; S.families[it] = {verdict: b.dataset.fv, rename: ren}; save(); toast(it + " → " + b.dataset.fv); advance(); }
@@ -786,7 +797,7 @@ function whenMathJax(fn){ let n = 0; const t = setInterval(() => { if (window.Ma
 
 /* ---------- export / import ---------- */
 function resolvedRoles(){ const out = {}; for (const [id, h] of Object.entries(S.roles)){ const sp = h.role === "definition" ? (h.span || proposed(id).span || null) : null; out[id] = {role: h.role, span: sp, source: sp ? (sp.source || "rule") : "human"}; } return out; }
-function exportPayload(){ return {schema_version: "discover-decisions-2", paper_key: KEY, exported: new Date().toISOString(), labeller: "human", roles: resolvedRoles(), marks: S.marks, indices: S.indices, families: S.families}; }
+function exportPayload(){ return {schema_version: "discover-decisions-2", paper_key: KEY, exported: new Date().toISOString(), labeller: "human", roles: resolvedRoles(), marks: S.marks, indices: S.indices, families: S.families, label_proposals: Object.keys(S.labels).sort()}; }
 function exportJSON(){
   const name = "discover_decisions_" + KEY + "_" + new Date().toISOString().slice(0, 10) + ".json";
   const text = JSON.stringify(exportPayload(), null, 1);
@@ -802,12 +813,13 @@ function importJSON(text){
   if (obj.paper_key !== KEY){ toast("that file is for " + obj.paper_key); return 0; }
   snap();
   if (obj.schema_version === "discover-decisions-1"){ const m = migrate(obj); Object.assign(S.roles, m.roles); for (const x of m.marks) if (!S.marks.some(y => y.para === x.para && y.text === x.text)) S.marks.push(x); Object.assign(S.indices, m.indices); Object.assign(S.families, m.families); }
-  else { for (const [id, v] of Object.entries(obj.roles || {})) S.roles[id] = {role: v.role, span: v.span && v.span.source === "human" ? v.span : undefined}; for (const x of obj.marks || []) if (!S.marks.some(y => y.para === x.para && y.text === x.text)) S.marks.push(x); Object.assign(S.indices, obj.indices || {}); Object.assign(S.families, obj.families || {}); }
+  else { for (const [id, v] of Object.entries(obj.roles || {})) S.roles[id] = {role: v.role, span: v.span && v.span.source === "human" ? v.span : undefined}; for (const x of obj.marks || []) if (!S.marks.some(y => y.para === x.para && y.text === x.text)) S.marks.push(x); Object.assign(S.indices, obj.indices || {}); Object.assign(S.families, obj.families || {}); for (const t of obj.label_proposals || []) S.labels[t] = true; }
   save(); paintAll(true); toast("imported (last wins)"); return 1;
 }
 $("exportBtn").addEventListener("click", exportJSON);
 $("importBtn").addEventListener("click", () => $("importFile").click());
 $("importFile").addEventListener("change", e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => importJSON(String(r.result)); r.readAsText(f); e.target.value = ""; });
+$("labelBtn").addEventListener("click", () => { const v = window.prompt ? window.prompt("label word to add to the standard scanning list (e.g. end, max, st)", "") : null; if (!v) return; snap(); S.labels[String(v).trim().toLowerCase()] = true; save(); toast("proposed “" + String(v).trim() + "”"); });
 $("clearBtn").addEventListener("click", () => { if (!confirm("Clear every decision for this paper?")) return; snap(); S = fresh(); save(); paintAll(true); });
 document.addEventListener("keydown", e => { if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return; const id = adhoc || ((S.round === "defs" || S.round === "forms") ? current() : null); if (/^[1-6]$/.test(e.key) && id) decideRole(id, ROLES[parseInt(e.key, 10) - 1]); else if (e.key === "ArrowRight") $("skipBtn").click(); else if (e.key === "ArrowLeft" && S.round === "indices") walkTo(-1); else if (e.key === "i" && S.round === "indices" && current()) decideLetter(current(), "index"); else if (e.key === "x" && S.round === "indices" && current()) decideLetter(current(), "not"); });
 
