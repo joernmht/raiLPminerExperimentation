@@ -785,6 +785,7 @@ def analyse(
     fam_desc: dict[str, str] = {}
     fam_sub: dict[str, set[str]] = defaultdict(set)
     fam_subsets: dict[str, Counter] = defaultdict(Counter)
+    subset_rows: set[tuple[str, str, str]] = set()
     counts: Counter[str] = Counter()
 
     def L(name: str) -> Letter:
@@ -814,8 +815,9 @@ def analyse(
                     counts["binder_bindings"] += 1
                 if b.family:
                     fam_sub[b.family].update(b.family_sub)
-                    if b.subset:
-                        fam_subsets[b.family][b.subset] += 1
+                    if b.subset and (row, b.family, b.subset) not in subset_rows:
+                        subset_rows.add((row, b.family, b.subset))
+                        fam_subsets[b.family][b.subset] += 1  # rows that use the subset
 
     rows_out: dict[str, dict] = {}
     rows_all: list[tuple[str, str]] = []
