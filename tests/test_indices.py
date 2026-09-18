@@ -265,3 +265,14 @@ def test_two_letter_names_in_binders_and_family_superscripts() -> None:
     assert L["tr"]["verdict"] == "index" and L["tr"]["family"] == "TR" and "r" not in L
     assert "dr" in L and L["dr"]["rule"] == "multi-letter name"
     assert F["E"]["indexed_by"] == ["dr"] and not F["E"]["subsets"]
+    rec = indices.analyse(
+        [
+            ("eq-0001", r"N_{s t} \le 1 , s t_{e} = s t_{e^{'}} , d r_{e} = d r_{e^{'}}"),
+            ("eq-0002", r"y_{e} \le 1 \quad \forall e \in E_{\text{de} , s t}^{\text{dis} , d r}"),
+        ],
+        None,
+    )
+    fam = rec["families"]["E"]
+    assert fam["indexed_by"] == ["dr", "st"] and fam["subsets"] == {
+        "de_dis": 1
+    }  # subscript first, superscript after
