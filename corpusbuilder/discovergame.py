@@ -692,7 +692,12 @@ function paintTop(){
     html += '<div class="prop">proposed: <b>' + esc(e.verdict || "?") + "</b> (" + esc(e.rule || "no rule") + ")" + (e.family ? " · family " + esc(e.family) : "") + (famDesc ? ' · <i>' + esc(famDesc.slice(0, 70)) + "</i>" : "") + (e.desc ? ' · paper: “' + esc(e.desc.slice(0, 60)) + "”" : "") + (st.h.verdict ? ' · <b class="you">yours: ' + esc(st.h.verdict) + (st.h.family ? " → " + esc(st.h.family) : "") + "</b>" : "") + "</div>";
     html += '<div class="ev">' + esc(evShort(e)) + "</div>";
     const runs = Object.keys(e.runs || {});
-    if (runs.length) html += '<div class="ev">written glued as <span class="mono">' + runs.map(esc).join(", ") + "</span> — a label word, or two indices without a comma?</div>";
+    if (runs.length){
+      const partners = [...new Set(runs.flatMap(r => r.split("").filter(ch => ch !== it)))];
+      const ptxt = partners.map(pl => { const ps = letterState(pl); return pl + (ps.fam ? " → " + ps.fam : " (unbound)"); }).join(", ");
+      html += '<div class="ev">written glued as <span class="mono">' + runs.map(esc).join(", ") + "</span>" + (ptxt ? " · glued to " + esc(ptxt) : "") + "</div>";
+      html += '<div class="ev">' + (e.verdict === "juxtaposed" ? "Two indices without a comma? Then ✓ index and pick its family. One word (a label)? Then the chip below." : "No letter of this word is bound anywhere: read as a label word; ✓ index only if it really ranges over a set.") + "</div>";
+    }
     if (!ids.length) html += '<div class="ev">no formula carries it in a subscript</div>';
   } else if (S.round === "families"){
     const f = D.indices.families[it], h = S.families[it] || {};
