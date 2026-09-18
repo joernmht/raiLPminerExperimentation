@@ -950,7 +950,11 @@ def analyse(
     primary: dict[str, str] = {}
     for name, lt in letters.items():
         votes: Counter[str] = Counter()
-        for c in (lt.bound, lt.tuple_bound, lt.prose, lt.table):
+        # a direct membership (i \in I) names the letter's own family; a tuple membership ((e, e') \in A)
+        # only says the pair is in A, so it votes only when nothing direct is known
+        direct = lt.bound or lt.prose or lt.table or lt.cap_family
+        sources = (lt.bound, lt.prose, lt.table, lt.cap_family) if direct else (lt.tuple_bound,)
+        for c in sources:
             for fam, n in c.items():
                 if fam != "?":
                     votes[fam] += n
@@ -963,7 +967,11 @@ def analyse(
     for name in sorted(letters):
         lt = letters[name]
         votes: Counter[str] = Counter()
-        for c in (lt.bound, lt.tuple_bound, lt.prose, lt.table, lt.cap_family):
+        # a direct membership (i \in I) names the letter's own family; a tuple membership ((e, e') \in A)
+        # only says the pair is in A, so it votes only when nothing direct is known
+        direct = lt.bound or lt.prose or lt.table or lt.cap_family
+        sources = (lt.bound, lt.prose, lt.table, lt.cap_family) if direct else (lt.tuple_bound,)
+        for c in sources:
             for fam, n in c.items():
                 if fam != "?":
                     votes[fam] += n
