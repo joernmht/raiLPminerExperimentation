@@ -405,8 +405,12 @@ def _family_of(text: str) -> tuple[str | None, tuple[str, ...]]:
     return fam, subs
 
 
-def _letters_of(text: str) -> tuple[str, ...]:
-    return tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", text) if is_letterish(t))
+def _is_index_token(t: str, words: frozenset[str]) -> bool:
+    return is_letterish(t) or t in words
+
+
+def _letters_of(text: str, words: frozenset[str] = frozenset()) -> tuple[str, ...]:
+    return tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", text) if _is_index_token(t, words))
 
 
 def _cap_family(hi: str) -> str | None:
@@ -424,15 +428,19 @@ def _cap_family(hi: str) -> str | None:
     return fam
 
 
-def parse_binder(text: str, sup: str = "") -> list[Binding]:
-    """Bindings named by one binder clause (already normalised)."""
+def parse_binder(text: str, sup: str = "", words: frozenset[str] = frozenset()) -> list[Binding]:
+    """Bindings named by one binder clause (already normalised).
+
+    ``words`` are the paper's multi-letter index names (``st`` for a station),
+    accepted wherever a single letter would be.
+    """
     text = text.strip()
     out: list[Binding] = []
     m = _RANGE_EQ.match(text) or _RANGE_SET.match(text)
-    if m and is_letterish(m.group(1)):
+    if m and _is_index_token(m.group(1), words):
         return [Binding((m.group(1),), _cap_family(m.group(3)), "range", m.group(2), m.group(3))]
     m = _RANGE_LE.match(text)
-    if m and is_letterish(m.group(2)):
+    if m and _is_index_token(m.group(2), words):
         return [Binding((m.group(2),), _cap_family(m.group(3)), "range", m.group(1), m.group(3))]
     m = re.match(r"^\s*(\w+)\s*=\s*([^,\s]+)\s*$", text)
     if m and sup.strip() and is_letterish(m.group(1)):
@@ -460,18 +468,18 @@ def parse_binder(text: str, sup: str = "") -> list[Binding]:
             fam, subs = _family_of(rhs)
             tm = _TUPLE.match(lhs.strip())
             if tm:
-                letters = _letters_of(tm.group(1))
+                letters = _letters_of(tm.group(1), words)
                 if letters and fam:
                     out.append(Binding(letters, fam, "tuple", family_sub=subs))
                 pending = []
                 continue
-            letters = tuple(pending) + _letters_of(lhs)
+            letters = tuple(pending) + _letters_of(lhs, words)
             if letters and fam and not any(op in lhs for op in ("+", "-", "=", "<", ">")):
                 out.append(Binding(letters, fam, "member", family_sub=subs))
             pending = []
             continue
         if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(\s+[A-Za-z][A-Za-z0-9_]*)*", clause) and all(
-            is_letterish(t) for t in clause.split()
+            _is_index_token(t, words) for t in clause.split()
         ):
             pending.extend(clause.split())
             continue
@@ -502,7 +510,7 @@ def _scripts(s: str, i: int) -> tuple[list[str], list[str], int]:
             return sub, sup, i
 
 
-def binders_of(norm: str) -> list[Binding]:
+def binders_of(norm: str, words: frozenset[str] = frozenset()) -> list[Binding]:
     """All bindings in one normalised row (big operators and quantifiers)."""
     out: list[Binding] = []
     for line in re.split(r"\\\\", norm):
@@ -512,11 +520,11 @@ def binders_of(norm: str) -> list[Binding]:
                 stop = re.search(
                     r"\\(?:forall|exists)(?![A-Za-z])|(?<![\\A-Za-z])(?:where|for|and)\b", tail
                 )
-                out.extend(parse_binder(tail[: stop.start()] if stop else tail))
+                out.extend(parse_binder(tail[: stop.start()] if stop else tail, words=words))
             else:
                 sub, sup, _ = _scripts(line, m.end())
                 if sub:
-                    out.extend(parse_binder(" , ".join(sub), " ".join(sup)))
+                    out.extend(parse_binder(" , ".join(sub), " ".join(sup), words))
     return out
 
 
@@ -529,7 +537,7 @@ class Use:
     run: str | None = None  # the glued word the letter was cut from ("st" in N_{st})
 
 
-def _pieces(sub: str) -> list[tuple[str, bool]]:
+def _pieces(sub: str, words: frozenset[str] = frozenset()) -> list[tuple[str, bool]]:
     """Index tokens of one subscript group: letters, arithmetic on a letter, juxtaposed letters."""
     out: list[tuple[str, bool]] = []
     for piece in _split_top(sub):
@@ -538,9 +546,12 @@ def _pieces(sub: str) -> list[tuple[str, bool]]:
         if tm:
             p = tm.group(1)
             for t in _split_top(p):
-                out.extend(_pieces(t))
+                out.extend(_pieces(t, words))
             continue
         if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", p):
+            if p in words:
+                out.append((p, False))  # the paper's own multi-letter index name (st, tr)
+                continue
             if len(p) > 1 and is_standard_label(p):
                 continue  # a label word (end, max, st): part of the name, never an index
             if is_letterish(p):
@@ -555,17 +566,24 @@ def _pieces(sub: str) -> list[tuple[str, bool]]:
         )
         if am:
             t = am.group(1) or am.group(2) or am.group(3)
-            if is_letterish(t):
+            if _is_index_token(t, words):
                 out.append((t, False))
             continue
         toks = re.findall(r"[A-Za-z][A-Za-z0-9_]*", p)
-        if toks and all(is_letterish(t) for t in toks) and not re.search(r"[=<>]|\\le|\\ge", p):
+        if (
+            toks
+            and all(_is_index_token(t, words) for t in toks)
+            and not re.search(r"[=<>]|\\le|\\ge", p)
+        ):
+            spaced_pair = (
+                "".join(toks) if len(toks) == 2 and all(len(t) == 1 for t in toks) else None
+            )
             for t in toks:
-                out.append((t, len(toks) > 1))
+                out.append((t, spaced_pair or (len(toks) > 1)))
     return out
 
 
-def subscript_uses(norm: str) -> list[Use]:
+def subscript_uses(norm: str, words: frozenset[str] = frozenset()) -> list[Use]:
     """Every (symbol, position, letter) in the subscripts and superscripts of one row."""
     uses: list[Use] = []
     i = 0
@@ -585,16 +603,79 @@ def subscript_uses(norm: str) -> list[Use]:
         ):
             continue
         for group in sub:
-            for pos, (letter, jux) in enumerate(_pieces(group), 1):
+            for pos, (letter, jux) in enumerate(_pieces(group, words), 1):
                 uses.append(
                     Use(name, str(pos), letter, bool(jux), jux if isinstance(jux, str) else None)
                 )
         for group in sup:
-            for letter, jux in _pieces(group):
+            for letter, jux in _pieces(group, words):
                 uses.append(
                     Use(name, "sup", letter, bool(jux), jux if isinstance(jux, str) else None)
                 )
     return uses
+
+
+_PAIR_RE = re.compile(r"(?<![A-Za-z\\])([a-z]) ?([a-z])(?![A-Za-z])")
+
+
+def index_words(rows: list[tuple[str, str]]) -> tuple[frozenset[str], dict[str, dict]]:
+    """Two-letter runs that are one identifier: ``st`` in ``N_{st}`` when ``st_e`` or bare ``st`` also occur.
+
+    A run glued inside a subscript is ambiguous (two indices ``ij``, a label
+    ``end``, or a name such as ``st`` for a station). It is a name of its own
+    when it also appears with its own subscript (``st_{e}``, the station of
+    e) or bare next to a relation (``st = st_{e'}``) and neither letter is
+    bound separately anywhere in the paper.
+    """
+    runs: Counter[str] = Counter()
+    for _rid, norm in rows:
+        for use in subscript_uses(norm):
+            if use.run:
+                runs[use.run] += 1
+    if not runs:
+        return frozenset(), {}
+    bound: set[str] = set()
+    for _rid, norm in rows:
+        for b in binders_of(norm):
+            bound.update(b.letters)
+    evidence: dict[str, dict] = {}
+    words: set[str] = set()
+    for run in runs:
+        a, b = run[0], run[1]
+        own = sum(
+            len(re.findall(rf"(?<![A-Za-z\\]){a} ?{b}_(?:\{{|[A-Za-z0-9])", norm))
+            for _r, norm in rows
+        )
+        bare = sum(
+            len(
+                re.findall(
+                    rf"(?<![A-Za-z\\_^{{]){a} ?{b} ?(?:=|\\ne|\\neq|\\le|\\ge|\\in|\\notin)(?![A-Za-z])",
+                    norm,
+                )
+            )
+            + len(re.findall(rf"(?:=|\\ne|\\neq|\\le|\\ge) ?{a} ?{b}(?![A-Za-z_])", norm))
+            for _r, norm in rows
+        )
+        if own + bare == 0:
+            continue
+        separate = {a, b} & bound
+        if separate and own < 2:
+            continue
+        words.add(run)
+        evidence[run] = {
+            "in_subscripts": runs[run],
+            "own_subscript": own,
+            "bare": bare,
+            "letters_bound_separately": sorted(separate),
+        }
+    return frozenset(words), evidence
+
+
+def join_words(norm: str, words: frozenset[str]) -> str:
+    """Write a spaced two-letter name as one token (``s t_{e}`` -> ``st_{e}``)."""
+    for w in sorted(words):
+        norm = re.sub(rf"(?<![A-Za-z\\]){w[0]} {w[1]}(?![A-Za-z])", w, norm)
+    return norm
 
 
 # -- declared sidecars -------------------------------------------------------
@@ -702,6 +783,10 @@ def analyse(
             ):
                 inline_rows.append((rec["id"], normalise(rec["latex"])))
 
+    words, word_evidence = index_words(rows_all + inline_rows)
+    rows_all = [(rid, join_words(norm, words)) for rid, norm in rows_all]
+    inline_rows = [(rid, join_words(norm, words)) for rid, norm in inline_rows]
+
     def note_row(rid: str, bindings: list[Binding]) -> None:
         entry = rows_out.setdefault(rid, {"binders": [], "letters": {}})
         for b in bindings:
@@ -718,13 +803,13 @@ def analyse(
                 entry["letters"][letter] = "binder"
 
     for rid, norm in rows_all:
-        bs = binders_of(norm)
+        bs = binders_of(norm, words)
         take(bs, rid, "binder")
         note_row(rid, bs)
     for rid, norm in inline_rows:
-        bs = binders_of(norm)
+        bs = binders_of(norm, words)
         if not bs:  # a bare membership statement in the prose: "i \in I"
-            bs = [b for b in parse_binder(norm) if b.family]
+            bs = [b for b in parse_binder(norm, words=words) if b.family]
         take(bs, rid, "prose")
         note_row(rid, bs)
 
@@ -732,7 +817,7 @@ def analyse(
     for rid, norm in rows_all + inline_rows:
         seen_letters: set[str] = set()
         seen_sup: set[str] = set()
-        for use in subscript_uses(norm):
+        for use in subscript_uses(norm, words):
             lt = L(use.letter)
             row_letters = rows_out.setdefault(rid, {"binders": [], "letters": {}})["letters"]
             row_letters.setdefault(use.letter, "sup" if use.position == "sup" else "sub")
@@ -837,7 +922,12 @@ def analyse(
         verdict = (
             "index" if (lt.bound or lt.tuple_bound or lt.capped or lt.prose or lt.table) else None
         )
-        if verdict == "index":
+        if verdict is None and name in words:
+            verdict, rule = (
+                "index",
+                "multi-letter name",
+            )  # st_e / bare st: a symbol of its own, used as an index
+        if verdict == "index" and rule is None:
             rule = (
                 "capped"
                 if lt.capped and not (lt.bound or lt.tuple_bound)
@@ -919,6 +1009,7 @@ def analyse(
             "alias_votes": dict(sorted(alias_votes.items())) if alias_votes else {},
             "rows": lt.rows,
             "runs": dict(lt.runs.most_common(6)),
+            "word_evidence": word_evidence.get(name, {}),
             "desc": lt.table_desc,
             "multi_family": len([f for f, n in votes.items() if n >= 2]) >= 2,
         }

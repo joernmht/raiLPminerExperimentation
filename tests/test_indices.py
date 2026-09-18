@@ -177,3 +177,24 @@ def test_standard_labels_and_glued_words_are_not_indices() -> None:
     assert L["k"]["verdict"] == "juxtaposed" and L["k"]["runs"] == {
         "ik": 1
     }  # glued to the bound i: undecided
+
+
+def test_two_letter_index_names_are_recognised_from_their_own_uses() -> None:
+    # Joern's case: st is the station of an event, tr its train; N_{st} is indexed by the station
+    rows = [
+        (
+            "eq-0001",
+            r"\underset{e}{\sum} n_{e , e^{'}}^{p} \leq \left(N_{s t} - 1\right) \left(1 - p_{e^{'}}\right) + p_{e^{'}} \left(N_{s t}^{p} - 1\right) , "
+            r"e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , s t = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} .",
+        ),
+        ("eq-0002", r"x_{i j} \le 1 \quad \forall i \in I, j \in J"),
+        ("eq-0003", r"t_{end} \le T_{max}"),
+    ]
+    rec = indices.analyse(rows, None)
+    L = rec["letters"]
+    assert L["st"]["verdict"] == "index" and L["st"]["rule"] == "multi-letter name"
+    assert L["st"]["word_evidence"]["own_subscript"] >= 2 and L["st"]["word_evidence"]["bare"] >= 1
+    assert "s" not in L and "t" not in L  # the pair is one name, not two letters or a label
+    assert L["e"]["verdict"] == "index" and L["e"]["family"] == "E"
+    assert L["i"]["verdict"] == "index" and L["j"]["verdict"] == "index"
+    assert rec["rows"]["eq-0001"]["letters"]["st"] == "sub"
