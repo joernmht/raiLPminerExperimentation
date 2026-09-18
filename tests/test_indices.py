@@ -152,6 +152,7 @@ def test_numeric_and_arithmetic_caps_name_no_family_and_capitals_are_labels() ->
         "kind": "range",
         "lo": "1",
         "hi": "|K|",
+        "subset": None,
     }
 
 
@@ -203,3 +204,22 @@ def test_two_letter_index_names_are_recognised_from_their_own_uses() -> None:
 def test_a_bare_binder_dummy_counts_as_bound_without_a_family() -> None:
     rec = indices.analyse([("eq-0001", r"\sum_{q} c_{q} x_{q} \le 1")], None)
     assert rec["letters"]["q"]["verdict"] == "index" and rec["letters"]["q"]["family"] is None
+
+
+def test_subsets_of_a_family_and_tuple_defined_dummies() -> None:
+    row = (
+        r"\begin{matrix} & x_{e^{''}} - x_{e^{'}} \geq L_{a^{'}} - \Delta_{a^{'}}^{\text{acce}} s_{a} - \Delta_{a^{'}}^{\text{dece}} s_{a^{''}} , "
+        r"a = \left(e , e^{'}\right) \in A_{\text{dwell}} , a^{'} = \left(e^{'} , e^{''}\right) \in A_{\text{run}} , "
+        r"a^{''} = \left(e^{''} , e^{'' '}\right) \in A_{\text{odturn}}^{\text{plan}} , \\ & y_{a} \le 1 \quad \forall a \in A \end{matrix}"
+    )
+    n = indices.normalise(row)
+    assert "eppp" in n and "'" not in n  # e''' written as ^{'' '} is three primes
+    rec = indices.analyse([("eq-0001", row)], None)
+    L, F = rec["letters"], rec["families"]
+    assert L["a"]["verdict"] == "index" and L["a"]["family"] == "A"
+    assert L["ap"]["family"] == "A" and L["app"]["family"] == "A"  # a', a'' range over A too
+    assert L["e"]["family"] == "A" and L["ep"]["family"] == "A"  # components of the pairs
+    assert F["A"]["subsets"] == {"dwell": 2, "run": 1, "odturn_plan": 1} or set(
+        F["A"]["subsets"]
+    ) == {"dwell", "run", "odturn_plan"}
+    assert set(F) == {"A"}  # one family, three subsets: not three families

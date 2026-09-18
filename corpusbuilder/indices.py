@@ -311,6 +311,9 @@ def normalise(latex: str) -> str:
         s,
     )
     s = re.sub(
+        r"\^\{\s*('(?:\s*')*)\s*\}", lambda m: "'" * m.group(1).count("'"), s
+    )  # ^{'' '} -> '''
+    s = re.sub(
         r"([A-Za-z][A-Za-z0-9_]*)\s*((?:'|\^\{?'+\}?)+)",
         lambda m: m.group(1) + "p" * m.group(2).count("'"),
         s,
@@ -356,6 +359,9 @@ class Binding:
     lo: str | None = None
     hi: str | None = None
     family_sub: tuple[str, ...] = ()
+    subset: str | None = (
+        None  # the label that restricts the family: A_{dwell} ranges over the dwell subset of A
+    )
 
 
 def _split_top(s: str, seps: str = ",") -> list[str]:
@@ -393,6 +399,9 @@ def _family_of(text: str) -> tuple[str | None, tuple[str, ...]]:
     fam = m.group(1)
     sub = m.group(2) or ""
     subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if is_letterish(t))
+    _family_of.last_subset = _subset_label(
+        text[m.end(1) :]
+    )  # side channel read by family_and_subset
     if (
         len(fam) > 1
         and fam not in GREEK
@@ -407,6 +416,26 @@ def _family_of(text: str) -> tuple[str | None, tuple[str, ...]]:
 
 def _is_index_token(t: str, words: frozenset[str]) -> bool:
     return is_letterish(t) or t in words
+
+
+def _subset_label(scripts: str) -> str | None:
+    """The word labels in a family's scripts: ``_{dwell}`` -> ``dwell``, ``^{plan}_{odturn}`` -> ``odturn_plan``."""
+    sub = re.search(r"_\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
+    sup = re.search(r"\^\s*(\{[^{}]*\}|[A-Za-z0-9])", scripts)
+    words = []
+    for g in (sub, sup):
+        if g:
+            words += [
+                t for t in re.findall(r"[A-Za-z][A-Za-z0-9]*", g.group(1)) if not is_letterish(t)
+            ]
+    return "_".join(words) or None
+
+
+def family_and_subset(text: str) -> tuple[str | None, tuple[str, ...], str | None]:
+    """``_family_of`` plus the subset label of the set expression."""
+    _family_of.last_subset = None
+    fam, subs = _family_of(text)
+    return fam, subs, getattr(_family_of, "last_subset", None)
 
 
 def _letters_of(text: str, words: frozenset[str] = frozenset()) -> tuple[str, ...]:
@@ -465,17 +494,26 @@ def parse_binder(text: str, sup: str = "", words: frozenset[str] = frozenset()) 
         mm = _MEMBER.match(clause)
         if mm and "\\notin" not in clause:
             lhs, rhs = mm.group(1), mm.group(2)
-            fam, subs = _family_of(rhs)
+            fam, subs, subset = family_and_subset(rhs)
             tm = _TUPLE.match(lhs.strip())
             if tm:
                 letters = _letters_of(tm.group(1), words)
                 if letters and fam:
-                    out.append(Binding(letters, fam, "tuple", family_sub=subs))
+                    out.append(Binding(letters, fam, "tuple", family_sub=subs, subset=subset))
+                pending = []
+                continue
+            dm = re.match(r"^\s*([A-Za-z][A-Za-z0-9_]*)\s*=\s*\(\s*([^()]*)\)\s*$", lhs)
+            if dm and fam and _is_index_token(dm.group(1), words):
+                # a = (e, e') \in A: the dummy a ranges over A, its components are e and e'
+                out.append(Binding((dm.group(1),), fam, "member", family_sub=subs, subset=subset))
+                comps = _letters_of(dm.group(2), words)
+                if comps:
+                    out.append(Binding(comps, fam, "tuple", family_sub=subs, subset=subset))
                 pending = []
                 continue
             letters = tuple(pending) + _letters_of(lhs, words)
             if letters and fam and not any(op in lhs for op in ("+", "-", "=", "<", ">")):
-                out.append(Binding(letters, fam, "member", family_sub=subs))
+                out.append(Binding(letters, fam, "member", family_sub=subs, subset=subset))
             pending = []
             continue
         if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*(\s+[A-Za-z][A-Za-z0-9_]*)*", clause) and all(
@@ -527,6 +565,11 @@ def binders_of(norm: str, words: frozenset[str] = frozenset()) -> list[Binding]:
                 sub, sup, _ = _scripts(line, m.end())
                 if sub:
                     out.extend(parse_binder(" , ".join(sub), " ".join(sup), words))
+        if not re.search(r"\\(?:forall|exists)(?![A-Za-z])", line):
+            # a membership tail without \forall: "x_{ij} \le 1 , i \in I , j \in J"
+            clauses = _split_top(line)
+            if len(clauses) > 1 and any(re.search(r"\\in(?![A-Za-z])", c) for c in clauses[1:]):
+                out.extend(parse_binder(" , ".join(clauses[1:]), words=words))
     return out
 
 
@@ -741,6 +784,7 @@ def analyse(
     letters: dict[str, Letter] = {}
     fam_desc: dict[str, str] = {}
     fam_sub: dict[str, set[str]] = defaultdict(set)
+    fam_subsets: dict[str, Counter] = defaultdict(Counter)
     counts: Counter[str] = Counter()
 
     def L(name: str) -> Letter:
@@ -770,6 +814,8 @@ def analyse(
                     counts["binder_bindings"] += 1
                 if b.family:
                     fam_sub[b.family].update(b.family_sub)
+                    if b.subset:
+                        fam_subsets[b.family][b.subset] += 1
 
     rows_out: dict[str, dict] = {}
     rows_all: list[tuple[str, str]] = []
@@ -799,6 +845,7 @@ def analyse(
                     "kind": b.kind,
                     "lo": b.lo,
                     "hi": b.hi,
+                    "subset": b.subset,
                 }
             )
             for letter in b.letters:
@@ -896,6 +943,7 @@ def analyse(
                 "desc": fam_desc.get(name, ""),
                 "cap": False,
                 "indexed_by": sorted(fam_sub.get(name, ())),
+                "subsets": dict(fam_subsets.get(name, Counter()).most_common()),
             }
         return families[name]
 
