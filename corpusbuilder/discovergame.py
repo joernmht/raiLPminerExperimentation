@@ -667,7 +667,7 @@ $("mid").addEventListener("click", e => { const el = e.target.closest("[data-id]
 
 /* ---------- top card ---------- */
 function citation(sp){ if (!sp) return ""; if (sp.table) return sp.table + " · row " + sp.row; if (sp.deflist !== undefined) return "definition list · item " + sp.deflist; return "paragraph " + sp.para + " · chars " + sp.start + "–" + sp.end; }
-function binderText(b){ if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + "…" + (b.hi || "?") + (b.family ? " (" + b.family + ")" : ""); return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?"); }
+function binderText(b){ if (b.kind === "range") return b.letters.join(", ") + " = " + (b.lo || "?") + "…" + (b.hi || "?") + (b.family ? " (" + b.family + ")" : ""); return (b.kind === "tuple" ? "(" + b.letters.join(", ") + ")" : b.letters.join(", ")) + " ∈ " + (b.family || "?") + (b.subset ? " [" + b.subset + "]" : ""); }
 function evShort(e){ const p = []; if (e.bound_rows) p.push("bound " + e.bound_rows + "×"); if (e.capped && Object.keys(e.capped).length) p.push("capped by " + Object.keys(e.capped).join("/")); if (e.prose_rows) p.push("prose " + e.prose_rows + "×"); if (e.table_rows) p.push("table"); if (e.sub_rows) p.push("in " + e.sub_rows + " rows"); const fams = Object.entries(e.families || {}); if (fams.length > 1) p.push("ranges over " + fams.map(([f, n]) => f + "×" + n).join(", ")); const av = Object.entries(e.alias_votes || {}); if (av.length) p.push("position votes " + av.map(([f, n]) => f + "×" + n).join(", ")); return p.join(" · "); }
 function paintRounds(){
   $("rounds").innerHTML = ROUNDS.map(([r, label]) => '<button data-r="' + r + '" class="' + (S.round === r ? "on" : "") + '">' + label + ' <span class="n">' + doneCount(r) + "/" + Q[r].length + "</span></button>").join("");
@@ -704,6 +704,8 @@ function paintTop(){
     html += '<div class="kicker">family ' + (pos() + 1) + " of " + Q.families.length + "</div>";
     html += '<div class="big mono">' + esc(it) + (f.cap ? ' <span class="flag">range 1..' + esc(it) + "</span>" : "") + "</div>";
     html += '<div class="prop">letters: <span class="mono">' + esc(Object.entries(f.letters || {}).map(([l, n]) => l + "×" + n).join(", ") || "-") + "</span> · " + (f.declared_as ? "declared as " + esc(f.declared_as) : '<span class="flag warn">not declared</span>') + (f.desc ? ' · paper: “' + esc(f.desc.slice(0, 80)) + "”" : "") + (h.verdict ? ' · <b class="you">yours: ' + esc(h.verdict) + "</b>" : "") + "</div>";
+    const subs = Object.entries(f.subsets || {});
+    if (subs.length) html += '<div class="ev">used with subsets: <span class="mono">' + subs.map(([k, n]) => esc(k) + "×" + n).join(", ") + "</span> — one family, the subsets become attributes (predicates) of it</div>";
     html += '<div class="walk"><input type="text" id="renameInp" placeholder="same as… (rename)" value="' + esc(h.rename || "") + '"></div>';
   } else {
     const m = D.maths[it], pr = proposed(it), h = S.roles[it];
