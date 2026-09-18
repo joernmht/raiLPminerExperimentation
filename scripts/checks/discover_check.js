@@ -36,7 +36,7 @@ function boot(path) {
   if (carrying.length) {
     ok(d.querySelector("#mid .cur") && carrying.includes(d.querySelector("#mid .cur").dataset.id), "text: a formula carrying the letter is lit");
     const before = d.querySelector("#mid .cur").dataset.id;
-    ok(!d.getElementById("navL").classList.contains("hidden") && !d.getElementById("navR").classList.contains("hidden") && /formula 1 of \d+/.test(d.getElementById("walkbox").textContent), "walk: edge navigators and the counter box are shown over the text");
+    ok(!d.getElementById("navs").classList.contains("hidden") && /formula 1 of \d+/.test(d.getElementById("walkbox").textContent), "walk: round navigators and the counter box are shown over the text");
     d.getElementById("navR").click();
     ok(carrying.length === 1 || d.querySelector("#mid .cur").dataset.id !== before, "walk: ▸ moves to the next formula carrying the letter");
     ok(carrying.length === 1 || /formula 2 of/.test(d.getElementById("walkbox").textContent), "walk: the counter box follows");
@@ -52,6 +52,11 @@ function boot(path) {
   ok(X.S().indices[X.Q.indices.find(l => X.S().indices[l] && X.S().indices[l].verdict === "not")], "decide: ✗ records not-an-index");
   await sleep(200);
   ok(d.getElementById("rounds").textContent.includes("2/" + X.Q.indices.length), "rounds: counter shows two decided letters");
+  // label proposals: a glued letter offers its run; the menu offers any word
+  const glued = X.Q.indices.find(l => Object.keys(D.indices.letters[l].runs || {}).length);
+  if (glued) { X.goTo(X.Q.indices.indexOf(glued)); const lb = d.querySelector("#decide button.lab"); ok(!!lb && d.getElementById("item").textContent.includes("written glued as"), "labels: glued letter shows its word and a proposal chip"); if (lb) { lb.click(); ok(X.S().labels[lb.dataset.lab] === true, "labels: chip records the proposal"); } }
+  w.prompt = () => "foo"; d.getElementById("labelBtn").click(); ok(X.S().labels.foo === true, "labels: menu proposes any word");
+  w.prompt = () => "ZZ";
   // definitions round
   X.setRound("defs");
   const defId = X.current();
@@ -91,7 +96,7 @@ function boot(path) {
   if (famName) { d.querySelector('#decide button[data-fv="family"]').click(); ok(X.S().families[famName] && X.S().families[famName].verdict === "family", "families: ✓ records the verdict"); await sleep(200); }
   // export / import
   const p = X.exportPayload();
-  ok(p.schema_version === "discover-decisions-2" && p.roles[defId].role === "mention" && p.indices[letter].verdict === "index" && p.roles[cur].span.source === "human", "export: v2 carries roles, spans, letters, families");
+  ok(p.schema_version === "discover-decisions-2" && p.roles[defId].role === "mention" && p.indices[letter].verdict === "index" && p.roles[cur].span.source === "human" && p.label_proposals.includes("foo"), "export: v2 carries roles, spans, letters, families, label proposals");
   ok(X.importJSON(JSON.stringify({ schema_version: "discover-decisions-1", paper_key: D.paper.key, formulas: { [disp.dataset.id]: "formula" }, spans: [{ para: 1, text: "x = 1" }], indices: {}, families: {} })) === 1 && X.roleOf(disp.dataset.id) === "formula" && X.S().marks.some(m => m.text === "x = 1"), "import: v1 accepted and converted");
   ok(X.importJSON(JSON.stringify({ schema_version: "discover-decisions-2", paper_key: "other" })) === 0, "import: refuses another paper's file");
   // keyboard: 1 = formula for the current definition candidate

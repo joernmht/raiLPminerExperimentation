@@ -51,6 +51,7 @@ from corpusbuilder.discover import DISCOVERY, load_record
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.fulltext import DOSSIERS, included_dossiers
 from corpusbuilder.game import _collapse_words, _group_end, _rewrite_ops
+from corpusbuilder.labels import is_standard_label
 from corpusbuilder.promote import CORPUS, DECLARATIONS
 
 INDICES = CORPUS / "indices"
@@ -525,6 +526,7 @@ class Use:
     position: str  # "1", "2", ... or "sup"
     letter: str
     juxtaposed: bool = False
+    run: str | None = None  # the glued word the letter was cut from ("st" in N_{st})
 
 
 def _pieces(sub: str) -> list[tuple[str, bool]]:
@@ -539,11 +541,13 @@ def _pieces(sub: str) -> list[tuple[str, bool]]:
                 out.extend(_pieces(t))
             continue
         if re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", p):
+            if len(p) > 1 and is_standard_label(p):
+                continue  # a label word (end, max, st): part of the name, never an index
             if is_letterish(p):
                 out.append((p, False))
             elif p.isalpha() and len(p) == 2 and p.islower():
                 for ch in p:
-                    out.append((ch, True))
+                    out.append((ch, p))
             continue
         am = re.fullmatch(
             r"([A-Za-z][A-Za-z0-9_]*)\s*[+-]\s*\w+|\d+\s*([A-Za-z][A-Za-z0-9_]*)|([A-Za-z][A-Za-z0-9_]*)\s*[+-]\s*1",
@@ -582,10 +586,14 @@ def subscript_uses(norm: str) -> list[Use]:
             continue
         for group in sub:
             for pos, (letter, jux) in enumerate(_pieces(group), 1):
-                uses.append(Use(name, str(pos), letter, jux))
+                uses.append(
+                    Use(name, str(pos), letter, bool(jux), jux if isinstance(jux, str) else None)
+                )
         for group in sup:
             for letter, jux in _pieces(group):
-                uses.append(Use(name, "sup", letter, jux))
+                uses.append(
+                    Use(name, "sup", letter, bool(jux), jux if isinstance(jux, str) else None)
+                )
     return uses
 
 
@@ -624,6 +632,7 @@ class Letter:
     sub_rows: int = 0
     sup_rows: int = 0
     juxtaposed_rows: int = 0
+    runs: Counter = field(default_factory=Counter)
     bases: Counter = field(default_factory=Counter)
     positions: Counter = field(default_factory=Counter)
     rows: list[str] = field(default_factory=list)
@@ -736,6 +745,8 @@ def analyse(
             lt.positions[f"{use.base}#{use.position}"] += 1
             if use.juxtaposed:
                 lt.juxtaposed_rows += 1
+                if use.run:
+                    lt.runs[use.run] += 1
             if use.letter not in seen_letters:
                 lt.sub_rows += 1
                 seen_letters.add(use.letter)
@@ -871,10 +882,24 @@ def analyse(
             and not (lt.bound or lt.tuple_bound or lt.capped or lt.prose or lt.table)
             and verdict == "candidate"
         ):
-            verdict = (
-                "juxtaposed"  # only ever seen glued to another letter: likely a label fragment
+            bound_letters = {
+                n
+                for n, x in letters.items()
+                if x.bound or x.tuple_bound or x.capped or x.prose or x.table
+            }
+            glued_to_bound = any(
+                any(ch in bound_letters and ch != name for ch in run) for run in lt.runs
             )
-            rule = "juxtaposed"
+            if lt.runs and not glued_to_bound:
+                verdict, rule = (
+                    "label",
+                    "glued word",
+                )  # "st" in N_{st}: no letter of the word is bound anywhere
+            else:
+                verdict = (
+                    "juxtaposed"  # glued to a bound letter: two indices without a comma, or a label
+                )
+                rule = "juxtaposed"
         entry = {
             "name": name,
             "base": lt.base,
@@ -893,6 +918,7 @@ def analyse(
             "positions": dict(lt.positions.most_common(8)),
             "alias_votes": dict(sorted(alias_votes.items())) if alias_votes else {},
             "rows": lt.rows,
+            "runs": dict(lt.runs.most_common(6)),
             "desc": lt.table_desc,
             "multi_family": len([f for f, n in votes.items() if n >= 2]) >= 2,
         }
@@ -1073,6 +1099,7 @@ def render_report_md(report: dict) -> str:
         "subscript",
         "juxtaposed",
         "uppercase",
+        "glued word",
     ):
         lines.append(f"| {rule} | {r.get(rule, 0)} |")
     lines += [
