@@ -223,3 +223,16 @@ def test_subsets_of_a_family_and_tuple_defined_dummies() -> None:
         F["A"]["subsets"]
     ) == {"dwell", "run", "odturn_plan"}
     assert set(F) == {"A"}  # one family, three subsets: not three families
+
+
+def test_direct_membership_beats_tuple_membership_for_a_letters_family() -> None:
+    rows = [
+        ("eq-0001", r"x_{e} \le 1 \quad \forall e \in E"),
+        ("eq-0002", r"y_{a} \le 1 , a = \left(e , e^{'}\right) \in A_{\text{run}}"),
+        ("eq-0003", r"y_{a} \le 1 , a = \left(e , e^{'}\right) \in A_{\text{dwell}}"),
+    ]
+    rec = indices.analyse(rows, None)
+    L = rec["letters"]
+    assert L["e"]["family"] == "E"  # not A, although (e, e') in A twice
+    assert L["ep"]["family"] == "A"  # nothing direct known about e': the tuple is all we have
+    assert L["a"]["family"] == "A" and rec["families"]["A"]["subsets"] == {"run": 1, "dwell": 1}
