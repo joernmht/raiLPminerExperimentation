@@ -188,7 +188,7 @@ def test_two_letter_index_names_are_recognised_from_their_own_uses() -> None:
             r"e , e^{'} \in E_{\text{ar}} , s t_{e} = s t_{e^{'}} , s t = s t_{e^{'}} , t r_{e} \neq t r_{e^{'}} .",
         ),
         ("eq-0002", r"x_{i j} \le 1 \quad \forall i \in I, j \in J"),
-        ("eq-0003", r"t_{end} \le T_{max}"),
+        ("eq-0003", r"t_{end} \le T_{max} \quad \forall e \in E"),
     ]
     rec = indices.analyse(rows, None)
     L = rec["letters"]
@@ -198,3 +198,8 @@ def test_two_letter_index_names_are_recognised_from_their_own_uses() -> None:
     assert L["e"]["verdict"] == "index" and L["e"]["family"] == "E"
     assert L["i"]["verdict"] == "index" and L["j"]["verdict"] == "index"
     assert rec["rows"]["eq-0001"]["letters"]["st"] == "sub"
+
+
+def test_a_bare_binder_dummy_counts_as_bound_without_a_family() -> None:
+    rec = indices.analyse([("eq-0001", r"\sum_{q} c_{q} x_{q} \le 1")], None)
+    assert rec["letters"]["q"]["verdict"] == "index" and rec["letters"]["q"]["family"] is None
