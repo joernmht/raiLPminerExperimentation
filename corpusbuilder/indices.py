@@ -393,13 +393,13 @@ def _family_of(
     if not text or text.startswith("{") or text.startswith("\\{") or text[0].isdigit():
         return None, ()
     m = re.match(
-        r"^([A-Za-z][A-Za-z0-9]*(?:_(?:hat|bar|tilde|vec|dot|underline))?p*)(?:\s*\^\s*(?:\{[^{}]*\}|\S))?(?:\s*_\s*(\{[^{}]*\}|[A-Za-z0-9]))?",
+        r"^([A-Za-z][A-Za-z0-9]*(?:_(?:hat|bar|tilde|vec|dot|underline))?p*)(?:\s*\^\s*(\{[^{}]*\}|\S))?(?:\s*_\s*(\{[^{}]*\}|[A-Za-z0-9]))?",
         text,
     )
     if not m:
         return None, ()
     fam = m.group(1)
-    sub = m.group(2) or ""
+    sub = (m.group(3) or "") + " , " + (m.group(2) or "")  # E_{st}^{dr}: indexed by st and by dr
     subs = tuple(t for t in re.findall(r"[A-Za-z][A-Za-z0-9_]*", sub) if _is_index_token(t, words))
     _family_of.last_subset = _subset_label(
         text[m.end(1) :], words
@@ -704,6 +704,13 @@ def index_words(rows: list[tuple[str, str]]) -> tuple[frozenset[str], dict[str, 
         for use in subscript_uses(norm):
             if use.run:
                 runs[use.run] += 1
+    for (
+        _rid,
+        norm,
+    ) in rows:  # "t r_{e} \ne t r_{e'}": a pair with its own subscript, never inside one
+        for a, b in re.findall(r"(?<![A-Za-z\\])([a-z]) ?([a-z])_(?:\{|[A-Za-z0-9])", norm):
+            if a + b not in runs and not is_letterish(a + b):
+                runs[a + b] += 0
     if not runs:
         return frozenset(), {}
     bound: set[str] = set()
@@ -728,8 +735,8 @@ def index_words(rows: list[tuple[str, str]]) -> tuple[frozenset[str], dict[str, 
             + len(re.findall(rf"(?:=|\\ne|\\neq|\\le|\\ge) ?{a} ?{b}(?![A-Za-z_])", norm))
             for _r, norm in rows
         )
-        if own + bare == 0:
-            continue
+        if own + bare == 0 or (runs[run] == 0 and own < 2):
+            continue  # a pair never inside a subscript needs its own subscript at least twice
         separate = {a, b} & bound
         if separate and own < 2:
             continue

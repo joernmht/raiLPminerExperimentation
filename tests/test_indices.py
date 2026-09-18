@@ -252,3 +252,16 @@ def test_qualifiers_in_a_family_script_are_labels_not_letters() -> None:
     assert not {"d", "r", "t", "l"} & set(L)  # tl and dr qualify the set E; they are not dummies
     assert L["ep"]["family"] == "E" and L["st"]["verdict"] == "index"
     assert F["E"]["indexed_by"] == ["st"] and F["E"]["subsets"] == {"de_dis_tl_dr": 1}
+
+
+def test_two_letter_names_in_binders_and_family_superscripts() -> None:
+    rows = [
+        ("eq-0001", r"x_{e} \le 1 \quad \forall t r \in TR, e \in E^{d r}"),
+        ("eq-0002", r"t r_{e} \neq t r_{e^{'}} , d r_{e} = d r_{e^{'}}"),
+        ("eq-0003", r"y_{e} \le 1 \quad \forall e \in E^{d r}"),
+    ]
+    rec = indices.analyse(rows, None)
+    L, F = rec["letters"], rec["families"]
+    assert L["tr"]["verdict"] == "index" and L["tr"]["family"] == "TR" and "r" not in L
+    assert "dr" in L and L["dr"]["rule"] == "multi-letter name"
+    assert F["E"]["indexed_by"] == ["dr"] and not F["E"]["subsets"]
