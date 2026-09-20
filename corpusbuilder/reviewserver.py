@@ -23,6 +23,7 @@ review folder. Run::
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import mimetypes
 import re
@@ -152,7 +153,7 @@ class Handler(BaseHTTPRequestHandler):
     state_dir: Path = STATE_DIR
 
     def log_message(self, fmt: str, *args) -> None:  # quiet, one line per request
-        sys.stderr.write("%s %s\n" % (self.address_string(), fmt % args))
+        sys.stderr.write(f"{self.address_string()} {fmt % args}\n")
 
     def _json(self, status: HTTPStatus, obj: dict) -> None:
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -266,10 +267,8 @@ def serve(host: str = "127.0.0.1", port: int = 8787) -> None:
         )
     httpd = ThreadingHTTPServer((host, port), Handler)
     print(f"review server on http://{host}:{port}/ serving {REVIEW}", file=sys.stderr)
-    try:
+    with contextlib.suppress(KeyboardInterrupt):
         httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
 
 
 def main(argv: list[str] | None = None) -> int:

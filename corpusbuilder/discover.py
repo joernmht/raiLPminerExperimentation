@@ -529,7 +529,6 @@ def discover_paper(
                 plain[max(0, a - NEAR_CHARS) : a] + " " + plain[b : b + NEAR_CHARS]
             )
     for table in tables:
-        body = [r for r in table["rows"] if not r["header"]]
         first_symbol = 0
         for row in table["rows"]:
             cells = row["cells"]

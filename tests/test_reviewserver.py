@@ -45,7 +45,7 @@ def _req(port: int, method: str, path: str, body: dict | None = None):
 
 
 def test_pages_are_served_and_paths_are_confined(server) -> None:
-    port, root = server
+    port, _root = server
     assert _req(port, "GET", "/") == (200, "<html>index</html>")
     assert _req(port, "GET", "/discover/p.html") == (200, "<html>page</html>")
     assert _req(port, "GET", "/../../etc/passwd")[0] == 404
@@ -99,7 +99,7 @@ def test_decisions_go_to_the_inbox_only_when_valid(server) -> None:
 
 
 def test_state_round_trip_and_progress(server) -> None:
-    port, root = server
+    port, _root = server
     assert _req(port, "GET", "/api/state/p") == (404, {"state": None})
     st = {
         "roles": {"m-0001": {"role": "formula"}},

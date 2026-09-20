@@ -50,7 +50,9 @@ def test_propose_roles_covers_every_element() -> None:
     assert by_latex["i∈I"]["role"] == "index"
     assert by_latex["n+1"]["role"] == "other"
     table = [v for k, v in r.items() if rec["maths"][int(k[2:]) - 1]["where"] == "table"]
-    assert table[0]["role"] == "definition" and table[0]["span"]["text"].startswith("⟨I⟩ | Set of trains")
+    assert table[0]["role"] == "definition" and table[0]["span"]["text"].startswith(
+        "⟨I⟩ | Set of trains"
+    )
     c = roles.counts(r)
     assert c["elements"] == len(rec["maths"]) and c["definition_with_span"] == c["definition"]
 
