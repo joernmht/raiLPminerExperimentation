@@ -264,7 +264,8 @@ def _stage_extras(stage: str) -> dict:
         return {}
     if override == "off":
         return dict(_NO_THINKING)
-    return dict(_NO_THINKING) if stage in ("a", "b", VOCAB_STAGE) else {}
+    # Stage i (index letters, corpusbuilder.indexassist) is a pattern task like a/b.
+    return dict(_NO_THINKING) if stage in ("a", "b", VOCAB_STAGE, "i") else {}
 
 
 def _payload(system: str, user: str, *, stage: str) -> dict:
