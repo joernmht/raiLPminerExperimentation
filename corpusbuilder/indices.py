@@ -674,9 +674,7 @@ def subscript_uses(
             continue
         sub, sup, j = _scripts(norm, i)
         i = j
-        if name in ("sum", "prod", "max", "min", "forall", "exists", "bigcup", "bigcap") or (
-            name in GREEK and False
-        ):
+        if name in ("sum", "prod", "max", "min", "forall", "exists", "bigcup", "bigcap"):
             continue
         split = name not in families
         for group in sub:
@@ -956,19 +954,18 @@ def analyse(
                 continue
             if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", norm):
                 continue
-            if (is_letterish(norm) and norm.islower()) or norm in GREEK:
-                if _TABLE_INDEX.search(desc) or re.search(
-                    r"\b(?:in|of)\s+(?:⟨[^⟩]+⟩|[A-Z]\b)", desc
-                ):
-                    lt = L(norm)
-                    _note_row(lt, src)
-                    lt.table_desc = lt.table_desc or desc[:160]
-                    fm = _TABLE_IN.search(desc)
-                    fam = None
-                    if fm:
-                        fam, _ = _family_of(normalise(fm.group(1) or fm.group(2)))
-                    lt.table[fam or "?"] += 1
-                    counts["table_bindings"] += 1
+            if ((is_letterish(norm) and norm.islower()) or norm in GREEK) and (
+                _TABLE_INDEX.search(desc) or re.search(r"\b(?:in|of)\s+(?:⟨[^⟩]+⟩|[A-Z]\b)", desc)
+            ):
+                lt = L(norm)
+                _note_row(lt, src)
+                lt.table_desc = lt.table_desc or desc[:160]
+                fm = _TABLE_IN.search(desc)
+                fam = None
+                if fm:
+                    fam, _ = _family_of(normalise(fm.group(1) or fm.group(2)))
+                lt.table[fam or "?"] += 1
+                counts["table_bindings"] += 1
             if (
                 _TABLE_SET.search(desc)
                 and (norm[0].isupper() or norm in GREEK)
@@ -1195,7 +1192,7 @@ def proposed_index_lines(record: dict) -> list[str]:
             continue
         letters = ", ".join(fam["letters"]) or "-"
         desc = fam["desc"] or f"index family (deterministic: ranged over by {letters})"
-        cap = " (range 1..%s)" % fam["name"] if fam["cap"] else ""
+        cap = f" (range 1..{fam['name']})" if fam["cap"] else ""
         lines.append(f"%@ index {fam['name']} ordered=0 cyclic=0 :: {desc}{cap}")
     return lines
 
