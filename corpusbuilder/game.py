@@ -1217,9 +1217,11 @@ def _evidence_codes(dossier) -> dict[str, str]:
     Imported lazily: :mod:`corpusbuilder.symbols` reads this module's tokenizer,
     so a module-level import here would close the cycle.
     """
-    from corpusbuilder.symbols import paper_evidence
+    from corpusbuilder.symbols import paper_evidence, stored_index_record
 
-    kinds = paper_evidence([f.latex for f in dossier.formulas]).kinds
+    kinds = paper_evidence(
+        [f.latex for f in dossier.formulas], index_record=stored_index_record(dossier.key)
+    ).kinds
     return {name: _EVIDENCE_CODE[kind] for name, kind in sorted(kinds.items())}
 
 

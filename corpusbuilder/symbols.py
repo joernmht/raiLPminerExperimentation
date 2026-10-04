@@ -20,14 +20,24 @@ probably a declaration is not one. ``t_e - \\bar{t}_e \\ge 0`` is a constraint,
 not a domain row, and is rejected because its left side is an expression rather
 than a list of symbols.
 
-Used by :mod:`corpusbuilder.resolution` to measure the deterministic prefill and
-by :mod:`corpusbuilder.promote` to pre-fill the declaration sidecar stub.
+Which letters are indices, and which sets are their families, is decided in ONE
+place, the discovery rule (:mod:`corpusbuilder.indices`), which the discovery
+pages propose and the human reliability sample measures (ADR-0023).
+:func:`paper_evidence` reads that rule's verdicts and adds the domain rows; the
+binder reader below (:func:`binder_roles`) only lists the names a binder
+mentions, it no longer types them.
+
+Used by :mod:`corpusbuilder.resolution` to measure the deterministic prefill, by
+:mod:`corpusbuilder.promote` to pre-fill the declaration sidecar stub, and by the
+review game and the assist stages as the symbols' deterministic kinds.
 """
 
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 from corpusbuilder.game import _collapse_words, _group_end, _rewrite_ops, extract_symbols
 
@@ -164,10 +174,14 @@ _DOMAIN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
         "binary",
         re.compile(r"^\s*(?:\\left)?\s*\\?\{\s*0\s*,\s*1\s*(?:\\right)?\s*\\?\}"),
     ),
-    ("binary", re.compile(r"^\s*(?:\\mathbb|\\mathcal|\\mathbf)?\s*\{?\s*B(?![a-zA-Z])")),
+    # Blackboard or bold only: a calligraphic or bare B, N, Z, R is how the
+    # corpus names index FAMILIES (blocks, nodes, routes), so reading
+    # "n \in \mathcal{N}" as "n is a natural number" declared index letters
+    # to be integer variables (49 of 428 rows did, in 7 papers).
+    ("binary", re.compile(r"^\s*(?:\\mathbb|\\mathbf)\s*\{?\s*B(?![a-zA-Z])")),
     (
         "integer",
-        re.compile(r"^\s*(?:\\mathbb|\\mathcal|\\mathbf)\s*\{?\s*[ZN](?![a-zA-Z])"),
+        re.compile(r"^\s*(?:\\mathbb|\\mathbf)\s*\{?\s*[ZN](?![a-zA-Z])"),
     ),
     (
         "non_negative",
@@ -176,8 +190,11 @@ _DOMAIN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
             r"\s*(?:\^\s*\{?\s*\+|_\s*\{?\s*(?:\+|\\geq?\s*0))"
         ),
     ),
-    ("continuous", re.compile(r"^\s*(?:\\mathbb|\\mathcal|\\mathbf)\s*\{?\s*R(?![a-zA-Z])")),
+    ("continuous", re.compile(r"^\s*(?:\\mathbb|\\mathbf)\s*\{?\s*R(?![a-zA-Z])")),
 )
+
+#: A membership inside a ``\\forall`` clause binds a letter, it declares nothing.
+_FORALL = re.compile(r"\\forall(?![a-zA-Z])|\u2200")
 
 #: A non-negativity row states the bound directly rather than naming a set.
 _GE_ZERO = re.compile(r"^\s*0(?![.0-9])")
@@ -194,7 +211,11 @@ def domain_declaration(latex: str) -> dict[str, str]:
     if not m:
         return {}
     lhs, rhs = s[: m.start()], s[m.end() :]
-    if not lhs.strip() or _LHS_OPERATOR.search(lhs):
+    if not lhs.strip() or _LHS_OPERATOR.search(lhs) or _FORALL.search(lhs):
+        return {}
+    if lhs.count("{") > lhs.count("}"):
+        # The relation sits inside a script group: \underset{n \in N}{\sum} is a
+        # binder whose operator comes after it, not a row of its own.
         return {}
 
     if _MEMBERSHIP.fullmatch(m.group(0)):
@@ -216,6 +237,19 @@ def domain_declaration(latex: str) -> dict[str, str]:
 
 #: Kinds in the canonical vocabulary, as the review game's classifier emits them.
 INDEX, PARAMETER, VARIABLE = "index", "parameter", "variable"
+
+#: Discovery verdicts (:mod:`corpusbuilder.indices`) that bind a letter.
+BINDING_VERDICTS = ("index", "alias")
+
+#: ``corpusbuilder.indices`` accent words -> the combining marks the game
+#: tokenizer writes (``s_hat`` is ``ŝ``); ``underline`` is dropped there.
+_ACCENT_MARK = {
+    "hat": "\u0302",
+    "bar": "\u0304",
+    "tilde": "\u0303",
+    "dot": "\u0307",
+    "vec": "\u20d7",
+}
 
 
 @dataclass(frozen=True, slots=True)
@@ -239,8 +273,56 @@ class Evidence:
         return self.kinds.get(symbol)
 
 
-def paper_evidence(latex_rows: list[str]) -> Evidence:
+def game_name(letter: str) -> str:
+    """The name the game tokenizer gives a letter the discovery rule names.
+
+    The discovery spells letters as words (``kp`` is k', ``s_hat``, ``delta``);
+    :func:`corpusbuilder.game.extract_symbols`, whose names the reviewer's symbol
+    tables and the resolution count use, drops primes and writes Greek letters
+    and accents as glyphs (``k``, ``ŝ``, ``δ``). A multi-letter name (``st``) is
+    its own name.
+    """
+    from corpusbuilder.game import _GREEK
+    from corpusbuilder.indices import _DECO_SUFFIX, base_letter
+
+    base = base_letter(letter)
+    if base is None:
+        return letter
+    m = _DECO_SUFFIX.match(letter)
+    accent = m.group(2) if m else None
+    glyph = "\u2113" if base == "ell" else _GREEK.get(base, base)  # the game keeps the glyph ℓ
+    return glyph + _ACCENT_MARK.get(accent or "", "")
+
+
+def stored_index_record(key: str, indices_dir: Path | None = None) -> dict | None:
+    """The discovery rule's record for one paper (``corpus/indices/<key>.json``),
+    or None when the paper has none."""
+    from corpusbuilder.indices import INDICES
+
+    path = (indices_dir or INDICES) / f"{key}.json"
+    if not path.exists():
+        return None
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def variable_domains(latex_rows: list[str]) -> dict[str, str]:
+    """Variables a paper's domain rows declare, with their domains."""
+    domains: dict[str, str] = {}
+    for latex in latex_rows:
+        domains.update(domain_declaration(latex))
+    return domains
+
+
+def paper_evidence(latex_rows: list[str], *, index_record: dict | None = None) -> Evidence:
     """Accumulate deterministic symbol evidence over one paper's formulas.
+
+    Indices and their families are the discovery rule's verdicts
+    (:mod:`corpusbuilder.indices`, ADR-0023): from ``index_record``, the paper's
+    stored record, when given (it carries the full evidence: display and inline
+    formulas, notation tables, prose), otherwise from the same rule run over
+    ``latex_rows`` alone. A name several discovery letters share in the game's
+    spelling (``k`` for both ``k`` and ``k'``) is an index only when every one of
+    them binds: a wrong prefill is worse than none.
 
     Order matters where the two constructs disagree. A symbol declared by a
     domain row is a variable, full stop: that row is an explicit statement about
@@ -248,20 +330,23 @@ def paper_evidence(latex_rows: list[str]) -> Evidence:
     ``\\sum_{t=1}^{T}`` where ``T`` is a horizon parameter, and may reuse a
     bound letter as a variable elsewhere). Variables therefore win over indices.
     """
-    families: set[str] = set()
-    bound: set[str] = set()
-    for latex in latex_rows:
-        roles = binder_roles(latex)
-        families |= roles.families
-        bound |= roles.indices
-    bound -= families
+    if index_record is None:
+        from corpusbuilder.indices import analyse
+
+        rows = [(f"r{n}", latex) for n, latex in enumerate(latex_rows) if latex]
+        index_record = analyse(rows, None)
+    letters = index_record.get("letters") or {}
+    binds: dict[str, bool] = {}
+    for name in sorted(letters):
+        g = game_name(name)
+        binds[g] = binds.get(g, True) and letters[name].get("verdict") in BINDING_VERDICTS
+    families = {game_name(f) for f in sorted(index_record.get("families") or {})}
+    bound = {g for g, ok in binds.items() if ok} - families
 
     kinds: dict[str, str] = {name: INDEX for name in sorted(families | bound)}
-    domains: dict[str, str] = {}
-    for latex in latex_rows:
-        for name, domain in domain_declaration(latex).items():
-            kinds[name] = VARIABLE
-            domains[name] = domain
+    domains = variable_domains(latex_rows)
+    for name in domains:
+        kinds[name] = VARIABLE
     declared = set(domains)
     return Evidence(
         kinds=kinds,

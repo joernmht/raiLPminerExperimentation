@@ -101,6 +101,9 @@ GREEK = frozenset(
         "Phi",
         "Psi",
         "Omega",
+        # \ell is no Greek letter, but it is a letter the corpus binds
+        # (\sum_{\ell \in L}); without it the discovery could not see the index.
+        "ell",
     ]
 )
 _GREEK_UNICODE = {
@@ -127,6 +130,7 @@ _GREEK_UNICODE = {
     "χ": "chi",
     "ψ": "psi",
     "ω": "omega",
+    "ℓ": "ell",
     "Γ": "Gamma",
     "Δ": "Delta",
     "Θ": "Theta",

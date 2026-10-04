@@ -71,7 +71,7 @@ from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex
 from corpusbuilder.promote import Decision, PaperDecisions, Row, declaration_stub, rows_for
 from corpusbuilder.split import split_latex
-from corpusbuilder.symbols import Evidence, binder_roles, paper_evidence
+from corpusbuilder.symbols import Evidence, binder_roles, paper_evidence, stored_index_record
 
 # ``promote`` above already ran the railpminer._lp2graph path shim as an import
 # side effect, so lp2graph resolves here without repeating it.
@@ -728,15 +728,19 @@ with that domain.
 100 characters."""
 
 
-def symbol_worklist(rows: list[Row]) -> tuple[list[str], Evidence]:
+def symbol_worklist(
+    rows: list[Row], index_record: dict | None = None
+) -> tuple[list[str], Evidence]:
     """The symbols stage B must type, plus the deterministic evidence about them.
 
     Mirrors :func:`corpusbuilder.promote.declaration_stub`: body symbols in
     first-seen order (``extract_symbols`` with ``limit=None`` — a truncated set
     would leave symbols past the cut untyped), then binder families, minus the
-    quantifier-bound letters that need no declaration of their own.
+    quantifier-bound letters that need no declaration of their own. ``index_record``
+    is the paper's discovery record (ADR-0023); without one the discovery rule
+    reads the rows alone.
     """
-    evidence = paper_evidence([row.latex for row in rows])
+    evidence = paper_evidence([row.latex for row in rows], index_record=index_record)
     names: list[str] = []
     for row in rows:
         for name, _count in extract_symbols(row.latex, limit=None)[0]:
@@ -1191,7 +1195,7 @@ def annotate_paper(
         return run
 
     # ---- stage B: symbols --------------------------------------------------
-    worklist, evidence = symbol_worklist(rows)
+    worklist, evidence = symbol_worklist(rows, stored_index_record(dossier.key))
     if not worklist:
         table: dict[str, dict] = {}
         run.stages["b"] = "skipped: no_symbols"

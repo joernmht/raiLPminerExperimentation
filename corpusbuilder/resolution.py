@@ -46,7 +46,7 @@ from corpusbuilder.game import (
 )
 from corpusbuilder.promote import DECISIONS, load_symbol_tables
 from corpusbuilder.split import split_latex
-from corpusbuilder.symbols import INDEX, VARIABLE, paper_evidence
+from corpusbuilder.symbols import INDEX, VARIABLE, paper_evidence, stored_index_record
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
@@ -112,7 +112,9 @@ def paper_record(dossier: Dossier, table: dict[str, str]) -> dict:
     ``table`` is the reviewer's own symbol table and wins wherever it disagrees
     with the algebraic evidence: a human verdict supersedes an inference.
     """
-    evidence = paper_evidence([f.latex for f in dossier.formulas])
+    evidence = paper_evidence(
+        [f.latex for f in dossier.formulas], index_record=stored_index_record(dossier.key)
+    )
     typed_kind = {**evidence.kinds, **table}
 
     formulas, symbol_sets = [], []

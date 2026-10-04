@@ -81,7 +81,12 @@ from railpminer import _lp2graph  # noqa: F401
 from corpusbuilder.algebra import declared_names, declared_products
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex, normalize_objective_head
-from corpusbuilder.symbols import binder_roles, domain_declaration, paper_evidence
+from corpusbuilder.symbols import (
+    binder_roles,
+    domain_declaration,
+    paper_evidence,
+    stored_index_record,
+)
 from lp2graph import loads as load_formulation
 from lp2graph.mining import REWRITE_RULES_VERSION
 from lp2graph.mining.corpusmgr import PRIORITY_CELLS, QUALITY_TIERS
@@ -646,8 +651,9 @@ def declaration_stub(
     guessed model.
 
     Two sources pre-classify a symbol. :func:`corpusbuilder.symbols.paper_evidence`
-    reads what the algebra states outright, index families off the binders and
-    decision variables (with their domains) off domain rows, and ``symbols`` is
+    reads what the paper states outright, indices and their families from the
+    discovery rule (ADR-0023) and decision variables (with their domains) off
+    domain rows, and ``symbols`` is
     the reviewer's own answer carried over from the review game's classifier
     (export key ``symbol_tables``). The reviewer wins where they disagree: a
     human verdict supersedes an inference. A symbol either source settles gets
@@ -658,7 +664,9 @@ def declaration_stub(
     never appears in a body, yet ``%@ index I`` is the one declaration the model
     cannot be assembled without, so a stub omitting it is unfillable as written.
     """
-    evidence = paper_evidence([row.latex for row in rows])
+    evidence = paper_evidence(
+        [row.latex for row in rows], index_record=stored_index_record(dossier.key)
+    )
     kinds = {**evidence.kinds, **(symbols or {})}
     reviewed = set(symbols or {})
     # A quantifier's bound letter needs no declaration of its own, and offering
