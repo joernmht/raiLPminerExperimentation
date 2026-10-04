@@ -131,6 +131,48 @@ def test_prose_and_table_evidence_bind_letters() -> None:
     assert sorted(rec["families"]["I"]["letters"]) == ["i", "j"]
 
 
+def test_the_family_the_table_declares_for_a_letter_beats_its_binders() -> None:
+    """Joern, 2026-10-04: "the letter's family is better" (trb.2014.05.005: f in F, p in P)."""
+    discovery = {
+        "maths": [],
+        "tables": [
+            {
+                "id": "t-0001",
+                "notation": True,
+                "rows": [
+                    {
+                        "header": False,
+                        "symbol": "f",
+                        "desc": "Train index, f ∈ F, F is the set of trains",
+                    },
+                    {
+                        "header": False,
+                        "symbol": "p",
+                        "desc": "Route index, p ⊂ P, P is the set of routes",
+                    },
+                    {
+                        "header": False,
+                        "symbol": "e",
+                        "desc": "Cell index, denoted by (i, j), e ∈ E",
+                    },
+                ],
+            }
+        ],
+        "deflists": [],
+    }
+    rows = [
+        ("eq-0001", r"\sum_{f \in E} x_{f} + \sum_{f \in E} y_{f} \le 1"),
+        ("eq-0002", r"\sum_{p \in \Omega} z_{p} \le 1"),
+        ("eq-0003", r"w_{e} \le 1"),
+    ]
+    rec = indices.analyse(rows, discovery)
+    assert rec["letters"]["f"]["family"] == "F"  # declared, though both binders use E
+    assert rec["letters"]["p"]["family"] == "P"
+    assert rec["letters"]["e"]["family"] == "E"
+    without = indices.analyse(rows, None)  # no table: the binders decide, as before
+    assert without["letters"]["f"]["family"] == "E" and without["letters"]["p"]["family"] == "Omega"
+
+
 def test_numeric_and_arithmetic_caps_name_no_family_and_capitals_are_labels() -> None:
     rows = [
         ("eq-0001", r"\sum_{i=1}^{3} x_{i} \le 1"),
