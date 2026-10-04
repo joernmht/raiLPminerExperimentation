@@ -107,6 +107,41 @@ function boot(path) {
   X.setRound("defs");
   const k = X.current();
   if (k) { d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "1" })); ok(X.S().roles[k] && X.S().roles[k].role === "formula", "keys: 1 sets formula"); }
+  // back: returns to the item just left, decided or not, with the human's verdict lit
+  X.setRound("indices");
+  {
+    const open = X.Q.indices.findIndex(l => !X.isDone("indices", l));
+    if (open >= 0) {
+      X.goTo(open); await sleep(150);
+      const l1 = X.current();
+      d.querySelector('#decide button[data-v="not"]').click(); await sleep(250);
+      ok(X.current() !== l1, "back: a decision advances to another item");
+      d.getElementById("backBtn").click(); await sleep(150);
+      ok(X.current() === l1 && X.S().indices[l1].verdict === "not", "back: returns to the letter just decided");
+      ok(d.querySelector('#decide button.on[data-v="not"]'), "back: the earlier verdict is lit on its button");
+      d.querySelector('#decide button[data-v="unsure"]').click(); await sleep(250);
+      ok(X.S().indices[l1].verdict === "unsure", "back: a revisited letter can be changed");
+    } else ok(false, "back: no open letter to start from");
+  }
+  {
+    // no history (a freshly opened page): back steps to the item before in the list
+    const fresh = boot(pagePath); const X3 = fresh.w.__discover; await sleep(100);
+    const p0 = X3.pos(), n = X3.Q[X3.S().round].length;
+    fresh.d.getElementById("backBtn").click(); await sleep(150);
+    ok(X3.pos() === (p0 > 0 ? p0 - 1 : n - 1), "back: without a history it steps to the previous item in the list");
+  }
+  // a decorated letter is offered its base letter's family in one tap
+  {
+    const deco = X.Q.indices.find(l => D.indices.letters[l].base && D.indices.letters[l].base !== l && D.indices.letters[D.indices.letters[l].base] && D.indices.letters[D.indices.letters[l].base].family);
+    if (deco) {
+      const base = D.indices.letters[deco].base, bfam = D.indices.letters[base].family;
+      X.goTo(X.Q.indices.indexOf(deco)); await sleep(150);
+      const same = d.querySelector("#decide button.same");
+      ok(same && same.textContent.includes("same as " + base) && same.dataset.fam === bfam, "same family: the chip names the base letter and its family");
+      same.click(); await sleep(250);
+      ok(X.S().indices[deco] && X.S().indices[deco].verdict === "index" && X.S().indices[deco].family === bfam, "same family: one tap records index and the base letter's family");
+    } else ok(false, "same family: the test paper has no decorated letter");
+  }
   {
     const { d: di } = boot(indexPath);
     ok(di.querySelectorAll("#papers tr").length > 200 && di.querySelector("#papers a").getAttribute("href").startsWith("discover/"), "index: worklist lists the papers with links");
