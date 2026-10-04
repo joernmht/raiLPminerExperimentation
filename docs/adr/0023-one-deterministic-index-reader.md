@@ -84,7 +84,7 @@ declared variable wins over an index, they also erased index letters.
 - Inputs of the review game and of assist stage B change for papers where the
   two readers differed, so their payload digests change: a re-run asks the
   model again instead of hitting the cache. Recorded decisions are not touched.
-- Fingerprint domain counts lose the 49 false domain rows (7 papers); the
+- Fingerprint domain counts lose the 49 false domain rows (8 papers); the
   feature clustering moves when it is next run.
 - The human labels stay valid: the pages always proposed the discovery rule,
   and none of the five labelled papers is among the 24 whose records changed.
