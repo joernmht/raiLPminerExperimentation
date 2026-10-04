@@ -97,7 +97,7 @@ def test_domain_rows_declare_variables(latex, expected):
         r"x_i \ge b_i",
         r"\sum_{i \in I} x_i \le C",
         # A calligraphic or bare letter names an index family, not a number set
-        # (the corpus misread 49 such rows, turning index letters into variables).
+        # (ADR-0023: such misreads turned index letters into variables).
         r"\forall b \in \mathcal{B} , y \in \mathcal{Y}",
         r"z \in \mathcal{Z}",
         r"r \in \mathcal{R}^{\text{up}}",

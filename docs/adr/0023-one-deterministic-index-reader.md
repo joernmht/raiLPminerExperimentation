@@ -31,7 +31,7 @@ domain-row reader took memberships in calligraphic or bare sets for number
 domains (`\forall n \in \mathcal{N}^{up}` as "n is an integer variable",
 `\forall r \in \mathcal{R}^{dn}` as "r is real") and read the membership of a
 binder whose operator comes after it (`\underset{n' \in N}{\sum}`) as a row of
-its own. 49 of 428 domain rows were such misreadings, in 7 papers; because a
+its own. 49 of 428 domain rows were such misreadings, in 8 papers; because a
 declared variable wins over an index, they also erased index letters.
 
 ## Decision
