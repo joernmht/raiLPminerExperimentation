@@ -386,6 +386,27 @@ def _split_top(s: str, seps: str = ",") -> list[str]:
     return [p.strip() for p in out if p.strip()]
 
 
+#: A membership of the letter itself inside a table description: "f ∈ F", "p ⊂ P".
+_DESC_MEMBER = r"\s*(?:\\in(?![A-Za-z])|\\subseteq|\\subset(?!eq)|⊂|⊆)\s*"
+
+
+def _desc_membership(letter: str, desc: str) -> str | None:
+    """The set a notation-table description puts ``letter`` itself in, or None.
+
+    Reads the mathematical statement ("Train index, f ∈ F, F is the set of
+    trains"; "⟨p \\subset P⟩"), which the phrase reader (``_TABLE_IN``) does not.
+    """
+    text = normalise(desc.replace("⟨", " ").replace("⟩", " "))
+    m = re.search(
+        r"(?<![A-Za-z0-9_'])" + re.escape(letter) + r"(?![A-Za-z0-9_'])" + _DESC_MEMBER + r"(.+)",
+        text,
+    )
+    if not m:
+        return None
+    fam, _ = _family_of(m.group(1))
+    return fam
+
+
 def _family_of(
     text: str, words: frozenset[str] = frozenset()
 ) -> tuple[str | None, tuple[str, ...]]:
@@ -796,6 +817,11 @@ class Letter:
     prose: Counter = field(default_factory=Counter)
     table: Counter = field(default_factory=Counter)
     table_desc: str = ""
+    #: The set the paper's notation table puts the letter itself in ("f \\in F" in the
+    #: symbol cell, or "f ∈ F" / "index of trains in F" in its description). The
+    #: letter's own family wins over the sets its binders happen to use (Joern,
+    #: 2026-10-04: "the letter's family is better").
+    declared_family: str | None = None
     sub_rows: int = 0
     sup_rows: int = 0
     juxtaposed_rows: int = 0
@@ -955,6 +981,11 @@ def analyse(
                 for b in bs:
                     for letter in b.letters:
                         L(letter).table_desc = L(letter).table_desc or desc[:160]
+                        if b.kind not in (
+                            "tuple",
+                            "range",
+                        ):  # (i, j) \in A says where the pair lives
+                            L(letter).declared_family = L(letter).declared_family or b.family
                 continue
             if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]*", norm):
                 continue
@@ -964,10 +995,12 @@ def analyse(
                 lt = L(norm)
                 _note_row(lt, src)
                 lt.table_desc = lt.table_desc or desc[:160]
-                fm = _TABLE_IN.search(desc)
-                fam = None
+                fam = _desc_membership(norm, desc)
+                fm = _TABLE_IN.search(desc) if fam is None else None
                 if fm:
                     fam, _ = _family_of(normalise(fm.group(1) or fm.group(2)))
+                if fam:
+                    lt.declared_family = lt.declared_family or fam
                 lt.table[fam or "?"] += 1
                 counts["table_bindings"] += 1
             if (
@@ -1009,7 +1042,9 @@ def analyse(
                     votes[fam] += n
         for fam, n in lt.cap_family.items():
             votes[fam] += n
-        if votes:
+        if lt.declared_family:
+            primary[name] = lt.declared_family
+        elif votes:
             fam = sorted(votes.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
             primary[name] = fam
 
