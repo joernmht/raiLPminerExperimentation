@@ -14,7 +14,7 @@
     "Source model row 'conflict_meet_pair' is a conjunction of two inequalities; only the first is carried here, as 'conflict_meet'.",
     "Used as the worked example of the Paper-1 figure fig:anatomy; every claim in that figure is checked by scripts/checks/anatomy_figure_check.py.",
     "Grounds and solves: cardinalities I=2, R=3, dur=[2,3,2], first=[1,0,0], last=[0,0,1], single=[0,1,0], M=1000 -> status optimal under both CBC and HiGHS, schedule t[1]=(0,2,5) tF[1]=7 (leader), t[0]=(0,5,8) tF[0]=10 (follower waits for the unit-capacity middle resource); Sum tF = 17 is the true minimum.",
-    "KNOWN LIBRARY DEFECT hit by this model's objective: the grounder derives a sum's loop variables from the term's bindings only (solve/grounder.py::_sum_scopes) and ignores Term.operator_over, so 'sum_{i in I, r in R} dur_r' grounds to sum_r dur_r instead of |I| * sum_r dur_r. The term is a constant, so the argmin (the schedule) is unaffected, but the reported objective is 10.0 where the algebra says 3.0. Do not plant an expected_optimum for this model until that is fixed."
+    "Library defect FIXED (lp2graph 03316fe, issue #60, ADR-0016): the grounder used to derive a sum's loops from the term's bindings only and ignored Term.operator_over, so 'sum_{i in I, r in R} dur_r' grounded to sum_r dur_r and the reported objective was 10.0. It now grounds to |I| * sum_r dur_r: objective 3.0 under both CBC and HiGHS (17 - 2 * 7), the value the algebra states; the schedule is unchanged."
   ],
   "repo": "Gurobi/modeling-examples",
   "solver": "Gurobi",
