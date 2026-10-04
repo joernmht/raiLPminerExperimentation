@@ -37,7 +37,8 @@ validated on. Only the first job scales with the number of papers.
    gitignored.
 2. **A deterministic router decides who sees a letter.** Rule and model agree
    on bind vs don't bind, and on the family where both name one: the letter is
-   accepted with `source: assist`. They disagree, the model is unsure, or an
+   accepted with `source: assist` (amended 2026-10-04: `source: rule`, see
+   below). They disagree, the model is unsure, or an
    index has no family: the letter goes to the human's queue. Label and "not
    an index" both mean don't bind for stage 3, so they are one class for the
    router; the exact verdict is still recorded. Accepted letters are never
@@ -69,3 +70,17 @@ validated on. Only the first job scales with the number of papers.
   15 seconds for five papers on the flash model with thinking off.
 - The model's "why" strings are model text and never leave the gitignored
   sidecar.
+
+## Amendment (2026-10-04): what the router releases is the rule's value
+
+Coherence review 2026-09-22 (ASSIST-WITHOUT-HUMAN): Paper 1 §3.3 says assisted
+entries "are never allowed to enter a released model without human
+confirmation", while this router accepted 65/76 letters with `source: assist`
+and no human. Joern's decision: the stamp, not the sentence, was wrong. When
+rule and model agree, the value released is the deterministic rule's (its
+verdict and, for an index, its family); the model has only decided that the
+human need not see the letter. Accepted letters therefore carry `source: rule`
+and `checked_by: model`. Where both do not bind, the released verdict is the
+rule's (`label` when the rule says label, `not` otherwise) and the model's own
+wording is kept as `model_verdict`. Rung (a)'s reliability number (the rule's
+precision on the human sample) is the one that describes these letters.
