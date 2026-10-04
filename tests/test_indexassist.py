@@ -204,3 +204,26 @@ def test_evaluate_leave_one_out_tallies_against_the_human(tmp_path: Path) -> Non
     assert set(report["per_class"]) == {x["class"] for x in report["per_letter"]}
     md = indexassist.report_markdown(report)
     assert "leave-one-paper-out" in md and f"`{first}`" in md
+
+
+def test_rules_score_both_deterministic_rules_against_the_human(tmp_path: Path) -> None:
+    disc, ind, idx = _paper(tmp_path, "p")
+    rec = json.loads((disc / "p.json").read_text(encoding="utf-8"))
+    display = [m["latex"] for m in rec["maths"] if m["where"] == "display"]
+    names = sorted(idx["letters"])
+    bound = [n for n in names if idx["letters"][n]["verdict"] in indexassist.RULE_BINDS]
+    assert bound, "the fixture must bind at least one letter"
+    labels = {
+        "p": {n: {"verdict": "index" if n in bound else "label", "family": ""} for n in names}
+    }
+    labels["p"][bound[0]] = {"verdict": "unsure", "family": ""}  # unsure never counts
+
+    rows = indexassist.rule_rows(labels, indices_dir=ind, display_latex=lambda key: display)
+    assert [r["letter"] for r in rows] == [n for n in names if n != bound[0]]
+    report = indexassist.rules_report(rows)
+    m, r = report["measured"], report["reported"]
+    assert m["n"] == r["n"] == len(rows)
+    assert m["agree"] == m["n"]  # the human agreed with the discovery rule everywhere
+    assert r["index_confirmed"] <= min(r["index_verdicts"], r["human_indices"])
+    md = indexassist.rules_markdown(report)
+    assert "precision" in md and "resIndexPrefill" in md

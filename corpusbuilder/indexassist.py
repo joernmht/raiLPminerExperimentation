@@ -35,9 +35,16 @@ counts-only ``corpus/indexassist.{json,md}``.
 The model's verdicts are **not** shown on the discovery page while the
 reliability sample is being labelled: the human labels are the test set.
 
+The same labels also score the *deterministic* index rule twice (``--rules``, no
+model): as the discovery pages propose it (:mod:`corpusbuilder.indices`), and as
+:mod:`corpusbuilder.resolution` counts it as the free index prefill
+(:func:`corpusbuilder.symbols.paper_evidence` over the stored record, in the game
+tokenizer's names; ADR-0023). Output: the counts-only ``corpus/indexrules.{json,md}``.
+
 Run::
 
     PYTHONPATH=. python3 -m corpusbuilder.indexassist --evaluate          # leave-one-paper-out over the labelled papers
+    PYTHONPATH=. python3 -m corpusbuilder.indexassist --rules             # both deterministic rules vs the labels, no model
     PYTHONPATH=. python3 -m corpusbuilder.indexassist KEY [KEY ...]       # second opinion + routing for these papers
     PYTHONPATH=. python3 -m corpusbuilder.indexassist --worklist 40       # top of corpus/review/discover.html
 """
@@ -55,15 +62,20 @@ from pathlib import Path
 from corpusbuilder import assist, discovergame
 from corpusbuilder.definitions import worklist_keys
 from corpusbuilder.discover import DISCOVERY, load_record
+from corpusbuilder.dossier import Dossier
 from corpusbuilder.fulltext import DOSSIERS
 from corpusbuilder.indices import INDICES
 from corpusbuilder.promote import CORPUS
+from corpusbuilder.symbols import game_name, paper_evidence
 
 STAGE = "i"
 SCHEMA = "indexassist-1"
 OUT_DIR = CORPUS / "assist" / "indexassist"
 REPORT_JSON = CORPUS / "indexassist.json"
 REPORT_MD = CORPUS / "indexassist.md"
+RULES_SCHEMA = "indexrules-1"
+RULES_JSON = CORPUS / "indexrules.json"
+RULES_MD = CORPUS / "indexrules.md"
 STATE_DIR = CORPUS / "review" / "state"
 INBOX_DIR = CORPUS / "review" / "inbox"
 DECISIONS_DIR = CORPUS / "decisions"
@@ -684,6 +696,126 @@ def report_markdown(report: dict) -> str:
 
 
 # --------------------------------------------------------------------------- #
+# The two deterministic index rules against the same labels (no model)
+# --------------------------------------------------------------------------- #
+
+
+def _dossier_latex(key: str) -> list[str]:
+    return [f.latex for f in Dossier.load(DOSSIERS / f"{key}.json").formulas]
+
+
+def rule_rows(
+    labels: dict[str, dict[str, dict]],
+    *,
+    indices_dir: Path = INDICES,
+    display_latex=_dossier_latex,
+) -> list[dict]:
+    """Per labelled letter: the human's bind/don't-bind and the rule's, twice.
+
+    *measured* is the discovery rule as the pages propose it (an ``index`` or
+    ``alias`` verdict binds); *reported* is the same rule as
+    :func:`corpusbuilder.symbols.paper_evidence` hands it to the resolution
+    count behind ``\\resIndexPrefill``: in the game tokenizer's names
+    (``k'`` is ``k``), a name shared by several letters binds only when all of
+    them do, and a domain row makes a symbol a variable. A letter counts as bound
+    when its name is a bound index letter there (a family's name is a set, not a
+    letter). The population is the one :func:`evaluate` scores (letters the
+    discovery knows, ``unsure`` excluded).
+    """
+    rows: list[dict] = []
+    for key in sorted(labels):
+        path = indices_dir / f"{key}.json"
+        if not path.exists():
+            continue
+        record = json.loads(path.read_text(encoding="utf-8"))
+        letters = record.get("letters") or {}
+        bound = paper_evidence(display_latex(key), index_record=record).bound
+        for name, h in sorted(labels[key].items()):
+            e = letters.get(name)
+            if e is None or h.get("verdict") == "unsure":
+                continue
+            rep = game_name(name)
+            rows.append(
+                {
+                    "paper": key,
+                    "letter": name,
+                    "reported_name": rep,
+                    "human": _bind_h(h.get("verdict") or ""),
+                    "measured": _bind_r(e.get("verdict") or ""),
+                    "reported": rep in bound,
+                }
+            )
+    return rows
+
+
+def _rule_scores(rows: list[dict], rule: str) -> dict:
+    confirmed = sum(1 for r in rows if r[rule] and r["human"])
+    return {
+        "n": len(rows),
+        "agree": sum(1 for r in rows if r[rule] == r["human"]),
+        "index_verdicts": sum(1 for r in rows if r[rule]),
+        "index_confirmed": confirmed,
+        "human_indices": sum(1 for r in rows if r["human"]),
+    }
+
+
+def rules_report(rows: list[dict]) -> dict:
+    """Agreement, precision and recall of both rules; deterministic (no date)."""
+    return {
+        "schema_version": RULES_SCHEMA,
+        "papers": sorted({r["paper"] for r in rows}),
+        "measured": _rule_scores(rows, "measured"),
+        "reported": _rule_scores(rows, "reported"),
+        "rules_disagree": sum(1 for r in rows if r["measured"] != r["reported"]),
+        "per_letter": rows,
+    }
+
+
+def rules_markdown(report: dict) -> str:
+    def line(label: str, x: dict) -> str:
+        return (
+            f"| {label} | {_pct(x['agree'], x['n'])} | {_pct(x['index_confirmed'], x['index_verdicts'])} "
+            f"| {_pct(x['index_confirmed'], x['human_indices'])} |"
+        )
+
+    def verdict(b: bool) -> str:
+        return "index" if b else "not"
+
+    lines = [
+        "# Index letters: the two deterministic rules against the human labels",
+        "",
+        f"Papers labelled: **{len(report['papers'])}**, letters (unsure excluded): "
+        f"**{report['measured']['n']}**. No model involved.",
+        "",
+        "* **measured**: `corpusbuilder.indices`, the rule as the discovery pages propose it.",
+        "* **reported**: the same rule as `corpusbuilder.resolution` counts it as the free "
+        "index prefill (`\\resIndexPrefill`), via `corpusbuilder.symbols.paper_evidence`: in "
+        "the game tokenizer's names (`k'` is `k`, `\\vartheta` is `θ`), a name shared by "
+        "several letters binds only when all of them do, and a domain row makes a symbol a "
+        "variable (ADR-0023).",
+        "",
+        "| rule | agrees with the human (bind vs not) | precision (index verdicts confirmed) | recall (human indices found) |",
+        "|---|---:|---:|---:|",
+        line("measured", report["measured"]),
+        line("reported", report["reported"]),
+        "",
+        f"The rules disagree on {report['rules_disagree']} letters.",
+        "",
+        "## Letters the reported rule gets wrong",
+        "",
+        "| paper | letter | read as | human | reported | measured |",
+        "|---|---|---|---|---|---|",
+    ]
+    for r in report["per_letter"]:
+        if r["reported"] != r["human"]:
+            lines.append(
+                f"| {r['paper']} | `{r['letter']}` | `{r['reported_name']}` | {verdict(r['human'])} "
+                f"| {verdict(r['reported'])} | {verdict(r['measured'])} |"
+            )
+    return "\n".join(lines) + "\n"
+
+
+# --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
 
@@ -703,9 +835,32 @@ def main(argv: list[str] | None = None) -> int:
         type=Path,
         help="exports / page-state files (default: decisions, inbox, state)",
     )
+    ap.add_argument(
+        "--rules",
+        action="store_true",
+        help="score both deterministic index rules against the labels (no model)",
+    )
     ap.add_argument("--force", action="store_true", help="ignore the reply cache")
     args = ap.parse_args(argv)
     labels = load_labels(args.labels if args.labels else default_label_paths())
+    if args.rules:
+        if not labels:
+            ap.error("no labelled papers found")
+        report = rules_report(rule_rows(labels))
+        RULES_JSON.write_text(
+            json.dumps(report, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        RULES_MD.write_text(rules_markdown(report), encoding="utf-8", newline="\n")
+        for rule in ("measured", "reported"):
+            x = report[rule]
+            print(
+                f"{rule}: agree {_pct(x['agree'], x['n'])}, precision "
+                f"{_pct(x['index_confirmed'], x['index_verdicts'])}, recall "
+                f"{_pct(x['index_confirmed'], x['human_indices'])}"
+            )
+        return 0
     ws = assist.Workspace()
     if args.evaluate:
         if not labels:

@@ -22,7 +22,7 @@ from artifacts that already exist (no network, no LLM at this stage):
   kind counts and the variable-to-parameter ratio. These are the one
   non-deterministically *sourced* input; reading them is still deterministic,
   and papers without a table fall back to zeros rather than being dropped;
-* :func:`corpusbuilder.symbols.paper_evidence` — domain-row counts by domain
+* :func:`corpusbuilder.symbols.variable_domains` — domain-row counts by domain
   (a binary row is the assignment/selection signal, non-negative rows the
   flow/LP signal);
 * structural-motif shares via regex on the normalized LaTeX — big-M linking,
@@ -58,7 +58,7 @@ from corpusbuilder.game import (
     is_objective_latex,
     parse_tree,
 )
-from corpusbuilder.symbols import paper_evidence
+from corpusbuilder.symbols import variable_domains
 
 ROOT = Path(__file__).resolve().parent.parent
 CORPUS = ROOT / "corpus"
@@ -207,9 +207,8 @@ def paper_vector(latex_rows: list[str], symbol_kinds: dict[str, str]) -> dict[st
     for name, count in motif_counts.items():
         features[f"motif_{name}"] = count / n if n else 0.0
 
-    evidence = paper_evidence(latex_rows)
     domain_counts = dict.fromkeys(_DOMAIN_NAMES, 0)
-    for domain in evidence.domains.values():
+    for domain in variable_domains(latex_rows).values():
         domain_counts[domain] += 1
     for name, count in domain_counts.items():
         features[f"domain_{name}"] = float(count)

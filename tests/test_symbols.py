@@ -10,12 +10,14 @@ from __future__ import annotations
 
 import pytest
 
+from corpusbuilder.game import extract_symbols
 from corpusbuilder.symbols import (
     INDEX,
     VARIABLE,
     binder_roles,
     binder_symbols,
     domain_declaration,
+    game_name,
     paper_evidence,
 )
 
@@ -94,6 +96,15 @@ def test_domain_rows_declare_variables(latex, expected):
         # A bound against something other than zero says nothing about a domain.
         r"x_i \ge b_i",
         r"\sum_{i \in I} x_i \le C",
+        # A calligraphic or bare letter names an index family, not a number set
+        # (the corpus misread 49 such rows, turning index letters into variables).
+        r"\forall b \in \mathcal{B} , y \in \mathcal{Y}",
+        r"z \in \mathcal{Z}",
+        r"r \in \mathcal{R}^{\text{up}}",
+        r"C \in B",
+        # A binder whose operator comes after its membership is not a row.
+        r"\underset{n^{'} \in \mathbb{N}}{\sum} \xi_{n^{'} , n} = 0",
+        r"\underset{\rho \geq 0}{max} \Delta",
     ],
 )
 def test_non_declarations_are_refused(latex):
@@ -132,3 +143,52 @@ def test_evidence_is_deterministic():
     first = paper_evidence(rows)
     assert paper_evidence(rows) == first
     assert paper_evidence(list(rows)) == first
+
+
+# --------------------------------------------------------------------------- #
+# One index reader (ADR-0023): the discovery rule's verdicts, in the game's names
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.parametrize(
+    ("letter", "latex"),
+    [
+        ("kp", r"x_{k'} \le 1 \quad \forall k' \in K"),
+        ("s_hat", r"\hat{s} \le 1"),
+        ("r_tilde", r"\tilde{r} \ge 0"),
+        ("d_bar", r"\bar{d} = 2"),
+        ("delta", r"\delta \ge 0"),
+        ("vartheta", r"\vartheta \ge 0"),
+    ],
+)
+def test_game_name_is_what_the_tokenizer_writes(letter, latex):
+    names = {n for n, _ in extract_symbols(latex, limit=None)[0]}
+    assert game_name(letter) in names
+
+
+def test_a_shared_game_name_is_an_index_only_when_every_letter_binds():
+    record = {
+        "letters": {
+            "k": {"verdict": "index"},
+            "kp": {"verdict": "index"},
+            "j": {"verdict": "index"},
+            "jp": {"verdict": "label"},
+        },
+        "families": {"K": {}, "J": {}},
+    }
+    e = paper_evidence([], index_record=record)
+    assert e.kinds["k"] == INDEX  # k and k' both bind
+    assert "j" not in e.kinds  # j' does not: no prefill rather than a wrong one
+    assert set(e.families) == {"J", "K"} and set(e.bound) == {"k"}
+
+
+def test_the_stored_record_carries_evidence_the_display_rows_lack():
+    rows = [r"\sum_{e \in E} x_{e} \le 1"]
+    alone = paper_evidence(rows)
+    assert alone.kinds["e"] == INDEX and alone.kinds["E"] == INDEX
+    # A notation-table letter the rows never bind reaches the prefill only through the record.
+    record = {
+        "letters": {"e": {"verdict": "index"}, "w": {"verdict": "index"}},
+        "families": {"E": {}},
+    }
+    assert paper_evidence(rows, index_record=record).kinds["w"] == INDEX
