@@ -129,3 +129,31 @@ def test_macros_are_deterministic_and_complete():
     # Every macro the paper may \input must be defined exactly once.
     names = [line.split("}")[0] for line in tex.splitlines() if line.startswith("\\newcommand")]
     assert len(names) == len(set(names))
+
+
+def test_the_deterministic_run_ignores_every_symbol_table(tmp_path, monkeypatch):
+    """Paper 1's reference row is the algebra alone; the assisted tables never reach it."""
+    import json
+
+    from corpusbuilder import resolution
+
+    dossiers, decisions = tmp_path / "dossiers", tmp_path / "decisions"
+    dossiers.mkdir()
+    decisions.mkdir()
+    d = _dossier(r"\sum_{i \in I} c_{i} x_{i} \le b", r"x_{i} \ge 0")
+    (dossiers / f"{d.key}.json").write_text(d.model_dump_json(), encoding="utf-8")
+    table = {
+        "schema_version": "game-decisions-3",
+        "symbol_tables": [{"paper_key": d.key, "symbols": {"c": "parameter", "b": "parameter"}}],
+    }
+    (decisions / "assist_x.json").write_text(json.dumps(table), encoding="utf-8")
+    monkeypatch.setattr(resolution, "DOSSIERS", dossiers)
+    monkeypatch.setattr(resolution, "DECISIONS", decisions)
+
+    with_tables = resolution.compute()
+    algebra_only = resolution.compute(deterministic=True)
+    assert algebra_only["deterministic"] is True and with_tables["deterministic"] is False
+    assert with_tables["reviewed_pairs"] > 0  # the table is read in the normal run...
+    assert algebra_only["reviewed_pairs"] == 0  # ...and never in the deterministic one
+    assert algebra_only["typed_pairs"] < with_tables["typed_pairs"]
+    assert "--deterministic" in render_macros(algebra_only).splitlines()[0]
