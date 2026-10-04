@@ -134,6 +134,7 @@ def page_payload(
                 "verdict",
                 "rule",
                 "family",
+                "base",
                 "families",
                 "bound_rows",
                 "capped",
@@ -586,7 +587,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
     <a href="../discover.html">← worklist</a>
   </div>
   <div id="decide"></div>
-  <div class="actions"><button id="menuBtn" title="menu">☰</button><button id="undoBtn" title="undo">↶ undo</button><button id="skipBtn" title="skip">skip ▸</button></div>
+  <div class="actions"><button id="menuBtn" title="menu">☰</button><button id="backBtn" title="back to the item before, decided or not">◂ back</button><button id="undoBtn" title="undo">↶ undo</button><button id="skipBtn" title="skip">skip ▸</button></div>
   <div id="unsaved" class="hidden">⚠ not stored in this browser · export (☰) before closing</div>
 </footer>
 <div id="toast"></div>
@@ -649,8 +650,19 @@ function doneCount(round){ return Q[round].filter(it => isDone(round, it)).lengt
 function pos(){ const p = S.pos[S.round]; return p === undefined ? -1 : p; }
 function current(){ const list = Q[S.round]; const p = pos(); return p >= 0 && p < list.length ? list[p] : null; }
 function nextOpen(from){ const list = Q[S.round]; for (let i = from + 1; i < list.length; i++) if (!isDone(S.round, list[i])) return i; for (let i = 0; i <= Math.min(from, list.length - 1); i++) if (!isDone(S.round, list[i])) return i; return -1; }
-function goTo(i){ S.pos[S.round] = i; save(); paintAll(true); }
-function setRound(r){ S.round = r; if (S.pos[r] === undefined || S.pos[r] < 0) S.pos[r] = nextOpen(-1); save(); paintAll(true); }
+const hist = []; // [round, pos] of the items left this session: "back" returns to them, decided or not
+function remember(){ const p = pos(); if (p < 0) return; const last = hist[hist.length - 1]; if (!last || last[0] !== S.round || last[1] !== p){ hist.push([S.round, p]); if (hist.length > 300) hist.shift(); } }
+function goTo(i){ remember(); S.pos[S.round] = i; save(); paintAll(true); }
+function setRound(r){ remember(); S.round = r; if (S.pos[r] === undefined || S.pos[r] < 0) S.pos[r] = nextOpen(-1); save(); paintAll(true); }
+function goBack(){
+  if (adhoc){ adhoc = null; paintAll(true); return; }
+  let h = hist.pop();
+  while (h && h[0] === S.round && h[1] === pos()) h = hist.pop();
+  if (h){ S.round = h[0]; S.pos[h[0]] = h[1]; save(); paintAll(true); return; }
+  // nothing visited yet (e.g. after a reload): the item before this one in the list
+  const n = Q[S.round].length; if (!n){ toast("nothing to go back to"); return; }
+  const p = pos(); S.pos[S.round] = p > 0 ? p - 1 : n - 1; save(); paintAll(true);
+}
 let adhoc = null; // an element tapped in the text outside the queue
 
 /* ---------- text ---------- */
@@ -756,9 +768,13 @@ function paintBottom(){
   if (id){ html = roleBtns(S.roles[id] ? S.roles[id].role : null, proposed(id).role); }
   else if (!it){ const nr = nextRoundWithOpen(); html = '<div class="grid1">' + (nr ? '<button class="dec big" id="nextRound">▸ ' + esc(ROUNDS.find(x => x[0] === nr)[1]) + "</button>" : '<button class="dec big" id="exportNow">⬇ export decisions</button>') + "</div>"; }
   else if (S.round === "indices"){
-    const st = letterState(it); const chips = FAMS.slice(0, 5);
-    html = '<div class="grid2"><button class="dec ok' + (st.e.verdict === "label" ? "" : " glow") + '" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec lab2' + (st.e.verdict === "label" ? " glow" : "") + '" data-v="label">label (part of a name)</button><button class="dec bad" data-v="not">✗ not an index</button><button class="dec mid" data-v="unsure">? unsure</button></div>';
-    html += '<div class="fams">' + chips.map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
+    const st = letterState(it); const chips = FAMS.slice(0, 5); const mine = st.h.verdict || "";
+    const on = v => (mine === v ? " on" : "");
+    html = '<div class="grid2"><button class="dec ok' + (st.e.verdict === "label" || mine ? "" : " glow") + on("index") + '" data-v="index">✓ index' + (st.fam ? " → " + esc(st.fam) : "") + '</button><button class="dec lab2' + (st.e.verdict === "label" && !mine ? " glow" : "") + on("label") + '" data-v="label">label (part of a name)</button><button class="dec bad' + on("not") + '" data-v="not">✗ not an index</button><button class="dec mid' + on("unsure") + '" data-v="unsure">? unsure</button></div>';
+    // a decorated letter (f', f-hat) usually ranges over its base letter's family: offer it as one tap
+    const base = st.e.base && st.e.base !== it ? st.e.base : null; const bfam = base ? letterState(base).fam : "";
+    const same = bfam ? '<button class="dec fam same' + (st.fam === bfam ? " on" : "") + '" data-fam="' + esc(bfam) + '">same as ' + esc(base) + " → " + esc(bfam) + "</button>" : "";
+    html += '<div class="fams">' + same + chips.filter(f => f !== bfam).map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
     const runs = Object.keys(st.e.runs || {});
     if (runs.length) html += '<div class="fams">' + runs.map(r => '<button class="dec lab' + (S.labels[r] ? " on" : "") + '" data-lab="' + esc(r) + '">＋ “' + esc(r) + '” is a label word</button>').join("") + "</div>";
   } else if (S.round === "families"){
@@ -766,7 +782,7 @@ function paintBottom(){
   } else { html = roleBtns(S.roles[it] ? S.roles[it].role : null, proposed(it).role); }
   $("decide").innerHTML = html;
 }
-function advance(){ adhoc = null; const i = nextOpen(pos()); S.pos[S.round] = i; save(); setTimeout(() => paintAll(true), 120); }
+function advance(){ adhoc = null; remember(); const i = nextOpen(pos()); S.pos[S.round] = i; save(); setTimeout(() => paintAll(true), 120); }
 function decideRole(id, role){ snap(); const cur = S.roles[id] || {}; S.roles[id] = {role: role, span: cur.span}; save(); refreshEl(id); toast(role); if (adhoc){ adhoc = null; paintAll(false); } else advance(); }
 function decideLetter(l, verdict, fam){ snap(); const st = letterState(l); S.indices[l] = {verdict: verdict, family: fam !== undefined ? fam : (st.fam || "")}; save(); toast(l + " → " + verdict + (S.indices[l].family ? " " + S.indices[l].family : "")); advance(); }
 $("decide").addEventListener("click", e => {
@@ -785,6 +801,7 @@ $("decide").addEventListener("click", e => {
 });
 $("rounds").addEventListener("click", e => { const b = e.target.closest("button[data-r]"); if (b){ adhoc = null; setRound(b.dataset.r); } });
 $("skipBtn").addEventListener("click", () => { if (adhoc){ adhoc = null; paintAll(true); return; } const i = nextOpen(pos()); if (i < 0 || i === pos()){ toast("nothing else open here"); return; } goTo(i); });
+$("backBtn").addEventListener("click", goBack);
 $("undoBtn").addEventListener("click", () => { const u = undoStack.pop(); if (!u){ toast("nothing to undo"); return; } S = JSON.parse(u); save(); paintAll(true); toast("undone"); });
 $("menuBtn").addEventListener("click", () => $("menu").classList.toggle("hidden"));
 
@@ -872,7 +889,7 @@ function paintAll(scroll){
 paintAll(true);
 pullState().then(changed => { if (changed){ paintAll(true); toast("continued from the machine's copy"); } });
 whenMathJax(() => typeset(document));
-window.__discover = {S: () => S, Q, current, setRound, goTo, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
+window.__discover = {S: () => S, Q, current, setRound, goTo, goBack, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
 </script>
 </body>
 </html>
