@@ -177,7 +177,7 @@ _DOMAIN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     # Blackboard or bold only: a calligraphic or bare B, N, Z, R is how the
     # corpus names index FAMILIES (blocks, nodes, routes), so reading
     # "n \in \mathcal{N}" as "n is a natural number" declared index letters
-    # to be integer variables (49 of 428 rows did, in 7 papers).
+    # to be integer variables (ADR-0023).
     ("binary", re.compile(r"^\s*(?:\\mathbb|\\mathbf)\s*\{?\s*B(?![a-zA-Z])")),
     (
         "integer",
