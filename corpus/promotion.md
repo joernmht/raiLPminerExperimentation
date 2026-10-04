@@ -18,18 +18,18 @@ Regenerate with `PYTHONPATH=. python3 -m corpusbuilder.promote`; do not edit by 
 ## Row coverage (every accepted row probed on its own)
 
 - papers probed: **160** · objective row parses: **23**
-- constraint rows parsing with their header: **415 / 4429** (9.4%) · median per paper 4% · papers with >= half: 3 · all rows: 0
-- domain-declaration rows absorbed into the sidecar: 400
+- constraint rows parsing with their header: **415 / 4469** (9.3%) · median per paper 4% · papers with >= half: 3 · all rows: 0
+- domain-declaration rows absorbed into the sidecar: 360
 
 | failing rows by class | rows |
 | --- | ---: |
-| quantifier: clause not understood | 1118 |
-| undeclared symbol (vocabulary) | 1011 |
-| juxtaposed factor / residue | 398 |
+| quantifier: clause not understood | 1127 |
+| undeclared symbol (vocabulary) | 1024 |
+| juxtaposed factor / residue | 409 |
 | other | 393 |
-| quantifier: tuple | 324 |
+| quantifier: tuple | 326 |
 | label subscript | 162 |
-| no comparator | 144 |
+| no comparator | 149 |
 | superscript after subscript | 121 |
 | subscripted-coef shape mismatch | 75 |
 | binder: range | 69 |
@@ -209,7 +209,7 @@ Not decided at promotion time:
 | 10.1016_j.trb.2019.02.017 | `10.1016_j.trb.2019.02.017` | `outside_grammar` | 37 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 't' (expected i \in S, a where-clause p_{i} = v, or a restriction i \ne j) |
 | 10.1016_j.trb.2019.05.002 | `10.1016_j.trb.2019.05.002` | `outside_grammar` | 26 | normalized LaTeX is not in the canonical grammar: subscripted coefficient 'z_{i, j}' names the variable 'z': a variable-times-variable product is nonlinear and outside the grammar |
 | 10.1016_j.trb.2019.06.010 | `10.1016_j.trb.2019.06.010` | `outside_grammar` | 30 | normalized LaTeX is not in the canonical grammar: referent '\\underset{l \\in \\mathcal{L}}{\\sum} \\sum_{m = 1}^{N_{l} - 1} \\left(C \\cdot f_{l}': trailing '^{N_{l} - 1} \\left(C \\cdot f_{l}' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
-| 10.1016_j.trb.2019.07.010 | `10.1016_j.trb.2019.07.010` | `outside_grammar` | 49 | normalized LaTeX is not in the canonical grammar: referent '\\left(\\underset{b \\in B}{\\sum} y_exit' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
+| 10.1016_j.trb.2019.07.010 | `10.1016_j.trb.2019.07.010` | `outside_grammar` | 52 | normalized LaTeX is not in the canonical grammar: referent '\\left(\\underset{b \\in B}{\\sum} y_exit' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trb.2019.07.011 | `10.1016_j.trb.2019.07.011` | `outside_grammar` | 29 | normalized LaTeX is not in the canonical grammar: tuple quantifier is not supported: '\\left(i , j\\right) \\in A' (bind each index over its own family) |
 | 10.1016_j.trb.2019.08.001 | `10.1016_j.trb.2019.08.001` | `outside_grammar` | 46 | normalized LaTeX is not in the canonical grammar: tuple binder is not supported: '\\left(i , ip , t , tp\\right) \\in E' (bind each index over its own family) |
 | 10.1016_j.trb.2019.12.005 | `10.1016_j.trb.2019.12.005` | `outside_grammar` | 32 | normalized LaTeX is not in the canonical grammar: referent 'a_{k}^{v \\left(u\\right)}': trailing '^{v \\left(u\\right)}' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
@@ -249,7 +249,7 @@ Not decided at promotion time:
 | 10.1016_j.trc.2017.02.001 | `10.1016_j.trc.2017.02.001` | `no_objective` | 15 |  |
 | 10.1016_j.trc.2017.03.012 | `10.1016_j.trc.2017.03.012` | `outside_grammar` | 9 | normalized LaTeX is not in the canonical grammar: referent 'alpha} \\mathit{RT' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2017.04.010 | `10.1016_j.trc.2017.04.010` | `outside_grammar` | 28 | normalized LaTeX is not in the canonical grammar: referent 'a_bar_{r} \\left(i , j\\right)': trailing '\\left(i , j\\right)' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
-| 10.1016_j.trc.2017.04.012 | `10.1016_j.trc.2017.04.012` | `outside_grammar` | 7 | normalized LaTeX is not in the canonical grammar: no comparator in constraint body: 'x \\in \\mathcal{X}' |
+| 10.1016_j.trc.2017.04.012 | `10.1016_j.trc.2017.04.012` | `outside_grammar` | 8 | normalized LaTeX is not in the canonical grammar: no comparator in constraint body: 'z \\in \\mathcal{Z}' |
 | 10.1016_j.trc.2017.06.005 | `10.1016_j.trc.2017.06.005` | `outside_grammar` | 26 | normalized LaTeX is not in the canonical grammar: referent 'min f' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2017.07.014 | `10.1016_j.trc.2017.07.014` | `outside_grammar` | 27 | normalized LaTeX is not in the canonical grammar: referent 'rho_min': subscript 's + 1' cannot serve as an index family (declare 'rho_min' with an explicit shape; constant and offset subscripts resolve only against a declared shape) |
 | 10.1016_j.trc.2018.02.006 | `10.1016_j.trc.2018.02.006` | `outside_grammar` | 24 | normalized LaTeX is not in the canonical grammar: referent "V_{a , k}^{'}": trailing "^{'}" after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
@@ -264,7 +264,7 @@ Not decided at promotion time:
 | 10.1016_j.trc.2021.103368 | `10.1016_j.trc.2021.103368` | `outside_grammar` | 1 | normalized LaTeX is not in the canonical grammar: referent '\\left(z_{\\mathcal{D}} , z_{\\mathcal{O}} , z_{\\mathcal{P}}\\right)': trailing ', z_{\\mathcal{O}} , z_{\\mathcal{P}}\\right)' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
 | 10.1016_j.trc.2022.103676 | `10.1016_j.trc.2022.103676` | `outside_grammar` | 8 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 'k + 1 \\in S' |
 | 10.1016_j.trc.2022.103708 | `10.1016_j.trc.2022.103708` | `outside_grammar` | 69 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 'k, k - 1 \\in Sar \\text{or} l \\in Nnderline' |
-| 10.1016_j.trc.2022.103805 | `10.1016_j.trc.2022.103805` | `outside_grammar` | 15 | normalized LaTeX is not in the canonical grammar: referent '\\mathcal{X}' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
+| 10.1016_j.trc.2022.103805 | `10.1016_j.trc.2022.103805` | `outside_grammar` | 16 | normalized LaTeX is not in the canonical grammar: referent '\\mathcal{X}' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2022.103994 | `10.1016_j.trc.2022.103994` | `outside_grammar` | 27 | normalized LaTeX is not in the canonical grammar: referent '\\underset{\\left(J , Tp\\right) \\in A \\left(I , T\\right)}{\\sum} x \\left(k , I , J , T , Tp\\right)' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2023.104150 | `10.1016_j.trc.2023.104150` | `outside_grammar` | 33 | normalized LaTeX is not in the canonical grammar: referent '\\left(\\sum_{e_{t} \\in R} r_{e_{t}}': trailing 'r_{e_{t}}' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
 | 10.1016_j.trc.2023.104155 | `10.1016_j.trc.2023.104155` | `no_objective` | 3 |  |
@@ -272,7 +272,7 @@ Not decided at promotion time:
 | 10.1016_j.trc.2023.104278 | `10.1016_j.trc.2023.104278` | `outside_grammar` | 39 | normalized LaTeX is not in the canonical grammar: referent 'omega' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2024.104526 | `10.1016_j.trc.2024.104526` | `outside_grammar` | 48 | normalized LaTeX is not in the canonical grammar: referent 'min\\quad Z' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.trc.2024.104681 | `10.1016_j.trc.2024.104681` | `outside_grammar` | 78 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 's + 1 \\in \\mathcal{S}' |
-| 10.1016_j.trc.2024.104893 | `10.1016_j.trc.2024.104893` | promoted | 79 |  |
+| 10.1016_j.trc.2024.104893 | `10.1016_j.trc.2024.104893` | promoted | 95 |  |
 | 10.1016_j.trc.2025.105001 | `10.1016_j.trc.2025.105001` | `outside_grammar` | 78 | normalized LaTeX is not in the canonical grammar: referent 'min alpha_0 \\sum_{i \\in N} y_{i}': trailing 'y_{i}' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
 | 10.1016_j.trc.2025.105076 | `10.1016_j.trc.2025.105076` | `outside_grammar` | 58 | normalized LaTeX is not in the canonical grammar: tuple binder is not supported: '\\left(i , j , t , tp , v , vp\\right) \\in A' (bind each index over its own family) |
 | 10.1016_j.trc.2025.105078 | `10.1016_j.trc.2025.105078` | `missing_declarations` | 62 | corpus/declarations/10.1016_j.trc.2025.105078.tex |
@@ -293,5 +293,5 @@ Not decided at promotion time:
 | 10.1016_j.tre.2025.104177 | `10.1016_j.tre.2025.104177` | `outside_grammar` | 28 | normalized LaTeX is not in the canonical grammar: referent 'w_abandon' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.tre.2025.104210 | `10.1016_j.tre.2025.104210` | `outside_grammar` | 45 | normalized LaTeX is not in the canonical grammar: referent 'P_S' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
 | 10.1016_j.tre.2025.104641 | `10.1016_j.tre.2025.104641` | `outside_grammar` | 75 | normalized LaTeX is not in the canonical grammar: referent 'D' is not a declared variable or parameter (declare it in the %@ header; an unbraced subscript such as w_u must be written w_{u}) |
-| 10.1016_j.tre.2026.104704 | `10.1016_j.tre.2026.104704` | `outside_grammar` | 74 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 'r \\in \\mathcal{R} \\cup \\mathcal{R}^{dn}' |
+| 10.1016_j.tre.2026.104704 | `10.1016_j.tre.2026.104704` | `outside_grammar` | 93 | normalized LaTeX is not in the canonical grammar: quantifier clause not understood: 'r \\in \\mathcal{R} \\cup \\mathcal{R}^{dn}' |
 | 10.1016_s0927-0507_06_14003-7 | `10.1016_s0927-0507_06_14003-7` | `outside_grammar` | 9 | normalized LaTeX is not in the canonical grammar: referent 'w_1 \\sum_{l \\in L, p \\in P} d_{l, p}': trailing 'd_{l, p}' after the subscript is not part of the canonical grammar (superscript indices and juxtaposed factors must be resolved upstream; nothing is dropped silently) |
