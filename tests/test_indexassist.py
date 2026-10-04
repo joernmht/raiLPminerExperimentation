@@ -60,10 +60,12 @@ def test_route_accepts_only_agreement() -> None:
 
     assert indexassist.route(rule_index, m("index", "I"))[0] == "auto"
     assert indexassist.route(rule_alias, m("index", ""))[0] == "auto"
+    # what is released is the rule's value; the model only decided the human need not see it
     assert indexassist.route(rule_alias, m("index", ""))[2] == {
         "verdict": "index",
         "family": "I",
-        "source": "assist",
+        "source": "rule",
+        "checked_by": "model",
     }
     assert indexassist.route(rule_index, m("index", "J"))[:2] == ("human", "family disagreement")
     assert indexassist.route(rule_index, m("label"))[:2] == ("human", "bind disagreement")
@@ -72,9 +74,16 @@ def test_route_accepts_only_agreement() -> None:
     assert indexassist.route(rule_cand, m("label")) == (
         "auto",
         "both do not bind",
-        {"verdict": "label", "family": "", "source": "assist"},
+        {
+            "verdict": "not",
+            "family": "",
+            "source": "rule",
+            "checked_by": "model",
+            "model_verdict": "label",
+        },
     )
-    assert indexassist.route(rule_label, m("not"))[2]["verdict"] == "not"
+    accepted = indexassist.route(rule_label, m("not"))[2]
+    assert accepted["verdict"] == "label" and accepted["model_verdict"] == "not"
     assert indexassist.route(rule_cand, m("index", "I"))[:2] == ("human", "bind disagreement")
 
 
@@ -141,8 +150,8 @@ def test_run_paper_hides_the_rule_from_the_model_and_routes(tmp_path: Path) -> N
     assert (tmp_path / "out" / "p.json").exists()
     for r in out["letters"].values():
         assert r["route"] in ("auto", "human") and r["model"]["source"] == "model"
-        if r["route"] == "auto":
-            assert r["accepted"]["source"] == "assist"
+        if r["route"] == "auto":  # released as the rule's value, the model only checked it
+            assert r["accepted"]["source"] == "rule" and r["accepted"]["checked_by"] == "model"
     assert out["summary"]["auto"] + out["summary"]["human"] == len(letters)
 
 
@@ -227,3 +236,13 @@ def test_rules_score_both_deterministic_rules_against_the_human(tmp_path: Path) 
     assert r["index_confirmed"] <= min(r["index_verdicts"], r["human_indices"])
     md = indexassist.rules_markdown(report)
     assert "precision" in md and "resIndexPrefill" in md
+
+
+def test_human_family_reads_the_base_letter_shorthand() -> None:
+    letters = {"f": {"base": "f", "family": "E"}, "fp": {"base": "f", "family": "E"}}
+    labels = {"f": {"verdict": "index", "family": "F"}, "fp": {"verdict": "index", "family": "f"}}
+    assert indexassist.human_family("fp", labels, letters) == "F"  # "same as f", and f is F
+    assert indexassist.human_family("f", labels, letters) == "F"
+    assert (
+        indexassist.human_family("fp", {"fp": {"family": "f"}}, letters) == "E"
+    )  # f unlabelled: the rule's

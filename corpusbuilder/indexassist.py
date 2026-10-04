@@ -12,7 +12,11 @@ small model for an *independent* second opinion on every letter and a
 deterministic router decides which letters need the human at all:
 
 * rule and model agree on "bind / don't bind" (and on the family where both
-  name one): accepted, ``source: assist``;
+  name one): the rule's verdict is accepted, ``source: rule``, ``checked_by:
+  model`` (the model only decides that the human need not see the letter; what
+  is released is the deterministic rule's value, so §3.3's "assisted entries
+  never enter a released model without human confirmation" holds; Joern,
+  2026-10-04);
 * they disagree, the model is unsure, or an index has no family: the human's
   queue.
 
@@ -331,14 +335,22 @@ def route(entry: dict, model: dict) -> tuple[str, str, dict | None]:
     if rule_binds != (mv == "index"):
         return "human", "bind disagreement", None
     if mv != "index":
-        return "auto", "both do not bind", {"verdict": mv, "family": "", "source": "assist"}
+        # The released verdict is the rule's (label, or not an index); the model's
+        # own wording is kept as information only.
+        verdict = "label" if entry.get("verdict") == "label" else "not"
+        accepted = {"verdict": verdict, "family": "", "source": "rule", "checked_by": "model"}
+        return "auto", "both do not bind", {**accepted, "model_verdict": mv}
     rf, mf = entry.get("family") or "", model.get("family") or ""
     if not rf:
         return "human", "rule has no family", None
     if mf and mf != rf:
         return "human", "family disagreement", None
     reason = "both bind, same family" if mf else "both bind, model names no family"
-    return "auto", reason, {"verdict": "index", "family": rf, "source": "assist"}
+    return (
+        "auto",
+        reason,
+        {"verdict": "index", "family": rf, "source": "rule", "checked_by": "model"},
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -520,6 +532,22 @@ TALLY_KEYS = (
 )
 
 
+def human_family(name: str, labels: dict[str, dict], letters: dict[str, dict]) -> str:
+    """The family a human label gives ``name``, with the shorthand resolved.
+
+    Before the page offered "same as f" (2026-10-04) the expert wrote the BASE
+    LETTER as the family of a decorated letter (``fp`` -> ``f``) to mean "the
+    family of f"; that reads as f's family (the human's, else the rule's).
+    """
+    fam = (labels.get(name) or {}).get("family") or ""
+    base = (letters.get(name) or {}).get("base") or name
+    if fam and fam == base and base != name:
+        return (
+            (labels.get(base) or {}).get("family") or (letters.get(base) or {}).get("family") or fam
+        )
+    return fam
+
+
 def _bind_h(v: str) -> bool:
     return v == "index"
 
@@ -576,7 +604,7 @@ def evaluate(
                     "model": r["model"]["verdict"],
                     "model_family": r["model"].get("family") or "",
                     "human": h["verdict"],
-                    "human_family": h.get("family") or "",
+                    "human_family": human_family(name, labels[key], idx.get("letters") or {}),
                     "route": r["route"],
                     "reason": r["reason"],
                 }
