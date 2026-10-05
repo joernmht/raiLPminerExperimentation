@@ -220,4 +220,4 @@ reviewed by the author, who takes full responsibility for the content.
 
 ## License
 
-MIT — see `LICENSE`.
+Apache-2.0 — see `LICENSE` and `NOTICE`.
