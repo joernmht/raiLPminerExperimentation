@@ -142,6 +142,32 @@ function boot(path) {
       ok(X.S().indices[deco] && X.S().indices[deco].verdict === "index" && X.S().indices[deco].family === bfam, "same family: one tap records index and the base letter's family");
     } else ok(false, "same family: the test paper has no decorated letter");
   }
+  // walk through the proposed family, not only the letter
+  X.setRound("indices");
+  {
+    const withFam = X.Q.indices.find(l => D.indices.letters[l].family && X.rowsWithFamily(D.indices.letters[l].family).length > X.rowsWith(l).length);
+    if (withFam) {
+      X.goTo(X.Q.indices.indexOf(withFam)); await sleep(150);
+      d.getElementById("walkFam").click(); await sleep(150);
+      const fam = D.indices.letters[withFam].family;
+      ok(X.walkIds(withFam).length === X.rowsWithFamily(fam).length && d.getElementById("walkbox").textContent.startsWith("family " + fam), "family walk: ◂ ▸ step through every formula using the family");
+      d.getElementById("navR").click(); await sleep(100);
+      ok(/formula 2 of/.test(d.getElementById("walkbox").textContent), "family walk: the arrows advance within the family");
+      d.getElementById("walkLetter").click(); await sleep(150);
+      ok(!d.getElementById("walkbox").textContent.startsWith("family"), "family walk: back to the letter's formulas");
+    } else ok(false, "family walk: no letter whose family reaches further than the letter");
+  }
+  // the time index is marked
+  {
+    const timePage = pagePath.replace(/[^/]+\.html$/, "10.1016_j.trb.2023.102815.html");
+    if (fs.existsSync(timePage)) {
+      const t = boot(timePage); const XT = t.w.__discover; await sleep(100);
+      const TD = JSON.parse(t.d.getElementById("data").textContent);
+      ok(TD.indices.time && TD.indices.time.family === "T", "time: the page carries the paper's time family");
+      const tl = XT.Q.indices.indexOf("t");
+      if (tl >= 0) { XT.goTo(tl); await sleep(150); ok(t.d.getElementById("item").textContent.includes("⏱ time index"), "time: the time letter is marked"); }
+    } else ok(false, "time: test page missing");
+  }
   {
     const { d: di } = boot(indexPath);
     ok(di.querySelectorAll("#papers tr").length > 200 && di.querySelector("#papers a").getAttribute("href").startsWith("discover/"), "index: worklist lists the papers with links");

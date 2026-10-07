@@ -1215,8 +1215,13 @@ def analyse(
         }
     )
     rules: Counter[str] = Counter(e["rule"] for e in out_letters.values() if e["rule"])
+    time = time_index(out_letters, families)
+    for fam in families:
+        families[fam]["time"] = fam == time["family"]
+    counts["time_family"] = int(time["family"] is not None)
     return {
         "schema_version": SCHEMA,
+        "time": time,
         "counts": dict(sorted(counts.items())),
         "rules": dict(sorted(rules.items())),
         "letters": out_letters,
@@ -1229,6 +1234,38 @@ def analyse(
         "declared_index": sorted(declared_idx),
         "declared_index_are_letters": letters_named_as_index,
     }
+
+
+#: Letters that name time: t, t', tau, t_k ... (Joern, 2026-10-07: "almost exclusively T").
+_TIME_LETTER = re.compile(r"^(?:t|tau)(?:p*|_[A-Za-z0-9]+)$")
+_TIME_DESC = re.compile(r"\b(?:time|period|slot|horizon|interval|instant)s?\b", re.IGNORECASE)
+
+
+def time_index(letters: dict[str, dict], families: dict[str, dict]) -> dict:
+    """The paper's time index: its family and the letters that run over it.
+
+    A family is time when a time letter (t, t', tau) ranges over it and it is
+    named T (or tau), or when its description says time/period/slot. T alone is
+    not enough: in some papers ``i, j \\in T`` is the set of trains.
+    ``family`` is None when time is only a bound letter without a set, or not an
+    index at all (continuous-time models, where t is a variable).
+    """
+    best: str | None = None
+    for name in sorted(families):
+        f = families[name]
+        timel = any(_TIME_LETTER.match(lt) for lt in (f.get("letters") or {}))
+        if (name in ("T", "tau", "Tau") and timel) or (
+            _TIME_DESC.search(f.get("desc") or "") and (timel or name == "T")
+        ):
+            best = name if best is None or name == "T" else best
+    bound = sorted(
+        n
+        for n, e in letters.items()
+        if _TIME_LETTER.match(n)
+        and e.get("verdict") in ("index", "alias")
+        and (best is None or e.get("family") in (best, None))
+    )
+    return {"family": best, "letters": bound}
 
 
 def proposed_index_lines(record: dict) -> list[str]:

@@ -182,6 +182,7 @@ def page_payload(
             "declared_index_are_letters": idx.get("declared_index_are_letters", []),
             "counts": idx.get("counts", {}),
             "rows": idx.get("rows", {}),
+            "time": idx.get("time", {"family": None, "letters": []}),
         },
     }
 
@@ -473,6 +474,8 @@ body{background:var(--page1);color:var(--ink);font:17px/1.5 -apple-system,BlinkM
 .actions{display:flex;gap:10px;margin-top:12px;justify-content:center}
 .actions button{flex:0 1 190px;font:inherit;font-size:16px;font-weight:700;border:1.5px solid var(--line);background:var(--card2);color:var(--ink);border-radius:14px;padding:8px 12px;min-height:50px}
 .actions #menuBtn{flex:0 0 60px}
+.walk .wm{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--card2);color:var(--ink);border-radius:999px;padding:6px 12px;margin:6px 6px 0 0}.walk .wm.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.time{color:var(--accent)}
 #menu{margin:0 0 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center;border-bottom:1px dashed var(--line);padding-bottom:12px}
 #menu button{font:inherit;font-size:15px;font-weight:700;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:7px 10px}
 #menu button.bad{color:var(--bad);border-color:var(--bad)}
@@ -634,6 +637,9 @@ function roleOf(id){ const h = S.roles[id]; return h ? h.role : proposed(id).rol
 function decided(id){ return !!S.roles[id]; }
 function spanOf(id){ const h = S.roles[id]; if (h && h.span) return h.span; return proposed(id).span || null; }
 function letterState(l){ const e = D.indices.letters[l] || {}; const h = S.indices[l] || {}; return {e, h, fam: h.family !== undefined && h.family !== "" ? h.family : (e.family || "")}; }
+function rowsWithFamily(f){ const out = []; if (!f) return out; for (const [k, r] of Object.entries(D.indices.rows || {})){ const hit = (r.binders || []).some(b => b.family === f) || Object.keys(r.letters || {}).some(l => letterState(l).fam === f); if (hit){ const id = k.startsWith("eq-") ? EQ2M[k] : k; if (id && D.maths[id]) out.push(id); } } return [...new Set(out)].sort(); }
+function walkIds(it){ return walk.mode === "family" ? rowsWithFamily(letterState(it).fam) : rowsWith(it); }
+const TIME = (D.indices.time || {}); function isTimeFam(f){ return !!f && f === TIME.family; } function isTimeLetter(l){ return (TIME.letters || []).includes(l) || isTimeFam(letterState(l).fam); }
 function rowsWith(l){ const out = []; for (const [k, r] of Object.entries(D.indices.rows || {})) if (r.letters && r.letters[l] !== undefined){ const id = k.startsWith("eq-") ? EQ2M[k] : k; if (id && D.maths[id]) out.push(id); } return out.sort(); }
 const FAMS = Object.keys(D.indices.families).sort((a, b) => Object.values(D.indices.families[b].letters || {}).reduce((x, y) => x + y, 0) - Object.values(D.indices.families[a].letters || {}).reduce((x, y) => x + y, 0));
 
@@ -684,7 +690,7 @@ function markFor(p){ const id = focusId(); if (!id) return null; const m = D.mat
 function paintText(){ let html = "", lastSec = null; for (const p of D.paras){ if (p.section !== lastSec){ lastSec = p.section; if (p.section) html += '<h4 class="sec">' + esc(p.section) + "</h4>"; } html += paraHTML(p, markFor(p)); } $("text").innerHTML = html; }
 function repaintPara(i){ const p = PARA[i]; if (!p) return; const el = document.querySelector('p.para[data-i="' + i + '"]'); if (!el) return; const tmp = document.createElement("div"); tmp.innerHTML = paraHTML(p, markFor(p)); el.replaceWith(tmp.firstChild); typeset(document.querySelector('p.para[data-i="' + i + '"]')); }
 function refreshEl(id){ const m = D.maths[id]; if (m.block !== undefined && PARA[m.block]) repaintPara(m.block); else document.querySelectorAll('[data-id="' + id + '"]').forEach(el => { el.className = el.className.replace(/\br-\w+/, "r-" + roleOf(id)).replace(/ h\b/, "") + (decided(id) ? " h" : ""); }); }
-let lastMarked = null, walk = {letter: null, i: 0};
+let lastMarked = null, walk = {letter: null, i: 0, mode: "letter"};
 function light(ids, curId){
   document.querySelectorAll(".cur, .hasL").forEach(el => el.classList.remove("cur", "hasL"));
   ids.forEach(id => document.querySelectorAll('#mid [data-id="' + id + '"]').forEach(el => el.classList.add("hasL")));
@@ -718,7 +724,7 @@ function paintTop(){
     html += '<div class="done">' + (Q[S.round].length ? "🎉 round complete" : "nothing to decide in this round") + '<div class="ev">' + (nextRoundWithOpen() ? "next: " + ROUNDS.find(x => x[0] === nextRoundWithOpen())[1] : "all rounds done — export your decisions (☰)") + "</div></div>";
   } else if (S.round === "indices"){
     const st = letterState(it), e = st.e; const ids = rowsWith(it); const famDesc = st.fam && D.indices.families[st.fam] ? D.indices.families[st.fam].desc : "";
-    html += '<div class="kicker">index letter ' + (pos() + 1) + " of " + Q.indices.length + "</div>";
+    html += '<div class="kicker">index letter ' + (pos() + 1) + " of " + Q.indices.length + (isTimeLetter(it) ? ' · <b class="time">⏱ time index</b>' : "") + "</div>";
     html += '<div class="big mono">' + esc(it) + ' <span class="arrow">→</span> ' + (st.fam ? esc(st.fam) : '<span class="q">?</span>') + "</div>";
     html += '<div class="prop">proposed: <b>' + esc(e.verdict || "?") + "</b> (" + esc(e.rule || "no rule") + ")" + (e.family ? " · family " + esc(e.family) : "") + (famDesc ? ' · <i>' + esc(famDesc.slice(0, 70)) + "</i>" : "") + (e.desc ? ' · paper: “' + esc(e.desc.slice(0, 60)) + "”" : "") + (st.h.verdict ? ' · <b class="you">yours: ' + esc(st.h.verdict) + (st.h.family ? " → " + esc(st.h.family) : "") + "</b>" : "") + "</div>";
     html += '<div class="ev">' + esc(evShort(e)) + "</div>";
@@ -730,10 +736,11 @@ function paintTop(){
       html += '<div class="ev">' + (e.verdict === "juxtaposed" ? "Two indices without a comma? Then ✓ index and pick its family. One word (a label)? Then the chip below." : "No letter of this word is bound anywhere: read as a label word; ✓ index only if it really ranges over a set.") + "</div>";
     }
     if (!ids.length) html += '<div class="ev">no formula carries it in a subscript</div>';
+    if (st.fam){ const nf = rowsWithFamily(st.fam).length; html += '<div class="walk"><button id="walkLetter" class="wm' + (walk.mode !== "family" ? " on" : "") + '">◂▸ formulas with ' + esc(it) + " (" + ids.length + ')</button><button id="walkFam" class="wm' + (walk.mode === "family" ? " on" : "") + '">◂▸ family ' + esc(st.fam) + (isTimeFam(st.fam) ? " ⏱" : "") + " (" + nf + ")</button></div>"; }
   } else if (S.round === "families"){
     const f = D.indices.families[it], h = S.families[it] || {};
     html += '<div class="kicker">family ' + (pos() + 1) + " of " + Q.families.length + "</div>";
-    html += '<div class="big mono">' + esc(it) + (f.cap ? ' <span class="flag">range 1..' + esc(it) + "</span>" : "") + "</div>";
+    html += '<div class="big mono">' + esc(it) + (f.cap ? ' <span class="flag">range 1..' + esc(it) + "</span>" : "") + (isTimeFam(it) ? ' <span class="flag time">⏱ time</span>' : "") + "</div>";
     html += '<div class="prop">letters: <span class="mono">' + esc(Object.entries(f.letters || {}).map(([l, n]) => l + "×" + n).join(", ") || "-") + "</span> · " + (f.declared_as ? "declared as " + esc(f.declared_as) : '<span class="flag warn">not declared</span>') + (f.desc ? ' · paper: “' + esc(f.desc.slice(0, 80)) + "”" : "") + (h.verdict ? ' · <b class="you">yours: ' + esc(h.verdict) + "</b>" : "") + "</div>";
     const subs = Object.entries(f.subsets || {});
     if (subs.length) html += '<div class="ev">used with subsets: <span class="mono">' + subs.map(([k, n]) => esc(k) + "×" + n).join(", ") + "</span> — one family, the subsets become attributes (predicates) of it</div>";
@@ -746,18 +753,20 @@ function paintTop(){
     if (roleOf(it) === "definition") html += spanLine(spanOf(it));
   }
   $("item").innerHTML = html; typeset($("item"));
+  const setWalk = m => { const it2 = current(); if (!it2) return; walk = {letter: it2, i: 0, mode: m}; const ids2 = walkIds(it2); light(ids2, ids2[0] || null); paintWalk(); paintTop(); };
+  const wl = $("walkLetter"), wf = $("walkFam"); if (wl) wl.addEventListener("click", () => setWalk("letter")); if (wf) wf.addEventListener("click", () => setWalk("family"));
   const ri = $("renameInp"); if (ri) ri.addEventListener("change", () => { snap(); const cur = S.families[it] || {verdict: "family"}; S.families[it] = {verdict: cur.verdict, rename: ri.value.trim()}; save(); paintRounds(); });
 }
 function propLine(pr, yours){ return '<div class="prop">proposed: <b class="r-' + esc(pr.role) + '">' + esc(pr.role) + "</b> (" + esc(pr.rule || "no rule") + ")" + (pr.note ? ' · <span class="flag warn">' + esc(pr.note) + "</span>" : "") + (yours ? ' · <b class="you">yours: ' + esc(yours) + "</b>" : "") + "</div>"; }
 function spanLine(sp){ if (!sp) return '<div class="ev">no defining sentence proposed — select it in the text, then “cite selection”</div>'; return '<div class="span"><span class="deftext">“' + esc(sp.text) + '”</span><div class="ev">' + esc(citation(sp)) + " · words " + esc(sp.position || "?") + " · source <b>" + esc(sp.source || "rule") + "</b></div></div>"; }
 function lettersLine(id){ const m = D.maths[id]; const rk = m.where === "display" ? (m.eq || null) : id; const row = rk && D.indices.rows ? D.indices.rows[rk] : null; if (!row) return ""; const letters = Object.keys(row.letters).sort(); return '<div class="ev">' + (row.binders.length ? "binds: " + esc(row.binders.map(binderText).join(" · ")) + " · " : "") + "letters: " + letters.map(l => { const st = letterState(l); return '<span class="mono">' + esc(l) + "→" + esc(st.fam || "?") + "</span>"; }).join(", ") + "</div>"; }
 function nextRoundWithOpen(){ const i = ROUNDS.findIndex(x => x[0] === S.round); for (let k = 1; k <= ROUNDS.length; k++){ const r = ROUNDS[(i + k) % ROUNDS.length][0]; if (Q[r].some(it => !isDone(r, it))) return r; } return null; }
-function walkTo(dir){ const it = current(); if (!it || S.round !== "indices" || adhoc) return; const ids = rowsWith(it); if (!ids.length) return; if (walk.letter !== it){ walk = {letter: it, i: 0}; } walk.i = (walk.i + dir + ids.length) % ids.length; light(ids, ids[walk.i]); paintWalk(); }
+function walkTo(dir){ const it = current(); if (!it || S.round !== "indices" || adhoc) return; const ids = walkIds(it); if (!ids.length) return; if (walk.letter !== it){ walk = {letter: it, i: 0, mode: "letter"}; } walk.i = (walk.i + dir + ids.length) % ids.length; light(ids, ids[walk.i]); paintWalk(); }
 function paintWalk(){
-  const it = current(); const ids = (!adhoc && it && S.round === "indices") ? rowsWith(it) : [];
+  const it = current(); const ids = (!adhoc && it && S.round === "indices") ? walkIds(it) : [];
   const on = ids.length > 0;
   $("navs").classList.toggle("hidden", !on); $("walkbox").classList.toggle("hidden", !on);
-  if (on) $("walkbox").textContent = "formula " + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length;
+  if (on) $("walkbox").textContent = (walk.mode === "family" ? "family " + letterState(it).fam + ": " : "") + "formula " + ((walk.letter === it ? walk.i : 0) + 1) + " of " + ids.length;
 }
 $("navL").addEventListener("click", () => walkTo(-1)); $("navR").addEventListener("click", () => walkTo(1));
 
@@ -774,7 +783,7 @@ function paintBottom(){
     // a decorated letter (f', f-hat) usually ranges over its base letter's family: offer it as one tap
     const base = st.e.base && st.e.base !== it ? st.e.base : null; const bfam = base ? letterState(base).fam : "";
     const same = bfam ? '<button class="dec fam same' + (st.fam === bfam ? " on" : "") + '" data-fam="' + esc(bfam) + '">same as ' + esc(base) + " → " + esc(bfam) + "</button>" : "";
-    html += '<div class="fams">' + same + chips.filter(f => f !== bfam).map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
+    html += '<div class="fams">' + same + chips.filter(f => f !== bfam).map(f => '<button class="dec fam' + (st.fam === f ? " on" : "") + '" data-fam="' + esc(f) + '">' + esc(f) + (isTimeFam(f) ? " ⏱" : "") + "</button>").join("") + '<button class="dec fam" data-fam="…">other…</button></div>';
     const runs = Object.keys(st.e.runs || {});
     if (runs.length) html += '<div class="fams">' + runs.map(r => '<button class="dec lab' + (S.labels[r] ? " on" : "") + '" data-lab="' + esc(r) + '">＋ “' + esc(r) + '” is a label word</button>').join("") + "</div>";
   } else if (S.round === "families"){
@@ -878,10 +887,10 @@ function paintAll(scroll){
   if (S.pos[S.round] === undefined || S.pos[S.round] < 0) S.pos[S.round] = nextOpen(-1);
   paintRounds(); paintText(); paintTables(); paintTop(); paintBottom();
   const it = current();
-  if (!adhoc && it && S.round === "indices" && walk.letter !== it) walk = {letter: it, i: 0};
+  if (!adhoc && it && S.round === "indices" && walk.letter !== it) walk = {letter: it, i: 0, mode: "letter"};
   paintWalk();
   if (adhoc) light([], adhoc);
-  else if (it && S.round === "indices"){ const ids = rowsWith(it); if (walk.letter !== it) walk = {letter: it, i: 0}; light(ids, ids[walk.i] || null); }
+  else if (it && S.round === "indices"){ if (walk.letter !== it) walk = {letter: it, i: 0, mode: "letter"}; const ids = walkIds(it); light(ids, ids[walk.i] || null); }
   else if (it && (S.round === "defs" || S.round === "forms")) light([], it);
   else light([], null);
   typeset($("mid"));
@@ -889,7 +898,7 @@ function paintAll(scroll){
 paintAll(true);
 pullState().then(changed => { if (changed){ paintAll(true); toast("continued from the machine's copy"); } });
 whenMathJax(() => typeset(document));
-window.__discover = {S: () => S, Q, current, setRound, goTo, goBack, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
+window.__discover = {S: () => S, Q, current, setRound, goTo, goBack, walkIds, rowsWithFamily, isTimeLetter, decideRole, decideLetter, exportPayload, importJSON, typeset, plainOf, plainOffset, selectionInfo, roleOf, spanOf, walkTo, rowsWith, isDone, pos};
 </script>
 </body>
 </html>
