@@ -259,6 +259,11 @@ _DECL = re.compile(r"^\s*%@\s*(index|param|var)\s+([A-Za-z_]\w*)\b(.*)$")
 # -- normalisation ----------------------------------------------------------
 
 
+_NUMBER_SET = re.compile(
+    r"\\(?:mathbb|mathbf|Bbb)\s*\{\s*[RNZQC]\s*\}|\\(?:R|N|Z|Q|C)(?![A-Za-z])(?=\s*(?:[\^_,.;]|$))|[ℝℕℤℚℂ]"
+)
+
+
 def _strip_wrappers(s: str) -> str:
     for _ in range(4):
         before = s
@@ -301,6 +306,9 @@ def normalise(latex: str) -> str:
     )
     s = re.sub(r"\\(?:left|right|Bigl|Bigr|bigl|bigr|big|Big)\s*(?=[\(\)\[\]\{\}\|.\\])", "", s)
     s = re.sub(r"\\(?:,|;|!|quad|qquad|:|>)", " ", s)
+    # a number set (\mathbb{R}, ℝ, \mathbb{Z}_{+}, ...) is a domain, never an index family:
+    # "Q \in \mathbb{R}" says Q is real-valued, it binds nothing (Joern, 2026-10-07)
+    s = _NUMBER_SET.sub(r"\\numberset ", s)
     s = _strip_wrappers(s)
     # accents and primes become name suffixes, as the lp2graph normaliser spells them
     for _ in range(3):

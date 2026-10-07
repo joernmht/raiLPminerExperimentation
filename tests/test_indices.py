@@ -318,3 +318,39 @@ def test_two_letter_names_in_binders_and_family_superscripts() -> None:
     assert fam["indexed_by"] == ["dr", "st"] and fam["subsets"] == {
         "de_dis": 1
     }  # subscript first, superscript after
+
+
+def test_a_number_set_is_a_domain_not_an_index_family() -> None:
+    """Joern, 2026-10-07: "Q is an element of the real numbers" (trb.2025.103233)."""
+    discovery = {
+        "maths": [
+            {
+                "id": "m-0001",
+                "where": "inline",
+                "cls": "statement",
+                "ok": True,
+                "latex": r"Q \in \mathbb{R}",
+            },
+            {
+                "id": "m-0002",
+                "where": "inline",
+                "cls": "statement",
+                "ok": True,
+                "latex": r"\eta \in ℝ",
+            },
+            {
+                "id": "m-0003",
+                "where": "inline",
+                "cls": "statement",
+                "ok": True,
+                "latex": r"r \in \mathcal{R}",
+            },
+        ],
+        "tables": [],
+        "deflists": [],
+    }
+    rec = indices.analyse([("eq-0001", r"F_{Q} + x_{r} \le 1")], discovery)
+    assert rec["letters"].get("Q", {}).get("verdict") != "index"
+    assert "eta" not in rec["letters"] or rec["letters"]["eta"]["verdict"] != "index"
+    assert rec["letters"]["r"]["family"] == "R"  # a calligraphic set is still a family
+    assert "R" in rec["families"] and len([f for f in rec["families"] if f == "R"]) == 1
