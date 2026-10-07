@@ -354,3 +354,14 @@ def test_a_number_set_is_a_domain_not_an_index_family() -> None:
     assert "eta" not in rec["letters"] or rec["letters"]["eta"]["verdict"] != "index"
     assert rec["letters"]["r"]["family"] == "R"  # a calligraphic set is still a family
     assert "R" in rec["families"] and len([f for f in rec["families"] if f == "R"]) == 1
+
+
+def test_the_time_index_is_t_over_T_but_not_trains_named_T() -> None:
+    """Joern, 2026-10-07: find the time index, "almost exclusively T"."""
+    timed = indices.analyse(
+        [("eq-0001", r"\sum_{t \in T} x_{i,t} = 1 \quad \forall i \in I")], None
+    )
+    assert timed["time"] == {"family": "T", "letters": ["t"]}
+    assert timed["families"]["T"]["time"] is True and timed["families"]["I"]["time"] is False
+    trains = indices.analyse([("eq-0001", r"\sum_{i \in T} y_{i} \le 1")], None)
+    assert trains["time"]["family"] is None  # T is the set of trains here
