@@ -122,3 +122,25 @@ def test_load_decisions_merges_v1_and_v2_last_wins_and_validates(tmp_path: Path)
     assert discovergame.validate_export(
         dict(v2, roles={"m-1": {"role": "definition", "span": {"para": 1}}})
     )
+
+
+def test_the_labelling_guide_covers_every_decision_case() -> None:
+    """Lab issue #15: one worked example per decision case, for colleagues."""
+    from corpusbuilder import discoverguide
+
+    page = discoverguide.guide_html()
+    assert page == discoverguide.guide_html()  # deterministic
+    for case in (
+        "notation table",
+        "bound by a sum",
+        "variable",
+        "parameter",
+        "not a declaration",
+        "number set",
+        "two-letter",
+        "part of a name",
+        "glued",
+        "Capital",
+    ):
+        assert case in page, case
+    assert "d^{+}" in page and r"t_e - \bar t_e" in page

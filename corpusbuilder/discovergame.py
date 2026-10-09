@@ -269,6 +269,11 @@ def build_all(
     # the worklist order: papers where confirmed indices could flip the most rows first
     rows.sort(key=lambda r: (-r["at_stake"], -r["rows_probed"], r["key"]))
     build_index(rows, index_page)
+    from corpusbuilder import discoverguide  # the guide sits next to the worklist
+
+    (index_page.parent / "guide.html").write_text(
+        discoverguide.guide_html(), encoding="utf-8", newline="\n"
+    )
     return rows
 
 
@@ -587,7 +592,7 @@ window.MathJax = {tex: {inlineMath: [["\\(", "\\)"]], displayMath: [["\\[", "\\]
     <button id="importBtn">⬆ Import</button><input type="file" id="importFile" accept="application/json" class="hidden">
     <button id="labelBtn">＋ propose a label word</button>
     <button id="clearBtn" class="bad">✕ Clear this paper</button>
-    <a href="../discover.html">← worklist</a>
+    <a href="../discover.html">← worklist</a> · <a href="../guide.html">guide</a>
   </div>
   <div id="decide"></div>
   <div class="actions"><button id="menuBtn" title="menu">☰</button><button id="backBtn" title="back to the item before, decided or not">◂ back</button><button id="undoBtn" title="undo">↶ undo</button><button id="skipBtn" title="skip">skip ▸</button></div>
@@ -918,6 +923,7 @@ INDEX_TEMPLATE = r"""<!DOCTYPE html>
 <div class="proto">working prototype — discovery round: deterministic marks, human decisions</div>
 <div class="eyebrow">Discovery round</div>
 <h1>Every paper, every formula</h1>
+<p><a href="guide.html"><b>New here? How to decide: one example per case →</b></a></p>
 <div class="sub">Worklist order: papers where confirmed indices and families could flip the most rows come first ("rows at stake" = rows that fail in an index-related class of the last promotion run). Open a paper, decide its letters in "Formulas × indices", skim "Statements in prose", export. Progress comes from this browser's storage.</div>
 <div class="card"><table class="grid" id="papers"></table></div>
 <script id="rows" type="application/json">__ROWS__</script>
