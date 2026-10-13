@@ -18,7 +18,7 @@ from unittest import mock
 import pytest
 import requests
 
-from corpusbuilder import cli
+from corpusbuilder import cli, mathml
 from corpusbuilder._http import (
     RETRYABLE_STATUS,
     AcquisitionError,
@@ -439,6 +439,45 @@ def test_missing_credential_aborts_instead_of_recording_a_tier_miss(
     assert rc != cli.EXIT_TRANSIENT
     assert list(tmp_path.glob("*.json")) == []  # nothing persisted…
     assert list(tmp_path.glob("*.md")) == []  # …so PRISMA cannot learn anything from it
+
+
+_ELS_FULL_TEXT = """<?xml version="1.0"?>
+<full-text-retrieval-response xmlns:ce="http://www.elsevier.com/xml/common/dtd"
+                              xmlns:mml="http://www.w3.org/1998/Math/MathML">
+  <ce:sections>
+    <ce:formula id="fd1"><mml:math><mml:mi>x</mml:mi></mml:math></ce:formula>
+  </ce:sections>
+</full-text-retrieval-response>"""
+
+
+@pytest.mark.parametrize("missing", ["node", "npm-install"])
+def test_missing_mathml_toolchain_aborts_instead_of_recording_a_tier_miss(
+    tmp_path, _no_openalex, monkeypatch, missing
+) -> None:
+    """ADR-0007 again: no Node on this machine says nothing about the paper.
+
+    Pre-fix, the bridge's setup checks raised a plain ``MathMLConversionError``
+    from inside the real ``extract_formulas``; the ladder took the permanent-miss
+    branch and saved a 0-formula dossier, which ``prisma.py`` counts as
+    ``no_machine_readable_formulas`` for a paper whose formulas were never read.
+    """
+    _no_openalex(_dossier())
+    if missing == "node":
+        monkeypatch.setattr(mathml.shutil, "which", lambda name: None)
+    else:
+        monkeypatch.setattr(mathml.shutil, "which", lambda name: "/usr/bin/node")
+        monkeypatch.setattr(mathml, "_BRIDGE", tmp_path / "no-bridge")
+    with mock.patch.object(cli.ElsevierClient, "full_text_xml", return_value=_ELS_FULL_TEXT):
+        rc = cli.cmd_dossier(_args(tmp_path))
+    assert rc == cli.EXIT_CONFIG
+    assert list(tmp_path.glob("*.json")) == []
+    assert list(tmp_path.glob("*.md")) == []
+
+
+def test_toolchain_error_is_still_a_conversion_error() -> None:
+    """Existing ``except MathMLConversionError`` handlers keep catching it."""
+    assert issubclass(mathml.MathMLToolchainMissing, mathml.MathMLConversionError)
+    assert issubclass(mathml.MathMLToolchainMissing, cli.config.ConfigError)
 
 
 def test_openalex_transient_failure_aborts_before_any_tier(tmp_path, _no_openalex, monkeypatch):

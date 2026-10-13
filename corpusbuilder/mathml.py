@@ -19,6 +19,8 @@ import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
+from corpusbuilder.config import ConfigError
+
 _BRIDGE = Path(__file__).resolve().parent / "_mathml2latex"
 _CONVERT = _BRIDGE / "convert.js"
 _MATHML_NS = "http://www.w3.org/1998/Math/MathML"
@@ -26,6 +28,18 @@ _MATHML_NS = "http://www.w3.org/1998/Math/MathML"
 
 class MathMLConversionError(RuntimeError):
     pass
+
+
+class MathMLToolchainMissing(MathMLConversionError, ConfigError):
+    """The node bridge cannot run on *this machine*: no ``node`` on PATH, or
+    ``npm install`` never ran in the bridge directory.
+
+    Also a :class:`~corpusbuilder.config.ConfigError`, because it says nothing
+    about the paper being converted. ``cmd_dossier`` catches that first and aborts
+    (exit 3, nothing written) instead of saving a 0-formula Tier-2 dossier, which
+    ``prisma.py`` would count as ``no_machine_readable_formulas``. Handlers that
+    catch :class:`MathMLConversionError` keep working. See ADR-0007.
+    """
 
 
 @dataclass(frozen=True, slots=True)
@@ -53,9 +67,9 @@ def mathml_to_latex(mathml_list: list[str], timeout: float = 120.0) -> list[Conv
     if not mathml_list:
         return []
     if shutil.which("node") is None:
-        raise MathMLConversionError("`node` not found on PATH; install Node.js")
+        raise MathMLToolchainMissing("`node` not found on PATH; install Node.js")
     if not (_BRIDGE / "node_modules").exists():
-        raise MathMLConversionError(
+        raise MathMLToolchainMissing(
             f"mathml-to-latex not installed; run `npm install` in {_BRIDGE}"
         )
     payload = json.dumps([_normalize(m) for m in mathml_list])
