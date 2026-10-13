@@ -93,7 +93,7 @@ def _software_versions() -> dict[str, str]:
     ``_versioned_resources`` stamps lp2graph's frozen *resource* versions
     (lexicon, thesaurus, ...), which pin the inputs of the method but say
     nothing about the implementation. The dependency is declared as
-    ``lp2graph[mining,solver]>=0.3`` — unbounded — so two artifact sets with
+    ``lp2graph[mining,solver]>=0.4`` — unbounded — so two artifact sets with
     identical resource stamps can still come from different algorithms. Record
     the library, the harness and the interpreter so an artifact is traceable to
     the code that emitted it.
