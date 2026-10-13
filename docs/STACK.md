@@ -173,10 +173,14 @@ Python's preferred encoding to ASCII — the compatibility gate for ADR-0016.
 - **Secrets** (`config.py`): API keys read only via accessors from
   `~/.config/raiLP/secrets.env` (chmod 600) or repo `.env` (git-ignored); never
   echoed in error messages (only paths/response bodies are).
-- **Open items / watch:** the ScienceDirect DOI is interpolated into the request
-  path (`article/doi/{doi}`) without validation — low risk (DOI comes from
-  OpenAlex, target is a fixed host) but a malformed DOI could reshape the path;
-  consider a DOI-shape guard. HTTP clients rely on `requests`' default TLS
+- **Identifiers in URLs** (`identifiers.py`, 2026-10-13): every DOI / arXiv id
+  is shape-checked before it is interpolated into a request path or the Scopus
+  query (`openalex.get_work`, `elsevier.full_text_xml`,
+  `elsevier.scopus_cited_by_count`, `arxiv.normalize_arxiv_id`). `requests`
+  normalises `..` segments, so `10.1016/x/../../authors/A1?x=` had addressed a
+  different endpoint with the Elsevier key attached. A malformed identifier is
+  a *permanent* client error, raised before any request.
+- **Open items / watch:** HTTP clients rely on `requests`' default TLS
   verification (good) and set no explicit `verify=`.
 
 ## Reliability posture (acquisition boundary)

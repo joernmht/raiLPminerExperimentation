@@ -28,6 +28,7 @@ from corpusbuilder._http import (
     request_with_retry,
 )
 from corpusbuilder.dossier import ExtractionMethod, FormulaRecord, VerificationStatus
+from corpusbuilder.identifiers import InvalidIdentifier, check_doi
 from corpusbuilder.mathml import mathml_to_latex
 
 _BASE = "https://api.elsevier.com/content"
@@ -61,6 +62,18 @@ def is_elsevier_doi(doi: str | None) -> bool:
 
 class ElsevierError(AcquisitionError):
     pass
+
+
+def _checked_doi(doi: str) -> str:
+    """A DOI safe to put in a URL path or a Scopus query, else a permanent error.
+
+    The request would carry the API key, so a DOI that could re-route the path
+    (``..`` segments, ``?``, ``#``) must never reach ``_get``. See ``identifiers``.
+    """
+    try:
+        return check_doi(doi)
+    except InvalidIdentifier as e:
+        raise ElsevierError(str(e), transient=False) from e
 
 
 class ElsevierClient:
@@ -110,7 +123,7 @@ class ElsevierClient:
     # -- full text ----------------------------------------------------------
 
     def full_text_xml(self, doi: str) -> str:
-        r = self._get(f"article/doi/{doi}", "text/xml")
+        r = self._get(f"article/doi/{_checked_doi(doi)}", "text/xml")
         if r.status_code != 200:
             raise ElsevierError(
                 f"Elsevier HTTP {r.status_code} for {doi}: {r.text[:200]}",
@@ -169,7 +182,7 @@ class ElsevierClient:
         r = self._get(
             "search/scopus",
             "application/json",
-            params={"query": f"DOI({doi})", "field": "citedby-count"},
+            params={"query": f"DOI({_checked_doi(doi)})", "field": "citedby-count"},
         )
         if r.status_code == 404:
             return None  # Scopus answered: the DOI is not indexed
