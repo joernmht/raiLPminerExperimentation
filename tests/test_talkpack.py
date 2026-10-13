@@ -19,7 +19,8 @@ from pathlib import Path
 
 import pytest
 
-# talkpack pins a headless backend at import; CI installs [dev,corpus] only.
+# talkpack pins a headless backend at import (the `figures` extra, which CI
+# installs); without it these tests skip rather than abort collection.
 pytest.importorskip("matplotlib")
 
 import matplotlib
