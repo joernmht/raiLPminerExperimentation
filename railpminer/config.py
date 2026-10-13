@@ -45,6 +45,13 @@ class PipelineConfig:
     #: Tolerance for the external-fidelity optimum check ``|z* - z_paper| <= eps``.
     optimum_tolerance: float = 1e-6
 
+    #: Independent solvers of the external-fidelity check, in run order. Fixed
+    #: here rather than discovered, so the artifacts do not depend on what a
+    #: machine happens to have installed or licensed: Gurobi (commercial,
+    #: licence-gated) runs only when listed. A listed solver that is not
+    #: available is reported in the validation notes, never dropped silently.
+    solvers: tuple[str, ...] = ("CBC", "HiGHS")
+
     @property
     def formulations_dir(self) -> Path:
         return self.corpus_dir / "formulations"

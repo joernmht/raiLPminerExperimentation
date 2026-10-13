@@ -6,7 +6,10 @@ import sys
 import types
 from types import SimpleNamespace
 
+import pytest
+
 from railpminer import clustering, validation
+from railpminer.config import PipelineConfig
 from railpminer.validation import run_validation, structural_fidelity
 
 
@@ -71,7 +74,7 @@ def test_solver_instances_are_never_reused_across_solves(corpus, config, monkeyp
     class _Recorder:
         """Stands in for a pulp solver; records that a fresh one was made."""
 
-    def _fake_solvers():
+    def _fake_solvers(*_requested):
         def make():
             s = _Recorder()
             built.append(s)
@@ -105,3 +108,35 @@ def test_optimum_tolerance_scales_with_the_objective() -> None:
     # absolute 1e-6 test could never satisfy for any floating-point solver.
     assert validation._within(3_700_000.0000001, 3_700_000.0, eps)
     assert not validation._within(3_700_010.0, 3_700_000.0, eps)
+
+
+# ---------------------------------------------------------------------------
+# The solver set is configuration, not machine discovery
+# ---------------------------------------------------------------------------
+
+
+def _pretend_installed(monkeypatch, *names: str) -> None:
+    import pulp
+
+    monkeypatch.setattr(pulp, "listSolvers", lambda onlyAvailable=False: list(names))
+
+
+def test_default_config_ignores_a_licensed_gurobi(monkeypatch) -> None:
+    """Artifacts must not change because this machine happens to have Gurobi."""
+    pytest.importorskip("pulp")
+    _pretend_installed(monkeypatch, "PULP_CBC_CMD", "HiGHS", "GUROBI")
+    used = [name for name, _ in validation._available_solvers(PipelineConfig().solvers)]
+    assert used == ["CBC", "HiGHS"]
+
+
+def test_gurobi_runs_only_when_requested(monkeypatch) -> None:
+    pytest.importorskip("pulp")
+    _pretend_installed(monkeypatch, "PULP_CBC_CMD", "HiGHS", "GUROBI_CMD")
+    used = [name for name, _ in validation._available_solvers(("Gurobi", "CBC"))]
+    assert used == ["Gurobi", "CBC"]  # requested order, CMD fallback accepted
+
+
+def test_a_requested_but_missing_solver_is_reported() -> None:
+    assert validation._solver_notes(("CBC", "HiGHS"), ("CBC", "HiGHS")) == []
+    (note,) = validation._solver_notes(("CBC", "HiGHS", "Gurobi"), ("CBC",))
+    assert "HiGHS, Gurobi" in note and "ran on CBC" in note
