@@ -36,6 +36,11 @@ _Last verified: 2026-09-07 (nightly quality pass — Compatibility)._
 - `PySocks>=1.7` — SOCKS routing through an SSH tunnel for entitled Elsevier
   full text from a campus IP (ADR-0003).
 
+### `figures` extra (`pip install -e .[figures]`)
+- `matplotlib>=3.8` — `corpusbuilder.talkpack` / `fingerprint` figures (imported at
+  module level). CI installs it in every test job: until 2026-10-13 it was only in
+  `notebooks`, so the 56 talkpack/fingerprint tests skipped in CI on every run.
+
 ### `notebooks` extra
 - `pandas`, `matplotlib`, `plotly`, `jupyter` — analysis notebooks only.
 

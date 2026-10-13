@@ -15,7 +15,8 @@ from pathlib import Path
 
 import pytest
 
-# talkpack imports matplotlib at module level; CI installs [dev,corpus] only.
+# talkpack imports matplotlib at module level (the `figures` extra, which CI
+# installs); without it these tests skip rather than abort collection.
 pytest.importorskip("matplotlib")
 
 from corpusbuilder import fingerprint, talkpack
