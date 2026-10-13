@@ -55,11 +55,18 @@ class ArxivError(AcquisitionError):
 
 
 def normalize_arxiv_id(s: str) -> str:
-    """Strip a URL/prefix down to a bare arXiv id (e.g. ``2103.04618``)."""
+    """Strip a URL/prefix down to a bare arXiv id (e.g. ``2103.04618``).
+
+    Raises a permanent :class:`ArxivError` when no id is found. The input used to
+    be returned unchanged, and it then went verbatim into the e-print URL and the
+    extraction directory name (``../x`` included).
+    """
     s = s.strip()
     s = re.sub(r"^arxiv:", "", s, flags=re.I)
     m = re.search(r"((?:\d{4}\.\d{4,5})(?:v\d+)?|[a-z\-]+/\d{7}(?:v\d+)?)", s, re.I)
-    return m.group(1) if m else s
+    if m is None:
+        raise ArxivError(f"not an arXiv id: {s!r}", transient=False)
+    return m.group(1)
 
 
 def fetch_source(

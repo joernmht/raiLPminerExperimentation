@@ -13,6 +13,7 @@ that is why the dossier records the retrieval date.
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 
 import requests
 
@@ -25,6 +26,7 @@ from corpusbuilder._http import (
     request_with_retry,
 )
 from corpusbuilder.dossier import CitationRef, Dossier, SourceInfo
+from corpusbuilder.identifiers import InvalidIdentifier, check_arxiv_id, check_doi
 
 _BASE = "https://api.openalex.org"
 _ARXIV_RE = re.compile(r"arxiv\.org/(?:abs|pdf)/([0-9]{4}\.[0-9]{4,5}|[a-z\-]+/[0-9]{7})", re.I)
@@ -39,6 +41,18 @@ class OpenAlexNotFound(OpenAlexError):
 
     def __init__(self, message: str) -> None:
         super().__init__(message, status=404, transient=False)
+
+
+def _checked(check: Callable[[str], str], value: str) -> str:
+    """Run an identifier shape check; a malformed one is a permanent OpenAlex error.
+
+    Permanent, not transient: re-running cannot fix a malformed identifier, and
+    ``cmd_dossier`` then reports it and writes nothing (see ``identifiers``).
+    """
+    try:
+        return check(value)
+    except InvalidIdentifier as e:
+        raise OpenAlexError(str(e), transient=False) from e
 
 
 class OpenAlexClient:
@@ -103,6 +117,7 @@ class OpenAlexClient:
             if m:
                 arxiv_id = m.group(1)
             arxiv_id = re.sub(r"v\d+$", "", arxiv_id)  # OpenAlex indexes the versionless id
+            _checked(check_arxiv_id, arxiv_id)
             # arXiv mints a DataCite DOI (10.48550/arXiv.<id>); that is the reliable key.
             try:
                 return self._get(f"works/doi:10.48550/arXiv.{arxiv_id}")
@@ -123,10 +138,13 @@ class OpenAlexClient:
         if ident.startswith("W") and ident[1:].isdigit():
             return self._get(f"works/{ident}")
         if "openalex.org/W" in ident:
-            return self._get(f"works/{ident.rstrip('/').rsplit('/', 1)[-1]}")
+            work_id = ident.rstrip("/").rsplit("/", 1)[-1]
+            if re.fullmatch(r"W\d+", work_id) is None:
+                raise OpenAlexError(f"not an OpenAlex work id: {work_id!r}", transient=False)
+            return self._get(f"works/{work_id}")
         # treat as DOI
         doi = ident.replace("https://doi.org/", "").replace("doi:", "")
-        return self._get(f"works/doi:{doi}")
+        return self._get(f"works/doi:{_checked(check_doi, doi)}")
 
     # -- mapping ------------------------------------------------------------
 
