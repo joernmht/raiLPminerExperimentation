@@ -62,18 +62,19 @@ def _abort_transient(stage: str, exc: BaseException) -> int:
 
 
 def _abort_config(stage: str, exc: BaseException) -> int:
-    """Refuse to persist a dossier whose extraction failed for want of a credential.
+    """Refuse to persist a dossier whose extraction failed for want of a credential
+    or a local tool (e.g. the Node MathML bridge).
 
-    The sibling of :func:`_abort_transient`, one layer up: a missing/expired key is
-    a fact about *this machine*, not about the paper. Degrading here would let
+    The sibling of :func:`_abort_transient`, one layer up: a missing/expired key or
+    an uninstalled tool is a fact about *this machine*, not about the paper. Degrading here would let
     ``prisma.py`` publish ``no_machine_readable_formulas`` about a paper nobody ever
     fetched — the ADR-0006 failure mode with a config fault as the trigger. Unlike a
     blip, re-running will not fix it, so this exits 3, not 2. See ADR-0007.
     """
     print(f"ERROR: {stage} could not run — misconfigured ({exc}).", file=sys.stderr)
     print(
-        "Refusing to record a tier miss caused by a missing credential — no dossier "
-        "written. Set the key, then re-run.",
+        "Refusing to record a tier miss caused by this machine's setup (a missing "
+        "credential or tool) — no dossier written. Fix what the error names, then re-run.",
         file=sys.stderr,
     )
     return EXIT_CONFIG

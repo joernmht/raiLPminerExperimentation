@@ -111,3 +111,19 @@ than asserting a fact), and it is already guarded by `config.elsevier_api_key()`
   are guards *upstream* of that weakness. A `tier_attempted` / `tier_outcome` field
   on `SourceInfo` would make the tally robust by construction rather than by
   discipline, at the cost of a `schema_version` bump to `dossier-2`.
+
+## Addendum (2026-10-13): a missing local tool is a config fault too
+
+The first follow-up above came true through a tool rather than a key. Tier-2
+converts Elsevier MathML through a vendored Node bridge, and its two setup checks
+(`node` on PATH, `npm install` run in `corpusbuilder/_mathml2latex`) raised a plain
+`MathMLConversionError(RuntimeError)`. Inside `extract_formulas` that took the
+permanent-miss branch, so a machine without Node saved a 0-formula dossier and
+`prisma.py` counted the paper as `no_machine_readable_formulas`.
+
+Those checks now raise `MathMLToolchainMissing`, which subclasses **both**
+`MathMLConversionError` (existing handlers keep catching it) and
+`config.ConfigError` (so `cmd_dossier` aborts with `EXIT_CONFIG` and writes
+nothing). `_abort_config`'s message now names "a missing credential or tool".
+A conversion that runs and fails for one formula is still a per-formula note,
+not an abort: that *is* a fact about the paper's MathML.
