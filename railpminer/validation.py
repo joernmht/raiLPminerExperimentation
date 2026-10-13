@@ -9,9 +9,10 @@ that says how representative a validated anchor is:
   ``parse(render(f)) ≡ f`` under the canonical normal form (no instance data,
   no solver).
 - **External fidelity** — each model with recoverable instance data is grounded
-  and solved with every available independent solver (CBC, HiGHS, …) and the
-  optimum is checked against the value published with the instance, within a
-  tolerance ``eps``. Cross-solver agreement rules out solver-specific artefacts.
+  and solved with each configured independent solver (``PipelineConfig.solvers``:
+  CBC and HiGHS by default, Gurobi opt-in) and the optimum is checked against the
+  value published with the instance, within a tolerance ``eps``. Cross-solver
+  agreement rules out solver-specific artefacts.
 - **Intra-cluster isomorphism (M6)** — per Level-M cluster, the schema-graph
   isomorphism rate, so a reader can judge how representative the highest-cited
   anchor is.
@@ -24,7 +25,7 @@ from __future__ import annotations
 
 import contextlib
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 
 from lp2graph.codec import canonical_normal_form, from_canonical_latex, to_canonical_latex
@@ -99,8 +100,15 @@ class ExternalFidelity:
     matches_status: bool | None = None
 
 
-def _available_solvers() -> list[tuple[str, Callable[[], object]]]:
-    """Independent solvers pulp can drive here, in a fixed order.
+def _available_solvers(
+    requested: Sequence[str] = ("CBC", "HiGHS"),
+) -> list[tuple[str, Callable[[], object]]]:
+    """The *requested* solvers pulp can drive here, in the requested order.
+
+    Only requested solvers are used (``PipelineConfig.solvers``). Using every
+    installed one made the artifacts depend on the machine: a licensed Gurobi
+    added a third solver, a third outcome per instance and different notes, so
+    the same corpus and config gave different ``validation_report.json`` bytes.
 
     Returns **factories**, not instances. A ``pulp`` solver object must not be
     reused across problems: the native-API back-ends are stateful. ``pulp``'s
@@ -122,16 +130,25 @@ def _available_solvers() -> list[tuple[str, Callable[[], object]]]:
     except ModuleNotFoundError:
         return []
     names = pulp.listSolvers(onlyAvailable=True)
-    solvers: list[tuple[str, Callable[[], object]]] = []
+    factories: dict[str, Callable[[], object]] = {}
     if "PULP_CBC_CMD" in names:
-        solvers.append(("CBC", lambda: pulp.PULP_CBC_CMD(msg=False, gapRel=0)))
+        factories["CBC"] = lambda: pulp.PULP_CBC_CMD(msg=False, gapRel=0)
     if "HiGHS" in names:
-        solvers.append(("HiGHS", lambda: pulp.HiGHS(msg=False, gapRel=0)))
+        factories["HiGHS"] = lambda: pulp.HiGHS(msg=False, gapRel=0)
     if "GUROBI" in names:
-        solvers.append(("Gurobi", lambda: pulp.GUROBI(msg=False, gapRel=0)))
+        factories["Gurobi"] = lambda: pulp.GUROBI(msg=False, gapRel=0)
     elif "GUROBI_CMD" in names:
-        solvers.append(("Gurobi", lambda: pulp.GUROBI_CMD(msg=False, gapRel=0)))
-    return solvers
+        factories["Gurobi"] = lambda: pulp.GUROBI_CMD(msg=False, gapRel=0)
+    return [(name, factories[name]) for name in requested if name in factories]
+
+
+def _solver_notes(requested: Sequence[str], used: Sequence[str]) -> list[str]:
+    """Name every requested solver that did not run (the honesty rule)."""
+    missing = [name for name in requested if name not in used]
+    if not missing:
+        return []
+    ran = ", ".join(used) if used else "no solver"
+    return [f"requested solver(s) not available here: {', '.join(missing)}; ran on {ran}."]
 
 
 def _close(backend: object) -> None:
@@ -160,10 +177,10 @@ def _within(value: float, target: float, eps: float) -> bool:
 def external_fidelity(
     corpus: LoadedCorpus, config: PipelineConfig | None = None
 ) -> list[ExternalFidelity]:
-    """Solve every instance with every available solver, vs its published optimum."""
+    """Solve every instance with the configured solvers, vs its published optimum."""
     config = config or PipelineConfig()
     by_id = {f.id: f for f in corpus.formulations}
-    solvers = _available_solvers()
+    solvers = _available_solvers(config.solvers)
 
     try:
         from lp2graph.solve import Instance, solve
@@ -363,12 +380,8 @@ def run_validation(
     iso = _isomorphism(formulations, tax)
     reps = _representatives(corpus, tax, external)
 
-    solvers_used = tuple(name for name, _ in _available_solvers())
-    notes: list[str] = []
-    if "Gurobi" not in solvers_used:
-        notes.append(
-            "Gurobi not available here; cross-solver check ran on " + ", ".join(solvers_used) + "."
-        )
+    solvers_used = tuple(name for name, _ in _available_solvers(config.solvers))
+    notes = _solver_notes(config.solvers, solvers_used)
     return ValidationReport(
         solvers_used=solvers_used,
         structural=tuple(structural),
