@@ -34,9 +34,11 @@ from .pipeline import run
 
 def _config(args: argparse.Namespace) -> PipelineConfig:
     base = PipelineConfig()
+    corpus = getattr(args, "corpus", None)
+    output = getattr(args, "output", None)
     return PipelineConfig(
-        corpus_dir=Path(args.corpus) if args.corpus else base.corpus_dir,
-        output_dir=Path(args.output) if args.output else base.output_dir,
+        corpus_dir=Path(corpus) if corpus else base.corpus_dir,
+        output_dir=Path(output) if output else base.output_dir,
         cluster=base.cluster,
         labeling=base.labeling,
         optimum_tolerance=base.optimum_tolerance,
@@ -163,10 +165,22 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     # Shared options usable either before or after the subcommand, so both
-    # `railpminer --output X run` and `railpminer run --output X` work.
+    # `railpminer --output X run` and `railpminer run --output X` work. The
+    # subparsers reuse these definitions, and a subparser writes its defaults
+    # over whatever the main parser already parsed, so a plain `default=None`
+    # silently discarded `--output X` given *before* the subcommand. SUPPRESS
+    # leaves an absent option unset instead; `_config` supplies the fallback.
     common = argparse.ArgumentParser(add_help=False)
-    common.add_argument("--corpus", help="corpus directory (default: ./corpus)")
-    common.add_argument("--output", help="output directory (default: ./outputs)")
+    common.add_argument(
+        "--corpus",
+        default=argparse.SUPPRESS,
+        help="corpus directory (default: corpus/ in the repository)",
+    )
+    common.add_argument(
+        "--output",
+        default=argparse.SUPPRESS,
+        help="output directory (default: outputs/ in the repository)",
+    )
 
     parser = argparse.ArgumentParser(
         prog="railpminer", description=__doc__.splitlines()[0], parents=[common]
