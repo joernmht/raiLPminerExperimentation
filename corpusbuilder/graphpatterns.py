@@ -301,11 +301,85 @@ def star_patterns(s: Star) -> list[str]:
         len(L) == 1
         and not L[0][0]["agg"]
         and L[0][0]["coef"] == "unit"
-        and (s.center["consts"] or s.center["lit"] is not None)
         and not any(k.endswith("big_m") for k, _, _ in s.center["consts"])
     ):
         hits.append("bound_row")
+
+    def count(v, sign):
+        return sum(
+            1
+            for e, _, w in L
+            if w == v and not e["agg"] and e["coef"] == "unit" and e["eff"] == sign
+        )
+
+    once = [(e, lf, v) for e, lf, v in L if sum(w == v for _, _, w in L) == 1]
+    if (
+        cmp in ("eq", "ge")
+        and {"partition_row", "covering_row"} & set(hits)
+        and any(e["agg"] for e, _, _ in L)
+    ):
+        agg_vars = {v for e, _, v in L if e["agg"]}
+        singles = [v for e, _, v in L if not e["agg"]]
+        if len(singles) == 1 and singles[0] not in agg_vars:
+            hits.append("escape_row")
+    stock = {v for _, _, v in L if count(v, 1) >= 1 and count(v, -1) >= 1}
+    if (
+        cmp == "eq"
+        and stock
+        and not _deviation_pair([(e, lf, v) for e, lf, v in L if v not in stock])
+    ):
+        hits.append("balance_row")
+    if (
+        cmp == "eq"
+        and len(L) >= 2
+        and any(e["coef"] == "unit" and not e["agg"] for e, _, _ in once)
+        and not set(hits)
+        & {
+            "partition_row",
+            "packing_row",
+            "covering_row",
+            "cardinality_row",
+            "flow_conservation_row",
+            "balance_row",
+        }
+    ):
+        hits.append("definition_row")
     return hits
+
+
+def _deviation_pair(rest) -> bool:
+    """s+ - s-: two unit slacks of opposite sign on two non-negative variables."""
+    return (
+        len(rest) == 2
+        and rest[0][2] != rest[1][2]
+        and rest[0][0]["eff"] != rest[1][0]["eff"]
+        and all(
+            e["coef"] == "unit" and not e["agg"] and lf["subtype"] == "non_negative"
+            for e, lf, _ in rest
+        )
+    )
+
+
+@dataclass(frozen=True)
+class Oriented:
+    cmp: str
+    others: list  # (eff as seen from the solved variable, edge, leaf attrs, leaf id)
+    lit: float | None  # net literal; None when a parameter stands on the right
+    params: list
+
+
+def oriented(s: Star, var: str) -> Oriented | None:
+    """The star solved for one leaf: it must hang on the centre by exactly one
+    unit, non-aggregated term edge."""
+    mine = [(e, lf, v) for e, lf, v in s.leaves if v == var]
+    if len(mine) != 1 or mine[0][0]["agg"] or mine[0][0]["coef"] != "unit":
+        return None
+    sg = mine[0][0]["eff"]
+    cmp = s.center["cmp"] if sg > 0 else FLIP[s.center["cmp"]]
+    others = [(e["eff"] * sg, e, lf, v) for e, lf, v in s.leaves if v != var]
+    params = [(k, sgn * sg, v) for k, sgn, v in s.center["consts"]]
+    lit = None if params else (s.center["lit"] or 0.0) * sg
+    return Oriented(cmp, others, lit, params)
 
 
 def star(tg: nx.MultiDiGraph, c: str) -> Star:
@@ -549,6 +623,7 @@ def match_models(tg: nx.MultiDiGraph) -> list[dict]:
             ]
             hit["rows"] |= set(pair)
             hit["variants"].add("with pair row" if pair else "ordering rows only")
+    _block_patterns(tg, merged)
     out = []
     for (name, _), hit in sorted(merged.items()):
         out.append(
@@ -560,6 +635,128 @@ def match_models(tg: nx.MultiDiGraph) -> list[dict]:
             }
         )
     return out
+
+
+def _objective_sign(tg: nx.MultiDiGraph, var: str) -> tuple[str | None, int]:
+    for n, d in tg.nodes(data=True):
+        if d["cls"] == "objective":
+            for _, v, e in tg.out_edges(n, data=True):
+                if v == var and e["kind"] == "term":
+                    return d["subtype"], e["eff"]
+            return d["subtype"], 0
+    return None, 0
+
+
+def _stars_on(tg: nx.MultiDiGraph, var: str) -> list[tuple[str, Star]]:
+    return [
+        (c, star(tg, c))
+        for c in sorted({u for u, _, e in tg.in_edges(var, data=True) if e["kind"] == "term"})
+        if tg.nodes[c]["cls"] == "constraint"
+    ]
+
+
+BLOCK_PATTERNS = (
+    "absolute_deviation",
+    "min_max",
+    "positive_part",
+    "logic_or",
+    "logic_and",
+    "two_sided_bound",
+)
+
+
+def _block_patterns(tg: nx.MultiDiGraph, merged: dict) -> None:
+    """Multi-star patterns joined at one variable node: two stars on the same
+    node for absolute deviation and two-sided bounds, star plus objective
+    edge for min-max and positive part, literal stars for logic."""
+
+    def add(name, var, rows, variant=""):
+        hit = merged.setdefault(
+            (name, var.split(":", 1)[1]),
+            {"pattern": name, "variable": var.split(":", 1)[1], "variants": set(), "rows": set()},
+        )
+        hit["rows"] |= {r.split(":", 1)[1] for r in rows}
+        if variant:
+            hit["variants"].add(variant)
+
+    variables = sorted(n for n, d in tg.nodes(data=True) if d["cls"] == "variable")
+    abs_vars, minmax_vars = set(), set()
+    for z in variables:
+        sense, osign = _objective_sign(tg, z)
+        stars = _stars_on(tg, z)
+        cands = [(c, o) for c, st in stars if (o := oriented(st, z)) and o.cmp == "ge" and o.others]
+        for (c1, o1), (c2, o2) in itertools.combinations(cands, 2):
+            k1 = sorted((v, e["agg"], e["coef"], -sg) for sg, e, _, v in o1.others)
+            k2 = sorted((v, e["agg"], e["coef"], sg) for sg, e, _, v in o2.others)
+            if k1 == k2:
+                abs_vars.add(z)
+                add(
+                    "absolute_deviation",
+                    z,
+                    [c1, c2],
+                    "penalized in a min objective" if sense == "min" and osign > 0 else "",
+                )
+        mm = []
+        for c, st in stars:
+            o = oriented(st, z)
+            if not o or len(o.others) != 1 or o.others[0][0] > 0 or o.others[0][1]["agg"]:
+                continue
+            if not set(tg.nodes[z]["shape"]) < set(tg.nodes[c]["forall"]):
+                continue
+            want = {"ge": "min", "le": "max"}.get(o.cmp)
+            if want and sense == want and osign > 0:
+                mm.append(c)
+        if mm:
+            minmax_vars.add(z)
+            add("min_max", z, mm, "min-max" if sense == "min" else "max-min")
+    for z in variables:
+        sense, osign = _objective_sign(tg, z)
+        if z in abs_vars or z in minmax_vars or tg.nodes[z]["subtype"] != "non_negative":
+            continue
+        if not (sense == "min" and osign > 0):
+            continue
+        stars = _stars_on(tg, z)
+        defining = [
+            c
+            for c, st in stars
+            if (o := oriented(st, z))
+            and o.cmp == "ge"
+            and o.others
+            and any(sg < 0 and lf["subtype"] in FRACTIONAL for sg, _, lf, _ in o.others)
+        ]
+        others = [
+            c for c, _ in stars if c not in defining and "bound_row" not in tg.nodes[c]["rows"]
+        ]
+        if len(defining) == 1 and not others:
+            add("positive_part", z, defining)
+    lits: dict[tuple[str, str], list[tuple[str, tuple[str, bool]]]] = defaultdict(list)
+    for c, d in tg.nodes(data=True):
+        if d["cls"] != "constraint" or d["cmp"] == "eq":
+            continue
+        st = star(tg, c)
+        if len(st.leaves) != 2 or any(e["agg"] or e["coef"] != "unit" for e, _, _ in st.leaves):
+            continue
+        for _, _, v in st.leaves:
+            o = oriented(st, v)
+            if not o or o.params:
+                continue
+            ((sg, _, lf, b),) = o.others
+            if lf["subtype"] != "binary" or b == v:
+                continue
+            if (sg < 0 and o.lit == 0.0) or (sg > 0 and o.lit == 1.0):
+                lits[(v, o.cmp)].append((c, (b, sg > 0)))
+    for (v, cmp), entries in sorted(lits.items()):
+        if len({lit for _, lit in entries}) >= 2:
+            add("logic_or" if cmp == "ge" else "logic_and", v, [c for c, _ in entries])
+    for x in variables:
+        bounds = [
+            (c, oriented(st, x)) for c, st in _stars_on(tg, x) if "bound_row" in tg.nodes[c]["rows"]
+        ]
+        lo = [c for c, o in bounds if o and o.cmp == "ge"]
+        up = [c for c, o in bounds if o and o.cmp == "le"]
+        pairs = [(a, b) for a in lo for b in up if tg.nodes[a]["forall"] == tg.nodes[b]["forall"]]
+        if pairs:
+            add("two_sided_bound", x, [n for p in pairs for n in p])
 
 
 def detect(formulation) -> dict:
@@ -639,6 +836,8 @@ def paper_macros(models: dict) -> str:
         f"\\newcommand{{\\patOracleRowDisagree}}{{{len(agr['row_disagreements'])}}}\n"
         f"\\newcommand{{\\patOracleModelDisagree}}{{{len(agr['model_disagreements'])}}}\n"
         f"\\newcommand{{\\patModelGraphPatterns}}{{{len(MODEL_GRAPH_PATTERNS)}}}\n"
+        f"\\newcommand{{\\patVfPatterns}}{{{len({g.name for g in MODEL_GRAPH_PATTERNS})}}}\n"
+        f"\\newcommand{{\\patBlockPatterns}}{{{len(BLOCK_PATTERNS)}}}\n"
     )
 
 

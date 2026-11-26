@@ -35,6 +35,7 @@ from __future__ import annotations
 # precede the lp2graph imports (same posture as corpusbuilder.promote).
 
 import argparse
+import itertools
 import json
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -64,7 +65,10 @@ ROW_PATTERNS = {
     "big_m_row": "big-M switch: binary times a big-M parameter",
     "difference_row": "difference: x - y vs a constant (precedence, headway)",
     "linking_row": "linking: x <= U*y or x >= L*y with a binary switch",
-    "bound_row": "bound: one variable vs a constant",
+    "bound_row": "bound: one variable vs a constant (0 when none is written)",
+    "escape_row": "exactly / at least one with an escape: sum x + c = 1, c a separate 0-1",
+    "balance_row": "balance recursion: the same variable on both sides (c_j = c_j-1 + in - out)",
+    "definition_row": "definition: one variable alone, defined by the other terms",
 }
 MODEL_PATTERNS = {
     "knapsack_problem": "knapsack problem: max weighted 0-1 sum s.t. knapsack rows",
@@ -75,6 +79,12 @@ MODEL_PATTERNS = {
     "set_packing_problem": "set packing: max value s.t. packing rows",
     "disjunctive_scheduling": "disjunctive scheduling: big-M ordering + y_ij + y_ji = 1",
     "pesp": "periodic event scheduling (PESP)",
+    "absolute_deviation": "absolute deviation: z >= e and z >= -e on the same expression",
+    "min_max": "min-max epigraph: h >= w_k for all k, h minimized",
+    "positive_part": "positive part: z >= t - p, z >= 0 penalized, defined by that row only",
+    "logic_or": "logical OR: r >= literal for two or more 0-1 literals",
+    "logic_and": "logical AND: r <= literal for two or more 0-1 literals",
+    "two_sided_bound": "two-sided bound: lower and upper bound rows on one variable",
 }
 
 
@@ -310,11 +320,94 @@ def row_patterns(row: Row) -> list[str]:
         len(vs) == 1
         and not vs[0].aggregated
         and vs[0].coef == "unit"
-        and row.consts
         and all(not k.startswith("param:big_m") for k, _, _ in row.consts)
     ):
         hits.append("bound_row")
+
+    once = [v for v in vs if sum(w.var == v.var for w in vs) == 1]
+    if (
+        row.comparator in ("eq", "ge")
+        and any(h in hits for h in ("partition_row", "covering_row"))
+        and any(v.aggregated for v in vs)
+    ):
+        agg_vars = {v.var for v in vs if v.aggregated}
+        singles = [v for v in vs if not v.aggregated]
+        if len(singles) == 1 and singles[0].var not in agg_vars:
+            hits.append("escape_row")
+    stock = [
+        v.var
+        for v in vs
+        if sum(
+            1 for w in vs if w.var == v.var and not w.aggregated and w.coef == "unit" and w.sign > 0
+        )
+        >= 1
+        and sum(
+            1 for w in vs if w.var == v.var and not w.aggregated and w.coef == "unit" and w.sign < 0
+        )
+        >= 1
+    ]
+    if (
+        row.comparator == "eq"
+        and stock
+        and not _deviation_pair([v for v in vs if v.var not in stock])
+    ):
+        hits.append("balance_row")
+    if (
+        row.comparator == "eq"
+        and len(vs) >= 2
+        and any(v.coef == "unit" and not v.aggregated for v in once)
+        and not set(hits)
+        & {
+            "partition_row",
+            "packing_row",
+            "covering_row",
+            "cardinality_row",
+            "flow_conservation_row",
+            "balance_row",
+        }
+    ):
+        hits.append("definition_row")
     return hits
+
+
+def _deviation_pair(rest: list[VarTerm]) -> bool:
+    """Two unit slacks of opposite sign on two non-negative variables (s+ - s-):
+    the row is a soft (goal) row, not a balance."""
+    return (
+        len(rest) == 2
+        and rest[0].var != rest[1].var
+        and rest[0].sign != rest[1].sign
+        and all(v.coef == "unit" and not v.aggregated and v.domain == "non_negative" for v in rest)
+    )
+
+
+def _literal(row: Row) -> float | None:
+    """Net literal constant on the right side, or None if a parameter is there."""
+    total = 0.0
+    for k, sgn, val in row.consts:
+        if k != "literal":
+            return None
+        total += sgn * float(val)
+    return total
+
+
+def oriented(row: Row, var: str):
+    """The row solved for ``var``: (comparator, other terms with signs as seen
+    from var's side, net literal or None, parameter constants), or None when
+    var is not exactly one unit, non-aggregated term of the row."""
+    mine = [v for v in row.vars if v.var == var]
+    if len(mine) != 1 or mine[0].aggregated or mine[0].coef != "unit":
+        return None
+    s = mine[0].sign
+    cmp = row.comparator if s > 0 else FLIP[row.comparator]
+    others = [
+        VarTerm(v.var, v.domain, v.sign * s, v.coef, v.aggregated, v.over, v.coef_ref)
+        for v in row.vars
+        if v.var != var
+    ]
+    lit = _literal(row)
+    params = [(k, sgn * s, val) for k, sgn, val in row.consts if k != "literal"]
+    return cmp, others, (None if lit is None else lit * s), params
 
 
 # ---------------------------------------------------------------------------
@@ -477,6 +570,8 @@ def model_patterns(f: Formulation, rows: list[tuple[Row, list[str]]]) -> list[di
                 }
             )
 
+    found += _block_patterns(f, [r for r, _ in rows], by_pat, obj, sense, shapes)
+
     if by_pat.get("pesp_row"):
         found.append(
             {
@@ -487,6 +582,134 @@ def model_patterns(f: Formulation, rows: list[tuple[Row, list[str]]]) -> list[di
             }
         )
     return found
+
+
+def _block_patterns(f, rows, by_pat, obj, sense, shapes) -> list[dict]:
+    """Multi-row patterns joined at one variable (absolute deviation, min-max,
+    positive part, logic, two-sided bound)."""
+    found: list[dict] = []
+    variables = sorted({v.var for r in rows for v in r.vars})
+    # absolute deviation: two rows z >= e, z >= -e
+    abs_vars: set[str] = set()
+    for z in variables:
+        cands = []
+        for r in rows:
+            o = oriented(r, z)
+            if o and o[0] == "ge" and o[1]:
+                cands.append((r, o))
+        for (r1, o1), (r2, o2) in itertools.combinations(cands, 2):
+            k1 = sorted((v.var, v.aggregated, v.coef, -v.sign) for v in o1[1])
+            k2 = sorted((v.var, v.aggregated, v.coef, v.sign) for v in o2[1])
+            if k1 == k2:
+                abs_vars.add(z)
+                found.append(
+                    {
+                        "pattern": "absolute_deviation",
+                        "variable": z,
+                        "variant": "penalized in a min objective"
+                        if sense == "min" and z in obj and obj[z][0] > 0
+                        else "",
+                        "rows": sorted([r1.name, r2.name]),
+                    }
+                )
+    # min-max (or max-min): h >= w_k over more indices than h has, h optimized
+    for h in variables:
+        rs = []
+        for r in rows:
+            o = oriented(r, h)
+            if not o or len(o[1]) != 1 or o[1][0].sign > 0 or o[1][0].aggregated:
+                continue
+            if not set(shapes.get(h, ())) < set(r.quantified):
+                continue
+            want = {"ge": "min", "le": "max"}.get(o[0])
+            if want and sense == want and h in obj and obj[h][0] > 0:
+                rs.append(r)
+        if rs:
+            found.append(
+                {
+                    "pattern": "min_max",
+                    "variable": h,
+                    "variant": "min-max" if sense == "min" else "max-min",
+                    "rows": sorted(r.name for r in rs),
+                }
+            )
+    # positive part: z >= t - p, z non-negative, penalized, defined by that row only
+    minmax_vars = {m["variable"] for m in found if m["pattern"] == "min_max"}
+    for z in variables:
+        if (
+            z in abs_vars
+            or z in minmax_vars
+            or f_domain(f, z) != "non_negative"
+            or not (sense == "min" and z in obj and obj[z][0] > 0)
+        ):
+            continue
+        on_z = [r for r in rows if any(v.var == z for v in r.vars)]
+        defining = []
+        for r in on_z:
+            o = oriented(r, z)
+            if (
+                o
+                and o[0] == "ge"
+                and o[1]
+                and any(v.sign < 0 and v.domain in FRACTIONAL for v in o[1])
+            ):
+                defining.append(r)
+        others = [r for r in on_z if r not in defining and "bound_row" not in row_patterns(r)]
+        if len(defining) == 1 and not others:
+            found.append(
+                {
+                    "pattern": "positive_part",
+                    "variable": z,
+                    "variant": "",
+                    "rows": [defining[0].name],
+                }
+            )
+    # logic: r >= / <= 0-1 literals
+    lits: dict[tuple[str, str], list[tuple[Row, tuple[str, bool]]]] = defaultdict(list)
+    for r in rows:
+        if (
+            len(r.vars) != 2
+            or any(v.aggregated or v.coef != "unit" for v in r.vars)
+            or r.comparator == "eq"
+        ):
+            continue
+        for v in r.vars:
+            o = oriented(r, v.var)
+            if not o or o[3]:
+                continue
+            (b,) = o[1]
+            if b.domain != "binary" or b.var == v.var:
+                continue
+            lit = o[2] or 0.0
+            if (b.sign < 0 and lit == 0.0) or (b.sign > 0 and lit == 1.0):
+                lits[(v.var, o[0])].append((r, (b.var, b.sign > 0)))
+    for (v, cmp), entries in sorted(lits.items()):
+        rs = [r for r, _ in entries]
+        if len({literal for _, literal in entries}) >= 2:
+            name = "logic_or" if cmp == "ge" else "logic_and"
+            found.append(
+                {"pattern": name, "variable": v, "variant": "", "rows": sorted(r.name for r in rs)}
+            )
+    # two-sided bound: a lower and an upper bound row on one variable
+    for x in variables:
+        bounds = [(r, oriented(r, x)) for r in by_pat.get("bound_row", []) if r.vars[0].var == x]
+        lo = [r for r, o in bounds if o and o[0] == "ge"]
+        up = [r for r, o in bounds if o and o[0] == "le"]
+        pairs = [(a, b) for a in lo for b in up if a.quantified == b.quantified]
+        if pairs:
+            found.append(
+                {
+                    "pattern": "two_sided_bound",
+                    "variable": x,
+                    "variant": "",
+                    "rows": sorted({n for a, b in pairs for n in (a.name, b.name)}),
+                }
+            )
+    return found
+
+
+def f_domain(f: Formulation, var: str) -> str:
+    return next((v.domain for v in f.variables if v.name == var), "?")
 
 
 # ---------------------------------------------------------------------------
@@ -584,6 +807,12 @@ MACRO_NAMES = {
     "set_packing_problem": "Packing",
     "disjunctive_scheduling": "Disjunctive",
     "pesp": "Pesp",
+    "absolute_deviation": "AbsDev",
+    "min_max": "MinMax",
+    "positive_part": "PosPart",
+    "logic_or": "LogicOr",
+    "logic_and": "LogicAnd",
+    "two_sided_bound": "TwoSidedBound",
 }
 
 

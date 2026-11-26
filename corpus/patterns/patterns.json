@@ -2,7 +2,7 @@
  "version": "patterns-2026.11.1",
  "n_models": 40,
  "n_rows": 146,
- "unmatched_rows": 47,
+ "unmatched_rows": 17,
  "row_pattern_counts": {
   "partition_row": 21,
   "packing_row": 4,
@@ -14,7 +14,10 @@
   "big_m_row": 8,
   "difference_row": 16,
   "linking_row": 10,
-  "bound_row": 24
+  "bound_row": 33,
+  "escape_row": 4,
+  "balance_row": 3,
+  "definition_row": 19
  },
  "model_pattern_counts": {
   "knapsack_problem": 0,
@@ -24,7 +27,13 @@
   "set_partitioning_problem": 8,
   "set_packing_problem": 0,
   "disjunctive_scheduling": 3,
-  "pesp": 2
+  "pesp": 2,
+  "absolute_deviation": 1,
+  "min_max": 2,
+  "positive_part": 2,
+  "logic_or": 1,
+  "logic_and": 1,
+  "two_sided_bound": 6
  },
  "models": {
   "10.1016_j.apm.2016.06.040": {
@@ -44,7 +53,9 @@
    "rows": [
     {
      "constraint": "eq_0039",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -116,7 +127,9 @@
    "rows": [
     {
      "constraint": "eq_0005_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -134,7 +147,9 @@
     },
     {
      "constraint": "eq_0011_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -152,7 +167,9 @@
     },
     {
      "constraint": "eq_0019_c_1",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -160,14 +177,35 @@
     },
     {
      "constraint": "eq_0019_c_2",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "two_sided_bound",
+     "variable": "pi",
+     "variant": "",
+     "rows": [
+      "eq_0005_lo",
+      "eq_0005_up"
+     ]
+    },
+    {
+     "pattern": "two_sided_bound",
+     "variable": "y",
+     "variant": "",
+     "rows": [
+      "eq_0011_lo",
+      "eq_0011_up"
+     ]
+    }
+   ]
   },
   "10.1016_j.trb.2009.07.007": {
    "rows": [
@@ -293,7 +331,8 @@
     {
      "constraint": "eq_0011",
      "patterns": [
-      "partition_row"
+      "partition_row",
+      "escape_row"
      ],
      "comparator": "eq",
      "flipped": false,
@@ -303,7 +342,8 @@
     {
      "constraint": "eq_0015",
      "patterns": [
-      "big_m_row"
+      "big_m_row",
+      "definition_row"
      ],
      "comparator": "eq",
      "flipped": false,
@@ -317,7 +357,9 @@
    "rows": [
     {
      "constraint": "eq_0001",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -385,7 +427,9 @@
     },
     {
      "constraint": "eq_0012",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "capacity",
@@ -393,7 +437,9 @@
     },
     {
      "constraint": "eq_0013",
-     "patterns": [],
+     "patterns": [
+      "balance_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "capacity",
@@ -401,7 +447,9 @@
     },
     {
      "constraint": "eq_0014_a",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -428,7 +476,35 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "min_max",
+     "variable": "eta",
+     "variant": "min-max",
+     "rows": [
+      "eq_0020"
+     ]
+    },
+    {
+     "pattern": "logic_and",
+     "variable": "y",
+     "variant": "",
+     "rows": [
+      "eq_0005",
+      "eq_0006",
+      "eq_0009"
+     ]
+    },
+    {
+     "pattern": "two_sided_bound",
+     "variable": "c",
+     "variant": "",
+     "rows": [
+      "eq_0014_a",
+      "eq_0014_b"
+     ]
+    }
+   ]
   },
   "10.1016_j.trb.2021.11.009": {
    "rows": [
@@ -459,7 +535,9 @@
     },
     {
      "constraint": "eq_0008_a",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -496,7 +574,17 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "two_sided_bound",
+     "variable": "y",
+     "variant": "",
+     "rows": [
+      "eq_0008_a",
+      "eq_0008_b"
+     ]
+    }
+   ]
   },
   "10.1016_j.trc.2016.05.005": {
    "rows": [
@@ -522,7 +610,9 @@
     },
     {
      "constraint": "eq_0018_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -539,7 +629,25 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "min_max",
+     "variable": "T",
+     "variant": "min-max",
+     "rows": [
+      "eq_0018_up"
+     ]
+    },
+    {
+     "pattern": "two_sided_bound",
+     "variable": "T",
+     "variant": "",
+     "rows": [
+      "eq_0017_lo",
+      "eq_0017_up"
+     ]
+    }
+   ]
   },
   "10.1016_j.trc.2016.11.007": {
    "rows": [
@@ -578,7 +686,9 @@
    "rows": [
     {
      "constraint": "eq_0096_a",
-     "patterns": [],
+     "patterns": [
+      "balance_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -586,7 +696,9 @@
     },
     {
      "constraint": "eq_0096_b",
-     "patterns": [],
+     "patterns": [
+      "balance_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -647,13 +759,43 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "absolute_deviation",
+     "variable": "a_tilde",
+     "variant": "",
+     "rows": [
+      "eq_0116_b",
+      "eq_0116_c"
+     ]
+    },
+    {
+     "pattern": "absolute_deviation",
+     "variable": "d_tilde",
+     "variant": "",
+     "rows": [
+      "eq_0116_d",
+      "eq_0116_e"
+     ]
+    },
+    {
+     "pattern": "logic_or",
+     "variable": "rho",
+     "variant": "",
+     "rows": [
+      "eq_0117_b",
+      "eq_0117_c"
+     ]
+    }
+   ]
   },
   "10.1016_j.trc.2025.105441": {
    "rows": [
     {
      "constraint": "eq_0003",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -661,7 +803,9 @@
     },
     {
      "constraint": "eq_0010",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -677,7 +821,9 @@
     },
     {
      "constraint": "eq_0016_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -695,7 +841,9 @@
     },
     {
      "constraint": "eq_0020",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -723,7 +871,9 @@
     },
     {
      "constraint": "eq_0029_d_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -752,7 +902,9 @@
     },
     {
      "constraint": "eq_0032_a",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -780,7 +932,9 @@
     },
     {
      "constraint": "eq_0043_c",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -796,7 +950,9 @@
     },
     {
      "constraint": "eq_0043_f_lo",
-     "patterns": [],
+     "patterns": [
+      "bound_row"
+     ],
      "comparator": "ge",
      "flipped": true,
      "annotated_kind": "linear",
@@ -814,14 +970,37 @@
     },
     {
      "constraint": "eq_0043_i",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "two_sided_bound",
+     "variable": "theta",
+     "variant": "",
+     "rows": [
+      "eq_0029_d_lo",
+      "eq_0029_d_up"
+     ]
+    },
+    {
+     "pattern": "two_sided_bound",
+     "variable": "varrho",
+     "variant": "",
+     "rows": [
+      "eq_0016_lo",
+      "eq_0016_up",
+      "eq_0043_f_lo",
+      "eq_0043_f_up"
+     ]
+    }
+   ]
   },
   "10.1016_j.tre.2022.102942": {
    "rows": [
@@ -835,7 +1014,9 @@
     },
     {
      "constraint": "eq_0005",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -843,7 +1024,9 @@
     },
     {
      "constraint": "eq_0008",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -871,7 +1054,9 @@
     },
     {
      "constraint": "eq_0016",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -889,7 +1074,9 @@
     },
     {
      "constraint": "eq_0027",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -897,7 +1084,9 @@
     },
     {
      "constraint": "eq_0032_b",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -905,7 +1094,9 @@
     },
     {
      "constraint": "eq_0035",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -952,7 +1143,28 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "two_sided_bound",
+     "variable": "u_r",
+     "variant": "",
+     "rows": [
+      "eq_0042_lo",
+      "eq_0042_up"
+     ]
+    },
+    {
+     "pattern": "two_sided_bound",
+     "variable": "u_s",
+     "variant": "",
+     "rows": [
+      "eq_0010_a",
+      "eq_0010_b",
+      "eq_0043_lo",
+      "eq_0043_up"
+     ]
+    }
+   ]
   },
   "GEN:cie.2025.111794": {
    "rows": [
@@ -1009,7 +1221,16 @@
      "annotated_domain_class": null
     }
    ],
-   "models": []
+   "models": [
+    {
+     "pattern": "positive_part",
+     "variable": "delay",
+     "variant": "",
+     "rows": [
+      "delay_def"
+     ]
+    }
+   ]
   },
   "GEN:ijdrr.2022.103361": {
    "rows": [
@@ -1253,6 +1474,14 @@
      "rows": [
       "headway_precede"
      ]
+    },
+    {
+     "pattern": "positive_part",
+     "variable": "delay",
+     "variant": "",
+     "rows": [
+      "delay_def"
+     ]
     }
    ]
   },
@@ -1261,7 +1490,8 @@
     {
      "constraint": "assign_flow",
      "patterns": [
-      "partition_row"
+      "partition_row",
+      "escape_row"
      ],
      "comparator": "eq",
      "flipped": false,
@@ -1280,7 +1510,9 @@
     },
     {
      "constraint": "timing",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "linear",
@@ -1382,7 +1614,8 @@
     {
      "constraint": "flight_cover",
      "patterns": [
-      "partition_row"
+      "partition_row",
+      "escape_row"
      ],
      "comparator": "eq",
      "flipped": false,
@@ -1392,7 +1625,8 @@
     {
      "constraint": "ground_duty_cover",
      "patterns": [
-      "partition_row"
+      "partition_row",
+      "escape_row"
      ],
      "comparator": "eq",
      "flipped": false,
@@ -1563,7 +1797,9 @@
    "rows": [
     {
      "constraint": "regularity_soft",
-     "patterns": [],
+     "patterns": [
+      "definition_row"
+     ],
      "comparator": "eq",
      "flipped": false,
      "annotated_kind": "soft",

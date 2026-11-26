@@ -44,3 +44,22 @@ other term on the constraint), which plain subgraph matching cannot say.
   `rhs_literal` instead of silently missing every exactly-one row.
 - Contraction keeps operator semantics on the edge; a pattern can still ask
   for "summed over a shape index of X" (assignment variants).
+
+## Addendum (2026-11-26): second group of patterns
+
+Added in lock step to both detectors (agreement still 0/0 on 40 models):
+
+- Row stars: `escape_row` (exactly / at least one with a separate 0-1 escape,
+  e.g. train cancellation), `balance_row` (the same variable with both signs:
+  stock recursion; rows whose rest is a `s+ - s-` deviation pair are excluded),
+  `definition_row` (one variable alone, defined by the others). `bound_row` now
+  also covers a bare `0 <= x` (no constant written).
+- Block patterns, found by joining stars at one variable node (and the
+  objective edge): `absolute_deviation` (two `>=` stars on z with all other
+  term signs flipped), `min_max` (h >= w over more indices than h has, h
+  optimized), `positive_part` (non-negative z >= t - p, penalized, defined by
+  that star only; not an absolute deviation or min-max), `logic_or` /
+  `logic_and` (two or more distinct 0-1 literals bounding one variable),
+  `two_sided_bound` (lower and upper bound stars on one variable over the same
+  quantifier sets).
+- Canonical set: unmatched constraint nodes 37 -> 8.
