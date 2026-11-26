@@ -30,34 +30,41 @@
 %@ param w shape=- kind=scalar :: Weight for objective function components
 
 % x: classified as variable during review
-%@ var x shape=T,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition c is chosen for trip t
+%det-was: %@ var x shape=T,C domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition c is chosen for trip t
+%@ var x shape=C,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if composition c is chosen for trip t
 
 % n: classified as variable during review
-%@ var n shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
+%det-was: %@ var n shape=T domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
+%@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
 
 % I: classified as variable during review
 %@ var I shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
 
 % c: classified as variable during review
-%@ var c shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
+%det-was: %@ var c shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
+%@ var c shape=M,T domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
 
 % carr: classified as parameter during review
-%@ param carr shape=C kind=vector :: Carriage kilometers for composition c
+%det-was: %@ param carr shape=C kind=vector :: Carriage kilometers for composition c
+%@ param carr shape=fam_c kind=vector :: Carriage kilometers for composition c
 
 % h: classified as parameter during review
-%@ param h shape=A kind=vector :: Headway time for activity
+%det-was: %@ param h shape=A kind=vector :: Headway time for activity
+%@ param h shape=E,E kind=matrix :: Headway time for activity
 
 % l: classified as parameter during review
-%@ param l shape=A kind=vector :: Lower bound for activity duration
+%det-was: %@ param l shape=A kind=vector :: Lower bound for activity duration
+%@ param l shape=E,E kind=matrix :: Lower bound for activity duration
 
 % p: classified as variable during review
 %@ var p shape=T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating different composition than planned
 
 % seat: classified as parameter during review
-%@ param seat shape=T,C kind=matrix :: Seat capacity for composition c on trip t
+%det-was: %@ param seat shape=T,C kind=matrix :: Seat capacity for composition c on trip t
+%@ param seat shape=fam_c,T kind=matrix :: Seat capacity for composition c on trip t
 
 % u: classified as variable during review
-%@ var u shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of uncoupled units
+%det-del: %@ var u shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of uncoupled units
 
 % C: classified as index during review
 %@ index C ordered=0 cyclic=0 :: Set of compositions
@@ -75,7 +82,8 @@
 %@ index Cprime ordered=0 cyclic=0 :: Set of successor compositions
 
 % z: classified as variable during review
-%@ var z shape=T,C,Cprime domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
+%det-was: %@ var z shape=T,C,Cprime domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
+%@ var z shape=fam_c,C,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable for composition change from c to c' for trip t
 
 % unusable as an identifier, rename or drop: Γ
 % unusable as an identifier, rename or drop: β
@@ -172,9 +180,11 @@
 %@ index N_S ordered=0 cyclic=0 :: Set of shunting trains
 %@ index N_T ordered=0 cyclic=0 :: Set of regular trains
 %@ param I_end shape=M,S kind=scalar domain=- :: End-of-day inventory of rolling stock units of type m at station s
-%@ param I_off shape=M,S kind=scalar domain=- :: Off-balance inventory deviation of rolling stock units of type m at station s
-%@ param alpha shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that become part of successor composition cp
-%@ param beta shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that are removed when transitioning to successor composition cp
+%det-del: %@ param I_off shape=M,S kind=scalar domain=- :: Off-balance inventory deviation of rolling stock units of type m at station s
+%det-was: %@ param alpha shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that become part of successor composition cp
+%@ param alpha shape=fam_c,C,M kind=matrix domain=- :: Number of units of type m in composition c that become part of successor composition cp
+%det-was: %@ param beta shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that are removed when transitioning to successor composition cp
+%@ param beta shape=fam_c,C,M kind=matrix domain=- :: Number of units of type m in composition c that are removed when transitioning to successor composition cp
 %@ param d_plus_max shape=- kind=scalar domain=- :: Maximum positive delay allowed for a train
 %@ param i_0 shape=M,S kind=scalar domain=- :: Initial inventory of rolling stock units of type m at station s
 %@ param i_end shape=M,S kind=scalar domain=- :: Target end-of-day inventory of rolling stock units of type m at station s
@@ -189,3 +199,15 @@
 %@ param w_5 shape=- kind=scalar domain=- :: Weight coefficient 5 in the objective function
 %@ param w_6 shape=- kind=scalar domain=- :: Weight coefficient 6 in the objective function
 %@ param w_7 shape=- kind=scalar domain=- :: Weight coefficient 7 in the objective function
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter cp over=C :: index letter (ADR-0023)
+%@ letter i over=E :: index letter (ADR-0023)
+%@ letter j over=E :: index letter (ADR-0023)
+%@ letter m over=M :: index letter (ADR-0023)
+%@ letter s over=S :: index letter (ADR-0023)
+%@ letter t over=T :: index letter (ADR-0023)
+%@ letter tp over=T :: index letter (ADR-0023)
+%@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ var I_off shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: Off-balance inventory deviation of rolling stock units of type m at station s
+%@ param u shape=E,E kind=matrix domain=- :: Number of uncoupled units
+% --- end deterministic declarations ---

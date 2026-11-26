@@ -1,0 +1,1699 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.jrtpm.2025.100555",
+  "name": "Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison",
+  "family": "milp",
+  "description": "Mined from Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison (Journal of Rail Transport Planning & Management, 2025).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.jrtpm.2025.100555",
+    "reference": "Optimizing periodic stability in railway timetables: A microscopic model for networks with a macroscopic comparison",
+    "author": "F.W. Fuchs; Bernardo Martin-Iradi; Francesco Corman",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "N",
+      "description": "family the formulas bind over",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "n",
+      "description": "Index for nodes in the Train Flow Network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of activities in the Event Activity Network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "family a declared shape names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of events in the Event Activity Network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "Set of resource paths",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of conflicting resource path pairs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "rho",
+      "description": "Index for resource paths (alternative spelling)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_p",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "b",
+      "description": "Time bound for an activity",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "Lower bound of time difference for an activity",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Upper bound of time difference for an activity",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Sufficiently large constant for linearization",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Period of the cyclic timetable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "k",
+      "description": "Minimum number of periods required for full periodicity",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "R",
+      "description": "Set of real numbers (domain for timestamps)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Delta",
+      "description": "Time horizon or period length",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_bar",
+      "description": "Upper bound on cycle time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_underline",
+      "description": "Lower bound on cycle time",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta",
+      "description": "Minimum separation time between entry and exit events",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "k_hat",
+      "description": "Number of periods to consider",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "omega",
+      "description": "Cycle time or period length",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l_x_b",
+      "description": "derived: l * b",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "u_x_b",
+      "description": "derived: u * b",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "x",
+      "description": "Binary variable indicating whether a train uses a link",
+      "shape": [
+        "W"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "t",
+      "description": "Timestamp of an event",
+      "shape": [
+        "E"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating if a resource path is used",
+      "shape": [
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary precedence variable between resource paths",
+      "shape": [
+        "P",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "Binary variable for conflict resolution between resource path pairs",
+      "shape": [
+        "P",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": 0.0,
+      "upper": 1.0,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "t_entry",
+      "description": "Entry time of a resource path",
+      "shape": [
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "t_exit",
+      "description": "Exit time of a resource path",
+      "shape": [
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "t_entry_pp",
+      "description": "variable: variant of the declared variable t_entry",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "t_exit_pp",
+      "description": "variable: variant of the declared variable t_exit",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z_pp",
+      "description": "variable: variant of the declared variable z",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0002_lo",
+      "description": "Time bounds for all activities in the Event Activity Network",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0002_up",
+      "description": "Time bounds for all activities in the Event Activity Network",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "u",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0003_lo",
+      "description": "Itinerary activity time bounds activated by route choice",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "W",
+              "expr": "alpha_{a}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l_x_b",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0003_up",
+      "description": "Itinerary activity time bounds activated by route choice",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "W",
+              "expr": "alpha_{a}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "u_x_b",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "W",
+              "expr": "alpha_{a}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0004_lo",
+      "description": "Time bounds for commercial activities",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0004_up",
+      "description": "Time bounds for commercial activities",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "u",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005_lo",
+      "description": "Vehicle circulation time bounds as commercial activities",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0005_up",
+      "description": "Vehicle circulation time bounds as commercial activities",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "E",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "b",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "u",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007",
+      "description": "At most one precedence direction per conflicting resource path pair",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Require precedence direction when both resource paths are used",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "z_pp",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Minimum separation on shared resource when one path precedes the other",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t_entry_pp",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t_exit",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Origin events occur within their periodic time windows",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t_entry",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t_exit_pp",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0040",
+      "description": "Constraint row in the C-MicroRTP model",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t_entry_pp",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t_exit",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0041",
+      "description": "Constraint row in the C-MicroRTP model",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "pp",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t_entry",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t_exit_pp",
+          "ref_kind": "variable",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "lambda",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "pp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total duration of all commercial activities",
+    "terms": [
+      {
+        "ref": "t",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "E",
+            "expr": "j",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "E",
+          "E"
+        ]
+      },
+      {
+        "ref": "t",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "E",
+            "expr": "i",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": 1.0,
+        "sign": -1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "E",
+          "E"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

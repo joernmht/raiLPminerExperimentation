@@ -8,7 +8,7 @@
 %@ prov author :: F.W. Fuchs; Bernardo Martin-Iradi; Francesco Corman
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total duration of all commercial activities
-%@ index N ordered=0 cyclic=0 :: Set of nodes in the Train Flow Network
+%@ index N ordered=0 cyclic=0 :: family the formulas bind over
 %@ index n ordered=0 cyclic=0 :: Index for nodes in the Train Flow Network
 %@ var x shape=W domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train uses a link
 %@ param b shape=A kind=vector domain=- :: Time bound for an activity
@@ -17,9 +17,9 @@
 %@ param l shape=- kind=vector domain=- :: Lower bound of time difference for an activity
 %@ param u shape=- kind=vector domain=- :: Upper bound of time difference for an activity
 %@ param M shape=- kind=big_m domain=- :: Sufficiently large constant for linearization
-%@ index W ordered=0 cyclic=0 :: Set of arcs in the Train Flow Network
+%@ index W ordered=0 cyclic=0 :: family a declared shape names
 %@ var z shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a resource path is used
-%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
+%@ var y shape=P,P domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
 %@ param T shape=- kind=scalar domain=- :: Period of the cyclic timetable
 %@ index E ordered=0 cyclic=0 :: Set of events in the Event Activity Network
 %@ param k shape=- kind=scalar domain=- :: Minimum number of periods required for full periodicity
@@ -58,30 +58,24 @@
 %@ param T_underline shape=- kind=scalar domain=- :: Lower bound on cycle time
 %@ param delta shape=- kind=scalar domain=- :: Minimum separation time between entry and exit events
 %@ param k_hat shape=- kind=scalar domain=- :: Number of periods to consider
-%@ var lambda shape=K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%@ var lambda shape=P,P domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
 %@ param omega shape=- kind=scalar domain=- :: Cycle time or period length
 %@ var t_entry shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
 %@ var t_exit shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path
+%@ index fam_p ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ var t_entry_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_entry
+%@ var t_exit_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_exit
+%@ var z_pp shape=- domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable z
 \begin{align}
-  & \sum_{w \in \mathit{rho} \left(n\right)^{+}} x_{w} - \sum_{w \in \mathit{rho} \left(n\right)^{-}} x_{w} = \left\{ 1 & \text{if} n \in \mathcal{N}^{\text{Source}} , \\ - 1 & \text{if} n \in \mathcal{N}^{\text{Sink}} , \\ 0 & \text{otherwise} , \right \tag{eq\_0001} \\
+  \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) \tag{eq\_0016} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A} . \tag{eq\_0002} \\
   & l \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} \leq t_{j} - t_{i} \leq u \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} + M \cdot \left(1 - x_{\mathit{alpha} \left(a\right)}\right) , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{ITI}} , \tag{eq\_0003} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{COM}} . \tag{eq\_0004} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{VEH}} . \tag{eq\_0005} \\
-  & z_{p} \geq \sum_{w \in \mathcal{W}_{p}} x_{w} - \left|\mathcal{W}_{p}\right| + 1 , \tag{eq\_0006} \\
   & y_{p pp} + y_{pp p} \leq 1 , \tag{eq\_0007} \\
   & y_{p pp} + y_{pp p} \geq z_{p} + z_{pp} - 1 , \tag{eq\_0008} \\
   & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p pp}\right) , \tag{eq\_0009} \\
   & t_{p}^{\text{entry}} - t_{pp}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{pp p}\right) , \tag{eq\_0011} \\
-  & k \cdot T \leq t_{e} \leq \left(k + 1\right) \cdot T , \forall e \in \mathcal{E}_{k}^{\text{origin}} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} \tag{eq\_0012} \\
-  & k_hat = \left⌈\frac{\mathit{Delta}}{T}\right⌉ + 1 . \tag{eq\_0013} \\
-  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot T , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0014} \\
-  & x_{w}^{\left(k\right)} = x_{w}^{\left(0\right)} , \forall w \in \mathcal{W} , \forall k \in \left\{1 , \ldots , k_hat - 1\right\} . \tag{eq\_0015} \\
-  \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) , \tag{eq\_0016} \\
-  & t_{e^{\left(k\right)}} = t_{e^{\left(0\right)}} + k \cdot \mathit{omega} , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0034} \\
-  & k \cdot \mathit{omega} \leq t_{e} \leq \left(k + 1\right) \cdot \mathit{omega} , \forall e \in \mathcal{E}_{k}^{\text{origin}} \forall k \in \left\{0 , 1 , \ldots k_hat - 1\right\} \tag{eq\_0035} \\
-  & t_{e^{\left(k\right)}} \leq t_{e^{\left(0\right)}} + k \cdot T_bar , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0036} \\
-  & t_{e^{\left(k\right)}} \geq t_{e^{\left(0\right)}} + k \cdot T_underline , \forall e \in \mathcal{E} , \forall k \in \left\{0 , 1 , \ldots , k_hat - 1\right\} . \tag{eq\_0037} \\
   & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p pp} + \mathit{lambda}_{p pp}\right) \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0040} \\
   & t_{p}^{\text{entry}} - t_{pp}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{pp p} + \mathit{lambda}_{p pp}\right) \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0041} \\
 \end{align}

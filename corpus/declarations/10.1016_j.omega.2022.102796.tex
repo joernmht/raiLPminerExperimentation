@@ -30,7 +30,8 @@
 %@ var t shape=N domain=non_negative role=primary drole=- lo=- hi=- :: Schedule time for each route node
 
 % N: classified as index during review
-%@ index N ordered=0 cyclic=0 :: Set of route nodes
+%det-was: %@ index N ordered=0 cyclic=0 :: Set of route nodes
+%@ index N ordered=0 cyclic=0 :: family a declared shape names
 
 % u: classified as index during review
 %@ index u ordered=0 cyclic=0 :: Route node index
@@ -40,7 +41,8 @@
 
 % unusable as an identifier, rename or drop: Γ
 % T: classified as parameter during review
-%@ param T shape=- kind=scalar domain=- :: Timetable target time at timing nodes
+%det-was: %@ param T shape=- kind=scalar domain=- :: Timetable target time at timing nodes
+%@ param T shape=N kind=vector domain=- :: Timetable target time at timing nodes
 
 % unusable as an identifier, rename or drop: η
 % unusable as an identifier, rename or drop: δ
@@ -51,7 +53,8 @@
 %@ index v ordered=0 cyclic=0 :: Route node index
 
 % A: classified as index during review
-%@ index A ordered=0 cyclic=0 :: Set of trains
+%det-was: %@ index A ordered=0 cyclic=0 :: Set of trains
+%@ index A ordered=0 cyclic=0 :: family a declared shape names
 
 % a: classified as index during review
 %@ index a ordered=0 cyclic=0 :: Train index
@@ -82,7 +85,8 @@
 %@ param r shape=A kind=vector domain=- :: Number of timing node partitions for a train
 
 % y: classified as variable during review
-%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for conflict pairs
+%det-was: %@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for conflict pairs
+%@ var y shape=N,N domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for conflict pairs
 
 % b: classified as index during review
 %@ index b ordered=0 cyclic=0 :: Train index (used in examples)
@@ -145,7 +149,15 @@
 %@ con eq_0022_c kind=big_m domain=- indicator=- :: Big-M conflict constraint parameterized by path selections
 % --- vocabulary fill (stage v, corpusbuilder.assist --vocab, model deepseek-v4-flash, 2026-09-10) ---
 % Non-deterministically sourced; the names come from corpus/vocab/10.1016_j.omega.2022.102796.json (deterministic fill-in list); pending human confirmation.
-%@ index rho ordered=0 cyclic=0 :: Set of paths associated with a route node
+%det-was: %@ index rho ordered=0 cyclic=0 :: Set of paths associated with a route node
+%@ param rho shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ param Gamma shape=N kind=scalar domain=- :: Minimum headway time for route node u
 %@ param delta shape=N kind=scalar domain=- :: Minimum separation time between conflicting route nodes
 %@ var eta shape=N domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Delay of train at route node u
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter a over=A :: index letter (ADR-0023)
+%@ letter p over=P :: index letter (ADR-0023)
+%@ letter q over=rho :: index letter (ADR-0023)
+%@ letter u over=N :: index letter (ADR-0023)
+%@ letter v over=K :: index letter (ADR-0023)
+% --- end deterministic declarations ---

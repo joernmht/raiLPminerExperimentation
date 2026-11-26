@@ -9,9 +9,9 @@
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total cost of trip compositions, composition changes, and end-of-day carriage imbalances
 %@ param c shape=- kind=scalar :: Cost coefficients for trips, composition changes, and balance
-%@ var E shape=L,W domain=non_negative role=primary :: End-of-day carriage inventory imbalance for line l and carriage type w
-%@ var X shape=T,P domain=binary role=primary :: 1 if composition p is assigned to trip t
-%@ var Z shape=T,Q domain=binary role=primary :: 1 if composition change q is performed at the end of trip t
+%@ var E shape=L,W domain=non_negative role=primary drole=- :: End-of-day carriage inventory imbalance for line l and carriage type w
+%@ var X shape=T,P domain=binary role=primary drole=- :: 1 if composition p is assigned to trip t
+%@ var Z shape=T,Q domain=binary role=primary drole=- :: 1 if composition change q is performed at the end of trip t
 %@ index L ordered=0 cyclic=0 :: Set of lines
 %@ index P ordered=0 cyclic=0 :: Set of compositions
 %@ index Q ordered=0 cyclic=0 :: Set of composition changes
@@ -20,12 +20,12 @@
 %@ index t ordered=0 cyclic=0 :: Index for trips
 %@ index p ordered=0 cyclic=0 :: Index for compositions
 %@ index o ordered=0 cyclic=0 :: Origin composition of a composition change
-%@ var U shape=T,W domain=non_negative role=primary :: Number of carriages of type w arriving at the end of trip t
-%@ var C shape=T,W,D domain=non_negative role=primary :: Number of carriages of type w departing at the start of trip t under disruption scenario i
+%@ var U shape=T,W domain=non_negative role=primary drole=- :: Number of carriages of type w arriving at the end of trip t
+%@ var C shape=T,W,D domain=non_negative role=primary drole=- :: Number of carriages of type w departing at the start of trip t under disruption scenario i
 %@ index A ordered=0 cyclic=0 :: Set of trips arriving before trip t
 %@ index B ordered=0 cyclic=0 :: Set of trips departing after trip t
 %@ param pt shape=T kind=vector :: Composition assigned to trip t in the original schedule
-%@ var Y shape=T domain=binary role=primary :: 1 if trip t is not robust
+%@ var Y shape=T domain=binary role=primary drole=- :: 1 if trip t is not robust
 %@ index R ordered=0 cyclic=0 :: Set of rolling stock schedules, one for each disruption scenario
 %@ index D ordered=0 cyclic=0 :: Set of disruption duration scenarios
 %@ con eq_0003 kind=linear :: Exactly one composition is assigned to each trip
@@ -55,24 +55,33 @@
 %@ con eq_0029 kind=linear :: C and U variables are non-negative in the strict robust schedule
 %@ con eq_0030 kind=linear :: E variables are non-negative in the strict robust schedule
 %@ con eq_0031 kind=linear :: Z variables are binary in the strict robust schedule
+%@ letter i over=D :: index letter (ADR-0023)
+%@ letter l over=L :: index letter (ADR-0023)
+%@ letter p over=P :: index letter (ADR-0023)
+%@ letter q over=Q :: index letter (ADR-0023)
+%@ index S ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter s over=S :: index letter (ADR-0023)
+%@ letter t over=T :: index letter (ADR-0023)
+%@ letter tp over=A :: index letter (ADR-0023)
+%@ index Psi ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter tpp over=Psi :: index letter (ADR-0023)
+%@ letter w over=W :: index letter (ADR-0023)
+%@ param alpha shape=- kind=scalar domain=- :: parameter: the paper says so (paragraph 32)
+%@ param beta shape=Q,W kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_bal shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_cc shape=T,Q kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_trip shape=T,P kind=matrix domain=- :: parameter: the paper says so (paragraph 40)
+%@ param nu shape=Q,W kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param zeta_0 shape=L,W kind=matrix domain=- :: parameter: the paper says so (paragraph 36)
+%@ index Omega ordered=0 cyclic=0 :: family the formulas bind over
 \begin{align}
   \min\quad & \sum_{t \in T, p \in P} c_{t , p}^{t r i p} \cdot X_{t , p} + \sum_{t \in T, q \in Q_{t}} c_{t , q}^{c c} \cdot Z_{t , q} + \sum_{l \in L, w \in W} c^{b a l} \cdot E_{l , w} \tag{eq\_0001} \\
-  & \mathit{subject} \mathit{to :} \sum_{p \in P} X_{t , p} = 1 \forall t \in T \tag{eq\_0003} \\
-  & X_{t , p \left(t\right)} = 1 \forall t \in T \left|\right. \mathit{tau}_{t}^{\text{dep}} < taup \tag{eq\_0004} \\
   & X_{t , p} = \sum_{q \in Q_{t} : p_{q} = p} Z_{t , q} \forall t \in T , p \in P \tag{eq\_0005} \\
   & X_{t , p} = \sum_{q \in Q_{\mathit{psi} \left(t\right)} : o_{q} = p} Z_{\mathit{psi} \left(t\right) , q} \forall t \in T , p \in P \tag{eq\_0006} \\
-  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} Z_{t , q} \forall t \in T , w \in W \tag{eq\_0007} \\
-  & C_{t , w} = \sum_{q \in Q_{\mathit{psi} \left(t\right)}} \mathit{beta}_{q , w} Z_{\mathit{psi} \left(t\right) , q} \forall t \in T , w \in W \tag{eq\_0008} \\
-  & \mathit{zeta}_{l , w}^{0} - \sum_{tp \in A_{t}} C_{tp , w} + \sum_{tp \in B_{t}} U_{tp , w} \geq 0 \forall l \in L , w \in W \tag{eq\_0009} \\
-  & \mathit{zeta}_{l , w}^{\infty} + E_{l , w} \geq \mathit{zeta}_{l , w}^{0} - \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{d e p} = l}}{\sum} C_{t , w} + \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{a r r} = l}}{\sum} U_{t , w} \forall l \in L , w \in W \tag{eq\_0010} \\
-  & 1 - Y_{t} \geq X_{tp , p} - X_{t^{' '} , p} \forall t \in T^{d i s} , tp , t^{' '} \in \mathit{Psi} t , tp \neq t^{' '} , p \in P \tag{eq\_0011} \\
-  & \sum_{t \in T^{d i s}} Y_{t} \geq \lceil \left|T^{d i s}\right| \cdot \mathit{alpha} \rceil \tag{eq\_0012} \\
-  & \mathit{subject} \mathit{to :} \sum_{p \in P} X_{t , p} = 1 \forall t \in T \tag{eq\_0020} \\
-  & X_{t , p \left(t\right)} = 1 \forall t \in T : \mathit{tau}_{t}^{\text{dep}} < taup \tag{eq\_0021} \\
+  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} \cdot Z_{t , q} \forall t \in T , w \in W \tag{eq\_0007} \\
+  & 1 - Y_{t} \geq X_{tp , p} - X_{tpp , p} \forall t \in T^{d i s} , tp , tpp \in \mathit{Psi} \left(t\right) , tp \neq tpp , p \in P \tag{eq\_0011} \\
   & X_{t , p} = \sum_{q \in Q_{t} : p_{q} = p} Z_{t , q} \forall t \in T , p \in P \tag{eq\_0022} \\
-  & X_{tp , p} = \sum_{q \in Q_{t} : o_{q} = p} Z_{t , q} \forall t \in T , tp \in \mathit{Omega} t , p \in P \tag{eq\_0023} \\
-  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} Z_{t , q} \forall t \in T , w \in W \tag{eq\_0024} \\
-  & C_{t , w , i} = \underset{q \in Q_{\mathit{psi}_{i} \left(t\right)}}{\sum} \mathit{beta}_{q , w} Z_{\mathit{psi}_{i} \left(t\right) , q} \forall t \in T , w \in W , i \in D \tag{eq\_0025} \\
+  & X_{tp , p} = \sum_{q \in Q_{t} : o_{q} = p} Z_{t , q} \forall t \in T , tp \in \mathit{Omega} \left(t\right) , p \in P \tag{eq\_0023} \\
+  & U_{t , w} = \sum_{q \in Q_{t}} \mathit{nu}_{q , w} \cdot Z_{t , q} \forall t \in T , w \in W \tag{eq\_0024} \\
   & \mathit{zeta}_{l_{t}^{d e p} , w}^{0} - \sum_{tp \in A_{t}} C_{tp , w , i} + \sum_{tp \in B_{t}} U_{tp , w} \geq 0 \forall t \in T , w \in W , i \in D \tag{eq\_0026} \\
-  & \mathit{zeta}_{l , w}^{\infty} + E_{l , w} \geq \mathit{zeta}_{l , w}^{0} - \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{d e p} = l}}{\sum} C_{t , w , i} + \underset{\genfrac{}{}{0pt}{}{t \in T}{l_{t}^{a r r} = l}}{\sum} U_{t , w} \forall l \in L , w \in W , i \in D \tag{eq\_0027} \\
 \end{align}

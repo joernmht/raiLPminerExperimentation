@@ -1,0 +1,1388 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trb.2022.02.002",
+  "name": "A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions",
+  "family": "milp",
+  "description": "Mined from A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions (Transportation Research Part B Methodological, 2022).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trb.2022.02.002",
+    "reference": "A heuristic approach to integrate train timetabling, platforming, and railway network maintenance scheduling decisions",
+    "author": "Qin Zhang; Richard Martin Lusby; Pan Shang; Xiaoning Zhu",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "A",
+      "description": "Set of space-time arcs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of trains.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta",
+      "description": "Set of arcs incident to a node (incoming/outgoing).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "sigma",
+      "description": "Origin space-time node of train f.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of space-time nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Space-time node index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "gamma",
+      "description": "Destination space-time node of train f.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of stations.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "psi",
+      "description": "Set of incompatible arrival/departure nodes for headway constraints.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "t",
+      "description": "Time instant.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "d",
+      "description": "Destination node or end time index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "o",
+      "description": "Origin node or start time index.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Set of nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Pi",
+      "description": "Set of incompatible space-time arcs for station route conflicts.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "M",
+      "description": "Set of maintenance tasks.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "phi",
+      "description": "Set of incompatible physical arcs for station route conflicts.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of physical arcs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Abar",
+      "description": "Set of available space-time arcs for a train.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_bar",
+      "description": "Set of available space-time arcs for a train.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_d",
+      "description": "Set of departure space-time arcs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_s",
+      "description": "Set of arrival space-time arcs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_st",
+      "description": "Set of station space-time arcs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_vi",
+      "description": "Set of virtual arcs for a train.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N_sm",
+      "description": "Set of station-maintenance nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Pi_aa",
+      "description": "Set of incompatible arrival-arrival arc pairs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Pi_ad",
+      "description": "Set of incompatible arrival-departure arc pairs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Pi_dd",
+      "description": "Set of incompatible departure-departure arc pairs.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V_a",
+      "description": "Set of arrival space-time nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V_d",
+      "description": "Set of departure space-time nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V_se",
+      "description": "Set of station event space-time nodes.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_minus",
+      "description": "Set of incoming arcs to a node.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_plus",
+      "description": "Set of outgoing arcs from a node.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "psi_a",
+      "description": "Set of incompatible arrival nodes for headway constraints.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "psi_aa",
+      "description": "Set of incompatible arrival-arrival node pairs for headway constraints.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "psi_ad_ks",
+      "description": "Set of incompatible arrival-departure node pairs at station k.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "psi_d",
+      "description": "Set of incompatible departure nodes for headway constraints.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Aar",
+      "description": "family the formulas bind over",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "Weighted running cost of space-time arc g for train f.",
+      "shape": [
+        "F",
+        "A"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "D",
+      "description": "Minimum dwell time at station k for train f.",
+      "shape": [
+        "F",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "Dmax",
+      "description": "Maximum dwell time at station k for train f.",
+      "shape": [
+        "F",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Headway time or time shift parameter.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "D_bar",
+      "description": "Upper bound on number of trains of type f at station k.",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "D_underline",
+      "description": "Lower bound on number of trains of type f at station k.",
+      "shape": [
+        "K",
+        "F"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_r",
+      "description": "Running time reserve or recovery time.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_sr",
+      "description": "Station route setup or release time at station k.",
+      "shape": [
+        "K"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "o_hat",
+      "description": "Scheduled or planned start time of space-time arc g.",
+      "shape": [
+        "A"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "Z",
+      "description": "Objective function value.",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable equal to 1 if train f uses space-time arc g.",
+      "shape": [
+        "F",
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable for implicit siding-track occupation (y_g^f) or maintenance start time (y_t^m).",
+      "shape": [
+        "S",
+        "M"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005",
+      "description": "Train flow balance: each train is assigned exactly one departure arc from its origin.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007",
+      "description": "Train flow balance: flow conservation at intermediate space-time nodes.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta"
+          ]
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta"
+          ]
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Minimum dwell time at each visited station.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "D_underline",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "D_underline",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Maximum dwell time at each visited station.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "D_bar",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "D_bar",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Node occupation variable x_v^f defined from incoming segment running arcs.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013",
+      "description": "Node occupation variable x_v^f defined from outgoing segment running arcs.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014",
+      "description": "Arrival headway: at most one train can occupy any incompatible arrival node set.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "vp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "V",
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0016",
+      "description": "Departure headway: at most one train can occupy any incompatible departure node set.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "vp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "V",
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0032",
+      "description": "Defines incompatible space-time AD arc set for mainline vs siding routes.",
+      "quantifiers": [
+        {
+          "index": "g",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "F",
+            "A"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "M",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "F",
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0033",
+      "description": "Prevents arrival-departure conflicts between mainline and siding route space-time arcs.",
+      "quantifiers": [
+        {
+          "index": "m",
+          "over": "M",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "M",
+              "expr": "m",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "S"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0034",
+      "description": "Links implicit siding occupation y_g^f to prior departure arcs on the same siding waiting arc.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "g",
+          "over": "phi",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "m",
+          "over": "M",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "M",
+              "expr": "m",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0037",
+      "description": "Maintenance demand: every maintenance task is assigned exactly one start time in its window.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "g",
+          "over": "phi",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "m",
+          "over": "M",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "M",
+              "expr": "m",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0043_b",
+      "description": "Binary domain for maintenance start variables y_t^m.",
+      "quantifiers": [
+        {
+          "index": "f",
+          "over": "F",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "g",
+          "over": "Aar",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total weighted train running cost plus weighted penalty for maintenance start time deviations.",
+    "terms": [
+      {
+        "ref": "x",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "F",
+            "expr": "f",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "A",
+            "expr": "g",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "F",
+          "A"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

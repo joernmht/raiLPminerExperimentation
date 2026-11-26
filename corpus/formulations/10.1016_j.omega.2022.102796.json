@@ -1,0 +1,975 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.omega.2022.102796",
+  "name": "Optimal Train Rescheduling in Oslo Central Station",
+  "family": "milp",
+  "description": "Mined from Optimal Train Rescheduling in Oslo Central Station (Omega, 2022).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.omega.2022.102796",
+    "reference": "Optimal Train Rescheduling in Oslo Central Station",
+    "author": "Carlo Mannino; Andreas Nakkerud",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "N",
+      "description": "family a declared shape names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "u",
+      "description": "Route node index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of pairs of route nodes in potential conflict",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Route node index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "family a declared shape names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "a",
+      "description": "Train index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "Set of all paths",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of potential successors of a node",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Index for partition of timing nodes",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "b",
+      "description": "Train index (used in examples)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Route node index (used in examples)",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "L",
+      "description": "Traversal time of interlocking route",
+      "shape": [
+        "N"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Timetable target time at timing nodes",
+      "shape": [
+        "N"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Origin node",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Large positive constant",
+      "shape": [],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "r",
+      "description": "Number of timing node partitions for a train",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Cost of selecting a path",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "iia",
+      "description": "Label for constraint (iia) in formulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "iib",
+      "description": "Label for constraint (iib) in formulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "iic",
+      "description": "Label for constraint (iic) in formulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "iid",
+      "description": "Label for constraint (iid) in formulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "iii",
+      "description": "Label for constraint (iii) in formulation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "k",
+      "description": "Cost of delay per unit for a train",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "rho",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Gamma",
+      "description": "Minimum headway time for route node u",
+      "shape": [
+        "N"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "delta",
+      "description": "Minimum separation time between conflicting route nodes",
+      "shape": [
+        "N"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "t",
+      "description": "Schedule time for each route node",
+      "shape": [
+        "N"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Binary path selection variable",
+      "shape": [
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary node active variable",
+      "shape": [
+        "N"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary precedence variable for conflict pairs",
+      "shape": [
+        "N",
+        "N"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "eta",
+      "description": "Delay of train at route node u",
+      "shape": [
+        "N"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005_b",
+      "description": "Disjunctive conflict precedence, second alternative",
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v + 1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014_a",
+      "description": "Delay lower bound when node active",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "eta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "T",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "big_m",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_a",
+      "description": "Precedence variable bounded by activity of u (first)",
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_b",
+      "description": "Precedence variable bounded by activity of u (second)",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_c",
+      "description": "Precedence variable bounded by activity of v (first)",
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_d",
+      "description": "Precedence variable bounded by activity of v (second)",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0020",
+      "description": "At most one direction of precedence is selected",
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0021",
+      "description": "Both active nodes require a precedence direction",
+      "quantifiers": [
+        {
+          "index": "u",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "N",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "u",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "N",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total path cost plus delay penalties",
+    "terms": [
+      {
+        "ref": "w",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "P",
+            "expr": "p",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "A",
+          "P"
+        ]
+      },
+      {
+        "ref": "eta",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "N",
+            "expr": "u",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "k",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "A",
+          "N"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

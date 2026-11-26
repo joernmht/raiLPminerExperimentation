@@ -81,6 +81,7 @@ from railpminer import _lp2graph  # noqa: F401
 from corpusbuilder.algebra import declared_names, declared_products
 from corpusbuilder.dossier import Dossier
 from corpusbuilder.game import extract_symbols, is_objective_latex, normalize_objective_head
+from corpusbuilder.objective import objective_split, resolve_objectives
 from corpusbuilder.symbols import (
     binder_roles,
     domain_declaration,
@@ -435,10 +436,21 @@ def rows_for(dossier: Dossier, decisions: PaperDecisions) -> tuple[list[Row], di
                 Row(
                     name=row_name(formula.id, i, len(texts)),
                     latex=text.strip(),
-                    is_objective=is_objective_latex(text),
+                    is_objective=is_objective_latex(text) or objective_split(text) is not None,
                     formula_id=formula.id,
                 )
             )
+    # Several objective statements: restatements and component definitions
+    # are read as what they are (see objective.resolve_objectives).
+    at = [k for k, r in enumerate(rows) if r.is_objective]
+    if len(at) > 1:
+        for k, (is_obj, text) in zip(
+            at, resolve_objectives([rows[k].latex for k in at]), strict=True
+        ):
+            if not is_obj:
+                rows[k] = Row(
+                    name=rows[k].name, latex=text, is_objective=False, formula_id=rows[k].formula_id
+                )
     return rows, dict(counts)
 
 
@@ -601,9 +613,15 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
     for row in rows:
         tag = row.name.replace("_", r"\_")
         if row.is_objective:
-            body = strip_objective_label(_row_latex(normalize_objective_head(row.latex)))
-            body = re.sub(r"^\\(min|max)(?:imi[sz]e)?\b", r"\\\1", body)
-            operator, rest = body.split(None, 1) if " " in body else (body, "")
+            head = objective_split(row.latex)
+            if head is not None:
+                # the head grammar found the operator: everything before it is
+                # label material, everything after it the expression
+                operator, rest = "\\" + head[0], _row_latex(head[1])
+            else:
+                body = strip_objective_label(_row_latex(normalize_objective_head(row.latex)))
+                body = re.sub(r"^\\(min|max)(?:imi[sz]e)?\b", r"\\\1", body)
+                operator, rest = body.split(None, 1) if " " in body else (body, "")
             lines.append(rf"  {operator}\quad & {rest.strip()} \tag{{{tag}}} \\")
         else:
             lines.append(rf"  & {_constraint_latex(row.latex)} \tag{{{tag}}} \\")

@@ -17,7 +17,8 @@
 %@ index b ordered=0 cyclic=0 :: Train speed profile option index
 %@ index l ordered=0 cyclic=0 :: Line index
 %@ index cop ordered=0 cyclic=0 :: Line platforms at the same station as p
-%@ index P ordered=0 cyclic=0 :: Set of all line platforms
+%det-was: %@ index P ordered=0 cyclic=0 :: Set of all line platforms
+%@ index P ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index phy ordered=0 cyclic=0 :: Line platforms using same physical platform as p
 %@ index Z ordered=0 cyclic=0 :: Set of depots
 %@ index z ordered=0 cyclic=0 :: Depot index
@@ -28,45 +29,69 @@
 %@ index J ordered=0 cyclic=0 :: Set of trains departing from output link of depot
 %@ index B ordered=0 cyclic=0 :: Set of speed profile options for train i at line platform p
 %@ index V ordered=0 cyclic=0 :: Set of line platforms that train i will visit
-%@ param rho shape=p,e,k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
+%det-was: %@ param rho shape=p,e,k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
+%@ param rho shape=P,S,fam_k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
 %@ param lambda shape=p,e,k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
 %@ param T shape=- kind=scalar domain=- :: Length of time step for the absorption model
-%@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
-%@ param chi shape=p,q,e kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
+%det-was: %@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
+%@ param alpha shape=P,S,fam_k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
+%det-was: %@ param chi shape=p,q,e kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
+%@ param chi shape=P,fam_q,S kind=matrix domain=- :: Proportion of passengers transferring from line platform p to q
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): sta shape=p -> -
-%@ param sta shape=- kind=vector domain=- :: Station corresponding to line platform p
+%det-was: %@ param sta shape=- kind=vector domain=- :: Station corresponding to line platform p
+%@ param sta shape=P kind=vector domain=- :: Station corresponding to line platform p
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): t shape=q,p -> -
 %@ param t shape=- kind=matrix domain=- :: Mean transfer time from line platform q to p
-%@ param gamma shape=p,k kind=matrix domain=- :: Mean time of trains from depot to line platform
+%det-del: %@ param gamma shape=p,k kind=matrix domain=- :: Mean time of trains from depot to line platform
 %@ param h shape=p kind=vector domain=- :: Minimum departure-arrival headway at line platform
-%@ param sigma shape=p,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
-%@ param M shape=- kind=big_m domain=- :: Sufficiently large positive value
-%@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
+%det-was: %@ param sigma shape=p,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
+%@ param sigma shape=P,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
+%det-was: %@ param M shape=- kind=big_m domain=- :: Sufficiently large positive value
+%@ param M shape=P kind=big_m domain=- :: Sufficiently large positive value
+%det-was: %@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
+%@ param L shape=fam_N kind=vector domain=- :: Penalty term for passengers not boarding at end of horizon
 %@ param eta shape=- kind=scalar domain=- :: Weight for energy consumption in objective
 %@ param epsilon shape=- kind=tolerance domain=- :: Sufficiently small number
-%@ param m shape=- kind=scalar domain=- :: Minimum value of a variable
+%det-was: %@ param m shape=- kind=scalar domain=- :: Minimum value of a variable
+%@ param m shape=P kind=vector domain=- :: Minimum value of a variable
 %@ param pt shape=i,l kind=matrix domain=- :: Preceding train of train i at line
-%@ param A shape=- kind=scalar domain=- :: State matrix in MLD model
+%det-was: %@ param A shape=- kind=scalar domain=- :: State matrix in MLD model
+%@ param A shape=fam_k kind=vector domain=- :: State matrix in MLD model
 %@ param D shape=- kind=scalar domain=- :: Matrix in MLD inequality constraints
 %@ param zeta shape=- kind=scalar domain=- :: Weighting factor for departure time deviation
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): s shape=p -> -
 %@ param s shape=- kind=vector domain=- :: Station corresponding to line platform
-%@ var n shape=p,e,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
-%@ var C shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
-%@ var f shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
-%@ var r shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train from line platform to succeeding
-%@ var u shape=l,k domain=non_negative role=primary drole=- lo=- hi=- :: Departure frequency from depot for line
-%@ var beta shape=p,k domain=integer role=primary drole=- lo=- hi=- :: Number of phases for trains from depot to line platform
-%@ var phi shape=p,k domain=continuous role=primary drole=- lo=- hi=- :: Remainder of gamma/T
-%@ var tau shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train at line platform
-%@ var a shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at line platform
-%@ var d shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train at line platform
-%@ var y shape=i,j,l,p domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j departs before train i
-%@ var x shape=i,p,b domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating speed profile selection
-%@ var xi shape=i,j,p,q domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of trains from different lines
-%@ var E shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
+%det-was: %@ var n shape=p,e,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
+%@ var n shape=P,S,fam_k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers stranded at line platform with destination
+%det-was: %@ var C shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
+%@ var C shape=P,fam_k domain=non_negative role=primary drole=- lo=- hi=- :: Total remaining capacity of trains at line platform
+%det-was: %@ var f shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
+%@ var f shape=P,fam_k domain=non_negative role=primary drole=- lo=- hi=- :: Number of trains departing from line platform during phase
+%det-was: %@ var r shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train from line platform to succeeding
+%@ var r shape=I,P domain=non_negative role=primary drole=- lo=- hi=- :: Running time of train from line platform to succeeding
+%det-was: %@ var u shape=l,k domain=non_negative role=primary drole=- lo=- hi=- :: Departure frequency from depot for line
+%@ var u shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Departure frequency from depot for line
+%det-was: %@ var beta shape=p,k domain=integer role=primary drole=- lo=- hi=- :: Number of phases for trains from depot to line platform
+%@ var beta shape=P,fam_k domain=integer role=primary drole=- lo=- hi=- :: Number of phases for trains from depot to line platform
+%det-was: %@ var phi shape=p,k domain=continuous role=primary drole=- lo=- hi=- :: Remainder of gamma/T
+%@ var phi shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: Remainder of gamma/T
+%det-was: %@ var tau shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train at line platform
+%@ var tau shape=I,P domain=non_negative role=primary drole=- lo=- hi=- :: Dwell time of train at line platform
+%det-was: %@ var a shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at line platform
+%@ var a shape=I,P domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train at line platform
+%det-was: %@ var d shape=i,p domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train at line platform
+%@ var d shape=I,P domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train at line platform
+%det-was: %@ var y shape=i,j,l,p domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j departs before train i
+%@ var y shape=I,I,l,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train j departs before train i
+%det-was: %@ var x shape=i,p,b domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating speed profile selection
+%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating speed profile selection
+%det-was: %@ var xi shape=i,j,p,q domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of trains from different lines
+%@ var xi shape=I,j,P,P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating order of trains from different lines
+%det-was: %@ var E shape=i,p domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
+%@ var E shape=I,P domain=non_negative role=primary drole=- lo=- hi=- :: Energy consumption of train from line platform
 %@ var U shape=- domain=continuous role=primary drole=- lo=- hi=- :: Vector of optimized control inputs over horizon
-%@ var w shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
+%det-was: %@ var w shape=p,k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
+%@ var w shape=P,fam_k domain=non_negative role=primary drole=- lo=- hi=- :: Number of passengers waiting to board
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): delta shape=k,p -> -
 %@ var delta shape=- domain=binary role=auxiliary drole=- lo=- hi=- :: Binary auxiliary variable for absorption transformation
 %@ con eq_0001 kind=linear domain=- indicator=- :: Passenger arrival rate at line platform
@@ -122,3 +147,42 @@
 %@ con eq_0046_a kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint a
 %@ con eq_0046_b kind=linear domain=- indicator=- :: Additional ordering or headway linearization constraint b
 %@ con eq_0066 kind=linear domain=- indicator=- :: Constraint 66 from the paper
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter b over=B :: index letter (ADR-0023)
+%@ letter e over=S :: index letter (ADR-0023)
+%@ letter i over=I :: index letter (ADR-0023)
+%@ letter ip over=I :: index letter (ADR-0023)
+%@ letter j over=I :: index letter (ADR-0023)
+%@ letter p over=P :: index letter (ADR-0023)
+%@ letter z over=Z :: index letter (ADR-0023)
+%@ index fam_k ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_q ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_N ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ var gamma shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: Mean time of trains from depot to line platform
+%@ param C_train shape=- kind=scalar domain=- :: parameter: the paper says so (Table 2)
+%@ param D_1 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_2 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_3 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_4 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_5 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ var J_high shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0035 sets it equal to variables (a row constrains at least one variable)
+%@ var J_low shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0044 sets it equal to variables (a row constrains at least one variable)
+%@ var d_depot shape=I,l domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 3)
+%@ var delta_absorb shape=fam_k,P domain=binary role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
+%@ var f_absorb shape=fam_k,P domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
+%@ param f_min shape=- kind=scalar domain=- :: parameter: a bound or reference value of the declared variable f
+%@ param h_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ var k_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 71)
+%@ var n_absorb shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var n_alight shape=P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var n_depart shape=P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var n_trans_arrive shape=P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var n_want shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ param r_max shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ param r_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ param tau_max shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ param tau_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ var theta shape=Z,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var n_transfer shape=P,P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ param t_transfer shape=fam_q,P kind=matrix domain=- :: parameter: variant of the declared parameter t
+% --- end deterministic declarations ---

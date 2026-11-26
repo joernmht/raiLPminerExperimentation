@@ -12,13 +12,16 @@
 %@ param c shape=- kind=scalar :: Cost coefficients for trips, composition changes, and balance
 
 % E: classified as variable during review
-%@ var E shape=L,W domain=non_negative role=primary :: End-of-day carriage inventory imbalance for line l and carriage type w
+%det-was: %@ var E shape=L,W domain=non_negative role=primary :: End-of-day carriage inventory imbalance for line l and carriage type w
+%@ var E shape=L,W domain=non_negative role=primary drole=- :: End-of-day carriage inventory imbalance for line l and carriage type w
 
 % X: classified as variable during review
-%@ var X shape=T,P domain=binary role=primary :: 1 if composition p is assigned to trip t
+%det-was: %@ var X shape=T,P domain=binary role=primary :: 1 if composition p is assigned to trip t
+%@ var X shape=T,P domain=binary role=primary drole=- :: 1 if composition p is assigned to trip t
 
 % Z: classified as variable during review
-%@ var Z shape=T,Q domain=binary role=primary :: 1 if composition change q is performed at the end of trip t
+%det-was: %@ var Z shape=T,Q domain=binary role=primary :: 1 if composition change q is performed at the end of trip t
+%@ var Z shape=T,Q domain=binary role=primary drole=- :: 1 if composition change q is performed at the end of trip t
 
 % L: classified as index during review
 %@ index L ordered=0 cyclic=0 :: Set of lines
@@ -46,11 +49,13 @@
 %@ index o ordered=0 cyclic=0 :: Origin composition of a composition change
 
 % U: classified as variable during review
-%@ var U shape=T,W domain=non_negative role=primary :: Number of carriages of type w arriving at the end of trip t
+%det-was: %@ var U shape=T,W domain=non_negative role=primary :: Number of carriages of type w arriving at the end of trip t
+%@ var U shape=T,W domain=non_negative role=primary drole=- :: Number of carriages of type w arriving at the end of trip t
 
 % unusable as an identifier, rename or drop: ν
 % C: classified as variable during review
-%@ var C shape=T,W,D domain=non_negative role=primary :: Number of carriages of type w departing at the start of trip t under disruption scenario i
+%det-was: %@ var C shape=T,W,D domain=non_negative role=primary :: Number of carriages of type w departing at the start of trip t under disruption scenario i
+%@ var C shape=T,W,D domain=non_negative role=primary drole=- :: Number of carriages of type w departing at the start of trip t under disruption scenario i
 
 % unusable as an identifier, rename or drop: β
 % unusable as an identifier, rename or drop: ζ
@@ -64,7 +69,8 @@
 %@ param pt shape=T kind=vector :: Composition assigned to trip t in the original schedule
 
 % Y: classified as variable during review
-%@ var Y shape=T domain=binary role=primary :: 1 if trip t is not robust
+%det-was: %@ var Y shape=T domain=binary role=primary :: 1 if trip t is not robust
+%@ var Y shape=T domain=binary role=primary drole=- :: 1 if trip t is not robust
 
 % unusable as an identifier, rename or drop: Ψ
 % unusable as an identifier, rename or drop: α
@@ -106,3 +112,24 @@
 %@ con eq_0029 kind=linear :: C and U variables are non-negative in the strict robust schedule
 %@ con eq_0030 kind=linear :: E variables are non-negative in the strict robust schedule
 %@ con eq_0031 kind=linear :: Z variables are binary in the strict robust schedule
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter i over=D :: index letter (ADR-0023)
+%@ letter l over=L :: index letter (ADR-0023)
+%@ letter p over=P :: index letter (ADR-0023)
+%@ letter q over=Q :: index letter (ADR-0023)
+%@ index S ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter s over=S :: index letter (ADR-0023)
+%@ letter t over=T :: index letter (ADR-0023)
+%@ letter tp over=A :: index letter (ADR-0023)
+%@ index Psi ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter tpp over=Psi :: index letter (ADR-0023)
+%@ letter w over=W :: index letter (ADR-0023)
+%@ param alpha shape=- kind=scalar domain=- :: parameter: the paper says so (paragraph 32)
+%@ param beta shape=Q,W kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_bal shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_cc shape=T,Q kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_trip shape=T,P kind=matrix domain=- :: parameter: the paper says so (paragraph 40)
+%@ param nu shape=Q,W kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param zeta_0 shape=L,W kind=matrix domain=- :: parameter: the paper says so (paragraph 36)
+%@ index Omega ordered=0 cyclic=0 :: family the formulas bind over
+% --- end deterministic declarations ---

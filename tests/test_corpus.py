@@ -5,22 +5,22 @@ from __future__ import annotations
 from railpminer.corpus import load_corpus
 
 
-def test_corpus_loads_without_failures(corpus) -> None:
-    assert len(corpus) >= 1
-    assert corpus.load_failures == ()
+def test_corpus_loads_without_failures(full_corpus) -> None:
+    assert len(full_corpus) >= 1
+    assert full_corpus.load_failures == ()
 
 
-def test_formulations_and_records_aligned(corpus) -> None:
-    forms = corpus.formulations
-    recs = corpus.records
+def test_formulations_and_records_aligned(full_corpus) -> None:
+    forms = full_corpus.formulations
+    recs = full_corpus.records
     assert len(forms) == len(recs)
     # ProvenanceRecord.source_id matches the formulation id it annotates.
     for f, r in zip(forms, recs, strict=True):
         assert r.source_id == f.id
 
 
-def test_entries_sorted_by_id(corpus) -> None:
-    ids = [f.id for f in corpus.formulations]
+def test_entries_sorted_by_id(full_corpus) -> None:
+    ids = [f.id for f in full_corpus.formulations]
     assert ids == sorted(ids)
 
 

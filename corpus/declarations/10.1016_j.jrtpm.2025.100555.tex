@@ -27,7 +27,8 @@
 %@ obj sense=min name=objective combination=sum :: Minimize total duration of all commercial activities
 
 % N: classified as index during review
-%@ index N ordered=0 cyclic=0 :: Set of nodes in the Train Flow Network
+%det-was: %@ index N ordered=0 cyclic=0 :: Set of nodes in the Train Flow Network
+%@ index N ordered=0 cyclic=0 :: family the formulas bind over
 
 % n: classified as index during review
 %@ index n ordered=0 cyclic=0 :: Index for nodes in the Train Flow Network
@@ -57,13 +58,15 @@
 %@ param M shape=- kind=big_m domain=- :: Sufficiently large constant for linearization
 
 % W: classified as index during review
-%@ index W ordered=0 cyclic=0 :: Set of arcs in the Train Flow Network
+%det-was: %@ index W ordered=0 cyclic=0 :: Set of arcs in the Train Flow Network
+%@ index W ordered=0 cyclic=0 :: family a declared shape names
 
 % z: classified as variable during review
 %@ var z shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a resource path is used
 
 % y: classified as variable during review
-%@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
+%det-was: %@ var y shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
+%@ var y shape=P,P domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
 
 % unusable as an identifier, rename or drop: δ
 % T: classified as parameter during review
@@ -126,7 +129,14 @@
 %@ param T_underline shape=- kind=scalar domain=- :: Lower bound on cycle time
 %@ param delta shape=- kind=scalar domain=- :: Minimum separation time between entry and exit events
 %@ param k_hat shape=- kind=scalar domain=- :: Number of periods to consider
-%@ var lambda shape=K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%det-was: %@ var lambda shape=K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%@ var lambda shape=P,P domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
 %@ param omega shape=- kind=scalar domain=- :: Cycle time or period length
 %@ var t_entry shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
 %@ var t_exit shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ index fam_p ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ var t_entry_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_entry
+%@ var t_exit_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_exit
+%@ var z_pp shape=- domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable z
+% --- end deterministic declarations ---

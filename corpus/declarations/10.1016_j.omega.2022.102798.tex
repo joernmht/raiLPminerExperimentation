@@ -36,13 +36,16 @@
 %@ index T ordered=0 cyclic=0 :: Set of trains
 
 % a: classified as variable during review
-%@ var a shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train t at station s
+%det-was: %@ var a shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train t at station s
+%@ var a shape=t,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train t at station s
 
 % d: classified as variable during review
-%@ var d shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
+%det-was: %@ var d shape=t,s domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
+%@ var d shape=t,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
 
 % f: classified as parameter during review
-%@ param f shape=t kind=vector domain=- :: Final station for train t
+%det-was: %@ param f shape=t kind=vector domain=- :: Final station for train t
+%@ param f shape=T kind=vector domain=- :: Final station for train t
 
 % s: classified as index during review
 %@ index s ordered=1 cyclic=0 :: Station index
@@ -50,7 +53,8 @@
 % unusable as an identifier, rename or drop: Δ
 % unusable as an identifier, rename or drop: Ω
 % p: classified as variable during review
-%@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for ordered pair of trains on shared track or station
+%det-was: %@ var p shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for ordered pair of trains on shared track or station
+%@ var p shape=t,t,S domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for ordered pair of trains on shared track or station
 
 % M: classified as parameter during review
 %@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
@@ -73,7 +77,8 @@
 %@ index h ordered=1 cyclic=0 :: Hour index
 
 % z: classified as variable during review
-%@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Base time for periodic pattern
+%det-was: %@ var z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Base time for periodic pattern
+%@ var z shape=S,S domain=continuous role=primary drole=- lo=- hi=- :: Base time for periodic pattern
 
 % unusable as an identifier, rename or drop: ρ
 % unusable as an identifier, rename or drop: δ
@@ -102,3 +107,16 @@
 %@ con eq_0013_b kind=linear domain=- indicator=- :: Quasi-periodicity upper bound on departure time relative to base time plus slack
 %@ con eq_0014 kind=linear domain=- indicator=- :: Upper bound on extra running time over minimum running time
 %@ con eq_0015 kind=linear domain=- indicator=- :: Upper bound on extra dwell time over minimum dwell time
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter c over=S :: index letter (ADR-0023)
+%@ index H ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter h over=H :: index letter (ADR-0023)
+%@ letter q over=T :: index letter (ADR-0023)
+%@ letter r over=T :: index letter (ADR-0023)
+%@ letter s over=S :: index letter (ADR-0023)
+%@ letter t over=T :: index letter (ADR-0023)
+%@ var d_v shape=t domain=continuous role=primary drole=- lo=- hi=- :: variable: variant of the declared variable d
+%@ var p_e shape=t,t domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable p
+%@ param Delta shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 30)
+%@ param Omega shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 31)
+% --- end deterministic declarations ---

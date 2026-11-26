@@ -87,7 +87,8 @@
 %@ index Pi ordered=0 cyclic=0 :: Set of incompatible space-time arcs for station route conflicts.
 
 % y: classified as variable during review
-%@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for implicit siding-track occupation (y_g^f) or maintenance start time (y_t^m).
+%det-was: %@ var y shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable for implicit siding-track occupation (y_g^f) or maintenance start time (y_t^m).
+%@ var y shape=S,M domain=binary role=primary drole=- lo=- hi=- :: Binary variable for implicit siding-track occupation (y_g^f) or maintenance start time (y_t^m).
 
 % M: classified as index during review
 %@ index M ordered=0 cyclic=0 :: Set of maintenance tasks.
@@ -155,3 +156,20 @@
 %@ param T_r shape=- kind=scalar domain=- :: Running time reserve or recovery time.
 %@ param T_sr shape=K kind=scalar domain=- :: Station route setup or release time at station k.
 %@ param o_hat shape=A kind=scalar domain=- :: Scheduled or planned start time of space-time arc g.
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter e over=E :: index letter (ADR-0023)
+%@ letter f over=F :: index letter (ADR-0023)
+%@ letter g over=A :: index letter (ADR-0023)
+%@ letter gp over=A :: index letter (ADR-0023)
+%@ letter i over=N :: index letter (ADR-0023)
+%@ letter j over=N :: index letter (ADR-0023)
+%@ letter k over=K :: index letter (ADR-0023)
+%@ letter m over=M :: index letter (ADR-0023)
+%@ index S ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter t over=S :: index letter (ADR-0023)
+%@ letter tau over=A :: index letter (ADR-0023)
+%@ letter v over=V :: index letter (ADR-0023)
+%@ letter vp over=V :: index letter (ADR-0023)
+%@ letter xi over=psi :: index letter (ADR-0023)
+%@ index Aar ordered=0 cyclic=0 :: family the formulas bind over
+% --- end deterministic declarations ---

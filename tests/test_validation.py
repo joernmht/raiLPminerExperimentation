@@ -31,8 +31,8 @@ def _solve_module(fake_solve):
     return mod
 
 
-def test_structural_fidelity_round_trips_every_model(corpus) -> None:
-    results = structural_fidelity(list(corpus.formulations))
+def test_structural_fidelity_round_trips_every_model(full_corpus) -> None:
+    results = structural_fidelity(list(full_corpus.formulations))
     assert results, "expected at least one formulation"
     failures = [r for r in results if not r.round_trip_ok]
     assert not failures, f"codec round-trip failed for: {[f.formulation_id for f in failures]}"

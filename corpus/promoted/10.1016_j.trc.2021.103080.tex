@@ -11,14 +11,13 @@
 %@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating whether event e is cancelled (1) or not (0).
 %@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e relative to original schedule.
 %@ param w shape=- kind=scalar :: Fixed penalty for each cancelled service.
-%@ index E ordered=0 cyclic=0 :: Set of events (arrival or departure).
+%@ index E ordered=0 cyclic=0 :: family a declared shape names
 %@ param M shape=- kind=scalar :: Large positive number (M1, M2) used in big-M constraints.
 %@ param o shape=E kind=vector :: Original scheduled time of event e.
 %@ var x shape=E domain=continuous role=primary drole=- lo=- hi=- :: Rescheduled time of event e.
 %@ param D shape=- kind=scalar :: Maximum allowed delay for events not in E_NMdelay.
-%@ param s shape=A kind=vector :: Binary parameter indicating if a station activity is a true stop (0) or not (1).
 %@ param n shape=- kind=scalar :: Number of disruptions (current disruption index).
-%@ index A ordered=0 cyclic=0 :: Set of activities (run, station, turn, odturn).
+%@ index A ordered=0 cyclic=0 :: family a declared shape names
 %@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if station of event e is chosen as short-turn station.
 %@ param R shape=- kind=scalar :: Required recovery time length after disruptions.
 %@ param T shape=- kind=scalar :: Time-related parameters (t_start, t_end).
@@ -82,7 +81,7 @@
 %@ con eq_0058 kind=linear domain=- indicator=- :: Auxiliary constraint for OD turn activities (part a).
 %@ con eq_0059 kind=linear domain=- indicator=- :: Auxiliary constraint for OD turn activities (part b).
 %@ con eq_0060 kind=linear domain=- indicator=- :: Auxiliary constraint for OD turn activities (part c).
-%@ param st shape=- domain=- role=- drole=- lo=- hi=- :: Scheduled time
+%@ param st shape=E domain=- role=- drole=- lo=- hi=- :: Scheduled time
 %@ param tr shape=- domain=- role=- drole=- lo=- hi=- :: Train of event
 %@ param t shape=- domain=- role=- drole=- lo=- hi=- :: Time
 %@ index ep shape=- domain=- role=- drole=- lo=- hi=- :: primed event index
@@ -92,13 +91,23 @@
 %@ index E_ar ordered=0 cyclic=0 :: Set of arrival events.
 %@ index E_de ordered=0 cyclic=0 :: Set of departure events.
 %@ index E_turn_de ordered=0 cyclic=0 :: Set of departure events of turn activities.
+%@ letter a over=A :: index letter (ADR-0023)
+%@ letter e over=E :: index letter (ADR-0023)
+%@ letter ep over=E :: index letter (ADR-0023)
+%@ letter epp over=A :: index letter (ADR-0023)
+%@ index TL ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter tl over=TL :: index letter (ADR-0023)
+%@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary parameter indicating if a station activity is a true stop (0) or not (1).
+%@ param M_1 shape=- kind=big_m domain=- :: parameter: the paper says so (Table 12)
+%@ param M_2 shape=- kind=big_m domain=- :: parameter: the paper says so (Table 12)
+%@ param r shape=E kind=vector domain=- :: parameter: the paper says so (paragraph 43)
+%@ param t_1_end shape=- kind=scalar domain=- :: parameter: variant of the declared parameter t
+%@ param t_n_end shape=- kind=scalar domain=- :: parameter: variant of the declared parameter t
+%@ param t_n_start shape=- kind=scalar domain=- :: parameter: variant of the declared parameter t
 \begin{align}
-  \min\quad & \sum_{e \in E_{ar}} w \cdot c_{e} + \sum_{e \in E_{ar} \cup E_{de}} d_{e} , \tag{eq\_0006} \\
-  & M_{1} \cdot c_{e} \leq x_{e} - o_{e} \leq M_{1} , e \in E_{ar} \cup E_{de} , \tag{eq\_0007} \\
+  \min\quad & \sum_{e \in E_{ar}} w \cdot c_{e} + \sum_{e \in E_{ar} \cup E_{de}} d_{e} \tag{eq\_0006} \\
   & x_{e} - o_{e} = d_{e} + M_{1} \cdot c_{e} , e \in E_{ar} \cup E_{de} , \tag{eq\_0009} \\
   & d_{e} \le D \qquad \forall e \in (E_{ar} \cup E_{de}) \backslash E^{NMdelay} \tag{eq\_0011} \\
-  & x_{e} \geq t_{end}^{i} \left(1 - c_{e}\right) , e \in E_{de} , \mathit{st}_{e} = \mathit{st}_{en}^{i , t r_{e}} \tag{eq\_0012\_a} \\
-  & t_{start}^{i} \leq o_{e} < t_{end}^{i} , 1 \leq i \leq n \tag{eq\_0012\_b} \\
   & c_{ep} - c_{e} = 0 \qquad \forall (e, ep) \in A_{run} \tag{eq\_0013} \\
   & c_{e} - c_{ep} = 0 \qquad \forall (e, ep) \in A_{station}, e \in E_{ar} \backslash E_{ar}^{turn}, ep \in E_{de} \backslash E_{de}^{turn} \tag{eq\_0014} \\
   & c_{e} \le c_{ep} \qquad \forall (e,ep) \in A_{station}, e \in E_{ar}^{turn}, ep \in E_{de} \backslash E_{de}^{turn} \tag{eq\_0015} \\
@@ -113,32 +122,18 @@
   & c_{e} \leq 1 - y_{e} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de}^{turn} , \tag{eq\_0026} \\
   & c_{e} \geq y_{ep} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de}^{turn} , \tag{eq\_0027} \\
   & c_{ep} \leq 1 - y_{ep} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de}^{turn} , . \tag{eq\_0028} \\
-  & \sum_{e : t r_{e} = t r} y_{e} \geq c_{ep} , \mathit{tr} \in \left(T \cdot R\right)_{turn}^{i} , e \in E_{ar}^{i , turn} , ep \in E_{de} , \mathit{tr}_{ep} = \mathit{tr} , \mathit{st}_{ep} = \mathit{st}_{en}^{i , d r_{ep}} , 1 \leq i \leq n , \tag{eq\_0029} \\
-  & \underset{ep : \mathit{tr}_{ep} = \mathit{tr}}{\sum} y_{ep} \geq c_{e} , \mathit{tr} \in \left(T \cdot R\right)_{turn}^{i} , ep \in E_{de}^{i , turn} , e \in E_{ar} , \mathit{tr}_{e} = \mathit{tr} , \mathit{st}_{e} = \mathit{st}_{ex}^{i , d r_{e}} , 1 \leq i \leq n , \tag{eq\_0031} \\
   & \sum_{e : t r_{e} = t r} y_{e} \leq \sum_{ep} c_{ep} , \mathit{tr} \in \left(T \cdot R\right)_{turn} , e \in E_{ar}^{turn} , ep \in E_{de} , \mathit{tr}_{ep} = \mathit{tr} , \mathit{st}_{ep} \in \left(S \cdot T\right)_{en}^{d r_{ep}} , 1 \leq i \leq n , \tag{eq\_0032} \\
   & \underset{ep : \mathit{tr}_{ep} = \mathit{tr}}{\sum} y_{ep} \leq \sum_{e} c_{e} , \mathit{tr} \in \left(T \cdot R\right)_{turn} , ep \in E_{de}^{turn} , e \in E_{ar} , \mathit{tr}_{e} = \mathit{tr} , \mathit{st}_{e} \in \left(S \cdot T\right)_{ex}^{d r_{e}} , 1 \leq i \leq n , \tag{eq\_0034} \\
-  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{\mathit{tail} \left(a\right) = e}}{\sum} m_{a} = c_{ep} - c_{e} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de} \backslash E_{de}^{turn} , \tag{eq\_0035} \\
-  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{\mathit{head} \left(a\right) = ep}}{\sum} m_{a} = c_{e} - c_{ep} , \left(e , ep\right) \in A_{station} , e \in E_{ar} \backslash E_{ar}^{turn} , ep \in E_{de}^{turn} , \tag{eq\_0037} \\
-  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{\mathit{tail} \left(a\right) = e}}{\sum} m_{a} = c_{ep} - c_{e} + y_{ep} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de}^{turn} , \tag{eq\_0038} \\
-  & \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{\mathit{head} \left(a\right) = ep}}{\sum} m_{a} = c_{e} - c_{ep} + y_{e} , \left(e , ep\right) \in A_{station} , e \in E_{ar}^{turn} , ep \in E_{de}^{turn} . \tag{eq\_0039} \\
   & M_{1} \cdot c_{e} + 2 \cdot D \left(1 - m_{a}\right) + x_{ep} - x_{e} \geq m_{a} \cdot L_{a} , a = \left(e , ep\right) \in A_{turn} , \tag{eq\_0040} \\
   & c_{e} = 0 , e \in E_{ar} \cup E_{de} , r_{e} < t_{start}^{n} , n \geq 2 , \tag{eq\_0041} \\
   & x_{e} - r_{e} = 0 , e \in E_{ar} \cup E_{de} , r_{e} < t_{start}^{n} , n \geq 2 , \tag{eq\_0043} \\
-  & x_{e} \geq t_{start}^{n} , e \in E_{ar} \cup E_{de} , r_{e} \geq t_{start}^{n} , n \geq 2 . \tag{eq\_0044} \\
   & c_{e} = 0 , e \in E_{de} \tag{eq\_0045\_a} \\
-  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0045\_b} \\
   & x_{e} - o_{e} = 0 , e \in E_{de} \tag{eq\_0047\_a} \\
-  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0047\_b} \\
   & c_{ep} = 0 , \left(e , ep\right) \in A_{run} \tag{eq\_0048\_a} \\
-  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0048\_b} \\
   & x_{ep} - o_{ep} = 0 , \left(e , ep\right) \in A_{run} \tag{eq\_0050\_a} \\
-  & o_{e} \geq max \left\{t_{end}^{1} , \ldots , t_{end}^{n}\right\} + R , n \geq 2 \tag{eq\_0050\_b} \\
   & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} + \sum_{j = 1}^{N_{s t_{e}}^{t h}} v_{e , j} = 1 - c_{e} , e \in E_{ar} , \tag{eq\_0051} \\
   & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} \geq 1 - s_{a} - c_{e} - c_{ep} e \in E_{ar} , a = \left(e , ep\right) \in A_{station} , \tag{eq\_0053} \\
-  & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} \geq \underset{\genfrac{}{}{0pt}{}{a \in A_{turn} ,}{\mathit{tail} \left(a\right) = e}}{\sum} m_{a} e \in E_{ar}^{turn} , \tag{eq\_0054} \\
   & \sum_{i = 1}^{N_{s t_{e}}^{p}} u_{e , i} = 1 - c_{e} , e \in E_{ar}^{odturn} , \tag{eq\_0055} \\
-  & x_{ep} - x_{e^{' '}} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - c_{e^{' '}} + u_{e , i} + u_{ep , i} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , \left(e , e^{' '}\right) \in A_{station} , \tag{eq\_0056} \\
-  & x_{ep} - x_{e^{' '}} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - \left(1 - m_{a}\right) + u_{e , i} + u_{ep , i} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , a = \left(e , e^{' '}\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0058} \\
-  & x_{ep} - x_{e^{' '}} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - c_{e^{' '}} + v_{e , j} + v_{ep , j} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , \left(e , e^{' '}\right) \in A_{station} , \tag{eq\_0059} \\
-  & x_{ep} - x_{e^{' '}} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - \left(1 - m_{a}\right) + v_{e , j} + v_{ep , j} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , a = \left(e , e^{' '}\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0060} \\
+  & x_{ep} - x_{epp} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - \left(1 - m_{a}\right) + u_{e , i} + u_{ep , i} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , a = \left(e , epp\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0058} \\
+  & x_{ep} - x_{epp} \geq h_{e , ep} + M_{2} \left(q_{e , ep} - c_{e} - c_{ep} - \left(1 - m_{a}\right) + v_{e , j} + v_{ep , j} - 3\right) , e , ep \in E_{ar} , \mathit{st}_{ep} = \mathit{st}_{e} , a = \left(e , epp\right) \in A_{turn} \cup A_{odturn} , \tag{eq\_0060} \\
 \end{align}

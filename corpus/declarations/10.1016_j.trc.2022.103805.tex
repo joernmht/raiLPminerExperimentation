@@ -30,10 +30,11 @@
 %@ index X ordered=0 cyclic=0 :: Set of line pool candidates (l,f,r) and their conflict subsets.
 
 % p: classified as variable during review
-%@ var p shape=S,OD domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on edge s for relation od.
+%det-was: %@ var p shape=S,OD domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on edge s for relation od.
+%@ var p shape=S,OD,OD domain=non_negative role=primary drole=- lo=- hi=- :: Passenger flow on edge s for relation od.
 
 % t: classified as variable during review
-%@ var t shape=A,E domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity a or timestamp of event e in the periodic timetable.
+%det-del: %@ var t shape=A,E domain=non_negative role=primary drole=- lo=- hi=- :: Duration of activity a or timestamp of event e in the periodic timetable.
 
 % OD: classified as index during review
 %@ index OD ordered=0 cyclic=0 :: Set of origin-destination passenger relations.
@@ -145,4 +146,22 @@
 %@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing edges from a node in the passenger flow network.
 %@ param f_max shape=I kind=scalar domain=- :: Maximum allowed frequency on track section i.
 %@ param g_max shape=- kind=scalar domain=- :: Maximum number of rolling stock units of type g.
-%@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
+%det-was: %@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
+%@ param gamma shape=OD,OD kind=matrix domain=- :: Passenger demand for origin-destination pair (o,d).
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter a over=A :: index letter (ADR-0023)
+%@ letter d over=OD :: index letter (ADR-0023)
+%@ letter e over=E :: index letter (ADR-0023)
+%@ letter f over=F :: index letter (ADR-0023)
+%@ letter g over=G :: index letter (ADR-0023)
+%@ letter i over=I :: index letter (ADR-0023)
+%@ index alpha ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
+%@ letter j over=alpha :: index letter (ADR-0023)
+%@ letter l over=L :: index letter (ADR-0023)
+%@ letter o over=OD :: index letter (ADR-0023)
+%@ letter r over=R :: index letter (ADR-0023)
+%@ letter s over=S :: index letter (ADR-0023)
+%@ letter v over=V :: index letter (ADR-0023)
+%@ param t shape=A kind=vector domain=- :: Duration of activity a or timestamp of event e in the periodic timetable.
+%@ index delta ordered=0 cyclic=0 :: family the formulas bind over
+% --- end deterministic declarations ---

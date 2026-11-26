@@ -30,25 +30,29 @@
 %@ index node ordered=0 cyclic=0 :: Node in the railway network
 
 % x: classified as variable during review
-%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
+%det-was: %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
+%@ var x shape=N,N,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if train t traverses arc (i,j)
 
 % N: classified as index during review
 %@ index N ordered=0 cyclic=0 :: Set of nodes in the infrastructure network
 
 % T: classified as variable during review
-%@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of a train
+%det-was: %@ var T shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of a train
+%@ var T shape=fam_D,N,T domain=non_negative role=primary drole=- lo=- hi=- :: Arrival or departure time of a train
 
 % a: classified as index during review
 %@ index a ordered=0 cyclic=0 :: Arc in the network
 
 % d: classified as variable during review
-%@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an end node for train t
+%det-was: %@ var d shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an end node for train t
+%@ var d shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is an end node for train t
 
 % end: classified as index during review
 %@ index end ordered=0 cyclic=0 :: End node of a train route
 
 % o: classified as variable during review
-%@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
+%det-was: %@ var o shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
+%@ var o shape=N,T domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if node i is a starting node for train t
 
 % starting: classified as index during review
 %@ index starting ordered=0 cyclic=0 :: Starting node of a train route
@@ -102,10 +106,12 @@
 %@ param s shape=T kind=scalar domain=- :: Capacity of train t
 
 % C: classified as parameter during review
-%@ param C shape=- kind=scalar domain=- :: Cost coefficient
+%det-was: %@ param C shape=- kind=scalar domain=- :: Cost coefficient
+%@ param C shape=fam_c,K kind=matrix domain=- :: Cost coefficient
 
 % c: classified as parameter during review
-%@ param c shape=- kind=scalar domain=- :: Cost factor or travel cost
+%det-was: %@ param c shape=- kind=scalar domain=- :: Cost factor or travel cost
+%@ param c shape=P,K kind=matrix domain=- :: Cost factor or travel cost
 
 % u: classified as parameter during review
 %@ param u shape=- kind=scalar domain=- :: Detour factor for cancellation cost
@@ -159,3 +165,15 @@
 %@ con eq_0036 kind=linear domain=- indicator=- :: Reduced cost condition for adding new passenger paths
 % --- index families the formulas bind (corpusbuilder.vocab, deterministic) ---
 %@ index T ordered=0 cyclic=0 :: family bound in the formulas (added by corpusbuilder.vocab)
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter i over=N :: index letter (ADR-0023)
+%@ letter j over=N :: index letter (ADR-0023)
+%@ letter k over=K :: index letter (ADR-0023)
+%@ letter n over=N :: index letter (ADR-0023)
+%@ letter p over=P :: index letter (ADR-0023)
+%@ index fam_D ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ param c_sched shape=T kind=vector domain=- :: parameter: variant of the declared parameter c
+%@ param delta shape=N,N,P kind=matrix domain=- :: parameter: the paper says so (Table 2)
+%@ param tau shape=N,N,T kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+% --- end deterministic declarations ---

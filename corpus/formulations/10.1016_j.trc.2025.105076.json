@@ -1,0 +1,1894 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2025.105076",
+  "name": "Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers",
+  "family": "milp",
+  "description": "Mined from Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers (Transportation Research Part C Emerging Technologies, 2025).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2025.105076",
+    "reference": "Integrated train rescheduling and speed management in a railway network: A meso-micro approach based on direct multiple shooting and alternating direction method of multipliers",
+    "author": "Cong Xiu; Jinyi Pan; Andrea D’Ariano; Shuguang Zhan; Tao Feng; Qiyuan Peng",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "q",
+      "description": "Node in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "K",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Q",
+      "description": "Set of nodes in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "k",
+      "description": "Train index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "family a declared shape names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Station index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of power supply districts",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of time instants",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "r",
+      "description": "Power supply district index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "Set of stations",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "s",
+      "description": "Position along track",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W_hat",
+      "description": "Set of visited stations for train",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "Set of track sections",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "a",
+      "description": "Arc index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_diruption",
+      "description": "Set of disruption arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_drive",
+      "description": "Set of driving arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_dwell",
+      "description": "Set of dwelling arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_off",
+      "description": "Set of off arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_on",
+      "description": "Set of on arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_q_minus",
+      "description": "Set of incoming arcs to node q in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_q_plus",
+      "description": "Set of outgoing arcs from node q in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_tilde",
+      "description": "Set of arcs in the space-time-state network excluding certain arcs",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A_track",
+      "description": "Set of track arcs in the space-time-state network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Omega",
+      "description": "family a declared shape names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Phi",
+      "description": "Set of arcs preceding a given arc",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "varphi",
+      "description": "Set of arcs in a power supply district at a time instant",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_n",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "d",
+      "description": "Passenger demand for getting off at station",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "e",
+      "description": "Energy consumption cost of arc",
+      "shape": [
+        "Omega",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "End location of train",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "o",
+      "description": "Origin of train",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "P",
+      "description": "Power supply capacity",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "p",
+      "description": "Power consumption of train on arc at a time instant",
+      "shape": [
+        "Omega",
+        "K",
+        "T"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "S",
+      "description": "Total length of track",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c",
+      "description": "Delay cost of arc",
+      "shape": [
+        "Omega",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "C",
+      "description": "Cancellation penalty cost",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Model index",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_max",
+      "description": "Upper bound of control variable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "x_max",
+      "description": "Upper bound of state variable",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "G",
+      "description": "Train dynamic function",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "C_0",
+      "description": "Coefficient in cost function",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Psi_1",
+      "description": "Penalty function for train order constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Psi_2",
+      "description": "Penalty function for power supply constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T_arr",
+      "description": "Scheduled arrival time of train k at station w",
+      "shape": [
+        "K",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "T_dep",
+      "description": "Scheduled departure time of train k from station w",
+      "shape": [
+        "K",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "Control variable (acceleration) in speed profile",
+      "shape": [
+        "fam_n"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "b_max",
+      "description": "Maximum braking force for train k",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "beta",
+      "description": "State variable (speed) in speed profile",
+      "shape": [
+        "fam_n"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "beta_0",
+      "description": "Initial speed in speed profile",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c_tilde",
+      "description": "Modified cost coefficient for arc a and train k",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "chi",
+      "description": "Function of state and control in speed profile",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "chi_bar",
+      "description": "Upper bound for chi",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "chi_max",
+      "description": "Maximum value for chi",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "chi_min",
+      "description": "Minimum value for chi",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "chi_underline",
+      "description": "Lower bound for chi",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "d_off",
+      "description": "Delay cost coefficient for off arcs at station w",
+      "shape": [
+        "K",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "d_on",
+      "description": "Delay cost coefficient for on arcs at station w",
+      "shape": [
+        "K",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "delta_star",
+      "description": "Optimal slack variable for arc a",
+      "shape": [
+        "Omega"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "eta",
+      "description": "Parameter in ADMM penalty update",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "f_max",
+      "description": "Maximum traction force for train k",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "gamma",
+      "description": "Parameter in ADMM penalty update",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "lambda_theta",
+      "description": "Dual variable at iteration theta for arc a",
+      "shape": [
+        "Omega"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "p_max",
+      "description": "Maximum power for train k",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "res_theta",
+      "description": "Residual at iteration theta",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "rho",
+      "description": "Penalty parameter in ADMM",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho_1",
+      "description": "Penalty parameter for train order constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho_2",
+      "description": "Penalty parameter for power supply constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho_theta",
+      "description": "Penalty parameter at iteration theta",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "theta_1",
+      "description": "Weight for passenger delay in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "theta_2",
+      "description": "Weight for energy consumption in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_bar",
+      "description": "Upper bound for control variable u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "u_underline",
+      "description": "Lower bound for control variable u",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "v_max",
+      "description": "Maximum speed limit",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "x_bar",
+      "description": "Upper bound for state variable x",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "x_underline",
+      "description": "Lower bound for state variable x",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "zeta_star",
+      "description": "Optimal slack variable for power supply district r and time t",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "mu",
+      "description": "Auxiliary variable for arc a and train k",
+      "shape": [
+        "Omega",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "pi",
+      "description": "Auxiliary variable for power supply district r, time t, train k",
+      "shape": [
+        "R",
+        "T",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "y",
+      "description": "Binary variable indicating if train k uses arc a",
+      "shape": [
+        "Omega",
+        "K"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "f",
+      "description": "Traction force of train",
+      "shape": [
+        "A",
+        "A",
+        "s",
+        "K"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "b",
+      "description": "Braking force of train",
+      "shape": [
+        "A",
+        "A",
+        "s",
+        "K"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "State variable (speed and time) of train",
+      "shape": [
+        "fam_n"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "Objective value",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "re",
+      "description": "Primary residual for ADMM penalty update",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "res",
+      "description": "Primary residual (alternative notation)",
+      "shape": [
+        "i"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "lambda",
+      "description": "Dual variable for arc a",
+      "shape": [
+        "Phi"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "xi",
+      "description": "Dual variable for power supply district r and time t",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "zeta",
+      "description": "Slack variable for power supply district r and time t",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "domain": "non_negative",
+      "lower": 0.0,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "delta",
+      "description": "Slack variable for arc a",
+      "shape": [
+        "Omega"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u",
+      "description": "variable: the paper says so (Table 2)",
+      "shape": [
+        "A",
+        "A",
+        "s",
+        "K"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0017_lo",
+      "description": "Definition of departure headway incompatible arcs",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "s",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "f",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "s",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017_up",
+      "description": "Definition of departure headway incompatible arcs",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "s",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "f",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "s",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "f_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018_lo",
+      "description": "Definition of arrival headway incompatible arcs",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "s",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "b",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "s",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018_up",
+      "description": "Definition of arrival headway incompatible arcs",
+      "quantifiers": [
+        {
+          "index": "s",
+          "over": "s",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "b",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "s",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "b_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0034",
+      "description": "Energy conflict arc set definition",
+      "quantifiers": [],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "beta",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "fam_n",
+              "expr": "0",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0045_lo",
+      "description": "Energy conflict arc set definition for power supply",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0045_up",
+      "description": "Energy conflict arc set definition for power supply",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0046_lo",
+      "description": "Power supply constraint ensuring energy use does not exceed capacity",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [],
+      "rhs": [
+        {
+          "ref": "zeta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0046_up",
+      "description": "Power supply constraint ensuring energy use does not exceed capacity",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "zeta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "P",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0047",
+      "description": "Power consumption calculation at a time instant",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "delta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "Phi"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0048",
+      "description": "Power consumption integral for an arc",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "zeta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "P",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "varphi"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0049_1",
+      "description": "Power consumption relation to traction force",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "Phi"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "kp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "Phi"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Phi"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0049_2",
+      "description": "Power consumption relation to traction force",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "kp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "Phi"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Phi"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "mu",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Phi"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0067",
+      "description": "Train system constraint on traction force bounds",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "delta_star",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "ap",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Phi"
+          ]
+        },
+        {
+          "ref": "mu",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0074",
+      "description": "Train system constraint on acceleration and deceleration comfort bounds",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "zeta_star",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "P",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
+          ]
+        },
+        {
+          "ref": "pi",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize weighted sum of passenger delay cost and train energy consumption",
+    "terms": [
+      {
+        "ref": "Z",
+        "ref_kind": "variable",
+        "bindings": [],
+        "coefficient": 1.0,
+        "sign": 1,
+        "role": "objective",
+        "operator": "none",
+        "operator_over": []
+      }
+    ],
+    "combination": "weighted_sum"
+  }
+}

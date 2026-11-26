@@ -1,0 +1,1047 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.ejor.2026.05.045",
+  "name": "Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty",
+  "family": "milp",
+  "description": "Mined from Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty (European Journal of Operational Research, 2026).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.ejor.2026.05.045",
+    "reference": "Two approaches for real-time robust rolling stock rescheduling given disruption duration uncertainty",
+    "author": "Joris Wagenaar; Evelien van der Hurk; Richard Lusby; Marie Schmidt",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "L",
+      "description": "Set of lines",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "Set of compositions",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Q",
+      "description": "Set of composition changes",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "T",
+      "description": "Set of trips",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "Set of carriage types",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "t",
+      "description": "Index for trips",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "p",
+      "description": "Index for compositions",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "o",
+      "description": "Origin composition of a composition change",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of trips arriving before trip t",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B",
+      "description": "Set of trips departing after trip t",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of rolling stock schedules, one for each disruption scenario",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "D",
+      "description": "Set of disruption duration scenarios",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Psi",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Omega",
+      "description": "family the formulas bind over",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "c",
+      "description": "Cost coefficients for trips, composition changes, and balance",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "pt",
+      "description": "Composition assigned to trip t in the original schedule",
+      "shape": [
+        "T"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "parameter: the paper says so (paragraph 32)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "beta",
+      "description": "parameter: it multiplies a declared variable (the model is linear)",
+      "shape": [
+        "Q",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "c_bal",
+      "description": "parameter: it multiplies a declared variable (the model is linear)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c_cc",
+      "description": "parameter: it multiplies a declared variable (the model is linear)",
+      "shape": [
+        "T",
+        "Q"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "c_trip",
+      "description": "parameter: the paper says so (paragraph 40)",
+      "shape": [
+        "T",
+        "P"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "nu",
+      "description": "parameter: it multiplies a declared variable (the model is linear)",
+      "shape": [
+        "Q",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "zeta_0",
+      "description": "parameter: the paper says so (paragraph 36)",
+      "shape": [
+        "L",
+        "W"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "E",
+      "description": "End-of-day carriage inventory imbalance for line l and carriage type w",
+      "shape": [
+        "L",
+        "W"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "X",
+      "description": "1 if composition p is assigned to trip t",
+      "shape": [
+        "T",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Z",
+      "description": "1 if composition change q is performed at the end of trip t",
+      "shape": [
+        "T",
+        "Q"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "U",
+      "description": "Number of carriages of type w arriving at the end of trip t",
+      "shape": [
+        "T",
+        "W"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "C",
+      "description": "Number of carriages of type w departing at the start of trip t under disruption scenario i",
+      "shape": [
+        "T",
+        "W",
+        "D"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Y",
+      "description": "1 if trip t is not robust",
+      "shape": [
+        "T"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0005",
+      "description": "Set incoming composition of each trip equal to the composition of the chosen composition change",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0006",
+      "description": "Set outgoing composition of the composition change to the composition of the affected trip",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "psi_{t}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007",
+      "description": "Compute arriving carriages from composition changes",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "w",
+          "over": "W",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "U",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "nu",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0011",
+      "description": "Link non-robust trips to differing compositions under disruption scenarios",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tp",
+          "over": "T",
+          "restriction": "ne_other",
+          "restriction_other": "tpp",
+          "where": null
+        },
+        {
+          "index": "tpp",
+          "over": "Psi",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "Y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "tp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "tpp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0022",
+      "description": "Set incoming composition of each trip from the composition change in the strict robust schedule",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0023",
+      "description": "Ensure successor trip composition matches the outgoing composition of the composition change",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "tp",
+          "over": "Omega",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "X",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "tp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0024",
+      "description": "Compute arriving carriages from composition changes in the strict robust schedule",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "w",
+          "over": "W",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "U",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "nu",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0026",
+      "description": "Ensure carriage availability per disruption scenario in the strict robust schedule",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "w",
+          "over": "W",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "D",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "zeta_0",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l_{t}^{d e p}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "C",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "tp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "D",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A"
+          ]
+        },
+        {
+          "ref": "U",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "tp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "B"
+          ]
+        }
+      ],
+      "rhs": [],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total cost of trip compositions, composition changes, and end-of-day carriage imbalances",
+    "terms": [
+      {
+        "ref": "X",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "t",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "P",
+            "expr": "p",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c_trip",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "T",
+          "P"
+        ]
+      },
+      {
+        "ref": "Z",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "T",
+            "expr": "t",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "Q",
+            "expr": "q",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c_cc",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "T",
+          "Q"
+        ]
+      },
+      {
+        "ref": "E",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "L",
+            "expr": "l",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "W",
+            "expr": "w",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "c_bal",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "L",
+          "W"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

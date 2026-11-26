@@ -38,7 +38,8 @@
 %@ var W shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Average waiting time until end of time slice
 
 % Y: classified as variable during review
-%@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
+%det-was: %@ var Y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
+%@ var Y shape=V,OD domain=non_negative role=primary drole=- lo=- hi=- :: Perceived travel time on route or from time slice
 
 % unusable as an identifier, rename or drop: γ
 % OD: classified as index during review
@@ -52,7 +53,7 @@
 %@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in the network
 
 % p: classified as variable during review
-%@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
+%det-del: %@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
 
 % s: classified as parameter during review
 %@ param s shape=- kind=scalar domain=- :: Possibly a parameter for start time or station, not defined in given text
@@ -61,10 +62,12 @@
 %@ param t shape=- kind=scalar domain=- :: Possibly a parameter for transfer time or type, not defined in given text
 
 % y: classified as variable during review
-%@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
+%det-was: %@ var y shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
+%@ var y shape=A,V domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
 
 % u: classified as parameter during review
-%@ param u shape=- kind=scalar domain=- :: Upper bound on activity duration
+%det-was: %@ param u shape=- kind=scalar domain=- :: Upper bound on activity duration
+%@ param u shape=V,OD kind=matrix domain=- :: Upper bound on activity duration
 
 % unusable as an identifier, rename or drop: ℓ
 % R: classified as index during review
@@ -81,10 +84,11 @@
 %@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
 
 % Q: classified as parameter during review
-%@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
+%det-del: %@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
 
 % x: classified as variable during review
-%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
+%det-was: %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
+%@ var x shape=V,T,OD domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
 
 % l: classified as parameter during review
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes v,k): l shape=- -> V,OD
@@ -136,3 +140,20 @@
 %@ con eq_0047 kind=linear domain=- indicator=- :: Linearization of binary route/event selection
 %@ con eq_0049 kind=linear domain=- indicator=- :: Linearization auxiliary constraint
 %@ con eq_0050 kind=linear domain=- indicator=- :: Linearization auxiliary constraint
+% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
+%@ letter a over=r :: index letter (ADR-0023)
+%@ letter d over=T :: index letter (ADR-0023)
+%@ letter i over=A :: index letter (ADR-0023)
+%@ letter j over=V :: index letter (ADR-0023)
+%@ letter k over=OD :: index letter (ADR-0023)
+%@ letter pi over=V :: index letter (ADR-0023)
+%@ letter r over=R :: index letter (ADR-0023)
+%@ letter v over=V :: index letter (ADR-0023)
+%@ letter vp over=V :: index letter (ADR-0023)
+%@ param p shape=A,V kind=matrix domain=- :: Integer variable representing modulo operator for activity duration
+%@ var Q shape=V,V domain=continuous role=primary drole=- lo=- hi=- :: Periodic time difference between events
+%@ var alpha shape=V,V domain=binary role=primary drole=- lo=- hi=- :: variable: a domain row of the paper declares it
+%@ index fam_w ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ param gamma shape=fam_w kind=vector domain=- :: parameter: the paper says so (Table 10)
+%@ var pi shape=V domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 10)
+% --- end deterministic declarations ---
