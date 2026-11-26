@@ -637,9 +637,6 @@ def main(argv: list[str] | None = None) -> int:
         fh.write("\n")
     with open(out / "patterns.md", "w", encoding="utf-8", newline="\n") as fh:
         fh.write(render_markdown(rep) + "\n")
-    canonical = rep if not args.include_generated else report(load_universe(False))
-    with open(out / "patterns_macros.tex", "w", encoding="utf-8", newline="\n") as fh:
-        fh.write(macros(canonical))
     print(
         f"{rep['n_models']} models, {rep['n_rows']} rows, {rep['unmatched_rows']} unmatched; "
         f"models: { {k: v for k, v in rep['model_pattern_counts'].items() if v} }"
