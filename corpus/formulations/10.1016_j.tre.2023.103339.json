@@ -1,0 +1,1576 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.tre.2023.103339",
+  "name": "Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles",
+  "family": "milp",
+  "description": "Mined from Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles (Transportation Research Part E Logistics and Transportation Review, 2023).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.tre.2023.103339",
+    "reference": "Bi-level model predictive control for metro networks: Integration of timetables, passenger flows, and train speed profiles",
+    "author": "Xiaoyu Liu; Azita Dabiri; Jing Xun; Bart De Schutter",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "k",
+      "description": "Time phase index for the higher-level model",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of all stations in the network",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "p",
+      "description": "Line platform index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "q",
+      "description": "Line platform index for transfers and shared-platform interactions",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "e",
+      "description": "Destination station index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "i",
+      "description": "Train index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "j",
+      "description": "Train index for depot departures and ordering",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "b",
+      "description": "Train speed profile option index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "l",
+      "description": "Line index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "cop",
+      "description": "Line platforms at the same station as p",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "Set of all line platforms",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "phy",
+      "description": "Line platforms using same physical platform as p",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "Set of depots",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "z",
+      "description": "Depot index",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "in",
+      "description": "Line platforms corresponding to entering link of depot",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "out",
+      "description": "Lines corresponding to output link of depot",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "N",
+      "description": "Number of phases in prediction horizon",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "I",
+      "description": "Set of trains",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "J",
+      "description": "Set of trains departing from output link of depot",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "B",
+      "description": "Set of speed profile options for train i at line platform p",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of line platforms that train i will visit",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_k",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_s",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_q",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_N",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "rho",
+      "description": "Passenger arrival rate at line platform with destination",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "lambda",
+      "description": "Splitting rate of passengers at station choosing line platform",
+      "shape": [
+        "fam_s",
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Length of time step for the absorption model",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "alpha",
+      "description": "Relative fraction of passengers boarding trains at line platform",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "chi",
+      "description": "Proportion of passengers transferring from line platform p to q",
+      "shape": [
+        "P",
+        "fam_q",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "sta",
+      "description": "Station corresponding to line platform p",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Mean transfer time from line platform q to p",
+      "shape": [],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "h",
+      "description": "Minimum departure-arrival headway at line platform",
+      "shape": [
+        "p"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "sigma",
+      "description": "Binary indicating if line platforms share same physical platform",
+      "shape": [
+        "P",
+        "q"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "M",
+      "description": "Sufficiently large positive value",
+      "shape": [
+        "P"
+      ],
+      "kind": "big_m",
+      "domain_class": null
+    },
+    {
+      "name": "eta",
+      "description": "Weight for energy consumption in objective",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "epsilon",
+      "description": "Sufficiently small number",
+      "shape": [],
+      "kind": "tolerance",
+      "domain_class": null
+    },
+    {
+      "name": "m",
+      "description": "Minimum value of a variable",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "pt",
+      "description": "Preceding train of train i at line",
+      "shape": [
+        "i",
+        "l"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "A",
+      "description": "State matrix in MLD model",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D",
+      "description": "Matrix in MLD inequality constraints",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "zeta",
+      "description": "Weighting factor for departure time deviation",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "s",
+      "description": "Station corresponding to line platform",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "C_train",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "P",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "h_min",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "r_max",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "r_min",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "tau_max",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "tau_min",
+      "description": "parameter: the paper says so (Table 2)",
+      "shape": [
+        "P"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D_1",
+      "description": "parameter: variant of the declared parameter D",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D_2",
+      "description": "parameter: variant of the declared parameter D",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D_3",
+      "description": "parameter: variant of the declared parameter D",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D_4",
+      "description": "parameter: variant of the declared parameter D",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "D_5",
+      "description": "parameter: variant of the declared parameter D",
+      "shape": [
+        "fam_k"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "f_min",
+      "description": "parameter: a bound or reference value of the declared variable f",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "rho_station",
+      "description": "parameter: variant of the declared parameter rho",
+      "shape": [
+        "fam_s",
+        "S",
+        "fam_k"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "t_transfer",
+      "description": "parameter: variant of the declared parameter t",
+      "shape": [
+        "fam_q",
+        "P"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "n",
+      "description": "Number of passengers stranded at line platform with destination",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "C",
+      "description": "Total remaining capacity of trains at line platform",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "f",
+      "description": "Number of trains departing from line platform during phase",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "r",
+      "description": "Running time of train from line platform to succeeding",
+      "shape": [
+        "I",
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "u",
+      "description": "Departure frequency from depot for line",
+      "shape": [],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "beta",
+      "description": "Number of phases for trains from depot to line platform",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "phi",
+      "description": "Remainder of gamma/T",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "tau",
+      "description": "Dwell time of train at line platform",
+      "shape": [
+        "I",
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "a",
+      "description": "Arrival time of train at line platform",
+      "shape": [
+        "I",
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d",
+      "description": "Departure time of train at line platform",
+      "shape": [
+        "I",
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable indicating if train j departs before train i",
+      "shape": [
+        "I",
+        "I",
+        "l",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary variable indicating speed profile selection",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "xi",
+      "description": "Binary variable indicating order of trains from different lines",
+      "shape": [
+        "I",
+        "j",
+        "P",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "E",
+      "description": "Energy consumption of train from line platform",
+      "shape": [
+        "I",
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "U",
+      "description": "Vector of optimized control inputs over horizon",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "w",
+      "description": "Number of passengers waiting to board",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "delta",
+      "description": "Binary auxiliary variable for absorption transformation",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "auxiliary",
+      "domain_role": null
+    },
+    {
+      "name": "gamma",
+      "description": "Mean time of trains from depot to line platform",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "L",
+      "description": "Penalty term for passengers not boarding at end of horizon",
+      "shape": [
+        "fam_N"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "J_high",
+      "description": "variable: row eq_0035 sets it equal to variables (a row constrains at least one variable)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "J_low",
+      "description": "variable: row eq_0044 sets it equal to variables (a row constrains at least one variable)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "d_depot",
+      "description": "variable: the paper says so (Table 3)",
+      "shape": [
+        "I",
+        "l"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "delta_absorb",
+      "description": "variable: the paper says so (paragraph 66)",
+      "shape": [
+        "fam_k",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "f_absorb",
+      "description": "variable: the paper says so (paragraph 66)",
+      "shape": [
+        "fam_k",
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "k_0",
+      "description": "variable: the paper says so (paragraph 71)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_absorb",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_alight",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_depart",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_trans_arrive",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_want",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "r_bar",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_tilde",
+      "description": "variable: the paper says so (paragraph 67)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "E_idx_I_B_P",
+      "description": "second variable written E: over (I, B, P), where E is declared over (I, P); row eq_0043 writes both forms; domain taken from E",
+      "shape": [
+        "I",
+        "B",
+        "P"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "r_idx_I_P_B",
+      "description": "second variable written r: over (I, P, B), where r is declared over (I, P); row eq_0028 writes both forms; domain taken from r",
+      "shape": [
+        "I",
+        "P",
+        "B"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "theta",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "Z",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "S",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "n_transfer",
+      "description": "variable: the paper says so (Table 4)",
+      "shape": [
+        "P",
+        "P",
+        "S",
+        "fam_k"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0022",
+      "description": "Arrival time from preceding departure and running time",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "tau",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0023_lo",
+      "description": "Definition of train order binary variable y",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "tau_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "tau",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0023_up",
+      "description": "Definition of train order binary variable y",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "tau",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "tau_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0024",
+      "description": "Lower-level rolling stock circulation constraint",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p_pla_{p}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p_pla_{p}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0027_lo",
+      "description": "Exactly one speed profile selected per train and platform",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "r_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0027_up",
+      "description": "Exactly one speed profile selected per train and platform",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "r",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "r_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0030",
+      "description": "Cross-line headway constraint for shared physical platforms",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "p_tra_ell_{i}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "h_min",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0036_a",
+      "description": "Linearization of binary-continuous product, part a",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "fam_k",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "f_absorb",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "fam_k",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "M",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "delta_absorb",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "fam_k",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": null
+}

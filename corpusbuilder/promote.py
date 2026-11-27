@@ -51,9 +51,21 @@ promotion). Two of the paper's categories — missing instance data and
 cross-solver disagreement — arise downstream at grounding/solving time and are
 listed in :data:`NOT_ASSESSED_HERE` rather than silently omitted.
 
+Partial promotion and the objective (ADR-0027)
+----------------------------------------------
+``--partial`` promotes the canonical *subset* of a paper's rows and records
+every excluded row with the parser's reason. The objective is a row like any
+other: it is in the model when the paper states exactly one and the grammar
+reads it; otherwise the constraint system is promoted without an objective.
+What the paper's objective is like (``canonical`` / ``outside_grammar`` /
+``several`` / ``none``, each statement with its sense and failure class) is a
+recorded feature of the entry, in the report and in the provenance record.
+Whole-paper promotion (no flag) keeps the gate: exactly one objective.
+
 Run::
 
     PYTHONPATH=. python3 -m corpusbuilder.promote            # promote + write report
+    PYTHONPATH=. python3 -m corpusbuilder.promote --partial  # canonical row subsets (the corpus run)
     PYTHONPATH=. python3 -m corpusbuilder.promote --dry-run  # report only, write nothing
 """
 
@@ -175,6 +187,14 @@ CAUSES: dict[str, tuple[str, str]] = {
         "under_specified",
         "no accepted formula states an objective — the model is incomplete",
     ),
+}
+
+#: The objective as a feature of a promoted entry (ADR-0027): status -> wording.
+OBJECTIVE_STATUSES: dict[str, str] = {
+    "canonical": "one objective, in the model",
+    "outside_grammar": "one objective, outside the grammar",
+    "several": "several objectives",
+    "none": "no objective stated",
 }
 
 #: Failure categories the paper's taxonomy names that cannot be decided at
@@ -824,6 +844,12 @@ class Outcome:
     #: Row-level probe (``--partial``): objective_ok, rows_probed, rows_ok,
     #: row_failures by class — measured for EVERY paper, promoted or not.
     coverage: dict | None = None
+    #: The paper's objective as a feature (``--partial``): ``status`` is
+    #: ``canonical`` (one objective, in the model), ``outside_grammar`` (one,
+    #: the grammar cannot read it), ``several`` or ``none``; ``rows`` lists
+    #: every objective statement with its sense and, when it does not parse,
+    #: the failure class. ``None`` before the objective was looked at.
+    objective: dict | None = None
 
     @property
     def category(self) -> str | None:
@@ -853,6 +879,8 @@ class Outcome:
             out["absorbed_declaration_rows"] = list(self.rows_absorbed)
         if self.coverage is not None:
             out["coverage"] = self.coverage
+        if self.objective is not None:
+            out["objective"] = self.objective
         if self.written:
             out["written"] = list(self.written)
         return out
@@ -911,29 +939,6 @@ def absorb_declaration_rows(rows: list[Row]) -> tuple[list[Row], tuple[str, ...]
     return kept, tuple(absorbed)
 
 
-def synthetic_objective_row(declarations: str) -> Row | None:
-    """A guaranteed-canonical objective over the first declared variable, used
-    ONLY to probe constraint rows when the paper's own objective fails."""
-    for m in re.finditer(r"^\s*%@\s*var\s+([A-Za-z_]\w*)\s+shape=(\S+)", declarations, re.M):
-        name, shape = m.group(1), m.group(2)
-        if shape == "-":
-            return Row(
-                name="probe_objective", latex=rf"\min {name}", is_objective=True, formula_id="probe"
-            )
-        families = [f for f in shape.split(",") if f]
-        if not families or any(not re.fullmatch(r"[A-Za-z_]\w*", f) for f in families):
-            continue
-        idx = [f"i{k}" for k in range(len(families))]
-        binders = ", ".join(rf"{i} \in \mathcal{{{f}}}" for i, f in zip(idx, families, strict=True))
-        return Row(
-            name="probe_objective",
-            latex=rf"\min \sum_{{{binders}}} {name}_{{{', '.join(idx)}}}",
-            is_objective=True,
-            formula_id="probe",
-        )
-    return None
-
-
 def entry_id_for(paper_key: str) -> str:
     """The canonical ``Formulation`` id for a paper key.
 
@@ -973,6 +978,7 @@ def promote_paper(
     rows, counts = rows_for(dossier, decisions)
     rows, absorbed = absorb_declaration_rows(rows)
     coverage: dict | None = None
+    objective: dict | None = None
 
     def fail(cause: str, detail: str = "", written: tuple[str, ...] = ()) -> Outcome:
         return Outcome(
@@ -986,6 +992,7 @@ def promote_paper(
             written=written,
             rows_absorbed=absorbed,
             coverage=coverage,
+            objective=objective,
         )
 
     decided = sum(counts.get(s, 0) for s in TERMINAL_STATUSES)
@@ -1003,11 +1010,14 @@ def promote_paper(
     if empty:
         return fail("corrected_without_replacement", ", ".join(sorted(empty)))
 
-    objectives = [r.name for r in rows if r.is_objective]
-    if not objectives:
-        return fail("no_objective")
-    if len(objectives) > 1:
-        return fail("multiple_objectives", ", ".join(objectives))
+    objective_rows = [r for r in rows if r.is_objective]
+    constraint_rows = [r for r in rows if not r.is_objective]
+    if not partial:
+        # Whole-paper promotion wants the complete model: exactly one objective.
+        if not objective_rows:
+            return fail("no_objective")
+        if len(objective_rows) > 1:
+            return fail("multiple_objectives", ", ".join(r.name for r in objective_rows))
 
     cell = decisions.cell
     if cell is None or cell not in PRIORITY_CELLS:
@@ -1026,7 +1036,20 @@ def promote_paper(
         return fail("missing_declarations", _rel(decl_path), written)
 
     declarations = decl_path.read_text(encoding="utf-8")
-    document = assemble(dossier, rows, declarations, entry_id=entry_id)
+
+    def _ingest(subset: list[Row], source: str):
+        return ingest_latex(
+            assemble(dossier, subset, declarations, entry_id=entry_id), source=source
+        )
+
+    def _message(res) -> str:
+        return _oneline("; ".join(f.message for f in res.failures))[:200]
+
+    # The whole paper first. With several objective statements there is no
+    # whole paper to try (the canonical model admits one objective), so the
+    # first candidate is the constraint system.
+    whole = rows if len(objective_rows) <= 1 else constraint_rows
+    document = assemble(dossier, whole, declarations, entry_id=entry_id)
     written_paths: list[str] = []
     if write:
         dirs["promoted"].mkdir(parents=True, exist_ok=True)
@@ -1036,71 +1059,126 @@ def promote_paper(
 
     result = ingest_latex(document, source=f"corpus/promoted/{entry_id}.tex")
     excluded: tuple[dict, ...] = ()
-    if not result.ok and partial:
+    if partial:
         # Partial promotion: whole-paper canonicalization is a conjunction
         # over every row, and one stubborn row vetoes the paper. The honest
-        # alternative to all-or-nothing is the canonical SUBSET: keep the
-        # objective plus every constraint row that parses in isolation,
-        # re-assemble, and record precisely which rows were dropped and what
-        # the parser said about each — coverage becomes a measured number,
-        # never a silent omission. A model missing rows is weaker, not wrong;
-        # the provenance carries ``partial`` so no reader can mistake it.
-        objective_rows = [r for r in rows if r.is_objective]
-
-        def _row_ok(row: Row, base: list[Row]) -> tuple[bool, str]:
-            doc = assemble(dossier, [*base, row], declarations, entry_id=entry_id)
-            probe = ingest_latex(doc, source=f"probe/{entry_id}")
-            if probe.ok:
-                return True, ""
-            return False, _oneline("; ".join(f.message for f in probe.failures))[:200]
-
-        obj_doc = assemble(dossier, objective_rows, declarations, entry_id=entry_id)
-        obj_probe = ingest_latex(obj_doc, source=f"probe/{entry_id}")
-        objective_ok = obj_probe.ok
-        # Measurement for every paper: when the paper's own objective fails,
-        # a synthetic objective over a declared variable lets the constraint
-        # rows be probed anyway (never promoted with it, only counted).
-        probe_base: list[Row] | None = objective_rows if objective_ok else None
-        if probe_base is None:
-            synthetic = synthetic_objective_row(declarations)
-            if synthetic is not None:
-                syn_doc = assemble(dossier, [synthetic], declarations, entry_id=entry_id)
-                if ingest_latex(syn_doc, source=f"probe/{entry_id}").ok:
-                    probe_base = [synthetic]
-        kept: list[Row] = list(objective_rows)
-        dropped: list[dict] = []
-        if probe_base is not None:
-            for row in rows:
-                if row.is_objective:
-                    continue
-                ok, why = _row_ok(row, probe_base)
-                if ok:
+        # alternative to all-or-nothing is the canonical SUBSET: every row
+        # that parses, re-assembled, with a record of which rows were dropped
+        # and what the parser said about each. Coverage becomes a measured
+        # number, never a silent omission. A model missing rows is weaker,
+        # not wrong; the provenance carries ``partial`` so no reader can
+        # mistake it.
+        #
+        # The objective is a row like any other (ADR-0027): when the paper
+        # states none, several, or one the grammar cannot read (non-linear,
+        # a function call, an expectation), the constraint system is promoted
+        # without an objective and the paper's objective is recorded as a
+        # feature of the entry, never invented and never dropped silently.
+        stated: list[dict] = []
+        usable: list[Row] = []
+        for row in objective_rows:
+            if result.ok and len(objective_rows) == 1:
+                probe_ok, why = True, ""
+            else:
+                probe = _ingest([row], f"probe/{entry_id}")
+                probe_ok, why = probe.ok, "" if probe.ok else _message(probe)
+            head = objective_split(row.latex)
+            entry: dict = {
+                "name": row.name,
+                "formula_id": row.formula_id,
+                "sense": head[0] if head else "",
+                "canonical": probe_ok,
+            }
+            if not probe_ok:
+                entry["class"] = classify_failure(why)
+                entry["error"] = why
+            stated.append(entry)
+            if probe_ok and len(objective_rows) == 1:
+                usable.append(row)
+        status = (
+            "none"
+            if not objective_rows
+            else "several"
+            if len(objective_rows) > 1
+            else "canonical"
+            if usable
+            else "outside_grammar"
+        )
+        objective = {"status": status, "stated": len(objective_rows), "rows": stated}
+        dropped: list[dict] = [
+            {
+                "name": e["name"],
+                "formula_id": e["formula_id"],
+                "error": e.get("error")
+                or f"one of {len(objective_rows)} objective statements; "
+                "the canonical model admits one",
+                "objective": True,
+            }
+            for e in stated
+            if not (usable and e["name"] == usable[0].name)
+        ]
+        kept: list[Row] = list(usable)
+        rows_ok = len(constraint_rows)
+        row_drops: list[dict] = []
+        if not result.ok:
+            for row in constraint_rows:
+                probe = _ingest([*usable, row], f"probe/{entry_id}")
+                if probe.ok:
                     kept.append(row)
                 else:
-                    dropped.append({"name": row.name, "formula_id": row.formula_id, "error": why})
+                    row_drops.append(
+                        {"name": row.name, "formula_id": row.formula_id, "error": _message(probe)}
+                    )
+            rows_ok = len(kept) - len(usable)
+            result = _ingest(kept, f"corpus/promoted/{entry_id}.tex")
+            if not result.ok and rows_ok:
+                # Rows that parse alone can fail together: some readings are
+                # decided for the whole document (the one family of a binder
+                # letter, the one shape of a derived parameter). Re-assemble
+                # row by row and leave out the row that breaks the document.
+                together: list[Row] = list(usable)
+                for row in kept[len(usable) :]:
+                    probe = _ingest([*together, row], f"probe/{entry_id}")
+                    if probe.ok:
+                        together.append(row)
+                    else:
+                        row_drops.append(
+                            {
+                                "name": row.name,
+                                "formula_id": row.formula_id,
+                                "error": "parses alone, not with the rows before it: "
+                                + _message(probe),
+                            }
+                        )
+                kept = together
+                result = _ingest(kept, f"corpus/promoted/{entry_id}.tex")
+            if len(kept) == len(usable):
+                # nothing but (at most) the objective is canonical: no model
+                result = _ingest(whole, f"corpus/promoted/{entry_id}.tex")
+        else:
+            kept = [*usable, *constraint_rows]
         coverage = {
-            "objective_ok": objective_ok,
-            "objective_error": ""
-            if objective_ok
-            else _oneline("; ".join(f.message for f in obj_probe.failures))[:200],
-            "rows_probed": (len(kept) - len(objective_rows) + len(dropped))
-            if probe_base is not None
-            else 0,
-            "rows_ok": len(kept) - len(objective_rows) if probe_base is not None else 0,
+            "objective_ok": bool(usable),
+            "objective_error": next((e["error"] for e in stated if "error" in e), ""),
+            "rows_probed": len(constraint_rows),
+            "rows_ok": rows_ok,
             "row_failures": dict(
-                sorted(Counter(classify_failure(d["error"]) for d in dropped).items())
+                sorted(
+                    Counter(
+                        classify_failure(d["error"])
+                        for d in row_drops
+                        if not d["error"].startswith("parses alone")
+                    ).items()
+                )
             ),
         }
-        if objective_ok and len(kept) > len(objective_rows):
-            subset_doc = assemble(dossier, kept, declarations, entry_id=entry_id)
-            subset = ingest_latex(subset_doc, source=f"corpus/promoted/{entry_id}.tex")
-            if subset.ok:
-                result = subset
-                document = subset_doc
-                excluded = tuple(dropped)
-                if write:
-                    tex_path = dirs["promoted"] / f"{entry_id}.tex"
-                    tex_path.write_text(document, encoding="utf-8", newline="\n")
+        if result.ok and len(kept) > len(usable):
+            order = {r.name: k for k, r in enumerate(rows)}
+            excluded = tuple(sorted([*dropped, *row_drops], key=lambda d: order[d["name"]]))
+            document = assemble(dossier, kept, declarations, entry_id=entry_id)
+            if write:
+                tex_path = dirs["promoted"] / f"{entry_id}.tex"
+                tex_path.write_text(document, encoding="utf-8", newline="\n")
     if not result.ok:
         stage = result.failures[0].stage
         cause = {
@@ -1113,6 +1191,17 @@ def promote_paper(
 
     formulation = result.formulation
     assert formulation is not None  # guaranteed by IngestionResult.ok
+    terms = [t for c in formulation.constraints for t in (*c.lhs, *c.rhs)]
+    if formulation.objective is not None:
+        terms += list(formulation.objective.terms)
+    if not any(t.ref_kind == "variable" for t in terms):
+        # Rows that relate data only (a constraint system without an objective
+        # can consist of them): there is nothing to decide, so no model.
+        return fail(
+            "semantic_invalid",
+            "the canonical rows name no decision variable",
+            tuple(written_paths),
+        )
     payload = json.dumps(
         formulation.model_dump(mode="json", warnings=False),
         indent=2,
@@ -1125,6 +1214,8 @@ def promote_paper(
     record = provenance_record(dossier, cell, entry_id=entry_id)
     if absorbed:
         record["declaration_rows"] = list(absorbed)
+    if objective is not None:
+        record["objective"] = objective
     if excluded:
         record["partial"] = {
             "rows_total": len(rows),
@@ -1158,6 +1249,7 @@ def promote_paper(
         promoted=True,
         rows_absorbed=absorbed,
         coverage=coverage,
+        objective=objective,
         counts=counts,
         rows=len(rows),
         written=tuple(written_paths),
@@ -1246,9 +1338,24 @@ def build_report(outcomes: list[Outcome], unrecognised: dict[str, int]) -> dict:
         if any(o.coverage for o in outcomes)
         else None
     )
+    objective_feature: dict[str, dict[str, int]] = {}
+    for o in outcomes:
+        if o.objective is None:
+            continue
+        slot = objective_feature.setdefault(
+            o.objective["status"], {"papers": 0, "promoted": 0, "rows": 0, "rows_included": 0}
+        )
+        slot["papers"] += 1
+        slot["rows"] += o.rows
+        if o.promoted:
+            slot["promoted"] += 1
+            slot["rows_included"] += o.rows_included
     return {
         "schema_version": PROMOTION_SCHEMA,
         "row_coverage": row_coverage,
+        "objective_feature": {
+            k: objective_feature[k] for k in OBJECTIVE_STATUSES if k in objective_feature
+        },
         "derived_from": "corpus/decisions/*.json + corpus/dossiers/*.json + corpus/declarations/*.tex",
         "rewrite_rules_version": REWRITE_RULES_VERSION,
         "papers_with_decisions": len(outcomes),
@@ -1319,6 +1426,25 @@ def render_report_md(report: dict) -> str:
             "| --- | ---: |",
         ]
         lines += [f"| {k} | {v} |" for k, v in rc["row_failures"].items()]
+
+    feature = report.get("objective_feature")
+    if feature:
+        lines += [
+            "",
+            "## The objective as a feature",
+            "",
+            "A paper is promoted as its canonical rows. Its objective is in the model only",
+            "when the paper states exactly one and the grammar reads it; otherwise the",
+            "constraint system is promoted without an objective and the entry records why.",
+            "",
+            "| objective | papers | promoted | rows | rows included |",
+            "| --- | ---: | ---: | ---: | ---: |",
+        ]
+        lines += [
+            f"| {OBJECTIVE_STATUSES[k]} | {v['papers']} | {v['promoted']} | {v['rows']} | "
+            f"{v['rows_included']} |"
+            for k, v in feature.items()
+        ]
 
     lines += ["", "## Failures by cause", ""]
     if report["failures_by_cause"]:
@@ -1482,7 +1608,8 @@ def main(argv: list[str] | None = None) -> int:
         "--partial",
         action="store_true",
         help="when the full document is outside the grammar, promote the canonical "
-        "row subset (objective required) and record the excluded rows per paper",
+        "row subset and record the excluded rows per paper; an objective that is "
+        "missing, stated several times or outside the grammar is recorded as a feature",
     )
     args = parser.parse_args(argv)
 

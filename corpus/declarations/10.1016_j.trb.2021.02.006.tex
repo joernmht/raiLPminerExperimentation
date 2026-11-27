@@ -53,7 +53,8 @@
 %@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in the network
 
 % p: classified as variable during review
-%det-del: %@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
+%det-was: %@ var p shape=- domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
+%@ var p shape=A,V domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
 
 % s: classified as parameter during review
 %@ param s shape=- kind=scalar domain=- :: Possibly a parameter for start time or station, not defined in given text
@@ -84,7 +85,8 @@
 %@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
 
 % Q: classified as parameter during review
-%det-del: %@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
+%det-was: %@ param Q shape=- kind=scalar domain=- :: Periodic time difference between events
+%@ param Q shape=V,V kind=matrix domain=- :: Periodic time difference between events
 
 % x: classified as variable during review
 %det-was: %@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
@@ -150,12 +152,12 @@
 %@ letter r over=R :: index letter (ADR-0023)
 %@ letter v over=V :: index letter (ADR-0023)
 %@ letter vp over=V :: index letter (ADR-0023)
-%@ param p shape=A,V kind=matrix domain=- :: Integer variable representing modulo operator for activity duration
-%@ var Q shape=V,V domain=continuous role=primary drole=- lo=- hi=- :: Periodic time difference between events
 %@ param T shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ var alpha shape=V,V domain=binary role=primary drole=- lo=- hi=- :: variable: a domain row of the paper declares it
 %@ param d shape=OD kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ index fam_w ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ param gamma shape=fam_w kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ var pi shape=V domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 10)
+%@ var Y_idx_R shape=R domain=non_negative role=primary drole=- lo=- hi=- :: second variable written Y: over (R), where Y is declared over (V, OD); written over different sets; domain taken from Y
+%@ var y_idx_r shape=r domain=non_negative role=primary drole=- lo=- hi=- :: second variable written y: over (r), where y is declared over (A, V); written over different sets; domain taken from y
 % --- end deterministic declarations ---

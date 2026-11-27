@@ -15,6 +15,7 @@
 %@ index OD ordered=0 cyclic=0 :: Set of origin-destination pairs
 %@ index V ordered=0 cyclic=0 :: Set of events (departure times) for each OD-pair
 %@ index A ordered=0 cyclic=0 :: Set of activities (arcs) in the network
+%@ var p shape=A,V domain=integer role=primary drole=- lo=- hi=- :: Integer variable representing modulo operator for activity duration
 %@ param s shape=- kind=scalar domain=- :: Possibly a parameter for start time or station, not defined in given text
 %@ param t shape=- kind=scalar domain=- :: Possibly a parameter for transfer time or type, not defined in given text
 %@ var y shape=A,V domain=non_negative role=primary drole=- lo=- hi=- :: Activity duration for arc (i,j)
@@ -23,6 +24,7 @@
 %@ index r ordered=0 cyclic=0 :: Route index
 %@ index v ordered=0 cyclic=0 :: Event index
 %@ param Z shape=- kind=scalar domain=- :: Possibly a parameter for number of transfers or something, not defined in given text
+%@ param Q shape=V,V kind=matrix domain=- :: Periodic time difference between events
 %@ var x shape=V,T,OD domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if time slice length is at least d
 %@ param l shape=V,OD kind=scalar domain=- :: Lower bound for linearization of Y_v^k
 %@ param M shape=V,OD kind=scalar domain=- :: Big-M constant for linearization
@@ -68,41 +70,26 @@
 %@ letter r over=R :: index letter (ADR-0023)
 %@ letter v over=V :: index letter (ADR-0023)
 %@ letter vp over=V :: index letter (ADR-0023)
-%@ param p shape=A,V kind=matrix domain=- :: Integer variable representing modulo operator for activity duration
-%@ var Q shape=V,V domain=continuous role=primary drole=- lo=- hi=- :: Periodic time difference between events
 %@ param T shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ var alpha shape=V,V domain=binary role=primary drole=- lo=- hi=- :: variable: a domain row of the paper declares it
 %@ param d shape=OD kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ index fam_w ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ param gamma shape=fam_w kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ var pi shape=V domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 10)
+%@ var Y_idx_R shape=R domain=non_negative role=primary drole=- lo=- hi=- :: second variable written Y: over (R), where Y is declared over (V, OD); written over different sets; domain taken from Y
+%@ var y_idx_r shape=r domain=non_negative role=primary drole=- lo=- hi=- :: second variable written y: over (r), where y is declared over (A, V); written over different sets; domain taken from y
 \begin{align}
-  \min\quad & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}} L_{v}^{k} \cdot \left(\mathit{gamma}_{w} \cdot W_{v}^{k} + Y_{v}^{k}\right) \tag{eq\_0011} \\
   & y_{i j} = \mathit{pi}_{j} - \mathit{pi}_{i} + T \cdot p_{i j} \forall \left(i , j\right) \in A \tag{eq\_0012} \\
-  & \mathit{ell}_{i j} \leq y_{i j} \leq u_{i j} \forall \left(i , j\right) \in A \tag{eq\_0013} \\
-  & Y_{r} = \sum_{a \in r} \left(y_{a} + \mathit{gamma}_{t} \cdot 1_{t} \left(a\right)\right) \forall r \in \mathcal{R} \tag{eq\_0014} \\
-  & L_{v}^{k} = \underset{vp \in V^{k} \backslash \left\{v\right\}}{min} \left\{\mathit{pi}_{v} - \mathit{pi}_{vp} + T \cdot \mathit{alpha}_{vp , v}\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0015} \\
   & \mathit{alpha}_{v , vp} + \mathit{alpha}_{vp , v} = 1 \forall k \in \mathcal{OD} , v \in V^{k} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0016} \\
   & W_{v}^{k} = \frac{1}{2} L_{v}^{k} \forall k \in \mathcal{OD} , \forall v \in V^{k} \tag{eq\_0017} \\
-  & Y_{v}^{k} = \underset{vp \in V^{k}}{min} \underset{r \in \mathcal{R}_{vp}^{k}}{min} \left\{Y_{r} + \mathit{gamma}_{w} \cdot \left(\mathit{pi}_{vp} - \mathit{pi}_{v} + T \cdot \mathit{alpha}_{v , vp}\right)\right\} \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0018} \\
   & L_{v}^{k} \in \left[0 , T\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0019} \\
-  & W_{v}^{k} \in \left[0 , T / 2\right] \forall k \in \mathcal{OD} , v \in V^{k} \tag{eq\_0020} \\
-  & \mathit{pi}_{v} \in \left\{0 , \ldots , T - 1\right\} \forall v \in V \tag{eq\_0022} \\
   & Q_{v , vp} = \mathit{pi}_{vp} - \mathit{pi}_{v} + T \cdot \mathit{alpha}_{v , vp} . \tag{eq\_0025} \\
   & L_{v}^{k} \leq Q_{vp , v} \forall k \in \mathcal{OD} , vp \in V^{k} \backslash \left\{v\right\} \tag{eq\_0026} \\
   & \sum_{v \in V^{k}} L_{v}^{k} = T . \forall k \in \mathcal{OD} \tag{eq\_0027} \\
   & x_{v , d}^{k} \leq x_{v , d - 1}^{k} \forall k \in \mathcal{OD} , v \in V^{k} , d \in \left\{2 , \ldots , T\right\} . \tag{eq\_0036} \\
   & L_{v}^{k} = \sum_{d = 1}^{T} x_{v , d}^{k} \tag{eq\_0037\_a} \\
-  & \left(L_{v}^{k}\right)^{2} = \sum_{d = 1}^{T} \left(2 \cdot d - 1\right) \cdot x_{v , d}^{k} \tag{eq\_0037\_b} \\
-  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}, d = 1} ^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 \cdot d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
-  & R_{v , d}^{k} \leq u_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0039} \\
-  & R_{v , d}^{k} \geq l_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0040} \\
-  & R_{v , d}^{k} \leq Y_{v}^{k} - l_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) \tag{eq\_0041} \\
-  & R_{v , d}^{k} \geq Y_{v}^{k} - u_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) , \tag{eq\_0042} \\
   & Y_{v}^{k} \leq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , vp} \forall vp \in V^{k} , r \in \mathcal{R}_{vp}^{k} \tag{eq\_0043} \\
   & Y_{v}^{k} \geq Y_{r} + \mathit{gamma}_{w} \cdot Q_{v , vp} - M_{v}^{k} \cdot \left(1 - z_{v , vp , r}^{k}\right) \forall vp \in V^{k} , r \in \mathcal{R}_{vp}^{k} \tag{eq\_0044} \\
   & \sum_{vp \in V^{k}} \underset{r \in \mathcal{R}_{vp}^{k}}{\sum} z_{v , vp , r}^{k} = 1 . \tag{eq\_0045} \\
-  & M_{v}^{k} = \mathit{gamma}_{w} \cdot T + \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_bar\right)_{r}\right\} - \underset{r \in \mathcal{R}^{k}}{max} \left\{\left(Y_underline\right)_{r}\right\} , \tag{eq\_0046} \\
-  & \sum_{v \in V^{k}} \frac{d_{k}}{T} \cdot L_{v}^{k} \cdot W_{v}^{k} \geq d_{k} \cdot \frac{T}{2 \left|\right. V^{k} \left|\right.} . \tag{eq\_0047} \\
   & \sum_{v \in V^{k}} L_{v}^{k} = T \tag{eq\_0049} \\
 \end{align}

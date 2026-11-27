@@ -32,6 +32,7 @@ formulas themselves.
 | R6 kind | where the paper names the kind outright and the assisted line says the other one, the paper is followed | the paper |
 | R7 deduction | *linearity*: what multiplies a declared variable (also through a fraction's numerator), or divides a term, is a parameter. *Non-vacuity*: a quantity set equal to an expression holding a variable is a variable; the one undeclared name of an inequality or objective that names no variable is a variable. To a fixpoint; a name both claim stays undeclared | the algebra |
 | R8 variants | a labelled variant of a declared symbol that nothing above decides: variant of a parameter is a parameter; a bound or reference label (`min`, `max`, `nom`, `plan`) on a variable is a parameter; letters, numbers or direction words on a variable give a variable. Accents on variables and other label words decide nothing | the assisted sidecar, read at the granularity it was written |
+| R9 homonyms | one letter the rows write with two index counts is two variables when the formulas keep them apart: the two forms are written over different sets (neither family tuple holds the other), or one row writes both. The second form is declared `x_idx_<families>`, which lp2graph's row reader reads for uses over exactly these families (lp2graph ADR-0018 point 17). When the families of one form are among those of the other, an index was left out or held fixed: one variable, no declaration, the rows stay out and the report names the case (`_together`). A form without indices is never split off | the formulas |
 
 Three properties hold for every rule:
 
@@ -102,7 +103,8 @@ label material, operator, decision variables under the operator, expression,
 "s.t." tail. Component objectives a combined objective names
 (`min Z = a_1 Z_1 + a_2 Z_2` next to `min Z_1 = ...`) become definitions of
 their labels, and a restated objective stops being a second one. A paper with
-several unrelated objectives still fails `multiple_objectives`.
+several unrelated objectives is promoted as its constraint system, the
+objectives recorded as a feature (ADR-0027).
 
 ## Consequences
 

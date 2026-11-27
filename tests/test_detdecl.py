@@ -166,3 +166,56 @@ def test_linearity_reads_through_a_fraction():
     D.rule_missing(sc, uses, {}, {}, {}, divisors=frozenset({"N"}))
     assert sc.names("param").keys() >= {"w", "N"}
     assert "q" not in sc.names("param") and sc.undeclared["q"] == "no evidence"
+
+
+_TWO_FORMS = (
+    "%@ index I ordered=0 cyclic=0 :: i\n"
+    "%@ index J ordered=0 cyclic=0 :: j\n"
+    "%@ index F ordered=0 cyclic=0 :: f\n"
+    "%@ index T ordered=0 cyclic=0 :: t\n"
+    "%@ var x shape=I,J domain=binary role=primary drole=- lo=- hi=- :: arc choice\n"
+)
+_FAMS = {"i": "I", "j": "J", "f": "F", "t": "T"}
+
+
+def test_one_letter_written_over_different_sets_is_two_variables():
+    # x over (I, J) and x over (F, T): neither tuple holds the other
+    sc = D.Sidecar(_TWO_FORMS)
+    rows = {
+        "a": r"& \sum_{j \in \mathcal{J}} x_{i,j} = 1 \forall i \in \mathcal{I}",
+        "b": r"& x_{i,j} \leq 1 \forall i \in \mathcal{I}, j \in \mathcal{J}",
+        "c": r"& \sum_{t \in \mathcal{T}} x_{f,t,t} \leq 1 \forall f \in \mathcal{F}",
+    }
+    D.rule_homonym_variables(sc, rows, _FAMS)
+    second = sc.names("var")["x_idx_F_T_T"]
+    assert second["shape"] == "F,T,T" and second["domain"] == "binary"
+    assert sc.rule_of[("symbol", "x_idx_F_T_T")] == D.HOMONYM_RULE
+    assert "written over different sets" in sc.text()
+    assert sc.together == {}
+
+
+def test_one_row_that_writes_both_forms_relates_two_variables():
+    # x_{i} next to x_{i,j} in one row: an aggregate and its parts
+    sc = D.Sidecar(_TWO_FORMS)
+    rows = {
+        "a": r"& x_{i,j} \leq 1 \forall i \in \mathcal{I}, j \in \mathcal{J}",
+        "b": r"& \sum_{j \in \mathcal{J}} x_{i,j} = x_{i} \forall i \in \mathcal{I}",
+    }
+    D.rule_homonym_variables(sc, rows, _FAMS)
+    assert sc.names("var")["x_idx_I"]["shape"] == "I"
+    assert "row b writes both forms" in sc.text()
+
+
+def test_an_index_left_out_is_one_variable():
+    # x_{i} in a row of its own, x declared over (I, J): the families of one
+    # form are among those of the other, so nothing says they are two
+    sc = D.Sidecar(_TWO_FORMS)
+    rows = {
+        "a": r"& x_{i,j} \leq 1 \forall i \in \mathcal{I}, j \in \mathcal{J}",
+        "b": r"& x_{i} \leq 1 \forall i \in \mathcal{I}",
+        "c": r"& x \geq 0",
+    }
+    D.rule_homonym_variables(sc, rows, _FAMS)
+    assert set(sc.names("var")) == {"x"}
+    assert list(sc.together) == ["x with 1 index"]
+    assert "one variable" in sc.together["x with 1 index"]

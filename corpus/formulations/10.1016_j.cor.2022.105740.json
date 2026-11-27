@@ -1,0 +1,399 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.cor.2022.105740",
+  "name": "An iterative heuristic for passenger-centric train timetabling with integrated adaption times",
+  "family": "milp",
+  "description": "Mined from An iterative heuristic for passenger-centric train timetabling with integrated adaption times (Computers & Operations Research, 2022).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.cor.2022.105740",
+    "reference": "An iterative heuristic for passenger-centric train timetabling with integrated adaption times",
+    "author": "Gert-Jaap Polinder; Valentina Cacchiani; Marie Schmidt; Dennis Huisman",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "r",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "O",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "P",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "OD",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Q",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "W",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "M",
+      "description": "parameter: the paper says so (paragraph 48)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "parameter: the paper says so (paragraph 38)",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma",
+      "description": "parameter: the paper says so (paragraph 40)",
+      "shape": [
+        "Q"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "Y",
+      "description": "variable: the paper says so (paragraph 171)",
+      "shape": [
+        "R"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "alpha",
+      "description": "variable: a domain row of the paper declares it",
+      "shape": [
+        "V",
+        "V"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "p",
+      "description": "variable: the paper says so (paragraph 160)",
+      "shape": [
+        "V",
+        "P"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "pi",
+      "description": "variable: the paper says so (paragraph 169)",
+      "shape": [
+        "V"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "variable: the paper says so (paragraph 169)",
+      "shape": [
+        "V",
+        "P"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "variable: the paper says so (paragraph 174)",
+      "shape": [
+        "L"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "Y_idx_V_OD",
+      "description": "second variable written Y: over (V, OD), where Y is declared over (R); written over different sets; domain taken from Y",
+      "shape": [
+        "V",
+        "OD"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y_idx_r",
+      "description": "second variable written y: over (r), where y is declared over (V, P); written over different sets; domain taken from y",
+      "shape": [
+        "r"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0011",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "pi",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "T",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "OD",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "vp",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "alpha",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "vp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "alpha",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "V",
+              "expr": "vp",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": null
+}

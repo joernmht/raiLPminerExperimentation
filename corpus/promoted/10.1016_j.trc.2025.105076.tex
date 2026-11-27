@@ -179,13 +179,17 @@
 %@ param W_hat shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ param c_dot shape=- kind=scalar domain=- :: parameter: variant of the declared parameter c
 %@ var x_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: variant of the declared variable x
+%@ var x_idx_k_A_s_K shape=k,A,s,K domain=continuous role=primary drole=- lo=- hi=- :: second variable written x: over (k, A, s, K), where x is declared over (fam_n); written over different sets; domain taken from x
+%@ var y_idx_k_A_T_A_A_A_K shape=k,A,T,A,A,A,K domain=binary role=primary drole=- lo=- hi=- :: second variable written y: over (k, A, T, A, A, A, K), where y is declared over (Omega, K); written over different sets; domain taken from y
 %@ index fam_s ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_x ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_u ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ param Omega shape=R,T kind=matrix domain=- :: parameter: the index family of this name used as a number
+%@ var y_idx_A_A_T_A_A_A_K shape=A,A,T,A,A,A,K domain=binary role=primary drole=- lo=- hi=- :: second variable written y: over (A, A, T, A, A, A, K), where y is declared over (Omega, K); written over different sets; domain taken from y
 %@ var u shape=A,A,K domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
 %@ var v shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
 %@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 51)
+%@ var x_idx_A_A_K shape=A,A,K domain=continuous role=primary drole=- lo=- hi=- :: second variable written x: over (A, A, K), where x is declared over (fam_n); written over different sets; domain taken from x
 \begin{align}
   \min\quad & Z \tag{eq\_0028\_a} \\
   & v_{i , j}^{k} \left(0\right) = v \tag{eq\_0022\_a} \\

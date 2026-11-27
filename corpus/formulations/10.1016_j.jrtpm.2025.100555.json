@@ -295,6 +295,19 @@
       "upper": null,
       "role": "primary",
       "domain_role": null
+    },
+    {
+      "name": "z_idx_K_K",
+      "description": "second variable written z: over (K, K), where z is declared over (K); row eq_0008 writes both forms; domain taken from z",
+      "shape": [
+        "K",
+        "K"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
     }
   ],
   "constraints": [
@@ -1177,6 +1190,135 @@
           "bindings": [],
           "coefficient": 1.0,
           "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Require precedence direction when both resource paths are used",
+      "quantifiers": [
+        {
+          "index": "p",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "z_idx_K_K",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": -1,
           "role": "rhs",
           "operator": "none",
           "operator_over": []

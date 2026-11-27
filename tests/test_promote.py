@@ -639,7 +639,21 @@ def test_domain_declaration_rows_are_absorbed_not_parsed(workspace):
     assert record["declaration_rows"] == [last]
 
 
-def test_partial_probes_every_row_even_when_the_objective_fails(workspace):
+def _promote_partial(workspace, *, write: bool = True):
+    dirs = workspace["dirs"]
+    return promote_all(
+        decisions_dir=dirs["decisions"],
+        dossiers_dir=dirs["dossiers"],
+        declarations_dir=dirs["declarations"],
+        out_dirs={k: dirs[k] for k in ("formulations", "provenance", "promoted")},
+        write=write,
+        partial=True,
+    )
+
+
+def test_an_objective_outside_the_grammar_is_a_feature_not_a_veto(workspace):
+    # ADR-0027: the constraint system is promoted without an objective and the
+    # entry records that the paper states one the grammar cannot read.
     dossier = workspace["dossier"]
     decisions = [{"id": f.id, "status": "accepted"} for f in dossier.formulas]
     # the objective formula is the first row; corrupt it with an undeclared symbol
@@ -649,28 +663,129 @@ def test_partial_probes_every_row_even_when_the_objective_fails(workspace):
         "parts": [r"\min \sum_{q \in \mathcal{Q}} zz_{q}"],
     }
     _write_decisions(workspace, _game_export(dossier.key, decisions))
-    dirs = workspace["dirs"]
-    report = promote_all(
-        decisions_dir=dirs["decisions"],
-        dossiers_dir=dirs["dossiers"],
-        declarations_dir=dirs["declarations"],
-        out_dirs={k: dirs[k] for k in ("formulations", "provenance", "promoted")},
-        write=False,
-        partial=True,
-    )
+    report = _promote_partial(workspace)
     (paper,) = report["papers"]
-    assert not paper["promoted"]
-    cov = paper["coverage"]
-    assert cov["objective_ok"] is False
-    assert "zz" in cov["objective_error"]
     n_constraints = len(dossier.formulas) - 1
-    assert cov["rows_probed"] == n_constraints
-    assert cov["rows_ok"] == n_constraints  # every constraint row is canonical
+    assert paper["promoted"], paper
+    assert paper["rows"] == n_constraints + 1
+    assert paper["partial"]["rows_included"] == n_constraints
+    (dropped,) = paper["partial"]["excluded"]
+    assert dropped["objective"] is True and "zz" in dropped["error"]
+    feature = paper["objective"]
+    assert feature["status"] == "outside_grammar" and feature["stated"] == 1
+    (stated,) = feature["rows"]
+    assert stated["sense"] == "min" and stated["canonical"] is False
+    assert stated["class"] == "undeclared symbol (vocabulary)"
+    cov = paper["coverage"]
+    assert cov["objective_ok"] is False and "zz" in cov["objective_error"]
+    assert cov["rows_probed"] == cov["rows_ok"] == n_constraints
     assert cov["row_failures"] == {}
     rc = report["row_coverage"]
     assert rc["papers_probed"] == 1 and rc["objective_ok"] == 0
-    assert rc["rows_ok"] == rc["rows_probed"] == n_constraints
-    assert "## Row coverage" in promote.render_report_md(report)
+    assert report["objective_feature"] == {
+        "outside_grammar": {
+            "papers": 1,
+            "promoted": 1,
+            "rows": n_constraints + 1,
+            "rows_included": n_constraints,
+        }
+    }
+    md = promote.render_report_md(report)
+    assert "## Row coverage" in md and "## The objective as a feature" in md
+    dirs = workspace["dirs"]
+    model = json.loads(
+        (dirs["formulations"] / f"{paper['entry_id']}.json").read_text(encoding="utf-8")
+    )
+    assert model["objective"] is None and len(model["constraints"]) >= n_constraints
+    record = json.loads(
+        (dirs["provenance"] / f"{paper['entry_id']}.json").read_text(encoding="utf-8")
+    )
+    assert record["objective"]["status"] == "outside_grammar"
+    assert record["partial"]["rows_included"] == n_constraints
+
+
+def test_a_readable_objective_is_recorded_as_canonical(workspace):
+    _write_decisions(workspace, _accept_all(workspace))
+    report = _promote_partial(workspace)
+    (paper,) = report["papers"]
+    assert paper["promoted"] and "partial" not in paper
+    assert paper["objective"]["status"] == "canonical"
+    assert paper["objective"]["rows"][0]["canonical"] is True
+    model = json.loads(
+        (workspace["dirs"]["formulations"] / f"{paper['entry_id']}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert model["objective"] is not None
+
+
+def test_several_objectives_promote_the_constraint_system(workspace):
+    # Two unrelated objectives: the canonical model admits one, so neither is
+    # in the model; both are recorded with their sense, and each parses.
+    dossier = workspace["dossier"]
+    extra = dossier.model_copy(deep=True)
+    extra.formulas.append(
+        FormulaRecord(
+            id="eq-0099",
+            latex=r"\max \sum_{i \in \mathcal{I}} t_{i}",
+            method=ExtractionMethod.mathml,
+        )
+    )
+    extra.save(workspace["dirs"]["dossiers"])
+    _write_decisions(
+        workspace,
+        _game_export(dossier.key, [{"id": f.id, "status": "accepted"} for f in extra.formulas]),
+    )
+    report = _promote_partial(workspace)
+    (paper,) = report["papers"]
+    assert paper["promoted"], paper
+    feature = paper["objective"]
+    assert feature["status"] == "several" and feature["stated"] == 2
+    assert [r["sense"] for r in feature["rows"]] == ["min", "max"]
+    assert all(r["canonical"] for r in feature["rows"])
+    assert paper["partial"]["rows_included"] == len(dossier.formulas) - 1
+    assert [d["name"] for d in paper["partial"]["excluded"]] == ["eq_0000", "eq_0099"]
+    assert all("one of 2 objective statements" in d["error"] for d in paper["partial"]["excluded"])
+    # whole-paper promotion keeps its gate
+    assert _cause(_promote(workspace, write=False)) == "multiple_objectives"
+
+
+def test_no_objective_promotes_the_constraint_system(workspace):
+    dossier = workspace["dossier"]
+    decisions = [{"id": f.id, "status": "accepted"} for f in dossier.formulas]
+    decisions[0] = {"id": dossier.formulas[0].id, "status": "rejected"}  # the objective row
+    _write_decisions(workspace, _game_export(dossier.key, decisions))
+    report = _promote_partial(workspace)
+    (paper,) = report["papers"]
+    assert paper["promoted"] and "partial" not in paper
+    assert paper["objective"] == {"status": "none", "stated": 0, "rows": []}
+    assert _cause(_promote(workspace, write=False)) == "no_objective"
+
+
+def test_rows_that_relate_data_only_are_no_model(workspace):
+    # Without an objective a paper could "promote" on rows that name no
+    # decision variable at all; that is not a model.
+    dossier = workspace["dossier"]
+    param = re.search(r"^%@ param (\w+) shape=-", workspace["declarations"], re.M).group(1)
+    only_data = Dossier(
+        source=dossier.source,
+        formulas=[
+            FormulaRecord(id="eq-0000", latex=rf"{param} \geq 1", method=ExtractionMethod.mathml),
+            FormulaRecord(
+                id="eq-0001", latex=r"qq_{i} + qq_{j} \leq 1", method=ExtractionMethod.mathml
+            ),
+        ],
+    )
+    only_data.save(workspace["dirs"]["dossiers"])
+    _write_decisions(
+        workspace,
+        _game_export(dossier.key, [{"id": f.id, "status": "accepted"} for f in only_data.formulas]),
+    )
+    report = _promote_partial(workspace)
+    (paper,) = report["papers"]
+    assert not paper["promoted"]
+    assert paper["cause"] == "semantic_invalid" and "no decision variable" in paper["detail"]
+    assert paper["objective"]["status"] == "none"
 
 
 def test_declaration_metadata_is_repaired_with_a_note(workspace):

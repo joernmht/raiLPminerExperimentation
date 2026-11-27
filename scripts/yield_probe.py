@@ -93,15 +93,19 @@ def _paper(key: str) -> dict:
     if decl_path.exists() and rows:
         declarations = decl_path.read_text(encoding="utf-8")
         entry = P.entry_id_for(key)
-        probe = P.synthetic_objective_row(declarations)
-        probe_ok = probe is not None and (
-            ingest_latex(P.assemble(dossier, [probe], declarations, entry_id=entry), source="p").ok
+        # promote's own base: the paper's objective when it states exactly one
+        # and the grammar reads it, otherwise the constraint rows stand alone
+        objectives = [r for r in rows if r.is_objective]
+        usable = (
+            objectives
+            if len(objectives) == 1
+            and ingest_latex(
+                P.assemble(dossier, objectives, declarations, entry_id=entry), source="p"
+            ).ok
+            else []
         )
         for row in rows:
-            base = [] if row.is_objective else [probe]
-            if not row.is_objective and not probe_ok:
-                detail.append({"name": row.name, "obj": False, "raw": row.latex, "ok": False})
-                continue
+            base = [] if row.is_objective else usable
             doc = P.assemble(dossier, [*base, row], declarations, entry_id=entry)
             tag = row.name.replace("_", "\\_")
             norm, _prov = normalize_latex(doc, source="p")

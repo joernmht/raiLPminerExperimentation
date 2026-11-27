@@ -47,6 +47,13 @@ R8  variants      a labelled variant of a declared symbol (``t_arr`` next to a
                   only letters, numbers or direction words is a variable.
                   Accented variants of variables and other label words are
                   left undeclared: there the sidecars split both ways.
+R9  homonyms      one letter the rows write with two index counts is two
+                  variables when the formulas keep them apart (the forms are
+                  written over different sets, or one row writes both); the
+                  second form is declared ``x_idx_<families>``. When the
+                  families of one form are among those of the other, an index
+                  was left out or held fixed: one variable, no declaration,
+                  the rows stay out and the report names the case.
 
 Nothing is guessed: a name without evidence stays undeclared and its rows stay
 refused. No model is called. Every changed line keeps its original in a
@@ -201,6 +208,9 @@ class Sidecar:
         self.undeclared: dict[str, str] = {}
         #: names a symbol is declared for next to the index family of that name
         self.beside: set[str] = set()
+        #: a variable written with two index counts that R9 left as one
+        #: variable, with the reason (report only)
+        self.together: dict[str, str] = {}
 
     def decls(self) -> list[tuple[int, str, str, dict[str, str], str]]:
         """``(line index, kind, name, key-values, description)`` of every live
@@ -534,6 +544,98 @@ def rule_shapes(sc: Sidecar, uses: dict[str, list], families: dict[str, str]) ->
         for fam in shape:
             ensure_family(sc, fam, "family a shape read off the formulas names")
         sc.set(kind, name, new, desc, "R4 shape")
+
+
+# --------------------------------------------------------------------------- #
+# R9 — one letter, two variables
+# --------------------------------------------------------------------------- #
+
+HOMONYM_RULE = "R9 one letter, two variables"
+
+
+def rule_homonym_variables(
+    sc: Sidecar, norm_rows: dict[str, str], families: dict[str, str]
+) -> None:
+    """A variable the rows write with two index counts is two variables when
+    the formulas themselves keep them apart, and one variable otherwise.
+
+    Papers reuse a letter: ``x_{i,j}`` chooses an arc, ``x_{f,t}`` a departure
+    time. R4 declares the letter with the shape most uses write, and every row
+    of the other form fails. The second form gets a declaration of its own,
+    ``x_idx_<families>`` (lp2graph's row reader reads a use over exactly these
+    families as that variable), on one of two findings:
+
+    * the two forms are written over *different sets*: neither family tuple
+      contains the other, so the shorter one is not the longer one with an
+      index left out;
+    * *one row writes both* forms: it relates two quantities, and no author
+      leaves an index out in one term of a row and writes it in the next.
+
+    Otherwise the two belong together: the families of one form are among the
+    families of the other, which is how a variable looks when an index is left
+    out or held fixed (the scenario, the train of a single-train section).
+    Declaring a second variable there would cut one node of the model in two;
+    the rows stay out and the report names the case. A form without indices is
+    never split off: a bare letter is the whole vector, or a misreading."""
+    sc.together = {}
+    # a second variable declared in an earlier pass whose letter has since
+    # turned out to be a parameter (R6) goes again
+    for (cls, sibling), rule in list(sc.rule_of.items()):
+        stale = sibling.split("_idx_")[0] not in sc.names("var")
+        if rule == HOMONYM_RULE and cls == "symbol" and stale:
+            sc.delete(sibling, HOMONYM_RULE)
+            del sc.rule_of[(cls, sibling)]
+    variables = sc.names("var")
+    derived = set(norm_rows.get("", "").split())
+    forms: dict[str, dict[int, list[tuple[str, object]]]] = {}
+    for row, text in sorted(norm_rows.items()):
+        if not row:
+            continue
+        for use in scan_symbols(text):
+            if use.in_tail or use.sup is not None or use.name in derived:
+                continue
+            if use.name in variables:
+                forms.setdefault(use.name, {}).setdefault(len(use.pieces), []).append((row, use))
+    for name, by in sorted(forms.items()):
+        declared = [f for f in variables[name].get("shape", "-").split(",") if f and f != "-"]
+        if not declared or len(declared) not in by:
+            continue
+        main_rows = {row for row, _use in by[len(declared)]}
+        for arity, occurrences in sorted(by.items()):
+            if arity in (0, len(declared)):
+                continue
+            label = f"{name} with {arity} ind" + ("ex" if arity == 1 else "ices")
+            shape, why = shape_of_uses([use for _row, use in occurrences], families)
+            if shape is None or any(f.startswith("fam_") for f in shape):
+                sc.together[label] = "index sets not readable" + (f": {why}" if why else "")
+                continue
+            written, known = Counter(shape), Counter(declared)
+            apart = bool(written - known) and bool(known - written)
+            shared = sorted(main_rows & {row for row, _use in occurrences})
+            if not apart and not shared:
+                sc.together[label] = (
+                    f"written over ({', '.join(shape)}), declared over ({', '.join(declared)}): "
+                    "an index left out or held fixed, one variable"
+                )
+                continue
+            sibling = f"{name}_idx_{'_'.join(shape)}"
+            if sibling in sc.names("param") or sibling in sc.names("index"):
+                continue
+            finding = (
+                "written over different sets" if apart else f"row {shared[0]} writes both forms"
+            )
+            kv = dict(variables[name])
+            kv["shape"] = ",".join(shape)
+            for fam in shape:
+                ensure_family(sc, fam, "family a shape read off the formulas names")
+            sc.set(
+                "var",
+                sibling,
+                kv,
+                f":: second variable written {name}: over ({', '.join(shape)}), where {name} "
+                f"is declared over ({', '.join(declared)}); {finding}; domain taken from {name}",
+                HOMONYM_RULE,
+            )
 
 
 # --------------------------------------------------------------------------- #
@@ -1390,11 +1492,16 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                             )
                             if sum(sc.changes.values()) == before:
                                 break
+                if "R9" in rules:
+                    # last in the pass: the kinds are settled by then
+                    rule_homonym_variables(sc, norm, fams)
                 rule_shape_families(sc, norm)
     final = sc.text()
     changes = dict(sorted(Counter(sc.rule_of.values()).items())) if final != sc_base else {}
     if sc.undeclared:
         changes["_undeclared"] = dict(sorted(sc.undeclared.items()))  # type: ignore[assignment]
+    if sc.together:
+        changes["_together"] = dict(sorted(sc.together.items()))  # type: ignore[assignment]
     return sc.text(), changes
 
 
@@ -1403,7 +1510,7 @@ def _plain(name: str) -> str:
     return (m.group(1) if m else name.strip()).replace("\\_", "_").replace(" ", "")
 
 
-ALL_RULES = frozenset({"R1", "R2", "R3", "R4", "R5", "R6", "R7"})
+ALL_RULES = frozenset({"R1", "R2", "R3", "R4", "R5", "R6", "R7", "R9"})
 
 #: Rule sets tried per paper, fullest first. The canonical parser decides
 #: between them: the set under which most rows of the paper promote is kept,
@@ -1411,6 +1518,7 @@ ALL_RULES = frozenset({"R1", "R2", "R3", "R4", "R5", "R6", "R7"})
 #: rolled back for that paper; nothing is tuned by hand.
 VARIANTS: tuple[tuple[str, frozenset[str]], ...] = (
     ("all", ALL_RULES),
+    ("one-letter-one-variable", ALL_RULES - {"R9"}),
     ("no-kind-correction", ALL_RULES - {"R6"}),
     ("no-deduction", ALL_RULES - {"R6", "R7"}),
     ("no-letters", frozenset({"R1", "R4", "R5", "R7"})),
