@@ -123,7 +123,7 @@
 %@ param beta shape=fam_n kind=vector domain=- :: State variable (speed) in speed profile
 %@ param beta_0 shape=- kind=scalar domain=- :: Initial speed in speed profile
 %@ param c_tilde shape=- kind=scalar domain=- :: Modified cost coefficient for arc a and train k
-%@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
+%@ param chi shape=fam_x,fam_u kind=matrix domain=- :: Function of state and control in speed profile
 %@ param chi_bar shape=- kind=scalar domain=- :: Upper bound for chi
 %@ param chi_max shape=- kind=scalar domain=- :: Maximum value for chi
 %@ param chi_min shape=- kind=scalar domain=- :: Minimum value for chi
@@ -174,17 +174,22 @@
 %@ var delta shape=Omega domain=continuous role=primary drole=- lo=- hi=- :: Slack variable for arc a
 %@ param mu shape=Omega,K kind=matrix domain=- :: Auxiliary variable for arc a and train k
 %@ param pi shape=R,T,K kind=matrix domain=- :: Auxiliary variable for power supply district r, time t, train k
+%@ var x_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: variant of the declared variable x
+%@ index fam_x ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_u ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ var u shape=A,A,s,K domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
 \begin{align}
   \min\quad & Z \tag{eq\_0028\_a} \\
   & 0 \leq f_{i , j}^{k} \left(s\right) \leq f_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0017} \\
   & 0 \leq b_{i , j}^{k} \left(s\right) \leq b_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0018} \\
+  & chi_underline \leq \mathit{chi} \left(x_{i , j}^{k} \left(s\right) , u_{i , j}^{k} \left(s\right)\right) \leq chi_bar , \forall s \in \left[0 , S\right] \tag{eq\_0025} \\
   & \mathit{beta}_{0} - x_{0} \left(0\right) = 0 \tag{eq\_0034} \\
   & 0 \leq \mathit{delta}_{a} \leq 1 , \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0045} \\
   & 0 \leq \mathit{zeta}_{r , t} \leq P_{r}^{t} , \forall t \in T , r \in R \tag{eq\_0046} \\
   & \mathit{delta}_{a} = 1 - \sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \tag{eq\_0047} \\
   & \mathit{zeta}_{r , t} = P_{r}^{t} - \sum_{k \in K, a \in \mathit{varphi} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0048} \\
   & \sum_{k \in K, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} = \sum_{kp \in K : kp \neq k, ap \in \mathit{Phi} \left(a\right)} y_{ap}^{kp} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} = \mathit{mu}_{a}^{k} + \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} \tag{eq\_0049} \\
+  & \sum_{k \in K, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \sum_{k \in K : kp \neq k, a \in \mathit{Omega} \left(r , t\right)} p_{a}^{kp , t} \cdot y_{a}^{kp} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} = \mathit{pi}_{r , t}^{k} + \sum_{a \in \mathit{Omega} \left(r , t\right)} p_{a}^{k , t} \cdot y_{a}^{k} \tag{eq\_0050} \\
   & \mathit{delta}_{a}^{*} = 1 - \sum_{ap \in \mathit{Phi} \left(a\right)} y_{ap}^{k} - \mathit{mu}_{a}^{k} \tag{eq\_0067} \\
   & \mathit{zeta}_{r , t}^{*} = P_{r}^{t} - \sum_{a \in \mathit{Omega} \left(r , t\right)} y_{a}^{k} \cdot p_{a}^{k , t} - \mathit{pi}_{r , t}^{k} \tag{eq\_0074} \\
 \end{align}

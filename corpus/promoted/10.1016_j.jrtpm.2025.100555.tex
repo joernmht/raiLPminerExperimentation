@@ -17,9 +17,9 @@
 %@ param l shape=- kind=vector domain=- :: Lower bound of time difference for an activity
 %@ param u shape=- kind=vector domain=- :: Upper bound of time difference for an activity
 %@ param M shape=- kind=big_m domain=- :: Sufficiently large constant for linearization
-%@ index W ordered=0 cyclic=0 :: family a declared shape names
-%@ var z shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a resource path is used
-%@ var y shape=P,P domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
+%@ index W ordered=0 cyclic=0 :: Set of arcs in the Train Flow Network
+%@ var z shape=K domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if a resource path is used
+%@ var y shape=K,K,K domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable between resource paths
 %@ param T shape=- kind=scalar domain=- :: Period of the cyclic timetable
 %@ index E ordered=0 cyclic=0 :: Set of events in the Event Activity Network
 %@ param k shape=- kind=scalar domain=- :: Minimum number of periods required for full periodicity
@@ -58,22 +58,25 @@
 %@ param T_underline shape=- kind=scalar domain=- :: Lower bound on cycle time
 %@ param delta shape=- kind=scalar domain=- :: Minimum separation time between entry and exit events
 %@ param k_hat shape=- kind=scalar domain=- :: Number of periods to consider
-%@ var lambda shape=P,P domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
-%@ param omega shape=- kind=scalar domain=- :: Cycle time or period length
-%@ var t_entry shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
-%@ var t_exit shape=P domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path
-%@ index fam_p ordered=0 cyclic=0 :: family a shape read off the formulas names
-%@ var t_entry_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_entry
-%@ var t_exit_pp shape=- domain=non_negative role=primary drole=- lo=- hi=- :: variable: variant of the declared variable t_exit
-%@ var z_pp shape=- domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable z
+%@ var lambda shape=K,K,K domain=binary role=auxiliary drole=- lo=0 hi=1 :: Binary variable for conflict resolution between resource path pairs
+%@ var t_entry shape=K,K domain=non_negative role=primary drole=- lo=0 hi=- :: Entry time of a resource path
+%@ var t_exit shape=K,K domain=non_negative role=primary drole=- lo=0 hi=- :: Exit time of a resource path
+%@ letter a over=A :: index letter (ADR-0023)
+%@ letter e over=E :: index letter (ADR-0023)
+%@ letter i over=A :: index letter (ADR-0023)
+%@ letter j over=A :: index letter (ADR-0023)
+%@ letter n over=N :: index letter (ADR-0023)
+%@ letter p over=K :: index letter (ADR-0023)
+%@ letter w over=W :: index letter (ADR-0023)
+%@ var omega shape=- domain=continuous role=primary drole=- lo=- hi=- :: Cycle time or period length
 \begin{align}
   \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) \tag{eq\_0016} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A} . \tag{eq\_0002} \\
   & l \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} \leq t_{j} - t_{i} \leq u \cdot b_{a} \cdot x_{\mathit{alpha} \left(a\right)} + M \cdot \left(1 - x_{\mathit{alpha} \left(a\right)}\right) , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{ITI}} , \tag{eq\_0003} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{COM}} . \tag{eq\_0004} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A}^{\text{VEH}} . \tag{eq\_0005} \\
+  & z_{p} \geq \sum_{w \in \mathcal{W}_{p}} x_{w} - \left|\mathcal{W}_{p}\right| + 1 , \tag{eq\_0006} \\
   & y_{p pp} + y_{pp p} \leq 1 , \tag{eq\_0007} \\
-  & y_{p pp} + y_{pp p} \geq z_{p} + z_{pp} - 1 , \tag{eq\_0008} \\
   & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{p pp}\right) , \tag{eq\_0009} \\
   & t_{p}^{\text{entry}} - t_{pp}^{\text{exit}} \geq \mathit{delta} - M \cdot \left(1 - y_{pp p}\right) , \tag{eq\_0011} \\
   & t_{pp}^{\text{entry}} - t_{p}^{\text{exit}} \geq \mathit{delta} - M \left(1 - y_{p pp} + \mathit{lambda}_{p pp}\right) \forall \left\{p , pp\right\} \in \mathcal{K} , \tag{eq\_0040} \\

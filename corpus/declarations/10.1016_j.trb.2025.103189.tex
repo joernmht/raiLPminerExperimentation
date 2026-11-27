@@ -38,7 +38,8 @@
 %@ var n shape=- domain=non_negative role=primary drole=- lo=- hi=- :: Number of additional coupled/uncoupled units
 
 % I: classified as variable during review
-%@ var I shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
+%det-was: %@ var I shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
+%@ var I shape=M,T domain=non_negative role=primary drole=- lo=- hi=- :: Inventory of rolling stock units at station after departure
 
 % c: classified as variable during review
 %det-was: %@ var c shape=T,M domain=non_negative role=primary drole=- lo=- hi=- :: Number of coupled units
@@ -209,5 +210,6 @@
 %@ letter tp over=T :: index letter (ADR-0023)
 %@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ var I_off shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: Off-balance inventory deviation of rolling stock units of type m at station s
-%@ param u shape=E,E kind=matrix domain=- :: Number of uncoupled units
+%@ var I_0 shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 46)
+%@ param u shape=M,T kind=matrix domain=- :: Number of uncoupled units
 % --- end deterministic declarations ---

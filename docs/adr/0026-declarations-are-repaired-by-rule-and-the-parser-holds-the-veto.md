@@ -48,6 +48,15 @@ Three properties hold for every rule:
    it does better. A repair that costs a paper rows is rolled back for that
    paper. Nothing is tuned by hand.
 
+Rules run in the order of their footing: what the paper states and what the
+algebra implies are applied to a fixpoint first, and only then R8, so a variant
+never takes a kind that later evidence would have decided otherwise.
+
+A paper with decisions and formulas but **no** assisted sidecar gets one
+written by the rules alone, starting from nothing but the objective's sense.
+Such a file opens with a `DETERMINISTIC ONLY` line, is kept only if the paper
+then promotes, and is removed by `--restore`.
+
 R7 and R8 are inferences, not readings, and are labelled as such. R7 rests on
 two properties a linear program has by definition. R8 has no such footing; it
 is included only in the three cases where the assisted sidecars themselves

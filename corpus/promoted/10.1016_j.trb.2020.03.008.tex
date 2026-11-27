@@ -76,9 +76,11 @@
 %@ letter p over=P :: index letter (ADR-0023)
 %@ index fam_D ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
-%@ param c_sched shape=T kind=vector domain=- :: parameter: variant of the declared parameter c
 %@ param delta shape=N,N,P kind=matrix domain=- :: parameter: the paper says so (Table 2)
+%@ param lambda shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param omega shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
 %@ param tau shape=N,N,T kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param c_sched shape=T kind=vector domain=- :: parameter: variant of the declared parameter c
 \begin{align}
   &  \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \begin{cases} - o_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node} \\ d_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node} \\ 0 , \text{else} \end{cases} \forall t \in T , i \in N^{t}  \tag{eq\_0001} \\
   & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0002} \\
@@ -111,6 +113,6 @@
   & C_{x}^{i , j , t} = c_{t} t_{i j}^{t} \tag{eq\_0032} \\
   & C_{c}^{t} = u \cdot c_{s c h e d}^{t} \tag{eq\_0033} \\
   \max\quad & \mathit{lambda} \sum_{k \in K} C_{z}^{k} \cdot z_{k} - \left(1 - \mathit{lambda}\right) \sum_{k \in K, p \in P^{k}} C_{y}^{p , k} \cdot y_{p}^{k} + \mathit{omega} \left[\sum_{k \in K, p \in P^{k}} C_{f}^{p , k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, i \in N, j \in N} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} C_{c}^{t} \cdot d_{N \left(O_{t}\right)}\right] \tag{eq\_0034} \\
-  & z_{k} , y_{p}^{k} \in \left[0 , 1\right] \forall k \in K , p \in \bar{P^{k}} , t \in T , \left(i , j\right) \in A \tag{eq\_0035} \\
+  & z_{k} , y_{p}^{k} \in \left[0 , 1\right] \forall k \in K , p \in P_bar^{k} , t \in T , \left(i , j\right) \in A \tag{eq\_0035} \\
   & \sum_{\left(i , j\right) \in A} \mathit{delta}_{i , j}^{p} \mathit{pi}_{i j} + \mathit{sigma}_{k} - \frac{\mathit{omega}}{c_{p}^{k}} \cdot d_{k} \geq 0 \forall k \in K \tag{eq\_0036} \\
 \end{align}

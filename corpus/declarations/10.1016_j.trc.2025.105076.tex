@@ -252,7 +252,8 @@
 %@ param beta_0 shape=- kind=scalar domain=- :: Initial speed in speed profile
 %det-was: %@ param c_tilde shape=A,K kind=matrix domain=- :: Modified cost coefficient for arc a and train k
 %@ param c_tilde shape=- kind=scalar domain=- :: Modified cost coefficient for arc a and train k
-%@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
+%det-was: %@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
+%@ param chi shape=fam_x,fam_u kind=matrix domain=- :: Function of state and control in speed profile
 %@ param chi_bar shape=- kind=scalar domain=- :: Upper bound for chi
 %@ param chi_max shape=- kind=scalar domain=- :: Maximum value for chi
 %@ param chi_min shape=- kind=scalar domain=- :: Minimum value for chi
@@ -314,5 +315,8 @@
 %@ var delta shape=Omega domain=continuous role=primary drole=- lo=- hi=- :: Slack variable for arc a
 %@ param mu shape=Omega,K kind=matrix domain=- :: Auxiliary variable for arc a and train k
 %@ param pi shape=R,T,K kind=matrix domain=- :: Auxiliary variable for power supply district r, time t, train k
+%@ var x_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: variant of the declared variable x
+%@ index fam_x ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_u ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ var u shape=A,A,s,K domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
 % --- end deterministic declarations ---

@@ -32,7 +32,7 @@
     },
     {
       "name": "W",
-      "description": "family a declared shape names",
+      "description": "Set of arcs in the Train Flow Network",
       "ordered": false,
       "cyclic": false
     },
@@ -57,12 +57,6 @@
     {
       "name": "rho",
       "description": "Index for resource paths (alternative spelling)",
-      "ordered": false,
-      "cyclic": false
-    },
-    {
-      "name": "fam_p",
-      "description": "family a shape read off the formulas names",
       "ordered": false,
       "cyclic": false
     }
@@ -155,10 +149,12 @@
       "domain_class": null
     },
     {
-      "name": "omega",
-      "description": "Cycle time or period length",
-      "shape": [],
-      "kind": "scalar",
+      "name": "card_W",
+      "description": "derived: number of elements of W",
+      "shape": [
+        "K"
+      ],
+      "kind": "vector",
       "domain_class": null
     },
     {
@@ -209,7 +205,7 @@
       "name": "z",
       "description": "Binary variable indicating if a resource path is used",
       "shape": [
-        "P"
+        "K"
       ],
       "domain": "binary",
       "lower": null,
@@ -221,8 +217,9 @@
       "name": "y",
       "description": "Binary precedence variable between resource paths",
       "shape": [
-        "P",
-        "P"
+        "K",
+        "K",
+        "K"
       ],
       "domain": "binary",
       "lower": null,
@@ -234,8 +231,9 @@
       "name": "lambda",
       "description": "Binary variable for conflict resolution between resource path pairs",
       "shape": [
-        "P",
-        "P"
+        "K",
+        "K",
+        "K"
       ],
       "domain": "binary",
       "lower": 0.0,
@@ -247,7 +245,8 @@
       "name": "t_entry",
       "description": "Entry time of a resource path",
       "shape": [
-        "P"
+        "K",
+        "K"
       ],
       "domain": "non_negative",
       "lower": 0.0,
@@ -259,7 +258,8 @@
       "name": "t_exit",
       "description": "Exit time of a resource path",
       "shape": [
-        "P"
+        "K",
+        "K"
       ],
       "domain": "non_negative",
       "lower": 0.0,
@@ -268,30 +268,10 @@
       "domain_role": null
     },
     {
-      "name": "t_entry_pp",
-      "description": "variable: variant of the declared variable t_entry",
+      "name": "omega",
+      "description": "Cycle time or period length",
       "shape": [],
-      "domain": "non_negative",
-      "lower": null,
-      "upper": null,
-      "role": "primary",
-      "domain_role": null
-    },
-    {
-      "name": "t_exit_pp",
-      "description": "variable: variant of the declared variable t_exit",
-      "shape": [],
-      "domain": "non_negative",
-      "lower": null,
-      "upper": null,
-      "role": "primary",
-      "domain_role": null
-    },
-    {
-      "name": "z_pp",
-      "description": "variable: variant of the declared variable z",
-      "shape": [],
-      "domain": "binary",
+      "domain": "continuous",
       "lower": null,
       "upper": null,
       "role": "primary",
@@ -1015,61 +995,25 @@
       "indicator": null
     },
     {
-      "name": "eq_0007",
-      "description": "At most one precedence direction per conflicting resource path pair",
+      "name": "eq_0006",
+      "description": "Link route choice variables to resource path usage",
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
         }
       ],
-      "comparator": "le",
+      "comparator": "ge",
       "lhs": [
         {
-          "ref": "y",
+          "ref": "z",
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
-              "expr": "p",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "P",
-              "expr": "pp",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        },
-        {
-          "ref": "y",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "P",
-              "expr": "pp",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1083,6 +1027,42 @@
         }
       ],
       "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "W"
+          ]
+        },
+        {
+          "ref": "card_W",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
         {
           "ref": "_const",
           "ref_kind": "literal",
@@ -1099,39 +1079,38 @@
       "indicator": null
     },
     {
-      "name": "eq_0008",
-      "description": "Require precedence direction when both resource paths are used",
+      "name": "eq_0007",
+      "description": "At most one precedence direction per conflicting resource path pair",
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
         }
       ],
-      "comparator": "ge",
+      "comparator": "le",
       "lhs": [
         {
           "ref": "y",
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             }
@@ -1147,13 +1126,19 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1168,38 +1153,11 @@
       ],
       "rhs": [
         {
-          "ref": "z",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "P",
-              "expr": "p",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        },
-        {
-          "ref": "z_pp",
-          "ref_kind": "variable",
-          "bindings": [],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        },
-        {
           "ref": "_const",
           "ref_kind": "literal",
           "bindings": [],
           "coefficient": 1.0,
-          "sign": -1,
+          "sign": 1,
           "role": "rhs",
           "operator": "none",
           "operator_over": []
@@ -1215,14 +1173,7 @@
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
@@ -1231,9 +1182,22 @@
       "comparator": "ge",
       "lhs": [
         {
-          "ref": "t_entry_pp",
+          "ref": "t_entry",
           "ref_kind": "variable",
-          "bindings": [],
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
           "coefficient": 1.0,
           "sign": 1,
           "role": "lhs",
@@ -1245,7 +1209,7 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1284,14 +1248,20 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             }
@@ -1313,14 +1283,7 @@
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
@@ -1333,7 +1296,7 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1346,9 +1309,22 @@
           "operator_over": []
         },
         {
-          "ref": "t_exit_pp",
+          "ref": "t_exit",
           "ref_kind": "variable",
-          "bindings": [],
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
           "coefficient": 1.0,
           "sign": -1,
           "role": "lhs",
@@ -1382,13 +1358,19 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1411,14 +1393,7 @@
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
@@ -1427,9 +1402,22 @@
       "comparator": "ge",
       "lhs": [
         {
-          "ref": "t_entry_pp",
+          "ref": "t_entry",
           "ref_kind": "variable",
-          "bindings": [],
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
           "coefficient": 1.0,
           "sign": 1,
           "role": "lhs",
@@ -1441,7 +1429,7 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1480,14 +1468,20 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             }
@@ -1503,14 +1497,20 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             }
@@ -1532,14 +1532,7 @@
       "quantifiers": [
         {
           "index": "p",
-          "over": "P",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        },
-        {
-          "index": "pp",
-          "over": "P",
+          "over": "K",
           "restriction": "none",
           "restriction_other": null,
           "where": null
@@ -1552,7 +1545,7 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1565,9 +1558,22 @@
           "operator_over": []
         },
         {
-          "ref": "t_exit_pp",
+          "ref": "t_exit",
           "ref_kind": "variable",
-          "bindings": [],
+          "bindings": [
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
           "coefficient": 1.0,
           "sign": -1,
           "role": "lhs",
@@ -1601,13 +1607,19 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
@@ -1624,14 +1636,20 @@
           "ref_kind": "variable",
           "bindings": [
             {
-              "index": "P",
+              "index": "K",
               "expr": "p",
               "offset": 0,
               "modulo": null
             },
             {
-              "index": "P",
-              "expr": "pp",
+              "index": "K",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "p",
               "offset": 0,
               "modulo": null
             }

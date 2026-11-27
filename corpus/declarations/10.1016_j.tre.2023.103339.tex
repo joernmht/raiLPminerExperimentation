@@ -31,7 +31,8 @@
 %@ index V ordered=0 cyclic=0 :: Set of line platforms that train i will visit
 %det-was: %@ param rho shape=p,e,k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
 %@ param rho shape=P,S,fam_k kind=matrix domain=- :: Passenger arrival rate at line platform with destination
-%@ param lambda shape=p,e,k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
+%det-was: %@ param lambda shape=p,e,k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
+%@ param lambda shape=fam_s,P,S,fam_k kind=matrix domain=- :: Splitting rate of passengers at station choosing line platform
 %@ param T shape=- kind=scalar domain=- :: Length of time step for the absorption model
 %det-was: %@ param alpha shape=p,e,k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
 %@ param alpha shape=P,S,fam_k kind=matrix domain=- :: Relative fraction of passengers boarding trains at line platform
@@ -156,21 +157,16 @@
 %@ letter p over=P :: index letter (ADR-0023)
 %@ letter z over=Z :: index letter (ADR-0023)
 %@ index fam_k ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index fam_s ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_q ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_N ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ var gamma shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: Mean time of trains from depot to line platform
 %@ param C_train shape=- kind=scalar domain=- :: parameter: the paper says so (Table 2)
-%@ param D_1 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
-%@ param D_2 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
-%@ param D_3 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
-%@ param D_4 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
-%@ param D_5 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
 %@ var J_high shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0035 sets it equal to variables (a row constrains at least one variable)
 %@ var J_low shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0044 sets it equal to variables (a row constrains at least one variable)
 %@ var d_depot shape=I,l domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 3)
 %@ var delta_absorb shape=fam_k,P domain=binary role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
 %@ var f_absorb shape=fam_k,P domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
-%@ param f_min shape=- kind=scalar domain=- :: parameter: a bound or reference value of the declared variable f
 %@ param h_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ var k_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 71)
 %@ var n_absorb shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
@@ -182,6 +178,13 @@
 %@ param r_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ param tau_max shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ param tau_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ param D_1 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_2 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_3 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_4 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param D_5 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
+%@ param f_min shape=- kind=scalar domain=- :: parameter: a bound or reference value of the declared variable f
+%@ param rho_station shape=fam_s,S,fam_k kind=matrix domain=- :: parameter: variant of the declared parameter rho
 %@ var theta shape=Z,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ var n_transfer shape=P,P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ param t_transfer shape=fam_q,P kind=matrix domain=- :: parameter: variant of the declared parameter t

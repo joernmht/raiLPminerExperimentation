@@ -323,6 +323,34 @@
       ],
       "kind": "scalar",
       "domain_class": null
+    },
+    {
+      "name": "card_Pi_ad",
+      "description": "derived: number of elements of Pi_ad",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "n1_over_card_Pi_ad",
+      "description": "derived: 1 / card_Pi_ad",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "n1_over_card_Pi_ad_g_on_x",
+      "description": "derived: n1_over_card_Pi_ad[g] at x[f, gp]",
+      "shape": [
+        "F",
+        "A"
+      ],
+      "kind": "matrix",
+      "domain_class": null
     }
   ],
   "variables": [
@@ -945,6 +973,96 @@
           "operator": "sum",
           "operator_over": [
             "V",
+            "A"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0029",
+      "description": "Prevents simultaneous occupation of a mainline departure arc and its incompatible siding departure arcs.",
+      "quantifiers": [
+        {
+          "index": "g",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "k",
+          "over": "K",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "gp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "n1_over_card_Pi_ad_g_on_x",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "A",
+            "F"
+          ]
+        },
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "A",
+              "expr": "g",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "F",
             "A"
           ]
         }

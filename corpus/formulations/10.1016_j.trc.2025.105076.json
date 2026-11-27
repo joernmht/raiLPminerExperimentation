@@ -173,6 +173,18 @@
       "description": "family a shape read off the formulas names",
       "ordered": false,
       "cyclic": false
+    },
+    {
+      "name": "fam_x",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_u",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
     }
   ],
   "parameters": [
@@ -371,8 +383,11 @@
     {
       "name": "chi",
       "description": "Function of state and control in speed profile",
-      "shape": [],
-      "kind": "scalar",
+      "shape": [
+        "fam_x",
+        "fam_u"
+      ],
+      "kind": "matrix",
       "domain_class": null
     },
     {
@@ -591,6 +606,16 @@
       ],
       "kind": "matrix",
       "domain_class": null
+    },
+    {
+      "name": "p_akpt_on_y",
+      "description": "derived: p[a, kp, t] at y[a, kp]",
+      "shape": [
+        "Omega",
+        "K"
+      ],
+      "kind": "matrix",
+      "domain_class": null
     }
   ],
   "variables": [
@@ -725,6 +750,16 @@
       "shape": [
         "Omega"
       ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x_0",
+      "description": "variable: variant of the declared variable x",
+      "shape": [],
       "domain": "continuous",
       "lower": null,
       "upper": null,
@@ -993,6 +1028,98 @@
               "modulo": null
             }
           ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0025_lo",
+      "description": "Station capacity incompatible arc set definition",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "chi_underline",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "chi",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "fam_x",
+              "expr": "x_{i, j, s, k}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "fam_u",
+              "expr": "u_{i, j, s, k}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0025_up",
+      "description": "Station capacity incompatible arc set definition",
+      "quantifiers": [],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "chi",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "fam_x",
+              "expr": "x_{i, j, s, k}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "fam_u",
+              "expr": "u_{i, j, s, k}",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "chi_bar",
+          "ref_kind": "parameter",
+          "bindings": [],
           "coefficient": 1.0,
           "sign": 1,
           "role": "rhs",
@@ -1627,6 +1754,246 @@
           "operator": "sum",
           "operator_over": [
             "Phi"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0050_1",
+      "description": "Power supply constraints over all conflicting arcs and trains",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "Omega"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "kp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p_akpt_on_y",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "K",
+            "Omega"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0050_2",
+      "description": "Power supply constraints over all conflicting arcs and trains",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "R",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "kp",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p_akpt_on_y",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "K",
+            "K",
+            "Omega"
+          ]
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "pi",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "Omega",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "K",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "p",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Omega"
           ]
         }
       ],

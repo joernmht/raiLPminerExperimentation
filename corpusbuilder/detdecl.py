@@ -88,6 +88,11 @@ from corpusbuilder.symbols import domain_declaration
 REPORT_JSON = P.CORPUS / "detdecl.json"
 REPORT_MD = P.CORPUS / "detdecl.md"
 
+#: First comment line of a sidecar this module wrote from nothing: the paper
+#: has decisions and formulas but no assisted sidecar. Everything in such a
+#: file is rule output; ``--restore`` removes the file.
+FROM_SCRATCH = "% DETERMINISTIC ONLY: no assisted sidecar exists; written by corpusbuilder.detdecl."
+
 BEGIN = "% --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---"
 END = "% --- end deterministic declarations ---"
 WAS = "%det-was: "
@@ -185,7 +190,10 @@ class Sidecar:
         self.lines = text.splitlines()
         #: (kind, name) -> added line, in insertion order
         self.added: dict[tuple[str, str], str] = {}
+        #: operations performed (drives the fixpoint loops, not the report)
         self.changes: Counter[str] = Counter()
+        #: the rule that last wrote each name: what the report counts
+        self.rule_of: dict[tuple[str, str], str] = {}
         #: used names left undeclared, with the reason (report only)
         self.undeclared: dict[str, str] = {}
 
@@ -214,6 +222,7 @@ class Sidecar:
         """Write one declaration: replace the live line of that name (keeping
         its original in a ``%det-was:`` comment) or add a new one."""
         new = _line(kind, name, kv, desc)
+        self.rule_of[("letter" if kind == "letter" else "symbol", name)] = rule
         for i, k, n, _kv_old, _d in self.decls():
             if (
                 n != name
@@ -414,7 +423,10 @@ def shape_of_uses(uses: list, families: dict[str, str]) -> tuple[list[str] | Non
         for u in clean:
             if len(u.pieces) != n:
                 continue
-            m = _PIECE_LETTER.match(u.pieces[pos])
+            # an index given by a map, s_{f} ("the station of f"), ranges over
+            # what its base letter ranges over; a number votes for no family
+            piece = u.pieces[pos]
+            m = _PIECE_LETTER.match(piece) or re.match(r"^([A-Za-z]\w*?)_\{", piece)
             if not m:
                 continue
             fam = families.get(m.group(1))
@@ -605,16 +617,25 @@ def rule_missing(
     domains: dict[str, str],
     table_kinds: dict[str, tuple[str, dict[str, str], str]],
     deduced: dict[str, str] | None = None,
+    *,
+    variants: bool = True,
 ) -> None:
-    variables = set(sc.names("var"))
+    """Declare used names nobody declared. ``variants=False`` holds rule R8
+    back: it has the weakest footing and must not pre-empt what the paper or
+    the algebra decides once more names are known."""
     sc.undeclared = {}
     deduced = deduced or {}
     symbols = set(sc.names("param")) | set(sc.names("var"))
     for name in sorted(uses):
         if name in symbols or name.lower() in _OPERATOR_WORDS or not _IDENT.fullmatch(name):
             continue
+        variables = set(sc.names("var"))  # includes what this pass declared so far
         scalar_use = all(not u.pieces for u in uses[name])
-        if name in sc.names("index") or (name in table_kinds and table_kinds[name][0] == "index"):
+        subscripted = all(u.pieces for u in uses[name])
+        says_index = name in table_kinds and table_kinds[name][0] == "index"
+        # a name the sidecar lists as an index but every formula writes with
+        # subscripts, as a term, is a symbol: it goes through the rules below
+        if (name in sc.names("index") and not subscripted) or says_index:
             # A set used as a number is its size (or its last element): data.
             if (
                 scalar_use
@@ -638,13 +659,13 @@ def rule_missing(
             continue
         # a letter whose every occurrence carries subscripts is (also) a symbol
         shape, why = shape_of_uses(uses[name], families)
-        coefficient = any(u.multiplies in variables for u in uses[name])
+        coefficient = any(variables.intersection(u.product) for u in uses[name])
         if coefficient and name in deduced:
             sc.undeclared[name] = (
                 "deductions disagree (coefficient of a variable, and " + deduced[name] + ")"
             )
             continue
-        variant = variant_kind(name, sc.names("param"), sc.names("var"))
+        variant = variant_kind(name, sc.names("param"), sc.names("var")) if variants else None
         evidence = (
             name in domains
             or name in table_kinds
@@ -784,7 +805,7 @@ def normalized_rows(dossier: Dossier, rows: list[P.Row], declarations: str) -> d
     except Exception:  # a normalizer failure is promote's finding, not ours
         return {}
     out: dict[str, str] = {}
-    derived = re.findall(r"^%@ param ([A-Za-z_]\w*) [^\n]*:: derived: ", norm, re.MULTILINE)
+    derived = re.findall(r"^%@ (?:param|var) ([A-Za-z_]\w*) [^\n]*:: derived: ", norm, re.MULTILINE)
     out[""] = " ".join(derived)
     for line in norm.splitlines():
         m = re.search(r"\\tag\{([^{}]*)\}", line)
@@ -823,10 +844,15 @@ def rule_kind_correction(sc: Sidecar, uses: dict[str, list], evidence: dict[str,
 # --------------------------------------------------------------------------- #
 
 _W_VAR = re.compile(r"\b(?:decision\s+)?variables?\b|\bdecision\b", re.IGNORECASE)
+# A description declares a set or an index only when it opens with the word
+# ("Set of stations", "Station index", "The collection of ..."); a mention
+# further in ("... of the train with index k") describes something else.
 _W_SET = re.compile(
-    r"\b(?:sub)?sets?\s+of\b|^\s*(?:the\s+)?(?:sub)?sets?\b|\bcollection of\b", re.IGNORECASE
+    r"^\s*(?:the\s+|a\s+)?(?:sub)?sets?\b|^\s*(?:the\s+|a\s+)?collection of\b", re.IGNORECASE
 )
-_W_INDEX = re.compile(r"\bind(?:ex|ices|exes)\b", re.IGNORECASE)
+_W_INDEX = re.compile(
+    r"^\s*(?:the\s+|an?\s+)?(?:[\w-]+\s+){0,2}ind(?:ex|ices|exes)\b", re.IGNORECASE
+)
 _W_PARAM = re.compile(
     r"\bparameters?\b|\bconstants?\b|\bgiven\b|\binput\b|\bpre-?(?:defined|specified|determined)\b"
     r"|\bknown\b|\bcoefficients?\b|\bweight(?:s|ing)?\b|\bpenalt(?:y|ies)\b|\bbig[- ]?M\b"
@@ -1023,7 +1049,8 @@ def _split_commas(latex: str) -> list[str]:
 
 def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tuple[str, dict]:
     """The repaired sidecar text and what changed, for one paper."""
-    sc = Sidecar(restore(text))
+    sc_base = restore(text)
+    sc = Sidecar(sc_base)
     idx = _load_json(INDICES / f"{key}.json")
     letters = index_letters(idx)
     if "R1" in rules:
@@ -1064,14 +1091,20 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                         hit = by_key.get(name_key(name))
                         if hit:
                             tk[name] = hit
-                    for _round in range(4):
-                        before = sum(sc.changes.values())
-                        deduced = deduce_variables(sc, norm, fams) if "R7" in rules else {}
-                        rule_missing(sc, uses, fams, domains, tk, deduced)
-                        if sum(sc.changes.values()) == before:
-                            break
+                    # what the paper states and what the algebra implies first,
+                    # to a fixpoint; labelled variants (R8) only after that
+                    for with_variants in (False, True):
+                        for _round in range(4):
+                            before = sum(sc.changes.values())
+                            deduced = deduce_variables(sc, norm, fams) if "R7" in rules else {}
+                            rule_missing(
+                                sc, uses, fams, domains, tk, deduced, variants=with_variants
+                            )
+                            if sum(sc.changes.values()) == before:
+                                break
                 rule_shape_families(sc, norm)
-    changes = dict(sorted(sc.changes.items()))
+    final = sc.text()
+    changes = dict(sorted(Counter(sc.rule_of.values()).items())) if final != sc_base else {}
     if sc.undeclared:
         changes["_undeclared"] = dict(sorted(sc.undeclared.items()))  # type: ignore[assignment]
     return sc.text(), changes
@@ -1145,11 +1178,41 @@ def repair_best(
     return best[2], {"variant": best[1], "scores": scores, "changes": best[3]}
 
 
+def scratch_sidecar(key: str, decisions: dict) -> str | None:
+    """The empty sidecar of a paper that has none: an objective line whose
+    sense is the paper's own objective row's, nothing else. ``None`` when the
+    paper has no single objective row to read the sense from."""
+    dossier, rows = paper_rows(key, decisions)
+    if dossier is None:
+        return None
+    objectives = [r for r in rows if r.is_objective]
+    if len(objectives) != 1:
+        return None
+    from corpusbuilder.objective import objective_split
+
+    head = objective_split(objectives[0].latex)
+    if head is None:
+        return None
+    return (
+        f"% Declaration sidecar for {key}\n{FROM_SCRATCH}\n"
+        f"%@ obj sense={head[0]} name=objective combination=sum :: -\n"
+    )
+
+
 def _work(args: tuple[str, str]) -> tuple[str, str, dict]:
     key, scratch = args
     decisions = _DECISIONS
-    text = (P.DECLARATIONS / f"{key}.tex").read_text(encoding="utf-8")
+    path = P.DECLARATIONS / f"{key}.tex"
+    if path.exists():
+        text = path.read_text(encoding="utf-8")
+    else:
+        text = scratch_sidecar(key, decisions) or ""
+    if not text:
+        return key, "", {"variant": "none", "scores": {}, "changes": {}}
     new, record = repair_best(key, text, decisions, Path(scratch) / key, exhaustive=_EXHAUSTIVE)
+    if FROM_SCRATCH in text and record["scores"].get(record["variant"], (0, 0))[0] == 0:
+        # rules alone did not promote the paper: leave it without a sidecar
+        return key, "", {"variant": "none", "scores": record["scores"], "changes": {}}
     return key, new, record
 
 
@@ -1178,12 +1241,20 @@ def run(
                 shutil.copy2(path, target / path.name)
             continue
         keys.append(key)
+    # papers with decisions and a dossier but no sidecar at all: rules only
+    for key in sorted(_DECISIONS):
+        if key not in keys and (not only or key in only) and (P.DOSSIERS / f"{key}.json").exists():
+            if not (P.DECLARATIONS / f"{key}.stub.tex").exists():
+                continue  # promote never reached the sidecar step for this paper
+            keys.append(key)
     totals: Counter[str] = Counter()
     variants: Counter[str] = Counter()
     per_paper: dict[str, dict] = {}
     with tempfile.TemporaryDirectory(prefix="detdecl-") as scratch, Pool(jobs) as pool:
         results = pool.map(_work, [(k, scratch) for k in keys], chunksize=2)
     for key, new, record in sorted(results):
+        if not new:
+            continue
         per_paper[key] = record
         variants[record["variant"]] += 1
         totals.update({k: v for k, v in record["changes"].items() if not k.startswith("_")})
@@ -1236,6 +1307,10 @@ def main(argv: list[str] | None = None) -> int:
         n = 0
         for path in sorted(P.DECLARATIONS.glob("*.tex")):
             text = path.read_text(encoding="utf-8")
+            if FROM_SCRATCH in text:
+                path.unlink()  # a sidecar the rules wrote from nothing
+                n += 1
+                continue
             new = restore(text)
             if new != text:
                 path.write_text(new, encoding="utf-8", newline="\n")

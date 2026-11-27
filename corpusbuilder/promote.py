@@ -633,7 +633,8 @@ def assemble(dossier: Dossier, rows: list[Row], declarations: str, *, entry_id: 
 #: at the head of a constraint row, with an optional colon.
 _ST_PREFIX = re.compile(
     r"^\s*(?:\\(?:text|mathrm|textrm|mathit)\s*\{\s*)?"
-    r"(?:s\s*\.\s*t\s*\.?|subject\s+to)\s*\}?\s*:?\s*",
+    r"(?:s\s*\}?\s*\.\s*(?:\\(?:text|mathrm|textrm|mathit)\s*\{\s*)?t\s*\}?\s*\.?|subject\s+to)"
+    r"\s*\}?\s*:?\s*",
     re.IGNORECASE,
 )
 
