@@ -60,12 +60,24 @@ then promotes, and is removed by `--restore`.
 
 R7 and R8 are inferences, not readings, and are labelled as such. R7 rests on
 two properties a linear program has by definition. R8 has no such footing; it
-is included only in the three cases where the assisted sidecars themselves
+is included only in the cases where the assisted sidecars themselves
 agree with it, measured on the 1,201 variants they declare
 (`detdecl.VARIANT_AGREEMENT`): 94 % for variants of parameters, 100 % for
 bound labels on variables, 85 % for letters, numbers and direction words on
-variables. That is agreement with an independent, unconfirmed source, not a
-precision. Accented variants of variables agree 51 % and are left alone.
+variables, and 99 % (121 of 122, leave-one-out) for a variant without a declared
+base whose sibling variants, at least two, all have one kind. That is agreement
+with an independent, unconfirmed source, not a precision.
+
+The assist stage wrote a second artifact next to each sidecar: the symbol table
+of the decision export (`corpus/decisions`, key `symbol_tables`). It classifies
+names the sidecar lacks. R8 reads it as the same source at the same footing: a
+used name the table calls a parameter or a variable takes that kind (the table
+and the sidecar agree on 3,139 of 3,171 names both hold, 99 %), and the table's
+letters serve as bases for the variant cases above (variant of a table
+parameter: 92 of 96; letters, numbers or direction words on a table variable:
+31 of 31). Such lines say `the assist stage's symbol table` in their
+description and are counted as `R8 ... (assist table)`: they are the assist
+model's word, not the paper's, and not a rule's reading of the algebra. Accented variants of variables agree 51 % and are left alone.
 
 **Homonyms** (2026-11-27). Papers write a set and a quantity with one letter:
 the periods and the horizon `T`, the time index `t` and the times `t_{e,a}`.
@@ -77,6 +89,15 @@ letter. A set or index letter most uses write *with subscripts* is also a
 symbol, but only when the paper states its kind or a row forces it: a letter
 next to a variable may be a call argument, so linearity (R7) and variants
 (R8) are not accepted as evidence for a homonym.
+
+**A table's "set" against the formulas.** A notation table can file a quantity
+under its sets: a group header carried one row too far, a description that
+opens with "set of". When no sidecar line declares the name as an index
+family, no row ranges over it (after `\in`, in a union, between cardinality
+bars) and every row writes it with indices as a value, the formulas say it is
+a quantity. The table's word is dropped for that name and its kind comes from
+the other evidence (R7, R8) or from nowhere; it used to stay undeclared as "a
+set used as a value" whatever the algebra said.
 
 Two deductions that looked attractive were measured and **rejected**, and are
 recorded here so they are not tried again:

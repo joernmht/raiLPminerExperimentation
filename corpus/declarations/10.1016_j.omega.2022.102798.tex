@@ -44,8 +44,7 @@
 %@ var d shape=t,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
 
 % f: classified as parameter during review
-%det-was: %@ param f shape=t kind=vector domain=- :: Final station for train t
-%@ param f shape=T kind=vector domain=- :: Final station for train t
+%@ param f shape=t kind=vector domain=- :: Final station for train t
 
 % s: classified as index during review
 %@ index s ordered=1 cyclic=0 :: Station index
@@ -121,4 +120,11 @@
 %@ var p_e shape=t,t domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable p
 %@ param Delta shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 30)
 %@ param Omega shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 31)
+%@ param Gamma shape=t,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Lambda shape=H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Psi shape=H,H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Theta shape=H,H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ var delta shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
+%@ var omega shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
+%@ var rho shape=S,T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
 % --- end deterministic declarations ---

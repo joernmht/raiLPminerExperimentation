@@ -45,6 +45,12 @@ R8  variants      a labelled variant of a declared symbol (``t_arr`` next to a
                   label (``min``, ``max``, ``nom``, ``plan`` ...) on a variable
                   names a parameter; a variant of a variable whose labels are
                   only letters, numbers or direction words is a variable.
+                  Without a declared base: a variant whose sibling variants
+                  (at least two, declared, none by this rule) are all of one
+                  kind is of that kind, unless its label is a bound or accent.
+                  The assist stage's symbol table (decision export) counts as
+                  that sidecar: a name it classifies and the sidecar lacks
+                  takes its kind, and its letters serve as bases.
                   Accented variants of variables and other label words are
                   left undeclared: there the sidecars split both ways.
 R9  homonyms      one letter the rows write with two index counts is two
@@ -676,36 +682,128 @@ VARIANT_AGREEMENT = {
     "variant of a parameter": (486, 519),
     "bound label on a variable": (119, 119),
     "letters, numbers or direction on a variable": (226, 266),
+    # no declared base: at least two declared variants of the base, all of
+    # one kind, and this one carries no bound or accent label (leave-one-out
+    # over the assisted sidecars)
+    "variant like its sibling variants": (121, 122),
+    # the assist stage's symbol table (decision export) against the assisted
+    # sidecar of the same paper: the very name, and a labelled variant whose
+    # base only the table knows
+    "name in the assist stage's symbol table": (3139, 3171),
+    "variant of a parameter of the symbol table": (92, 96),
+    "letters, numbers or direction on a variable of the symbol table": (31, 31),
 }
 
 
 def variant_kind(
-    name: str, params: dict[str, dict[str, str]], variables: dict[str, dict[str, str]]
+    name: str,
+    params: dict[str, dict[str, str]],
+    variables: dict[str, dict[str, str]],
+    inferred: frozenset[str] = frozenset(),
+    assisted: dict[str, str] | None = None,
 ) -> tuple[str, dict[str, str], str] | None:
     """R8: ``(kind, key-values to inherit, reason)`` for a labelled variant of
-    a declared symbol, or ``None`` when the rule does not decide."""
+    a declared symbol, or ``None`` when the rule does not decide.
+
+    ``inferred`` names declarations this rule made itself: they never serve
+    as the siblings another variant is decided by. ``assisted`` is the assist
+    stage's symbol table of the paper (:func:`assisted_kinds`): the same
+    source as the assisted sidecar, which lists names the sidecar lacks."""
+    assisted = assisted or {}
+    if name in assisted:
+        word = "parameter" if assisted[name] == "param" else "variable"
+        extra = {} if assisted[name] == "param" else {"domain": "continuous"}
+        return assisted[name], extra, f"{ASSIST_TABLE} classifies it as a {word}"
     toks = name.split("_")
     for k in range(len(toks) - 1, 0, -1):
         base = "_".join(toks[:k])
-        if base in params or base in variables:
+        if base in params or base in variables or base in assisted:
             labels = toks[k:]
             break
     else:
-        return None
-    if base in params:
-        return "param", {}, f"variant of the declared parameter {base}"
+        return _sibling_kind(name, params, variables, inferred)
+    declared = base in params or base in variables
+    base_is_param = base in params if declared else assisted[base] == "param"
+    said = "declared" if declared else "assist-table"
+    if base_is_param:
+        return "param", {}, f"variant of the {said} parameter {base}"
     low = [x.lower() for x in labels]
     if any(x in BOUND_LABELS for x in low):
-        return "param", {}, f"a bound or reference value of the declared variable {base}"
+        return "param", {}, f"a bound or reference value of the {said} variable {base}"
     if any(x in ACCENT_LABELS for x in low):
         return None
     if all(
         len(x) == 1 or x.isdigit() or x.lower() in PHASE_LABELS or re.fullmatch(r"[a-z]p+", x)
         for x in labels
     ):
-        dom = variables[base].get("domain", "continuous")
-        return "var", {"domain": dom}, f"variant of the declared variable {base}"
+        dom = variables[base].get("domain", "continuous") if declared else "continuous"
+        return "var", {"domain": dom}, f"variant of the {said} variable {base}"
     return None
+
+
+#: How a declaration names the assist stage's symbol table as its source.
+ASSIST_TABLE = "the assist stage's symbol table"
+_GLYPH_NAMES: dict[str, list[str]] = {}
+_ASSIST_TABLES: dict[str, dict[str, str]] | None = None
+
+
+def assisted_kinds(key: str) -> dict[str, str]:
+    """name -> ``param`` | ``var`` as the assist stage's symbol table of the
+    paper's decision export classifies it (``corpus/decisions``, key
+    ``symbol_tables``). A Greek glyph is spelled out, in each spelling the
+    formulas may use (``epsilon`` and ``varepsilon``); accented and compound
+    glyphs, and names the table calls an index, are left out."""
+    global _ASSIST_TABLES
+    if _ASSIST_TABLES is None:
+        from corpusbuilder.game import _GREEK
+
+        for name, glyph in _GREEK.items():
+            _GLYPH_NAMES.setdefault(glyph, []).append(name)
+        _GLYPH_NAMES.setdefault("\u2113", []).append("ell")
+        _ASSIST_TABLES = P.load_symbol_tables(sorted(P.DECISIONS.glob("*.json")))
+    out: dict[str, str] = {}
+    for symbol, kind in _ASSIST_TABLES.get(key, {}).items():
+        if kind not in ("parameter", "variable"):
+            continue
+        glyphs = [ch for ch in symbol if ch in _GLYPH_NAMES]
+        spellings = [symbol]
+        if len(glyphs) == 1:
+            spellings = [symbol.replace(glyphs[0], name) for name in _GLYPH_NAMES[glyphs[0]]]
+        for name in spellings:
+            if name.isascii() and _IDENT.fullmatch(name):
+                out[name] = "param" if kind == "parameter" else "var"
+    return out
+
+
+def _sibling_kind(
+    name: str,
+    params: dict[str, dict[str, str]],
+    variables: dict[str, dict[str, str]],
+    inferred: frozenset[str],
+) -> tuple[str, dict[str, str], str] | None:
+    """The base letter is declared nowhere, but at least two labelled variants
+    of it are, and they are all parameters or all variables: a further
+    variant is of that kind, unless its label is a bound or an accent."""
+    toks = name.split("_")
+    if len(toks) < 2:
+        return None
+    low = [x.lower() for x in toks[1:]]
+    if any(x in BOUND_LABELS or x in ACCENT_LABELS for x in low):
+        return None
+    siblings = sorted(
+        n
+        for n in (*params, *variables)
+        if n != name and n not in inferred and "_" in n and n.split("_")[0] == toks[0]
+    )
+    kinds = {"param" if n in params else "var" for n in siblings}
+    if len(siblings) < 2 or len(kinds) != 1:
+        return None
+    like = f"{siblings[0]} and {siblings[1]}"
+    if kinds == {"param"}:
+        return "param", {}, f"variant like the declared parameters {like}"
+    domains = {variables[n].get("domain", "continuous") for n in siblings}
+    dom = next(iter(domains)) if len(domains) == 1 else "continuous"
+    return "var", {"domain": dom}, f"variant like the declared variables {like}"
 
 
 def deduce_variables(
@@ -761,11 +859,14 @@ def rule_missing(
     variants: bool = True,
     bound: frozenset[str] = frozenset(),
     divisors: frozenset[str] = frozenset(),
+    ranged_over: frozenset[str] = frozenset(),
+    assisted: dict[str, str] | None = None,
 ) -> None:
     """Declare used names nobody declared. ``bound`` holds the letters some
     row binds (a capital bound as ``T \\in \\mathcal{T}`` is an index letter). ``variants=False`` holds rule R8
     back: it has the weakest footing and must not pre-empt what the paper or
-    the algebra decides once more names are known."""
+    the algebra decides once more names are known. ``ranged_over`` holds the
+    names some row uses as a set (after ``\\in``, between cardinality bars)."""
     sc.undeclared = {}
     deduced = deduced or {}
     symbols = set(sc.names("param")) | set(sc.names("var"))
@@ -788,9 +889,17 @@ def rule_missing(
         # most uses are written; the others stay with the set or the letter.
         mostly_subscripted = n_sub >= 2 and n_sub > n_scalar
         homonym = False
+        table = table_kinds.get(name)
         if says_index and (not is_index or subscripted):
-            sc.undeclared[name] = "a set used as a value"
-            continue
+            if is_index or not subscripted or name in ranged_over or is_letter:
+                sc.undeclared[name] = "a set used as a value"
+                continue
+            # The notation table files the name under its sets (a group
+            # header carried too far, a description that opens with "set of
+            # ... times"), but no row ranges over it and every row writes it
+            # with indices as a value: the formulas say it is a quantity. The
+            # table's word is dropped; its kind must come from elsewhere.
+            table = None
         if is_index and not subscripted:
             # (a capital only: a family named by a lower-case letter is an
             # index letter's own set, and the letter alone is an index)
@@ -822,7 +931,7 @@ def rule_missing(
         if homonym:
             # Only what the paper states or the algebra forces declares a
             # homonym: a letter next to a variable may be a call argument.
-            stated = name in table_kinds and table_kinds[name][0] in ("var", "param")
+            stated = table is not None and table[0] in ("var", "param")
             if not (name in domains or stated or name in deduced):
                 sc.undeclared[name] = (
                     "homonym of an index name; neither the paper nor a row decides its kind"
@@ -841,13 +950,19 @@ def rule_missing(
             )
             continue
         variant = (
-            variant_kind(name, sc.names("param"), sc.names("var"))
+            variant_kind(
+                name,
+                sc.names("param"),
+                sc.names("var"),
+                frozenset(n for (_c, n), r in sc.rule_of.items() if r.startswith("R8")),
+                assisted,
+            )
             if variants and not homonym
             else None
         )
         evidence = (
             name in domains
-            or name in table_kinds
+            or table is not None
             or coefficient
             or divides
             or name in deduced
@@ -877,8 +992,8 @@ def rule_missing(
                 ":: variable: a domain row of the paper declares it",
                 "R5 variable (domain row)",
             )
-        elif name in table_kinds:
-            kind, extra, where = table_kinds[name]
+        elif table is not None:
+            kind, extra, where = table
             if kind == "var":
                 sc.set(
                     "var",
@@ -951,7 +1066,9 @@ def rule_missing(
                         "hi": "-",
                     },
                     f":: variable: {why}",
-                    "R8 variable (variant)",
+                    "R8 variable (assist table)"
+                    if why.startswith(ASSIST_TABLE)
+                    else "R8 variable (variant)",
                 )
             else:
                 sc.set(
@@ -959,7 +1076,9 @@ def rule_missing(
                     name,
                     {"shape": shape_s, "kind": pkind, "domain": "-"},
                     f":: parameter: {why}",
-                    "R8 parameter (variant)",
+                    "R8 parameter (assist table)"
+                    if why.startswith(ASSIST_TABLE)
+                    else "R8 parameter (variant)",
                 )
 
 
@@ -1467,6 +1586,11 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                     for name, hit in prose_evidence(key, sorted(uses)).items():
                         tk.setdefault(name, hit)
                     bound = frozenset(bound_letters("\n".join(norm_all.values())))
+                    ranged_over = frozenset(
+                        _plain(re.sub(r"\\(?:mathcal|mathit)\s*\{([^{}]*)\}", r"\1", m.group(1)))
+                        for row_text in norm_all.values()
+                        for m in _SET_USE.finditer(row_text)
+                    )
                     divisors = frozenset(
                         name
                         for row_name, row_text in norm.items()
@@ -1489,6 +1613,8 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                                 variants=with_variants,
                                 bound=bound,
                                 divisors=divisors,
+                                ranged_over=ranged_over,
+                                assisted=assisted_kinds(key),
                             )
                             if sum(sc.changes.values()) == before:
                                 break
@@ -1503,6 +1629,14 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
     if sc.together:
         changes["_together"] = dict(sorted(sc.together.items()))  # type: ignore[assignment]
     return sc.text(), changes
+
+
+#: A name a row uses as a set: the target of a membership, or what stands
+#: between cardinality bars (with or without the calligraphic wrapper).
+_SET_USE = re.compile(
+    r"(?:\\in|\\subseteq?|\\left\s*\||\\cup|\\cap|\\setminus|\\backslash)\s*"
+    r"((?:\\mathcal|\\mathit)\s*\{[^{}]*\}|[A-Za-z]\w*)"
+)
 
 
 def _plain(name: str) -> str:

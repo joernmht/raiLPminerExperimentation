@@ -60,7 +60,7 @@
       "name": "f",
       "description": "Final station for train t",
       "shape": [
-        "T"
+        "t"
       ],
       "kind": "vector",
       "domain_class": null
@@ -101,6 +101,48 @@
       "description": "parameter: the paper says so (paragraph 31)",
       "shape": [
         "T",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "Gamma",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [
+        "t",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "Lambda",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [
+        "H",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "Psi",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [
+        "H",
+        "H",
+        "S"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "Theta",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [
+        "H",
+        "H",
         "S"
       ],
       "kind": "matrix",
@@ -204,6 +246,46 @@
         "t"
       ],
       "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "delta",
+      "description": "variable: the assist stage's symbol table classifies it as a variable",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "omega",
+      "description": "variable: the assist stage's symbol table classifies it as a variable",
+      "shape": [
+        "T",
+        "S"
+      ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "rho",
+      "description": "variable: the assist stage's symbol table classifies it as a variable",
+      "shape": [
+        "S",
+        "T",
+        "S"
+      ],
+      "domain": "continuous",
       "lower": null,
       "upper": null,
       "role": "primary",
@@ -679,6 +761,838 @@
           "ref": "_const",
           "ref_kind": "literal",
           "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007_a",
+      "description": "Safety margin when q precedes r into a station",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "q",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Gamma",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "big_m",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007_b",
+      "description": "Safety margin when r precedes q into a station",
+      "quantifiers": [
+        {
+          "index": "q",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "r",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Gamma",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "big_m",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Intra-hour separation between local trains at a station",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "q",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "h",
+          "over": "H",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Lambda",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "H",
+              "expr": "h",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "l",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "big_m",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0010",
+      "description": "Intra-hour separation between local and non-local trains at a station",
+      "quantifiers": [
+        {
+          "index": "r",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "q",
+          "over": "t",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "h",
+          "over": "H",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Lambda",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "H",
+              "expr": "h",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 0.5,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "l",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "t",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "big_m",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0014",
+      "description": "Upper bound on extra running time over minimum running time",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s + 1",
+              "offset": 1,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Delta",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "delta",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0015",
+      "description": "Upper bound on extra dwell time over minimum dwell time",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "s",
+          "over": "S",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "d",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "a",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "t",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Omega",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "omega",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
           "coefficient": 1.0,
           "sign": 1,
           "role": "rhs",

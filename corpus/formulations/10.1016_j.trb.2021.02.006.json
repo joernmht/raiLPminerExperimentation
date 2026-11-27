@@ -156,6 +156,16 @@
       "domain_class": null
     },
     {
+      "name": "ell",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [
+        "A",
+        "V"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
       "name": "gamma_x_Q",
       "description": "derived: gamma * Q",
       "shape": [
@@ -174,6 +184,16 @@
         "V",
         "R",
         "OD"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "u_idx_A_V",
+      "description": "derived: u written over (A, V); declared over (V, OD)",
+      "shape": [
+        "A",
+        "V"
       ],
       "kind": "matrix",
       "domain_class": null
@@ -423,6 +443,154 @@
             }
           ],
           "coefficient": "T",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013_lo",
+      "description": "Activity duration from periodic event times and modulo integer",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "ell",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013_up",
+      "description": "Activity duration from periodic event times and modulo integer",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "j",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u_idx_A_V",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "j",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
           "sign": 1,
           "role": "rhs",
           "operator": "none",

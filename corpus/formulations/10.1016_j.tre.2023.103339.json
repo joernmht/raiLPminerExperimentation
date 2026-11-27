@@ -446,6 +446,13 @@
       "domain_class": null
     },
     {
+      "name": "varepsilon",
+      "description": "parameter: the assist stage's symbol table classifies it as a parameter",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
       "name": "t_transfer",
       "description": "parameter: variant of the declared parameter t",
       "shape": [
@@ -848,6 +855,16 @@
     {
       "name": "y_tilde",
       "description": "variable: the paper says so (paragraph 67)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "J_pass",
+      "description": "variable: variant like the declared variables J_high and J_low",
       "shape": [],
       "domain": "continuous",
       "lower": null,
@@ -1561,6 +1578,113 @@
             }
           ],
           "coefficient": "M",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0036_b",
+      "description": "Linearization of binary-continuous product, part b",
+      "quantifiers": [
+        {
+          "index": "k",
+          "over": "fam_k",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "p",
+          "over": "P",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "f_absorb",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "fam_k",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "varepsilon",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "delta_absorb",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "fam_k",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "m",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "delta_absorb",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "fam_k",
+              "expr": "k",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "P",
+              "expr": "p",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "varepsilon",
           "sign": -1,
           "role": "rhs",
           "operator": "none",

@@ -13,7 +13,7 @@
 %@ index T ordered=0 cyclic=0 :: Set of trains
 %@ var a shape=t,S domain=continuous role=primary drole=- lo=- hi=- :: Arrival time of train t at station s
 %@ var d shape=t,S domain=continuous role=primary drole=- lo=- hi=- :: Departure time of train t from station s
-%@ param f shape=T kind=vector domain=- :: Final station for train t
+%@ param f shape=t kind=vector domain=- :: Final station for train t
 %@ index s ordered=1 cyclic=0 :: Station index
 %@ var p shape=t,t,S domain=binary role=primary drole=- lo=- hi=- :: Binary precedence variable for ordered pair of trains on shared track or station
 %@ param M shape=- kind=big_m domain=- :: Large constant for big-M constraints
@@ -55,10 +55,23 @@
 %@ var p_e shape=t,t domain=binary role=primary drole=- lo=- hi=- :: variable: variant of the declared variable p
 %@ param Delta shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 30)
 %@ param Omega shape=T,S kind=matrix domain=- :: parameter: the paper says so (paragraph 31)
+%@ param Gamma shape=t,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Lambda shape=H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Psi shape=H,H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ param Theta shape=H,H,S kind=matrix domain=- :: parameter: the assist stage's symbol table classifies it as a parameter
+%@ var delta shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
+%@ var omega shape=T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
+%@ var rho shape=S,T,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the assist stage's symbol table classifies it as a variable
 \begin{align}
   & a_{t}^{s + 1} - d_{t}^{s} \geq \mathit{Delta}_{t}^{s} , t \in T , s \in S \left(t\right) \backslash \left\{f_{t}\right\} , \tag{eq\_0001} \\
   & d_{t}^{s} - a_{t}^{s} \geq \mathit{Omega}_{t}^{s} , t \in T , s \in S \left(t\right) . \tag{eq\_0002} \\
   & p_{q , r}^{e} + p_{r , q}^{e} = 1 . \tag{eq\_0003} \\
   & d_{r}^{v} - a_{q}^{u + 1} \geq - M \cdot p_{r , q}^{e} . \tag{eq\_0004} \\
   & p_{q , r}^{s} + p_{r , q}^{s} = 1 \tag{eq\_0005\_a} \\
+  & a_{r}^{s} - a_{q}^{s} \geq \mathit{Gamma}_{q}^{s} - M \cdot p_{r , q}^{s} \tag{eq\_0007\_a} \\
+  & a_{q}^{s} - a_{r}^{s} \geq \mathit{Gamma}_{r}^{s} - M \cdot p_{q , r}^{s} \tag{eq\_0007\_b} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \mathit{Lambda}_{h}^{s} - l_{q , r} - M \cdot p_{r , q}^{s} \tag{eq\_0009} \\
+  & d_{r}^{s} - d_{q}^{s} \geq \frac{\mathit{Lambda}_{h}^{s}}{2} - l_{q , r} - M \cdot p_{r , q}^{s} . \tag{eq\_0010} \\
+  & a_{t}^{s + 1} - d_{t}^{s} \leq \mathit{Delta}_{t}^{s} + \mathit{delta}_{t}^{s} , t \in T , s \in S \left(t\right) \backslash \left\{f_{t}\right\} ; \tag{eq\_0014} \\
+  & d_{t}^{s} - a_{t}^{s} \leq \mathit{Omega}_{t}^{s} + \mathit{omega}_{t}^{s} , t \in T , s \in S \left(t\right) ; \tag{eq\_0015} \\
 \end{align}

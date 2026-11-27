@@ -219,3 +219,65 @@ def test_an_index_left_out_is_one_variable():
     assert set(sc.names("var")) == {"x"}
     assert list(sc.together) == ["x with 1 index"]
     assert "one variable" in sc.together["x with 1 index"]
+
+
+def test_a_variant_without_a_declared_base_follows_its_sibling_variants():
+    var = {"domain": "non_negative"}
+    variables = {"t_arr": var, "t_dep": var}
+    params = {"h_min": {}, "h_safe": {}, "w_a": {}}
+    # two declared variants of t, both variables: a third one is a variable
+    assert D.variant_kind("t_pass", params, variables)[:2] == ("var", {"domain": "non_negative"})
+    assert D.variant_kind("h_dwell", params, variables)[0] == "param"
+    # a bound or an accent on the label decides nothing here
+    assert D.variant_kind("t_max", params, variables) is None
+    assert D.variant_kind("t_bar", params, variables) is None
+    # one sibling is not enough, mixed kinds decide nothing
+    assert D.variant_kind("w_b", params, variables) is None
+    assert D.variant_kind("t_pass", {"t_plan": {}}, variables) is None
+    # declarations this rule made itself are never the siblings
+    assert D.variant_kind("t_pass", params, variables, frozenset({"t_dep"})) is None
+
+
+def test_the_formulas_overrule_a_table_that_files_a_quantity_under_sets():
+    # The notation table lists h under its sets, but every row writes h with
+    # an index as a value and no row ranges over it: it is a quantity, and its
+    # kind comes from the algebra (here: it multiplies a declared variable).
+    header = "%@ var x shape=S domain=binary role=primary drole=- lo=- hi=- :: x\n"
+    table = {"h": ("index", {}, "Table 1"), "K": ("index", {}, "Table 1")}
+    rows = (r"& h_{s} \cdot x_{s} \leq 1 \forall s \in \mathcal{S}",)
+    sc = D.Sidecar(header)
+    D.rule_missing(sc, _uses(*rows), {"s": "S"}, {}, table)
+    assert sc.names("param")["h"]["shape"] == "S"
+    assert "it multiplies a declared variable" in sc.text()
+    # a name some row ranges over stays what the table says
+    sc = D.Sidecar(header)
+    D.rule_missing(sc, _uses(*rows), {"s": "S"}, {}, table, ranged_over=frozenset({"h"}))
+    assert "h" not in sc.names("param") and sc.undeclared["h"] == "a set used as a value"
+    # without other evidence the name stays undeclared, as before
+    sc = D.Sidecar(header)
+    D.rule_missing(sc, _uses(r"& h_{s} \leq 1 \forall s \in \mathcal{S}"), {"s": "S"}, {}, table)
+    assert "h" not in sc.names("param") and "h" not in sc.names("var")
+
+
+def test_the_assist_symbol_table_counts_as_the_assisted_sidecar():
+    assisted = {"q": "param", "u": "var", "w": "var"}
+    params, variables = {"M": {}}, {"x": {"domain": "binary"}}
+    # the very name
+    kind, extra, why = D.variant_kind("u", params, variables, frozenset(), assisted)
+    assert (kind, extra) == ("var", {"domain": "continuous"}) and why.startswith(D.ASSIST_TABLE)
+    assert D.variant_kind("q", params, variables, frozenset(), assisted)[0] == "param"
+    # its letters serve as bases, by the cases of the rule
+    assert D.variant_kind("q_plan", params, variables, frozenset(), assisted)[0] == "param"
+    assert D.variant_kind("u_max", params, variables, frozenset(), assisted)[0] == "param"
+    assert D.variant_kind("u_1", params, variables, frozenset(), assisted)[0] == "var"
+    assert D.variant_kind("u_recovery", params, variables, frozenset(), assisted) is None
+    assert D.variant_kind("u_bar", params, variables, frozenset(), assisted) is None
+    # a declared base goes first, and nothing changes without the table
+    assert (
+        "declared variable x" in D.variant_kind("x_1", params, variables, frozenset(), assisted)[2]
+    )
+    assert D.variant_kind("u_1", params, variables) is None
+    # the rule label says where the kind came from
+    sc = D.Sidecar("%@ var x shape=- domain=binary role=primary drole=- lo=- hi=- :: x\n")
+    D.rule_missing(sc, _uses(r"& u + x \leq 1"), {}, {}, {}, assisted=assisted)
+    assert sc.rule_of[("symbol", "u")] == "R8 variable (assist table)"
