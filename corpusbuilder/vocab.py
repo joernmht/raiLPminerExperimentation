@@ -256,7 +256,9 @@ def _rows(body: str) -> list[tuple[str, str]]:
 
 def scan_document(text: str) -> dict:
     """Deterministic vocabulary audit of one candidate document."""
-    normalized, _prov = normalize_latex(text, source="corpusbuilder.vocab")
+    # an audit of the declarations: a symbol written against its declared
+    # shape must stay as written, not be read as a derived parameter
+    normalized, _prov = normalize_latex(text, source="corpusbuilder.vocab", redeclare=False)
     bm = _BODY_RE.search(normalized)
     body = bm.group(1) if bm else normalized
     ctx = DocContext.build(normalized, body)

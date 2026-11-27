@@ -90,6 +90,13 @@ recorded here so they are not tried again:
   letters are frame words only bare and in lower case now; rows that had been
   promoted on that footing no longer are.
 
+The rules read shapes and kinds off how the rows *write* a symbol. lp2graph
+now reads a parameter written against its declaration as a derived parameter
+(`v_idx_P`, lp2graph ADR-0018 point 15), which would hide exactly those uses,
+so this module and `corpusbuilder.vocab` normalize with `redeclare=False`: a
+shape the formulas decide is repaired in the declaration (exact), and only
+what no rule here can repair is left to the recorded departure (widened).
+
 The objective row is read by a head grammar (`corpusbuilder.objective`):
 label material, operator, decision variables under the operator, expression,
 "s.t." tail. Component objectives a combined objective names
@@ -117,6 +124,16 @@ several unrelated objectives still fails `multiple_objectives`.
   `restricted_set_widen` since September and is closed there, ADR-0018 point
   13), 4 repeat a sum in the source itself and are listed in the script. The
   check must stay at zero; run it after every promote.
+- **Where the rows are (2026-11-28, 1,438 canonical of 6,284 = 22.9 %;
+  `scripts/yield_probe.py`).** Row by row, with a stand-in objective where the
+  paper's own cannot be read, 2,589 constraint rows parse. They do not all
+  count, because a row counts only inside a promoted paper and promotion needs
+  one readable objective: 1,340 are in the 99 promoted papers, 750 in 67
+  papers whose objective is outside the grammar (quadratic, stochastic,
+  vector-valued, or naming quantities nothing declares), 302 in 25 papers with
+  several objectives, 197 in 19 papers without one. With every gate as it is,
+  rules cannot reach more than what parses row by row, 41 % of all candidate
+  rows; the gates were not touched.
 - R7 misdeclares a variable as a parameter when a row is bilinear in two
   variables of which one is undeclared. The corpus has about 40 such rows; the
   per-rule audit (lab issue #3) should sample R7 and R8 lines first.

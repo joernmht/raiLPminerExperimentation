@@ -151,7 +151,9 @@ def objective_split(latex: str) -> tuple[str, str] | None:
         return None
     # "min T = min (T_1 + T_2)": a repeated operator after a label says nothing new
     rest = re.sub(
-        r"(=\s*)(?:\\(?:min|max)(?![A-Za-z])|(?<![A-Za-z\\_])" + _OPWORD + r"(?![A-Za-z]))\s*",
+        r"(=\s*)(?:\\(?:min|max)(?![A-Za-z])|(?<![A-Za-z\\_])(?:"
+        + _OPWORD
+        + r"|m\s+i\s+n|m\s+a\s+x)(?![A-Za-z]))\s*",
         r"\1",
         rest,
         flags=re.IGNORECASE,

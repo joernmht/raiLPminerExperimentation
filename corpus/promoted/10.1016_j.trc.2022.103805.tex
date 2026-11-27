@@ -77,20 +77,13 @@
 %@ param X shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ param l shape=A kind=vector domain=- :: parameter: the paper says so (Table 8)
 \begin{align}
-  & 0 < \left|\mathcal{X}_{\text{conflict}}\right| \leq \left|\mathcal{X}_{\text{plan}}\right| \leq \left|\mathcal{X}_{\text{pool}}\right| . \tag{eq\_0001} \\
   \min\quad & \sum_{o d \in \mathcal{OD}, s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\
-  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}, r \in \mathcal{R}_{l}} x_{l , f , r} \casesof{= 1}{\text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} ,}{\leq 1}{\text{otherwise} ,}\forall l \in \mathcal{L} , \tag{eq\_0005} \\
   & \sum_{s \in \mathit{delta}^{-} \left(v\right)} p_{s}^{o d} - \sum_{s \in \mathit{delta}^{+} \left(v\right)} p_{s}^{o d} = \casesof{- \mathit{gamma}^{o d}}{\text{if} v = o ,}{\mathit{gamma}^{o d}}{\text{if} v = d ,}{0}{\text{otherwise} ,}\forall v \in \mathcal{V} , \forall o d \in \mathcal{OD} , \tag{eq\_0006} \\
   & \sum_{o d \in \mathcal{OD}} p_{s}^{o d} \leq \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot \left(\mathit{cap}\right)_{r} \cdot f , \forall i \in \mathcal{I} , \tag{eq\_0007} \\
   & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{pool}}}{\sum} x_{l , f , r} \cdot \left(\mathit{mix}\right)_{g , r} \cdot f \leq g_{\text{max}} , \forall g \in \mathcal{G} , \tag{eq\_0008} \\
   & \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot f \leq f_{i , \text{max}} , \forall i \in \mathcal{I} , \tag{eq\_0009} \\
-  & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{conflict}}}{\sum} x_{l , f , r} \leq \left|\mathcal{X}_{\text{conflict}}\right| - 1 , \forall \mathcal{X}_{\text{conflict}} \in \mathcal{C} , \tag{eq\_0010} \\
   & l_{a} - l_{a} \cdot y_{a} \leq t_{a} \leq u_{a} + \left(T - u_{a}\right) \cdot y_{a} , \tag{eq\_0013} \\
-  & \text{subject}\textrm{ }\text{to}: t_{a} \leq u_{a} + y_{a} \left(T - u_{a} - d t\right) , \forall a \in \mathcal{A} , \tag{eq\_0016} \\
   & t_{a} \geq l_{a} - y_{a} \cdot l_{a} , \forall a \in \mathcal{A} , \tag{eq\_0017} \\
   & z_{a^{+}} + z_{a^{-}} + 2 \cdot y_{a} \leq 2 , \forall a \in \mathcal{Y} , \tag{eq\_0018} \\
   & \sum_{a \in \mathit{delta}^{+} \left(e\right)} y_{a} = \sum_{a \in \mathit{delta}^{-} \left(e\right)} y_{a} = z_{e} , \forall e \in \mathcal{Z} , \tag{eq\_0019} \\
-  & \underset{z_{e} \in \mathcal{Z}_{\text{source}}^{l}}{\sum} z_{e} = 1 , \forall l \in \mathcal{L}^{'} , \tag{eq\_0020} \\
-  & t_{a} = \left(t_{e_{a^{-}}} - t_{e_{a^{+}}}\right) d t + k_{a} \cdot T , \forall a \in \mathcal{A} , \tag{eq\_0021} \\
-  & \text{variables}: t_{e} \in \left\{0 , 1 , . . , \left(T - d t\right) / d t\right\} , \forall e \in \mathcal{E} , \tag{eq\_0022} \\
 \end{align}

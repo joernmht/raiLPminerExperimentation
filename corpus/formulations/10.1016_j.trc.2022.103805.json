@@ -1,0 +1,1171 @@
+{
+  "schema_version": "0.1.0",
+  "id": "10.1016_j.trc.2022.103805",
+  "name": "Enhancing the interaction of railway timetabling and line planning with infrastructure awareness",
+  "family": "milp",
+  "description": "Mined from Enhancing the interaction of railway timetabling and line planning with infrastructure awareness (Transportation Research Part C Emerging Technologies, 2022).",
+  "tags": [],
+  "provenance": {
+    "source": "10.1016/j.trc.2022.103805",
+    "reference": "Enhancing the interaction of railway timetabling and line planning with infrastructure awareness",
+    "author": "Florian Fuchs; Alessio Trivella; Francesco Corman",
+    "date": "2026-06-21"
+  },
+  "indices": [
+    {
+      "name": "X",
+      "description": "Set of line pool candidates (l,f,r) and their conflict subsets.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "OD",
+      "description": "Set of origin-destination passenger relations.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "S",
+      "description": "Set of directed edges in the space-time / route graph.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "L",
+      "description": "Set of railway lines.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "F",
+      "description": "Set of possible service frequencies.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "R",
+      "description": "Set of possible vehicle compositions.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "v",
+      "description": "Node of the railway network used in passenger flow conservation.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "V",
+      "description": "Set of nodes in the railway network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "I",
+      "description": "Set of track sections in the infrastructure-aware route constraints.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "G",
+      "description": "Set of rolling stock types.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "C",
+      "description": "Set of conflicts among line pool candidates.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "A",
+      "description": "Set of activities in the event-activity network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Y",
+      "description": "Set of selectable activities (route itinerary edges).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "Z",
+      "description": "Set of selectable events (route itinerary nodes).",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "e",
+      "description": "Event in the event-activity network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "E",
+      "description": "Set of events in the event-activity network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_minus",
+      "description": "Set of incoming edges to a node in the passenger flow network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "delta_plus",
+      "description": "Set of outgoing edges from a node in the passenger flow network.",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "alpha",
+      "description": "family the index reader found (ADR-0023)",
+      "ordered": false,
+      "cyclic": false
+    }
+  ],
+  "parameters": [
+    {
+      "name": "mandatory",
+      "description": "Indicator whether line l is mandatory (1) or optional (0).",
+      "shape": [],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "cap",
+      "description": "Passenger capacity of vehicle composition r.",
+      "shape": [
+        "R"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "mix",
+      "description": "Number of rolling stock units of type g used in composition r.",
+      "shape": [
+        "G",
+        "R"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "u",
+      "description": "Upper bound on the duration of activity a.",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "T",
+      "description": "Period length of the periodic timetable.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "f_max",
+      "description": "Maximum allowed frequency on track section i.",
+      "shape": [
+        "I"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "g_max",
+      "description": "Maximum number of rolling stock units of type g.",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "gamma",
+      "description": "Passenger demand for origin-destination pair (o,d).",
+      "shape": [
+        "OD"
+      ],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "t",
+      "description": "Duration of activity a or timestamp of event e in the periodic timetable.",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "X",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "l",
+      "description": "parameter: the paper says so (Table 8)",
+      "shape": [
+        "A"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "t_idx_S",
+      "description": "derived: t written over (S); declared over (A)",
+      "shape": [
+        "S"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "case_eq_0006_1",
+      "description": "derived: value by index condition, 3 cases, of the row eq_0006",
+      "shape": [
+        "OD",
+        "OD",
+        "V"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "val_F",
+      "description": "derived: numeric value of the index over F",
+      "shape": [
+        "F"
+      ],
+      "kind": "vector",
+      "domain_class": null
+    },
+    {
+      "name": "cap_x_val_F",
+      "description": "derived: cap * val_F",
+      "shape": [
+        "R",
+        "F"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
+      "name": "mix_x_val_F",
+      "description": "derived: mix * val_F",
+      "shape": [
+        "G",
+        "R",
+        "F"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    }
+  ],
+  "variables": [
+    {
+      "name": "p",
+      "description": "Passenger flow on edge s for relation od.",
+      "shape": [
+        "S",
+        "OD",
+        "OD"
+      ],
+      "domain": "non_negative",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "x",
+      "description": "Binary selection of line pool candidate (l,f,r).",
+      "shape": [
+        "L",
+        "F",
+        "R"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "variables",
+      "description": "Auxiliary binary variable for selecting an event in the timetable.",
+      "shape": [],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "y",
+      "description": "Binary variable for selectable activity a (0=active duration bounds, 1=relaxed).",
+      "shape": [
+        "A"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "z",
+      "description": "Binary variable indicating whether selectable event e is part of the chosen itinerary.",
+      "shape": [
+        "E"
+      ],
+      "domain": "binary",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "k",
+      "description": "Integer period adjustment for the duration of activity a.",
+      "shape": [
+        "A"
+      ],
+      "domain": "integer",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    }
+  ],
+  "constraints": [
+    {
+      "name": "eq_0006",
+      "description": "Line configuration selection: exactly one for mandatory lines, at most one for optional lines.",
+      "quantifiers": [
+        {
+          "index": "v",
+          "over": "V",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "o",
+          "over": "OD",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "d",
+          "over": "OD",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "o",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta_minus"
+          ]
+        },
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "o",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": -1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta_plus"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "case_eq_0006_1",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "OD",
+              "expr": "o",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "V",
+              "expr": "v",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0007",
+      "description": "Passenger flow conservation at every node for every origin-destination relation.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "p",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "S",
+              "expr": "s",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "o",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "OD",
+              "expr": "d",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "OD",
+            "OD"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "cap_x_val_F",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "L",
+            "F",
+            "R"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0008",
+      "description": "Track-section capacity: total passenger flow cannot exceed the capacity of selected line configurations.",
+      "quantifiers": [
+        {
+          "index": "g",
+          "over": "G",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "mix_x_val_F",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "L",
+            "F",
+            "R"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "g_max",
+          "ref_kind": "parameter",
+          "bindings": [],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0009",
+      "description": "Rolling stock type availability: total used units per type cannot exceed the available fleet.",
+      "quantifiers": [
+        {
+          "index": "i",
+          "over": "I",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "x",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "L",
+              "expr": "l",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "F",
+              "expr": "f",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "R",
+              "expr": "r",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "val_F",
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "L",
+            "F",
+            "R"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "f_max",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "I",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013_lo",
+      "description": "Selectable activity lower bound: duration is at least l_a minus the relaxation term.",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "l",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l",
+          "sign": -1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "t",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0013_up",
+      "description": "Selectable activity lower bound: duration is at least l_a minus the relaxation term.",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "u",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "T",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "u",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0017",
+      "description": "Flow conservation for selected events and activities in the route-itinerary network.",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "A",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "ge",
+      "lhs": [
+        {
+          "ref": "t",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "l",
+          "ref_kind": "parameter",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "l",
+          "sign": -1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0018",
+      "description": "Exactly one source event per line must be selected in the route-itinerary.",
+      "quantifiers": [
+        {
+          "index": "a",
+          "over": "Y",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "le",
+      "lhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "a_plus",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "a_minus",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        },
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 2.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "_const",
+          "ref_kind": "literal",
+          "bindings": [],
+          "coefficient": 2.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_1",
+      "description": "Periodic duration relation: t_a = t_{e^-} - t_{e^+} + k_a T.",
+      "quantifiers": [
+        {
+          "index": "e",
+          "over": "Z",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta_plus"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta_minus"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
+      "name": "eq_0019_2",
+      "description": "Periodic duration relation: t_a = t_{e^-} - t_{e^+} + k_a T.",
+      "quantifiers": [
+        {
+          "index": "e",
+          "over": "Z",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "y",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "A",
+              "expr": "a",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "sum",
+          "operator_over": [
+            "delta_minus"
+          ]
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "E",
+              "expr": "e",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "rhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    }
+  ],
+  "objective": {
+    "sense": "min",
+    "name": "objective",
+    "description": "Minimize total passenger travel time in the line planning problem and weighted activity duration in the timetabling problem.",
+    "terms": [
+      {
+        "ref": "p",
+        "ref_kind": "variable",
+        "bindings": [
+          {
+            "index": "S",
+            "expr": "s",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "OD",
+            "expr": "o",
+            "offset": 0,
+            "modulo": null
+          },
+          {
+            "index": "OD",
+            "expr": "d",
+            "offset": 0,
+            "modulo": null
+          }
+        ],
+        "coefficient": "t_idx_S",
+        "sign": 1,
+        "role": "objective",
+        "operator": "sum",
+        "operator_over": [
+          "OD",
+          "OD",
+          "S"
+        ]
+      }
+    ],
+    "combination": "sum"
+  }
+}

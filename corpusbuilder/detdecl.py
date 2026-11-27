@@ -872,7 +872,7 @@ def normalized_rows(dossier: Dossier, rows: list[P.Row], declarations: str) -> d
     """
     doc = P.assemble(dossier, rows, declarations, entry_id=P.entry_id_for(dossier.key))
     try:
-        norm, _prov = normalize_latex(doc, source="corpusbuilder.detdecl")
+        norm, _prov = normalize_latex(doc, source="corpusbuilder.detdecl", redeclare=False)
     except Exception:  # a normalizer failure is promote's finding, not ours
         return {}
     out: dict[str, str] = {}
