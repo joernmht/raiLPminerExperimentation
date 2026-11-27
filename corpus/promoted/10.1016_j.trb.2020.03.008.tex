@@ -76,13 +76,15 @@
 %@ letter p over=P :: index letter (ADR-0023)
 %@ index fam_D ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ param A shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ param delta shape=N,N,P kind=matrix domain=- :: parameter: the paper says so (Table 2)
-%@ param lambda shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
+%@ param lambda shape=- kind=scalar domain=- :: parameter: the paper says so (running text, paragraph 61)
 %@ param omega shape=- kind=scalar domain=- :: parameter: it multiplies a declared variable (the model is linear)
 %@ param tau shape=N,N,T kind=matrix domain=- :: parameter: it multiplies a declared variable (the model is linear)
 %@ param c_sched shape=T kind=vector domain=- :: parameter: variant of the declared parameter c
+%@ param t shape=N,T kind=matrix domain=- :: parameter: the paper says so (Table 2)
 \begin{align}
-  &  \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \begin{cases} - o_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node} \\ d_{i}^{t} , \text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node} \\ 0 , \text{else} \end{cases} \forall t \in T , i \in N^{t}  \tag{eq\_0001} \\
+  &  \sum_{j \in N} x_{i j}^{t} - \sum_{j \in N} x_{j i}^{t} = \casesof{- o_{i}^{t}}{\text{if} \text{node} \text{i} \text{is} \text{a} \text{starting} \text{node}}{d_{i}^{t}}{\text{if} \text{node} \text{i} \text{is} \text{an} \text{end} \text{node}}{0}{\text{else}} \forall t \in T , i \in N^{t}  \tag{eq\_0001} \\
   & \sum_{i \in N^{t}} o_{i}^{t} = \sum_{i \in N^{t}} d_{i}^{t} \forall t \in T \tag{eq\_0002} \\
   & o_{i}^{t} = 1 \forall t \in T , i = N \left(O_{t}\right) \tag{eq\_0003} \\
   & d_{i}^{t} = 1 \forall t \in T , i = N \left(D_{t}\right) \tag{eq\_0004} \\
@@ -98,7 +100,7 @@
   & T_{D_tilde , i}^{t} + \mathit{tau}_{i j}^{t} \cdot x_{i j}^{t} \leq T_{A_tilde , j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0015} \\
   & T_{D_tilde , i}^{t} \geq \sum_{j \in N} T_{D , i}^{t} \cdot x_{i j}^{t} \forall t \in T , i \in N^{t} \tag{eq\_0016} \\
   & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} - M \cdot \left(1 - x_{i j}^{t}\right) \forall t \in T^{R R} , \left(i , j\right) \in A \tag{eq\_0017} \\
-  & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
+  & T_{D_tilde , i}^{t} - T_{A_tilde , i}^{t} \geq t_{i}^{t} \cdot x_{i j}^{t} \forall t \in T^{S T} , \left(i , j\right) \in A^{t} \tag{eq\_0018} \\
   & T_{D_tilde , i}^{t} \geq T_{D_tilde , i}^{m} + h_{i j}^{t , m} - M \left(1 - x_{i j}^{t}\right) - M \left(1 - x_{i j}^{m}\right) \forall t \in T , m \in T , i \in N^{t} , m \neq t \tag{eq\_0019} \\
   & \sum_{p \in P^{k}} y_{p}^{k} + z_{k} \geq 1 \forall k \in K \tag{eq\_0021} \\
   & z_{k} \leq 1 - y_{p}^{k} \forall k \in K , p \in P^{k} \tag{eq\_0022} \\
@@ -110,7 +112,7 @@
   & f_{p}^{k} = \left[0 , 1\right] \forall k \in K , p \in P^{k} \tag{eq\_0028} \\
   & C_{z}^{k} = c_{k} \cdot d_{k} \tag{eq\_0029} \\
   & C_{f}^{p , k} = \frac{1}{c_{p}^{k}} d_{k} \tag{eq\_0031} \\
-  & C_{x}^{i , j , t} = c_{t} t_{i j}^{t} \tag{eq\_0032} \\
+  & C_{x}^{i , j , t} = c_{t} \cdot t_{i j}^{t} \tag{eq\_0032} \\
   & C_{c}^{t} = u \cdot c_{s c h e d}^{t} \tag{eq\_0033} \\
   \max\quad & \mathit{lambda} \sum_{k \in K} C_{z}^{k} \cdot z_{k} - \left(1 - \mathit{lambda}\right) \sum_{k \in K, p \in P^{k}} C_{y}^{p , k} \cdot y_{p}^{k} + \mathit{omega} \left[\sum_{k \in K, p \in P^{k}} C_{f}^{p , k} \cdot f_{p}^{k} - \sum_{t \in T^{R R}, i \in N, j \in N} C_{x}^{i , j , t} \cdot x_{i j}^{t} - \sum_{t \in T^{R R}} C_{c}^{t} \cdot d_{N \left(O_{t}\right)}\right] \tag{eq\_0034} \\
   & z_{k} , y_{p}^{k} \in \left[0 , 1\right] \forall k \in K , p \in P_bar^{k} , t \in T , \left(i , j\right) \in A \tag{eq\_0035} \\

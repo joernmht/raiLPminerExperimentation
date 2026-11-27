@@ -845,6 +845,95 @@
       "indicator": null
     },
     {
+      "name": "eq_0025",
+      "description": "Compute departing carriages per disruption scenario in the strict robust schedule",
+      "quantifiers": [
+        {
+          "index": "t",
+          "over": "T",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "w",
+          "over": "W",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        },
+        {
+          "index": "i",
+          "over": "D",
+          "restriction": "none",
+          "restriction_other": null,
+          "where": null
+        }
+      ],
+      "comparator": "eq",
+      "lhs": [
+        {
+          "ref": "C",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "t",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "W",
+              "expr": "w",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "D",
+              "expr": "i",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": 1.0,
+          "sign": 1,
+          "role": "lhs",
+          "operator": "none",
+          "operator_over": []
+        }
+      ],
+      "rhs": [
+        {
+          "ref": "Z",
+          "ref_kind": "variable",
+          "bindings": [
+            {
+              "index": "T",
+              "expr": "psi_{i,t}",
+              "offset": 0,
+              "modulo": null
+            },
+            {
+              "index": "Q",
+              "expr": "q",
+              "offset": 0,
+              "modulo": null
+            }
+          ],
+          "coefficient": "beta",
+          "sign": 1,
+          "role": "rhs",
+          "operator": "sum",
+          "operator_over": [
+            "Q"
+          ]
+        }
+      ],
+      "kind": "linear",
+      "domain_class": null,
+      "indicator": null
+    },
+    {
       "name": "eq_0026",
       "description": "Ensure carriage availability per disruption scenario in the strict robust schedule",
       "quantifiers": [

@@ -32,8 +32,10 @@ R7  deduction     kinds that follow from the algebra under two assumptions a
                   least one variable, so a quantity set equal to an expression
                   that contains a variable is a variable, and the single
                   undeclared name of an inequality (or objective) that names
-                  no variable is one. Applied to a fixpoint; a name both
-                  deductions claim stays undeclared.
+                  no variable is one. (Not term by term: an objective may
+                  hold constant terms, so a lone unknown in one term proves
+                  nothing.) Applied to a fixpoint; a name both deductions
+                  claim stays undeclared.
 R8  variants      a labelled variant of a declared symbol (``t_arr`` next to a
                   declared ``t``) that nothing above decides takes its kind
                   from the base, in the three cases where the assisted
@@ -77,6 +79,7 @@ from pathlib import Path
 
 from railpminer import _lp2graph  # noqa: F401
 from lp2graph.mining.ingest import normalize_latex
+from lp2graph.mining.ingest.latex_normalizer import bound_letters
 from lp2graph.mining.ingest.row_canon import outline_row, scan_symbols
 
 from corpusbuilder import promote as P
@@ -196,6 +199,8 @@ class Sidecar:
         self.rule_of: dict[tuple[str, str], str] = {}
         #: used names left undeclared, with the reason (report only)
         self.undeclared: dict[str, str] = {}
+        #: names a symbol is declared for next to the index family of that name
+        self.beside: set[str] = set()
 
     def decls(self) -> list[tuple[int, str, str, dict[str, str], str]]:
         """``(line index, kind, name, key-values, description)`` of every live
@@ -223,13 +228,22 @@ class Sidecar:
         its original in a ``%det-was:`` comment) or add a new one."""
         new = _line(kind, name, kv, desc)
         self.rule_of[("letter" if kind == "letter" else "symbol", name)] = rule
-        for i, k, n, _kv_old, _d in self.decls():
-            if (
-                n != name
-                or k not in ("param", "var", "index", "letter")
-                or (k == "letter") != (kind == "letter")
-            ):
-                continue
+        candidates = [
+            d
+            for d in self.decls()
+            if d[2] == name
+            and d[1] in ("param", "var", "index", "letter")
+            and (d[1] == "letter") == (kind == "letter")
+        ]
+        # A set and a symbol may share a name (the horizon T next to the
+        # periods \mathcal{T}): a write goes to the line of its own class, and
+        # for a name in ``beside`` never replaces the line of the other class.
+        same = [d for d in candidates if (d[1] == "index") == (kind == "index")]
+        if same:
+            candidates = same
+        elif name in self.beside:
+            candidates = []
+        for i, k, n, _kv_old, _d in candidates[:1]:
             if i < 0:
                 key = (k, n)
                 if self.added[key] != new:
@@ -376,6 +390,15 @@ _OPERATOR_WORDS = frozenset(
     {"min", "max", "minimize", "maximize", "minimise", "maximise", "subject", "to", "st", "s", "t"}
     | {"such", "that", "where", "for", "all", "and", "or", "if", "otherwise", "else", "forall"}
 )
+
+
+def _operator_word(name: str, subscripted: bool) -> bool:
+    """A word of the row's frame (``min``, ``subject to``, the letters of a
+    stripped ``s.t.``), not a symbol. The single letters count only bare and
+    in lower case: ``t_{e,a}`` and the horizon ``T`` are symbols."""
+    if len(name) == 1:
+        return name in _OPERATOR_WORDS and not subscripted
+    return name.lower() in _OPERATOR_WORDS
 
 
 def row_uses(norm_rows: dict[str, str]) -> dict[str, list]:
@@ -528,7 +551,22 @@ PHASE_LABELS = frozenset(
     {"up", "dn", "down", "arr", "dep", "arrival", "departure", "in", "out", "entr", "exit"}
     | {"entry", "plus", "minus", "start", "end"}
 )
-ACCENT_LABELS = frozenset({"hat", "bar", "tilde", "star", "underline", "vec", "dot"})
+ACCENT_LABELS = frozenset(
+    {
+        "hat",
+        "bar",
+        "tilde",
+        "star",
+        "underline",
+        "vec",
+        "lvec",
+        "lrvec",
+        "dot",
+        "ddot",
+        "breve",
+        "check",
+    }
+)
 #: Share of declared variants in the assisted sidecars (2026-11-26, n = 1,201)
 #: whose kind equals what rule R8 would assign; the rule's measured agreement
 #: with an independent source, not a ground-truth precision.
@@ -589,7 +627,7 @@ def deduce_variables(
         names: list[str] = []
         for side in o.sides:
             for u in side:
-                if u.in_tail or u.name in derived or u.name.lower() in _OPERATOR_WORDS:
+                if u.in_tail or u.name in derived or _operator_word(u.name, bool(u.pieces)):
                     continue
                 if not u.pieces and (u.name in families or u.name in indices):
                     continue  # an index letter or a family used as a number
@@ -619,30 +657,44 @@ def rule_missing(
     deduced: dict[str, str] | None = None,
     *,
     variants: bool = True,
+    bound: frozenset[str] = frozenset(),
 ) -> None:
-    """Declare used names nobody declared. ``variants=False`` holds rule R8
+    """Declare used names nobody declared. ``bound`` holds the letters some
+    row binds (a capital bound as ``T \\in \\mathcal{T}`` is an index letter). ``variants=False`` holds rule R8
     back: it has the weakest footing and must not pre-empt what the paper or
     the algebra decides once more names are known."""
     sc.undeclared = {}
     deduced = deduced or {}
     symbols = set(sc.names("param")) | set(sc.names("var"))
     for name in sorted(uses):
-        if name in symbols or name.lower() in _OPERATOR_WORDS or not _IDENT.fullmatch(name):
+        if name in symbols or not _IDENT.fullmatch(name):
+            continue
+        if _operator_word(name, any(u.pieces for u in uses[name])):
             continue
         variables = set(sc.names("var"))  # includes what this pass declared so far
-        scalar_use = all(not u.pieces for u in uses[name])
-        subscripted = all(u.pieces for u in uses[name])
+        n_scalar = sum(1 for u in uses[name] if not u.pieces)
+        n_sub = len(uses[name]) - n_scalar
+        subscripted = n_scalar == 0
         says_index = name in table_kinds and table_kinds[name][0] == "index"
-        # a name the sidecar lists as an index but every formula writes with
-        # subscripts, as a term, is a symbol: it goes through the rules below
-        if (name in sc.names("index") and not subscripted) or says_index:
-            # A set used as a number is its size (or its last element): data.
-            if (
-                scalar_use
-                and name in sc.names("index")
-                and name in set(families.values())
-                and name not in families
-            ):
+        is_index = name in sc.names("index")
+        is_letter = name in families or name in sc.names("letter")
+        # Homonyms. Papers write a set and a quantity with one letter (the
+        # periods \mathcal{T} and the horizon T; the time index t and the
+        # times t_{e,a}); the model keeps families and symbols apart, so both
+        # may be declared. Which uses belong to the symbol is decided by how
+        # most uses are written; the others stay with the set or the letter.
+        mostly_subscripted = n_sub >= 2 and n_sub > n_scalar
+        homonym = False
+        if says_index and (not is_index or subscripted):
+            sc.undeclared[name] = "a set used as a value"
+            continue
+        if is_index and not subscripted:
+            # (a capital only: a family named by a lower-case letter is an
+            # index letter's own set, and the letter alone is an index)
+            if not is_letter and name not in bound and name[:1].isupper() and n_scalar > n_sub:
+                # A set's own name written as a number is its size (or its
+                # last element): data.
+                sc.beside.add(name)
                 sc.set(
                     "param",
                     name,
@@ -650,22 +702,41 @@ def rule_missing(
                     ":: parameter: the index family of this name used as a number",
                     "R5 parameter (family as a number)",
                 )
-            else:
+                continue
+            if not mostly_subscripted:
                 sc.undeclared[name] = "a set used as a value"
-            continue
-        is_letter = name in families or name in sc.names("letter")
-        if is_letter and any(not u.pieces for u in uses[name]):
-            sc.undeclared[name] = "index letter used as a value"
-            continue
+                continue
+            homonym = True
+        if is_letter and n_scalar:
+            if not mostly_subscripted:
+                sc.undeclared[name] = "index letter used as a value"
+                continue
+            homonym = True
         # a letter whose every occurrence carries subscripts is (also) a symbol
-        shape, why = shape_of_uses(uses[name], families)
-        coefficient = any(variables.intersection(u.product) for u in uses[name])
+        own = [u for u in uses[name] if u.pieces] if homonym else uses[name]
+        shape, why = shape_of_uses(own, families)
+        coefficient = any(variables.intersection(u.product) for u in own)
+        if homonym:
+            # Only what the paper states or the algebra forces declares a
+            # homonym: a letter next to a variable may be a call argument.
+            stated = name in table_kinds and table_kinds[name][0] in ("var", "param")
+            if not (name in domains or stated or name in deduced):
+                sc.undeclared[name] = (
+                    "homonym of an index name; neither the paper nor a row decides its kind"
+                )
+                continue
+            coefficient = False
+            sc.beside.add(name)
         if coefficient and name in deduced:
             sc.undeclared[name] = (
                 "deductions disagree (coefficient of a variable, and " + deduced[name] + ")"
             )
             continue
-        variant = variant_kind(name, sc.names("param"), sc.names("var")) if variants else None
+        variant = (
+            variant_kind(name, sc.names("param"), sc.names("var"))
+            if variants and not homonym
+            else None
+        )
         evidence = (
             name in domains
             or name in table_kinds
@@ -883,6 +954,10 @@ _G_SET = re.compile(r"\bsets?\b|\bind(?:ex|ices|exes)\b|\bsubscripts?\b", re.IGN
 _MATH_ONLY = re.compile(r"^(?:⟨[^⟩]*⟩[\s,;/]*(?:and|or)?\s*)+$")
 _MATH = re.compile(r"⟨([^⟩]*)⟩")
 
+#: ``⟨a⟩, ⟨b⟩ and`` in front of a symbol / ``, ⟨b⟩ and ⟨c⟩`` behind it
+_ENUM_BEFORE = re.compile(r"⟨[^⟩]*⟩\s*(?:,|;|/|&|\band\b|\bor\b|,\s*and\b|as well as)\s*$")
+_ENUM_AFTER = re.compile(r"\s*(?:,|;|/|&|\band\b|\bor\b|,\s*and\b|as well as)\s*⟨[^⟩]*⟩")
+
 Evidence = tuple[str, dict[str, str], str]
 
 
@@ -929,12 +1004,30 @@ def name_key(name: str) -> str:
     return toks[0] + "|" + ",".join(sorted(toks[1:])) if toks else ""
 
 
+_COMBINING_ACCENTS = {
+    "\u0303": "tilde",
+    "\u02dc": "tilde",
+    "\u0302": "hat",
+    "\u0304": "bar",
+    "¯": "bar",
+    "\u20d7": "vec",
+    "\u0307": "dot",
+}
+_COMBINING_ACCENT = re.compile(
+    r"\\overset\s*\{\s*(" + "|".join(_COMBINING_ACCENTS) + r")\s*\}\s*\{\s*([^{}]*)\s*\}"
+)
+
+
 def symbol_key(latex: str, letters: set[str]) -> str | None:
     """The :func:`name_key` of a symbol as the paper writes it: its base and
     its label scripts, index letters dropped (case kept: ``T`` is not ``t``)."""
     from corpusbuilder import indices as ix
     from corpusbuilder.declare import is_index_token
 
+    # publishers write an accent as a combining character above the symbol
+    latex = _COMBINING_ACCENT.sub(
+        lambda am: "\\" + _COMBINING_ACCENTS[am.group(1)] + "{" + am.group(2) + "}", latex
+    )
     n = ix.normalise(latex)
     m = ix._IDENT.search(n)
     if not m or n[: m.start()].strip():
@@ -1011,9 +1104,26 @@ def kind_evidence(key: str, letters: set[str]) -> dict[str, Evidence]:
         at = text.find("⟨" + m["latex"] + "⟩")
         if at < 0:
             continue
-        before = text[max(0, at - 70) : at].rsplit("⟩", 1)[-1]
-        after = text[at + len(m["latex"]) + 2 : at + len(m["latex"]) + 92].split("⟨", 1)[0]
+        # An enumeration shares its description: in "⟨a⟩, ⟨b⟩ and ⟨c⟩ are
+        # weights" the words after the last symbol describe all three, and in
+        # "the weights ⟨a⟩ and ⟨b⟩" the words before the first do.
+        lo, hi = at, at + len(m["latex"]) + 2
+        while True:
+            back = _ENUM_BEFORE.search(text[:lo])
+            if back is None:
+                break
+            lo = back.start()
+        while True:
+            ahead = _ENUM_AFTER.match(text[hi:])
+            if ahead is None:
+                break
+            hi += ahead.end()
+        before = text[max(0, lo - 70) : lo].rsplit("⟩", 1)[-1]
+        after = text[hi : hi + 90].split("⟨", 1)[0]
         kind = kind_of_words(before + " | " + after)
+        if kind is None and len(_MATH.findall(text)) == 1:
+            # a sentence about this one symbol: its words anywhere describe it
+            kind = kind_of_words(_MATH.sub(" ", text))
         if kind is None:
             continue
         for piece in _split_commas(m["latex"]):
@@ -1026,6 +1136,151 @@ def kind_evidence(key: str, letters: set[str]) -> dict[str, Evidence]:
             continue
         a, b = sorted(kinds)[0]
         out[k] = (a, json.loads(b), where_said[k])
+    return out
+
+
+#: Greek letters as publishers write them in running text (outside maths)
+_GREEK_PROSE = {
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "εϵ",
+    "varepsilon": "εϵ",
+    "zeta": "ζ",
+    "eta": "η",
+    "theta": "θϑ",
+    "vartheta": "θϑ",
+    "iota": "ι",
+    "kappa": "κ",
+    "lambda": "λ",
+    "mu": "μµ",
+    "nu": "ν",
+    "xi": "ξ",
+    "pi": "π",
+    "varpi": "ϖ",
+    "rho": "ρ",
+    "sigma": "σ",
+    "tau": "τ",
+    "upsilon": "υ",
+    "phi": "φϕ",
+    "varphi": "φϕ",
+    "chi": "χ",
+    "psi": "ψ",
+    "omega": "ω",
+    "Gamma": "Γ",
+    "Delta": "Δ",
+    "Theta": "Θ",
+    "Lambda": "Λ",
+    "Xi": "Ξ",
+    "Pi": "Π",
+    "Sigma": "Σ",
+    "Phi": "Φ",
+    "Psi": "Ψ",
+    "Omega": "Ω",
+    "ell": "ℓ",
+}
+_PROSE_NOUN = r"(?P<noun>variables?|parameters?|constants?|coefficients?|weights?)"
+_PROSE_INDEX_RUN = r"(?:\s{0,3}[A-Za-z′'](?:\s?,?\s?[A-Za-z0-9′']){0,6})?"
+#: "binary decision variable" + symbol: the kind noun stands right before it
+_PROSE_BEFORE = re.compile(
+    r"(?P<adj>(?:\b[\w–-]+\s+){0,3})\b" + _PROSE_NOUN + r"\s+(?:vector\s+)?$", re.IGNORECASE
+)
+#: symbol + "is a binary variable" / symbol + "variables"
+_PROSE_AFTER = re.compile(
+    r"^"
+    + _PROSE_INDEX_RUN
+    + r"\s*(?:(?:is|are|denotes?|represents?)\s+(?:a|an|the)\s+(?P<adj>(?:[\w–-]+\s+){0,3}?))?"
+    + _PROSE_NOUN
+    + r"\b",
+    re.IGNORECASE,
+)
+_PROSE_NOT = re.compile(r"\bdual\b|lagrang|multiplier|\brandom\b", re.IGNORECASE)
+
+
+def _prose_kind(adjectives: str, noun: str) -> tuple[str, dict[str, str]] | None:
+    if _PROSE_NOT.search(adjectives):
+        return None  # a multiplier of a relaxation is neither of the model's kinds
+    if noun.lower().startswith("variable"):
+        low = adjectives.lower()
+        domain = (
+            "binary"
+            if re.search(r"\bbinary\b|\bboolean\b|0\s*[–-]\s*1", low)
+            else "integer"
+            if "integer" in low
+            else "continuous"
+        )
+        return "var", {"domain": domain}
+    return "param", {"kind": ""}
+
+
+def prose_evidence(key: str, names: list[str]) -> dict[str, Evidence]:
+    """name -> ``(kind, extra, where)`` from running text that names a Greek
+    symbol outside maths ("where α 1 is a binary variable", "the tolerance
+    parameter ξ"). Publishers set many inline symbols as plain characters; the
+    notation tables and defining sentences read only marked-up maths.
+
+    Deliberately narrow: the kind noun must stand right before the symbol or
+    right after it ("is a ... variable"), a sentence that calls it both ways
+    decides nothing, and a symbol with a label (``α 1``) is never taken for
+    the bare letter."""
+    disc = load_record(key, DISCOVERY) or {}
+    paras = [
+        (p.get("i"), re.sub(r"⟨[^⟩]*⟩", " ⟨⟩ ", p.get("plain") or ""))
+        for p in disc.get("paras", [])
+    ]
+    greek = [n for n in names if n.split("_")[0] in _GREEK_PROSE]
+    out: dict[str, Evidence] = {}
+    for name in sorted(greek):
+        base, *rest = name.split("_")
+        if any(r in ACCENT_LABELS for r in rest):
+            continue  # an accent does not survive as plain text
+        siblings = sorted(
+            {
+                o.split("_")[1]
+                for o in names
+                if o != name and o.split("_")[0] == base and len(o.split("_")) > len(rest) + 1
+            }
+        )
+        pat = re.compile(
+            r"(?<![A-Za-z0-9])["
+            + _GREEK_PROSE[base]
+            + "]"
+            + "".join(r"\s{0,2}" + re.escape(r) for r in rest)
+            + r"(?![0-9])"
+        )
+        found: set[tuple[str, str]] = set()
+        where = ""
+        for i, plain in paras:
+            for m in pat.finditer(plain):
+                after = plain[m.end() : m.end() + 90]
+                if re.match(r"\s{0,2}\d", after) or any(
+                    re.match(r"\s{0,2}" + re.escape(sib) + r"(?![A-Za-z])", after)
+                    for sib in siblings
+                ):
+                    continue  # another symbol: the letter with a label
+                clause = re.split(r"[.;:()]", plain[max(0, m.start() - 60) : m.start()])[-1]
+                hit = _PROSE_BEFORE.search(clause) or _PROSE_AFTER.match(after)
+                if hit is None:
+                    continue
+                kind = _prose_kind(hit.group("adj") or "", hit.group("noun"))
+                if kind is not None:
+                    found.add((kind[0], json.dumps(kind[1], sort_keys=True)))
+                    where = where or f"running text, paragraph {i}"
+        if len({k for k, _e in found}) == 1:
+            kinds = sorted(found)
+            # binary before integer before continuous: the most specific wording
+            extra = json.loads(kinds[0][1])
+            if kinds[0][0] == "var":
+                doms = {json.loads(e)["domain"] for _k, e in kinds}
+                extra = {
+                    "domain": "binary"
+                    if "binary" in doms
+                    else "integer"
+                    if "integer" in doms
+                    else "continuous"
+                }
+            out[name] = (kinds[0][0], extra, where)
     return out
 
 
@@ -1091,6 +1346,9 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                         hit = by_key.get(name_key(name))
                         if hit:
                             tk[name] = hit
+                    for name, hit in prose_evidence(key, sorted(uses)).items():
+                        tk.setdefault(name, hit)
+                    bound = frozenset(bound_letters("\n".join(norm_all.values())))
                     # what the paper states and what the algebra implies first,
                     # to a fixpoint; labelled variants (R8) only after that
                     for with_variants in (False, True):
@@ -1098,7 +1356,14 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                             before = sum(sc.changes.values())
                             deduced = deduce_variables(sc, norm, fams) if "R7" in rules else {}
                             rule_missing(
-                                sc, uses, fams, domains, tk, deduced, variants=with_variants
+                                sc,
+                                uses,
+                                fams,
+                                domains,
+                                tk,
+                                deduced,
+                                variants=with_variants,
+                                bound=bound,
                             )
                             if sum(sc.changes.values()) == before:
                                 break

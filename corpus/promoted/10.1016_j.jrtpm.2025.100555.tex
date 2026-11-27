@@ -8,7 +8,7 @@
 %@ prov author :: F.W. Fuchs; Bernardo Martin-Iradi; Francesco Corman
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total duration of all commercial activities
-%@ index N ordered=0 cyclic=0 :: family the formulas bind over
+%@ index N ordered=0 cyclic=0 :: Set of nodes in the Train Flow Network
 %@ index n ordered=0 cyclic=0 :: Index for nodes in the Train Flow Network
 %@ var x shape=W domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating whether a train uses a link
 %@ param b shape=A kind=vector domain=- :: Time bound for an activity
@@ -69,6 +69,8 @@
 %@ letter p over=K :: index letter (ADR-0023)
 %@ letter w over=W :: index letter (ADR-0023)
 %@ var omega shape=- domain=continuous role=primary drole=- lo=- hi=- :: Cycle time or period length
+%@ param N shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ var x_0 shape=W domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0015 sets it equal to variables (a row constrains at least one variable)
 \begin{align}
   \min\quad & \underset{a = \left(i , j\right) \in \mathcal{A}^{\text{COM}}}{\sum} \left(t_{j} - t_{i}\right) \tag{eq\_0016} \\
   & l \cdot b_{a} \leq t_{j} - t_{i} \leq u \cdot b_{a} , \forall a = \left(i , j\right) \in \mathcal{A} . \tag{eq\_0002} \\

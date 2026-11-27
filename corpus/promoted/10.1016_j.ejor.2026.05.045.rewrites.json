@@ -1,6 +1,6 @@
 {
   "source": "corpus/promoted/10.1016_j.ejor.2026.05.045.tex",
-  "rules_version": "rewrite-2026.11.0",
+  "rules_version": "rewrite-2026.11.1",
   "rewrites": [
     {
       "rule": "restricted_set_widen",
@@ -84,19 +84,27 @@
     },
     {
       "rule": "restricted_set_widen",
+      "before": "\\in Q_{\\mathit{psi}_{i} \\left(t\\right)}",
+      "after": "\\in Q",
+      "line": 86,
+      "start": 7551,
+      "end": 7590
+    },
+    {
+      "rule": "restricted_set_widen",
       "before": "\\in A_{t}",
       "after": "\\in A",
-      "line": 86,
-      "start": 7572,
-      "end": 7581
+      "line": 87,
+      "start": 7773,
+      "end": 7782
     },
     {
       "rule": "restricted_set_widen",
       "before": "\\in B_{t}",
       "after": "\\in B",
-      "line": 86,
-      "start": 7609,
-      "end": 7618
+      "line": 87,
+      "start": 7810,
+      "end": 7819
     },
     {
       "rule": "superscript_label",
@@ -126,9 +134,9 @@
       "rule": "superscript_label",
       "before": "\\mathit{zeta}_{l_{t}^{d e p} , w}^{0}",
       "after": "zeta_0_{l_{t}^{d e p} , w}",
-      "line": 86,
-      "start": 7523,
-      "end": 7560
+      "line": 87,
+      "start": 7724,
+      "end": 7761
     },
     {
       "rule": "forall_lone_letters",
@@ -145,6 +153,14 @@
       "line": 82,
       "start": 7009,
       "end": 7161
+    },
+    {
+      "rule": "row_exact",
+      "before": "  & C_{t , w , i} = \\underset{q \\in Q}{\\sum} \\mathit{beta}_{q , w} \\cdot Z_{\\mathit{psi}_{i} \\left(t\\right) , q} \\forall t \\in T , w \\in W , i \\in D \\tag{eq\\_0025} \\\\",
+      "after": "  & C_{t,w,i} = \\sum_{q \\in \\mathcal{Q}} \\mathit{beta}_{q,w} \\cdot Z_{psi_{i,t},q} \\qquad \\forall t \\in \\mathcal{T},\\; \\forall w \\in \\mathcal{W},\\; \\forall i \\in \\mathcal{D} \\tag{eq\\_0025} \\\\",
+      "line": 86,
+      "start": 7519,
+      "end": 7719
     },
     {
       "rule": "row_widened",
@@ -248,7 +264,15 @@
       "after": " ",
       "line": 86,
       "start": 7519,
-      "end": 7521
+      "end": 7519
+    },
+    {
+      "rule": "collapse_ws",
+      "before": "  ",
+      "after": " ",
+      "line": 87,
+      "start": 7720,
+      "end": 7722
     }
   ]
 }

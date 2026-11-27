@@ -38,7 +38,7 @@
     },
     {
       "name": "A",
-      "description": "family a declared shape names",
+      "description": "Set of arcs in the space-time-state network",
       "ordered": false,
       "cyclic": false
     },
@@ -152,7 +152,7 @@
     },
     {
       "name": "Omega",
-      "description": "family a declared shape names",
+      "description": "Set of arcs in a power supply district at a time instant",
       "ordered": false,
       "cyclic": false
     },
@@ -170,6 +170,12 @@
     },
     {
       "name": "fam_n",
+      "description": "family a shape read off the formulas names",
+      "ordered": false,
+      "cyclic": false
+    },
+    {
+      "name": "fam_s",
       "description": "family a shape read off the formulas names",
       "ordered": false,
       "cyclic": false
@@ -383,11 +389,8 @@
     {
       "name": "chi",
       "description": "Function of state and control in speed profile",
-      "shape": [
-        "fam_x",
-        "fam_u"
-      ],
-      "kind": "matrix",
+      "shape": [],
+      "kind": "scalar",
       "domain_class": null
     },
     {
@@ -608,6 +611,44 @@
       "domain_class": null
     },
     {
+      "name": "A_track",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Q",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "W_hat",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "c_dot",
+      "description": "parameter: variant of the declared parameter c",
+      "shape": [],
+      "kind": "scalar",
+      "domain_class": null
+    },
+    {
+      "name": "Omega",
+      "description": "parameter: the index family of this name used as a number",
+      "shape": [
+        "R",
+        "T"
+      ],
+      "kind": "matrix",
+      "domain_class": null
+    },
+    {
       "name": "p_akpt_on_y",
       "description": "derived: p[a, kp, t] at y[a, kp]",
       "shape": [
@@ -638,7 +679,6 @@
       "shape": [
         "A",
         "A",
-        "s",
         "K"
       ],
       "domain": "non_negative",
@@ -653,7 +693,6 @@
       "shape": [
         "A",
         "A",
-        "s",
         "K"
       ],
       "domain": "non_negative",
@@ -772,9 +811,28 @@
       "shape": [
         "A",
         "A",
-        "s",
         "K"
       ],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "v",
+      "description": "variable: the paper says so (Table 2)",
+      "shape": [],
+      "domain": "continuous",
+      "lower": null,
+      "upper": null,
+      "role": "primary",
+      "domain_role": null
+    },
+    {
+      "name": "s",
+      "description": "variable: the paper says so (paragraph 51)",
+      "shape": [],
       "domain": "continuous",
       "lower": null,
       "upper": null,
@@ -784,341 +842,15 @@
   ],
   "constraints": [
     {
-      "name": "eq_0017_lo",
-      "description": "Definition of departure headway incompatible arcs",
-      "quantifiers": [
-        {
-          "index": "s",
-          "over": "s",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        }
-      ],
-      "comparator": "le",
+      "name": "eq_0022_a",
+      "description": "Boundary condition for initial speed",
+      "quantifiers": [],
+      "comparator": "eq",
       "lhs": [],
       "rhs": [
         {
-          "ref": "f",
+          "ref": "v",
           "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "A",
-              "expr": "i",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "A",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "s",
-              "expr": "s",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0017_up",
-      "description": "Definition of departure headway incompatible arcs",
-      "quantifiers": [
-        {
-          "index": "s",
-          "over": "s",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        }
-      ],
-      "comparator": "le",
-      "lhs": [
-        {
-          "ref": "f",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "A",
-              "expr": "i",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "A",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "s",
-              "expr": "s",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "f_max",
-          "ref_kind": "parameter",
-          "bindings": [
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0018_lo",
-      "description": "Definition of arrival headway incompatible arcs",
-      "quantifiers": [
-        {
-          "index": "s",
-          "over": "s",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        }
-      ],
-      "comparator": "le",
-      "lhs": [],
-      "rhs": [
-        {
-          "ref": "b",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "A",
-              "expr": "i",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "A",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "s",
-              "expr": "s",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0018_up",
-      "description": "Definition of arrival headway incompatible arcs",
-      "quantifiers": [
-        {
-          "index": "s",
-          "over": "s",
-          "restriction": "none",
-          "restriction_other": null,
-          "where": null
-        }
-      ],
-      "comparator": "le",
-      "lhs": [
-        {
-          "ref": "b",
-          "ref_kind": "variable",
-          "bindings": [
-            {
-              "index": "A",
-              "expr": "i",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "A",
-              "expr": "j",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "s",
-              "expr": "s",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "b_max",
-          "ref_kind": "parameter",
-          "bindings": [
-            {
-              "index": "K",
-              "expr": "k",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0025_lo",
-      "description": "Station capacity incompatible arc set definition",
-      "quantifiers": [],
-      "comparator": "le",
-      "lhs": [
-        {
-          "ref": "chi_underline",
-          "ref_kind": "parameter",
-          "bindings": [],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "chi",
-          "ref_kind": "parameter",
-          "bindings": [
-            {
-              "index": "fam_x",
-              "expr": "x_{i, j, s, k}",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "fam_u",
-              "expr": "u_{i, j, s, k}",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "rhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "kind": "linear",
-      "domain_class": null,
-      "indicator": null
-    },
-    {
-      "name": "eq_0025_up",
-      "description": "Station capacity incompatible arc set definition",
-      "quantifiers": [],
-      "comparator": "le",
-      "lhs": [
-        {
-          "ref": "chi",
-          "ref_kind": "parameter",
-          "bindings": [
-            {
-              "index": "fam_x",
-              "expr": "x_{i, j, s, k}",
-              "offset": 0,
-              "modulo": null
-            },
-            {
-              "index": "fam_u",
-              "expr": "u_{i, j, s, k}",
-              "offset": 0,
-              "modulo": null
-            }
-          ],
-          "coefficient": 1.0,
-          "sign": 1,
-          "role": "lhs",
-          "operator": "none",
-          "operator_over": []
-        }
-      ],
-      "rhs": [
-        {
-          "ref": "chi_bar",
-          "ref_kind": "parameter",
           "bindings": [],
           "coefficient": 1.0,
           "sign": 1,

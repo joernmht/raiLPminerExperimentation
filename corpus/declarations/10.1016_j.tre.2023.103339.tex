@@ -17,8 +17,7 @@
 %@ index b ordered=0 cyclic=0 :: Train speed profile option index
 %@ index l ordered=0 cyclic=0 :: Line index
 %@ index cop ordered=0 cyclic=0 :: Line platforms at the same station as p
-%det-was: %@ index P ordered=0 cyclic=0 :: Set of all line platforms
-%@ index P ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ index P ordered=0 cyclic=0 :: Set of all line platforms
 %@ index phy ordered=0 cyclic=0 :: Line platforms using same physical platform as p
 %@ index Z ordered=0 cyclic=0 :: Set of depots
 %@ index z ordered=0 cyclic=0 :: Depot index
@@ -49,8 +48,7 @@
 %@ param sigma shape=P,q kind=matrix domain=binary :: Binary indicating if line platforms share same physical platform
 %det-was: %@ param M shape=- kind=big_m domain=- :: Sufficiently large positive value
 %@ param M shape=P kind=big_m domain=- :: Sufficiently large positive value
-%det-was: %@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
-%@ param L shape=fam_N kind=vector domain=- :: Penalty term for passengers not boarding at end of horizon
+%det-del: %@ param L shape=- kind=scalar domain=- :: Penalty term for passengers not boarding at end of horizon
 %@ param eta shape=- kind=scalar domain=- :: Weight for energy consumption in objective
 %@ param epsilon shape=- kind=tolerance domain=- :: Sufficiently small number
 %det-was: %@ param m shape=- kind=scalar domain=- :: Minimum value of a variable
@@ -161,9 +159,11 @@
 %@ index fam_q ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_N ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ var gamma shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: Mean time of trains from depot to line platform
+%@ var L shape=fam_N domain=continuous role=primary drole=- lo=- hi=- :: Penalty term for passengers not boarding at end of horizon
 %@ param C_train shape=- kind=scalar domain=- :: parameter: the paper says so (Table 2)
 %@ var J_high shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0035 sets it equal to variables (a row constrains at least one variable)
 %@ var J_low shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: row eq_0044 sets it equal to variables (a row constrains at least one variable)
+%@ param P shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ var d_depot shape=I,l domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 3)
 %@ var delta_absorb shape=fam_k,P domain=binary role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
 %@ var f_absorb shape=fam_k,P domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 66)
@@ -174,10 +174,12 @@
 %@ var n_depart shape=P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ var n_trans_arrive shape=P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ var n_want shape=P,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var r_bar shape=P domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ param r_max shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ param r_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ param tau_max shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
 %@ param tau_min shape=P kind=vector domain=- :: parameter: the paper says so (Table 2)
+%@ var y_tilde shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 67)
 %@ param D_1 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
 %@ param D_2 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
 %@ param D_3 shape=fam_k kind=vector domain=- :: parameter: variant of the declared parameter D
@@ -186,6 +188,7 @@
 %@ param f_min shape=- kind=scalar domain=- :: parameter: a bound or reference value of the declared variable f
 %@ param rho_station shape=fam_s,S,fam_k kind=matrix domain=- :: parameter: variant of the declared parameter rho
 %@ var theta shape=Z,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
+%@ var S shape=- domain=continuous role=primary drole=- lo=- hi=- :: parameter: the index family of this name used as a number
 %@ var n_transfer shape=P,P,S,fam_k domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 4)
 %@ param t_transfer shape=fam_q,P kind=matrix domain=- :: parameter: variant of the declared parameter t
 % --- end deterministic declarations ---

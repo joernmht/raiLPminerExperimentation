@@ -11,13 +11,13 @@
 %@ var c shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary decision variable indicating whether event e is cancelled (1) or not (0).
 %@ var d shape=E domain=non_negative role=primary drole=- lo=- hi=- :: Delay of event e relative to original schedule.
 %@ param w shape=- kind=scalar :: Fixed penalty for each cancelled service.
-%@ index E ordered=0 cyclic=0 :: family a declared shape names
+%@ index E ordered=0 cyclic=0 :: Set of events (arrival or departure).
 %@ param M shape=- kind=scalar :: Large positive number (M1, M2) used in big-M constraints.
 %@ param o shape=E kind=vector :: Original scheduled time of event e.
 %@ var x shape=E domain=continuous role=primary drole=- lo=- hi=- :: Rescheduled time of event e.
 %@ param D shape=- kind=scalar :: Maximum allowed delay for events not in E_NMdelay.
 %@ param n shape=- kind=scalar :: Number of disruptions (current disruption index).
-%@ index A ordered=0 cyclic=0 :: family a declared shape names
+%@ index A ordered=0 cyclic=0 :: Set of activities (run, station, turn, odturn).
 %@ var y shape=E domain=binary role=primary drole=- lo=- hi=- :: Binary variable indicating if station of event e is chosen as short-turn station.
 %@ param R shape=- kind=scalar :: Required recovery time length after disruptions.
 %@ param T shape=- kind=scalar :: Time-related parameters (t_start, t_end).
@@ -98,6 +98,8 @@
 %@ index TL ordered=0 cyclic=0 :: family the index reader found (ADR-0023)
 %@ letter tl over=TL :: index letter (ADR-0023)
 %@ var s shape=A domain=binary role=primary drole=- lo=- hi=- :: Binary parameter indicating if a station activity is a true stop (0) or not (1).
+%@ param E_de shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param E_turn_de shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ param M_1 shape=- kind=big_m domain=- :: parameter: the paper says so (Table 12)
 %@ param M_2 shape=- kind=big_m domain=- :: parameter: the paper says so (Table 12)
 %@ param r shape=E kind=vector domain=- :: parameter: the paper says so (paragraph 43)

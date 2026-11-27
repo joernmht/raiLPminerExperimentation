@@ -28,7 +28,7 @@ formulas themselves.
 | R2 index letters | `%@ letter i over=I`; families the formulas bind over; an index letter no formula binds ranges over an unnamed family `fam_i` | index reader (verdict `index`, or `alias` by decoration; never `alias` by position, never a capital) |
 | R3 folded names | a declared `x_ij` whose suffix is index letters is the indexed `x` | the formulas |
 | R4 shapes | the family tuple most uses write, position by position | the formulas |
-| R5 missing names | a domain row (variable); a notation-table row, definition-list item or defining sentence (kind from its own words, else from the table's group header) | the paper |
+| R5 missing names | a domain row (variable); a notation-table row, definition-list item or defining sentence (kind from its own words, else from the table's group header); a Greek symbol set as plain characters in running text with the kind noun right next to it ("where α 1 is a binary variable", "the tolerance parameter ξ") | the paper |
 | R6 kind | where the paper names the kind outright and the assisted line says the other one, the paper is followed | the paper |
 | R7 deduction | *linearity*: what multiplies a declared variable is a parameter. *Non-vacuity*: a quantity set equal to an expression holding a variable is a variable; the one undeclared name of an inequality or objective that names no variable is a variable. To a fixpoint; a name both claim stays undeclared | the algebra |
 | R8 variants | a labelled variant of a declared symbol that nothing above decides: variant of a parameter is a parameter; a bound or reference label (`min`, `max`, `nom`, `plan`) on a variable is a parameter; letters, numbers or direction words on a variable give a variable. Accents on variables and other label words decide nothing | the assisted sidecar, read at the granularity it was written |
@@ -66,6 +66,30 @@ bound labels on variables, 85 % for letters, numbers and direction words on
 variables. That is agreement with an independent, unconfirmed source, not a
 precision. Accented variants of variables agree 51 % and are left alone.
 
+**Homonyms** (2026-11-27). Papers write a set and a quantity with one letter:
+the periods and the horizon `T`, the time index `t` and the times `t_{e,a}`.
+The model keeps families and symbols in separate name spaces (lp2graph
+ADR-0018, point 12), so the sidecar may declare both. A capital family name
+most uses write bare, as a term, gets a scalar parameter next to its index
+line (the set's own name as a number), unless some row binds the capital as a
+letter. A set or index letter most uses write *with subscripts* is also a
+symbol, but only when the paper states its kind or a row forces it: a letter
+next to a variable may be a call argument, so linearity (R7) and variants
+(R8) are not accepted as evidence for a homonym.
+
+Two deductions that looked attractive were measured and **rejected**, and are
+recorded here so they are not tried again:
+
+- *Term by term in an objective* ("a term whose only undeclared name is
+  multiplied by no variable is a variable"). An objective holds constant
+  terms: the rule declared the normalisation constants of
+  `(J - J_min) / (J_max - J_min)` as variables.
+- *Skipping the letters of a stripped `s.t.`* case-insensitively and with
+  subscripts. It hid the horizon `T` and every `t_{...}` from all rules, and
+  made non-vacuity fire on rows that do name another quantity (`t`). The
+  letters are frame words only bare and in lower case now; rows that had been
+  promoted on that footing no longer are.
+
 The objective row is read by a head grammar (`corpusbuilder.objective`):
 label material, operator, decision variables under the operator, expression,
 "s.t." tail. Component objectives a combined objective names
@@ -86,6 +110,13 @@ several unrelated objectives still fails `multiple_objectives`.
 - Human decisions from the discovery round overrule every rule here: a
   confirmed index letter or kind goes into the sidecar above the marked block
   and the rules never rebind a declared symbol.
+- `scripts/checks/cancelling_sums_check.py` scans the promoted models for a
+  summed term that appears twice with opposite sign. At `bd3c31d` it flagged
+  16 source rows in 11 papers: 12 were balance rows that widening had turned
+  into `0 = 0` or had half emptied (the hole was in lp2graph's
+  `restricted_set_widen` since September and is closed there, ADR-0018 point
+  13), 4 repeat a sum in the source itself and are listed in the script. The
+  check must stay at zero; run it after every promote.
 - R7 misdeclares a variable as a parameter when a row is bilinear in two
   variables of which one is undeclared. The corpus has about 40 such rows; the
   per-rule audit (lab issue #3) should sample R7 and R8 lines first.

@@ -12,3 +12,10 @@ Node-based smoke tests for the Formula Express game builds. Setup (once, any dir
 - `mjsweep.js` — renders every formula in ./demo_tex.json through MathJax
   (export that JSON with corpusbuilder.game.render_latex over dossiers) and
   lists render errors; `mjtest.js '<latex>'` for one-off probes.
+
+## Corpus checks (Python)
+
+- `cancelling_sums_check.py` — no promoted constraint may hold a summed term
+  twice with opposite sign (a balance row whose in-arc and out-arc sets were
+  widened to one family reads `0 = 0`). Run after every `promote`:
+  `PYTHONPATH=. python3 scripts/checks/cancelling_sums_check.py`; exit 1 on a hit.

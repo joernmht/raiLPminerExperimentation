@@ -34,3 +34,29 @@ def test_loading_is_deterministic(config) -> None:
     a = load_corpus(config)
     b = load_corpus(config)
     assert [f.id for f in a.formulations] == [f.id for f in b.formulations]
+
+
+def test_no_promoted_constraint_holds_two_sums_that_cancel():
+    """Widening must never merge the two sums of a balance row (lp2graph
+    ADR-0018, point 13): the corpus is scanned, not a hand-picked example."""
+    import importlib.util
+    import json
+    from pathlib import Path
+
+    from lp2graph.core.model import Formulation
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "cancelling_sums_check", root / "scripts" / "checks" / "cancelling_sums_check.py"
+    )
+    assert spec is not None and spec.loader is not None
+    check = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(check)
+    hits = []
+    for path in sorted((root / "corpus" / "formulations").glob("*.json")):
+        formulation = Formulation.model_validate(json.loads(path.read_text(encoding="utf-8")))
+        for constraint, symbol in check.cancelling_sums(formulation):
+            row = check._SOURCE_ROW.match(constraint)
+            if (formulation.id, row.group(0) if row else constraint) not in check.SOURCE_REPEATS:
+                hits.append((formulation.id, constraint, symbol))
+    assert hits == []

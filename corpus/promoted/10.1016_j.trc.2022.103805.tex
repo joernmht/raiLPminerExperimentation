@@ -20,9 +20,9 @@
 %@ index v ordered=0 cyclic=0 :: Node of the railway network used in passenger flow conservation.
 %@ index V ordered=0 cyclic=0 :: Set of nodes in the railway network.
 %@ index I ordered=0 cyclic=0 :: Set of track sections in the infrastructure-aware route constraints.
-%@ param cap shape=- kind=vector domain=- :: Passenger capacity of vehicle composition r.
+%@ param cap shape=R kind=vector domain=- :: Passenger capacity of vehicle composition r.
 %@ index G ordered=0 cyclic=0 :: Set of rolling stock types.
-%@ param mix shape=- kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+%@ param mix shape=G,R kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
 %@ index C ordered=0 cyclic=0 :: Set of conflicts among line pool candidates.
 %@ var variables shape=- domain=binary role=primary drole=- lo=- hi=- :: Auxiliary binary variable for selecting an event in the timetable.
 %@ param u shape=A kind=vector domain=- :: Upper bound on the duration of activity a.
@@ -59,7 +59,7 @@
 %@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing edges from a node in the passenger flow network.
 %@ param f_max shape=I kind=scalar domain=- :: Maximum allowed frequency on track section i.
 %@ param g_max shape=- kind=scalar domain=- :: Maximum number of rolling stock units of type g.
-%@ param gamma shape=OD,OD kind=matrix domain=- :: Passenger demand for origin-destination pair (o,d).
+%@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
 %@ letter a over=A :: index letter (ADR-0023)
 %@ letter d over=OD :: index letter (ADR-0023)
 %@ letter e over=E :: index letter (ADR-0023)
@@ -74,12 +74,13 @@
 %@ letter s over=S :: index letter (ADR-0023)
 %@ letter v over=V :: index letter (ADR-0023)
 %@ param t shape=A kind=vector domain=- :: Duration of activity a or timestamp of event e in the periodic timetable.
-%@ index delta ordered=0 cyclic=0 :: family the formulas bind over
+%@ param X shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param l shape=A kind=vector domain=- :: parameter: the paper says so (Table 8)
 \begin{align}
   & 0 < \left|\mathcal{X}_{\text{conflict}}\right| \leq \left|\mathcal{X}_{\text{plan}}\right| \leq \left|\mathcal{X}_{\text{pool}}\right| . \tag{eq\_0001} \\
   \min\quad & \sum_{o d \in \mathcal{OD}, s \in \mathcal{S}} t_{s} \cdot p_{s}^{o d} \tag{eq\_0003} \\
-  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}, r \in \mathcal{R}_{l}} x_{l , f , r} \left\{ = 1 & \text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} , \\ \leq 1 & \text{otherwise} , \right \forall l \in \mathcal{L} , \tag{eq\_0005} \\
-  & \sum_{s \in \mathit{delta}^{-} \left(v\right)} p_{s}^{o d} - \sum_{s \in \mathit{delta}^{+} \left(v\right)} p_{s}^{o d} = \left\{ - \mathit{gamma}^{o d} & \text{if} v = o , \\ \mathit{gamma}^{o d} & \text{if} v = d , \\ 0 & \text{otherwise} , \right \forall v \in \mathcal{V} , \forall o d \in \mathcal{OD} , \tag{eq\_0006} \\
+  & \text{subject}\textrm{ }\text{to}: \sum_{f \in \mathcal{F}_{l}, r \in \mathcal{R}_{l}} x_{l , f , r} \casesof{= 1}{\text{if}\textrm{ } l \text{is}\textrm{ }\text{mandatory} ,}{\leq 1}{\text{otherwise} ,}\forall l \in \mathcal{L} , \tag{eq\_0005} \\
+  & \sum_{s \in \mathit{delta}^{-} \left(v\right)} p_{s}^{o d} - \sum_{s \in \mathit{delta}^{+} \left(v\right)} p_{s}^{o d} = \casesof{- \mathit{gamma}^{o d}}{\text{if} v = o ,}{\mathit{gamma}^{o d}}{\text{if} v = d ,}{0}{\text{otherwise} ,}\forall v \in \mathcal{V} , \forall o d \in \mathcal{OD} , \tag{eq\_0006} \\
   & \sum_{o d \in \mathcal{OD}} p_{s}^{o d} \leq \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot \left(\mathit{cap}\right)_{r} \cdot f , \forall i \in \mathcal{I} , \tag{eq\_0007} \\
   & \underset{\left(l , f , r\right) \in \mathcal{X}_{\text{pool}}}{\sum} x_{l , f , r} \cdot \left(\mathit{mix}\right)_{g , r} \cdot f \leq g_{\text{max}} , \forall g \in \mathcal{G} , \tag{eq\_0008} \\
   & \sum_{\left(l , f , r\right) \in \mathcal{X}_{i}} x_{l , f , r} \cdot f \leq f_{i , \text{max}} , \forall i \in \mathcal{I} , \tag{eq\_0009} \\

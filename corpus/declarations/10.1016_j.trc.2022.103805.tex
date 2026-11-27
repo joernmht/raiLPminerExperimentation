@@ -71,14 +71,16 @@
 
 % cap: classified as parameter during review
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): cap shape=R -> -
-%@ param cap shape=- kind=vector domain=- :: Passenger capacity of vehicle composition r.
+%det-was: %@ param cap shape=- kind=vector domain=- :: Passenger capacity of vehicle composition r.
+%@ param cap shape=R kind=vector domain=- :: Passenger capacity of vehicle composition r.
 
 % G: classified as index during review
 %@ index G ordered=0 cyclic=0 :: Set of rolling stock types.
 
 % mix: classified as parameter during review
 % shape fixed by corpusbuilder.vocab (deterministic: every use writes no index): mix shape=G,R -> -
-%@ param mix shape=- kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+%det-was: %@ param mix shape=- kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
+%@ param mix shape=G,R kind=matrix domain=- :: Number of rolling stock units of type g used in composition r.
 
 % C: classified as index during review
 %@ index C ordered=0 cyclic=0 :: Set of conflicts among line pool candidates.
@@ -146,8 +148,7 @@
 %@ index delta_plus ordered=0 cyclic=0 :: Set of outgoing edges from a node in the passenger flow network.
 %@ param f_max shape=I kind=scalar domain=- :: Maximum allowed frequency on track section i.
 %@ param g_max shape=- kind=scalar domain=- :: Maximum number of rolling stock units of type g.
-%det-was: %@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
-%@ param gamma shape=OD,OD kind=matrix domain=- :: Passenger demand for origin-destination pair (o,d).
+%@ param gamma shape=OD kind=scalar domain=- :: Passenger demand for origin-destination pair (o,d).
 % --- deterministic declarations (corpusbuilder.detdecl: rules, no model) ---
 %@ letter a over=A :: index letter (ADR-0023)
 %@ letter d over=OD :: index letter (ADR-0023)
@@ -163,5 +164,6 @@
 %@ letter s over=S :: index letter (ADR-0023)
 %@ letter v over=V :: index letter (ADR-0023)
 %@ param t shape=A kind=vector domain=- :: Duration of activity a or timestamp of event e in the periodic timetable.
-%@ index delta ordered=0 cyclic=0 :: family the formulas bind over
+%@ param X shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param l shape=A kind=vector domain=- :: parameter: the paper says so (Table 8)
 % --- end deterministic declarations ---

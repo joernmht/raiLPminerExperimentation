@@ -17,7 +17,7 @@
 %@ index k ordered=0 cyclic=0 :: Train index
 %@ param l shape=K kind=vector :: End location of train
 %@ param o shape=K kind=vector :: Origin of train
-%@ index A ordered=0 cyclic=0 :: family a declared shape names
+%@ index A ordered=0 cyclic=0 :: Set of arcs in the space-time-state network
 %@ index i ordered=0 cyclic=0 :: Station index
 %@ param P shape=R,T kind=matrix :: Power supply capacity
 %@ index R ordered=0 cyclic=0 :: Set of power supply districts
@@ -25,10 +25,10 @@
 %@ param p shape=Omega,K,T kind=matrix :: Power consumption of train on arc at a time instant
 %@ index r ordered=0 cyclic=0 :: Power supply district index
 %@ index W ordered=0 cyclic=0 :: Set of stations
-%@ var f shape=A,A,s,K domain=non_negative role=primary drole=- lo=- hi=- :: Traction force of train
+%@ var f shape=A,A,K domain=non_negative role=primary drole=- lo=- hi=- :: Traction force of train
 %@ index s ordered=0 cyclic=0 :: Position along track
 %@ param S shape=- kind=scalar :: Total length of track
-%@ var b shape=A,A,s,K domain=non_negative role=primary drole=- lo=- hi=- :: Braking force of train
+%@ var b shape=A,A,K domain=non_negative role=primary drole=- lo=- hi=- :: Braking force of train
 %@ var x shape=fam_n domain=continuous role=primary drole=- lo=- hi=- :: State variable (speed and time) of train
 %@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: Objective value
 %@ param c shape=Omega,K kind=matrix :: Delay cost of arc
@@ -110,7 +110,7 @@
 %@ index A_q_plus ordered=0 cyclic=0 :: Set of outgoing arcs from node q in the space-time-state network
 %@ index A_tilde ordered=0 cyclic=0 :: Set of arcs in the space-time-state network excluding certain arcs
 %@ index A_track ordered=0 cyclic=0 :: Set of track arcs in the space-time-state network
-%@ index Omega ordered=0 cyclic=0 :: family a declared shape names
+%@ index Omega ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
 %@ index Phi ordered=0 cyclic=0 :: Set of arcs preceding a given arc
 %@ index varphi ordered=0 cyclic=0 :: Set of arcs in a power supply district at a time instant
 %@ param C_0 shape=- kind=scalar domain=- :: Coefficient in cost function
@@ -123,7 +123,7 @@
 %@ param beta shape=fam_n kind=vector domain=- :: State variable (speed) in speed profile
 %@ param beta_0 shape=- kind=scalar domain=- :: Initial speed in speed profile
 %@ param c_tilde shape=- kind=scalar domain=- :: Modified cost coefficient for arc a and train k
-%@ param chi shape=fam_x,fam_u kind=matrix domain=- :: Function of state and control in speed profile
+%@ param chi shape=- kind=scalar domain=- :: Function of state and control in speed profile
 %@ param chi_bar shape=- kind=scalar domain=- :: Upper bound for chi
 %@ param chi_max shape=- kind=scalar domain=- :: Maximum value for chi
 %@ param chi_min shape=- kind=scalar domain=- :: Minimum value for chi
@@ -174,15 +174,21 @@
 %@ var delta shape=Omega domain=continuous role=primary drole=- lo=- hi=- :: Slack variable for arc a
 %@ param mu shape=Omega,K kind=matrix domain=- :: Auxiliary variable for arc a and train k
 %@ param pi shape=R,T,K kind=matrix domain=- :: Auxiliary variable for power supply district r, time t, train k
+%@ param A_track shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param Q shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param W_hat shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param c_dot shape=- kind=scalar domain=- :: parameter: variant of the declared parameter c
 %@ var x_0 shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: variant of the declared variable x
+%@ index fam_s ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_x ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ index fam_u ordered=0 cyclic=0 :: family a shape read off the formulas names
-%@ var u shape=A,A,s,K domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
+%@ param Omega shape=R,T kind=matrix domain=- :: parameter: the index family of this name used as a number
+%@ var u shape=A,A,K domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
+%@ var v shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 2)
+%@ var s shape=- domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 51)
 \begin{align}
   \min\quad & Z \tag{eq\_0028\_a} \\
-  & 0 \leq f_{i , j}^{k} \left(s\right) \leq f_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0017} \\
-  & 0 \leq b_{i , j}^{k} \left(s\right) \leq b_{\mathit{max}}^{k} , \forall s \in \left[0 , S\right] \tag{eq\_0018} \\
-  & chi_underline \leq \mathit{chi} \left(x_{i , j}^{k} \left(s\right) , u_{i , j}^{k} \left(s\right)\right) \leq chi_bar , \forall s \in \left[0 , S\right] \tag{eq\_0025} \\
+  & v_{i , j}^{k} \left(0\right) = v \tag{eq\_0022\_a} \\
   & \mathit{beta}_{0} - x_{0} \left(0\right) = 0 \tag{eq\_0034} \\
   & 0 \leq \mathit{delta}_{a} \leq 1 , \forall a \in A_{\mathit{drive}} \cup A_{\mathit{track}} \tag{eq\_0045} \\
   & 0 \leq \mathit{zeta}_{r , t} \leq P_{r}^{t} , \forall t \in T , r \in R \tag{eq\_0046} \\

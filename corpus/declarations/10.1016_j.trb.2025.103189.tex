@@ -180,7 +180,7 @@
 %@ index Gamma ordered=0 cyclic=0 :: Set of composition transitions
 %@ index N_S ordered=0 cyclic=0 :: Set of shunting trains
 %@ index N_T ordered=0 cyclic=0 :: Set of regular trains
-%@ param I_end shape=M,S kind=scalar domain=- :: End-of-day inventory of rolling stock units of type m at station s
+%det-del: %@ param I_end shape=M,S kind=scalar domain=- :: End-of-day inventory of rolling stock units of type m at station s
 %det-del: %@ param I_off shape=M,S kind=scalar domain=- :: Off-balance inventory deviation of rolling stock units of type m at station s
 %det-was: %@ param alpha shape=C,Cprime,M kind=scalar domain=- :: Number of units of type m in composition c that become part of successor composition cp
 %@ param alpha shape=fam_c,C,M kind=matrix domain=- :: Number of units of type m in composition c that become part of successor composition cp
@@ -209,6 +209,7 @@
 %@ letter t over=T :: index letter (ADR-0023)
 %@ letter tp over=T :: index letter (ADR-0023)
 %@ index fam_c ordered=0 cyclic=0 :: family a shape read off the formulas names
+%@ var I_end shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: End-of-day inventory of rolling stock units of type m at station s
 %@ var I_off shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: Off-balance inventory deviation of rolling stock units of type m at station s
 %@ var I_0 shape=M,S domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (paragraph 46)
 %@ param u shape=M,T kind=matrix domain=- :: Number of uncoupled units

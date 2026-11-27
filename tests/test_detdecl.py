@@ -104,3 +104,55 @@ def test_non_vacuity_deduces_variables_and_nothing_else():
 
 def test_name_keys_ignore_label_order_but_keep_case():
     assert D.name_key("t_arr_1") == D.name_key("t_1_arr") != D.name_key("T_arr_1")
+
+
+def test_prose_evidence_needs_the_kind_noun_next_to_the_symbol(monkeypatch):
+    # invented sentences in the shapes publishers produce (symbols as plain characters)
+    paras = [
+        {
+            "i": 1,
+            "plain": "where α 1 is a binary variable, and the tolerance parameter ξ is small.",
+        },
+        {"i": 2, "plain": "The event times πi  and πj  lie within the given bounds."},
+        {
+            "i": 3,
+            "plain": "the variable δij  and parameter ϕij  are introduced; ⟨\\rho_{k}⟩ is a variable.",
+        },
+        {"i": 4, "plain": "the dual variable λ of the relaxed constraint, and Zα is given."},
+    ]
+    monkeypatch.setattr(D, "load_record", lambda key, _dir=None: {"paras": paras})
+    names = ["alpha", "alpha_1", "xi", "pi", "delta", "phi", "rho", "lambda", "x"]
+    got = D.prose_evidence("demo", names)
+    assert got["alpha_1"][:2] == ("var", {"domain": "binary"})
+    assert got["xi"][0] == "param" and got["delta"][0] == "var" and got["phi"][0] == "param"
+    # the bare letter is not the labelled one; a mention without a kind noun,
+    # a symbol inside maths, a multiplier and a subscript decide nothing
+    assert not {"alpha", "pi", "rho", "lambda", "x"} & set(got)
+
+
+def _uses(*rows: str) -> dict[str, list]:
+    out: dict[str, list] = {}
+    for row in rows:
+        for u in scan_symbols(row):
+            if not u.in_tail:
+                out.setdefault(u.name, []).append(u)
+    return out
+
+
+def test_a_set_and_a_symbol_may_share_a_name():
+    sc = D.Sidecar(
+        "%@ index T ordered=1 cyclic=0 :: periods\n"
+        "%@ index I ordered=0 cyclic=0 :: trains\n"
+        "%@ index k ordered=0 cyclic=0 :: a family named by its letter\n"
+        "%@ var x shape=I domain=continuous role=primary drole=- lo=- hi=- :: x\n"
+    )
+    uses = _uses(r"& x_{i} \le T", r"& x_{i} + T \ge 2 \cdot T", r"& x_{i} \le k")
+    D.rule_missing(sc, uses, {"i": "I"}, {}, {})
+    # the capital set written as a number: a parameter next to the family
+    assert "T" in sc.names("index") and sc.names("param")["T"]["shape"] == "-"
+    # a family named by a lower-case letter is an index letter's own set
+    assert "k" not in sc.names("param") and sc.undeclared["k"] == "a set used as a value"
+    # a capital some row binds as a letter (T \in \mathcal{T}) is an index, not a number
+    sc2 = D.Sidecar("%@ index T ordered=1 cyclic=0 :: periods\n")
+    D.rule_missing(sc2, _uses(r"& x \le T"), {}, {}, {}, bound=frozenset({"T"}))
+    assert "T" not in sc2.names("param")

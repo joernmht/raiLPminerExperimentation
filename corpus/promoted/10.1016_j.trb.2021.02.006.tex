@@ -70,7 +70,9 @@
 %@ letter vp over=V :: index letter (ADR-0023)
 %@ param p shape=A,V kind=matrix domain=- :: Integer variable representing modulo operator for activity duration
 %@ var Q shape=V,V domain=continuous role=primary drole=- lo=- hi=- :: Periodic time difference between events
+%@ param T shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 %@ var alpha shape=V,V domain=binary role=primary drole=- lo=- hi=- :: variable: a domain row of the paper declares it
+%@ param d shape=OD kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ index fam_w ordered=0 cyclic=0 :: family a shape read off the formulas names
 %@ param gamma shape=fam_w kind=vector domain=- :: parameter: the paper says so (Table 10)
 %@ var pi shape=V domain=continuous role=primary drole=- lo=- hi=- :: variable: the paper says so (Table 10)
@@ -91,8 +93,8 @@
   & \sum_{v \in V^{k}} L_{v}^{k} = T . \forall k \in \mathcal{OD} \tag{eq\_0027} \\
   & x_{v , d}^{k} \leq x_{v , d - 1}^{k} \forall k \in \mathcal{OD} , v \in V^{k} , d \in \left\{2 , \ldots , T\right\} . \tag{eq\_0036} \\
   & L_{v}^{k} = \sum_{d = 1}^{T} x_{v , d}^{k} \tag{eq\_0037\_a} \\
-  & \left(L_{v}^{k}\right)^{2} = \sum_{d = 1}^{T} \left(2 d - 1\right) \cdot x_{v , d}^{k} \tag{eq\_0037\_b} \\
-  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}, d = 1} ^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
+  & \left(L_{v}^{k}\right)^{2} = \sum_{d = 1}^{T} \left(2 \cdot d - 1\right) \cdot x_{v , d}^{k} \tag{eq\_0037\_b} \\
+  & \sum_{k \in \mathcal{OD}} \frac{d_{k}}{T} \sum_{v \in V^{k}, d = 1} ^{T} \left[\frac{\mathit{gamma}_{w}}{2} \left(2 \cdot d - 1\right) \cdot x_{v , d}^{k} + R_{v , d}^{k}\right] , \tag{eq\_0038} \\
   & R_{v , d}^{k} \leq u_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0039} \\
   & R_{v , d}^{k} \geq l_{v}^{k} \cdot x_{v , d}^{k} \tag{eq\_0040} \\
   & R_{v , d}^{k} \leq Y_{v}^{k} - l_{v}^{k} \cdot \left(1 - x_{v , d}^{k}\right) \tag{eq\_0041} \\

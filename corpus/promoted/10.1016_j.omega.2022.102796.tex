@@ -9,13 +9,13 @@
 %@ prov date :: 2026-06-21
 %@ obj sense=min name=objective combination=sum :: Minimize total path cost plus delay penalties
 %@ var t shape=N domain=non_negative role=primary drole=- lo=- hi=- :: Schedule time for each route node
-%@ index N ordered=0 cyclic=0 :: family a declared shape names
+%@ index N ordered=0 cyclic=0 :: Set of route nodes
 %@ index u ordered=0 cyclic=0 :: Route node index
 %@ param L shape=N kind=vector domain=- :: Traversal time of interlocking route
 %@ param T shape=N kind=vector domain=- :: Timetable target time at timing nodes
 %@ index K ordered=0 cyclic=0 :: Set of pairs of route nodes in potential conflict
 %@ index v ordered=0 cyclic=0 :: Route node index
-%@ index A ordered=0 cyclic=0 :: family a declared shape names
+%@ index A ordered=0 cyclic=0 :: Set of trains
 %@ index a ordered=0 cyclic=0 :: Train index
 %@ var w shape=P domain=binary role=primary drole=- lo=- hi=- :: Binary path selection variable
 %@ index P ordered=0 cyclic=0 :: Set of all paths
@@ -63,7 +63,7 @@
 %@ con eq_0022_a kind=big_m domain=- indicator=- :: Big-M conflict constraint for u before v
 %@ con eq_0022_b kind=big_m domain=- indicator=- :: Big-M conflict constraint for v before u
 %@ con eq_0022_c kind=big_m domain=- indicator=- :: Big-M conflict constraint parameterized by path selections
-%@ param rho shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ index rho ordered=0 cyclic=0 :: Set of paths associated with a route node
 %@ param Gamma shape=N kind=scalar domain=- :: Minimum headway time for route node u
 %@ param delta shape=N kind=scalar domain=- :: Minimum separation time between conflicting route nodes
 %@ var eta shape=N domain=non_negative role=auxiliary drole=- lo=0 hi=- :: Delay of train at route node u
@@ -72,6 +72,10 @@
 %@ letter q over=rho :: index letter (ADR-0023)
 %@ letter u over=N :: index letter (ADR-0023)
 %@ letter v over=K :: index letter (ADR-0023)
+%@ param A shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param K shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param N shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
+%@ param S shape=- kind=scalar domain=- :: parameter: the index family of this name used as a number
 \begin{align}
   \min\quad & \sum_{a \in \mathcal{A}, p \in \mathcal{P} \left(a\right)} c_{p} \cdot w_{p} + \sum_{a \in \mathcal{A}, u \in \mathcal{N}_{T} \left(a\right)} k_{a} \cdot \mathit{eta}_{u} \tag{eq\_0024} \\
   & t_{u} - t_{v + 1} \geq \mathit{delta}_{v} \tag{eq\_0005\_b} \\

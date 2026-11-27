@@ -1,6 +1,6 @@
 {
   "source": "corpus/promoted/10.1016_j.trb.2022.02.002.tex",
-  "rules_version": "rewrite-2026.11.0",
+  "rules_version": "rewrite-2026.11.1",
   "rewrites": [
     {
       "rule": "restricted_set_widen",
@@ -20,22 +20,6 @@
     },
     {
       "rule": "restricted_set_widen",
-      "before": "\\in \\mathit{delta}_{f}^{-}",
-      "after": "\\in \\mathit{delta}",
-      "line": 102,
-      "start": 9141,
-      "end": 9167
-    },
-    {
-      "rule": "restricted_set_widen",
-      "before": "\\in \\mathit{delta}_{f}^{+}",
-      "after": "\\in \\mathit{delta}",
-      "line": 102,
-      "start": 9204,
-      "end": 9230
-    },
-    {
-      "rule": "restricted_set_widen",
       "before": "\\in V_{f}",
       "after": "\\in V",
       "line": 102,
@@ -44,43 +28,11 @@
     },
     {
       "rule": "restricted_set_widen",
-      "before": "\\in A_{k}^{s}",
-      "after": "\\in A",
-      "line": 103,
-      "start": 9395,
-      "end": 9408
-    },
-    {
-      "rule": "restricted_set_widen",
-      "before": "\\in A_{f}^{v i}",
-      "after": "\\in A",
-      "line": 103,
-      "start": 9454,
-      "end": 9469
-    },
-    {
-      "rule": "restricted_set_widen",
       "before": "\\in K_{f}",
       "after": "\\in K",
       "line": 103,
       "start": 9542,
       "end": 9551
-    },
-    {
-      "rule": "restricted_set_widen",
-      "before": "\\in A_{k}^{s}",
-      "after": "\\in A",
-      "line": 104,
-      "start": 9582,
-      "end": 9595
-    },
-    {
-      "rule": "restricted_set_widen",
-      "before": "\\in A_{f}^{v i}",
-      "after": "\\in A",
-      "line": 104,
-      "start": 9641,
-      "end": 9656
     },
     {
       "rule": "restricted_set_widen",
@@ -316,6 +268,14 @@
     },
     {
       "rule": "superscript_index",
+      "before": "A_{f}^{v i}",
+      "after": "A_{f, v, i}",
+      "line": 103,
+      "start": 9458,
+      "end": 9469
+    },
+    {
+      "rule": "superscript_index",
       "before": "x_{g}^{f}",
       "after": "x_{g, f}",
       "line": 103,
@@ -337,6 +297,14 @@
       "line": 104,
       "start": 9608,
       "end": 9617
+    },
+    {
+      "rule": "superscript_index",
+      "before": "A_{f}^{v i}",
+      "after": "A_{f, v, i}",
+      "line": 104,
+      "start": 9645,
+      "end": 9656
     },
     {
       "rule": "superscript_index",
@@ -540,6 +508,38 @@
     },
     {
       "rule": "superscript_label",
+      "before": "\\mathit{delta}_{f}^{-}",
+      "after": "delta_minus_{f}",
+      "line": 102,
+      "start": 9145,
+      "end": 9167
+    },
+    {
+      "rule": "superscript_label",
+      "before": "\\mathit{delta}_{f}^{+}",
+      "after": "delta_plus_{f}",
+      "line": 102,
+      "start": 9208,
+      "end": 9230
+    },
+    {
+      "rule": "superscript_label",
+      "before": "A_{k}^{s}",
+      "after": "A_s_{k}",
+      "line": 103,
+      "start": 9399,
+      "end": 9408
+    },
+    {
+      "rule": "superscript_label",
+      "before": "A_{k}^{s}",
+      "after": "A_s_{k}",
+      "line": 104,
+      "start": 9586,
+      "end": 9595
+    },
+    {
+      "rule": "superscript_label",
       "before": "V_{f}^{s e}",
       "after": "V_se_{f}",
       "line": 105,
@@ -628,24 +628,24 @@
     },
     {
       "rule": "row_widened",
-      "before": "  & \\sum_{g \\in \\mathit{delta} \\left(v\\right)} x_{g, f} - \\sum_{g \\in \\mathit{delta} \\left(v\\right)} x_{g, f} = 0 \\forall v \\in V \\backslash \\left\\{\\mathit{sigma}_{f} , \\mathit{gamma}_{f}\\right\\} , \\forall f \\in F \\tag{eq\\_0007} \\\\",
-      "after": "  & \\sum_{g \\in \\mathcal{delta}} x_{f,g} - \\sum_{g \\in \\mathcal{delta}} x_{f,g} = 0 \\qquad \\forall v \\in \\mathcal{V},\\; \\forall f \\in \\mathcal{F} \\tag{eq\\_0007} \\\\",
+      "before": "  & \\sum_{g \\in delta_minus_{f} \\left(v\\right)} x_{g, f} - \\sum_{g \\in delta_plus_{f} \\left(v\\right)} x_{g, f} = 0 \\forall v \\in V \\backslash \\left\\{\\mathit{sigma}_{f} , \\mathit{gamma}_{f}\\right\\} , \\forall f \\in F \\tag{eq\\_0007} \\\\",
+      "after": "  & \\sum_{g \\in \\mathcal{delta\\_minus}} x_{f,g} - \\sum_{g \\in \\mathcal{delta\\_plus}} x_{f,g} = 0 \\qquad \\forall v \\in \\mathcal{V},\\; \\forall f \\in \\mathcal{F} \\tag{eq\\_0007} \\\\",
       "line": 102,
       "start": 9129,
       "end": 9382
     },
     {
       "rule": "row_widened",
-      "before": "  & \\sum_{g \\in A \\cap A_{f}} x_{g, f} \\geq \\left(1 - \\sum_{g \\in A} x_{g, f}\\right) \\cdot D_underline_{k, f} \\forall f \\in F , \\forall k \\in K \\tag{eq\\_0008} \\\\",
-      "after": "  & \\sum_{g \\in \\mathcal{A}} x_{f,g} \\ge \\mathit{D\\_underline}_{k,f} - \\sum_{g \\in \\mathcal{A}} \\mathit{D\\_underline}_{k,f} \\cdot x_{f,g} \\qquad \\forall f \\in \\mathcal{F},\\; \\forall k \\in \\mathcal{K} \\tag{eq\\_0008} \\\\",
+      "before": "  & \\sum_{g \\in A_s_{k} \\cap A_{f}} x_{g, f} \\geq \\left(1 - \\sum_{g \\in A_{f, v, i}} x_{g, f}\\right) \\cdot D_underline_{k, f} \\forall f \\in F , \\forall k \\in K \\tag{eq\\_0008} \\\\",
+      "after": "  & \\sum_{g \\in \\mathcal{A\\_s}} x_{f,g} \\ge \\mathit{D\\_underline}_{k,f} - \\sum_{g \\in \\mathcal{A}} \\mathit{D\\_underline}_{k,f} \\cdot x_{f,g} \\qquad \\forall f \\in \\mathcal{F},\\; \\forall k \\in \\mathcal{K} \\tag{eq\\_0008} \\\\",
       "line": 103,
       "start": 9383,
       "end": 9569
     },
     {
       "rule": "row_widened",
-      "before": "  & \\sum_{g \\in A \\cap A_{f}} x_{g, f} \\leq \\left(1 - \\sum_{g \\in A} x_{g, f}\\right) \\cdot D_bar_{k, f} \\forall f \\in F , \\forall k \\in K \\tag{eq\\_0010} \\\\",
-      "after": "  & \\sum_{g \\in \\mathcal{A}} x_{f,g} \\le \\mathit{D\\_bar}_{k,f} - \\sum_{g \\in \\mathcal{A}} \\mathit{D\\_bar}_{k,f} \\cdot x_{f,g} \\qquad \\forall f \\in \\mathcal{F},\\; \\forall k \\in \\mathcal{K} \\tag{eq\\_0010} \\\\",
+      "before": "  & \\sum_{g \\in A_s_{k} \\cap A_{f}} x_{g, f} \\leq \\left(1 - \\sum_{g \\in A_{f, v, i}} x_{g, f}\\right) \\cdot D_bar_{k, f} \\forall f \\in F , \\forall k \\in K \\tag{eq\\_0010} \\\\",
+      "after": "  & \\sum_{g \\in \\mathcal{A\\_s}} x_{f,g} \\le \\mathit{D\\_bar}_{k,f} - \\sum_{g \\in \\mathcal{A}} \\mathit{D\\_bar}_{k,f} \\cdot x_{f,g} \\qquad \\forall f \\in \\mathcal{F},\\; \\forall k \\in \\mathcal{K} \\tag{eq\\_0010} \\\\",
       "line": 104,
       "start": 9570,
       "end": 9750
