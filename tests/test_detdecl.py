@@ -97,9 +97,15 @@ def test_non_vacuity_deduces_variables_and_nothing_else():
         "c2": r"& w_{i} \le M",  # the only undeclared name of an inequality without variables
         "c3": r"& v_{i} = M",  # an equation between a name and data decides nothing
         "c4": r"& p_{i} + q_{i} \le M",  # two undeclared names: undecided
+        # a lone name on the right is a supply, a capacity, a given value as
+        # often as a variable: it decides nothing
+        "c5": r"& t_{i} = b_{i}",
+        "c6": r"& t_{i} + t_{i} = d_{i}",
     }
     out = D.deduce_variables(sc, rows, {"i": "I"})
     assert set(out) == {"u", "w"}
+    left, right = (D.EQUALITY_AGREEMENT[k] for k in ("alone on the left", "alone on the right"))
+    assert left[0] / left[1] > 0.9 > right[0] / right[1]
 
 
 def test_name_keys_ignore_label_order_but_keep_case():

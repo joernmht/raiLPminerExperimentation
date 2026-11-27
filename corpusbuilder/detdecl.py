@@ -29,8 +29,9 @@ R7  deduction     kinds that follow from the algebra under two assumptions a
                   linear program satisfies by definition. *Linearity*: a term
                   holds at most one variable, so what multiplies a declared
                   variable is a parameter. *Non-vacuity*: a row constrains at
-                  least one variable, so a quantity set equal to an expression
-                  that contains a variable is a variable, and the single
+                  least one variable, so the quantity on the left of an
+                  equality whose right side contains a variable is a variable
+                  (a lone name on the right is data as often as not), and the single
                   undeclared name of an inequality (or objective) that names
                   no variable is one. (Not term by term: an objective may
                   hold constant terms, so a lone unknown in one term proves
@@ -806,6 +807,13 @@ def _sibling_kind(
     return "var", {"domain": dom}, f"variant like the declared variables {like}"
 
 
+#: The equality half of non-vacuity, measured on the names the assisted
+#: sidecars declare (variables, of all declared names in that position): a
+#: name alone on the LEFT of an equality whose other side holds a variable,
+#: and the same on the RIGHT. Only the left side is evidence.
+EQUALITY_AGREEMENT = {"alone on the left": (732, 767), "alone on the right": (82, 146)}
+
+
 def deduce_variables(
     sc: Sidecar, norm_rows: dict[str, str], families: dict[str, str]
 ) -> dict[str, str]:
@@ -835,11 +843,14 @@ def deduce_variables(
         unknown = sorted({n for n in names if n not in known and _IDENT.fullmatch(n)})
         has_var = any(n in variables for n in names)
         if len(o.comparators) == 1 and o.comparators[0] == "eq" and len(o.sides) == 2:
-            for k in (0, 1):
-                side, other = o.sides[k], o.sides[1 - k]
-                defined = o.alone[k] and side and side[0].name in unknown
-                if defined and any(u.name in variables for u in other):
-                    out.setdefault(side[0].name, f"row {row} sets it equal to variables")
+            # The defined quantity stands on the left: ``y = sum x``. A lone
+            # name on the right is data as often as a variable (a supply, a
+            # capacity, a given start value: ``sum x = d``, ``x = b``), so it
+            # decides nothing (see EQUALITY_AGREEMENT).
+            side, other = o.sides
+            defined = o.alone[0] and side and side[0].name in unknown
+            if defined and any(u.name in variables for u in other):
+                out.setdefault(side[0].name, f"row {row} sets it equal to variables")
         if not has_var and len(unknown) == 1:
             if objective and not o.comparators:
                 out.setdefault(unknown[0], f"objective {row} names no other variable")
