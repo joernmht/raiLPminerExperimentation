@@ -96,3 +96,19 @@ construction: survey the literature before curating, and query the optimization-
 catalog (`lit.py catalog <terms>`) for published constraint/objective/variable families.
 Add papers via **`literature-intake`**. (A *literature* reference — NOT the Paper 1
 scientific corpus to be built here, which is unstarted.)
+
+## Private working repository, filtered public copy (since 2026-11-27)
+
+This working copy's `origin` is the PRIVATE repository
+`joernmht/raiLPminerExperimentation-private`. It holds corpus material derived
+from papers that are not openly licensed. **Never push it to the public
+repository by hand** (the `public` remote has its push URL disabled on
+purpose). The public repository `joernmht/raiLPminerExperimentation` is a
+filtered export of this history: `python3 scripts/publish_public.py --check`
+then `--push` (needs `git_filter_repo.py`, on this box at
+`~/.local/share/git-filter-repo/`). It keeps code, count-only reports and the
+per-paper files of the CC BY papers in `corpus/public_keys.txt`
+(`corpus/PUBLIC.md`). A new per-paper directory or a new corpus-wide report
+that holds formulas or symbols of papers must be added to the rules in
+`scripts/publish_public.py` in the same commit. Tests that need non-public
+corpus files must skip when the file is absent.

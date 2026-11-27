@@ -97,7 +97,12 @@ HOLDOUT = [
 
 
 def _formula(doi: str, fid: str) -> str:
-    d = json.loads((DOSSIERS / f"{doi}.json").read_text(encoding="utf-8"))
+    path = DOSSIERS / f"{doi}.json"
+    if not path.exists():
+        # the public copy of the repository holds the dossiers of openly
+        # licensed papers only (corpus/public_keys.txt)
+        pytest.skip(f"dossier {doi} is not part of this copy of the corpus")
+    d = json.loads(path.read_text(encoding="utf-8"))
     return next(f["latex"] for f in d["formulas"] if f["id"] == fid)
 
 
