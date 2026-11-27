@@ -156,3 +156,13 @@ def test_a_set_and_a_symbol_may_share_a_name():
     sc2 = D.Sidecar("%@ index T ordered=1 cyclic=0 :: periods\n")
     D.rule_missing(sc2, _uses(r"& x \le T"), {}, {}, {}, bound=frozenset({"T"}))
     assert "T" not in sc2.names("param")
+
+
+def test_linearity_reads_through_a_fraction():
+    # w multiplies the numerator's variable; whatever divides is data
+    sc = D.Sidecar("%@ var Z shape=- domain=continuous role=primary drole=- lo=- hi=- :: z\n")
+    rows = (r"& y = w \cdot \frac{Z}{N} + q",)
+    uses = _uses(*rows)
+    D.rule_missing(sc, uses, {}, {}, {}, divisors=frozenset({"N"}))
+    assert sc.names("param").keys() >= {"w", "N"}
+    assert "q" not in sc.names("param") and sc.undeclared["q"] == "no evidence"

@@ -80,7 +80,7 @@ from pathlib import Path
 from railpminer import _lp2graph  # noqa: F401
 from lp2graph.mining.ingest import normalize_latex
 from lp2graph.mining.ingest.latex_normalizer import bound_letters
-from lp2graph.mining.ingest.row_canon import outline_row, scan_symbols
+from lp2graph.mining.ingest.row_canon import denominator_names, outline_row, scan_symbols
 
 from corpusbuilder import promote as P
 from corpusbuilder.discover import DISCOVERY, load_record
@@ -658,6 +658,7 @@ def rule_missing(
     *,
     variants: bool = True,
     bound: frozenset[str] = frozenset(),
+    divisors: frozenset[str] = frozenset(),
 ) -> None:
     """Declare used names nobody declared. ``bound`` holds the letters some
     row binds (a capital bound as ``T \\in \\mathcal{T}`` is an index letter). ``variants=False`` holds rule R8
@@ -727,9 +728,14 @@ def rule_missing(
                 continue
             coefficient = False
             sc.beside.add(name)
-        if coefficient and name in deduced:
+        divides = name in divisors and not homonym
+        if (coefficient or divides) and name in deduced:
             sc.undeclared[name] = (
-                "deductions disagree (coefficient of a variable, and " + deduced[name] + ")"
+                "deductions disagree ("
+                + ("coefficient of a variable" if coefficient else "a divisor")
+                + ", and "
+                + deduced[name]
+                + ")"
             )
             continue
         variant = (
@@ -741,6 +747,7 @@ def rule_missing(
             name in domains
             or name in table_kinds
             or coefficient
+            or divides
             or name in deduced
             or variant is not None
         )
@@ -801,6 +808,15 @@ def rule_missing(
                 name,
                 {"shape": shape_s, "kind": pkind, "domain": "-"},
                 ":: parameter: it multiplies a declared variable (the model is linear)",
+                "R7 parameter (linearity)",
+            )
+        elif divides:
+            # ... and whatever divides is one as well.
+            sc.set(
+                "param",
+                name,
+                {"shape": shape_s, "kind": pkind, "domain": "-"},
+                ":: parameter: it divides a term (the model is linear)",
                 "R7 parameter (linearity)",
             )
         elif name in deduced:
@@ -1349,6 +1365,12 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                     for name, hit in prose_evidence(key, sorted(uses)).items():
                         tk.setdefault(name, hit)
                     bound = frozenset(bound_letters("\n".join(norm_all.values())))
+                    divisors = frozenset(
+                        name
+                        for row_name, row_text in norm.items()
+                        if row_name
+                        for name in denominator_names(row_text)
+                    )
                     # what the paper states and what the algebra implies first,
                     # to a fixpoint; labelled variants (R8) only after that
                     for with_variants in (False, True):
@@ -1364,6 +1386,7 @@ def repair(key: str, text: str, decisions: dict, *, rules: frozenset[str]) -> tu
                                 deduced,
                                 variants=with_variants,
                                 bound=bound,
+                                divisors=divisors,
                             )
                             if sum(sc.changes.values()) == before:
                                 break

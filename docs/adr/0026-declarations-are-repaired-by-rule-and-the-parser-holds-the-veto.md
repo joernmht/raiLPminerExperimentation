@@ -30,7 +30,7 @@ formulas themselves.
 | R4 shapes | the family tuple most uses write, position by position | the formulas |
 | R5 missing names | a domain row (variable); a notation-table row, definition-list item or defining sentence (kind from its own words, else from the table's group header); a Greek symbol set as plain characters in running text with the kind noun right next to it ("where α 1 is a binary variable", "the tolerance parameter ξ") | the paper |
 | R6 kind | where the paper names the kind outright and the assisted line says the other one, the paper is followed | the paper |
-| R7 deduction | *linearity*: what multiplies a declared variable is a parameter. *Non-vacuity*: a quantity set equal to an expression holding a variable is a variable; the one undeclared name of an inequality or objective that names no variable is a variable. To a fixpoint; a name both claim stays undeclared | the algebra |
+| R7 deduction | *linearity*: what multiplies a declared variable (also through a fraction's numerator), or divides a term, is a parameter. *Non-vacuity*: a quantity set equal to an expression holding a variable is a variable; the one undeclared name of an inequality or objective that names no variable is a variable. To a fixpoint; a name both claim stays undeclared | the algebra |
 | R8 variants | a labelled variant of a declared symbol that nothing above decides: variant of a parameter is a parameter; a bound or reference label (`min`, `max`, `nom`, `plan`) on a variable is a parameter; letters, numbers or direction words on a variable give a variable. Accents on variables and other label words decide nothing | the assisted sidecar, read at the granularity it was written |
 
 Three properties hold for every rule:
@@ -124,7 +124,7 @@ several unrelated objectives still fails `multiple_objectives`.
   `restricted_set_widen` since September and is closed there, ADR-0018 point
   13), 4 repeat a sum in the source itself and are listed in the script. The
   check must stay at zero; run it after every promote.
-- **Where the rows are (2026-11-28, 1,438 canonical of 6,284 = 22.9 %;
+- **Where the rows are (2026-11-28, at 1,438 canonical of 6,284 = 22.9 %;
   `scripts/yield_probe.py`).** Row by row, with a stand-in objective where the
   paper's own cannot be read, 2,589 constraint rows parse. They do not all
   count, because a row counts only inside a promoted paper and promotion needs
