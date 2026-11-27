@@ -1,0 +1,280 @@
+{
+ "schema_version": "abstract-graph-1",
+ "doi": "10.1016/j.cor.2012.08.018",
+ "year": 2012,
+ "objective": "canonical",
+ "rows": {
+  "candidate": 3,
+  "canonical": 2
+ },
+ "nodes": [
+  {
+   "id": "index:1",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:2",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:3",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:4",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "param:1",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:2",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:3",
+   "cls": "parameter",
+   "subtype": "matrix",
+   "shape": [
+    "index:1",
+    "index:3"
+   ]
+  },
+  {
+   "id": "param:4",
+   "cls": "parameter",
+   "subtype": "matrix",
+   "shape": [
+    "index:1",
+    "index:3"
+   ]
+  },
+  {
+   "id": "param:5",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:6",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:7",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:8",
+   "cls": "parameter",
+   "subtype": "matrix",
+   "shape": [
+    "index:1",
+    "index:3"
+   ]
+  },
+  {
+   "id": "var:1",
+   "cls": "variable",
+   "subtype": "continuous",
+   "shape": [
+    "index:1",
+    "index:3"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:2",
+   "cls": "variable",
+   "subtype": "integer",
+   "shape": [
+    "index:1"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "con:1",
+   "cls": "constraint",
+   "subtype": "linear",
+   "comparator": "le",
+   "rhs_literal": null,
+   "quantifiers": [
+    {
+     "over": "index:1",
+     "restriction": "none"
+    },
+    {
+     "over": "index:3",
+     "restriction": "none"
+    }
+   ]
+  },
+  {
+   "id": "con:2",
+   "cls": "constraint",
+   "subtype": "linear",
+   "comparator": "le",
+   "rhs_literal": null,
+   "quantifiers": [
+    {
+     "over": "index:1",
+     "restriction": "none"
+    },
+    {
+     "over": "index:3",
+     "restriction": "none"
+    }
+   ]
+  },
+  {
+   "id": "obj:1",
+   "cls": "objective",
+   "subtype": "min",
+   "combination": "weighted_sum"
+  },
+  {
+   "id": "op:1",
+   "cls": "operator",
+   "subtype": "sum",
+   "shape": [
+    "index:1",
+    "index:3"
+   ],
+   "over": [
+    "index:1",
+    "index:3"
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "src": "param:3",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:3",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:8",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:8",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:1",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:1",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:2",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "con:1",
+   "dst": "var:1",
+   "type": "var_in_constraint",
+   "role": "rhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:2",
+   "dst": "var:1",
+   "type": "var_in_constraint",
+   "role": "lhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:2",
+   "dst": "param:4",
+   "type": "var_in_constraint",
+   "role": "rhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:2",
+   "dst": "param:3",
+   "type": "var_in_constraint",
+   "role": "rhs",
+   "sign": -1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "obj:1",
+   "dst": "op:1",
+   "type": "operator_input",
+   "role": "objective"
+  },
+  {
+   "src": "op:1",
+   "dst": "var:1",
+   "type": "var_in_objective",
+   "role": "objective",
+   "sign": 1,
+   "coefficient": "param:8"
+  },
+  {
+   "src": "obj:1",
+   "dst": "param:8",
+   "type": "uses_parameter",
+   "role": "coef"
+  }
+ ],
+ "patterns": {
+  "rows": {
+   "bound_row": 2
+  },
+  "models": [
+   "two_sided_bound"
+  ]
+ }
+}

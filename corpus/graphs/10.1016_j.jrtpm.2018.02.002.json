@@ -1,0 +1,449 @@
+{
+ "schema_version": "abstract-graph-1",
+ "doi": "10.1016/j.jrtpm.2018.02.002",
+ "year": 2018,
+ "objective": "outside_grammar",
+ "rows": {
+  "candidate": 8,
+  "canonical": 1
+ },
+ "nodes": [
+  {
+   "id": "index:1",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:2",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:3",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:4",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:5",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:6",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:7",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:8",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:9",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:10",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:11",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:12",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "index:13",
+   "cls": "index",
+   "subtype": "set"
+  },
+  {
+   "id": "param:1",
+   "cls": "parameter",
+   "subtype": "scalar"
+  },
+  {
+   "id": "param:2",
+   "cls": "parameter",
+   "subtype": "scalar",
+   "shape": [
+    "index:1"
+   ]
+  },
+  {
+   "id": "param:3",
+   "cls": "parameter",
+   "subtype": "vector",
+   "shape": [
+    "index:12"
+   ]
+  },
+  {
+   "id": "param:4",
+   "cls": "parameter",
+   "subtype": "matrix",
+   "shape": [
+    "index:2",
+    "index:4",
+    "index:1",
+    "index:1"
+   ]
+  },
+  {
+   "id": "var:1",
+   "cls": "variable",
+   "subtype": "non_negative",
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:2",
+   "cls": "variable",
+   "subtype": "binary",
+   "shape": [
+    "index:3",
+    "index:4",
+    "index:1"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:3",
+   "cls": "variable",
+   "subtype": "continuous",
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:4",
+   "cls": "variable",
+   "subtype": "binary",
+   "shape": [
+    "index:12",
+    "index:13"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:5",
+   "cls": "variable",
+   "subtype": "binary",
+   "shape": [
+    "index:3",
+    "index:6"
+   ],
+   "role": "auxiliary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:6",
+   "cls": "variable",
+   "subtype": "binary",
+   "shape": [
+    "index:3",
+    "index:6"
+   ],
+   "role": "auxiliary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:7",
+   "cls": "variable",
+   "subtype": "continuous",
+   "shape": [
+    "index:12"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:8",
+   "cls": "variable",
+   "subtype": "continuous",
+   "shape": [
+    "index:12"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:9",
+   "cls": "variable",
+   "subtype": "binary",
+   "shape": [
+    "index:2",
+    "index:2"
+   ],
+   "role": "primary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:10",
+   "cls": "variable",
+   "subtype": "continuous",
+   "shape": [
+    "index:2"
+   ],
+   "role": "auxiliary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "var:11",
+   "cls": "variable",
+   "subtype": "continuous",
+   "shape": [
+    "index:2"
+   ],
+   "role": "auxiliary",
+   "bounded": [
+    false,
+    false
+   ]
+  },
+  {
+   "id": "con:1",
+   "cls": "constraint",
+   "subtype": "big_m",
+   "comparator": "ge",
+   "rhs_literal": null,
+   "quantifiers": [
+    {
+     "over": "index:2",
+     "restriction": "none"
+    },
+    {
+     "over": "index:2",
+     "restriction": "none"
+    }
+   ]
+  }
+ ],
+ "edges": [
+  {
+   "src": "param:2",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:3",
+   "dst": "index:12",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:2",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:4",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "param:4",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:2",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:2",
+   "dst": "index:4",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:2",
+   "dst": "index:1",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:4",
+   "dst": "index:12",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:4",
+   "dst": "index:13",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:5",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:5",
+   "dst": "index:6",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:6",
+   "dst": "index:3",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:6",
+   "dst": "index:6",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:7",
+   "dst": "index:12",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:8",
+   "dst": "index:12",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:9",
+   "dst": "index:2",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:9",
+   "dst": "index:2",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:10",
+   "dst": "index:2",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "var:11",
+   "dst": "index:2",
+   "type": "uses_index",
+   "role": "shape"
+  },
+  {
+   "src": "con:1",
+   "dst": "param:1",
+   "type": "var_in_constraint",
+   "role": "lhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:1",
+   "dst": "var:9",
+   "type": "var_in_constraint",
+   "role": "lhs",
+   "sign": -1,
+   "coefficient": "param:1"
+  },
+  {
+   "src": "con:1",
+   "dst": "param:1",
+   "type": "uses_parameter",
+   "role": "coef"
+  },
+  {
+   "src": "con:1",
+   "dst": "var:11",
+   "type": "var_in_constraint",
+   "role": "lhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:1",
+   "dst": "var:10",
+   "type": "var_in_constraint",
+   "role": "rhs",
+   "sign": 1,
+   "coefficient": 1.0
+  },
+  {
+   "src": "con:1",
+   "dst": "param:4",
+   "type": "var_in_constraint",
+   "role": "rhs",
+   "sign": 1,
+   "coefficient": 1.0
+  }
+ ],
+ "patterns": {
+  "rows": {
+   "big_m_row": 1
+  },
+  "models": []
+ }
+}

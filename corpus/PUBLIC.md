@@ -31,3 +31,12 @@ key list `corpus/public_keys.txt`.
 | Fuchs et al., [10.1016/j.trc.2022.103805](https://doi.org/10.1016/j.trc.2022.103805) | 2022 | Transportation Research Part C Emerging Technologies | 16 | 9 | canonical |
 | Xiu et al., [10.1016/j.trc.2025.105076](https://doi.org/10.1016/j.trc.2025.105076) | 2025 | Transportation Research Part C Emerging Technologies | 58 | 11 | canonical |
 | Liu et al., [10.1016/j.tre.2023.103339](https://doi.org/10.1016/j.tre.2023.103339) | 2023 | Transportation Research Part E Logistics and Transportation Review | 54 | 7 | several |
+
+## Abstracted graphs for all promoted papers
+
+`corpus/graphs/<paper key>.json` holds, for every promoted paper whatever its license, the
+structure of its canonical model without its words: the schema graph with anonymous node ids
+(`var:3`, `con:12`, `index:2`), node classes and subtypes, shapes, comparators, quantifiers,
+signs and operators, the objective feature, candidate and canonical row counts, the named
+patterns found, and the DOI. No symbol name, description or formula is in these files
+(`scripts/export_abstract_graphs.py`).
