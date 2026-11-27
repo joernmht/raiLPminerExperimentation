@@ -15,11 +15,12 @@ keywords = ["LP", "MILP", "mining", "taxonomy", "railway", "rescheduling", "opti
 # lp2graph is the core method library. It is listed here so an installed
 # environment is complete; during local development it is commonly a sibling
 # checkout used via PYTHONPATH, which railpminer auto-detects.
-# `>=0.4`: the harness imports `solve_lexicographic`, `lp2graph.validation` and
-# `DocContext`, none of which exist in 0.3.0 (every lp2graph import checked
-# against both release tags). Deliberately no ceiling yet: docs/STACK.md.
+# `>=0.5`: the corpus builder imports the structural row reader
+# (`lp2graph.mining.ingest.row_canon`: `scan_symbols`, `outline_row`,
+# `denominator_names`), `bound_letters` and `normalize_latex(redeclare=...)`,
+# all first released in 0.5.0. Deliberately no ceiling yet: docs/STACK.md.
 dependencies = [
-    "lp2graph[mining,solver]>=0.4",
+    "lp2graph[mining,solver]>=0.5",
 ]
 
 [project.optional-dependencies]
