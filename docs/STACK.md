@@ -21,7 +21,7 @@ _Last verified: 2026-09-07 (nightly quality pass — Compatibility)._
 ## Dependencies
 
 ### Core method (required)
-- **`lp2graph[mining,solver]>=0.4`** — the single source of truth for the
+- **`lp2graph[mining,solver]>=0.5`** — the single source of truth for the
   method. Not pip-installed here; the sibling checkout `../lp2graph/src` is
   auto-detected via `railpminer/_lp2graph.py` (override with `LP2GRAPH_SRC`).
   **Always `from . import _lp2graph` before importing `lp2graph.*`.**
@@ -145,7 +145,7 @@ Python's preferred encoding to ASCII — the compatibility gate for ADR-0016.
   templates), *not* the paper-grade dataset. See `README.md` and the home
   `CLAUDE.md` corpus ground-truth note. (`corpus/formulations/` now holds 18
   entries — the 10 seed templates plus 8 hand-canonicalised extractions.)
-- **The `lp2graph` requirement is unbounded** (`lp2graph[mining,solver]>=0.4`)
+- **The `lp2graph` requirement is unbounded** (`lp2graph[mining,solver]>=0.5`)
   and lp2graph is a *source* sibling here, not an installed distribution, so
   the method implementation in play is whatever `../lp2graph/src` currently
   contains. ADR-0017 makes that visible in `run_summary.json.software`; it does
